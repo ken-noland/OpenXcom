@@ -441,14 +441,15 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
   GIT_TAG "master" # Can be a tag (yaml-cpp-x.x.x), a commit hash, or a branch name (master)
 )
-FetchContent_GetProperties(yaml-cpp)
+FetchContent_MakeAvailable(yaml-cpp)
 
+# Define custom target for Yaml
+add_custom_target(build_yaml
+    DEPENDS yaml-cpp::yaml-cpp
+    COMMAND ${CMAKE_COMMAND} --build . --target yaml-cpp
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
 
-if(NOT yaml-cpp_POPULATED)
-  message(STATUS "Fetching yaml-cpp...")
-  FetchContent_Populate(yaml-cpp)
-  add_subdirectory(${yaml-cpp_SOURCE_DIR} ${yaml-cpp_BINARY_DIR})
-endif()
 
 # Fetch Lua
 #  Lua is used as a scripting language to showcase the script binding capabilities of SimpleRTTR
@@ -496,6 +497,13 @@ add_library(lua STATIC  ${lua_SOURCE_DIR}/lapi.c
                         ${lua_SOURCE_DIR}/lzio.c)
 
 target_include_directories(lua PUBLIC ${lua_SOURCE_DIR}/src)
+
+# Define custom target for Lua
+add_custom_target(build_lua
+    DEPENDS lua
+    COMMAND ${CMAKE_COMMAND} --build . --target lua
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
 
 
 set ( data_install_dir bin )
@@ -719,6 +727,7 @@ if ( MSVC OR "${CMAKE_GENERATOR}" STREQUAL "Xcode" )
   source_group ( "Mod" FILES ${mod_src} )
   source_group ( "Savegame" FILES ${savegame_src} )
   source_group ( "Ufopedia" FILES ${ufopedia_src} )
+  source_group ( "Lua" FILES ${lua_src} )
   if ( APPLE )
     source_group ( "SDL" FILES ${sdl_src} )
   endif ()

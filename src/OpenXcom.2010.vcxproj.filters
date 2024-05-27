@@ -1143,6 +1143,7 @@
     <ClCompile Include="Interface\ProgressBar.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
+    <ClCompile Include="Lua\LuaState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -2348,6 +2349,7 @@
     <ClInclude Include="Interface\ProgressBar.h">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="Lua\LuaState.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Geoscape">
@@ -2389,6 +2391,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\res\windows\openxcom.ico" />
+    <None Include="configure_cmake.bat" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="yaml-cpp.natvis" />
