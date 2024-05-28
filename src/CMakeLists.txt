@@ -490,7 +490,6 @@ add_library(lua STATIC  ${lua_SOURCE_DIR}/lapi.c
                         ${lua_SOURCE_DIR}/ltablib.c
                         ${lua_SOURCE_DIR}/ltests.c
                         ${lua_SOURCE_DIR}/ltm.c
-                        ${lua_SOURCE_DIR}/lua.c
                         ${lua_SOURCE_DIR}/lundump.c
                         ${lua_SOURCE_DIR}/lutf8lib.c
                         ${lua_SOURCE_DIR}/lvm.c
