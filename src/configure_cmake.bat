@@ -17,6 +17,20 @@ if "%2"=="" (
     set PLATFORM=%2
 )
 
+set VS_PATH="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
+if exist %VS_PATH% (
+    if %PLATFORM%==x64 (
+		call %VS_PATH% x64
+	) else if %PLATFORM%==x86 (
+		call %VS_PATH% x86_amd64
+	) else (
+        call %VS_PATH% %PLATFORM%
+    )
+) else (
+    echo Visual Studio environment setup script not found!
+    exit /b 1
+)
+
 echo Configuring CMake for %BUILD_TYPE% and %PLATFORM%...
 mkdir build\%PLATFORM%
 cd build\%PLATFORM%
