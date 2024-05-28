@@ -34,10 +34,10 @@ if exist %VS_PATH% (
 echo Configuring CMake for %BUILD_TYPE% and %PLATFORM%...
 mkdir build\%PLATFORM%
 cd build\%PLATFORM%
-cmake -G "Visual Studio 17 2022" -A %PLATFORM% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ../..
+cmake -G "Visual Studio 17 2022" -A %PLATFORM% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ../../..
 if %errorlevel% neq 0 (
     echo CMake configuration failed!
-    cd ../..
+    cd ../../..
     exit /b 1
 )
 
@@ -46,7 +46,7 @@ echo Building Lua...
 cmake --build . --target build_lua --config %BUILD_TYPE%
 if %errorlevel% neq 0 (
     echo Building Lua target failed!
-    cd ../..
+    cd ../../..
     exit /b 1
 )
 
@@ -54,8 +54,8 @@ echo Building Yaml...
 cmake --build . --target build_yaml --config %BUILD_TYPE%
 if %errorlevel% neq 0 (
     echo Building YAML target failed!
-    cd ../..
+    cd ../../..
     exit /b 1
 )
 
-cd ../..
+cd ../../..
