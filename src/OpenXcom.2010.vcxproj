@@ -141,7 +141,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>yaml-cppd.lib;lua.lib;SDL_image.lib;SDL_mixer.lib;SDL_gfx.lib;SDLmain.lib;SDL.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)build\Win32\_deps\yaml-cpp-build\Debug;$(ProjectDir)build\Win32\Debug;$(ProjectDir)..\deps\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)build\Win32\_deps\yaml-cpp-build\Debug;$(ProjectDir)build\Win32\Debug;$(ProjectDir)build\Win32\src\Debug;$(ProjectDir)..\deps\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -181,7 +181,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>yaml-cppd.lib;lua.lib;SDL_image.lib;SDL_mixer.lib;SDL_gfx.lib;SDLmain.lib;SDL.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)build\x64\_deps\yaml-cpp-build\Debug;$(ProjectDir)build\x64\Debug;$(ProjectDir)..\deps\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)build\x64\_deps\yaml-cpp-build\Debug;$(ProjectDir)build\x64\Debug;$(ProjectDir)build\x64\src\Debug;$(ProjectDir)..\deps\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -218,7 +218,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>yaml-cpp.lib;lua.lib;SDL_image.lib;SDL_mixer.lib;SDL_gfx.lib;SDLmain.lib;SDL.lib;SDL_gfx.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)build\Win32\_deps\yaml-cpp-build\Release;$(ProjectDir)build\Win32\Release;$(ProjectDir)..\deps\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)build\Win32\_deps\yaml-cpp-build\Release;$(ProjectDir)build\Win32\Release;$(ProjectDir)build\Win32\src\Release;$(ProjectDir)..\deps\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -295,7 +295,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>yaml-cpp.lib;lua.lib;SDL_image.lib;SDL_mixer.lib;SDL_gfx.lib;SDLmain.lib;SDL.lib;SDL_gfx.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)build\x64\_deps\yaml-cpp-build\Release;$(ProjectDir)build\x64\Release;$(ProjectDir)..\deps\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)build\x64\_deps\yaml-cpp-build\Release;$(ProjectDir)build\x64\Release;$(ProjectDir)build\x64\src\Release;$(ProjectDir)..\deps\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
