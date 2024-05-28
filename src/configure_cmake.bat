@@ -34,7 +34,7 @@ if exist %VS_PATH% (
 echo Configuring CMake for %BUILD_TYPE% and %PLATFORM%...
 mkdir build\%PLATFORM%
 cd build\%PLATFORM%
-cmake -G "Visual Studio 17 2022" -A %PLATFORM% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ../..
+cmake -G "Visual Studio 17 2022" -A %PLATFORM% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ../../..
 if %errorlevel% neq 0 (
     echo CMake configuration failed!
     cd ../..
