@@ -213,7 +213,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/utf-8</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj</AdditionalOptions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -290,7 +290,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/utf-8</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj</AdditionalOptions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
