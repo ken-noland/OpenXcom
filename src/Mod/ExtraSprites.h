@@ -26,7 +26,7 @@ namespace OpenXcom
 
 class Surface;
 class SurfaceSet;
-struct ModData;
+class ModInfo;
 
 /**
  * For adding a set of extra sprite data to the game.
@@ -36,7 +36,7 @@ class ExtraSprites
 private:
 	std::string _type;
 	std::map<int, std::string> _sprites;
-	const ModData* _current;
+	const ModInfo* _current;
 	int _width, _height;
 	bool _singleImage;
 	int _subX, _subY;
@@ -49,7 +49,7 @@ public:
 	/// Cleans up the external sprite set.
 	virtual ~ExtraSprites();
 	/// Loads the data from YAML.
-	void load(const YAML::Node &node, const ModData* current);
+	void load(const YAML::Node& node, const ModInfo* current);
 	/// Gets the sprite's type.
 	const std::string& getType() const;
 	/// Gets the list of sprites defined by this mod.
@@ -73,7 +73,7 @@ public:
 	/// Load the external sprite into a surface set.
 	SurfaceSet *loadSurfaceSet(SurfaceSet *set);
 	/// Gets mod data that define this surface.
-	const ModData* getModOwner() { return _current; }
+	const ModInfo* getModOwner() { return _current; }
 };
 
 }

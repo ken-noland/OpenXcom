@@ -259,7 +259,7 @@ void ManufactureInfoState::initProfitInfo ()
 		{
 			int64_t adjustedSellValue = pair.first->getSellCostAdjusted(_base, _game->getSavedGame());
 			adjustedSellValue *= pair.second;
-			_producedItemsValue += adjustedSellValue;
+			_producedItemsValue += static_cast<int>(adjustedSellValue);
 		}
 	}
 }
@@ -287,7 +287,7 @@ int ManufactureInfoState::getMonthlyNetFunds () const
 	}
 	float itemsPerMonth = (float)manHoursPerMonth / (float)item->getManufactureTime();
 
-	return (saleValue - item->getManufactureCost()) * itemsPerMonth;
+	return static_cast<int>((saleValue - item->getManufactureCost()) * itemsPerMonth);
 }
 
 /**

@@ -31,7 +31,12 @@ extern "C"
 namespace OpenXcom
 {
 
-struct ModData;
+// Forward declarations
+class Game;
+class ModInfo;
+
+namespace Lua
+{
 
 /**
  * LuaState is the base state used to run the LUA scripts. It instantiates a lua_State object and provides it with the in-game API.
@@ -40,10 +45,11 @@ class LuaState
 {
 private:
 	lua_State *_state; // The lua_State object
+
 	bool _error; // Error flag
 	std::string _errorString; // Error message
 
-	ModData* _modData; // The mod data
+	const ModInfo* _modData; // The mod data
 
 	std::filesystem::path _scriptPath; // The path to the script file
 
@@ -55,11 +61,12 @@ private:
 	bool loadScript(const std::filesystem::path& filename);
 
   public:
-	LuaState(const std::filesystem::path& scriptPath, const ModData* modData); // Constructor
+	LuaState(const std::filesystem::path& scriptPath, const ModInfo* modData); // Constructor
 	~LuaState(); // Destructor
 
 	const std::filesystem::path &getScriptPath() const; // Returns the path to the script file
-	const ModData* getModData() const; // Returns the mod data
+	const ModInfo* getModData() const;                  // Returns the mod data
 };
 
-}
+} // namespace Lua
+} // namespace OpenXcom

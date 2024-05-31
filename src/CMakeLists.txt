@@ -300,6 +300,7 @@ set ( mod_src
   Mod/MapScript.cpp
   Mod/MCDPatch.cpp
   Mod/Mod.cpp
+  Mod/ModFile.cpp
   Mod/Polygon.cpp
   Mod/Polyline.cpp
   Mod/RuleAlienMission.cpp
@@ -410,6 +411,11 @@ set ( ufopedia_src
 )
 
 set ( lua_src
+  Lua/BasescapeScript.cpp
+  Lua/BattlescapeScript.cpp
+  Lua/GameScript.cpp
+  Lua/GeoscapeScript.cpp
+  Lua/LuaMod.cpp
   Lua/LuaState.cpp
 )
 

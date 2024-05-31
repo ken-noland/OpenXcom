@@ -265,13 +265,13 @@ constexpr bool ArgIsPtrE(ArgEnum arg)
 constexpr int ArgCompatible(ArgEnum argType, ArgEnum varType, size_t overloadSize)
 {
 	return
-		argType == ArgInvalid ? 0 :
+		argType == static_cast<int>(ArgInvalid ? 0 :
 		ArgIsVar(argType) && argType != varType ? 0 :
 		ArgBase(argType) != ArgBase(varType) ? 0 :
 		ArgIsReg(argType) != ArgIsReg(varType) ? 0 :
 		ArgIsPtr(argType) != ArgIsPtr(varType) ? 0 :
 		ArgIsPtrE(argType) && !ArgIsPtrE(varType) ? 0 :
-			255 - (ArgIsPtrE(argType) != ArgIsPtrE(varType) ? 128 : 0) - (ArgIsVar(argType) != ArgIsVar(varType) ? 64 : 0) - (overloadSize > 8 ? 8 : overloadSize);
+			255 - (ArgIsPtrE(argType) != ArgIsPtrE(varType) ? 128 : 0) - (ArgIsVar(argType) != ArgIsVar(varType) ? 64 : 0) - (overloadSize > 8 ? 8 : overloadSize));
 }
 
 /**

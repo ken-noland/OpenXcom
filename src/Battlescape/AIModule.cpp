@@ -6401,22 +6401,22 @@ float AIModule::getCoverValue(Tile* tile, BattleUnit* bu, int coverQuality)
 					float dist = Position::distance(tile->getPosition(), pos);
 					if (direction == enemyDir)
 					{
-						enemiesInThisDirection += 1.0 / dist;
-						trueDirection += 1.0 / dist;
+						enemiesInThisDirection += 1.0f / dist;
+						trueDirection += 1.0f / dist;
 					}
 					if (direction == enemyDir - 1 || (direction == 0 && enemyDir == 7))
-						enemiesInThisDirection += 0.5 / dist;
+						enemiesInThisDirection += 0.5f / dist;
 					if (direction == enemyDir + 1 || (direction == 7 && enemyDir == 0))
-						enemiesInThisDirection += 0.5 / dist;
-					totalEnemies += 2.0 / dist;
+						enemiesInThisDirection += 0.5f / dist;
+					totalEnemies += 2.0f / dist;
 				}
 			}
 			float dirCoverMod = enemiesInThisDirection / totalEnemies;
 			std::vector<Position> traj;
 			float coverFromDir = 0;
-			coverFromDir += _save->getTileEngine()->horizontalBlockage(tileInDirection, tileFrom, DT_NONE) / 255.0;
+			coverFromDir += _save->getTileEngine()->horizontalBlockage(tileInDirection, tileFrom, DT_NONE) / 255.0f;
 			if (coverFromDir >= 1 || coverQuality > 3)
-				coverFromDir += _save->getTileEngine()->horizontalBlockage(tileInDirection, tileFrom, DT_HE) / 255.0;
+				coverFromDir += _save->getTileEngine()->horizontalBlockage(tileInDirection, tileFrom, DT_HE) / 255.0f;
 			if (coverFromDir > 0)
 				cover += coverFromDir * dirCoverMod;
 			else if (coverQuality == 1 && enemiesInThisDirection > 0)

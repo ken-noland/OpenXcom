@@ -200,13 +200,13 @@ bool Mod::EXTENDED_EXPERIENCE_AWARD_SYSTEM;
 
 constexpr size_t MaxDifficultyLevels = 5;
 
-
 /// Special value for default string different to empty one.
-const std::string Mod::STR_NULL = { '\0' };
+const std::string Mod::STR_NULL = {'\0'};
 /// Predefined name for first loaded mod that have all original data
 const std::string ModNameMaster = "master";
 /// Predefined name for current mod that is loading rulesets.
 const std::string ModNameCurrent = "current";
+
 
 /// Reduction of size allocated for transparency LUTs.
 const size_t ModTransparencySizeReduction = 100;
@@ -324,13 +324,13 @@ class ModScriptGlobal : public ScriptGlobal
 		if (node)
 		{
 			auto name = node.as<std::string>();
-			if (name == ModNameMaster)
+			if (name == "master")
 			{
 				value = 0;
 			}
-			else if (name == ModNameCurrent)
+			else if (name == "current")
 			{
-				value = _modCurr;
+				value = (int)_modCurr;
 			}
 			else
 			{
@@ -406,7 +406,8 @@ public:
 /**
  * Creates an empty mod.
  */
-Mod::Mod() :
+Mod::Mod(const ModFile& modFiles) :
+	_modFiles(modFiles),
 	_inventoryOverlapsPaperdoll(false),
 	_maxViewDistance(20), _maxDarknessToSeeUnits(9), _maxStaticLightDistance(16), _maxDynamicLightDistance(24), _enhancedLighting(0),
 	_costHireEngineer(0), _costHireScientist(0),
@@ -937,7 +938,7 @@ Music *Mod::getRandomMusic(const std::string &name) const
 		}
 		else
 		{
-			return music[RNG::seedless(0, music.size() - 1)];
+			return music[RNG::seedless(0, static_cast<int>(music.size() - 1))];
 		}
 	}
 }
@@ -1219,7 +1220,7 @@ void Mod::verifySoundOffset(const std::string &parent, const std::vector<int>& s
  */
 int Mod::getModOffset() const
 {
-	return _modCurrent->offset;
+	return _modCurrent->getOffset();
 }
 
 
@@ -1615,7 +1616,7 @@ void loadRuleInfoHelper(const YAML::Node &node, const char* nodeName, const char
 void Mod::loadOffsetNode(const std::string &parent, int& offset, const YAML::Node &node, int shared, const std::string &set, size_t multiplier, size_t sizeScale) const
 {
 	assert(_modCurrent);
-	const ModData* curr = _modCurrent;
+	const ModInfo* curr = _modCurrent;
 	if (node.IsScalar())
 	{
 		offset = node.as<int>();
@@ -1626,7 +1627,7 @@ void Mod::loadOffsetNode(const std::string &parent, int& offset, const YAML::Nod
 		std::string mod = node["mod"].as<std::string>();
 		if (mod == ModNameMaster)
 		{
-			curr = &_modData.at(0);
+			curr = _modFiles.getModData().at(0);
 		}
 		else if (mod == ModNameCurrent)
 		{
@@ -1634,13 +1635,13 @@ void Mod::loadOffsetNode(const std::string &parent, int& offset, const YAML::Nod
 		}
 		else
 		{
-			const ModData* n = 0;
-			for (size_t i = 0; i < _modData.size(); ++i)
+			const ModInfo* n = 0;
+			for (size_t i = 0; i < _modFiles.getModData().size(); ++i)
 			{
-				const ModData& d = _modData[i];
-				if (d.name == mod)
+				const ModInfo* d = _modFiles.getModData()[i];
+				if (d->getName() == mod)
 				{
-					n = &d;
+					n = d;
 					break;
 				}
 			}
@@ -1678,15 +1679,15 @@ void Mod::loadOffsetNode(const std::string &parent, int& offset, const YAML::Nod
 	else
 	{
 		int f = offset;
-		f *= multiplier;
-		if ((size_t)f > curr->size / sizeScale)
+		f *= (int)multiplier;
+		if ((size_t)f > curr->getSize() / sizeScale)
 		{
 			std::ostringstream err;
-			err << "offset '" << offset << "' exceeds mod size limit " << (curr->size / multiplier / sizeScale) << " in set '" << set << "'";
+			err << "offset '" << offset << "' exceeds mod size limit " << (curr->getSize() / multiplier / sizeScale) << " in set '" << set << "'";
 			throw LoadRuleException(parent, node, err.str());
 		}
 		if (f >= shared)
-			f += curr->offset / sizeScale;
+			f += (int)(curr->getOffset() / sizeScale);
 		offset = f;
 	}
 }
@@ -1814,7 +1815,7 @@ int Mod::getOffset(int id, int max) const
 {
 	assert(_modCurrent);
 	if (id > max)
-		return id + _modCurrent->offset;
+		return id + (int)_modCurrent->getOffset();
 	else
 		return id;
 }
@@ -1856,9 +1857,9 @@ void Mod::loadBaseFunction(const std::string& parent, RuleBaseFacilityFunctions&
 			}
 		}
 		catch(LoadRuleException& ex)
-		{
+		{	
 			//context is already included in exception, no need add more
-			throw;
+			(void)ex; throw;
 		}
 		catch(Exception& ex)
 		{
@@ -2116,9 +2117,7 @@ static void throwModOnErrorHelper(const std::string& modId, const std::string& e
 void Mod::loadAll()
 {
 	ModScript parser{ _scriptGlobal, this };
-	const FileMap::RSOrder& mods = FileMap::getRulesets();
 
-	Log(LOG_INFO) << "Loading begins...";
 	if (Options::oxceModValidationLevel < LOG_ERROR)
 	{
 		Log(LOG_ERROR) << "Validation of mod data disabled, game can crash when run";
@@ -2128,42 +2127,18 @@ void Mod::loadAll()
 		Log(LOG_WARNING) << "Validation of mod data reduced, game can behave incorrectly";
 	}
 	_scriptGlobal->beginLoad();
-	_modData.clear();
-	_modData.resize(mods.size());
-
-	std::set<std::string> usedModNames;
-	usedModNames.insert(ModNameMaster);
-	usedModNames.insert(ModNameCurrent);
-
-
-	// calculated offsets and other things for all mods
-	size_t offset = 0;
-	for (size_t i = 0; mods.size() > i; ++i)
-	{
-		const std::string& modId = mods[i].name;
-		if (usedModNames.insert(modId).second == false)
-		{
-			throwModOnErrorHelper(modId, "this mod name is already used");
-		}
-		_scriptGlobal->addMod(mods[i].name, 1000 * (int)offset);
-		const ModInfo *modInfo = &Options::getModInfos().at(modId);
-		size_t size = modInfo->getReservedSpace();
-		_modData[i].name = modId;
-		_modData[i].offset = 1000 * offset;			//KN NOTE: WTF?
-		_modData[i].info = modInfo;
-		_modData[i].size = 1000 * size;
-		offset += size;
-	}
 
 	Log(LOG_INFO) << "Pre-loading rulesets...";
 	// load rulesets that can affect loading vanilla resources
-	for (size_t i = 0; _modData.size() > i; ++i)
+	for (const ModInfo* modInfo : _modFiles.getModData())
 	{
-		_modCurrent = &_modData.at(i);
-		const ModInfo *info = _modCurrent->info;
-		if (!info->getResourceConfigFile().empty())
+		_modCurrent = modInfo;
+
+		_scriptGlobal->addMod(modInfo->getName(), modInfo->getOffset());
+
+		if (!_modCurrent->getResourceConfigFile().empty())
 		{
-			auto file = FileMap::getModRuleFile(_modCurrent->info, _modCurrent->info->getResourceConfigFile());
+			auto file = FileMap::getModRuleFile(_modCurrent, _modCurrent->getResourceConfigFile());
 			if (file)
 			{
 				loadResourceConfigFile(*file);
@@ -2173,7 +2148,7 @@ void Mod::loadAll()
 
 	Log(LOG_INFO) << "Loading vanilla resources...";
 	// vanilla resources load
-	_modCurrent = &_modData.at(0);
+	_modCurrent = _modFiles.getModData()[0];
 	loadVanillaResources();
 	_surfaceOffsetBasebits = _sets["BASEBITS.PCK"]->getMaxSharedFrames();
 	_surfaceOffsetBigobs = _sets["BIGOBS.PCK"]->getMaxSharedFrames();
@@ -2187,38 +2162,24 @@ void Mod::loadAll()
 
 	Log(LOG_INFO) << "Loading rulesets...";
 	// load rest rulesets
-	for (size_t i = 0; mods.size() > i; ++i)
+	for (const ModInfo* modInfo : _modFiles.getModData())
 	{
 		try
 		{
-			_modCurrent = &_modData.at(i);
-			_scriptGlobal->setMod((int)_modCurrent->offset);
-			loadMod(mods[i].files, parser);
+			_modCurrent = modInfo;
+			_scriptGlobal->setMod((int)_modCurrent->getOffset());
+			loadMod(modInfo->getRulesetFiles(), parser);
 		}
 		catch (Exception &e)
 		{
-			const std::string &modId = mods[i].name;
+			const std::string& modId = modInfo->getName();
 			throwModOnErrorHelper(modId, e.what());
 		}
 	}
 
 	// back master
-	_modCurrent = &_modData.at(0);
+	_modCurrent = _modFiles.getModData()[0];
 	Log(LOG_INFO) << "Loading rulesets done.";
-
-	Log(LOG_INFO) << "Loading Lua...";
-	for (const ModData& modData : _modData)
-	{
-		//okay, so this gets a bit tricky. The whole "mod" part was originally developed just to allow cascading rulesets, so
-		// there is no central "mod" object that I can utilize for the LuaState object. What this means is that I have to
-		// manage the life-cycle of the Lua stuff separately from everything else.
-		if (modData.info->hasLua())
-		{
-			std::filesystem::path luaPath = modData.info->getPath() / modData.info->getLuaScript();
-			_luaMods.push_back(LuaState(luaPath, &modData));
-		}
-	}
-	Log(LOG_INFO) << "Loading Lua done.";
 
 	_scriptGlobal->endLoad();
 
@@ -2328,7 +2289,7 @@ void Mod::loadAll()
 				checkForSoftError(true, "mod", "Both '" + _finalResearch->getName() + "' and '" + r.second->getName() + "' research are marked as 'unlockFinalMission: true'", LOG_INFO);
 
 				// to make old mods semi-compatible with new code we decide that last updated rule will be consider final research. This could make false-positive as last update could not touch this flag.
-				if (getModLastUpdatingRule(r.second)->offset < getModLastUpdatingRule(_finalResearch)->offset)
+				if (getModLastUpdatingRule(r.second)->getOffset() < getModLastUpdatingRule(_finalResearch)->getOffset())
 				{
 					continue;
 				}
@@ -2397,6 +2358,7 @@ void Mod::loadAll()
 		Options::save();
 	}
 
+	//KN NOTE: Why is this here?
 	// fixed user options
 	if (!_fixedUserOptions.empty())
 	{
@@ -2427,7 +2389,6 @@ void Mod::loadAll()
 		}
 	}
 
-	Log(LOG_INFO) << "Loading ended.";
 
 	sortLists();
 	modResources();
@@ -2536,8 +2497,8 @@ void Mod::loadResourceConfigFile(const FileMap::FileRecord &filerec)
 
 	if (const YAML::Node& luts = doc["transparencyLUTs"])
 	{
-		const size_t start = _modCurrent->offset / ModTransparencySizeReduction;
-		const size_t limit =  _modCurrent->size / ModTransparencySizeReduction;
+		const size_t start = _modCurrent->getOffset() / ModTransparencySizeReduction;
+		const size_t limit = _modCurrent->getSize() / ModTransparencySizeReduction;
 		size_t curr = 0;
 
 		_transparencies.resize(start + limit);
@@ -2690,7 +2651,7 @@ void Mod::loadConstants(const YAML::Node &node)
  */
 void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 {
-	auto doc = filerec.getYAML();
+	YAML::Node doc = filerec.getYAML();
 
 	auto loadDocInfoHelper = [&](const char* nodeName)
 	{
@@ -2707,10 +2668,10 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	{
 		if (const YAML::Node& t = extended["tagsFile"])
 		{
-			auto filePath = t.as<std::string>();
-			auto file = FileMap::getModRuleFile(_modCurrent->info, filePath);
+			std::filesystem::path filePath = t.as<std::string>();
+			const FileMap::FileRecord* file = FileMap::getModRuleFile(_modCurrent, filePath);
 
-			if (false == checkForSoftError(file == nullptr, "extended", t, "Unknown file name for 'tagsFile': '" + filePath + "'", LOG_ERROR))
+			if (false == checkForSoftError(file == nullptr, "extended", t, "Unknown file name for 'tagsFile': '" + filePath.string() + "'", LOG_ERROR))
 			{
 				//copy only tags and load them in current file.
 				YAML::Node tempTags = file->getYAML()["extended"]["tags"];
@@ -3379,10 +3340,10 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 				type = (*i)["typeSingle"].as<std::string>();
 			}
 			ExtraSprites *extraSprites = new ExtraSprites();
-			const ModData* data = _modCurrent;
+			const ModInfo* data = _modCurrent;
 			// doesn't support modIndex
 			if (type == "TEXTURE.DAT")
-				data = &_modData.at(0);
+				data = _modFiles.getModData()[0];
 			extraSprites->load(*i, data);
 			_extraSprites[type].push_back(extraSprites);
 		}
@@ -3609,11 +3570,11 @@ T *Mod::loadRule(const YAML::Node &node, std::map<std::string, T*> *map, std::ve
 		}
 		return name;
 	};
-	auto addTracking = [&](std::unordered_map<const void*, const ModData*>& track, const auto* t)
+	auto addTracking = [&](std::unordered_map<const void*, const ModInfo*>& track, const auto* t)
 	{
 		track[static_cast<const void*>(t)] = _modCurrent;
 	};
-	auto removeTracking = [&]( std::unordered_map<const void*, const ModData*>& track, const auto* t)
+	auto removeTracking = [&](std::unordered_map<const void*, const ModInfo*>& track, const auto* t)
 	{
 		track.erase(static_cast<const void*>(t));
 	};

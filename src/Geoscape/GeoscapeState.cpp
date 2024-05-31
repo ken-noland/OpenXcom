@@ -912,6 +912,12 @@ const std::vector<Craft*>* GeoscapeState::updateActiveCrafts()
  */
 void GeoscapeState::time5Seconds()
 {
+	// broadcast game.battlescape.PauseState to any listeners
+	//if (!_game->getGameScript()->getGeoscapeScript().Broadcast("PauseState"))
+	//{
+	//	return;
+	//}
+
 	// If in "slow mode", handle UFO hunting and escorting logic every 5 seconds, not only every 10 minutes
 	if ((_timeSpeed == _btn5Secs || _timeSpeed == _btn1Min) && _game->getMod()->getHunterKillerFastRetarget())
 	{

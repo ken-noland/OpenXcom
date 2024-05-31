@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 
 class SoundSet;
-struct ModData;
+class ModInfo;
 
 /**
  * For adding a set of extra sound data to the game.
@@ -35,7 +35,7 @@ class ExtraSounds
 private:
 	std::string _type;
 	std::map<int, std::string> _sounds;
-	const ModData* _current;
+	const ModInfo* _current;
 
 	void loadSound(SoundSet *set, int index, const std::string &fileName) const;
 public:
@@ -44,7 +44,7 @@ public:
 	/// Cleans up the external sound set.
 	virtual ~ExtraSounds();
 	/// Loads the data from yaml
-	void load(const YAML::Node &node, const ModData* current);
+	void load(const YAML::Node& node, const ModInfo* current);
 	/// Gets the sound's type.
 	const std::string& getType() const;
 	/// Gets the list of sounds defined by this mod
@@ -52,7 +52,7 @@ public:
 	/// Load the external sound into a set.
 	SoundSet *loadSoundSet(SoundSet *set) const;
 	/// Gets mod data that define this sounds.
-	const ModData* getModOwner() { return _current; }
+	const ModInfo* getModOwner() { return _current; }
 };
 
 }

@@ -25,7 +25,9 @@
 #include "../Engine/Logger.h"
 #include "../Engine/Exception.h"
 #include "../Engine/Unicode.h"
+#include "../Engine/ModInfo.h"
 #include "Mod.h"
+
 
 namespace OpenXcom
 {
@@ -49,7 +51,7 @@ ExtraSprites::~ExtraSprites()
  * @param node YAML node.
  * @param modIndex the internal index of the associated mod.
  */
-void ExtraSprites::load(const YAML::Node &node, const ModData* current)
+void ExtraSprites::load(const YAML::Node &node, const ModInfo* current)
 {
 	_type = node["type"].as<std::string>(_type);
 
@@ -287,18 +289,18 @@ Surface *ExtraSprites::getFrame(SurfaceSet *set, int index) const
 	int indexWithOffset = index;
 	if (indexWithOffset >= set->getMaxSharedFrames())
 	{
-		if ((size_t)indexWithOffset >= _current->size)
+		if ((size_t)indexWithOffset >= _current->getSize())
 		{
 			std::ostringstream err;
-			err << "ExtraSprites '" << _type << "' frame '" << indexWithOffset << "' exceeds mod '"<< _current->name <<"' size limit " << _current->size;
+			err << "ExtraSprites '" << _type << "' frame '" << indexWithOffset << "' exceeds mod '"<< _current->getName() <<"' size limit " << _current->getSize();
 			throw Exception(err.str());
 		}
-		indexWithOffset += _current->offset;
+		indexWithOffset += _current->getOffset();
 	}
 	else if (indexWithOffset < 0)
 	{
 		std::ostringstream err;
-		err << "ExtraSprites '" << _type << "' frame '" << indexWithOffset << "' in mod '" << _current->name << "' is not allowed.";
+		err << "ExtraSprites '" << _type << "' frame '" << indexWithOffset << "' in mod '" << _current->getName() << "' is not allowed.";
 		throw Exception(err.str());
 	}
 

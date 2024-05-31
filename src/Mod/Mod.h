@@ -34,8 +34,7 @@
 #include "RuleAlienMission.h"
 #include "RuleBaseFacilityFunctions.h"
 #include "RuleItem.h"
-
-#include "../Lua/LuaState.h"
+#include "ModFile.h"
 
 namespace OpenXcom
 {
@@ -109,20 +108,11 @@ struct StatAdjustment;
 
 enum GameDifficulty : int;
 
-/**
- * Mod data used when loading resources
- */
-struct ModData
+
+namespace Lua
 {
-	/// Mod name
-	std::string name;
-	/// Optional info about mod
-	const ModInfo* info;
-	/// Offset that mod use is common sets
-	size_t offset;
-	/// Maximum size allowed by mod in common sets
-	size_t size;
-};
+	class GameScript;
+}
 
 /**
  * Helper exception representing the final message with all the required context for the end user to fix the errors in rulesets
@@ -153,8 +143,8 @@ public:
 	constexpr static int TransparenciesOpacityLevels = 4;
 
 private:
-	using LuaMods = std::vector<LuaState>;
-	LuaMods _luaMods;
+	/// contains all the mod files
+	const ModFile& _modFiles;
 
 	Music *_muteMusic;
 	Sound *_muteSound;
@@ -309,8 +299,8 @@ private:
 	std::vector<std::array<SDL_Color, TransparenciesOpacityLevels>> _transparencies;
 	int _facilityListOrder, _craftListOrder, _itemCategoryListOrder, _itemListOrder, _researchListOrder,  _manufactureListOrder;
 	int _soldierBonusListOrder, _transformationListOrder, _ufopaediaListOrder, _invListOrder, _soldierListOrder;
-	std::vector<ModData> _modData;
-	ModData* _modCurrent;
+	
+	const ModInfo* _modCurrent;
 	const SDL_Color *_statePalette;
 
 	std::vector<std::string> _psiRequirements; // it's a cache for psiStrengthEval
@@ -318,9 +308,9 @@ private:
 	std::vector<const RuleItem*> _armorStorageItemsCache;
 	std::vector<const RuleItem*> _craftWeaponStorageItemsCache;
 	/// Track of what mod create rule object.
-	std::unordered_map<const void*, const ModData*> _ruleCreationTracking;
+	std::unordered_map<const void*, const ModInfo*> _ruleCreationTracking;
 	/// Track of what mod last update rule object.
-	std::unordered_map<const void*, const ModData*> _ruleLastUpdateTracking;
+	std::unordered_map<const void*, const ModInfo*> _ruleLastUpdateTracking;
 
 	size_t _surfaceOffsetBigobs = 0;
 	size_t _surfaceOffsetFloorob = 0;
@@ -453,7 +443,7 @@ public:
 	static void ScriptRegister(ScriptParserBase* parser);
 
 	/// Creates a blank mod.
-	Mod();
+	Mod(const ModFile& modFiles);
 	/// Cleans up the mod.
 	~Mod();
 
@@ -991,10 +981,10 @@ public:
 
 	/// Return mod what created given rule object.
 	template<typename T>
-	const ModData* getModCreatingRule(const T* t) const { return _ruleCreationTracking.at(static_cast<const void*>(t)); }
+	const ModInfo* getModCreatingRule(const T* t) const { return _ruleCreationTracking.at(static_cast<const void*>(t)); }	//KN Note: this looks dirt!
 	/// Return mod what last updated given rule object.
 	template<typename T>
-	const ModData* getModLastUpdatingRule(const T* t) const { return _ruleLastUpdateTracking.at(static_cast<const void*>(t)); }
+	const ModInfo* getModLastUpdatingRule(const T* t) const { return _ruleLastUpdateTracking.at(static_cast<const void*>(t)); }
 
 	/// Gets the ruleset for a specific research project.
 	RuleResearch *getResearch(const std::string &id, bool error = false) const;

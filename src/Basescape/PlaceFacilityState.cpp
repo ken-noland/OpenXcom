@@ -60,8 +60,8 @@ PlaceFacilityState::PlaceFacilityState(Base *base, const RuleBaseFacility *rule,
 	_numCost = new Text(110, 17, 202, 70);
 	_numResources = new Text(110, 25, 202, 87);
 	const size_t resourceTextOffset = 9*std::min((size_t)3, (_origFac == nullptr ? _rule->getBuildCostItems().size() : 0));
-	_txtTime = new Text(110, 9, 202, 90+resourceTextOffset);
-	_numTime = new Text(110, 17, 202, 98+resourceTextOffset);
+	_txtTime = new Text(110, 9, 202, static_cast<int>(90 + resourceTextOffset));
+	_numTime = new Text(110, 17, 202, static_cast<int>(98 + resourceTextOffset));
 	_txtMaintenance = new Text(110, 9, 202, 118+resourceTextOffset);
 	_numMaintenance = new Text(110, 17, 202, 126+resourceTextOffset);
 

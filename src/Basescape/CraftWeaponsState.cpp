@@ -95,7 +95,7 @@ CraftWeaponsState::CraftWeaponsState(Base *base, size_t craft, size_t weapon) : 
 	_txtAmmunition->setWordWrap(true);
 	_txtAmmunition->setVerticalAlign(ALIGN_BOTTOM);
 
-	const std::string slotName = _craft->getRules()->getWeaponSlotString(weapon);
+	const std::string slotName = _craft->getRules()->getWeaponSlotString((int)weapon);
 	CraftWeapon *current = _craft->getWeapons()->at(_weapon);
 	if (current != 0)
 	{
@@ -123,7 +123,7 @@ CraftWeaponsState::CraftWeaponsState(Base *base, size_t craft, size_t weapon) : 
 		{
 			isResearched = _game->getSavedGame()->isResearched(w->getClipItem()->getRequirements());
 		}
-		if (isResearched && _base->getStorageItems()->getItem(w->getLauncherItem()) > 0 && c->isValidWeaponSlot(weapon, w->getWeaponType()))
+		if (isResearched && _base->getStorageItems()->getItem(w->getLauncherItem()) > 0 && c->isValidWeaponSlot((int)weapon, w->getWeaponType()))
 		{
 			_weapons.push_back(w);
 			std::ostringstream ss, ss2;

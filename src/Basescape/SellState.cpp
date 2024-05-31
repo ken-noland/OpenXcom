@@ -189,7 +189,7 @@ void SellState::delayedInit()
 		{
 			TransferRow row = { TRANSFER_SOLDIER, soldier, soldier->getName(true), 0, 1, 0, 0, -4, 0, 0, 0 };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -203,7 +203,7 @@ void SellState::delayedInit()
 		{
 			TransferRow row = { TRANSFER_CRAFT, craft, craft->getName(_game->getLanguage()), craft->getRules()->getSellCost(), 1, 0, 0, -3, 0, 0, craft->getRules()->getSellCost() };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -214,7 +214,7 @@ void SellState::delayedInit()
 	{
 		TransferRow row = { TRANSFER_SCIENTIST, 0, tr("STR_SCIENTIST"), 0, _base->getAvailableScientists(), 0, 0, -2, 0, 0, 0 };
 		_items.push_back(row);
-		std::string cat = getCategory(_items.size() - 1);
+		std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 		if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 		{
 			_cats.push_back(cat);
@@ -224,7 +224,7 @@ void SellState::delayedInit()
 	{
 		TransferRow row = { TRANSFER_ENGINEER, 0, tr("STR_ENGINEER"), 0, _base->getAvailableEngineers(), 0, 0, -1, 0, 0, 0 };
 		_items.push_back(row);
-		std::string cat = getCategory(_items.size() - 1);
+		std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 		if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 		{
 			_cats.push_back(cat);
@@ -270,7 +270,7 @@ void SellState::delayedInit()
 				_spaceChange -= qty * rule->getSize();
 			}
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -506,14 +506,14 @@ void SellState::updateList()
 					continue;
 				}
 			}
-			else if (categoryFilterEnabled && !belongsToCategory(i, selectedCategory))
+			else if (categoryFilterEnabled && !belongsToCategory(static_cast<int>(i), selectedCategory))
 			{
 				continue;
 			}
 		}
 		else
 		{
-			if (categoryFilterEnabled && selectedCategory != getCategory(i))
+			if (categoryFilterEnabled && selectedCategory != getCategory(static_cast<int>(i)))
 			{
 				continue;
 			}
@@ -546,7 +546,7 @@ void SellState::updateList()
 		ssAmount << _items[i].amount;
 		int64_t adjustedCost = _items[i].cost;
 		_lstItems->addRow(4, name.c_str(), ssQty.str().c_str(), ssAmount.str().c_str(), Unicode::formatFunding(adjustedCost).c_str());
-		_rows.push_back(i);
+		_rows.push_back(static_cast<int>(i));
 		if (_items[i].amount > 0)
 		{
 			_lstItems->setRowColor(_rows.size() - 1, _lstItems->getSecondaryColor());

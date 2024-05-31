@@ -79,7 +79,7 @@ public:
 	 * @return Number of values left to remove
 	 */
 	template<typename C, typename F>
-	static int deleteIf(C& colection, int numberToRemove, F&& func)
+	static size_t deleteIf(C& colection, size_t numberToRemove, F&& func)
 	{
 		return removeIf(colection, numberToRemove,
 			[&](typename C::reference t)
@@ -138,7 +138,7 @@ public:
 	 * @return Number of values left to remove
 	 */
 	template<typename T, typename F>
-	static int removeIf(std::vector<T>& vec, int numberToRemove, F&& func)
+	static size_t removeIf(std::vector<T>& vec, size_t numberToRemove, F&& func)
 	{
 		if (numberToRemove <= 0)
 		{
@@ -184,7 +184,7 @@ public:
 	 * @return Number of values left to remove
 	 */
 	template<typename C, typename F>
-	static int removeIf(C& colection, int numberToRemove, F&& func)
+	static size_t removeIf(C& colection, size_t numberToRemove, F&& func)
 	{
 		if (numberToRemove <= 0)
 		{
@@ -216,7 +216,7 @@ public:
 	 * @return Number of values left in collection
 	 */
 	template<typename C, typename F>
-	static int removeIf(C& colection, F&& func)
+	static size_t removeIf(C& colection, F&& func)
 	{
 		return removeIf(colection, colection.size(), std::forward<F>(func));
 	}

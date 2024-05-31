@@ -31,6 +31,7 @@
 #include "../Interface/Cursor.h"
 #include "../Interface/FpsCounter.h"
 #include "../Mod/Mod.h"
+#include "../Mod/ModFile.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/SavedBattleGame.h"
 #include "Action.h"
@@ -46,6 +47,8 @@
 #include "../fallthrough.h"
 #include "../Geoscape/GeoscapeState.h"
 
+#include "../Lua/LuaMod.h"
+
 namespace OpenXcom
 {
 
@@ -57,7 +60,7 @@ const double Game::VOLUME_GRADIENT = 10.0;
  * also creates the base game lua state.
  * @param title Title of the game window.
  */
-Game::Game(const std::string &title) : _screen(0), _cursor(0), _lang(0), _save(0), _mod(0), _quit(false), _init(false), _update(false),  _mouseActive(true), _timeUntilNextFrame(0),
+Game::Game(const std::string &title) : _screen(0), _cursor(0), _lang(0), _save(0), _quit(false), _init(false), _update(false),  _mouseActive(true), _timeUntilNextFrame(0),
 	_ctrl(false), _alt(false), _shift(false), _rmb(false), _mmb(false)
 {
 	Options::reload = false;
@@ -126,7 +129,7 @@ Game::~Game()
 	delete _cursor;
 	delete _lang;
 	delete _save;
-	delete _mod;
+	_mod.reset();
 	delete _screen;
 	delete _fpsCounter;
 
@@ -503,9 +506,22 @@ void Game::setSavedGame(SavedGame *save)
 void Game::loadMods()
 {
 	Mod::resetGlobalStatics();
-	delete _mod;
-	_mod = new Mod();
+
+	Log(LOG_INFO) << "Loading begins...";
+
+	//files
+	_modFiles = std::make_unique<ModFile>();
+	_modFiles->loadAll();
+
+	//base game and rulesets
+	_mod = std::make_unique<Mod>(*_modFiles);
 	_mod->loadAll();
+
+	//lua
+	_luaMod = std::make_unique<Lua::LuaMod>(this);	//despite the circular dependency, LuaMod needs Game in order to do, well, anything.
+	_luaMod->loadAll();
+
+	Log(LOG_INFO) << "Loading ended.";
 }
 
 /**
