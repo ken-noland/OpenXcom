@@ -62,8 +62,8 @@ PlaceFacilityState::PlaceFacilityState(Base *base, const RuleBaseFacility *rule,
 	const size_t resourceTextOffset = 9*std::min((size_t)3, (_origFac == nullptr ? _rule->getBuildCostItems().size() : 0));
 	_txtTime = new Text(110, 9, 202, static_cast<int>(90 + resourceTextOffset));
 	_numTime = new Text(110, 17, 202, static_cast<int>(98 + resourceTextOffset));
-	_txtMaintenance = new Text(110, 9, 202, 118+resourceTextOffset);
-	_numMaintenance = new Text(110, 17, 202, 126+resourceTextOffset);
+	_txtMaintenance = new Text(110, 9, 202, static_cast<int>(118+resourceTextOffset));
+	_numMaintenance = new Text(110, 17, 202, static_cast<int>(126+resourceTextOffset));
 
 	// Set palette
 	setInterface("placeFacility");
@@ -277,7 +277,7 @@ void PlaceFacilityState::viewClick(Action *)
 			double reducedBuildTime = 0.0;
 			bool buildingOver = false;
 			const BaseAreaSubset areaToBuildOver = BaseAreaSubset(_rule->getSizeX(), _rule->getSizeY()).offset(_view->getGridX(), _view->getGridY());
-			for (int i = _base->getFacilities()->size() - 1; i >= 0; --i)
+			for (int i = static_cast<int>(_base->getFacilities()->size() - 1); i >= 0; --i)
 			{
 				BaseFacility *checkFacility = _base->getFacilities()->at(i);
 				if (BaseAreaSubset::intersection(areaToBuildOver, checkFacility->getPlacement()))

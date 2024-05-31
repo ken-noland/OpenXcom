@@ -1354,7 +1354,7 @@ bool AIModule::selectPointNearTarget(BattleUnit *target, int maxTUs)
 						_save->getPathfinding()->calculate(_unit, checkPath, BAM_NORMAL, 0, maxTUs);
 
 						//for 100% dodge diff and on 4th difficulty it will allow aliens to move 10 squares around to made attack from behind.
-						int distanceCurrent = _save->getPathfinding()->getPath().size() - dodgeChanceDiff * _save->getTileEngine()->getArcDirection(dir - 4, dirTarget);
+						int distanceCurrent = static_cast<int>(_save->getPathfinding()->getPath().size() - dodgeChanceDiff * _save->getTileEngine()->getArcDirection(dir - 4, dirTarget));
 						if (_save->getPathfinding()->getStartDirection() != -1 && distanceCurrent < distance)
 						{
 							_attackAction.target = checkPath;
@@ -1407,7 +1407,7 @@ bool AIModule::selectPointNearTargetLeeroy(BattleUnit *target, bool canRun)
 						{
 							_attackAction.target = checkPath;
 							returnValue = true;
-							distance = _save->getPathfinding()->getPath().size();
+							distance = static_cast<unsigned int>(_save->getPathfinding()->getPath().size());
 						}
 						_save->getPathfinding()->abortPath();
 					}
@@ -1619,10 +1619,10 @@ void AIModule::evaluateAIMode()
 	{
 		escapeOdds = 5;
 	}
-	int ambushOdds = 12;
-	int combatOdds = 20;
+	double ambushOdds = 12;
+	double combatOdds = 20;
 	// we're less likely to patrol if we see enemies.
-	int patrolOdds = _visibleEnemies ? 15 : 30;
+	double patrolOdds = _visibleEnemies ? 15 : 30;
 
 	// the enemy sees us, we should take retreat into consideration, and forget about patrolling for now.
 	if (_spottingEnemies)
@@ -1774,7 +1774,7 @@ void AIModule::evaluateAIMode()
 		ambushOdds = 0;
 	}
 	// generate a random number to represent our decision.
-	int decision = RNG::generate(1, std::max(1, patrolOdds + ambushOdds + escapeOdds + combatOdds));
+	int decision = RNG::generate(1, static_cast<int>(std::max(1.0, patrolOdds + ambushOdds + escapeOdds + combatOdds)));
 
 	if (decision > escapeOdds)
 	{

@@ -1358,7 +1358,7 @@ int overloadInvalidProc(const ScriptProcData& spd, const ScriptRefData* begin, c
  */
 int overloadCustomProc(const ScriptProcData& spd, const ScriptRefData* begin, const ScriptRefData* end)
 {
-	auto tempSorce = 255;
+	size_t tempSorce = 255;
 	auto curr = begin;
 	for (auto& currOver : spd.overloadArg)
 	{
@@ -1371,7 +1371,7 @@ int overloadCustomProc(const ScriptProcData& spd, const ScriptRefData* begin, co
 		{
 			if (ArgBase(curr->type) != ArgInvalid)
 			{
-				int oneArgTempScore = 0;
+				size_t oneArgTempScore = 0;
 				for (auto& o : currOver)
 				{
 					oneArgTempScore = std::max(oneArgTempScore, ArgCompatible(o, curr->type, size - 1));

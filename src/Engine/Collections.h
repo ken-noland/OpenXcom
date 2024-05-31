@@ -104,7 +104,7 @@ public:
 	 * @return Number of values left in collection
 	 */
 	template<typename C, typename F>
-	static int deleteIf(C& colection, F&& func)
+	static size_t deleteIf(C& colection, F&& func)
 	{
 		return deleteIf(colection, colection.size(), std::forward<F>(func));
 	}

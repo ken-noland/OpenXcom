@@ -165,7 +165,7 @@ void ResearchState::onOpenTechTreeViewer(Action *)
  */
 void ResearchState::lstResearchMousePress(Action *action)
 {
-	if (!_lstResearch->isInsideNoScrollArea(action->getAbsoluteXMouse()))
+	if (!_lstResearch->isInsideNoScrollArea(static_cast<int>(action->getAbsoluteXMouse())))
 	{
 		return;
 	}

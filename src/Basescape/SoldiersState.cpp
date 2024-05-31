@@ -363,17 +363,17 @@ void SoldiersState::initList(size_t scrl)
 			if(selectedCraftIndex == 0)
 			{
 				_filteredListOfSoldiers.push_back(soldier);
-				_filteredIndicesOfSoldiers.push_back(i);
+				_filteredIndicesOfSoldiers.push_back(static_cast<int>(i));
 			}else if(selectedCraftIndex == 1){
 				if (soldier->getCraft() == 0){
 					_filteredListOfSoldiers.push_back(soldier);	
-					_filteredIndicesOfSoldiers.push_back(i);									
+					_filteredIndicesOfSoldiers.push_back(static_cast<int>(i));									
 				}	
 			}else{
 				if (soldier->getCraft() == _base->getCrafts()->at(selectedCraftIndex-2))
 				{
 					_filteredListOfSoldiers.push_back(soldier);
-					_filteredIndicesOfSoldiers.push_back(i);
+					_filteredIndicesOfSoldiers.push_back(static_cast<int>(i));
 				}
 			
 			}

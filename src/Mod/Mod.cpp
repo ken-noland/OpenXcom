@@ -2402,7 +2402,7 @@ void Mod::loadAll()
  */
 void Mod::loadMod(const std::vector<FileMap::FileRecord> &rulesetFiles, ModScript &parsers)
 {
-	for (const auto& filerec : rulesetFiles)
+	for (const FileMap::FileRecord& filerec : rulesetFiles)
 	{
 		Log(LOG_VERBOSE) << "- " << filerec.fullpath;
 		try
