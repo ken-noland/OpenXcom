@@ -17,8 +17,11 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "LuaMod.h"
+#include "LuaApi.h"
+#include "LuaState.h"
 #include "GameScript.h"
 #include "../Engine/Logger.h"
+#include "../Mod/ModFile.h"
 
 namespace OpenXcom
 {
@@ -26,9 +29,10 @@ namespace OpenXcom
 namespace Lua
 {
 
-LuaMod::LuaMod(Game* game)
+LuaMod::LuaMod(Game& game, const ModFile& modFiles)
 	:
-	_game(game)
+	_game(game),
+	_modFiles(modFiles)
 {
 }
 
@@ -40,21 +44,24 @@ bool LuaMod::loadAll()
 {
 	Log(LOG_INFO) << "Loading Lua...";
 
-	_luaGameScript = std::make_unique<Lua::GameScript>();
+	_luaGameScript = std::make_unique<GameScript>(_game);
 
-	//for (const ModInfo* modData : _luaMods)
-	//{
-	//	// okay, so this gets a bit tricky. The whole "mod" part was originally developed just to allow cascading rulesets, so
-	//	//  there is no central "mod" object that I can utilize for the LuaState object. What this means is that I have to
-	//	//  manage the life-cycle of the Lua stuff separately from everything else.
-	//	if (modData.info->hasLua())
-	//	{
-	//		std::filesystem::path luaPath = modData.info->getPath() / modData.info->getLuaScript();
-	//		_luaMods.push_back(Lua::LuaState(luaPath, &modData));
-	//	}
-	//}
+	// Load all the Lua scripts
+	for (const ModInfo* modData : _modFiles.getModData())
+	{
+		if (modData->hasLua())
+		{
+			//construct a path to the lua file
+			std::filesystem::path luaPath = modData->getPath() / modData->getLuaScript();
+
+			std::unique_ptr<LuaState> luaState = std::make_unique<LuaState>(luaPath, modData, std::initializer_list<LuaApi*>{_luaGameScript.get()});
+
+			//initialize the lua state
+			_luaMods.push_back(std::move(luaState));
+		}
+	}
+
 	Log(LOG_INFO) << "Loading Lua done.";
-
 
 	return true;
 }

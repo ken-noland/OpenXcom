@@ -61,7 +61,7 @@ private:
 	/// list of mods and their files
 	std::unique_ptr<ModFile> _modFiles;
 
-	/// rules and other data from mods
+	/// rules, y-scripts and other data from mods
 	std::unique_ptr<Mod> _mod;
 
 	/// Lua mods
@@ -108,6 +108,8 @@ public:
 	void setSavedGame(SavedGame *save);
 	/// Gets the currently loaded mod.
 	Mod *getMod() const { return _mod.get(); }
+	/// Gets the currently loaded Lua mod.
+	Lua::LuaMod& getLuaMod() const { return *_luaMod.get(); }
 	/// Loads the mods specified in the game options.
 	void loadMods();
 	/// Sets whether the mouse cursor is activated.

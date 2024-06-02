@@ -25,6 +25,8 @@ namespace Lua
 {
 
 GeoscapeScript::GeoscapeScript()
+	:
+	LuaApi("geoscape")
 {
 }
 
@@ -32,10 +34,11 @@ GeoscapeScript::~GeoscapeScript()
 {
 }
 
-bool GeoscapeScript::Broadcast(const std::string& name)
+void GeoscapeScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
 {
-	return false;
 }
 
+
 } // namespace Lua
+
 } // namespace OpenXcom

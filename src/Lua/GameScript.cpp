@@ -17,6 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "GameScript.h"
+#include "../Engine/Game.h"
 
 namespace OpenXcom
 {
@@ -24,13 +25,25 @@ namespace OpenXcom
 namespace Lua
 {
 
-GameScript::GameScript()
+GameScript::GameScript(Game& game)
+	:
+	LuaApi("game"),
+	_game(game),
+	_onTest("on_test"),
+	_onLoadGame("on_load_game")
 {
 }
 
 GameScript::~GameScript()
 {
 }
+
+void GameScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
+{
+	_geoscapeScript.registerApi(luaState, parentTableIndex);
+	_onTest.registerApi(luaState, parentTableIndex);
+}
+
 
 } // namespace Lua
 

@@ -518,7 +518,7 @@ void Game::loadMods()
 	_mod->loadAll();
 
 	//lua
-	_luaMod = std::make_unique<Lua::LuaMod>(this);	//despite the circular dependency, LuaMod needs Game in order to do, well, anything.
+	_luaMod = std::make_unique<Lua::LuaMod>(*this, *_modFiles); // KN TODO: pass in game functions as a function pointer interface instead of the whole game object
 	_luaMod->loadAll();
 
 	Log(LOG_INFO) << "Loading ended.";

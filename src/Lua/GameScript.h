@@ -18,39 +18,59 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "LuaApi.h"
+#include "LuaDispatch.h"
 #include "GeoscapeScript.h"
 #include "BattlescapeScript.h"
 #include "BasescapeScript.h"
 
 
-extern "C"
+namespace YAML
 {
-	struct lua_State;
+	class Node;
 }
 
 namespace OpenXcom
 {
 
+class Game;
+
 namespace Lua
 {
 
-class GameScript
+class GameScript : public LuaApi
 {
+public:
+	using LuaOnTest = LuaDispatchEvent<void, const std::string&>;
+	using LuaOnLoadGame = LuaDispatchEvent<void, const YAML::Node&>;
+
 private:
+	Game& _game;
+
 	GeoscapeScript _geoscapeScript;
 	BattlescapeScript _battlescapeScript;
 	BasescapeScript _basescapeScript;
 
+	//just a test function for now(please delete later)
+	LuaOnTest _onTest;
+
+	LuaOnLoadGame _onLoadGame;
+
 public:
-	GameScript();
+	GameScript(Game& game);
 	~GameScript();
 
-	/// Populates the Lua state with the game API.
-	bool Populate(lua_State* luaState);
+	/// Registers the game API with the Lua state.
+	virtual void onRegisterApi(lua_State* luaState, int parentTableIndex) override;
 
 	inline GeoscapeScript& getGeoscapeScript() { return _geoscapeScript; }
 	inline BattlescapeScript& getBattlescapeScript() { return _battlescapeScript; }
 	inline BasescapeScript& getBasescapeScript() { return _basescapeScript; }
+
+	// just a test function for now(please delete later)
+	LuaOnTest& onTest() { return _onTest; }
+
+	LuaOnLoadGame& onLoadGame() { return _onLoadGame; }
 };
 
 } // namespace Lua
