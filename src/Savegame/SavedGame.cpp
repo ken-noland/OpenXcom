@@ -68,6 +68,11 @@
 #include "../Mod/AlienRace.h"
 #include "RankCount.h"
 
+#include "../Engine/Game.h"
+#include "../Lua/LuaMod.h"
+#include "../Lua/GameScript.h"
+
+
 namespace OpenXcom
 {
 
@@ -740,6 +745,8 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang)
 	}
 
 	_scriptValues.load(doc, mod->getScriptGlobal());
+
+	getGame()->getLuaMod().getGameScript().onLoadGame().dispatchCallback(doc);
 }
 
 /**

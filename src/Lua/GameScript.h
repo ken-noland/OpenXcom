@@ -40,10 +40,6 @@ namespace Lua
 
 class GameScript : public LuaApi
 {
-public:
-	using LuaOnTest = LuaDispatchEvent<void, const std::string&>;
-	using LuaOnLoadGame = LuaDispatchEvent<void, const YAML::Node&>;
-
 private:
 	Game& _game;
 
@@ -52,9 +48,14 @@ private:
 	BasescapeScript _basescapeScript;
 
 	//just a test function for now(please delete later)
+	using LuaOnTest = LuaSimpleCallback<void, const std::string&>;
 	LuaOnTest _onTest;
 
+	using LuaOnLoadGame = LuaSimpleCallback<void, const YAML::Node&>;
+	using LuaOnSaveGame = LuaAccumulatorCallback<YAML::Node, const YAML::Node&>;
+
 	LuaOnLoadGame _onLoadGame;
+	LuaOnSaveGame _onSaveGame;
 
 public:
 	GameScript(Game& game);

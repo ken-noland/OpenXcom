@@ -181,4 +181,8 @@ public:
 	GeoscapeState *getGeoscapeState() const;
 };
 
+/// Global function that retrieve a thread local Game object.
+Game* getGame();
+
+
 }

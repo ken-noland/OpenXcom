@@ -18,11 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "LuaApi.h"
-
-namespace YAML
-{
-class Node;
-}
+#include "LuaArg.h"
 
 namespace OpenXcom
 {
@@ -30,91 +26,47 @@ namespace OpenXcom
 namespace Lua
 {
 
-struct LuaCallback
+struct LuaCallbackData
 {
-	lua_State* L;
+	lua_State* luaState;
 	int functionRef;
+
+	bool operator==(const LuaCallbackData& other) const
+	{
+		return luaState == other.luaState && functionRef == other.functionRef;
+	}
 };
 
-template <typename T>
-inline void toLuaArg(lua_State* L, T arg)
-{
-	// Default implementation does nothing
-	//
-	// if you get this error, you need to specialize the toLuaArg function for this type.
-	static_assert(sizeof(T) == 0, "No toLuaArg function defined for this type");
-}
-
-// KN NOTE: temporarily placing these specializations here, until I find a better place for them
-template <>
-inline void toLuaArg(lua_State* L, int arg)
-{
-	lua_pushinteger(L, arg);
-}
-
-template <>
-inline void toLuaArg(lua_State* L, float arg)
-{
-	lua_pushnumber(L, static_cast<lua_Number>(arg));
-}
-
-template <>
-inline void toLuaArg(lua_State* L, double arg)
-{
-	lua_pushnumber(L, static_cast<lua_Number>(arg));
-}
-
-template <>
-inline void toLuaArg(lua_State* L, const std::string& arg)
-{
-	lua_pushstring(L, arg.c_str());
-}
-
-template <>
-inline void toLuaArg(lua_State* L, const char* arg)
-{
-	lua_pushstring(L, arg);
-}
-
-template <>
-inline void toLuaArg(lua_State* L, const class YAML::Node& arg)
-{
-	// KN TODO: implement
-}
-
-template <typename T>
-T&& fromLuaRet(lua_State* L)
-{
-//	// Default implementation does nothing
-//	// 
-//	// if you get this error, you need to specialize the fromLuaRet function for this type.
-//	static_assert(sizeof(T) == 0, "No fromLuaRet function defined for this type");
-}
-
 template <typename Ret, typename... Args>
-class LuaDispatchEvent : public LuaApi
+class LuaCallback : public LuaApi
 {
-	using LuaCallbackList = std::vector<LuaCallback>;
+public:
+	using LuaCallbackList = std::vector<LuaCallbackData>;
 
 private:
 	LuaCallbackList _callbacks;
 
+protected:
+	LuaCallback(const std::string& name) : LuaApi(name) {}
+
+	LuaCallbackList& getCallbacks() { return _callbacks; }
+
 	template <typename T>
-	inline void pushArgument(lua_State* L, T&& arg)
+	inline void pushArgument(lua_State* luaState, T&& arg)
 	{
-		toLuaArg<T>(L, std::forward<T>(arg));
+		toLuaArg<T>(luaState, std::forward<T>(arg));
 	}
 
-	inline void pushArguments(lua_State* L) {}
+	inline void pushArguments(lua_State* luaState) {}
 
 	template <typename T, typename... Rest>
-	inline void pushArguments(lua_State* L, T&& first, Rest&&... rest)
+	inline void pushArguments(lua_State* luaState, T&& first, Rest&&... rest)
 	{
-		pushArgument(L, std::forward<T>(first));
-		pushArguments(L, std::forward<Rest>(rest)...);
+		pushArgument(luaState, std::forward<T>(first));
+		pushArguments(luaState, std::forward<Rest>(rest)...);
 	}
 
-	inline void registerCallback(const LuaCallback& callback)
+	inline void registerCallback(const LuaCallbackData& callback)
 	{
 		_callbacks.push_back(callback);
 	}
@@ -130,54 +82,67 @@ private:
 		int functionRef = luaL_ref(luaState, LUA_REGISTRYINDEX);
 
 		// Create the callback and store it
-		registerCallback(LuaCallback{luaState, functionRef});
+		registerCallback(LuaCallbackData{luaState, functionRef});
+
+		return 0;
+	}
+
+	
+	inline void unregisterCallback(const LuaCallbackData& callback)
+	{
+		_callbacks.erase(std::remove(_callbacks.begin(), _callbacks.end(), callback), _callbacks.end());
+	}
+
+	int unregisterCallback(lua_State* luaState)
+	{
+		if (lua_gettop(luaState) != 2 || !lua_isfunction(luaState, 2))
+		{
+			return luaL_error(luaState, "Expected a function as the argument");
+		}
+
+		// Store the function reference
+		int functionRef = luaL_ref(luaState, LUA_REGISTRYINDEX);
+
+		// Create the callback and store it
+		unregisterCallback(LuaCallbackData{luaState, functionRef});
 
 		return 0;
 	}
 
 	virtual void onRegisterApi(lua_State* luaState, int parentTableIndex) override
 	{
-		createClassFunction<LuaDispatchEvent, &LuaDispatchEvent::registerCallback>(luaState, "registerCallback");
+		createClassFunction<LuaCallback, &LuaCallback::registerCallback>(luaState, "registerCallback");
+		createClassFunction<LuaCallback, &LuaCallback::unregisterCallback>(luaState, "unregisterCallback");
 	}
+};
 
+template <typename Ret, typename... Args>
+class LuaSimpleCallback : public LuaCallback<Ret, Args...>
+{
 public:
-	LuaDispatchEvent(const std::string& name) : LuaApi(name) {}
+	LuaSimpleCallback(const std::string& name) : LuaCallback(name) {}
 
+	/// calls all registered callbacks with the given arguments
 	inline Ret dispatchCallback(Args&&... args)
 	{
-		for (const LuaCallback& callback : _callbacks)
+		for (const LuaCallbackData& callback : getCallbacks())
 		{
-			lua_State* L = callback.L;
-			lua_rawgeti(L, LUA_REGISTRYINDEX, callback.functionRef); // Get the function
+			lua_State* luaState = callback.luaState;
+			lua_rawgeti(luaState, LUA_REGISTRYINDEX, callback.functionRef); // Get the function
 
 			// Push the arguments onto the Lua stack
-			pushArguments(L, std::forward<Args>(args)...);
+			pushArguments(luaState, std::forward<Args>(args)...);
 
 			// Call the function with the arguments
-			if (lua_pcall(L, sizeof...(args), 1, 0) != LUA_OK)
+			if (lua_pcall(luaState, sizeof...(args), 1, 0) != LUA_OK)
 			{
-				Log(LOG_ERROR) << "Error calling Lua function: " << lua_tostring(L, -1) << std::endl;
-				lua_pop(L, 1); // Pop the error message
+				Log(LOG_ERROR) << "Error calling Lua function: " << lua_tostring(luaState, -1) << std::endl;
+				lua_pop(luaState, 1); // Pop the error message
 			}
 			else
 			{
-				// Handle the return value
-				if (lua_isnumber(L, -1))
-				{
-					if constexpr (!std::is_void<Ret>::value)
-					{
-						// KN TODO: fromLua
-						Ret result = static_cast<Ret>(lua_tonumber(L, -1));
-						lua_pop(L, 1); // Pop the result
-						return result; // For simplicity, return the result of the first successful callback
-					}
-					else
-					{
-						lua_pop(L, 1); // Pop the result
-					}
-					return;
-				}
-				lua_pop(L, 1); // Pop the result if not handled
+				//check for a return and pop it off the stack
+				while (lua_gettop(luaState) > 0) { lua_pop(luaState, 1); }	//KN NOTE: Maybe issue a warning?
 			}
 		}
 		if constexpr (!std::is_void<Ret>::value)
@@ -185,10 +150,52 @@ public:
 			return Ret(); // Return a default-constructed value if no callbacks are successful and Ret is not void
 		}
 	}
-
-
-
 };
+
+template <typename Ret, typename... Args>
+class LuaAccumulatorCallback : public LuaCallback<Ret, Args...>
+{
+public:
+	LuaAccumulatorCallback(const std::string& name) : LuaCallback(name) {}
+
+	/// calls all registered callbacks with the given arguments, passing the results from one callback to the next and returning the result
+	inline Ret dispatchCallback(Ret defaultValue, Args&&... args)
+	{
+		// make sure we are not using void as a return type
+		static_assert(!std::is_void<Ret>::value, "LuaAccumulatorCallback cannot be used with void return type");
+
+		// check that the first template argument is the same as the default value
+		static_assert(std::is_same_v<Ret, std::decay_t<Ret>>, "The first template argument must be the same as the default value");
+
+		Ret result = std::move(defaultValue);
+		for (const LuaCallback& callback : getCallbacks())
+		{
+			lua_State* luaState = callback.luaState;
+			lua_rawgeti(luaState, LUA_REGISTRYINDEX, callback.functionRef); // Get the function
+
+			// Push the arguments onto the Lua stack
+			pushArguments(luaState, std::forward<Args>(args)...);
+
+			// Call the function with the arguments
+			if (lua_pcall(luaState, sizeof...(args), 1, 0) != LUA_OK)
+			{
+				Log(LOG_ERROR) << "Error calling Lua function: " << lua_tostring(luaState, -1) << std::endl;
+				lua_pop(luaState, 1); // Pop the error message
+			}
+			else
+			{
+				result = fromLuaArg<Ret>(L, -1);
+			}
+		}
+
+		return result;
+	}
+};
+
+//template <typename Ret, typename... Args>
+//class LuaConditionalDispatchCallback : public LuaDispatch<Ret, Args...>
+//{
+//};
 
 } // namespace Lua
 

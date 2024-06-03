@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "GameScript.h"
-#include "../Engine/Game.h"
+#include "LuaArg.h"
+#include <yaml-cpp/yaml.h>
 
 namespace OpenXcom
 {
@@ -25,29 +25,36 @@ namespace OpenXcom
 namespace Lua
 {
 
-GameScript::GameScript(Game& game)
-	:
-	LuaApi("game"),
-	_game(game),
-	_onTest("on_test_event"),
-	_onLoadGame("on_load_game"),
-	_onSaveGame("on_save_game")
+void yamlNodeToLua(lua_State* L, const YAML::Node& node)
 {
+	if (node.IsScalar())
+	{
+		toLuaArg<const std::string&>(L, node.as<std::string>());
+	}
+	else if (node.IsSequence())
+	{
+		lua_newtable(L);
+		for (std::size_t i = 0; i < node.size(); ++i)
+		{
+			yamlNodeToLua(L, node[i]);
+			lua_rawseti(L, -2, i + 1);
+		}
+	}
+	else if (node.IsMap())
+	{
+		lua_newtable(L);
+		for (const auto& pair : node)
+		{
+			yamlNodeToLua(L, pair.first);
+			yamlNodeToLua(L, pair.second);
+			lua_settable(L, -3);
+		}
+	}
+	else
+	{
+		lua_pushnil(L);
+	}
 }
-
-GameScript::~GameScript()
-{
-}
-
-void GameScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
-{
-	_geoscapeScript.registerApi(luaState, parentTableIndex);
-
-	_onLoadGame.registerApi(luaState, parentTableIndex);
-
-	_onTest.registerApi(luaState, parentTableIndex);
-}
-
 
 } // namespace Lua
 

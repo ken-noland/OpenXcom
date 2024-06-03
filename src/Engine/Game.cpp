@@ -54,6 +54,23 @@ namespace OpenXcom
 
 const double Game::VOLUME_GRADIENT = 10.0;
 
+// Function that returns a reference to a thread-local Game* pointer
+Game*& _GamePtr()
+{
+	static thread_local Game* ptr = nullptr;
+	return ptr;
+}
+
+void setThreadLocalGame(Game* gameInstance)
+{
+	_GamePtr() = gameInstance;
+}
+
+Game* getGame()
+{
+	return _GamePtr();
+}
+
 /**
  * Starts up all the SDL subsystems,
  * creates the display screen and sets up the cursor.
@@ -63,6 +80,8 @@ const double Game::VOLUME_GRADIENT = 10.0;
 Game::Game(const std::string &title) : _screen(0), _cursor(0), _lang(0), _save(0), _quit(false), _init(false), _update(false),  _mouseActive(true), _timeUntilNextFrame(0),
 	_ctrl(false), _alt(false), _shift(false), _rmb(false), _mmb(false)
 {
+	setThreadLocalGame(this);
+
 	Options::reload = false;
 	Options::mute = false;
 
