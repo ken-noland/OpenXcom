@@ -18,3 +18,18 @@
  */
 #include "LuaDispatch.h"
 
+namespace YAML
+{
+class Node;
+}
+
+namespace OpenXcom
+{
+
+namespace Lua
+{
+
+
+} // namespace Lua
+
+} // namespace OpenXcom

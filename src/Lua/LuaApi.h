@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 #include "../Engine/Logger.h"
 
 extern "C"
@@ -36,8 +37,8 @@ namespace Lua
 {
 
 /**
-* * LuaApi is the base class for all the LUA API classes. It provides the basic functionality to register the API in the LUA state.
-* */
+ * * LuaApi is the base class for all the LUA API classes. It provides the basic functionality to register the API in the LUA state.
+ * */
 class LuaApi
 {
 private:
@@ -45,8 +46,14 @@ private:
 
 protected:
 	/// Helper function to create a table. Returns the index of the table on the stack.
-	void createTable(lua_State* L, const std::string tableName, int parentIndex = LUA_REGISTRYINDEX);
-	void createFunction(lua_State* L, const std::string functionName, lua_CFunction function, void* userData);
+	int createTable(lua_State* luaState, const std::string tableName, void* userData = nullptr, int parentIndex = LUA_REGISTRYINDEX, std::function<void(int)> onTableCreated = nullptr);
+
+	/// Helper function to create a function in the table.
+	void createFunction(lua_State* luaState, const std::string functionName, lua_CFunction function);
+
+	/// Helper function to create a class function in the table.
+	template <typename Owner, int (Owner::*func)(lua_State* luaState)>
+	inline void createClassFunction(lua_State* luaState, const std::string functionName);
 
 public:
 	LuaApi(const std::string& name);
@@ -57,6 +64,29 @@ public:
 	virtual void onRegisterApi(lua_State* luaState, int parentTableIndex){};
 };
 
+
+/// Static function to act as a trampoline for member functions
+template <typename Owner, int (Owner::*func)(lua_State*)>
+int memberFunctionWrapper(lua_State* luaState)
+{
+	// Get the object instance from the table's metatable
+	lua_getmetatable(luaState, 1);
+	lua_getfield(luaState, -1, "__userdata");
+	void* userdata = lua_touserdata(luaState, -1);
+	lua_pop(luaState, 2);
+
+	// Call the member function
+	Owner* obj = static_cast<Owner*>(userdata);
+	return (obj->*func)(luaState);
+}
+
+/// Helper function to create a class function in the table.
+template <typename Owner, int (Owner::*func)(lua_State*)>
+inline void LuaApi::createClassFunction(lua_State* luaState, const std::string functionName)
+{
+	lua_pushcfunction(luaState, reinterpret_cast<lua_CFunction>(memberFunctionWrapper<Owner, func>)); // Push the function
+	lua_setfield(luaState, -2, functionName.c_str());                // tableName[functionName] = function
+}
 
 } // namespace Lua
 

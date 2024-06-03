@@ -208,7 +208,8 @@ void LoadGameState::think()
 			}
 
 			// execute the Lua callbacks
-			_game->getLuaMod().getGameScript().onLoadGame().dispatchCallback(YAML::Node());
+			YAML::Node node;
+			_game->getLuaMod().getGameScript().onLoadGame().dispatchCallback(node);
 		}
 		catch (Exception &e)
 		{

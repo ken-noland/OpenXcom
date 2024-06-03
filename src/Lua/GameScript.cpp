@@ -29,7 +29,7 @@ GameScript::GameScript(Game& game)
 	:
 	LuaApi("game"),
 	_game(game),
-	_onTest("on_test"),
+	_onTest("on_test_event"),
 	_onLoadGame("on_load_game")
 {
 }

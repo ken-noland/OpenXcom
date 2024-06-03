@@ -37,37 +37,58 @@ LuaApi::~LuaApi()
 {
 }
 
-void LuaApi::createTable(lua_State* L, const std::string tableName, int parentIndex)
+/// Creates a new table and sets the metatable to the userdata. Allows a callback to be called after the table is created, but before it is popped off the stack
+int LuaApi::createTable(lua_State* luaState, const std::string tableName, void* userData, int parentIndex, std::function<void(int)> onTableCreated)
 {
-	lua_newtable(L); // Create a new table
+	lua_newtable(luaState); // Create a new table
+	lua_newtable(luaState); // Create the metatable
+
+	// Store the userdata in the metatable
+	lua_pushlightuserdata(luaState, userData);
+	lua_setfield(luaState, -2, "__userdata");
+
+    lua_setmetatable(luaState, -2); // Set the metatable for the new table
+
+	int tableIndex = lua_gettop(luaState);
 
 	if (parentIndex == LUA_REGISTRYINDEX)
 	{
-		lua_setglobal(L, tableName.c_str()); // Set the table as a global variable
+		lua_setglobal(luaState, tableName.c_str()); // Set the table as a global variable
+		lua_getglobal(luaState, _name.c_str()); 
 	}
 	else
 	{
-		lua_pushvalue(L, -1);                            // Duplicate the new table
-		lua_setfield(L, parentIndex, tableName.c_str()); // Set the new table as a field in the parent table
+		lua_pushvalue(luaState, tableIndex);                    // Duplicate the new table
+		lua_setfield(luaState, parentIndex, tableName.c_str()); // Set the new table as a field in the parent table
+		//lua_pop(luaState, 1);                                   // Pop the parent table
 	}
+
+	//since we are pushing the table on the stack, and we need to clean it up afterwards, then a callback or lambda is needed
+	if(onTableCreated)
+	{
+		onTableCreated(tableIndex);
+	}
+
+	lua_pop(luaState, 1);
+
+	return tableIndex;
 }
 
-void LuaApi::createFunction(lua_State* L, const std::string functionName, lua_CFunction function, void* userData)
+void LuaApi::createFunction(lua_State* L, const std::string functionName, lua_CFunction function)
 {
+	lua_pushcfunction(L, function);            // Push the function
+	lua_setfield(L, -2, functionName.c_str()); // tableName[functionName] = function
 }
+
+
 
 void LuaApi::registerApi(lua_State* luaState, int parentTableIndex)
 {
 	// create a new table with the name of the API
-	createTable(luaState, _name, parentTableIndex);
-
-	// Push table to the stack
-	lua_getglobal(luaState, _name.c_str()); 
-
-	onRegisterApi(luaState, lua_gettop(luaState));
-
-	// Pop table from the stack
-	lua_pop(luaState, 1);
+	int tableIndex = createTable(luaState, _name, this, parentTableIndex, [this, luaState](int tableIndex) {
+		// Register API-specific functions and values
+        onRegisterApi(luaState, tableIndex);
+	});
 }
 
 } // namespace Lua
