@@ -29,7 +29,7 @@ void yamlNodeToLua(lua_State* L, const YAML::Node& node)
 {
 	if (node.IsScalar())
 	{
-		toLuaArg<const std::string&>(L, node.as<std::string>());
+		toLua<const std::string&>(L, node.as<std::string>());
 	}
 	else if (node.IsSequence())
 	{
@@ -54,6 +54,14 @@ void yamlNodeToLua(lua_State* L, const YAML::Node& node)
 	{
 		lua_pushnil(L);
 	}
+}
+
+
+/// Converts a Lua table to a YAML node
+YAML::Node luaToYamlNode(lua_State* luaState, int index)
+{
+	YAML::Node node;
+	return node;
 }
 
 } // namespace Lua

@@ -57,6 +57,8 @@ private:
 	LuaOnLoadGame _onLoadGame;
 	LuaOnSaveGame _onSaveGame;
 
+	int getNumberOfBases(int i);
+
 public:
 	GameScript(Game& game);
 	~GameScript();

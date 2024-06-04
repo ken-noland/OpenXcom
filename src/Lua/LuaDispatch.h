@@ -54,7 +54,7 @@ protected:
 	template <typename T>
 	inline void pushArgument(lua_State* luaState, T&& arg)
 	{
-		toLuaArg<T>(luaState, std::forward<T>(arg));
+		toLua<T>(luaState, std::forward<T>(arg));
 	}
 
 	inline void pushArguments(lua_State* luaState) {}
@@ -111,8 +111,8 @@ protected:
 
 	virtual void onRegisterApi(lua_State* luaState, int parentTableIndex) override
 	{
-		createClassFunction<LuaCallback, &LuaCallback::registerCallback>(luaState, "registerCallback");
-		createClassFunction<LuaCallback, &LuaCallback::unregisterCallback>(luaState, "unregisterCallback");
+		createClassLuaFunction<LuaCallback, &LuaCallback::registerCallback>(luaState, "registerCallback");
+		createClassLuaFunction<LuaCallback, &LuaCallback::unregisterCallback>(luaState, "unregisterCallback");
 	}
 };
 

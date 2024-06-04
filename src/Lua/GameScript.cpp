@@ -18,13 +18,13 @@
  */
 #include "GameScript.h"
 #include "../Engine/Game.h"
+#include "../Savegame/SavedGame.h"
 
 namespace OpenXcom
 {
 
 namespace Lua
 {
-
 GameScript::GameScript(Game& game)
 	:
 	LuaApi("game"),
@@ -44,8 +44,16 @@ void GameScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
 	_geoscapeScript.registerApi(luaState, parentTableIndex);
 
 	_onLoadGame.registerApi(luaState, parentTableIndex);
+	_onSaveGame.registerApi(luaState, parentTableIndex);
+
+	createClassFunction<&GameScript::getNumberOfBases>(luaState, "getNumberOfBases");
 
 	_onTest.registerApi(luaState, parentTableIndex);
+}
+
+int GameScript::getNumberOfBases(int i)
+{
+	return 42;
 }
 
 
