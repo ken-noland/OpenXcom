@@ -135,13 +135,13 @@ void MiniMapView::draw()
 					}
 				}
 				// perhaps (at least one) item on this tile?
-				if (t->isDiscovered(O_FLOOR) && !t->getInventory()->empty())
+				if (t->isDiscovered(O_FLOOR) && !t->getInventory().empty())
 				{
 					int frame = 9 + _frame;
 					Surface * s = _set->getFrame(frame);
 					bool allHidden = true;
 					bool atLeastOnePrimed = false;
-					for (const auto* item : *t->getInventory())
+					for (const BattleItem* item : t->getInventory())
 					{
 						if (!item->getRules()->isHiddenOnMinimap())
 						{
@@ -300,8 +300,8 @@ void MiniMapView::mouseClick(Action *action, State *state)
 
 	if (_game->isLeftClick(action))
 	{
-		int origX = action->getRelativeXMouse() / action->getXScale();
-		int origY = action->getRelativeYMouse() / action->getYScale();
+		int origX = (int)(action->getRelativeXMouse() / action->getXScale());
+		int origY = (int)(action->getRelativeYMouse() / action->getYScale());
 		// get offset (in cells) of the click relative to center of screen
 		int xOff = (origX / CELL_WIDTH) - ((getWidth() / 2) / CELL_WIDTH);
 		int yOff = (origY / CELL_HEIGHT) - ((getHeight() / 2) / CELL_HEIGHT);
@@ -373,8 +373,8 @@ void MiniMapView::mouseOver(Action *action, State *state)
 		}
 		_mouseScrollX += scrollX;
 		_mouseScrollY += scrollY;
-		newX = _posBeforeMouseScrolling.x + _mouseScrollX / action->getXScale() / 4;
-		newY = _posBeforeMouseScrolling.y + _mouseScrollY / action->getYScale() / 4;
+		newX = (int)(_posBeforeMouseScrolling.x + _mouseScrollX / action->getXScale() / 4);
+		newY = (int)(_posBeforeMouseScrolling.y + _mouseScrollY / action->getYScale() / 4);
 
 		// Keep the limits...
 		if (newX < -1 || _camera->getMapSizeX() < newX)

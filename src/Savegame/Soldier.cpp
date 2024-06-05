@@ -105,7 +105,7 @@ Soldier::Soldier(RuleSoldier *rules, Armor *armor, int nationality, int id) :
 			if ((size_t)_nationality >= names.size())
 			{
 				// handling weird cases, e.g. corner cases in soldier transformations
-				_nationality = RNG::generate(0, names.size() - 1);
+				_nationality = RNG::generate(0, (int)names.size() - 1);
 			}
 			_name = names.at(_nationality)->genName(&_gender, rules->getFemaleFrequency());
 			_callsign = generateCallsign(rules->getNames());
@@ -331,7 +331,7 @@ YAML::Node Soldier::save(const ScriptGlobal *shared) const
 	{
 		node["death"] = _death->save();
 	}
-	if (Options::soldierDiaries && (!_diary->getMissionIdList().empty() || !_diary->getSoldierCommendations()->empty() || _diary->getMonthsService() > 0))
+	if (Options::soldierDiaries && (!_diary->getMissionIdList().empty() || !_diary->getSoldierCommendations().empty() || _diary->getMonthsService() > 0))
 	{
 		node["diary"] = _diary->save();
 	}
@@ -397,7 +397,7 @@ void Soldier::genName()
 		// clamp (and randomize) nationality if needed (i.e. if the modder messed up)
 		if ((size_t)_nationality >= names.size())
 		{
-			_nationality = RNG::generate(0, names.size() - 1);
+			_nationality = RNG::generate(0, (int)names.size() - 1);
 		}
 		_name = names.at(_nationality)->genName(&_gender, _rules->getFemaleFrequency());
 		_callsign = generateCallsign(_rules->getNames());
@@ -1207,7 +1207,7 @@ int Soldier::getWoundRecovery(float absBonus, float relBonus) const
  */
 void Soldier::setWoundRecovery(int recovery)
 {
-	_recovery = std::max(recovery, 0);
+	_recovery = (float)std::max(recovery, 0);
 }
 
 
@@ -1716,7 +1716,7 @@ bool Soldier::isEligibleForTransformation(const RuleSoldierTransformation *trans
 	for (const auto& reqd_comm : transformationRule->getRequiredCommendations())
 	{
 		bool found = false;
-		for (const auto* comm : *_diary->getSoldierCommendations())
+		for (const SoldierCommendations* comm : _diary->getSoldierCommendations())
 		{
 			if (comm->getDecorationLevelInt() >= reqd_comm.second && comm->getType() == reqd_comm.first)
 			{
@@ -1745,7 +1745,7 @@ void Soldier::transform(const Mod *mod, RuleSoldierTransformation *transformatio
 
 	if (transformationRule->getRecoveryTime() > 0)
 	{
-		_recovery = transformationRule->getRecoveryTime();
+		_recovery = (float)transformationRule->getRecoveryTime();
 	}
 	_training = false;
 	_returnToTrainingWhenHealed = false;
@@ -1809,7 +1809,7 @@ void Soldier::transform(const Mod *mod, RuleSoldierTransformation *transformatio
 				{
 					if ((size_t)_nationality >= _rules->getNames().size())
 					{
-						_nationality = RNG::generate(0, names.size() - 1);
+						_nationality = RNG::generate(0, (int)names.size() - 1);
 					}
 				}
 				else
@@ -2012,15 +2012,15 @@ const std::vector<const RuleSoldierBonus*> *Soldier::getBonuses(const Mod *mod)
 			}
 		};
 
-		for (const auto& bonusName : _transformationBonuses)
+		for (const std::pair<std::string, int>& bonusName : _transformationBonuses)
 		{
 			auto bonusRule = mod->getSoldierBonus(bonusName.first, false);
 
 			addSorted(bonusRule);
 		}
-		for (auto commendation : *_diary->getSoldierCommendations())
+		for (SoldierCommendations* commendation : _diary->getSoldierCommendations())
 		{
-			auto bonusRule = commendation->getRule()->getSoldierBonus(commendation->getDecorationLevelInt());
+			const RuleSoldierBonus* bonusRule = commendation->getRule()->getSoldierBonus(commendation->getDecorationLevelInt());
 
 			addSorted(bonusRule);
 		}

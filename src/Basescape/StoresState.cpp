@@ -232,7 +232,7 @@ void StoresState::initList()
 	_itemList.clear();
 
 	// find relevant items
-	for (auto& itemType : _game->getMod()->getItemsList())
+	for (const std::string& itemType : _game->getMod()->getItemsList())
 	{
 		// quick search
 		if (!searchString.empty())
@@ -256,13 +256,13 @@ void StoresState::initList()
 		{
 
 			// items from all bases
-			for (auto* xbase : *_game->getSavedGame()->getBases())
+			for (Base* xbase : _game->getSavedGame()->getBases())
 			{
 				// 1. items in base stores
 				qty += xbase->getStorageItems()->getItem(rule);
 
 				// 1b. items from base defense facilities
-				for (const auto* facility : *xbase->getFacilities())
+				for (const BaseFacility* facility : xbase->getFacilities())
 				{
 					if (facility->getRules()->getAmmoMax() > 0 && facility->getRules()->getAmmoItem() == rule)
 					{
@@ -271,13 +271,13 @@ void StoresState::initList()
 				}
 
 				// 2. items from craft
-				for (const auto* craft : *xbase->getCrafts())
+				for (const Craft* craft : xbase->getCrafts())
 				{
 					qty += craft->getTotalItemCount(rule);
 				}
 
 				// 3. armor in use (worn by soldiers)
-				for (const auto* soldier : *xbase->getSoldiers())
+				for (const Soldier* soldier : xbase->getSoldiers())
 				{
 					if (soldier->getArmor()->getStoreItem() == rule)
 					{
@@ -286,9 +286,9 @@ void StoresState::initList()
 				}
 
 				// 4. items/aliens in research
-				for (const auto* research : xbase->getResearch())
+				for (const ResearchProject* research : xbase->getResearch())
 				{
-					const auto* rrule = research->getRules();
+					const RuleResearch* rrule = research->getRules();
 					if (rrule->needItem() && rrule->destroyItem())
 					{
 						if (rrule->getNeededItem() && rrule->getNeededItem() == rule)
@@ -300,7 +300,7 @@ void StoresState::initList()
 				}
 
 				// 5. items in transfer
-				for (auto* transfer : *xbase->getTransfers())
+				for (Transfer* transfer : xbase->getTransfers())
 				{
 					if (transfer->getCraft())
 					{

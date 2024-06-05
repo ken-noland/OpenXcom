@@ -47,7 +47,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to handle.
  */
-AllocateTrainingState::AllocateTrainingState(Base *base) : _sel(0), _base(base), _origSoldierOrder(*_base->getSoldiers())
+AllocateTrainingState::AllocateTrainingState(Base *base) : _sel(0), _base(base), _origSoldierOrder(_base->getSoldiers())
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);
@@ -221,7 +221,7 @@ void AllocateTrainingState::cbxSortByChange(Action *action)
 	{
 		if (selIdx == 2)
 		{
-			std::stable_sort(_base->getSoldiers()->begin(), _base->getSoldiers()->end(),
+			std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(),
 				[](const Soldier* a, const Soldier* b)
 				{
 					return Unicode::naturalCompare(a->getName(), b->getName());
@@ -230,11 +230,11 @@ void AllocateTrainingState::cbxSortByChange(Action *action)
 		}
 		else
 		{
-			std::stable_sort(_base->getSoldiers()->begin(), _base->getSoldiers()->end(), *compFunc);
+			std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(), *compFunc);
 		}
 		if (_game->isShiftPressed())
 		{
-			std::reverse(_base->getSoldiers()->begin(), _base->getSoldiers()->end());
+			std::reverse(_base->getSoldiers().begin(), _base->getSoldiers().end());
 		}
 	}
 	else
@@ -243,12 +243,12 @@ void AllocateTrainingState::cbxSortByChange(Action *action)
 		// soldiers that have been sacked since this state started
 		for (const auto* origSoldier : _origSoldierOrder)
 		{
-			auto soldierIt = std::find(_base->getSoldiers()->begin(), _base->getSoldiers()->end(), origSoldier);
-			if (soldierIt != _base->getSoldiers()->end())
+			auto soldierIt = std::find(_base->getSoldiers().begin(), _base->getSoldiers().end(), origSoldier);
+			if (soldierIt != _base->getSoldiers().end())
 			{
 				Soldier *s = *soldierIt;
-				_base->getSoldiers()->erase(soldierIt);
-				_base->getSoldiers()->insert(_base->getSoldiers()->end(), s);
+				_base->getSoldiers().erase(soldierIt);
+				_base->getSoldiers().insert(_base->getSoldiers().end(), s);
 			}
 		}
 	}
@@ -303,7 +303,7 @@ void AllocateTrainingState::initList(size_t scrl)
 {
 	int row = 0;
 	_lstSoldiers->clearList();
-	for (auto* soldier : *_base->getSoldiers())
+	for (Soldier* soldier : _base->getSoldiers())
 	{
 		const UnitStats* stats = _btnPlus->getPressed() ? soldier->getStatsWithSoldierBonusesOnly() : soldier->getCurrentStats();
 
@@ -387,16 +387,16 @@ void AllocateTrainingState::lstItemsLeftArrowClick(Action *action)
  */
 void AllocateTrainingState::moveSoldierUp(Action *action, unsigned int row, bool max)
 {
-	Soldier *s = _base->getSoldiers()->at(row);
+	Soldier *s = _base->getSoldiers().at(row);
 	if (max)
 	{
-		_base->getSoldiers()->erase(_base->getSoldiers()->begin() + row);
-		_base->getSoldiers()->insert(_base->getSoldiers()->begin(), s);
+		_base->getSoldiers().erase(_base->getSoldiers().begin() + row);
+		_base->getSoldiers().insert(_base->getSoldiers().begin(), s);
 	}
 	else
 	{
-		_base->getSoldiers()->at(row) = _base->getSoldiers()->at(row - 1);
-		_base->getSoldiers()->at(row - 1) = s;
+		_base->getSoldiers().at(row) = _base->getSoldiers().at(row - 1);
+		_base->getSoldiers().at(row - 1) = s;
 		if (row != _lstSoldiers->getScroll())
 		{
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<Uint16>(8 * action->getYScale()));
@@ -416,7 +416,7 @@ void AllocateTrainingState::moveSoldierUp(Action *action, unsigned int row, bool
 void AllocateTrainingState::lstItemsRightArrowClick(Action *action)
 {
 	unsigned int row = _lstSoldiers->getSelectedRow();
-	size_t numSoldiers = _base->getSoldiers()->size();
+	size_t numSoldiers = _base->getSoldiers().size();
 	if (0 < numSoldiers && INT_MAX >= numSoldiers && row < numSoldiers - 1)
 	{
 		if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
@@ -440,16 +440,16 @@ void AllocateTrainingState::lstItemsRightArrowClick(Action *action)
  */
 void AllocateTrainingState::moveSoldierDown(Action *action, unsigned int row, bool max)
 {
-	Soldier *s = _base->getSoldiers()->at(row);
+	Soldier *s = _base->getSoldiers().at(row);
 	if (max)
 	{
-		_base->getSoldiers()->erase(_base->getSoldiers()->begin() + row);
-		_base->getSoldiers()->insert(_base->getSoldiers()->end(), s);
+		_base->getSoldiers().erase(_base->getSoldiers().begin() + row);
+		_base->getSoldiers().insert(_base->getSoldiers().end(), s);
 	}
 	else
 	{
-		_base->getSoldiers()->at(row) = _base->getSoldiers()->at(row + 1);
-		_base->getSoldiers()->at(row + 1) = s;
+		_base->getSoldiers().at(row) = _base->getSoldiers().at(row + 1);
+		_base->getSoldiers().at(row + 1) = s;
 		if (row != _lstSoldiers->getVisibleRows() - 1 + _lstSoldiers->getScroll())
 		{
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<Uint16>(8 * action->getYScale()));
@@ -477,7 +477,7 @@ void AllocateTrainingState::lstSoldiersClick(Action *action)
 	_sel = _lstSoldiers->getSelectedRow();
 	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
 	{
-		auto soldier = _base->getSoldiers()->at(_sel);
+		auto soldier = _base->getSoldiers().at(_sel);
 
 		// can't put fully trained soldiers back into training
 		if (soldier->isFullyTrained()) return;
@@ -530,7 +530,7 @@ void AllocateTrainingState::lstSoldiersMousePress(Action *action)
 	if (Options::changeValueByMouseWheel == 0)
 		return;
 	unsigned int row = _lstSoldiers->getSelectedRow();
-	size_t numSoldiers = _base->getSoldiers()->size();
+	size_t numSoldiers = _base->getSoldiers().size();
 	if (action->getDetails()->button.button == SDL_BUTTON_WHEELUP &&
 		row > 0)
 	{
@@ -558,7 +558,7 @@ void AllocateTrainingState::lstSoldiersMousePress(Action *action)
 void AllocateTrainingState::btnDeassignAllSoldiersClick(Action* action)
 {
 	int row = 0;
-	for (auto* soldier : *_base->getSoldiers())
+	for (Soldier* soldier : _base->getSoldiers())
 	{
 		soldier->setTraining(false);
 		soldier->setReturnToTrainingWhenHealed(false);
@@ -586,7 +586,7 @@ void AllocateTrainingState::btnDeassignAllSoldiersClick(Action* action)
 void AllocateTrainingState::btnAssignAllSoldiersClick(Action* action)
 {
 	int row = 0;
-	for (auto* soldier : *_base->getSoldiers())
+	for (Soldier* soldier : _base->getSoldiers())
 	{
 		if (soldier->isFullyTrained())
 		{

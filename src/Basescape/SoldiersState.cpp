@@ -54,7 +54,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(*_base->getSoldiers()), _dynGetter(NULL), selectedCraftIndex(0)
+SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL), selectedCraftIndex(0)
 {
 	bool isPsiBtnVisible = Options::anytimePsiTraining && _base->getAvailablePsiLabs() > 0;
 	bool isTrnBtnVisible = _base->getAvailableTraining() > 0;
@@ -125,7 +125,7 @@ SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(*_base
 	}
 	if (refreshDeadSoldierStats)
 	{
-		for (auto* deadMan : *_game->getSavedGame()->getDeadSoldiers())
+		for (Soldier* deadMan : _game->getSavedGame()->getDeadSoldiers())
 		{
 			deadMan->prepareStatsWithBonuses(_game->getMod()); // refresh stats for sorting
 		}
@@ -140,9 +140,9 @@ SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(*_base
 	_craftOptions.clear();  // NHR: could be a std::string? defined here
 	_craftOptions.push_back("STR_NO_CRAFT_FILTER");
 	_craftOptions.push_back("STR_NOT_ASSIGNED");
-	for (size_t craft = 0; craft < _base->getCrafts()->size(); ++craft)
+	for (size_t craft = 0; craft < _base->getCrafts().size(); ++craft)
 	{
-       _craftOptions.push_back( _base->getCrafts()->at(craft)->getName(_game->getLanguage()));
+       _craftOptions.push_back( _base->getCrafts().at(craft)->getName(_game->getLanguage()));
 	}
 	_cbxFilterByCraft->setOptions(_craftOptions, true);
 	_cbxFilterByCraft->setSelected(0);
@@ -255,7 +255,7 @@ void SoldiersState::cbxSortByChange(Action *action)
 		{
 			if (selIdx == 2)
 			{
-				std::stable_sort(_base->getSoldiers()->begin(), _base->getSoldiers()->end(),
+				std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(),
 					[](const Soldier* a, const Soldier* b)
 					{
 						return Unicode::naturalCompare(a->getName(), b->getName());
@@ -264,7 +264,7 @@ void SoldiersState::cbxSortByChange(Action *action)
 			}
 			else if (selIdx == 3)
 			{
-				std::stable_sort(_base->getSoldiers()->begin(), _base->getSoldiers()->end(),
+				std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(),
 					[](const Soldier* a, const Soldier* b)
 					{
 						if (a->getCraft())
@@ -291,11 +291,11 @@ void SoldiersState::cbxSortByChange(Action *action)
 			}
 			else
 			{
-				std::stable_sort(_base->getSoldiers()->begin(), _base->getSoldiers()->end(), *compFunc);
+				std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(), *compFunc);
 			}
 			if (_game->isShiftPressed())
 			{
-				std::reverse(_base->getSoldiers()->begin(), _base->getSoldiers()->end());
+				std::reverse(_base->getSoldiers().begin(), _base->getSoldiers().end());
 			}
 		}
 	}
@@ -305,12 +305,12 @@ void SoldiersState::cbxSortByChange(Action *action)
 		// soldiers that have been sacked since this state started
 		for (const auto* origSoldier : _origSoldierOrder)
 		{
-			auto soldierIt = std::find(_base->getSoldiers()->begin(), _base->getSoldiers()->end(), origSoldier);
-			if (soldierIt != _base->getSoldiers()->end())
+			auto soldierIt = std::find(_base->getSoldiers().begin(), _base->getSoldiers().end(), origSoldier);
+			if (soldierIt != _base->getSoldiers().end())
 			{
 				Soldier *s = *soldierIt;
-				_base->getSoldiers()->erase(soldierIt);
-				_base->getSoldiers()->insert(_base->getSoldiers()->end(), s);
+				_base->getSoldiers().erase(soldierIt);
+				_base->getSoldiers().insert(_base->getSoldiers().end(), s);
 			}
 		}
 	}
@@ -357,9 +357,9 @@ void SoldiersState::initList(size_t scrl)
 		_lstSoldiers->setArrowColumn(188, ARROW_VERTICAL);
 
 		// all soldiers in the base // NHR: Change to selection based on selectedCraftIndex
-		for(size_t i=0; i< _base->getSoldiers()->size();++i)
+		for(size_t i=0; i< _base->getSoldiers().size();++i)
 		{
-			Soldier* soldier=_base->getSoldiers()->at(i);
+			Soldier* soldier=_base->getSoldiers().at(i);
 			if(selectedCraftIndex == 0)
 			{
 				_filteredListOfSoldiers.push_back(soldier);
@@ -370,7 +370,7 @@ void SoldiersState::initList(size_t scrl)
 					_filteredIndicesOfSoldiers.push_back(static_cast<int>(i));									
 				}	
 			}else{
-				if (soldier->getCraft() == _base->getCrafts()->at(selectedCraftIndex-2))
+				if (soldier->getCraft() == _base->getCrafts().at(selectedCraftIndex-2))
 				{
 					_filteredListOfSoldiers.push_back(soldier);
 					_filteredIndicesOfSoldiers.push_back(static_cast<int>(i));
@@ -389,12 +389,12 @@ void SoldiersState::initList(size_t scrl)
 		if (transformationRule)
 		{
 			int idx = -1;
-			for (auto* soldier : *_base->getSoldiers())
+			for (Soldier* soldier : _base->getSoldiers())
 			{
 				idx++;
 				if ((soldier->getCraft() && soldier->getCraft()->getStatus() == "STR_OUT") || 
                   
-				    ((selectedCraftIndex  > 1) && soldier->getCraft() != _base->getCrafts()->at(selectedCraftIndex-2)) ||
+				    ((selectedCraftIndex  > 1) && soldier->getCraft() != _base->getCrafts().at(selectedCraftIndex-2)) ||
 					
 					(selectedCraftIndex == 1 )  && soldier->getCraft())
 				{
@@ -407,7 +407,7 @@ void SoldiersState::initList(size_t scrl)
 					_filteredIndicesOfSoldiers.push_back(idx);
 				}
 			}
-			for (auto* deadMan : *_game->getSavedGame()->getDeadSoldiers())
+			for (Soldier* deadMan : _game->getSavedGame()->getDeadSoldiers())
 			{
 				if (deadMan->isEligibleForTransformation(transformationRule))
 				{
@@ -497,14 +497,14 @@ void SoldiersState::moveSoldierUp(Action *action, unsigned int row, bool max)
 	size_t baseIndex = _filteredIndicesOfSoldiers.at(row);
 	if (max)
 	{
-		_base->getSoldiers()->erase(_base->getSoldiers()->begin() + baseIndex);
-		_base->getSoldiers()->insert(_base->getSoldiers()->begin(), s);
+		_base->getSoldiers().erase(_base->getSoldiers().begin() + baseIndex);
+		_base->getSoldiers().insert(_base->getSoldiers().begin(), s);
 	}
 	else
 	{
 		size_t baseIndexNext = _filteredIndicesOfSoldiers.at(row - 1);
-		_base->getSoldiers()->at(baseIndex) = _base->getSoldiers()->at(baseIndexNext);
-		_base->getSoldiers()->at(baseIndexNext) = s;
+		_base->getSoldiers().at(baseIndex) = _base->getSoldiers().at(baseIndexNext);
+		_base->getSoldiers().at(baseIndexNext) = s;
 		if (row != _lstSoldiers->getScroll())
 		{
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<Uint16>(8 * action->getYScale()));
@@ -552,14 +552,14 @@ void SoldiersState::moveSoldierDown(Action *action, unsigned int row, bool max)
 	size_t baseIndex = _filteredIndicesOfSoldiers.at(row);
 	if (max)
 	{
-		_base->getSoldiers()->erase(_base->getSoldiers()->begin() + baseIndex);
-		_base->getSoldiers()->insert(_base->getSoldiers()->end(), s);
+		_base->getSoldiers().erase(_base->getSoldiers().begin() + baseIndex);
+		_base->getSoldiers().insert(_base->getSoldiers().end(), s);
 	}
 	else
 	{
 		size_t baseIndexNext = _filteredIndicesOfSoldiers.at(row + 1);
-		_base->getSoldiers()->at(baseIndex) = _base->getSoldiers()->at(baseIndexNext);
-		_base->getSoldiers()->at(baseIndexNext) = s;
+		_base->getSoldiers().at(baseIndex) = _base->getSoldiers().at(baseIndexNext);
+		_base->getSoldiers().at(baseIndexNext) = s;
 		if (row != _lstSoldiers->getVisibleRows() - 1 + _lstSoldiers->getScroll())
 		{
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<Uint16>(8 * action->getYScale()));
@@ -602,7 +602,7 @@ void SoldiersState::cbxScreenActionsChange(Action *action)
 	else if (selAction == "STR_AI_LISTBUTTON")
 	{
 		_cbxScreenActions->setSelected(0);
-		_game->pushState(new SoldiersAIState(*_base->getSoldiers()));
+		_game->pushState(new SoldiersAIState(_base->getSoldiers()));
 	}
 	else if (selAction == "STR_PSI_TRAINING")
 	{
@@ -720,7 +720,7 @@ void SoldiersState::lstSoldiersMousePress(Action *action)
 	if (Options::changeValueByMouseWheel == 0)
 		return;
 	unsigned int row = _lstSoldiers->getSelectedRow();
-	size_t numSoldiers = _base->getSoldiers()->size();
+	size_t numSoldiers = _base->getSoldiers().size();
 	if (action->getDetails()->button.button == SDL_BUTTON_WHEELUP &&
 		row > 0)
 	{
@@ -744,7 +744,7 @@ void SoldiersState::lstSoldiersMousePress(Action *action)
 /// Handler for clicking the AI button.
 void SoldiersState::btnAIClick(Action *action)
 {
-	_game->pushState(new SoldiersAIState(*_base->getSoldiers()));
+	_game->pushState(new SoldiersAIState(_base->getSoldiers()));
 }
 
 }

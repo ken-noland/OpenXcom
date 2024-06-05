@@ -388,7 +388,7 @@ public:
 	/// New turn preparations.
 	void prepareNewTurn(bool smokeDamage);
 	/// Get inventory on this tile.
-	std::vector<BattleItem *> *getInventory();
+	std::vector<BattleItem *>& getInventory();
 	/// Set the tile marker color.
 	void setMarkerColor(int color);
 	/// Get the tile marker color.

@@ -502,19 +502,19 @@ void SoldierTransformationState::performTransformation()
 		if (_sourceSoldier->getDeath())
 		{
 			// true resurrect = remove from Memorial Wall
-			auto it = find(_game->getSavedGame()->getDeadSoldiers()->begin(), _game->getSavedGame()->getDeadSoldiers()->end(), _sourceSoldier);
-			if (it != _game->getSavedGame()->getDeadSoldiers()->end())
+			auto it = find(_game->getSavedGame()->getDeadSoldiers().begin(), _game->getSavedGame()->getDeadSoldiers().end(), _sourceSoldier);
+			if (it != _game->getSavedGame()->getDeadSoldiers().end())
 			{
-				_game->getSavedGame()->getDeadSoldiers()->erase(it);
+				_game->getSavedGame()->getDeadSoldiers().erase(it);
 			}
 		}
 		else if (_transformationRule->getTransferTime() > 0)
 		{
 			// transfer time on a live soldier already at the base (doesn't make much sense, but we need to handle it anyway)
-			auto it = find(_base->getSoldiers()->begin(), _base->getSoldiers()->end(), _sourceSoldier);
-			if (it != _base->getSoldiers()->end())
+			auto it = find(_base->getSoldiers().begin(), _base->getSoldiers().end(), _sourceSoldier);
+			if (it != _base->getSoldiers().end())
 			{
-				_base->getSoldiers()->erase(it);
+				_base->getSoldiers().erase(it);
 			}
 		}
 	}
@@ -524,7 +524,7 @@ void SoldierTransformationState::performTransformation()
 		int transferTime = _transformationRule->getTransferTime() > 0 ? _transformationRule->getTransferTime() : 24;
 		Transfer *transfer = new Transfer(transferTime);
 		transfer->setSoldier(destinationSoldier);
-		_base->getTransfers()->push_back(transfer);
+		_base->getTransfers().push_back(transfer);
 	}
 
 	destinationSoldier->transform(_game->getMod(), _transformationRule, _sourceSoldier, _base);
@@ -537,20 +537,20 @@ void SoldierTransformationState::retire()
 		if (_sourceSoldier->getDeath())
 		{
 			// I wonder if anyone will ever use THIS option
-			auto it = find(_game->getSavedGame()->getDeadSoldiers()->begin(), _game->getSavedGame()->getDeadSoldiers()->end(), _sourceSoldier);
-			if (it != _game->getSavedGame()->getDeadSoldiers()->end())
+			auto it = find(_game->getSavedGame()->getDeadSoldiers().begin(), _game->getSavedGame()->getDeadSoldiers().end(), _sourceSoldier);
+			if (it != _game->getSavedGame()->getDeadSoldiers().end())
 			{
 				delete (*it);
-				_game->getSavedGame()->getDeadSoldiers()->erase(it);
+				_game->getSavedGame()->getDeadSoldiers().erase(it);
 			}
 		}
 		else
 		{
-			auto it = find(_base->getSoldiers()->begin(), _base->getSoldiers()->end(), _sourceSoldier);
-			if (it != _base->getSoldiers()->end())
+			auto it = find(_base->getSoldiers().begin(), _base->getSoldiers().end(), _sourceSoldier);
+			if (it != _base->getSoldiers().end())
 			{
 				delete (*it);
-				_base->getSoldiers()->erase(it);
+				_base->getSoldiers().erase(it);
 			}
 		}
 	}
@@ -560,7 +560,7 @@ void SoldierTransformationState::retire()
 		int transferTime = _transformationRule->getTransferTime() > 0 ? _transformationRule->getTransferTime() : 1;
 		Transfer *transfer = new Transfer(transferTime);
 		transfer->setItems(_game->getMod()->getItem(_transformationRule->getProducedItem(), true), 1);
-		_base->getTransfers()->push_back(transfer);
+		_base->getTransfers().push_back(transfer);
 	}
 }
 

@@ -160,11 +160,11 @@ BriefingState::BriefingState(Craft *craft, Base *base, bool infoOnly, BriefingDa
 		if (!_game->getMod()->getOperationNamesFirst().empty())
 		{
 			std::ostringstream ss;
-			int pickFirst = RNG::seedless(0, _game->getMod()->getOperationNamesFirst().size() - 1);
+			int pickFirst = RNG::seedless(0, (int)_game->getMod()->getOperationNamesFirst().size() - 1);
 			ss << _game->getMod()->getOperationNamesFirst().at(pickFirst);
 			if (!_game->getMod()->getOperationNamesLast().empty())
 			{
-				int pickLast = RNG::seedless(0, _game->getMod()->getOperationNamesLast().size() - 1);
+				int pickLast = RNG::seedless(0, (int)_game->getMod()->getOperationNamesLast().size() - 1);
 				ss << " " << _game->getMod()->getOperationNamesLast().at(pickLast);
 			}
 			s = ss.str();

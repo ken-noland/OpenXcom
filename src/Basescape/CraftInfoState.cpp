@@ -69,7 +69,7 @@ CraftInfoState::CraftInfoState(Base *base, size_t craftId) : _base(base), _craft
 		_window = new Window(this, 320, 200, 0, 0, POPUP_NONE);
 	}
 
-	_craft = _base->getCrafts()->at(_craftId);
+	_craft = _base->getCrafts().at(_craftId);
 	_weaponNum = _craft->getRules()->getWeapons();
 	if (_weaponNum > RuleCraft::WeaponMax)
 		_weaponNum = RuleCraft::WeaponMax;
@@ -275,7 +275,7 @@ void CraftInfoState::init()
 
 		SurfaceSet *customArmorPreviews = _game->getMod()->getSurfaceSet("CustomArmorPreviews");
 		int x = 0;
-		for (const auto* soldier : *_base->getSoldiers())
+		for (const Soldier* soldier : _base->getSoldiers())
 		{
 			if (soldier->getCraft() == _craft)
 			{
@@ -301,7 +301,7 @@ void CraftInfoState::init()
 
 		SurfaceSet *customItemPreviews = _game->getMod()->getSurfaceSet("CustomItemPreviews");
 		x = 0;
-		for (const auto* vehicle : *_craft->getVehicles())
+		for (const Vehicle* vehicle : _craft->getVehicles())
 		{
 			for (int index : vehicle->getRules()->getCustomItemPreviewIndex())
 			{
@@ -326,7 +326,7 @@ void CraftInfoState::init()
 		using ArraySurfaces = std::array<const Surface *, 3>;
 		std::map<ArrayIndexes, std::tuple<ArraySurfaces, size_t>, std::greater<>> itemsBySprite;
 
-		for (auto& item : *_craft->getItems()->getContents())
+		for (const std::pair<const RuleItem*, int>& item : _craft->getItems()->getContents())
 		{
 			ArrayIndexes ind = { };
 
@@ -408,7 +408,7 @@ void CraftInfoState::init()
 
 	for (int i = 0; i < _weaponNum; ++i)
 	{
-		CraftWeapon *w1 = _craft->getWeapons()->at(i);
+		CraftWeapon *w1 = _craft->getWeapons().at(i);
 
 		_weapon[i]->clear();
 		if (w1 != 0)
@@ -599,7 +599,7 @@ void CraftInfoState::btnWIconClick(Action *action)
 	{
 		if (action->getSender() == _weapon[i])
 		{
-			CraftWeapon *w1 = _craft->getWeapons()->at(i);
+			CraftWeapon *w1 = _craft->getWeapons().at(i);
 			if (w1)
 			{
 				// Toggle the weapon status

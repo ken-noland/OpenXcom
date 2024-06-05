@@ -55,10 +55,10 @@ namespace OpenXcom
  * @param craft ID of the selected craft.
  */
 CraftSoldiersState::CraftSoldiersState(Base *base, size_t craft)
-		:  _base(base), _craft(craft), _otherCraftColor(0), _origSoldierOrder(*_base->getSoldiers()), _dynGetter(NULL)
+		:  _base(base), _craft(craft), _otherCraftColor(0), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL)
 {
 	bool hidePreview = _game->getSavedGame()->getMonthsPassed() == -1;
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	if (c && !c->getRules()->isForNewBattle())
 	{
 		// no battlescape map available
@@ -216,7 +216,7 @@ void CraftSoldiersState::cbxSortByChange(Action *)
 		{
 			if (selIdx == 2)
 			{
-				std::stable_sort(_base->getSoldiers()->begin(), _base->getSoldiers()->end(),
+				std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(),
 					[](const Soldier* a, const Soldier* b)
 					{
 						return Unicode::naturalCompare(a->getName(), b->getName());
@@ -225,7 +225,7 @@ void CraftSoldiersState::cbxSortByChange(Action *)
 			}
 			else if (selIdx == 3)
 			{
-				std::stable_sort(_base->getSoldiers()->begin(), _base->getSoldiers()->end(),
+				std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(),
 					[](const Soldier* a, const Soldier* b)
 					{
 						if (a->getCraft())
@@ -252,11 +252,11 @@ void CraftSoldiersState::cbxSortByChange(Action *)
 			}
 			else
 			{
-				std::stable_sort(_base->getSoldiers()->begin(), _base->getSoldiers()->end(), *compFunc);
+				std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(), *compFunc);
 			}
 			if (_game->isShiftPressed())
 			{
-				std::reverse(_base->getSoldiers()->begin(), _base->getSoldiers()->end());
+				std::reverse(_base->getSoldiers().begin(), _base->getSoldiers().end());
 			}
 		}
 	}
@@ -266,12 +266,12 @@ void CraftSoldiersState::cbxSortByChange(Action *)
 		// soldiers that have been sacked since this state started
 		for (const auto* origSoldier : _origSoldierOrder)
 		{
-			auto soldierIt = std::find(_base->getSoldiers()->begin(), _base->getSoldiers()->end(), origSoldier);
-			if (soldierIt != _base->getSoldiers()->end())
+			auto soldierIt = std::find(_base->getSoldiers().begin(), _base->getSoldiers().end(), origSoldier);
+			if (soldierIt != _base->getSoldiers().end())
 			{
 				Soldier *s = *soldierIt;
-				_base->getSoldiers()->erase(soldierIt);
-				_base->getSoldiers()->insert(_base->getSoldiers()->end(), s);
+				_base->getSoldiers().erase(soldierIt);
+				_base->getSoldiers().insert(_base->getSoldiers().end(), s);
 			}
 		}
 	}
@@ -295,7 +295,7 @@ void CraftSoldiersState::btnOkClick(Action *)
  */
 void CraftSoldiersState::btnPreviewClick(Action *)
 {
-	Craft* c = _base->getCrafts()->at(_craft);
+	Craft* c = _base->getCrafts().at(_craft);
 	if (c->getSpaceUsed() <= 0)
 	{
 		// at least one unit must be onboard
@@ -335,9 +335,9 @@ void CraftSoldiersState::initList(size_t scrl)
 		_lstSoldiers->setColumns(3, 106, 98, 76);
 	}
 
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	BaseSumDailyRecovery recovery = _base->getSumRecoveryPerDay();
-	for (const auto* soldier : *_base->getSoldiers())
+	for (const Soldier* soldier : _base->getSoldiers())
 	{
 		if (_dynGetter != NULL)
 		{
@@ -386,7 +386,7 @@ void CraftSoldiersState::init()
 	initList(0);
 
 	// update the label to indicate presence of a saved craft deployment
-	Craft* c = _base->getCrafts()->at(_craft);
+	Craft* c = _base->getCrafts().at(_craft);
 	if (c->hasCustomDeployment())
 		_btnPreview->setText(tr("STR_CRAFT_DEPLOYMENT_PREVIEW_SAVED"));
 	else
@@ -423,16 +423,16 @@ void CraftSoldiersState::lstItemsLeftArrowClick(Action *action)
  */
 void CraftSoldiersState::moveSoldierUp(Action *action, unsigned int row, bool max)
 {
-	Soldier *s = _base->getSoldiers()->at(row);
+	Soldier *s = _base->getSoldiers().at(row);
 	if (max)
 	{
-		_base->getSoldiers()->erase(_base->getSoldiers()->begin() + row);
-		_base->getSoldiers()->insert(_base->getSoldiers()->begin(), s);
+		_base->getSoldiers().erase(_base->getSoldiers().begin() + row);
+		_base->getSoldiers().insert(_base->getSoldiers().begin(), s);
 	}
 	else
 	{
-		_base->getSoldiers()->at(row) = _base->getSoldiers()->at(row - 1);
-		_base->getSoldiers()->at(row - 1) = s;
+		_base->getSoldiers().at(row) = _base->getSoldiers().at(row - 1);
+		_base->getSoldiers().at(row - 1) = s;
 		if (row != _lstSoldiers->getScroll())
 		{
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<Uint16>(8 * action->getYScale()));
@@ -452,7 +452,7 @@ void CraftSoldiersState::moveSoldierUp(Action *action, unsigned int row, bool ma
 void CraftSoldiersState::lstItemsRightArrowClick(Action *action)
 {
 	unsigned int row = _lstSoldiers->getSelectedRow();
-	size_t numSoldiers = _base->getSoldiers()->size();
+	size_t numSoldiers = _base->getSoldiers().size();
 	if (0 < numSoldiers && INT_MAX >= numSoldiers && row < numSoldiers - 1)
 	{
 		if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
@@ -476,16 +476,16 @@ void CraftSoldiersState::lstItemsRightArrowClick(Action *action)
  */
 void CraftSoldiersState::moveSoldierDown(Action *action, unsigned int row, bool max)
 {
-	Soldier *s = _base->getSoldiers()->at(row);
+	Soldier *s = _base->getSoldiers().at(row);
 	if (max)
 	{
-		_base->getSoldiers()->erase(_base->getSoldiers()->begin() + row);
-		_base->getSoldiers()->insert(_base->getSoldiers()->end(), s);
+		_base->getSoldiers().erase(_base->getSoldiers().begin() + row);
+		_base->getSoldiers().insert(_base->getSoldiers().end(), s);
 	}
 	else
 	{
-		_base->getSoldiers()->at(row) = _base->getSoldiers()->at(row + 1);
-		_base->getSoldiers()->at(row + 1) = s;
+		_base->getSoldiers().at(row) = _base->getSoldiers().at(row + 1);
+		_base->getSoldiers().at(row + 1) = s;
 		if (row != _lstSoldiers->getVisibleRows() - 1 + _lstSoldiers->getScroll())
 		{
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<Uint16>(8 * action->getYScale()));
@@ -512,8 +512,8 @@ void CraftSoldiersState::lstSoldiersClick(Action *action)
 	int row = _lstSoldiers->getSelectedRow();
 	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
 	{
-		Craft *c = _base->getCrafts()->at(_craft);
-		Soldier *s = _base->getSoldiers()->at(_lstSoldiers->getSelectedRow());
+		Craft *c = _base->getCrafts().at(_craft);
+		Soldier *s = _base->getSoldiers().at(_lstSoldiers->getSelectedRow());
 		if (s->getCraft() == c)
 		{
 			s->setCraftAndMoveEquipment(0, _base, _game->getSavedGame()->getMonthsPassed() == -1);
@@ -569,7 +569,7 @@ void CraftSoldiersState::lstSoldiersMousePress(Action *action)
 	if (Options::changeValueByMouseWheel == 0)
 		return;
 	unsigned int row = _lstSoldiers->getSelectedRow();
-	size_t numSoldiers = _base->getSoldiers()->size();
+	size_t numSoldiers = _base->getSoldiers().size();
 	if (action->getDetails()->button.button == SDL_BUTTON_WHEELUP &&
 		row > 0)
 	{
@@ -597,7 +597,7 @@ void CraftSoldiersState::lstSoldiersMousePress(Action *action)
 void CraftSoldiersState::btnDeassignAllSoldiersClick(Action *action)
 {
 	int row = 0;
-	for (auto* soldier : *_base->getSoldiers())
+	for (Soldier* soldier : _base->getSoldiers())
 	{
 		if (soldier->getCraft() && soldier->getCraft()->getStatus() != "STR_OUT")
 		{
@@ -608,7 +608,7 @@ void CraftSoldiersState::btnDeassignAllSoldiersClick(Action *action)
 		row++;
 	}
 
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	_txtAvailable->setText(tr("STR_SPACE_AVAILABLE").arg(c->getSpaceAvailable()));
 	_txtUsed->setText(tr("STR_SPACE_USED").arg(c->getSpaceUsed()));
 }
@@ -619,9 +619,9 @@ void CraftSoldiersState::btnDeassignAllSoldiersClick(Action *action)
  */
 void CraftSoldiersState::btnDeassignCraftSoldiersClick(Action *action)
 {
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	int row = 0;
-	for (auto* soldier : *_base->getSoldiers())
+	for (Soldier* soldier : _base->getSoldiers())
 	{
 		if (soldier->getCraft() == c)
 		{
@@ -639,7 +639,7 @@ void CraftSoldiersState::btnDeassignCraftSoldiersClick(Action *action)
 /// Handler for clicking the AI button.
 void CraftSoldiersState::btnAIClick(Action *action)
 {
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	_game->pushState(new SoldiersAIState(c));
 
 }

@@ -93,7 +93,7 @@ private:
 	void addItemsToBaseStores(const RuleItem *ruleItem, Base *base, int quantity, bool considerTransformations);
 	void addItemsToBaseStores(const std::string &itemType, Base *base, int quantity, bool considerTransformations);
 	/// Recovers items from the battlescape.
-	void recoverItems(std::vector<BattleItem*> *from, Base *base, Craft* craft);
+	void recoverItems(std::vector<BattleItem*>& from, Base *base, Craft* craft);
 	/// Recovers a civilian from the battlescape.
 	void recoverCivilian(BattleUnit *from, Base *base, Craft* craft);
 	/// Recovers an alien from the battlescape.

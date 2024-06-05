@@ -20,16 +20,73 @@
 #include "../Engine/Game.h"
 #include "../Savegame/SavedGame.h"
 
+#include <yaml-cpp/yaml.h>
+
 namespace OpenXcom
 {
 
 namespace Lua
 {
+
+	
+void yamlNodeToLua(lua_State* L, const YAML::Node& node)
+{
+	if (node.IsScalar())
+	{
+		toLua<const std::string&>(L, node.as<std::string>());
+	}
+	else if (node.IsSequence())
+	{
+		lua_newtable(L);
+		for (std::size_t i = 0; i < node.size(); ++i)
+		{
+			yamlNodeToLua(L, node[i]);
+			lua_rawseti(L, -2, i + 1);
+		}
+	}
+	else if (node.IsMap())
+	{
+		lua_newtable(L);
+		for (const auto& pair : node)
+		{
+			yamlNodeToLua(L, pair.first);
+			yamlNodeToLua(L, pair.second);
+			lua_settable(L, -3);
+		}
+	}
+	else
+	{
+		lua_pushnil(L);
+	}
+}
+
+/// Converts a Lua table to a YAML node
+YAML::Node luaToYamlNode(lua_State* luaState, int index)
+{
+	YAML::Node node;
+	return node;
+}
+
+
+
+// specialization of template functions to allow for serialization of YAML
+template <>
+void toLua(lua_State* L, const YAML::Node& arg)
+{
+	yamlNodeToLua(L, arg);
+}
+
+template <>
+YAML::Node fromLua(lua_State* luaState, int index)
+{
+	return luaToYamlNode(luaState, index);
+}
+
+
 GameScript::GameScript(Game& game)
 	:
 	LuaApi("game"),
 	_game(game),
-	_onTest("on_test_event"),
 	_onLoadGame("on_load_game"),
 	_onSaveGame("on_save_game")
 {
@@ -46,14 +103,8 @@ void GameScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
 	_onLoadGame.registerApi(luaState, parentTableIndex);
 	_onSaveGame.registerApi(luaState, parentTableIndex);
 
-	createClassFunction<&GameScript::getNumberOfBases>(luaState, "getNumberOfBases");
-
-	_onTest.registerApi(luaState, parentTableIndex);
-}
-
-int GameScript::getNumberOfBases(int i)
-{
-	return 42;
+	//using lambdas to register functions for the game table.
+	createFunction(luaState, "get_base_num", []() -> int { return 42; });
 }
 
 

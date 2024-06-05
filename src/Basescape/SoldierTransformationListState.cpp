@@ -216,7 +216,7 @@ void SoldierTransformationListState::initList()
 		int projectsPossible = 10; // max
 		if (transformationRule->getCost() > 0)
 		{
-			int byFunds = _game->getSavedGame()->getFunds() / transformationRule->getCost();
+			int byFunds = (int)(_game->getSavedGame()->getFunds() / transformationRule->getCost());
 			projectsPossible = std::min(projectsPossible, byFunds);
 		}
 		for (auto item : transformationRule->getRequiredItems())
@@ -241,7 +241,7 @@ void SoldierTransformationListState::initList()
 		}
 
 		int eligibleSoldiers = 0;
-		for (const auto* soldier : *_base->getSoldiers())
+		for (const Soldier* soldier : _base->getSoldiers())
 		{
 			if (soldier->getCraft() && soldier->getCraft()->getStatus() == "STR_OUT")
 			{
@@ -253,7 +253,7 @@ void SoldierTransformationListState::initList()
 				++eligibleSoldiers;
 			}
 		}
-		for (const auto* deadMan : *_game->getSavedGame()->getDeadSoldiers())
+		for (const Soldier* deadMan : _game->getSavedGame()->getDeadSoldiers())
 		{
 			if (deadMan->isEligibleForTransformation(transformationRule))
 			{

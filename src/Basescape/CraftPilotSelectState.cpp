@@ -74,7 +74,7 @@ CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft) : _base(b
 	_btnCancel->onMouseClick((ActionHandler)&CraftPilotSelectState::btnCancelClick);
 	_btnCancel->onKeyboardPress((ActionHandler)&CraftPilotSelectState::btnCancelClick, Options::keyCancel);
 
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_PILOT"));
@@ -92,7 +92,7 @@ CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft) : _base(b
 	_lstPilot->setBackground(_window);
 	_lstPilot->setMargin(8);
 
-	for (const auto* soldier : *_base->getSoldiers())
+	for (const Soldier* soldier : _base->getSoldiers())
 	{
 		// must be on board & able to drive
 		if (soldier->getCraft() == c && soldier->getRules()->getAllowPiloting())
@@ -140,7 +140,7 @@ void CraftPilotSelectState::btnCancelClick(Action *)
 void CraftPilotSelectState::lstPilotClick(Action *)
 {
 	int pilotId = _pilot[_lstPilot->getSelectedRow()];
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	c->addPilot(pilotId);
 
 	_game->popState();

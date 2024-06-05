@@ -76,7 +76,7 @@ ConfirmNewBaseState::ConfirmNewBaseState(Base *base, Globe *globe) : _base(base)
 	_btnCancel->onKeyboardPress((ActionHandler)&ConfirmNewBaseState::btnCancelClick, Options::keyCancel);
 
 	std::string area;
-	for (const auto* region : *_game->getSavedGame()->getRegions())
+	for (const Region* region : _game->getSavedGame()->getRegions())
 	{
 		if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
 		{
@@ -108,7 +108,7 @@ void ConfirmNewBaseState::btnOkClick(Action *)
 	if (_game->getSavedGame()->getFunds() >= _cost)
 	{
 		_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() - _cost);
-		_game->getSavedGame()->getBases()->push_back(_base);
+		_game->getSavedGame()->getBases().push_back(_base);
 		_game->pushState(new BaseNameState(_base, _globe, false, false));
 	}
 	else

@@ -242,7 +242,7 @@ int BattlescapeGame::think()
 						// calculate AI progress
 						int units = 0;
 						int total = 0;
-						for (auto* bu : *_save->getUnits())
+						for (BattleUnit* bu : _save->getUnits())
 						{
 							if (bu->getFaction() == sideBackup && !bu->isOut())
 							{
@@ -394,7 +394,7 @@ void BattlescapeGame::handleAI(BattleUnit *unit)
 		}
 		if (unit->getOriginalFaction() != FACTION_PLAYER || unit->isAIControlled())
 		{
-			if ((unit->getOriginalFaction() == FACTION_HOSTILE && unit->getVisibleUnits()->empty()) || pickUpWeaponsMoreActively)
+			if ((unit->getOriginalFaction() == FACTION_HOSTILE && unit->getVisibleUnits().empty()) || pickUpWeaponsMoreActively)
 			{
 				weaponPickedUp = findItem(&action, pickUpWeaponsMoreActively, walkToItem);
 			}
@@ -585,7 +585,7 @@ void BattlescapeGame::endTurn()
 		// check for hot grenades on the ground
 		if (_save->getSide() != FACTION_NEUTRAL && !_save->isPreview())
 		{
-			for (BattleItem *item : *_save->getItems())
+			for (BattleItem *item : _save->getItems())
 			{
 				if (item->isOwnerIgnored())
 				{
@@ -656,7 +656,7 @@ void BattlescapeGame::endTurn()
 	{
 		if (_save->getSide() != FACTION_NEUTRAL)
 		{
-			for (BattleItem *item : *_save->getItems())
+			for (BattleItem *item : _save->getItems())
 			{
 				if (item->isOwnerIgnored())
 				{
@@ -770,7 +770,7 @@ void BattlescapeGame::checkForCasualties(const RuleDamageType *damageType, Battl
 	if (origMurderer && (origMurderer->getSpecialAbility() == SPECAB_EXPLODEONDEATH || origMurderer->getSpecialAbility() == SPECAB_BURN_AND_EXPLODE)
 		&& origMurderer->getStatus() == STATUS_DEAD && origMurderer->getMurdererId() != 0)
 	{
-		for (auto* bu : *_save->getUnits())
+		for (BattleUnit* bu : _save->getUnits())
 		{
 			if (bu->getId() == origMurderer->getMurdererId())
 			{
@@ -804,13 +804,13 @@ void BattlescapeGame::checkForCasualties(const RuleDamageType *damageType, Battl
 		}
 	}
 
-	for (auto* victim : *_save->getUnits())
+	for (BattleUnit* victim : _save->getUnits())
 	{
 		if (victim->isIgnored()) continue;
 		BattleUnit *murderer = origMurderer;
 
 		BattleUnitKills killStat;
-		killStat.mission = _parentState->getGame()->getSavedGame()->getMissionStatistics()->size();
+		killStat.mission = (int)_parentState->getGame()->getSavedGame()->getMissionStatistics().size();
 		killStat.setTurn(_save->getTurn(), _save->getSide());
 		killStat.setUnitStats(victim);
 		killStat.faction = victim->getOriginalFaction();
@@ -839,7 +839,7 @@ void BattlescapeGame::checkForCasualties(const RuleDamageType *damageType, Battl
 		// Assumption : The last person to hit the victim is the murderer.
 		if (!murderer && !terrainExplosion)
 		{
-			for (auto* bu : *_save->getUnits())
+			for (BattleUnit* bu : _save->getUnits())
 			{
 				if (bu->getId() == victim->getMurdererId())
 				{
@@ -856,7 +856,7 @@ void BattlescapeGame::checkForCasualties(const RuleDamageType *damageType, Battl
 			if (murderer->getFaction() == FACTION_PLAYER && murderer->getOriginalFaction() != FACTION_PLAYER)
 			{
 				// This must be a mind controlled unit. Find out who mind controlled him and award the kill to that unit.
-				for (auto* bu : *_save->getUnits())
+				for (BattleUnit* bu : _save->getUnits())
 				{
 					if (bu->getId() == murderer->getMindControllerId() && bu->getGeoscapeSoldier())
 					{
@@ -927,7 +927,7 @@ void BattlescapeGame::checkForCasualties(const RuleDamageType *damageType, Battl
 					int modifier = _save->getUnitMoraleModifier(victim);
 					int loserMod =  _save->getFactionMoraleModifier(victim->getOriginalFaction() != FACTION_HOSTILE);
 					int winnerMod = _save->getFactionMoraleModifier(victim->getOriginalFaction() == FACTION_HOSTILE);
-					for (auto* bu : *_save->getUnits())
+					for (BattleUnit* bu : _save->getUnits())
 					{
 						if (!bu->isOut() && (bu->isSmallUnit() || bu->getGeoscapeSoldier())) // soldier in 2x2 armors should feel dread too
 						{
@@ -1003,7 +1003,7 @@ void BattlescapeGame::checkForCasualties(const RuleDamageType *damageType, Battl
 						// the murderer gets a morale bonus if he is of a different faction (excluding neutrals)
 						murderer->moraleChange(20);
 
-						for (auto winner : *_save->getUnits())
+						for (BattleUnit* winner : _save->getUnits())
 						{
 							if (!winner->isOut() && winner->isSmallUnit() && winner->getOriginalFaction() == murderer->getOriginalFaction())
 							{
@@ -1547,7 +1547,7 @@ bool BattlescapeGame::checkReservedTU(BattleUnit *bu, int tu, int energy, bool j
  */
 bool BattlescapeGame::handlePanickingPlayer()
 {
-	for (auto* bu : *_save->getUnits())
+	for (BattleUnit* bu : _save->getUnits())
 	{
 		if (bu->getFaction() == FACTION_PLAYER &&
 			bu->getOriginalFaction() == FACTION_PLAYER &&
@@ -1604,7 +1604,7 @@ bool BattlescapeGame::handlePanickingUnit(BattleUnit *unit)
 		{
 			soundPlayed = true;
 			if (sounds.size() > 1)
-				playSound(sounds[RNG::generate(0, sounds.size() - 1)]);
+				playSound(sounds[RNG::generate(0, (int)sounds.size() - 1)]);
 			else
 				playSound(sounds.front());
 		}
@@ -1824,7 +1824,7 @@ void BattlescapeGame::primaryAction(Position pos)
 				// Populate the action's waypoints with the positions we want to fire at
 				// Start from the last shot and move to the first, since we'll be using the last element first and then pop_back()
 				int numberOfShots = _currentAction.weapon->getRules()->getConfigAuto()->shots;
-				int numberOfWaypoints = _currentAction.waypoints.size();
+				int numberOfWaypoints = (int)_currentAction.waypoints.size();
 				_currentAction.waypoints.clear();
 				for (int i = numberOfShots - 1; i > 0; --i)
 				{
@@ -1875,7 +1875,7 @@ void BattlescapeGame::primaryAction(Position pos)
 			{
 				if (!_currentAction.weapon->getRules()->isLOSRequired() ||
 					(_currentAction.actor->getFaction() == FACTION_PLAYER && targetUnit->getFaction() != FACTION_HOSTILE) ||
-					std::find(_currentAction.actor->getVisibleUnits()->begin(), _currentAction.actor->getVisibleUnits()->end(), targetUnit) != _currentAction.actor->getVisibleUnits()->end())
+					std::find(_currentAction.actor->getVisibleUnits().begin(), _currentAction.actor->getVisibleUnits().end(), targetUnit) != _currentAction.actor->getVisibleUnits().end())
 				{
 					std::string error;
 					if (_currentAction.spendTU(&error))
@@ -1943,7 +1943,7 @@ void BattlescapeGame::primaryAction(Position pos)
 					_currentAction.target = pos;
 					if (!_currentAction.weapon->getRules()->isLOSRequired() ||
 						(attackerFaction == FACTION_PLAYER && targetFaction != FACTION_HOSTILE) ||
-						std::find(_currentAction.actor->getVisibleUnits()->begin(), _currentAction.actor->getVisibleUnits()->end(), targetUnit) != _currentAction.actor->getVisibleUnits()->end())
+						std::find(_currentAction.actor->getVisibleUnits().begin(), _currentAction.actor->getVisibleUnits().end(), targetUnit) != _currentAction.actor->getVisibleUnits().end())
 					{
 						// get the sound/animation started
 						getMap()->setCursorType(CT_NONE);
@@ -2195,7 +2195,7 @@ void BattlescapeGame::requestEndTurn(bool askForConfirmation)
 
 		// check for fatal wounds
 		int soldiersWithFatalWounds = 0;
-		for (const auto* bu : *_save->getUnits())
+		for (const BattleUnit* bu : _save->getUnits())
 		{
 			if (bu->getOriginalFaction() == FACTION_PLAYER && bu->getStatus() != STATUS_DEAD && bu->getFatalWounds() > 0)
 				soldiersWithFatalWounds++;
@@ -2366,7 +2366,7 @@ void BattlescapeGame::spawnNewUnit(BattleActionAttack attack, Position position)
 		newUnit->clearTimeUnits();
 		newUnit->setPreviousOwner(owner);
 		newUnit->setVisible(faction == FACTION_PLAYER);
-		_save->getUnits()->push_back(newUnit);
+		_save->getUnits().push_back(newUnit);
 		_save->initUnit(newUnit, itemLevel);
 
 		getTileEngine()->applyGravity(newUnit->getTile());
@@ -2423,7 +2423,7 @@ void BattlescapeGame::spawnNewItem(BattleActionAttack attack, Position position)
 	{
 		tile->addItem(newItem, getMod()->getInventoryGround());
 		newItem->setPreviousOwner(owner);
-		_save->getItems()->push_back(newItem);
+		_save->getItems().push_back(newItem);
 		_save->initItem(newItem, owner);
 
 		getTileEngine()->applyGravity(newItem->getTile());
@@ -2447,7 +2447,7 @@ void BattlescapeGame::spawnFromPrimedItems()
 {
 	std::vector<BattleItem*> itemsSpawningUnits;
 
-	for (auto* bi : *_save->getItems())
+	for (BattleItem* bi : _save->getItems())
 	{
 		if (bi->isOwnerIgnored() || !bi->getTile())
 		{
@@ -2477,10 +2477,10 @@ void BattlescapeGame::removeSummonedPlayerUnits()
 {
 	std::vector<Unit*> resummonAsCivilians;
 
-	auto buIt = _save->getUnits()->begin();
-	while (buIt != _save->getUnits()->end())
+	auto buIt = _save->getUnits().begin();
+	while (buIt != _save->getUnits().end())
 	{
-		auto* bu = (*buIt);
+		BattleUnit* bu = (*buIt);
 		if (!bu->isSummonedPlayerUnit())
 		{
 			++buIt;
@@ -2500,8 +2500,8 @@ void BattlescapeGame::removeSummonedPlayerUnits()
 
 			//remove all items from unit
 			bu->removeSpecialWeapons(_save);
-			auto invCopy = *bu->getInventory();
-			for (auto* bi : invCopy)
+			std::vector<BattleItem*> invCopy = bu->getInventory();
+			for (BattleItem* bi : invCopy)
 			{
 				_save->removeItem(bi);
 			}
@@ -2509,7 +2509,7 @@ void BattlescapeGame::removeSummonedPlayerUnits()
 			bu->setTile(nullptr, _save);
 			_save->clearUnitSelection(bu);
 			delete bu;
-			buIt = _save->getUnits()->erase(buIt);
+			buIt = _save->getUnits().erase(buIt);
 		}
 	}
 
@@ -2518,7 +2518,7 @@ void BattlescapeGame::removeSummonedPlayerUnits()
 		BattleUnit *newUnit = new BattleUnit(getMod(),
 			unitType,
 			FACTION_NEUTRAL,
-			_save->getUnits()->back()->getId() + 1,
+			_save->getUnits().back()->getId() + 1,
 			_save->getEnviroEffects(),
 			unitType->getArmor(),
 			nullptr,
@@ -2529,7 +2529,7 @@ void BattlescapeGame::removeSummonedPlayerUnits()
 		newUnit->setTile(nullptr, _save);
 		newUnit->setPosition(TileEngine::invalid);
 		newUnit->markAsResummonedFakeCivilian();
-		_save->getUnits()->push_back(newUnit);
+		_save->getUnits().push_back(newUnit);
 	}
 }
 
@@ -2539,7 +2539,7 @@ void BattlescapeGame::removeSummonedPlayerUnits()
 void BattlescapeGame::tallySummonedVIPs()
 {
 	EscapeType escapeType = _save->getVIPEscapeType();
-	for (const auto* unit : *_save->getUnits())
+	for (const BattleUnit* unit : _save->getUnits())
 	{
 		if (unit->isVIP() && unit->isSummonedPlayerUnit())
 		{
@@ -2707,7 +2707,7 @@ BattleItem *BattlescapeGame::surveyItems(BattleAction *action, bool pickUpWeapon
 	std::vector<BattleItem*> droppedItems;
 
 	// first fill a vector with items on the ground that were dropped on the alien turn, and have an attraction value.
-	for (auto* bi : *_save->getItems())
+	for (BattleItem* bi : _save->getItems())
 	{
 		if (bi->isOwnerIgnored())
 		{
@@ -2781,10 +2781,10 @@ bool BattlescapeGame::worthTaking(BattleItem* item, BattleAction *action, bool p
 
 	// don't even think about making a move for that gun if you can see a target, for some reason
 	// (maybe this should check for enemies spotting the tile the item is on?)
-	if (action->actor->getVisibleUnits()->empty() || pickUpWeaponsMoreActively)
+	if (action->actor->getVisibleUnits().empty() || pickUpWeaponsMoreActively)
 	{
 		// retrieve an insignificantly low value from the ruleset.
-		worthToTake = action->actor->getAIModule()->getItemPickUpScore(item);
+		worthToTake = (int)action->actor->getAIModule()->getItemPickUpScore(item);
 
 		// it's always going to be worth while to try and take a blaster launcher, apparently
 		if (item->getRules()->getBattleType() == BT_FIREARM && item->getCurrentWaypoints() == 0)
@@ -2794,7 +2794,7 @@ bool BattlescapeGame::worthTaking(BattleItem* item, BattleAction *action, bool p
 			if (!item->haveAnyAmmo())
 			{
 				ammoFound = false;
-				for (const auto* bi : *action->actor->getInventory())
+				for (const BattleItem* bi : action->actor->getInventory())
 				{
 					if (bi->getRules()->getBattleType() == BT_AMMO)
 					{
@@ -2816,7 +2816,7 @@ bool BattlescapeGame::worthTaking(BattleItem* item, BattleAction *action, bool p
 		{
 			// similar to the above, but this time we're checking if the ammo is suitable for a weapon we have.
 			bool weaponFound = false;
-			for (const auto* bi : *action->actor->getInventory())
+			for (const BattleItem* bi : action->actor->getInventory())
 			{
 				if (bi->getRules()->getBattleType() == BT_FIREARM)
 				{
@@ -2838,7 +2838,7 @@ bool BattlescapeGame::worthTaking(BattleItem* item, BattleAction *action, bool p
 	{
 		// use bad logic to determine if we'll have room for the item
 		int freeSlots = 25;
-		for (const auto* bi : *action->actor->getInventory())
+		for (const BattleItem* bi : action->actor->getInventory())
 		{
 			freeSlots -= bi->getRules()->getInventoryHeight() * bi->getRules()->getInventoryWidth();
 		}
@@ -2886,7 +2886,7 @@ int BattlescapeGame::takeItemFromGround(BattleItem* item, BattleAction *action)
 	else
 	{
 		// check to make sure we have enough space by checking all the sizes of items in our inventory
-		for (const auto* bi : *action->actor->getInventory())
+		for (const BattleItem* bi : action->actor->getInventory())
 		{
 			freeSlots -= bi->getRules()->getInventoryHeight() * bi->getRules()->getInventoryWidth();
 		}
@@ -3066,7 +3066,7 @@ BattlescapeTally BattlescapeGame::tallyUnits()
 {
 	BattlescapeTally tally = { };
 
-	for (auto* bu : *_save->getUnits())
+	for (BattleUnit* bu : _save->getUnits())
 	{
 		//TODO: add handling of stunned units for display purposes in AbortMissionState
 		if (!bu->isOut() && (!bu->isOutThresholdExceed() || (bu->getUnitRules() && bu->getUnitRules()->getSpawnUnit())))
@@ -3158,7 +3158,7 @@ bool BattlescapeGame::convertInfected()
 {
 	bool retVal = false;
 	std::vector<BattleUnit*> forTransform;
-	for (auto* bu : *_save->getUnits())
+	for (BattleUnit* bu : _save->getUnits())
 	{
 		if (!bu->isOutThresholdExceed() && bu->getRespawn())
 		{
@@ -3174,7 +3174,7 @@ bool BattlescapeGame::convertInfected()
 		}
 	}
 
-	for (auto* bu : forTransform)
+	for (BattleUnit* bu : forTransform)
 	{
 		convertUnit(bu);
 	}
@@ -3236,7 +3236,7 @@ int BattlescapeGame::checkForProximityGrenades(BattleUnit *unit)
 			(deathTrapRule->getBattleType() == BT_PROXIMITYGRENADE || deathTrapRule->getBattleType() == BT_MELEE))
 		{
 			BattleItem* deathTrapItem = nullptr;
-			for (auto item : *deathTrapTile->getInventory())
+			for (BattleItem* item : deathTrapTile->getInventory())
 			{
 				if (item->getRules() == deathTrapRule)
 				{
@@ -3276,7 +3276,7 @@ int BattlescapeGame::checkForProximityGrenades(BattleUnit *unit)
 			if (t)
 			{
 				std::vector<BattleItem*> forRemoval;
-				for (BattleItem *item : *t->getInventory())
+				for (BattleItem *item : t->getInventory())
 				{
 					const RuleItem *ruleItem = item->getRules();
 					bool g = item->getGlow();
@@ -3392,7 +3392,7 @@ void BattlescapeGame::playUnitResponseSound(BattleUnit *unit, int type)
 	if (!sounds.empty())
 	{
 		if (sounds.size() > 1)
-			sound = sounds[RNG::seedless(0, sounds.size() - 1)];
+			sound = sounds[RNG::seedless(0, (int)sounds.size() - 1)];
 		else
 			sound = sounds.front();
 	}

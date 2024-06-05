@@ -84,16 +84,16 @@ PromotionsState::PromotionsState()
 	_lstSoldiers->setBackground(_window);
 	_lstSoldiers->setMargin(8);
 
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
-		for (auto* soldier : *xbase->getSoldiers())
+		for (Soldier* soldier : xbase->getSoldiers())
 		{
 			if (soldier->isPromoted())
 			{
 				_lstSoldiers->addRow(3, soldier->getName().c_str(), tr(soldier->getRankString()).c_str(), xbase->getName().c_str());
 			}
 		}
-		for (auto* transfer : *xbase->getTransfers())
+		for (Transfer* transfer : xbase->getTransfers())
 		{
 			if (transfer->getType() == TRANSFER_SOLDIER)
 			{

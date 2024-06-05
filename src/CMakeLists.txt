@@ -415,9 +415,10 @@ set ( lua_src
   Lua/BattlescapeScript.cpp
   Lua/GameScript.cpp
   Lua/GeoscapeScript.cpp
-  Lua/LuaArg.cpp
   Lua/LuaApi.cpp
+  Lua/LuaArg.cpp
   Lua/LuaDispatch.cpp
+  Lua/LuaHelpers.cpp
   Lua/LuaMod.cpp
   Lua/LuaState.cpp
 )

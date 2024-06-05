@@ -92,10 +92,7 @@ UnitDieBState::UnitDieBState(BattlescapeGame *parent, BattleUnit *unit, const Ru
 
 	if (!_parent->getSave()->isBeforeGame() && _unit->getFaction() == FACTION_HOSTILE)
 	{
-		std::vector<Node *> *nodes = _parent->getSave()->getNodes();
-		if (!nodes) return; // this better not happen.
-
-		for (auto* node : *nodes)
+		for (Node* node : _parent->getSave()->getNodes())
 		{
 			if (!node->isDummy() && Position::distanceSq(node->getPosition(), _unit->getPosition()) < 4)
 			{
@@ -303,7 +300,7 @@ void UnitDieBState::convertUnitToCorpse()
 		else
 		{
 			// replace the unconscious body item with a corpse in the carrying unit's inventory
-			for (auto* bi : *_parent->getSave()->getItems())
+			for (BattleItem* bi : _parent->getSave()->getItems())
 			{
 				if (bi->getUnit() == _unit)
 				{
@@ -344,7 +341,7 @@ void UnitDieBState::playDeathSound()
 	const std::vector<int> &sounds = _unit->getDeathSounds();
 	if (!sounds.empty())
 	{
-		int i = sounds[RNG::generate(0, sounds.size() - 1)];
+		int i = sounds[RNG::generate(0, (int)sounds.size() - 1)];
 		if (i >= 0)
 		{
 			_parent->getMod()->getSoundByDepth(_parent->getDepth(), i)->play(-1, _parent->getMap()->getSoundAngle(_unit->getPosition()));

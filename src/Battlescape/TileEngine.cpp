@@ -1003,14 +1003,14 @@ void TileEngine::calculateTerrainItems(MapSubset gs)
 		{
 			auto currLight = 0;
 
-			for (const auto* bi : *tile->getInventory())
+			for (const BattleItem* bi : tile->getInventory())
 			{
 				if (bi->getGlow())
 				{
 					currLight = std::max(currLight, bi->getGlowRange());
 				}
 
-				auto* bu = bi->getUnit();
+				const BattleUnit* bu = bi->getUnit();
 				if (bu && bu->getFire())
 				{
 					currLight = std::max(currLight, unitFireLightPowerStunned);
@@ -1031,7 +1031,7 @@ void TileEngine::calculateTerrainItems(MapSubset gs)
   */
 void TileEngine::calculateUnitLighting(MapSubset gs)
 {
-	for (BattleUnit *unit : *_save->getUnits())
+	for (BattleUnit *unit : _save->getUnits())
 	{
 		if (unit->isOut())
 		{
@@ -1346,15 +1346,15 @@ bool TileEngine::setupEventVisibilitySector(const Position &observerPos, const P
 		//units beyond it (they can now be hidden or revealed based on what occurred at the event position)
 		//So, with a circle at eventPos of radius eventRadius, define its tangent points as viewed from this unit.
 		Position posDiff = eventPos - observerPos;
-		float a = asinf(eventRadius / sqrtf(posDiff.x * posDiff.x + posDiff.y * posDiff.y));
+		float a = asinf(eventRadius / sqrtf((float)(posDiff.x * posDiff.x + posDiff.y * posDiff.y)));
 		float b = atan2f(posDiff.y, posDiff.x);
 		float t1 = b - a;
 		float t2 = b + a;
 		//Define the points where the lines tangent to the circle intersect it. Note: resulting positions are relative to observer, not in direct tile space.
-		_eventVisibilitySectorL.x = roundf(eventPos.x + eventRadius * sinf(t1)) - observerPos.x;
-		_eventVisibilitySectorL.y = roundf(eventPos.y - eventRadius * cosf(t1)) - observerPos.y;
-		_eventVisibilitySectorR.x = roundf(eventPos.x - eventRadius * sinf(t2)) - observerPos.x;
-		_eventVisibilitySectorR.y = roundf(eventPos.y + eventRadius * cosf(t2)) - observerPos.y;
+		_eventVisibilitySectorL.x = (Sint16)roundf(eventPos.x + eventRadius * sinf(t1)) - observerPos.x;
+		_eventVisibilitySectorL.y = (Sint16)roundf(eventPos.y - eventRadius * cosf(t1)) - observerPos.y;
+		_eventVisibilitySectorR.x = (Sint16)roundf(eventPos.x - eventRadius * sinf(t2)) - observerPos.x;
+		_eventVisibilitySectorR.y = (Sint16)roundf(eventPos.y + eventRadius * cosf(t2)) - observerPos.y;
 		_eventVisibilityObserverPos = observerPos;
 		return false;
 	}
@@ -1407,7 +1407,7 @@ bool TileEngine::calculateUnitsInFOV(BattleUnit* unit, const Position eventPos, 
 	}
 
 	//Loop through all units specified and figure out which ones we can actually see.
-	for (auto* bu : *_save->getUnits())
+	for (BattleUnit* bu : _save->getUnits())
 	{
 		Position posOther = bu->getPosition();
 		if (!bu->isOut() && (unit->getId() != bu->getId()))
@@ -1483,7 +1483,7 @@ bool TileEngine::calculateUnitsInFOV(BattleUnit* unit, const Position eventPos, 
 	// we only react when there are at least the same amount of visible units as before AND the checksum is different
 	// this way we stop if there are the same amount of visible units, but a different unit is seen
 	// or we stop if there are more visible units seen
-	if (unit->getUnitsSpottedThisTurn().size() > oldNumVisibleUnits && !unit->getVisibleUnits()->empty())
+	if (unit->getUnitsSpottedThisTurn().size() > oldNumVisibleUnits && !unit->getVisibleUnits().empty())
 	{
 		return true;
 	}
@@ -1800,7 +1800,7 @@ std::tuple<int, int, int, int, int> getTrajectoryDataHelper(TileEngine* te, cons
 	// so in fresh smoke we should only have 4 tiles of visibility
 	// this is traced in voxel space, with smoke affecting visibility every step of the way
 	te->calculateLineVoxel(originVoxel, scanVoxel, true, &_trajectory, const_cast<BattleUnit*>(currentUnit));
-	const int trajectorySize = _trajectory.size();
+	int trajectorySize = (int)_trajectory.size();
 	float densityOfSmoke = 0;
 	float densityOfFire = 0;
 	float densityOfSmokeNearUnit = 0;
@@ -2374,8 +2374,8 @@ bool TileEngine::canTargetUnit(Position *originVoxel, Tile *tile, Position *scan
 			for ( int testRadius = unitRadius-1; testRadius <= unitRadius; ++testRadius)
 			{
 				float normal = testRadius / sqrt((float)(relPos.x*relPos.x + relPos.y*relPos.y));
-				int relX = floor(((float)relPos.y)*normal+0.5);
-				int relY = floor(((float)-relPos.x)*normal+0.5);
+				int relX = (int)floor(((float)relPos.y)*normal+0.5);
+				int relY = (int)floor(((float)-relPos.x) * normal + 0.5);
 
 				verticalSlices[ ++shiftCount ] = relX; // starting from index 2
 				verticalSlices[ ++shiftCount ] = relY;
@@ -2396,8 +2396,8 @@ bool TileEngine::canTargetUnit(Position *originVoxel, Tile *tile, Position *scan
 			for ( int testRadius = 3; testRadius <= 15; testRadius += 3 )
 			{
 				float normal = testRadius / sqrt((float)(relPos.x*relPos.x + relPos.y*relPos.y));
-				int relX = floor(((float)relPos.y)*normal+0.5);
-				int relY = floor(((float)-relPos.x)*normal+0.5);
+				int relX = (int)floor(((float)relPos.y) * normal + 0.5);
+				int relY = (int)floor(((float)-relPos.x) * normal + 0.5);
 
 				verticalSlices[ ++shiftCount ] = relX;
 				verticalSlices[ ++shiftCount ] = relY;
@@ -2486,8 +2486,8 @@ bool TileEngine::canTargetUnit(Position *originVoxel, Tile *tile, Position *scan
 		Position relPos = targetVoxel - *originVoxel;
 
 		float normal = unitRadius/sqrt((float)(relPos.x*relPos.x + relPos.y*relPos.y));
-		int relX = floor(((float)relPos.y)*normal+0.5);
-		int relY = floor(((float)-relPos.x)*normal+0.5);
+		int relX = (int)floor(((float)relPos.y) * normal + 0.5);
+		int relY = (int)floor(((float)-relPos.x) * normal + 0.5);
 
 		// Targeting order: center, right, left, front, back
 		int verticalSlices[] = { 0,0, relX,relY, -relX,-relY, relY,-relX, -relY,relX };
@@ -2738,7 +2738,7 @@ void TileEngine::calculateFOV(Position position, int eventRadius, const bool upd
 		updateRadius = getMaxViewDistance() + (eventRadius > 0 ? eventRadius : 0);
 		updateRadius *= updateRadius;
 	}
-	for (auto* bu : *_save->getUnits())
+	for (BattleUnit* bu : _save->getUnits())
 	{
 		if (Position::distance2dSq(position, bu->getPosition()) <= updateRadius) //could this unit have observed the event?
 		{
@@ -2822,11 +2822,11 @@ std::vector<TileEngine::ReactionScore> TileEngine::getSpottingUnits(BattleUnit* 
 {
 	std::vector<TileEngine::ReactionScore> spotters;
 	Tile *tile = unit->getTile();
-	int threshold = unit->getReactionScore();
+	int threshold = (int)unit->getReactionScore();
 	// no reaction on civilian turn.
 	if (_save->getSide() != FACTION_NEUTRAL)
 	{
-		for (auto* bu : *_save->getUnits())
+		for (BattleUnit* bu : _save->getUnits())
 		{
 				// not dead/unconscious
 			if (!bu->isOut() &&
@@ -3506,7 +3506,7 @@ void TileEngine::hit(BattleActionAttack attack, Position center, int power, cons
 		bool nothing = true;
 		if (terrainMeleeTilePart == 0 && (part == V_FLOOR || part == V_OBJECT))
 		{
-			for (auto* bi : *tile->getInventory())
+			for (BattleItem* bi : tile->getInventory())
 			{
 				if (hitUnit(attack, bi->getUnit(), Position(0,0,0), damage, type, rangeAtack))
 				{
@@ -3618,13 +3618,13 @@ void TileEngine::explode(BattleActionAttack attack, Position center, int power, 
 	switch (exHeight)
 	{
 	case 1:
-		vertdec = 3.0f * type->RadiusReduction;
+		vertdec = (int)(3.0f * type->RadiusReduction);
 		break;
 	case 2:
-		vertdec = 1.0f * type->RadiusReduction;
+		vertdec = (int)(1.0f * type->RadiusReduction);
 		break;
 	case 3:
-		vertdec = 0.5f * type->RadiusReduction;
+		vertdec = (int)(0.5f * type->RadiusReduction);
 	}
 
 	Tile *origin = _save->getTile(Position(centetTile));
@@ -3694,7 +3694,7 @@ void TileEngine::explode(BattleActionAttack attack, Position center, int power, 
 							const int itemDamage = bu->getOverKillDamage();
 							if (itemDamage > 0)
 							{
-								for (auto* bi : *bu->getInventory())
+								for (BattleItem* bi : bu->getInventory())
 								{
 									if (!hitUnit(attack, bi->getUnit(), Position(0, 0, 0), itemDamage, type, rangeAtack) && type->getItemFinalDamage(itemDamage) > bi->getRules()->getArmor())
 									{
@@ -3704,7 +3704,7 @@ void TileEngine::explode(BattleActionAttack attack, Position center, int power, 
 							}
 						}
 						// Affect all items and units on ground
-						for (auto* bi : *dest->getInventory())
+						for (BattleItem* bi : dest->getInventory())
 						{
 							if (!hitUnit(attack, bi->getUnit(), Position(0, 0, 0), damage, type) && type->getItemFinalDamage(damage) > bi->getRules()->getArmor())
 							{
@@ -3732,7 +3732,7 @@ void TileEngine::explode(BattleActionAttack attack, Position center, int power, 
 				if (!dest) break; // out of map!
 
 				// blockage by terrain is deducted from the explosion power
-				power_ -= type->RadiusReduction; // explosive damage decreases by 10 per tile
+				power_ -= (int)type->RadiusReduction; // explosive damage decreases by 10 per tile
 				if (origin->getPosition().z != tileZ)
 					power_ -= vertdec; //3d explosion factor
 
@@ -3740,7 +3740,7 @@ void TileEngine::explode(BattleActionAttack attack, Position center, int power, 
 				{
 					int dir;
 					Pathfinding::vectorToDirection(origin->getPosition() - dest->getPosition(), dir);
-					if (dir != -1 && dir %2) power_ -= 0.5f * type->RadiusReduction; // diagonal movement costs an extra 50% for fire.
+					if (dir != -1 && dir %2) power_ -= (int)(0.5f * type->RadiusReduction); // diagonal movement costs an extra 50% for fire.
 				}
 				if (l > 0.5) {
 					if ( l > 1.5)
@@ -5028,7 +5028,7 @@ bool TileEngine::psiAttack(BattleActionAttack attack, BattleUnit *victim)
 		killStat.weapon = attack.weapon_item->getRules()->getName();
 		killStat.weaponAmmo = attack.weapon_item->getRules()->getName(); //Psi weapons got no ammo, just filling up the field
 		killStat.faction = victim->getOriginalFaction();
-		killStat.mission = _save->getGeoscapeSave()->getMissionStatistics()->size();
+		killStat.mission = (int)_save->getGeoscapeSave()->getMissionStatistics().size();
 		killStat.id = victim->getId();
 
 		if (attack.type == BA_PANIC)
@@ -5346,7 +5346,7 @@ bool TileEngine::skillUse(BattleAction *action, const RuleSkill *skill)
  */
 bool TileEngine::tryConcealUnit(BattleUnit* unit)
 {
-	for (const auto* bu : *_save->getUnits())
+	for (const BattleUnit* bu : _save->getUnits())
 	{
 		if (bu->getFaction() != unit->getFaction() && bu->hasVisibleUnit(unit))
 		{
@@ -5372,7 +5372,7 @@ bool TileEngine::tryConcealUnit(BattleUnit* unit)
  */
 Tile *TileEngine::applyGravity(Tile *t)
 {
-	if (!t || (t->getInventory()->empty() && !t->getUnit())) return t; // skip this if there are no items
+	if (!t || (t->getInventory().empty() && !t->getUnit())) return t; // skip this if there are no items
 
 	BattleUnit *occupant = t->getUnit();
 
@@ -5405,7 +5405,7 @@ Tile *TileEngine::applyGravity(Tile *t)
 		rt = _save->getBelowTile(rt);
 	}
 
-	for (auto* bi : *t->getInventory())
+	for (BattleItem* bi : t->getInventory())
 	{
 		if (bi->getUnit() && t->getPosition() == bi->getUnit()->getPosition())
 		{
@@ -5420,7 +5420,7 @@ Tile *TileEngine::applyGravity(Tile *t)
 	if (t != rt)
 	{
 		// clear tile
-		t->getInventory()->clear();
+		t->getInventory().clear();
 	}
 
 	return rt;
@@ -5475,7 +5475,7 @@ void TileEngine::itemDrop(Tile *t, BattleItem *item, bool updateLight)
  */
 void TileEngine::itemDropInventory(Tile *t, BattleUnit *unit, bool unprimeItems, bool deleteFixedItems)
 {
-	Collections::removeIf(*unit->getInventory(),
+	Collections::removeIf(unit->getInventory(),
 		[&](BattleItem* i)
 		{
 			if (!i->getRules()->isFixed())
@@ -6039,7 +6039,7 @@ bool TileEngine::validateThrow(BattleAction &action, Position originVoxel, Posit
  */
 void TileEngine::recalculateFOV()
 {
-	for (auto* bu : *_save->getUnits())
+	for (BattleUnit* bu : _save->getUnits())
 	{
 		if (bu->getTile() != 0)
 		{
@@ -6485,7 +6485,7 @@ std::set<Tile*> TileEngine::visibleTilesFrom(BattleUnit* unit, Position pos, int
 	if (Options::aiPerformanceOptimization)
 	{
 		int myUnits = 0;
-		for (BattleUnit* bu : *(_save->getUnits()))
+		for (BattleUnit* bu : _save->getUnits())
 		{
 			if (bu->getFaction() == unit->getFaction() && !bu->isOut())
 				++myUnits;
@@ -6493,7 +6493,7 @@ std::set<Tile*> TileEngine::visibleTilesFrom(BattleUnit* unit, Position pos, int
 		float scaleFactor = (float)60 * 60 * 4 * 30 / (_save->getMapSizeXYZ() * myUnits);
 		maxDist = std::min(60, _save->getMod()->getMaxViewDistance());
 		if (scaleFactor < 1)
-			maxDist *= scaleFactor;
+			maxDist = (int)(maxDist * scaleFactor);
 	}
 	for (int x = 0; x <= maxDist; ++x) // TODO: Possible improvement: find the intercept points of the arc at max view distance and choose a more intelligent sweep of values when an event arc is defined.
 	{

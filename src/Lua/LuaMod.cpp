@@ -61,8 +61,6 @@ bool LuaMod::loadAll()
 		}
 	}
 
-	_luaGameScript->onTest().dispatchCallback("this is from C++");
-
 	Log(LOG_INFO) << "Loading Lua done.";
 
 	return true;

@@ -130,7 +130,11 @@ struct OxceVersionDate
 		size_t offset = data.find(" (v");
 		if (offset != std::string::npos && data.size() >= offset + 14 && data[offset + 2] == 'v' && data[offset + 7] == '-' && data[offset + 10] == '-' && data[offset + 13] == ')')
 		{
+			#ifdef _MSC_VER
+			correct = (sscanf_s(data.data() + offset, " (v%4d-%2d-%2d)", &year, &month, &day) == 3);
+			#else
 			correct = (std::sscanf(data.data() + offset, " (v%4d-%2d-%2d)", &year, &month, &day) == 3);
+			#endif
 		}
 
 		if (!correct)
@@ -1220,7 +1224,7 @@ void Mod::verifySoundOffset(const std::string &parent, const std::vector<int>& s
  */
 int Mod::getModOffset() const
 {
-	return _modCurrent->getOffset();
+	return (int)_modCurrent->getOffset();
 }
 
 
@@ -2134,7 +2138,7 @@ void Mod::loadAll()
 	{
 		_modCurrent = modInfo;
 
-		_scriptGlobal->addMod(modInfo->getName(), modInfo->getOffset());
+		_scriptGlobal->addMod(modInfo->getName(), (int)modInfo->getOffset());
 
 		if (!_modCurrent->getResourceConfigFile().empty())
 		{
@@ -2543,7 +2547,7 @@ void Mod::loadResourceConfigFile(const FileMap::FileRecord &filerec)
 							taint.r = Clamp((int)(color.r * to), 0, 255);
 							taint.g = Clamp((int)(color.g * to), 0, 255);
 							taint.b = Clamp((int)(color.b * to), 0, 255);
-							taint.unused = 255 * co;
+							taint.unused = (Uint8)(255 * co);
 							_transparencies[start + curr][opacity] = taint;
 						};
 					}
@@ -3483,7 +3487,7 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	count = 0;
 	for (YAML::const_iterator i = doc["armorMultipliersAbs"].begin(); i != doc["armorMultipliersAbs"].end() && count < MaxDifficultyLevels; ++i)
 	{
-		_statAdjustment[count].armorMultiplierAbs = (*i).as<double>(_statAdjustment[count].armorMultiplierAbs);
+		_statAdjustment[count].armorMultiplierAbs = (int)((*i).as<double>(_statAdjustment[count].armorMultiplierAbs));
 		++count;
 	}
 	count = 0;
@@ -3737,11 +3741,11 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 	{
 		RuleCountry *countryRule = getCountry(countryName);
 		if (!countryRule->getLonMin().empty())
-			save->getCountries()->push_back(new Country(countryRule));
+			save->getCountries().push_back(new Country(countryRule));
 	}
 	// Adjust funding to total $6M
-	int missing = ((_initialFunding - save->getCountryFunding()/1000) / (int)save->getCountries()->size()) * 1000;
-	for (auto* country : *save->getCountries())
+	int missing = ((_initialFunding - save->getCountryFunding()/1000) / (int)save->getCountries().size()) * 1000;
+	for (Country* country : save->getCountries())
 	{
 		int funding = country->getFunding().back() + missing;
 		if (funding < 0)
@@ -3757,35 +3761,35 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 	{
 		RuleRegion *regionRule = getRegion(regionName);
 		if (!regionRule->getLonMin().empty())
-			save->getRegions()->push_back(new Region(regionRule));
+			save->getRegions().push_back(new Region(regionRule));
 	}
 
 	// Set up starting base
 	const YAML::Node &startingBaseByDiff = getStartingBase(diff);
 	Base *base = new Base(this);
 	base->load(startingBaseByDiff, save, true);
-	save->getBases()->push_back(base);
+	save->getBases().push_back(base);
 
 	// Correct IDs
-	for (auto* craft : *base->getCrafts())
+	for (Craft* craft : base->getCrafts())
 	{
 		save->getId(craft->getRules()->getType());
 	}
 
 	// Remove craft weapons if needed
-	for (auto* craft : *base->getCrafts())
+	for (Craft* craft : base->getCrafts())
 	{
 		if (craft->getMaxUnitsRaw() < 0 || craft->getMaxVehiclesAndLargeSoldiersRaw() < 0)
 		{
 			size_t weaponIndex = 0;
-			for (auto* current : *craft->getWeapons())
+			for (CraftWeapon* current : craft->getWeapons())
 			{
 				base->getStorageItems()->addItem(current->getRules()->getLauncherItem());
 				base->getStorageItems()->addItem(current->getRules()->getClipItem(), current->getClipsLoaded());
 				craft->addCraftStats(-current->getRules()->getBonusStats());
 				craft->setShield(craft->getShield());
 				delete current;
-				craft->getWeapons()->at(weaponIndex) = 0;
+				craft->getWeapons().at(weaponIndex) = 0;
 				weaponIndex++;
 			}
 		}
@@ -3843,20 +3847,20 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			RuleSoldier* ruleSoldier = getSoldier(randomTypes[i], true);
 			int nationality = save->selectSoldierNationalityByLocation(this, ruleSoldier, nullptr); // -1 (unfortunately the first base is not placed yet)
 			Soldier *soldier = genSoldier(save, ruleSoldier, nationality);
-			base->getSoldiers()->push_back(soldier);
+			base->getSoldiers().push_back(soldier);
 			// Award soldier a special 'original eight' commendation
 			if (_commendations.find("STR_MEDAL_ORIGINAL8_NAME") != _commendations.end())
 			{
 				SoldierDiary *diary = soldier->getDiary();
 				diary->awardOriginalEightCommendation(this);
-				for (auto* comm : *diary->getSoldierCommendations())
+				for (SoldierCommendations* comm : diary->getSoldierCommendations())
 				{
 					comm->makeOld();
 				}
 			}
 		}
 		// Assign pilots to craft (interceptors first, transport last) and non-pilots to transports only
-		for (auto* soldier : *base->getSoldiers())
+		for (Soldier* soldier : base->getSoldiers())
 		{
 			if (soldier->getArmor()->getSize() > 1)
 			{
@@ -3865,7 +3869,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			else if (soldier->getRules()->getAllowPiloting())
 			{
 				Craft *found = 0;
-				for (auto* craft : *base->getCrafts())
+				for (Craft* craft : base->getCrafts())
 				{
 					CraftPlacementErrors err = craft->validateAddingSoldier(craft->getSpaceAvailable(), soldier);
 					if (!found && craft->getRules()->getAllowLanding() && err == CPE_None)
@@ -3884,7 +3888,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			else
 			{
 				Craft *found = 0;
-				for (auto* craft : *base->getCrafts())
+				for (Craft* craft : base->getCrafts())
 				{
 					CraftPlacementErrors err = craft->validateAddingSoldier(craft->getSpaceAvailable(), soldier);
 					if (craft->getRules()->getAllowLanding() && err == CPE_None)
@@ -4937,10 +4941,10 @@ Soldier *Mod::genSoldier(SavedGame *save, const RuleSoldier* ruleSoldier, int na
 		delete soldier;
 		soldier = new Soldier(const_cast<RuleSoldier*>(ruleSoldier), ruleSoldier->getDefaultArmor(), nationality, newId);
 		duplicate = false;
-		for (auto* xbase : *save->getBases())
+		for (Base* xbase : save->getBases())
 		{
 			if (duplicate) break; // loop finished
-			for (auto* xsoldier : *xbase->getSoldiers())
+			for (Soldier* xsoldier : xbase->getSoldiers())
 			{
 				if (duplicate) break; // loop finished
 				if (xsoldier->getName() == soldier->getName())
@@ -4948,7 +4952,7 @@ Soldier *Mod::genSoldier(SavedGame *save, const RuleSoldier* ruleSoldier, int na
 					duplicate = true;
 				}
 			}
-			for (auto* transfer : *xbase->getTransfers())
+			for (Transfer* transfer : xbase->getTransfers())
 			{
 				if (duplicate) break; // loop finished
 				if (transfer->getType() == TRANSFER_SOLDIER && transfer->getSoldier()->getName() == soldier->getName())
@@ -5293,7 +5297,7 @@ void Mod::loadVanillaResources()
 	{
 		std::string s = "GEODATA/PALETTES.DAT";
 		_palettes[pal[i]] = new Palette();
-		_palettes[pal[i]]->loadDat(s, 256, Palette::palOffset(i));
+		_palettes[pal[i]]->loadDat(s, 256, Palette::palOffset((int)i));
 	}
 	{
 		std::string s1 = "GEODATA/BACKPALS.DAT";
@@ -5328,7 +5332,7 @@ void Mod::loadVanillaResources()
 		{ 3, 3, 6, 255 } };
 		for (size_t i = 0; i < ARRAYLEN(gradient); ++i)
 		{
-			SDL_Color *color = _palettes[s2]->getColors(Palette::backPos + 16 + i);
+			SDL_Color* color = _palettes[s2]->getColors(Palette::backPos + 16 + (int)i);
 			*color = gradient[i];
 		}
 		//_palettes[s2]->savePalMod("../../../customPalettes.rul", "PAL_BATTLESCAPE_CUSTOM", "PAL_BATTLESCAPE");
@@ -5852,7 +5856,7 @@ void Mod::loadBattlescapeResources()
 				//Palette fix for ION armor
 				if (j == 2)
 				{
-					int size = xcom_2->getTotalFrames();
+					int size = (int)xcom_2->getTotalFrames();
 					for (int i = 0; i < size; ++i)
 					{
 						Surface *surf = xcom_2->getFrame(i);
@@ -6227,7 +6231,7 @@ Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFi
 				if (track < adlibcat->size())
 				{
 					music = new AdlibMusic(rule->getNormalization());
-					music->load(adlibcat->getRWops(track));
+					music->load(adlibcat->getRWops((Uint32)track));
 				}
 				// separate intro music
 				else if (aintrocat)
@@ -6236,7 +6240,7 @@ Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFi
 					if (track < aintrocat->size())
 					{
 						music = new AdlibMusic(rule->getNormalization());
-						music->load(aintrocat->getRWops(track));
+						music->load(aintrocat->getRWops((Uint32)track));
 					}
 					else
 					{
@@ -6252,7 +6256,7 @@ Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFi
 			// DOS MIDI
 			if (gmcat && track < gmcat->size())
 			{
-				music = gmcat->loadMIDI(track);
+				music = gmcat->loadMIDI((unsigned int)track);
 			}
 		}
 		// Try digital tracks

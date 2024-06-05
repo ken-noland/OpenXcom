@@ -147,7 +147,7 @@ public:
 	/// Gets if this is craft pre-equip phase in base view.
 	bool isBaseCraftInventory();
 	/// Gets the game's mapdata files.
-	std::vector<MapDataSet*> *getMapDataSets();
+	std::vector<MapDataSet*>& getMapDataSets();
 	/// Sets the mission type.
 	void setMissionType(const std::string &missionType);
 	/// Gets the mission type.
@@ -215,11 +215,11 @@ public:
 	/// Gets the global shade.
 	int getGlobalShade() const;
 	/// Gets a pointer to the list of nodes.
-	std::vector<Node*> *getNodes();
+	std::vector<Node*>& getNodes();
 	/// Gets a pointer to the list of items.
-	std::vector<BattleItem*> *getItems();
+	std::vector<BattleItem*>& getItems();
 	/// Gets a pointer to the list of units.
-	std::vector<BattleUnit*> *getUnits();
+	std::vector<BattleUnit*>& getUnits();
 	/// Gets terrain size x.
 	int getMapSizeX() const { return _mapsize_x; }
 	/// Gets terrain size y.
@@ -571,9 +571,9 @@ public:
 	// gets ruleset.
 	const Mod *getMod() const;
 	/// gets the list of items we're guaranteed.
-	std::vector<BattleItem*> *getGuaranteedRecoveredItems();
+	std::vector<BattleItem*>& getGuaranteedRecoveredItems();
 	/// gets the list of items we MIGHT get.
-	std::vector<BattleItem*> *getConditionalRecoveredItems();
+	std::vector<BattleItem*>& getConditionalRecoveredItems();
 	/// Get the name of the music track.
 	const std::string &getMusic() const;
 	/// Set the name of the music track.

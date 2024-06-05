@@ -440,29 +440,29 @@ void StatsForNerdsState::btnPreviewClick(Action *)
 			// we use NEGATIVE soldier IDs to make sure there is not even a theoretical chance of modifying real geoscape soldiers during the preview
 			int newId = -(i + 1);
 			Soldier* soldier = new Soldier(soldierRule, defaultArmor, 0 /*nationality*/, newId);
-			base->getSoldiers()->push_back(soldier);
+			base->getSoldiers().push_back(soldier);
 			soldier->setName("Position" + std::to_string(newId));
 		}
 	}
 	// now clean up from the previous preview
 	{
-		for (auto* soldier : *base->getSoldiers())
+		for (Soldier* soldier : base->getSoldiers())
 		{
 			soldier->setCraft(nullptr);
 		}
-		for (auto* craft : *base->getCrafts())
+		for (Craft* craft : base->getCrafts())
 		{
 			delete craft;
 		}
-		base->getCrafts()->clear();
+		base->getCrafts().clear();
 	}
 	// and finally create the craft we need
 	RuleCraft* craftRule = mod->getCraft(_topicId);
 	Craft* c = new Craft(craftRule, base, RuleCraft::DUMMY_CRAFT_ID); // a negative integer
-	base->getCrafts()->push_back(c);
+	base->getCrafts().push_back(c);
 	c->setName(tr(craftRule->getType()));
 	int max = craftRule->getMaxUnitsLimit();
-	for (auto* soldier : *base->getSoldiers())
+	for (Soldier* soldier : base->getSoldiers())
 	{
 		soldier->setCraft(c);
 		max--;
@@ -1711,7 +1711,7 @@ void StatsForNerdsState::addSpriteResourcePath(std::ostringstream &ss, Mod *mod,
 		for (auto extraSprite : i->second)
 		{
 			// strip mod offset from the in-game ID
-			int originalSpriteId = resourceId - (extraSprite->getModOwner()->getOffset());
+			size_t originalSpriteId = resourceId - (extraSprite->getModOwner()->getOffset());
 
 			auto mapOfSprites = extraSprite->getSprites();
 			auto individualSprite = mapOfSprites->find(originalSpriteId);
@@ -3611,7 +3611,7 @@ void StatsForNerdsState::initUfoList()
 		// spread 100-200%
 		double avgFireRate = fireCountdown * 1.5;
 		double avgDpm = avgDamage * (totalAccuracy / 100.0) * (60.0 / avgFireRate);
-		addInteger(ss, Round(avgDpm), "_averageDPM");
+		addInteger(ss, (const int)Round(avgDpm), "_averageDPM");
 
 		endHeading();
 	}

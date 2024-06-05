@@ -434,7 +434,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 	{
 		std::vector<std::string> regionList;
 		regionList.push_back("All regions");
-		for (auto r : *_game->getSavedGame()->getRegions())
+		for (Region* r : _game->getSavedGame()->getRegions())
 		{
 			regionList.push_back(r->getRules()->getType());
 		}
@@ -464,7 +464,7 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 
 		std::vector<std::string> countryList;
 		countryList.push_back("All countries");
-		for (auto c : *_game->getSavedGame()->getCountries())
+		for (Country* c : _game->getSavedGame()->getCountries())
 		{
 			countryList.push_back(tr(c->getRules()->getType()));
 		}
@@ -541,9 +541,9 @@ void GeoscapeState::handle(Action *action)
 			if (action->getDetails()->key.keysym.sym == SDLK_2)
 			{
 				_txtDebug->setText("ALL FACILITY CONSTRUCTION COMPLETED");
-				for (auto* xbase : *_game->getSavedGame()->getBases())
+				for (Base* xbase : _game->getSavedGame()->getBases())
 				{
-					for (auto* facility : *xbase->getFacilities())
+					for (BaseFacility* facility : xbase->getFacilities())
 					{
 						facility->setBuildTime(0);
 						facility->setIfHadPreviousFacility(false);
@@ -554,7 +554,7 @@ void GeoscapeState::handle(Action *action)
 			if (action->getDetails()->key.keysym.sym == SDLK_3)
 			{
 				_txtDebug->setText("+50 SCIENTISTS/ENGINEERS");
-				for (auto* xbase : *_game->getSavedGame()->getBases())
+				for (Base* xbase : _game->getSavedGame()->getBases())
 				{
 					xbase->setScientists(xbase->getScientists() + 50);
 					xbase->setEngineers(xbase->getEngineers() + 50);
@@ -564,11 +564,11 @@ void GeoscapeState::handle(Action *action)
 			if (action->getDetails()->key.keysym.sym == SDLK_4)
 			{
 				_txtDebug->setText("+2 ALL ITEMS");
-				for (auto* xbase : *_game->getSavedGame()->getBases())
+				for (Base* xbase : _game->getSavedGame()->getBases())
 				{
-					for (auto& itemType : _game->getMod()->getItemsList())
+					for (const std::string& itemType : _game->getMod()->getItemsList())
 					{
-						auto* item = _game->getMod()->getItem(itemType);
+						RuleItem* item = _game->getMod()->getItem(itemType);
 						if (item && item->isRecoverable() && !item->isAlien() && item->getSellCost() > 0)
 						{
 							xbase->getStorageItems()->addItem(item, 2);
@@ -580,7 +580,7 @@ void GeoscapeState::handle(Action *action)
 			if (action->getDetails()->key.keysym.sym == SDLK_5)
 			{
 				_txtDebug->setText("+2 ALL LIVE ALIENS");
-				for (auto* xbase : *_game->getSavedGame()->getBases())
+				for (Base* xbase : _game->getSavedGame()->getBases())
 				{
 					for (auto& itemType : _game->getMod()->getItemsList())
 					{
@@ -597,12 +597,12 @@ void GeoscapeState::handle(Action *action)
 			{
 				_txtDebug->setText("XCOM/ALIEN ACTIVITY FOR THIS MONTH RESET");
 				size_t invertedEntry = _game->getSavedGame()->getFundsList().size() - 1;
-				for (auto* region : *_game->getSavedGame()->getRegions())
+				for (Region* region : _game->getSavedGame()->getRegions())
 				{
 					region->getActivityXcom().at(invertedEntry) = 0;
 					region->getActivityAlien().at(invertedEntry) = 0;
 				}
-				for (auto* country : *_game->getSavedGame()->getCountries())
+				for (Country* country : _game->getSavedGame()->getCountries())
 				{
 					country->getActivityXcom().at(invertedEntry) = 0;
 					country->getActivityAlien().at(invertedEntry) = 0;
@@ -612,12 +612,12 @@ void GeoscapeState::handle(Action *action)
 			if (action->getDetails()->key.keysym.sym == SDLK_7)
 			{
 				_txtDebug->setText("BIG BROTHER SEES ALL");
-				for (auto* ufo : *_game->getSavedGame()->getUfos())
+				for (Ufo* ufo : _game->getSavedGame()->getUfos())
 				{
 					ufo->setDetected(true);
 					ufo->setHyperDetected(true);
 				}
-				for (auto* ab : *_game->getSavedGame()->getAlienBases())
+				for (AlienBase* ab : _game->getSavedGame()->getAlienBases())
 				{
 					ab->setDiscovered(true);
 				}
@@ -626,9 +626,9 @@ void GeoscapeState::handle(Action *action)
 			if (action->getDetails()->key.keysym.sym == SDLK_a)
 			{
 				_txtDebug->setText("SOLDIER DIARIES DELETED");
-				for (auto* xbase : *_game->getSavedGame()->getBases())
+				for (Base* xbase : _game->getSavedGame()->getBases())
 				{
-					for (auto* soldier : *xbase->getSoldiers())
+					for (Soldier* soldier : xbase->getSoldiers())
 					{
 						soldier->resetDiary();
 					}
@@ -638,15 +638,15 @@ void GeoscapeState::handle(Action *action)
 			if (action->getDetails()->key.keysym.sym == SDLK_c)
 			{
 				_txtDebug->setText("SOLDIER COMMENDATIONS DELETED");
-				for (auto* xbase : *_game->getSavedGame()->getBases())
+				for (Base* xbase : _game->getSavedGame()->getBases())
 				{
-					for (auto* soldier : *xbase->getSoldiers())
+					for (Soldier* soldier : xbase->getSoldiers())
 					{
-						for (auto* commendation : *soldier->getDiary()->getSoldierCommendations())
+						for (SoldierCommendations* commendation : soldier->getDiary()->getSoldierCommendations())
 						{
 							delete commendation;
 						}
-						soldier->getDiary()->getSoldierCommendations()->clear();
+						soldier->getDiary()->getSoldierCommendations().clear();
 					}
 				}
 			}
@@ -717,13 +717,14 @@ void GeoscapeState::init()
 		// run once
 	if (_game->getSavedGame()->getMonthsPassed() == -1 &&
 		// as long as there's a base
-		!_game->getSavedGame()->getBases()->empty() &&
+		!_game->getSavedGame()->getBases().empty() &&
 		// and it has a name (THIS prevents it from running prior to the base being placed.)
-		!_game->getSavedGame()->getBases()->front()->getName().empty())
+		!_game->getSavedGame()->getBases().front()->getName().empty())
 	{
 		_game->getSavedGame()->addMonth();
 		determineAlienMissions();
-		_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() - (_game->getSavedGame()->getBaseMaintenance() - _game->getSavedGame()->getBases()->front()->getPersonnelMaintenance()));
+		_game->getSavedGame()->setFunds(
+			_game->getSavedGame()->getFunds() - (_game->getSavedGame()->getBaseMaintenance() - _game->getSavedGame()->getBases().front()->getPersonnelMaintenance()));
 	}
 }
 
@@ -890,12 +891,12 @@ void GeoscapeState::timeAdvance()
  * Update list of active crafts.
  * @return Const pointer to updated list.
  */
-const std::vector<Craft*>* GeoscapeState::updateActiveCrafts()
+const std::vector<Craft*>& GeoscapeState::updateActiveCrafts()
 {
 	_activeCrafts.clear();
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
-		for (auto* xcraft : *xbase->getCrafts())
+		for (Craft* xcraft : xbase->getCrafts())
 		{
 			if (xcraft->getStatus() == "STR_OUT" && !xcraft->isDestroyed())
 			{
@@ -903,7 +904,7 @@ const std::vector<Craft*>* GeoscapeState::updateActiveCrafts()
 			}
 		}
 	}
-	return &_activeCrafts;
+	return _activeCrafts;
 }
 
 /**
@@ -925,7 +926,7 @@ void GeoscapeState::time5Seconds()
 	}
 
 	// Game over if there are no more bases.
-	if (_game->getSavedGame()->getBases()->empty())
+	if (_game->getSavedGame()->getBases().empty())
 	{
 		_game->getSavedGame()->setEnding(END_LOSE);
 	}
@@ -943,7 +944,7 @@ void GeoscapeState::time5Seconds()
 
 	// Handle UFO logic
 	bool ufoIsAttacking = false;
-	for (auto* ufo : *_game->getSavedGame()->getUfos())
+	for (Ufo* ufo : _game->getSavedGame()->getUfos())
 	{
 		switch (ufo->getStatus())
 		{
@@ -981,7 +982,7 @@ void GeoscapeState::time5Seconds()
 						if (_game->getMod()->getEscortsJoinFightAgainstHK())
 						{
 							int secondaryTargets = 0;
-							for (auto craft : *activeCrafts)
+							for (Craft* craft : activeCrafts)
 							{
 								if (!craft->isIgnoredByHK() && craft != c)
 								{
@@ -1017,7 +1018,7 @@ void GeoscapeState::time5Seconds()
 					continue;
 				}
 
-				size_t count = _game->getSavedGame()->getMissionSites()->size();
+				size_t count = _game->getSavedGame()->getMissionSites().size();
 				AlienMission *mission = ufo->getMission();
 				bool detected = ufo->getDetected();
 				mission->ufoReachedWaypoint(*ufo, *_game, *_globe);
@@ -1031,9 +1032,9 @@ void GeoscapeState::time5Seconds()
 					if (!(ufo->getTrajectory().getID() == UfoTrajectory::RETALIATION_ASSAULT_RUN && ufo->getStatus() == Ufo::LANDED))
 						popup(new UfoLostState(ufo->getName(_game->getLanguage())));
 				}
-				if (count < _game->getSavedGame()->getMissionSites()->size())
+				if (count < _game->getSavedGame()->getMissionSites().size())
 				{
-					MissionSite *site = _game->getSavedGame()->getMissionSites()->back();
+					MissionSite *site = _game->getSavedGame()->getMissionSites().back();
 					site->setDetected(true);
 					popup(new MissionDetectedState(site, this));
 				}
@@ -1046,7 +1047,7 @@ void GeoscapeState::time5Seconds()
 					ufo->setDestination(0);
 					base->setupDefenses(mission);
 					timerReset();
-					if (!base->getDefenses()->empty() && !ufo->getMission()->getRules().ignoreBaseDefenses())
+					if (!base->getDefenses().empty() && !ufo->getMission()->getRules().ignoreBaseDefenses())
 					{
 						popup(new BaseDefenseState(base, ufo, this));
 						return; // don't allow multiple simultaneous attacks in the same game tick
@@ -1108,14 +1109,14 @@ void GeoscapeState::time5Seconds()
 	}
 
 	// Handle craft logic
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
-		for (auto craftIt = xbase->getCrafts()->begin(); craftIt != xbase->getCrafts()->end();)
+		for (auto craftIt = xbase->getCrafts().begin(); craftIt != xbase->getCrafts().end();)
 		{
 			Craft* xcraft = (*craftIt);
 			if (xcraft->isDestroyed())
 			{
-				for (auto* country : *_game->getSavedGame()->getCountries())
+				for (Country* country : _game->getSavedGame()->getCountries())
 				{
 					if (country->getRules()->insideCountry(xcraft->getLongitude(), xcraft->getLatitude()))
 					{
@@ -1123,7 +1124,7 @@ void GeoscapeState::time5Seconds()
 						break;
 					}
 				}
-				for (auto* region : *_game->getSavedGame()->getRegions())
+				for (Region* region : _game->getSavedGame()->getRegions())
 				{
 					if (region->getRules()->insideRegion(xcraft->getLongitude(), xcraft->getLatitude()))
 					{
@@ -1139,7 +1140,7 @@ void GeoscapeState::time5Seconds()
 				// if a transport craft has been shot down, kill all the soldiers on board.
 				if (xcraft->getRules()->getMaxUnitsLimit() > 0)
 				{
-					for (auto soldierIt = xbase->getSoldiers()->begin(); soldierIt != xbase->getSoldiers()->end();)
+					for (auto soldierIt = xbase->getSoldiers().begin(); soldierIt != xbase->getSoldiers().end();)
 					{
 						Soldier* soldier = (*soldierIt);
 						if (soldier->getCraft() == xcraft)
@@ -1277,7 +1278,7 @@ void GeoscapeState::time5Seconds()
 							{
 								// Start fighting escorts and other craft as well (if they are in escort range)
 								int secondaryTargets = 0;
-								for (auto craft : *activeCrafts)
+								for (Craft* craft : activeCrafts)
 								{
 									if (!craft->isIgnoredByHK() && craft != xcraft)
 									{
@@ -1406,7 +1407,7 @@ void GeoscapeState::time5Seconds()
 	}
 
 	// Clean up dead UFOs and end dogfights which were minimized.
-	Collections::deleteIf(*_game->getSavedGame()->getUfos(), _game->getSavedGame()->getUfos()->size(),
+	Collections::deleteIf(_game->getSavedGame()->getUfos(), _game->getSavedGame()->getUfos().size(),
 		[&](Ufo* ufo)
 		{
 			if (ufo->getStatus() == Ufo::DESTROYED)
@@ -1441,7 +1442,7 @@ void GeoscapeState::time5Seconds()
 	}
 
 	// Clean up unused waypoints
-	Collections::deleteIf(*_game->getSavedGame()->getWaypoints(), _game->getSavedGame()->getWaypoints()->size(),
+	Collections::deleteIf(_game->getSavedGame()->getWaypoints(), _game->getSavedGame()->getWaypoints().size(),
 		[&](Waypoint* way)
 		{
 			return way->getFollowers()->empty();
@@ -1479,7 +1480,7 @@ bool DetectXCOMBase::operator()(const Ufo *ufo) const
 	{
 		return false;
 	}
-	return RNG::percent(_base.getDetectionChance());
+	return RNG::percent((int)_base.getDetectionChance());
 }
 
 /**
@@ -1488,10 +1489,10 @@ bool DetectXCOMBase::operator()(const Ufo *ufo) const
  */
 void GeoscapeState::time10Minutes()
 {
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
 		// Fuel consumption for XCOM craft.
-		for (auto* xcraft : *xbase->getCrafts())
+		for (Craft* xcraft : xbase->getCrafts())
 		{
 			if (xcraft->getStatus() == "STR_OUT")
 			{
@@ -1520,11 +1521,11 @@ void GeoscapeState::time10Minutes()
 				if (xcraft->getDestination() == 0 && xcraft->getCraftStats().sightRange > 0)
 				{
 					double range = Nautical(xcraft->getCraftStats().sightRange);
-					for (auto* ab : *_game->getSavedGame()->getAlienBases())
+					for (AlienBase* ab : _game->getSavedGame()->getAlienBases())
 					{
 						if (xcraft->getDistance(ab) <= range)
 						{
-							if (RNG::percent(50-(xcraft->getDistance(ab) / range) * 50) && !ab->isDiscovered())
+							if (RNG::percent((int)(50-(xcraft->getDistance(ab) / range) * 50)) && !ab->isDiscovered())
 							{
 								ab->setDiscovered(true);
 							}
@@ -1537,11 +1538,11 @@ void GeoscapeState::time10Minutes()
 	if (Options::aggressiveRetaliation)
 	{
 		// Detect as many bases as possible.
-		for (auto* xbase : *_game->getSavedGame()->getBases())
+		for (Base* xbase : _game->getSavedGame()->getBases())
 		{
 			// Find a UFO that detected this base, if any.
-			auto uu = std::find_if (_game->getSavedGame()->getUfos()->begin(), _game->getSavedGame()->getUfos()->end(), DetectXCOMBase(*xbase));
-			if (uu != _game->getSavedGame()->getUfos()->end())
+			auto uu = std::find_if (_game->getSavedGame()->getUfos().begin(), _game->getSavedGame()->getUfos().end(), DetectXCOMBase(*xbase));
+			if (uu != _game->getSavedGame()->getUfos().end())
 			{
 				// Base found
 				xbase->setRetaliationTarget(true);
@@ -1552,11 +1553,11 @@ void GeoscapeState::time10Minutes()
 	{
 		// Only remember last base in each region.
 		std::map<const Region *, Base *> discovered;
-		for (auto* xbase : *_game->getSavedGame()->getBases())
+		for (Base* xbase : _game->getSavedGame()->getBases())
 		{
 			// Find a UFO that detected this base, if any.
-			auto uu = std::find_if (_game->getSavedGame()->getUfos()->begin(), _game->getSavedGame()->getUfos()->end(), DetectXCOMBase(*xbase));
-			if (uu != _game->getSavedGame()->getUfos()->end())
+			auto uu = std::find_if (_game->getSavedGame()->getUfos().begin(), _game->getSavedGame()->getUfos().end(), DetectXCOMBase(*xbase));
+			if (uu != _game->getSavedGame()->getUfos().end())
 			{
 				discovered[_game->getSavedGame()->locateRegion(*xbase)] = xbase;
 			}
@@ -1579,7 +1580,7 @@ void GeoscapeState::ufoHuntingAndEscorting()
 {
 	auto activeCrafts = updateActiveCrafts();
 
-	for (auto* ufo : *_game->getSavedGame()->getUfos())
+	for (Ufo* ufo : _game->getSavedGame()->getUfos())
 	{
 		if (ufo->isHunterKiller() && ufo->getStatus() == Ufo::FLYING)
 		{
@@ -1601,7 +1602,7 @@ void GeoscapeState::ufoHuntingAndEscorting()
 			}
 
 			// look for more attractive target
-			for (auto craft : *activeCrafts)
+			for (Craft* craft : activeCrafts)
 			{
 				if (!craft->isIgnoredByHK() && !craft->getRules()->isUndetectable())
 				{
@@ -1647,7 +1648,7 @@ void GeoscapeState::ufoHuntingAndEscorting()
 			if (ufo->isEscort() && !ufo->isHunting() && !ufo->isEscorting())
 			{
 				// Find a UFO to escort
-				for (auto* ufoToBeEscorted : *_game->getSavedGame()->getUfos())
+				for (Ufo* ufoToBeEscorted : _game->getSavedGame()->getUfos())
 				{
 					// From the same mission
 					if (ufoToBeEscorted->getMission()->getId() == ufo->getMission()->getId())
@@ -1669,7 +1670,7 @@ void GeoscapeState::baseHunting()
 {
 	auto activeCrafts = updateActiveCrafts();
 
-	for (auto* ab : *_game->getSavedGame()->getAlienBases())
+	for (AlienBase* ab : _game->getSavedGame()->getAlienBases())
 	{
 		if (ab->getDeployment()->getBaseDetectionRange() > 0)
 		{
@@ -1681,7 +1682,7 @@ void GeoscapeState::baseHunting()
 			{
 				// Look for nearby craft
 				bool started = false;
-				for (auto craft : *activeCrafts)
+				for (Craft* craft : activeCrafts)
 				{
 					// Craft is flying (i.e. not in base)
 					if (craft->getStatus() == "STR_OUT" && !craft->isDestroyed() && !craft->getRules()->isUndetectable() && !craft->isIgnoredByHK())
@@ -1715,7 +1716,7 @@ void GeoscapeState::baseHunting()
 									const std::vector<MissionArea> areas = regionRules->getMissionZones().at(missionZone).areas;
 									if (!areas.empty())
 									{
-										targetArea = RNG::generate(0, areas.size() - 1);
+										targetArea = RNG::generate(0, (int)areas.size() - 1);
 									}
 								}
 								mission->setMissionSiteZoneArea(targetArea);
@@ -1806,7 +1807,7 @@ bool GeoscapeState::processMissionSite(MissionSite *site)
 	{
 		region->addActivityAlien(score);
 	}
-	for (auto* country : *_game->getSavedGame()->getCountries())
+	for (Country* country : _game->getSavedGame()->getCountries())
 	{
 		if (country->getRules()->insideCountry(site->getLongitude(), site->getLatitude()))
 		{
@@ -1827,13 +1828,13 @@ void GeoscapeState::time30Minutes()
 	// Decrease mission countdowns
 	for (auto am : _game->getSavedGame()->getAlienMissions())
 	{
-		size_t abCount = _game->getSavedGame()->getAlienBases()->size();
+		size_t abCount = _game->getSavedGame()->getAlienBases().size();
 
 		am->think(*_game, *_globe);
 
-		if (abCount < _game->getSavedGame()->getAlienBases()->size())
+		if (abCount < _game->getSavedGame()->getAlienBases().size())
 		{
-			AlienBase* newAlienBase = _game->getSavedGame()->getAlienBases()->back();
+			AlienBase* newAlienBase = _game->getSavedGame()->getAlienBases().back();
 			if (!newAlienBase->isDiscovered() && am->getRules().showAlienBase())
 			{
 				newAlienBase->setDiscovered(true);
@@ -1843,7 +1844,7 @@ void GeoscapeState::time30Minutes()
 
 		if (am->getRules().getObjective() == OBJECTIVE_RETALIATION && am->isOver())
 		{
-			for (auto* xcomBase : *_game->getSavedGame()->getBases())
+			for (Base* xcomBase : _game->getSavedGame()->getBases())
 			{
 				if (xcomBase->getRetaliationMission() == am)
 				{
@@ -1863,7 +1864,7 @@ void GeoscapeState::time30Minutes()
 	);
 
 	// Handle crashed UFOs expiration
-	for (auto* ufo : *_game->getSavedGame()->getUfos())
+	for (Ufo* ufo : _game->getSavedGame()->getUfos())
 	{
 		if (ufo->getStatus() == Ufo::CRASHED)
 		{
@@ -1878,9 +1879,9 @@ void GeoscapeState::time30Minutes()
 	}
 
 	// Handle craft maintenance and alien base detection
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
-		for (auto* xcraft : *xbase->getCrafts())
+		for (Craft* xcraft : xbase->getCrafts())
 		{
 			if (xcraft->getStatus() == "STR_REFUELLING")
 			{
@@ -1905,7 +1906,7 @@ void GeoscapeState::time30Minutes()
 							if (w != 0 && w->getId() == 0)
 							{
 								w->setId(_game->getSavedGame()->getId("STR_WAY_POINT"));
-								_game->getSavedGame()->getWaypoints()->push_back(w);
+								_game->getSavedGame()->getWaypoints().push_back(w);
 							}
 							xcraft->setDestination(w);
 							xcraft->setStatus("STR_OUT");
@@ -1936,7 +1937,7 @@ void GeoscapeState::time30Minutes()
 	std::map<OpenXcom::Country*, int> hiddenUfoCountries;
 
 	// Handle UFO detection and give aliens points
-	for (auto ufo : *_game->getSavedGame()->getUfos())
+	for (Ufo* ufo : _game->getSavedGame()->getUfos())
 	{
 		// instant retaliation missions are ignored (UFOs shouldn't be detected)
 		if (ufo->getMission()->getRules().getObjective() == OBJECTIVE_INSTANT_RETALIATION)
@@ -1956,7 +1957,7 @@ void GeoscapeState::time30Minutes()
 			ufoCountry = nullptr;
 
 			// Get area
-			for (auto region : *_game->getSavedGame()->getRegions())
+			for (Region* region : _game->getSavedGame()->getRegions())
 			{
 				if (region->getRules()->insideRegion(ufo->getLongitude(), ufo->getLatitude()))
 				{
@@ -1966,7 +1967,7 @@ void GeoscapeState::time30Minutes()
 				}
 			}
 			// Get country
-			for (auto country : *_game->getSavedGame()->getCountries())
+			for (Country* country : _game->getSavedGame()->getCountries())
 			{
 				if (country->getRules()->insideCountry(ufo->getLongitude(), ufo->getLatitude()))
 				{
@@ -2006,11 +2007,11 @@ void GeoscapeState::time30Minutes()
 
 	if (Options::displayHiddenAlienActivity != 0)
 	{
-		std::map<OpenXcom::Region*, int> displayHiddenAlienActivityRegions;
-		std::map<OpenXcom::Country*, int> displayHiddenAlienActivityCountries;
+		std::map<Region*, int> displayHiddenAlienActivityRegions;
+		std::map<Country*, int> displayHiddenAlienActivityCountries;
 		bool displayHiddenAlienActivityPopup = false;
 
-		for (OpenXcom::Region* region : *_game->getSavedGame()->getRegions())
+		for (Region* region : _game->getSavedGame()->getRegions())
 		{
 			// old value
 
@@ -2054,7 +2055,7 @@ void GeoscapeState::time30Minutes()
 
 		}
 
-		for (OpenXcom::Country* country : *_game->getSavedGame()->getCountries())
+		for (Country* country : _game->getSavedGame()->getCountries())
 		{
 			// old value
 
@@ -2103,7 +2104,7 @@ void GeoscapeState::time30Minutes()
 
 	// Processes MissionSites
 	Collections::deleteIf(
-		*_game->getSavedGame()->getMissionSites(),
+		_game->getSavedGame()->getMissionSites(),
 		[&](MissionSite* site)
 		{
 			return processMissionSite(site);
@@ -2111,7 +2112,7 @@ void GeoscapeState::time30Minutes()
 	);
 
 	// Decrease event countdowns and pop up if needed
-	for (auto ge : _game->getSavedGame()->getGeoscapeEvents())
+	for (GeoscapeEvent* ge : _game->getSavedGame()->getGeoscapeEvents())
 	{
 		ge->think();
 
@@ -2147,7 +2148,7 @@ void GeoscapeState::time30Minutes()
  * Logic responsible for detecting ufo and its tracking.
  * @param ufo
  */
-void GeoscapeState::ufoDetection(Ufo* ufo, const std::vector<Craft*>* activeCrafts)
+void GeoscapeState::ufoDetection(Ufo* ufo, const std::vector<Craft*>& activeCrafts)
 {
 	auto maskTest = [](UfoDetection value, UfoDetection mask)
 	{
@@ -2162,12 +2163,12 @@ void GeoscapeState::ufoDetection(Ufo* ufo, const std::vector<Craft*>* activeCraf
 	auto alreadyTracked = ufo->getDetected();
 	auto save = _game->getSavedGame();
 
-	for (auto* base : *_game->getSavedGame()->getBases())
+	for (Base* base : _game->getSavedGame()->getBases())
 	{
 		detected = maskBitOr(detected, base->detect(ufo, save, alreadyTracked));
 	}
 
-	for (auto* craft : *activeCrafts)
+	for (Craft* craft : activeCrafts)
 	{
 		detected = maskBitOr(detected, craft->detect(ufo, save, alreadyTracked));
 	}
@@ -2214,9 +2215,9 @@ void GeoscapeState::ufoDetection(Ufo* ufo, const std::vector<Craft*>* activeCraf
 void GeoscapeState::time1Hour()
 {
 	// Handle craft maintenance
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
-		for (auto* xcraft : *xbase->getCrafts())
+		for (Craft* xcraft : xbase->getCrafts())
 		{
 			if (xcraft->getStatus() == "STR_REPAIRS")
 			{
@@ -2243,11 +2244,11 @@ void GeoscapeState::time1Hour()
 	}
 
 	// Handle base defenses maintenance
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
-		for (auto* facility : *xbase->getFacilities())
+		for (BaseFacility* facility : xbase->getFacilities())
 		{
-			auto* ammo = facility->rearm();
+			const RuleItem* ammo = facility->rearm();
 			if (ammo)
 			{
 				std::string msg = tr("STR_NOT_ENOUGH_ITEM_TO_REARM_FACILITY_AT_BASE")
@@ -2261,9 +2262,9 @@ void GeoscapeState::time1Hour()
 
 	// Handle transfers
 	bool window = false;
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
-		for (auto* transfer : *xbase->getTransfers())
+		for (Transfer* transfer : xbase->getTransfers())
 		{
 			transfer->advance(xbase);
 			if (!window && transfer->getHours() <= 0)
@@ -2277,14 +2278,14 @@ void GeoscapeState::time1Hour()
 		popup(new ItemsArrivingState(this));
 	}
 	// Handle Production
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
 		std::map<Production*, productionProgress_e> toRemove;
-		for (auto* prod : xbase->getProductions())
+		for (Production* prod : xbase->getProductions())
 		{
 			toRemove[prod] = prod->step(xbase, _game->getSavedGame(), _game->getMod(), _game->getLanguage());
 		}
-		for (const auto& pair : toRemove)
+		for (const std::pair<Production*, productionProgress_e>& pair : toRemove)
 		{
 			if (pair.second > PROGRESS_NOT_COMPLETE)
 			{
@@ -2304,7 +2305,7 @@ void GeoscapeState::time1Hour()
 			if (!_game->getSavedGame()->getAlienContainmentChecked())
 			{
 				std::map<int, int> prisonTypes;
-				for (const auto& item : *xbase->getStorageItems()->getContents())
+				for (const std::pair<const RuleItem*, int>& item : xbase->getStorageItems()->getContents())
 				{
 					const RuleItem* rule = item.first;
 					if (rule->isAlien())
@@ -2312,7 +2313,7 @@ void GeoscapeState::time1Hour()
 						prisonTypes[rule->getPrisonType()] += 1;
 					}
 				}
-				for (const auto& pair : prisonTypes)
+				for (const std::pair<int, int>& pair : prisonTypes)
 				{
 					int prisonType = pair.first;
 					if (xbase->getUsedContainment(prisonType) > xbase->getAvailableContainment(prisonType))
@@ -2334,7 +2335,7 @@ void GeoscapeState::time1Hour()
 	_game->getSavedGame()->setAlienContainmentChecked(true); // check only once after reload
 
 	bool postpone = false;
-	for (auto* msite : *_game->getSavedGame()->getMissionSites())
+	for (MissionSite* msite : _game->getSavedGame()->getMissionSites())
 	{
 		if (!msite->getDetected())
 		{
@@ -2350,7 +2351,7 @@ void GeoscapeState::time1Hour()
 	}
 	if (postpone)
 	{
-		for (auto* msite : *_game->getSavedGame()->getMissionSites())
+		for (MissionSite* msite : _game->getSavedGame()->getMissionSites())
 		{
 			if (!msite->getDetected())
 			{
@@ -2401,11 +2402,11 @@ void GenerateSupplyMission::operator()(AlienBase *base) const
 			{
 				// 1. target a random xcom base region
 				std::vector<std::string> regionsWithXcomBases;
-				for (auto* xbase : *_save.getBases())
+				for (Base* xbase : _save.getBases())
 				{
 					regionsWithXcomBases.push_back(_save.locateRegion(*xbase)->getRules()->getType());
 				}
-				targetRegion = regionsWithXcomBases[RNG::generate(0, regionsWithXcomBases.size() - 1)];
+				targetRegion = regionsWithXcomBases[RNG::generate(0, (int)regionsWithXcomBases.size() - 1)];
 			}
 			else if (rule.hasRegionWeights())
 			{
@@ -2436,7 +2437,7 @@ void GenerateSupplyMission::operator()(AlienBase *base) const
 				const std::vector<MissionArea> areas = regionRules->getMissionZones().at(missionZone).areas;
 				if (!areas.empty())
 				{
-					targetArea = RNG::generate(0, areas.size() - 1);
+					targetArea = RNG::generate(0, (int)areas.size() - 1);
 				}
 			}
 			mission->setMissionSiteZoneArea(targetArea);
@@ -2460,11 +2461,11 @@ void GeoscapeState::time1Day()
 	SavedGame *saveGame = _game->getSavedGame();
 	Mod *mod = _game->getMod();
 	bool psiStrengthEval = (Options::psiStrengthEval && saveGame->isResearched(mod->getPsiRequirements()));
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
 		// Handle facility construction
 		std::map<const RuleBaseFacility*, int> finishedFacilities;
-		for (auto* facility : *xbase->getFacilities())
+		for (BaseFacility* facility : xbase->getFacilities())
 		{
 			if (facility->getBuildTime() > 0)
 			{
@@ -2475,7 +2476,7 @@ void GeoscapeState::time1Day()
 				}
 			}
 		}
-		for (const auto& pair : finishedFacilities)
+		for (const std::pair<const RuleBaseFacility*, int>& pair : finishedFacilities)
 		{
 			if (pair.second > 1)
 			{
@@ -2671,7 +2672,7 @@ void GeoscapeState::time1Day()
 		// Handle soldier wounds and martial training
 		BaseSumDailyRecovery recovery = xbase->getSumRecoveryPerDay();
 		std::vector<Soldier *> trainingFinishedList;
-		for (auto* soldier : *xbase->getSoldiers())
+		for (Soldier* soldier : xbase->getSoldiers())
 		{
 			soldier->replenishStats(recovery);
 
@@ -2706,7 +2707,7 @@ void GeoscapeState::time1Day()
 		if (xbase->getAvailablePsiLabs() > 0 && Options::anytimePsiTraining)
 		{
 			std::vector<Soldier*> psiTrainingFinishedList;
-			for (auto* s : *xbase->getSoldiers())
+			for (Soldier* s : xbase->getSoldiers())
 			{
 				s->trainPsi1Day();
 				s->calcStatString(_game->getMod()->getStatStrings(), psiStrengthEval);
@@ -2724,10 +2725,10 @@ void GeoscapeState::time1Day()
 	}
 
 	// check and remove disabled projects from ongoing research
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
 		std::vector<ResearchProject*> obsolete;
-		for (auto* proj : xbase->getResearch())
+		for (ResearchProject* proj : xbase->getResearch())
 		{
 			if (_game->getSavedGame()->isResearchRuleStatusDisabled(proj->getRules()->getName()))
 			{
@@ -2741,7 +2742,7 @@ void GeoscapeState::time1Day()
 	}
 
 	// check and interrupt alien missions if necessary (based on discovered research)
-	for (auto am : saveGame->getAlienMissions())
+	for (AlienMission* am : saveGame->getAlienMissions())
 	{
 		auto& researchName = am->getRules().getInterruptResearch();
 		if (!researchName.empty())
@@ -2755,8 +2756,8 @@ void GeoscapeState::time1Day()
 	}
 
 	// check and self-destruct alien bases if necessary (based on discovered research)
-	auto abIt = saveGame->getAlienBases()->begin();
-	while (abIt != saveGame->getAlienBases()->end())
+	auto abIt = saveGame->getAlienBases().begin();
+	while (abIt != saveGame->getAlienBases().end())
 	{
 		AlienBase* ab = (*abIt);
 		auto& selfDestructCode = ab->getDeployment()->getBaseSelfDestructCode();
@@ -2767,7 +2768,7 @@ void GeoscapeState::time1Day()
 			{
 				saveGame->clearLinksForAlienBase(ab, _game->getMod());
 				delete ab;
-				abIt = saveGame->getAlienBases()->erase(abIt);
+				abIt = saveGame->getAlienBases().erase(abIt);
 			}
 			else
 			{
@@ -2781,9 +2782,9 @@ void GeoscapeState::time1Day()
 	}
 
 	// handle regional and country points for alien bases
-	for (auto* ab : *saveGame->getAlienBases())
+	for (AlienBase* ab : saveGame->getAlienBases())
 	{
-		for (auto* region : *saveGame->getRegions())
+		for (Region* region : saveGame->getRegions())
 		{
 			if (region->getRules()->insideRegion(ab->getLongitude(), ab->getLatitude()))
 			{
@@ -2791,7 +2792,7 @@ void GeoscapeState::time1Day()
 				break;
 			}
 		}
-		for (auto* country : *saveGame->getCountries())
+		for (Country* country : saveGame->getCountries())
 		{
 			if (country->getRules()->insideCountry(ab->getLongitude(), ab->getLatitude()))
 			{
@@ -2802,17 +2803,17 @@ void GeoscapeState::time1Day()
 	}
 
 	// Handle resupply of alien bases.
-	std::for_each(saveGame->getAlienBases()->begin(), saveGame->getAlienBases()->end(),
+	std::for_each(saveGame->getAlienBases().begin(), saveGame->getAlienBases().end(),
 			  GenerateSupplyMission(*_game, *_globe));
 
 	// Handle alien base detection (by xcom base facilities).
-	for (auto alienBase : *_game->getSavedGame()->getAlienBases())
+	for (AlienBase* alienBase : _game->getSavedGame()->getAlienBases())
 	{
 		if (alienBase->isDiscovered()) continue;
-		for (auto xcomBase : *_game->getSavedGame()->getBases())
+		for (Base* xcomBase : _game->getSavedGame()->getBases())
 		{
 			int distance = XcomDistance(xcomBase->getDistance(alienBase));
-			for (auto facility : *xcomBase->getFacilities())
+			for (BaseFacility* facility : xcomBase->getFacilities())
 			{
 				if (facility->getBuildTime() == 0 && facility->getRules()->getSightRange() > distance)
 				{
@@ -2832,9 +2833,9 @@ void GeoscapeState::time1Day()
 	}
 
 	// clear the daily dogfight experience cache
-	for (auto* xbase : *saveGame->getBases())
+	for (Base* xbase : saveGame->getBases())
 	{
-		for (auto* soldier : *xbase->getSoldiers())
+		for (Soldier* soldier : xbase->getSoldiers())
 		{
 			soldier->resetDailyDogfightExperienceCache();
 		}
@@ -2902,11 +2903,11 @@ void GeoscapeState::time1Month()
 	if (!Options::anytimePsiTraining)
 	{
 		bool psiStrengthEval = (Options::psiStrengthEval && _game->getSavedGame()->isResearched(_game->getMod()->getPsiRequirements()));
-		for (auto* xbase : *_game->getSavedGame()->getBases())
+		for (Base* xbase : _game->getSavedGame()->getBases())
 		{
 			if (xbase->getAvailablePsiLabs() > 0)
 			{
-				for (auto* soldier : *xbase->getSoldiers())
+				for (Soldier* soldier : xbase->getSoldiers())
 				{
 					if (soldier->isInPsiTraining())
 					{
@@ -2924,9 +2925,9 @@ void GeoscapeState::time1Month()
 	popup(new MonthlyReportState(_globe));
 
 	// Handle Xcom Operatives discovering bases
-	if (!_game->getSavedGame()->getAlienBases()->empty() && RNG::percent(20))
+	if (!_game->getSavedGame()->getAlienBases().empty() && RNG::percent(20))
 	{
-		for (auto* ab : *_game->getSavedGame()->getAlienBases())
+		for (AlienBase* ab : _game->getSavedGame()->getAlienBases())
 		{
 			if (!ab->isDiscovered())
 			{
@@ -3118,7 +3119,7 @@ void GeoscapeState::btnBasesClick(Action *)
 		return;
 	}
 	timerReset();
-	if (!_game->getSavedGame()->getBases()->empty())
+	if (!_game->getSavedGame()->getBases().empty())
 	{
 		_game->pushState(new BasescapeState(_game->getSavedGame()->getSelectedBase(), _globe));
 	}
@@ -3558,7 +3559,7 @@ void GeoscapeState::handleBaseDefense(Base *base, Ufo *ufo)
 			popup(new BaseDestroyedState(base, ufo, true, true));
 		}
 	}
-	else if (base->getAvailableSoldiers(true, true) > 0 || !base->getVehicles()->empty())
+	else if (base->getAvailableSoldiers(true, true) > 0 || !base->getVehicles().empty())
 	{
 		SavedBattleGame *bgame = new SavedBattleGame(_game->getMod(), _game->getLanguage());
 		_game->getSavedGame()->setBattleGame(bgame);
@@ -3604,14 +3605,14 @@ void GeoscapeState::determineAlienMissions()
 
 	std::set<std::string> xcomBaseRegions;
 	std::set<std::string> xcomBaseCountries;
-	for (auto* xcomBase : *save->getBases())
+	for (Base* xcomBase : save->getBases())
 	{
-		auto region = save->locateRegion(*xcomBase);
+		Region* region = save->locateRegion(*xcomBase);
 		if (region)
 		{
 			xcomBaseRegions.insert(region->getRules()->getType());
 		}
-		auto country = save->locateCountry(*xcomBase);
+		Country* country = save->locateCountry(*xcomBase);
 		if (country)
 		{
 			xcomBaseCountries.insert(country->getRules()->getType());
@@ -3750,7 +3751,7 @@ void GeoscapeState::determineAlienMissions()
 					}
 				}
 			}
-			Base* hq = save->getBases()->front();
+			Base* hq = save->getBases().front();
 			bool canAddOneMore = arcCommand->getMaxArcs() == -1 || arcCommand->getMaxArcs() > arcsEnabled;
 			if (canAddOneMore && !disabledSeqArcs.empty())
 			{
@@ -4129,7 +4130,7 @@ void GeoscapeState::determineAlienMissions()
 	// Alien base upgrades happen only AFTER the first game month
 	if (month > 0)
 	{
-		for (auto alienBase : *save->getAlienBases())
+		for (AlienBase* alienBase : save->getAlienBases())
 		{
 			auto baseAgeInMonths = month - alienBase->getStartMonth();
 			auto upgradeId = alienBase->getDeployment()->generateAlienBaseUpgrade(baseAgeInMonths);
@@ -4190,7 +4191,7 @@ bool GeoscapeState::processCommand(RuleMissionScript *command)
 		// we know for a fact that this command has mission weights defined, otherwise this flag could not be set.
 		missionType = command->generate(month, GEN_MISSION);
 		std::vector<std::string> missions = command->getMissionTypes(month);
-		int maxMissions = missions.size();
+		int maxMissions = (int)missions.size();
 		bool targetBase = RNG::percent(command->getTargetBaseOdds());
 		int currPos = 0;
 		for (; currPos != maxMissions; ++currPos)
@@ -4216,7 +4217,7 @@ bool GeoscapeState::processCommand(RuleMissionScript *command)
 			{
 				std::vector<std::string> regionsToKeep;
 				//if we're targetting a base, we ignore regions that don't contain bases, simple.
-				for (auto* xbase : *save->getBases())
+				for (Base* xbase : save->getBases())
 				{
 					regionsToKeep.push_back(save->locateRegion(xbase->getLongitude(), xbase->getLatitude())->getRules()->getType());
 				}
@@ -4353,7 +4354,7 @@ bool GeoscapeState::processCommand(RuleMissionScript *command)
 				// if we don't have a weighted list, we'll select a region at random from the ruleset,
 				// validate that it's in our list, and pick one of its cities at random
 				// this will give us an even distribution between regions regardless of the number of cities.
-				targetRegion = mod->getRegionsList().at(RNG::generate(0, mod->getRegionsList().size() - 1));
+				targetRegion = mod->getRegionsList().at(RNG::generate(0, (int)mod->getRegionsList().size() - 1));
 			}
 
 			// we need to know the range of the region within our vector, in order to randomly select a city from it
@@ -4392,7 +4393,7 @@ bool GeoscapeState::processCommand(RuleMissionScript *command)
 		std::vector<std::string> types = command->getMissionTypes(month);
 		// now build a list of regions with bases in.
 		std::vector<std::string> regionsMaster;
-		for (auto* xbase : *save->getBases())
+		for (Base* xbase : save->getBases())
 		{
 			regionsMaster.push_back(save->locateRegion(*xbase)->getRules()->getType());
 		}
@@ -4414,13 +4415,13 @@ bool GeoscapeState::processCommand(RuleMissionScript *command)
 				return false;
 			}
 			// pick a random region from our list
-			targetRegion = regionsMaster[RNG::generate(0, regionsMaster.size()-1)];
+			targetRegion = regionsMaster[RNG::generate(0, (int)regionsMaster.size()-1)];
 		}
 		else
 		{
 			// we don't care about regional mission distributions, we're targetting a base with whatever mission we pick, so let's pick now
 			// we'll iterate the mission list, starting at a random point, and wrapping around to the beginning
-			int max = types.size();
+			int max = (int)types.size();
 			int entry = RNG::generate(0,  max - 1);
 			std::vector<std::string> regions;
 
@@ -4450,7 +4451,7 @@ bool GeoscapeState::processCommand(RuleMissionScript *command)
 				if (!regions.empty())
 				{
 					missionType = types[entry];
-					targetRegion = regions[RNG::generate(0, regions.size()-1)];
+					targetRegion = regions[RNG::generate(0, (int)regions.size()-1)];
 					break;
 				}
 				// otherwise, try the next mission in the list.
@@ -4669,7 +4670,7 @@ void GeoscapeState::updateSlackingIndicator()
 
 	int scientistsSlacking = 0;
 	int engineersSlacking = 0;
-	for (auto xcomBase : *_game->getSavedGame()->getBases())
+	for (Base* xcomBase : _game->getSavedGame()->getBases())
 	{
 		scientistsSlacking += xcomBase->getAvailableScientists();
 		engineersSlacking += xcomBase->getAvailableEngineers();
@@ -4693,7 +4694,7 @@ void GeoscapeState::cbxRegionChange(Action *)
 	}
 	else
 	{
-		_game->getSavedGame()->debugRegion = (*_game->getSavedGame()->getRegions())[index-1];
+		_game->getSavedGame()->debugRegion = _game->getSavedGame()->getRegions()[index-1];
 	}
 	updateZoneInfo();
 }
@@ -4769,7 +4770,7 @@ void GeoscapeState::cbxCountryChange(Action *)
 	}
 	else
 	{
-		_game->getSavedGame()->debugCountry = (*_game->getSavedGame()->getCountries())[index - 1];
+		_game->getSavedGame()->debugCountry = _game->getSavedGame()->getCountries()[index - 1];
 	}
 
 	std::ostringstream ss;

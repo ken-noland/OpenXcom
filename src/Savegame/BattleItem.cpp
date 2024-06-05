@@ -553,18 +553,18 @@ void BattleItem::moveToOwner(BattleUnit *owner)
 
 		if (_previousOwner)
 		{
-			for (auto iter = _previousOwner->getInventory()->begin(); iter != _previousOwner->getInventory()->end(); ++iter)
+			for (auto iter = _previousOwner->getInventory().begin(); iter != _previousOwner->getInventory().end(); ++iter)
 			{
 				if ((*iter) == this)
 				{
-					_previousOwner->getInventory()->erase(iter);
+					_previousOwner->getInventory().erase(iter);
 					break;
 				}
 			}
 		}
 		if (_owner)
 		{
-			_owner->getInventory()->push_back(this);
+			_owner->getInventory().push_back(this);
 		}
 	}
 }

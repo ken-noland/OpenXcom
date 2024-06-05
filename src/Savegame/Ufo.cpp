@@ -195,9 +195,9 @@ void Ufo::finishLoading(const YAML::Node &node, SavedGame &save)
 			std::string type = dest["type"].as<std::string>();
 			int id = dest["id"].as<int>();
 			bool found = false;
-			for (auto* xbase : *save.getBases())
+			for (Base* xbase : save.getBases())
 			{
-				for (auto* xcraft : *xbase->getCrafts())
+				for (Craft* xcraft : xbase->getCrafts())
 				{
 					if (xcraft->getId() == id && xcraft->getRules()->getType() == type)
 					{
@@ -226,7 +226,7 @@ void Ufo::finishLoading(const YAML::Node &node, SavedGame &save)
 				int uniqueUfoId = dest["uniqueId"].as<int>(0);
 				if (uniqueUfoId > 0)
 				{
-					for (auto* ufo : *save.getUfos())
+					for (Ufo* ufo : save.getUfos())
 					{
 						if (ufo->getUniqueId() == uniqueUfoId)
 						{

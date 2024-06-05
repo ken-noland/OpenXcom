@@ -59,7 +59,7 @@ public:
 	/// Get the color.
 	Uint8 getColor() const { return _color; }
 	/// Get the opacity.
-	Uint8 getOpacity() const { return _screenData.z; }
+	Uint8 getOpacity() const { return (Uint8)_screenData.z; }
 	/// Gets screen offset X relative to tile.
 	int getOffsetX() const { return _screenData.x; }
 	/// Gets screen offset Y relative to tile.

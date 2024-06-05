@@ -103,9 +103,9 @@ void CraftNotEnoughPilotsState::btnAssignPilotsClick(Action *)
 	Base *b = _craft->getBase();
 	if (b)
 	{
-		for (size_t i = 0; i < b->getCrafts()->size(); ++i)
+		for (size_t i = 0; i < b->getCrafts().size(); ++i)
 		{
-			if (b->getCrafts()->at(i) == _craft)
+			if (b->getCrafts().at(i) == _craft)
 			{
 				_game->popState();
 				_game->pushState(new CraftInfoState(_craft->getBase(), i));

@@ -164,14 +164,14 @@ SavedGame *SaveConverter::loadOriginal()
 		country->getActivityAlien().clear();
 		country->getActivityXcom().clear();
 		country->getFunding().clear();
-		_save->getCountries()->push_back(country);
+		_save->getCountries().push_back(country);
 	}
 	for (size_t i = 0; i < _rules->getRegions().size(); ++i)
 	{
 		Region *region = new Region(_mod->getRegion(_rules->getRegions()[i], true));
 		region->getActivityAlien().clear();
 		region->getActivityXcom().clear();
-		_save->getRegions()->push_back(region);
+		_save->getRegions().push_back(region);
 	}
 	loadDatXcom();
 	loadDatAlien();
@@ -281,14 +281,14 @@ void SaveConverter::loadDatIGlob()
 	graphVector(_save->getResearchScores(), month, _year != _mod->getStartingTime().getYear());
 	for (size_t i = 0; i < _rules->getCountries().size(); ++i)
 	{
-		Country *country = _save->getCountries()->at(i);
+		Country *country = _save->getCountries().at(i);
 		graphVector(country->getActivityAlien(), month, _year != _mod->getStartingTime().getYear());
 		graphVector(country->getActivityXcom(), month, _year != _mod->getStartingTime().getYear());
 		graphVector(country->getFunding(), month, _year != _mod->getStartingTime().getYear());
 	}
 	for (size_t i = 0; i < _rules->getRegions().size(); ++i)
 	{
-		Region *region = _save->getRegions()->at(i);
+		Region *region = _save->getRegions().at(i);
 		graphVector(region->getActivityAlien(), month, _year != _mod->getStartingTime().getYear());
 		graphVector(region->getActivityXcom(), month, _year != _mod->getStartingTime().getYear());
 	}
@@ -393,7 +393,7 @@ void SaveConverter::loadDatLease()
 	{
 		if (zoom == DISTANCE[i])
 		{
-			_save->setGlobeZoom(i);
+			_save->setGlobeZoom((int)i);
 			break;
 		}
 	}
@@ -417,13 +417,13 @@ void SaveConverter::loadDatXcom()
 		// country
 		if (j < _rules->getCountries().size())
 		{
-			_save->getCountries()->at(j)->getActivityXcom().push_back(score);
+			_save->getCountries().at(j)->getActivityXcom().push_back(score);
 		}
 		// region
 		else
 		{
 			j -= _rules->getCountries().size();
-			_save->getRegions()->at(j)->getActivityXcom().push_back(score);
+			_save->getRegions().at(j)->getActivityXcom().push_back(score);
 		}
 	}
 }
@@ -446,13 +446,13 @@ void SaveConverter::loadDatAlien()
 		// country
 		if (j < _rules->getCountries().size())
 		{
-			_save->getCountries()->at(j)->getActivityAlien().push_back(score);
+			_save->getCountries().at(j)->getActivityAlien().push_back(score);
 		}
 		// region
 		else
 		{
 			j -= _rules->getCountries().size();
-			_save->getRegions()->at(j)->getActivityAlien().push_back(score);
+			_save->getRegions().at(j)->getActivityAlien().push_back(score);
 		}
 	}
 }
@@ -477,7 +477,7 @@ void SaveConverter::loadDatDiplom()
 	for (size_t i = 0; i < _rules->getCountries().size(); ++i)
 	{
 		char *cdata = (data + i * ENTRY_SIZE);
-		Country *country = _save->getCountries()->at(i);
+		Country *country = _save->getCountries().at(i);
 
 		int satisfaction = load<Sint16>(cdata + 0x02);
 		for (size_t j = 0; j < MONTHS; ++j)
@@ -571,7 +571,7 @@ void SaveConverter::loadDatMissions()
 			int spawn = load<Uint16>(mdata + 0x04);
 			int race = load<Uint16>(mdata + 0x06);
 			int mission = i % MISSIONS;
-			int region = i / MISSIONS;
+			int region = static_cast<int>(i / MISSIONS);
 
 			YAML::Node node;
 			AlienMission *m = new AlienMission(*_mod->getAlienMission(_rules->getMissions()[mission], true));
@@ -590,7 +590,7 @@ void SaveConverter::loadDatMissions()
 					// try to account for TFTD's artefacts and such
 					missionZone = 0;
 				}
-				node["missionSiteZone"] = RNG::generate(0, rule->getMissionZones().at(missionZone).areas.size() - 1);
+				node["missionSiteZone"] = RNG::generate(0, (int)rule->getMissionZones().at(missionZone).areas.size() - 1);
 			}
 			m->load(node, *_save, _mod);
 			_save->getAlienMissions().push_back(m);
@@ -660,13 +660,13 @@ void SaveConverter::loadDatLoc()
 			abase->setId(id);
 			abase->setAlienRace(_rules->getCrews()[dat]);
 			abase->setDiscovered(detected);
-			_save->getAlienBases()->push_back(abase);
+			_save->getAlienBases().push_back(abase);
 			target = abase;
 			break;
 		case TARGET_WAYPOINT:
 			waypoint = new Waypoint();
 			waypoint->setId(id);
-			_save->getWaypoints()->push_back(waypoint);
+			_save->getWaypoints().push_back(waypoint);
 			target = waypoint;
 			break;
 		case TARGET_TERROR:
@@ -691,7 +691,7 @@ void SaveConverter::loadDatLoc()
 			mission->setAlienRace(_rules->getCrews()[dat]);
 			mission->setSecondsRemaining(timer * 3600);
 			mission->setDetected(detected);
-			_save->getMissionSites()->push_back(mission);
+			_save->getMissionSites().push_back(mission);
 			target = mission;
 		}
 		if (target != 0)
@@ -734,12 +734,12 @@ void SaveConverter::loadDatBase()
 				{
 					BaseFacility *facility = new BaseFacility(_mod->getBaseFacility(_rules->getFacilities()[facilityType], true), base);
 					int x = k % BASE_SIZE;
-					int y = k / BASE_SIZE;
+					int y = static_cast<int>(k / BASE_SIZE);
 					int days = load<Uint8>(bdata + _rules->getOffset("BASE.DAT_FACILITIES") + FACILITIES + k);
 					facility->setX(x);
 					facility->setY(y);
 					facility->setBuildTime(days);
-					base->getFacilities()->push_back(facility);
+					base->getFacilities().push_back(facility);
 				}
 			}
 			int engineers = load<Uint8>(bdata + _rules->getOffset("BASE.DAT_ENGINEERS"));
@@ -765,7 +765,7 @@ void SaveConverter::loadDatBase()
 	{
 		if (*i != 0)
 		{
-			_save->getBases()->push_back(*i);
+			_save->getBases().push_back(*i);
 		}
 	}
 }
@@ -858,7 +858,7 @@ void SaveConverter::loadDatTransfer()
 				break;
 			}
 
-			b->getTransfers()->push_back(transfer);
+			b->getTransfers().push_back(transfer);
 		}
 	}
 }
@@ -892,7 +892,7 @@ void SaveConverter::loadDatCraft()
 				if (lweapon != 0xFF)
 				{
 					CraftWeapon *cw = new CraftWeapon(_mod->getCraftWeapon(_rules->getCraftWeapons()[lweapon], true), lammo);
-					craft->getWeapons()->at(0) = cw;
+					craft->getWeapons().at(0) = cw;
 				}
 				int flight = load<Uint8>(cdata + _rules->getOffset("CRAFT.DAT_FLIGHT"));
 				int rweapon = load<Uint8>(cdata + _rules->getOffset("CRAFT.DAT_RIGHT_WEAPON"));
@@ -900,7 +900,7 @@ void SaveConverter::loadDatCraft()
 				if (rweapon != 0xFF)
 				{
 					CraftWeapon *cw = new CraftWeapon(_mod->getCraftWeapon(_rules->getCraftWeapons()[rweapon], true), rammo);
-					craft->getWeapons()->at(1) = cw;
+					craft->getWeapons().at(1) = cw;
 				}
 
 				node["damage"] = (int)load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_DAMAGE"));
@@ -918,7 +918,7 @@ void SaveConverter::loadDatCraft()
 					for (int v = 0; v < qty; ++v)
 					{
 						const RuleItem *rule = _mod->getItem(_rules->getItems()[k + 10], true);
-						craft->getVehicles()->push_back(new Vehicle(rule, rule->getVehicleClipSize(), 4));
+						craft->getVehicles().push_back(new Vehicle(rule, rule->getVehicleClipSize(), 4));
 					}
 				}
 				// items
@@ -947,7 +947,7 @@ void SaveConverter::loadDatCraft()
 				{
 					Base *b = dynamic_cast<Base*>(_targets[base]);
 					craft->setBase(b, false);
-					b->getCrafts()->push_back(craft);
+					b->getCrafts().push_back(craft);
 				}
 			}
 			Ufo *ufo = dynamic_cast<Ufo*>(_targets[i]);
@@ -1008,7 +1008,7 @@ void SaveConverter::loadDatCraft()
 					ufo->setSecondsRemaining(0);
 				}
 
-				_save->getUfos()->push_back(ufo);
+				_save->getUfos().push_back(ufo);
 			}
 		}
 	}
@@ -1090,7 +1090,7 @@ void SaveConverter::loadDatSoldier()
 			if (base != 0xFFFF)
 			{
 				Base *b = dynamic_cast<Base*>(_targets[base]);
-				b->getSoldiers()->push_back(soldier);
+				b->getSoldiers().push_back(soldier);
 			}
 			if (craft != 0xFFFF)
 			{
@@ -1183,9 +1183,9 @@ void SaveConverter::loadDatProject()
 	const size_t ENTRIES = _rules->getResearch().size();
 	// days (Uint16) | scientists (Uint8)
 	const size_t ENTRY_SIZE = ENTRIES * (sizeof(Uint16) + sizeof(Uint8));
-	for (size_t i = 0; i < _save->getBases()->size(); ++i)
+	for (size_t i = 0; i < _save->getBases().size(); ++i)
 	{
-		Base *base = _save->getBases()->at(i);
+		Base *base = _save->getBases().at(i);
 		char *pdata = (data + i * ENTRY_SIZE);
 		Uint16 *arrRemaining = (Uint16*)pdata;
 		Uint8 *arrScientists = (Uint8*)(&arrRemaining[ENTRIES]);
@@ -1221,9 +1221,9 @@ void SaveConverter::loadDatBProd()
 	const size_t ENTRIES = _rules->getManufacture().size();
 	// hours (int) | engineers (Uint16) | quantity (Uint16)| produced (Uint16)
 	const size_t ENTRY_SIZE = ENTRIES * (sizeof(int) + 3 * sizeof(Uint16));
-	for (size_t i = 0; i < _save->getBases()->size(); ++i)
+	for (size_t i = 0; i < _save->getBases().size(); ++i)
 	{
-		Base *base = _save->getBases()->at(i);
+		Base *base = _save->getBases().at(i);
 		char *pdata = (data + i * ENTRY_SIZE);
 		int *arrRemaining = (int*)pdata;
 		Uint16 *arrEngineers = (Uint16*)(&arrRemaining[ENTRIES]);

@@ -38,6 +38,10 @@ class Game;
 namespace Lua
 {
 
+//template specialization forward declarations
+template <> void toLua(lua_State* L, const YAML::Node& arg);
+template <> YAML::Node fromLua(lua_State* luaState, int index);
+
 class GameScript : public LuaApi
 {
 private:
@@ -47,17 +51,11 @@ private:
 	BattlescapeScript _battlescapeScript;
 	BasescapeScript _basescapeScript;
 
-	//just a test function for now(please delete later)
-	using LuaOnTest = LuaSimpleCallback<void, const std::string&>;
-	LuaOnTest _onTest;
-
 	using LuaOnLoadGame = LuaSimpleCallback<void, const YAML::Node&>;
 	using LuaOnSaveGame = LuaAccumulatorCallback<YAML::Node, const YAML::Node&>;
 
 	LuaOnLoadGame _onLoadGame;
 	LuaOnSaveGame _onSaveGame;
-
-	int getNumberOfBases(int i);
 
 public:
 	GameScript(Game& game);
@@ -70,10 +68,8 @@ public:
 	inline BattlescapeScript& getBattlescapeScript() { return _battlescapeScript; }
 	inline BasescapeScript& getBasescapeScript() { return _basescapeScript; }
 
-	// just a test function for now(please delete later)
-	LuaOnTest& onTest() { return _onTest; }
-
 	LuaOnLoadGame& onLoadGame() { return _onLoadGame; }
+	LuaOnSaveGame& onSaveGame() { return _onSaveGame; }
 };
 
 } // namespace Lua

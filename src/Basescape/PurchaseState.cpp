@@ -202,7 +202,7 @@ PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(bas
 	{
 		if (!rule->getRequiresBuyCountry().empty())
 		{
-			for (const auto* country : *_game->getSavedGame()->getCountries())
+			for (const Country* country : _game->getSavedGame()->getCountries())
 			{
 				if (country->getPact() && country->getRules()->getType() == rule->getRequiresBuyCountry())
 				{
@@ -739,18 +739,18 @@ void PurchaseState::btnOkClick(Action *)
 					t = new Transfer(time);
 					int nationality = _game->getSavedGame()->selectSoldierNationalityByLocation(_game->getMod(), rule, _base);
 					t->setSoldier(_game->getMod()->genSoldier(_game->getSavedGame(), rule, nationality));
-					_base->getTransfers()->push_back(t);
+					_base->getTransfers().push_back(t);
 				}
 				break;
 			case TRANSFER_SCIENTIST:
 				t = new Transfer(_game->getMod()->getPersonnelTime());
 				t->setScientists(transferRow.amount);
-				_base->getTransfers()->push_back(t);
+				_base->getTransfers().push_back(t);
 				break;
 			case TRANSFER_ENGINEER:
 				t = new Transfer(_game->getMod()->getPersonnelTime());
 				t->setEngineers(transferRow.amount);
-				_base->getTransfers()->push_back(t);
+				_base->getTransfers().push_back(t);
 				break;
 			case TRANSFER_CRAFT:
 				for (int c = 0; c < transferRow.amount; c++)
@@ -767,7 +767,7 @@ void PurchaseState::btnOkClick(Action *)
 					craft->initFixedWeapons(_game->getMod());
 					craft->setStatus("STR_REFUELLING");
 					t->setCraft(craft);
-					_base->getTransfers()->push_back(t);
+					_base->getTransfers().push_back(t);
 				}
 				break;
 			case TRANSFER_ITEM:
@@ -781,7 +781,7 @@ void PurchaseState::btnOkClick(Action *)
 					}
 					t = new Transfer(rule->getTransferTime());
 					t->setItems(rule, transferRow.amount);
-					_base->getTransfers()->push_back(t);
+					_base->getTransfers().push_back(t);
 					if (_parent && !_missingItemsMap.empty() && _missingItemsMap.find(rule) != _missingItemsMap.end())
 					{
 						// remember the decreased amount for next buy

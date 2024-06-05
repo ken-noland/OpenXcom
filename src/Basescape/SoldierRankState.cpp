@@ -70,7 +70,7 @@ SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : _base(base), 
 	_btnCancel->onMouseClick((ActionHandler)&SoldierRankState::btnCancelClick);
 	_btnCancel->onKeyboardPress((ActionHandler)&SoldierRankState::btnCancelClick, Options::keyCancel);
 
-	Soldier *soldier = _base->getSoldiers()->at(_soldierId);
+	Soldier *soldier = _base->getSoldiers().at(_soldierId);
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_PROMOTE_SOLDIER").arg(tr(soldier->getRankString())).arg(soldier->getName()));
 
@@ -147,7 +147,7 @@ void SoldierRankState::lstRankClick(Action*)
 	const RankItem& selectedRank = _ranks[_lstRanks->getSelectedRow()];
 	if (selectedRank.promotionAllowed)
 	{
-		Soldier* soldier = _base->getSoldiers()->at(_soldierId);
+		Soldier* soldier = _base->getSoldiers().at(_soldierId);
 		soldier->setRank(selectedRank.rank);
 
 		_game->popState();

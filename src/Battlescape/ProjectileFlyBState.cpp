@@ -717,7 +717,7 @@ void ProjectileFlyBState::think()
 				_action.waypoints.pop_front();
 				_action.target = _action.waypoints.front();
 				// launch the next projectile in the waypoint cascade
-				ProjectileFlyBState *nextWaypoint = new ProjectileFlyBState(_parent, _action, _origin, _range + _parent->getMap()->getProjectile()->getDistance());
+				ProjectileFlyBState *nextWaypoint = new ProjectileFlyBState(_parent, _action, _origin, (int)(_range + _parent->getMap()->getProjectile()->getDistance()));
 				nextWaypoint->setOriginVoxel(_parent->getMap()->getProjectile()->getPosition(-1));
 				if (_origin == _action.target)
 				{
@@ -753,7 +753,7 @@ void ProjectileFlyBState::think()
 						_parent, _parent->getMap()->getProjectile()->getLastPositions(offset),
 						attack, 0,
 						noMoreShotsToShoot(),
-						shotgun ? 0 : _range + _parent->getMap()->getProjectile()->getDistance()
+						shotgun ? 0 : (int)(_range + _parent->getMap()->getProjectile()->getDistance())
 					));
 
 					if (_projectileImpact == V_UNIT)
@@ -819,7 +819,7 @@ void ProjectileFlyBState::think()
 										projectileHitUnit(proj->getPosition(offset));
 									}
 									Explosion *explosion = new Explosion(proj->getPosition(offset), _ammo->getRules()->getHitAnimation(), 0, false, false, _ammo->getRules()->getHitAnimationFrames());
-									int power = _ammo->getRules()->getPowerBonus(attack) - _ammo->getRules()->getPowerRangeReduction(proj->getDistance());
+									int power = (int)(_ammo->getRules()->getPowerBonus(attack) - _ammo->getRules()->getPowerRangeReduction(proj->getDistance()));
 									_parent->getMap()->getExplosions()->push_back(explosion);
 									_parent->getSave()->getTileEngine()->hit(attack, proj->getPosition(offset), power, _ammo->getRules()->getDamageType());
 
@@ -950,7 +950,7 @@ int ProjectileFlyBState::getMaxThrowDistance(int weight, int strength, int level
 		{
 			dz = std::max(dz, -1.0);
 			if (std::abs(dz)>1e-10) //rollback horizontal
-				dist -= curZ / dz;
+				dist -= (int)(curZ / dz);
 			break;
 		}
 		dz -= (double)(50 * weight / strength)/100;
@@ -1043,7 +1043,7 @@ void ProjectileFlyBState::projectileHitUnit(Position pos)
 			}
 		}
 		victim->updateEnemyKnowledge(_parent->getSave()->getTileIndex(victim->getPosition()), true);
-		for (BattleUnit *unit : *(_parent->getSave()->getUnits()))
+		for (BattleUnit *unit : _parent->getSave()->getUnits())
 		{
 			if (unit->isOut())
 				continue;

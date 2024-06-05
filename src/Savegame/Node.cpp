@@ -155,9 +155,9 @@ int Node::getSegment() const
 }
 
 /// get the node's paths
-std::vector<int> *Node::getNodeLinks()
+std::vector<int>& Node::getNodeLinks()
 {
-	return &_nodeLinks;
+	return _nodeLinks;
 }
 
 /**

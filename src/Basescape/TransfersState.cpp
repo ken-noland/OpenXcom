@@ -85,7 +85,7 @@ TransfersState::TransfersState(Base *base) : _base(base)
 	_lstTransfers->setBackground(_window);
 	_lstTransfers->setMargin(2);
 
-	for (const auto* transfer : *_base->getTransfers())
+	for (const Transfer* transfer : _base->getTransfers())
 	{
 		std::ostringstream ss, ss2;
 		ss << transfer->getQuantity();

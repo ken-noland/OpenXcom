@@ -18,7 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "LuaApi.h"
-
+#include "LuaHelpers.h"
 
 namespace OpenXcom
 {
@@ -37,19 +37,20 @@ LuaApi::~LuaApi()
 {
 }
 
+int LuaApi::pushTable(lua_State* luaState, void* userData)
+{
+	return pushTableWithUserdata(luaState, userData);
+}
+
+void LuaApi::popTable(lua_State* luaState)
+{
+	lua_pop(luaState, 1);
+}
+
 /// Creates a new table and sets the metatable to the userdata. Allows a callback to be called after the table is created, but before it is popped off the stack
 int LuaApi::createTable(lua_State* luaState, const std::string tableName, void* userData, int parentIndex, std::function<void(int)> onTableCreated)
 {
-	lua_newtable(luaState); // Create a new table
-	lua_newtable(luaState); // Create the metatable
-
-	// Store the userdata in the metatable
-	lua_pushlightuserdata(luaState, userData);
-	lua_setfield(luaState, -2, "__userdata");
-
-    lua_setmetatable(luaState, -2); // Set the metatable for the new table
-
-	int tableIndex = lua_gettop(luaState);
+	int tableIndex = pushTable(luaState, userData);
 
 	if (parentIndex == LUA_REGISTRYINDEX)
 	{
@@ -69,12 +70,12 @@ int LuaApi::createTable(lua_State* luaState, const std::string tableName, void* 
 		onTableCreated(tableIndex);
 	}
 
-	lua_pop(luaState, 1);
+	popTable(luaState);
 
 	return tableIndex;
 }
 
-void LuaApi::createFunction(lua_State* L, const std::string functionName, lua_CFunction function)
+void LuaApi::createLuaFunction(lua_State* L, const std::string functionName, lua_CFunction function)
 {
 	lua_pushcfunction(L, function);            // Push the function
 	lua_setfield(L, -2, functionName.c_str()); // tableName[functionName] = function

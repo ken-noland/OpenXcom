@@ -360,7 +360,7 @@ void SavedBattleGame::load(const YAML::Node &node, Mod *mod, SavedGame* savedGam
 						}
 						else
 						{
-							bu->getInventory()->push_back(item);
+							bu->getInventory().push_back(item);
 						}
 					}
 				}
@@ -1111,27 +1111,27 @@ BattleUnit *SavedBattleGame::selectUnit(Position pos)
  * Gets the list of nodes.
  * @return Pointer to the list of nodes.
  */
-std::vector<Node*> *SavedBattleGame::getNodes()
+std::vector<Node*>& SavedBattleGame::getNodes()
 {
-	return &_nodes;
+	return _nodes;
 }
 
 /**
  * Gets the list of units.
  * @return Pointer to the list of units.
  */
-std::vector<BattleUnit*> *SavedBattleGame::getUnits()
+std::vector<BattleUnit*>& SavedBattleGame::getUnits()
 {
-	return &_units;
+	return _units;
 }
 
 /**
  * Gets the list of items.
  * @return Pointer to the list of items.
  */
-std::vector<BattleItem*> *SavedBattleGame::getItems()
+std::vector<BattleItem*>& SavedBattleGame::getItems()
 {
-	return &_items;
+	return _items;
 }
 
 /**
@@ -1156,9 +1156,9 @@ TileEngine *SavedBattleGame::getTileEngine() const
  * Gets the array of mapblocks.
  * @return Pointer to the array of mapblocks.
  */
-std::vector<MapDataSet*> *SavedBattleGame::getMapDataSets()
+std::vector<MapDataSet*>& SavedBattleGame::getMapDataSets()
 {
-	return &_mapDataSets;
+	return _mapDataSets;
 }
 
 /**
@@ -1289,7 +1289,7 @@ void SavedBattleGame::startFirstTurn()
 
 
 	// initialize xcom units for battle
-	for (auto* bu : *getUnits())
+	for (BattleUnit* bu : getUnits())
 	{
 		if (bu->getOriginalFaction() != FACTION_PLAYER || bu->isOut())
 		{
@@ -1450,9 +1450,9 @@ void SavedBattleGame::saveDummyCraftDeployment()
 	auto* save = getGeoscapeSave();
 
 	// don't forget to invalidate custom deployments of all real craft of this type
-	for (auto* xbase : *save->getBases())
+	for (Base* xbase : save->getBases())
 	{
-		for (auto* xcraft : *xbase->getCrafts())
+		for (Craft* xcraft : xbase->getCrafts())
 		{
 			if (xcraft->getRules() == _craftForPreview->getRules())
 			{
@@ -1888,13 +1888,13 @@ void SavedBattleGame::randomizeItemLocations(Tile *t)
 {
 	if (!_storageSpace.empty())
 	{
-		for (auto iter = t->getInventory()->begin(); iter != t->getInventory()->end();)
+		for (auto iter = t->getInventory().begin(); iter != t->getInventory().end();)
 		{
 			BattleItem* bi = (*iter);
 			if (bi->getSlot()->getType() == INV_GROUND)
 			{
-				getTile(_storageSpace.at(RNG::generate(0, _storageSpace.size() -1)))->addItem(bi, bi->getSlot());
-				iter = t->getInventory()->erase(iter);
+				getTile(_storageSpace.at(RNG::generate(0, (int)_storageSpace.size() -1)))->addItem(bi, bi->getSlot());
+				iter = t->getInventory().erase(iter);
 			}
 			else
 			{
@@ -2157,7 +2157,7 @@ BattleUnit *SavedBattleGame::createTempUnit(const Unit *rules, UnitFaction facti
 		getMod(),
 		const_cast<Unit*>(rules),
 		faction,
-		nextUnitId > 0 ? nextUnitId : getUnits()->back()->getId() + 1,
+		nextUnitId > 0 ? nextUnitId : getUnits().back()->getId() + 1,	//KN Note: why the conditional?
 		getEnviroEffects(),
 		rules->getArmor(),
 		faction == FACTION_HOSTILE ? _rule->getStatAdjustment(getGeoscapeSave()->getDifficulty()) : nullptr,
@@ -2230,7 +2230,7 @@ BattleUnit *SavedBattleGame::convertUnit(BattleUnit *unit)
 	newUnit->setTile(tile, this);
 	newUnit->setPosition(unit->getPosition());
 	newUnit->setDirection(unit->getDirection());
-	getUnits()->push_back(newUnit);
+	getUnits().push_back(newUnit);
 	initUnit(newUnit);
 
 	getTileEngine()->calculateFOV(newUnit->getPosition());  //happens fairly rarely, so do a full recalc for units in range to handle the potential unit visible cache issues.
@@ -2337,7 +2337,7 @@ Node *SavedBattleGame::getSpawnNode(int nodeRank, BattleUnit *unit)
 	int highestPriority = -1;
 	std::vector<Node*> compliantNodes;
 
-	for (auto* node : *getNodes())
+	for (Node* node : getNodes())
 	{
 		if (node->isDummy())
 		{
@@ -2365,7 +2365,7 @@ Node *SavedBattleGame::getSpawnNode(int nodeRank, BattleUnit *unit)
 
 	if (compliantNodes.empty()) return 0;
 
-	int n = RNG::generate(0, compliantNodes.size() - 1);
+	int n = RNG::generate(0, (int)compliantNodes.size() - 1);
 
 	return compliantNodes[n];
 }
@@ -2385,25 +2385,25 @@ Node *SavedBattleGame::getPatrolNode(bool scout, BattleUnit *unit, Node *fromNod
 	if (fromNode == 0)
 	{
 		if (Options::traceAI) { Log(LOG_INFO) << "This alien got lost. :("; }
-		fromNode = getNodes()->at(RNG::generate(0, getNodes()->size() - 1));
+		fromNode = getNodes().at(RNG::generate(0, (int)getNodes().size() - 1));
 		while (fromNode->isDummy())
 		{
-			fromNode = getNodes()->at(RNG::generate(0, getNodes()->size() - 1));
+			fromNode = getNodes().at(RNG::generate(0, (int)getNodes().size() - 1));
 		}
 	}
 
 	// scouts roam all over while all others shuffle around to adjacent nodes at most:
-	const int end = scout ? getNodes()->size() : fromNode->getNodeLinks()->size();
+	const int end = scout ? (int)getNodes().size() : fromNode->getNodeLinks().size();
 
 	for (int i = 0; i < end; ++i)
 	{
-		if (!scout && fromNode->getNodeLinks()->at(i) < 1) continue;
+		if (!scout && fromNode->getNodeLinks().at(i) < 1) continue;
 
-		Node *n = getNodes()->at(scout ? i : fromNode->getNodeLinks()->at(i));
+		Node *n = getNodes().at(scout ? i : fromNode->getNodeLinks().at(i));
 		if ( !n->isDummy()																				// don't consider dummy nodes.
 			&& (n->getFlags() > 0 || n->getRank() > 0 || scout)											// for non-scouts we find a node with a desirability above 0
 			&& (!(n->getType() & Node::TYPE_SMALL) || unit->isSmallUnit())								// the small unit bit is not set or the unit is small
-			&& (!(n->getType() & Node::TYPE_FLYING) || unit->getMovementType() == MT_FLY)	// the flying unit bit is not set or the unit can fly
+			&& (!(n->getType() & Node::TYPE_FLYING) || unit->getMovementType() == MT_FLY)				// the flying unit bit is not set or the unit can fly
 			&& !n->isAllocated()																		// check if not allocated
 			&& !(n->getType() & Node::TYPE_DANGEROUS)													// don't go there if an alien got shot there; stupid behavior like that
 			&& setUnitPosition(unit, n->getPosition(), true)											// check if not already occupied
@@ -2438,7 +2438,7 @@ Node *SavedBattleGame::getPatrolNode(bool scout, BattleUnit *unit, Node *fromNod
 	if (scout)
 	{
 		// scout picks a random destination:
-		return compliantNodes[RNG::generate(0, compliantNodes.size() - 1)];
+		return compliantNodes[RNG::generate(0, (int)compliantNodes.size() - 1)];
 	}
 	else
 	{
@@ -2600,7 +2600,7 @@ void SavedBattleGame::prepareNewTurn()
 	}
 
 	Mod *mod = getBattleState()->getGame()->getMod();
-	for (auto* bu : *getUnits())
+	for (BattleUnit* bu : getUnits())
 	{
 		bu->calculateEnviDamage(mod, this);
 	}
@@ -2617,7 +2617,7 @@ void SavedBattleGame::prepareNewTurn()
  */
 void SavedBattleGame::reviveUnconsciousUnits(bool noTU)
 {
-	for (auto* bu : *getUnits())
+	for (BattleUnit* bu : getUnits())
 	{
 		if (bu->isSmallUnit() && !bu->isIgnored())
 		{
@@ -2670,7 +2670,7 @@ void SavedBattleGame::removeUnconsciousBodyItem(BattleUnit *bu)
 	int size = bu->getArmor()->getSize();
 	size *= size;
 	// remove the unconscious body item corresponding to this unit
-	for (auto iter = getItems()->begin(); iter != getItems()->end(); )
+	for (auto iter = getItems().begin(); iter != getItems().end(); )
 	{
 		if ((*iter)->getUnit() == bu)
 		{
@@ -2748,12 +2748,12 @@ bool SavedBattleGame::setUnitPosition(BattleUnit *bu, Position position, bool te
  */
 bool SavedBattleGame::eyesOnTarget(UnitFaction faction, BattleUnit* unit)
 {
-	for (auto* bu : *getUnits())
+	for (BattleUnit* bu : getUnits())
 	{
 		if (bu->getFaction() != faction) continue;
 
-		auto* vis = bu->getVisibleUnits();
-		if (std::find(vis->begin(), vis->end(), unit) != vis->end()) return true;
+		std::vector<BattleUnit*>& vis = bu->getVisibleUnits();
+		if (std::find(vis.begin(), vis.end(), unit) != vis.end()) return true;
 		// aliens know the location of all XCom agents sighted by all other aliens due to sharing locations over their space-walkie-talkies
 	}
 
@@ -3172,7 +3172,7 @@ void SavedBattleGame::playRandomAmbientSound()
 {
 	if (!_ambienceRandom.empty())
 	{
-		int soundIndex = RNG::seedless(0, _ambienceRandom.size() - 1);
+		int soundIndex = RNG::seedless(0, (int)_ambienceRandom.size() - 1);
 		getMod()->getSoundByDepth(_depth, _ambienceRandom.at(soundIndex))->play(3); // use fixed ambience channel; don't check if previous sound is still playing or not
 	}
 }
@@ -3190,18 +3190,18 @@ const Mod *SavedBattleGame::getMod() const
  * get the list of items we're guaranteed to take with us (ie: items that were in the skyranger)
  * @return the list of items we're guaranteed.
  */
-std::vector<BattleItem*> *SavedBattleGame::getGuaranteedRecoveredItems()
+std::vector<BattleItem*>& SavedBattleGame::getGuaranteedRecoveredItems()
 {
-	return &_recoverGuaranteed;
+	return _recoverGuaranteed;
 }
 
 /**
  * get the list of items we're not guaranteed to take with us (ie: items that were NOT in the skyranger)
  * @return the list of items we might get.
  */
-std::vector<BattleItem*> *SavedBattleGame::getConditionalRecoveredItems()
+std::vector<BattleItem*>& SavedBattleGame::getConditionalRecoveredItems()
 {
-	return &_recoverConditional;
+	return _recoverConditional;
 }
 
 /**
@@ -3448,7 +3448,7 @@ void SavedBattleGame::setRandomHiddenMovementBackground(const Mod *mod)
 {
 	if (mod && !mod->getHiddenMovementBackgrounds().empty())
 	{
-		int rng = RNG::generate(0, mod->getHiddenMovementBackgrounds().size() - 1);
+		int rng = RNG::generate(0, (int)mod->getHiddenMovementBackgrounds().size() - 1);
 		_hiddenMovementBackground = mod->getHiddenMovementBackgrounds().at(rng);
 	}
 	else
@@ -3771,7 +3771,7 @@ void SavedBattleGame::updateVisibleTiles()
 	for (BattleUnit* unit : _units)
 	{
 		if (unit->getFaction() == FACTION_PLAYER)
-			_currentlyVisibleTiles.insert(unit->getVisibleTiles()->begin(), unit->getVisibleTiles()->end());
+			_currentlyVisibleTiles.insert(unit->getVisibleTiles().begin(), unit->getVisibleTiles().end());
 	}
 }
 

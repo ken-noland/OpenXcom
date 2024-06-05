@@ -25,44 +25,71 @@ namespace OpenXcom
 namespace Lua
 {
 
-void yamlNodeToLua(lua_State* L, const YAML::Node& node)
+template <>
+void toLua(lua_State* L, int arg)
 {
-	if (node.IsScalar())
-	{
-		toLua<const std::string&>(L, node.as<std::string>());
-	}
-	else if (node.IsSequence())
-	{
-		lua_newtable(L);
-		for (std::size_t i = 0; i < node.size(); ++i)
-		{
-			yamlNodeToLua(L, node[i]);
-			lua_rawseti(L, -2, i + 1);
-		}
-	}
-	else if (node.IsMap())
-	{
-		lua_newtable(L);
-		for (const auto& pair : node)
-		{
-			yamlNodeToLua(L, pair.first);
-			yamlNodeToLua(L, pair.second);
-			lua_settable(L, -3);
-		}
-	}
-	else
-	{
-		lua_pushnil(L);
-	}
+	lua_pushinteger(L, arg);
 }
 
-
-/// Converts a Lua table to a YAML node
-YAML::Node luaToYamlNode(lua_State* luaState, int index)
+template <>
+void toLua(lua_State* L, float arg)
 {
-	YAML::Node node;
-	return node;
+	lua_pushnumber(L, static_cast<lua_Number>(arg));
 }
+
+template <>
+void toLua(lua_State* L, double arg)
+{
+	lua_pushnumber(L, static_cast<lua_Number>(arg));
+}
+
+template <>
+void toLua(lua_State* L, const std::string& arg)
+{
+	lua_pushstring(L, arg.c_str());
+}
+
+template <>
+void toLua(lua_State* L, const char* arg)
+{
+	lua_pushstring(L, arg);
+}
+
+template <>
+int fromLua(lua_State* luaState, int index)
+{
+	return static_cast<int>(lua_tointeger(luaState, index));
+}
+
+template <>
+float fromLua(lua_State* luaState, int index)
+{
+	return static_cast<float>(lua_tointeger(luaState, index));
+}
+
+template <>
+double fromLua(lua_State* luaState, int index)
+{
+	return static_cast<double>(lua_tointeger(luaState, index));
+}
+
+template <>
+std::string fromLua(lua_State* luaState, int index)
+{
+	const char* str = lua_tostring(luaState, index);
+	if (str == nullptr)
+	{
+		luaL_error(luaState, "Expected a string at index %d", index);
+	}
+	return std::string(str);
+}
+
+template <>
+const char* fromLua(lua_State* luaState, int index)
+{
+	return lua_tostring(luaState, index);
+}
+
 
 } // namespace Lua
 

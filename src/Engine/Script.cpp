@@ -38,6 +38,12 @@
 #include "../fallthrough.h"
 #include "Collections.h"
 
+#ifndef _MSC_VER
+#define FORCE_INLINE [[gnu::always_inline]]
+#else
+#define FORCE_INLINE __forceinline
+#endif
+
 namespace OpenXcom
 {
 
@@ -92,7 +98,7 @@ constexpr bool isKnowNamePrefix(ScriptRef name)
 ////////////////////////////////////////////////////////////
 //						proc definition
 ////////////////////////////////////////////////////////////
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline void addShade_h(int& reg, const int& var)
 {
 	const int newShade = (reg & 0xF) + var;
@@ -113,7 +119,7 @@ static inline void addShade_h(int& reg, const int& var)
 		reg = 0x01;
 }
 
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline RetEnum mulAddMod_h(int& reg, const int& mul, const int& add, const int& mod)
 {
 	const int64_t a = ((int64_t)reg) * mul + add;
@@ -125,7 +131,7 @@ static inline RetEnum mulAddMod_h(int& reg, const int& mul, const int& add, cons
 	return RetError;
 }
 
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline RetEnum mulDiv_h(int& reg, const int& mul, const int& div)
 {
 	if (div)
@@ -136,7 +142,7 @@ static inline RetEnum mulDiv_h(int& reg, const int& mul, const int& div)
 	return RetError;
 }
 
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline RetEnum wavegen_rect_h(int& reg, const int& period, const int& size, const int& max)
 {
 	if (period <= 0)
@@ -151,7 +157,7 @@ static inline RetEnum wavegen_rect_h(int& reg, const int& period, const int& siz
 	return RetContinue;
 }
 
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline RetEnum wavegen_saw_h(int& reg, const int& period, const int& size, const int& max)
 {
 	if (period <= 0)
@@ -166,7 +172,7 @@ static inline RetEnum wavegen_saw_h(int& reg, const int& period, const int& size
 	return RetContinue;
 }
 
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline RetEnum wavegen_tri_h(int& reg, const int& period, const int& size, const int& max)
 {
 	if (period <= 0)
@@ -186,7 +192,7 @@ static inline RetEnum wavegen_tri_h(int& reg, const int& period, const int& size
 	return RetContinue;
 }
 
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline RetEnum wavegen_sin_h(int& reg, const int& period, const int& size)
 {
 	if (period <= 0)
@@ -195,7 +201,7 @@ static inline RetEnum wavegen_sin_h(int& reg, const int& period, const int& size
 	return RetContinue;
 }
 
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline RetEnum wavegen_cos_h(int& reg, const int& period, const int& size)
 {
 	if (period <= 0)
@@ -204,7 +210,7 @@ static inline RetEnum wavegen_cos_h(int& reg, const int& period, const int& size
 	return RetContinue;
 }
 
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline RetEnum call_func_h(ScriptWorkerBase& c, ScriptFunc func, const Uint8* d, ProgPos& p)
 {
 	auto t = p;
@@ -213,7 +219,7 @@ static inline RetEnum call_func_h(ScriptWorkerBase& c, ScriptFunc func, const Ui
 	return r;
 }
 
-[[gnu::always_inline]]
+FORCE_INLINE
 static inline RetEnum bit_popcount_h(int& reg)
 {
 	constexpr size_t minBitsetSize = 8*sizeof(std::bitset<1>);

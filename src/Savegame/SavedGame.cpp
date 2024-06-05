@@ -914,7 +914,7 @@ void SavedGame::save(const std::string &filename, Mod *mod) const
 		std::ostringstream oss;
 		oss << "globalCraftLoadout" << j;
 		std::string key = oss.str();
-		if (!_globalCraftLoadout[j]->getContents()->empty())
+		if (!_globalCraftLoadout[j]->getContents().empty())
 		{
 			node[key] = _globalCraftLoadout[j]->save();
 		}
@@ -1305,9 +1305,9 @@ void SavedGame::setAllIds(const std::map<std::string, int> &ids)
  * Returns the list of countries in the game world.
  * @return Pointer to country list.
  */
-std::vector<Country*> *SavedGame::getCountries()
+std::vector<Country*>& SavedGame::getCountries()
 {
-	return &_countries;
+	return _countries;
 }
 
 /**
@@ -1328,18 +1328,18 @@ int SavedGame::getCountryFunding() const
  * Returns the list of world regions.
  * @return Pointer to region list.
  */
-std::vector<Region*> *SavedGame::getRegions()
+std::vector<Region*>& SavedGame::getRegions()
 {
-	return &_regions;
+	return _regions;
 }
 
 /**
  * Returns the list of player bases.
  * @return Pointer to base list.
  */
-std::vector<Base*> *SavedGame::getBases()
+std::vector<Base*>& SavedGame::getBases()
 {
-	return &_bases;
+	return _bases;
 }
 
 /**
@@ -1390,9 +1390,9 @@ void SavedGame::setVisibleBasesIndex(size_t lastVisibleBasesIndex)
  * Returns an immutable list of player bases.
  * @return Pointer to base list.
  */
-const std::vector<Base*> *SavedGame::getBases() const
+const std::vector<Base*>& SavedGame::getBases() const
 {
-	return &_bases;
+	return _bases;
 }
 
 /**
@@ -1413,36 +1413,36 @@ int SavedGame::getBaseMaintenance() const
  * Returns the list of alien UFOs.
  * @return Pointer to UFO list.
  */
-std::vector<Ufo*> *SavedGame::getUfos()
+std::vector<Ufo*>& SavedGame::getUfos()
 {
-	return &_ufos;
+	return _ufos;
 }
 
 /**
  * Returns the list of alien UFOs.
  * @return Pointer to UFO list.
  */
-const std::vector<Ufo*> *SavedGame::getUfos() const
+const std::vector<Ufo*>& SavedGame::getUfos() const
 {
-	return &_ufos;
+	return _ufos;
 }
 
 /**
  * Returns the list of craft waypoints.
  * @return Pointer to waypoint list.
  */
-std::vector<Waypoint*> *SavedGame::getWaypoints()
+std::vector<Waypoint*>& SavedGame::getWaypoints()
 {
-	return &_waypoints;
+	return _waypoints;
 }
 
 /**
  * Returns the list of mission sites.
  * @return Pointer to mission site list.
  */
-std::vector<MissionSite*> *SavedGame::getMissionSites()
+std::vector<MissionSite*>& SavedGame::getMissionSites()
 {
-	return &_missionSites;
+	return _missionSites;
 }
 
 /**
@@ -1556,7 +1556,7 @@ const RuleResearch* SavedGame::selectGetOneFree(const RuleResearch* research)
 			size_t pick = 0;
 			if (!research->sequentialGetOneFree())
 			{
-				pick = RNG::generate(0, possibilities.size() - 1);
+				pick = RNG::generate(0, (int)possibilities.size() - 1);
 			}
 			auto ret = possibilities.at(pick);
 			return ret;
@@ -2266,9 +2266,9 @@ bool SavedGame::isItemObtained(const std::string &itemType) const
  */
 bool SavedGame::isFacilityBuilt(const std::string &facilityType) const
 {
-	for (auto* xbase : _bases)
+	for (Base* xbase : _bases)
 	{
-		for (auto* fac : *xbase->getFacilities())
+		for (BaseFacility* fac : xbase->getFacilities())
 		{
 			if (fac->getBuildTime() == 0 && fac->getRules()->getType() == facilityType)
 			{
@@ -2286,9 +2286,9 @@ bool SavedGame::isFacilityBuilt(const std::string &facilityType) const
  */
 bool SavedGame::isSoldierTypeHired(const std::string& soldierType) const
 {
-	for (auto* xbase : _bases)
+	for (Base* xbase : _bases)
 	{
-		for (auto* soldier : *xbase->getSoldiers())
+		for (Soldier* soldier : xbase->getSoldiers())
 		{
 			if (soldier->getRules()->getType() == soldierType)
 			{
@@ -2306,9 +2306,9 @@ bool SavedGame::isSoldierTypeHired(const std::string& soldierType) const
  */
 Soldier *SavedGame::getSoldier(int id) const
 {
-	for (auto* xbase : _bases)
+	for (Base* xbase : _bases)
 	{
-		for (auto* soldier : *xbase->getSoldiers())
+		for (Soldier* soldier : xbase->getSoldiers())
 		{
 			if (soldier->getId() == id)
 			{
@@ -2465,9 +2465,9 @@ int SavedGame::getSoldierScore(Soldier *soldier)
   * Returns the list of alien bases.
   * @return Pointer to alien base list.
   */
-std::vector<AlienBase*> *SavedGame::getAlienBases()
+std::vector<AlienBase*>& SavedGame::getAlienBases()
 {
-	return &_alienBases;
+	return _alienBases;
 }
 
 /**
@@ -2852,9 +2852,9 @@ bool SavedGame::wasEventGenerated(const std::string& eventName)
  * Returns the list of dead soldiers.
  * @return Pointer to soldier list.
  */
-std::vector<Soldier*> *SavedGame::getDeadSoldiers()
+std::vector<Soldier*>& SavedGame::getDeadSoldiers()
 {
-	return &_deadSoldiers;
+	return _deadSoldiers;
 }
 
 /**
@@ -2866,10 +2866,10 @@ std::vector<Soldier*> SavedGame::getAllActiveSoldiers() const
 	std::vector<Soldier*> soldiers;
 	for (auto* xbase : _bases)
 	{
-		std::vector<Soldier*> baseSoldiers = *xbase->getSoldiers();
+		std::vector<Soldier*> baseSoldiers = xbase->getSoldiers();
 		soldiers.insert(soldiers.end(), baseSoldiers.begin(), baseSoldiers.end());
 
-		for (auto* transfer : *xbase->getTransfers())
+		for (Transfer* transfer : xbase->getTransfers())
 		{
 			if (transfer->getType() == TRANSFER_SOLDIER)
 			{
@@ -2979,9 +2979,9 @@ void SavedGame::setGlobalCraftLoadoutName(int index, const std::string &name)
  * Returns the list of mission statistics.
  * @return Pointer to statistics list.
  */
-std::vector<MissionStatistics*> *SavedGame::getMissionStatistics()
+std::vector<MissionStatistics*>& SavedGame::getMissionStatistics()
 {
-	return &_missionStatistics;
+	return _missionStatistics;
 }
 
 /**
@@ -3026,15 +3026,15 @@ std::vector<Soldier*>::iterator SavedGame::killSoldier(bool resetArmor, Soldier 
 	}
 
 	std::vector<Soldier*>::iterator soldierIt;
-	for (auto* xbase : _bases)
+	for (Base* xbase : _bases)
 	{
-		for (soldierIt = xbase->getSoldiers()->begin(); soldierIt != xbase->getSoldiers()->end(); ++soldierIt)
+		for (soldierIt = xbase->getSoldiers().begin(); soldierIt != xbase->getSoldiers().end(); ++soldierIt)
 		{
 			if ((*soldierIt) == soldier)
 			{
 				soldier->die(new SoldierDeath(*_time, cause));
 				_deadSoldiers.push_back(soldier);
-				return xbase->getSoldiers()->erase(soldierIt);
+				return xbase->getSoldiers().erase(soldierIt);
 			}
 		}
 	}
@@ -3074,7 +3074,7 @@ void SavedGame::removeAllSoldiersFromXcomCraft(Craft *craft)
 {
 	for (auto* xbase : _bases)
 	{
-		for (auto* soldier : *xbase->getSoldiers())
+		for (Soldier* soldier : xbase->getSoldiers())
 		{
 			if (soldier->getCraft() == craft)
 			{
@@ -3100,9 +3100,9 @@ void SavedGame::stopHuntingXcomCraft(Craft *target)
  */
 void SavedGame::stopHuntingXcomCrafts(Base *base)
 {
-	for (auto* xcraft : *base->getCrafts())
+	for (Craft* xcraft : base->getCrafts())
 	{
-		for (auto* ufo : _ufos)
+		for (Ufo* ufo : _ufos)
 		{
 			ufo->resetOriginalDestination(xcraft);
 		}
@@ -3373,7 +3373,7 @@ void SavedGame::handlePrimaryResearchSideEffects(const std::vector<const RuleRes
 		{
 			Transfer* t = new Transfer(1);
 			t->setItems(spawnedItem, std::max(1, myResearchRule->getSpawnedItemCount()));
-			base->getTransfers()->push_back(t);
+			base->getTransfers().push_back(t);
 		}
 		for (const auto& spawnedItemName2 : myResearchRule->getSpawnedItemList())
 		{
@@ -3382,7 +3382,7 @@ void SavedGame::handlePrimaryResearchSideEffects(const std::vector<const RuleRes
 			{
 				Transfer* t = new Transfer(1);
 				t->setItems(spawnedItem2);
-				base->getTransfers()->push_back(t);
+				base->getTransfers().push_back(t);
 			}
 		}
 		// 3l. handle spawned events

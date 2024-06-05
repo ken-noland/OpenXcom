@@ -62,7 +62,7 @@ PsiTrainingState::PsiTrainingState()
 	_txtTitle->setText(tr("STR_PSIONIC_TRAINING"));
 
 	int buttons = 0;
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
 		if (xbase->getAvailablePsiLabs())
 		{

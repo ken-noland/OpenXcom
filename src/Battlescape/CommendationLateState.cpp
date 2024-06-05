@@ -116,7 +116,7 @@ CommendationLateState::CommendationLateState(std::vector<Soldier*> soldiersMedal
 			noun = "noNoun";
 
 			// Loop over soldier's commendation
-			for (auto* soldierComm : *soldier->getDiary()->getSoldierCommendations())
+			for (SoldierCommendations* soldierComm : soldier->getDiary()->getSoldierCommendations())
 			{
 				if (soldierComm->getType() == commType && soldierComm->isNew() && noun == "noNoun")
 				{

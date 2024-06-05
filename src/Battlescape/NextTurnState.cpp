@@ -229,7 +229,7 @@ NextTurnState::NextTurnState(SavedBattleGame *battleGame, BattlescapeState *stat
 		{
 			// beginning of alien's and neutral's turn
 			bool anyoneStanding = false;
-			for (const auto* bu : *_battleGame->getUnits())
+			for (const BattleUnit* bu : _battleGame->getUnits())
 			{
 				if (bu->getOriginalFaction() == FACTION_HOSTILE && !bu->isOut())
 				{
@@ -353,7 +353,7 @@ void NextTurnState::checkBugHuntMode()
 	if (_battleGame->getBughuntMode()) return;
 
 	int count = 0;
-	for (const auto* bu : *_battleGame->getUnits())
+	for (const BattleUnit* bu : _battleGame->getUnits())
 	{
 		if (!bu->isOut())
 		{
@@ -432,7 +432,7 @@ bool NextTurnState::applyEnvironmentalConditionToFaction(UnitFaction faction, En
 			bodypart = (UnitBodyPart)condition.bodyPart;
 		}
 
-		for (auto* bu : *_battleGame->getUnits())
+		for (BattleUnit* bu : _battleGame->getUnits())
 		{
 			if (bu->getOriginalFaction() == faction && bu->getStatus() != STATUS_DEAD && !bu->isIgnored())
 			{
@@ -520,7 +520,7 @@ void NextTurnState::close()
 		tally.liveAliens = 0;
 
 		// mind control anyone who was revived (needed for correct recovery in the debriefing)
-		for (auto bu : *_battleGame->getUnits())
+		for (BattleUnit* bu : _battleGame->getUnits())
 		{
 			if (bu->getOriginalFaction() == FACTION_HOSTILE && !bu->isOut())
 			{
@@ -777,9 +777,9 @@ bool NextTurnState::determineReinforcements()
 			bool checkNodeRanks = !wave.spawnNodeRanks.empty();
 			bool checkZLevels = !wave.spawnZLevels.empty();
 
-			_compliantNodesList.reserve(_battleGame->getNodes()->size());
+			_compliantNodesList.reserve(_battleGame->getNodes().size());
 
-			for (auto node : *_battleGame->getNodes())
+			for (Node* node : _battleGame->getNodes())
 			{
 				if (node->isDummy())
 				{
@@ -805,7 +805,7 @@ bool NextTurnState::determineReinforcements()
 				if (wave.minDistanceFromXcomUnits > 1)
 				{
 					bool foundXcomUnitNearby = false;
-					for (auto xcomUnit : *_battleGame->getUnits())
+					for (BattleUnit* xcomUnit : _battleGame->getUnits())
 					{
 						if (xcomUnit->getOriginalFaction() == FACTION_PLAYER &&
 							!xcomUnit->isOut() &&
@@ -928,7 +928,7 @@ bool NextTurnState::deployReinforcements(const ReinforcementsData &wave)
 					{
 						if (iset.items.empty())
 							continue;
-						auto pick = RNG::generate(0, iset.items.size() - 1);
+						auto pick = RNG::generate(0, (int)iset.items.size() - 1);
 						RuleItem* ruleItem = _game->getMod()->getItem(iset.items[pick]);
 						if (ruleItem)
 						{
@@ -966,7 +966,7 @@ BattleUnit* NextTurnState::addReinforcement(const ReinforcementsData &wave, Unit
 				unit->getAIModule()->setStartNode(node);
 				unit->setRankInt(alienRank);
 				unit->setDirection(RNG::generate(0, 7));
-				_battleGame->getUnits()->push_back(unit);
+				_battleGame->getUnits().push_back(unit);
 				unitPlaced = true;
 				break;
 			}
@@ -996,7 +996,7 @@ BattleUnit* NextTurnState::addReinforcement(const ReinforcementsData &wave, Unit
 		int edgeY = (_battleGame->getMapSizeY() / 10) - 1;
 		while (!unitPlaced && tries)
 		{
-			int randomBlockIndex = RNG::generate(0, _compliantBlocksList.size() - 1);
+			int randomBlockIndex = RNG::generate(0, (int)_compliantBlocksList.size() - 1);
 			if (wave.maxDistanceFromBorders > 0 && wave.maxDistanceFromBorders < 10)
 			{
 				// Note: we assume that the modder has done the necessary work and allowed only border blocks to come this far
@@ -1035,7 +1035,7 @@ BattleUnit* NextTurnState::addReinforcement(const ReinforcementsData &wave, Unit
 			bool foundXcomUnitNearby = false;
 			if (wave.minDistanceFromXcomUnits > 1)
 			{
-				for (auto xcomUnit : *_battleGame->getUnits())
+				for (BattleUnit* xcomUnit : _battleGame->getUnits())
 				{
 					if (xcomUnit->getOriginalFaction() == FACTION_PLAYER &&
 						!xcomUnit->isOut() &&
@@ -1064,7 +1064,7 @@ BattleUnit* NextTurnState::addReinforcement(const ReinforcementsData &wave, Unit
 					{
 						unit->setRankInt(alienRank);
 						unit->setDirection(RNG::generate(0, 7));
-						_battleGame->getUnits()->push_back(unit);
+						_battleGame->getUnits().push_back(unit);
 						unitPlaced = true;
 						break;
 					}
@@ -1079,7 +1079,7 @@ BattleUnit* NextTurnState::addReinforcement(const ReinforcementsData &wave, Unit
 	{
 		unit->setRankInt(alienRank);
 		unit->setDirection(RNG::generate(0, 7));
-		_battleGame->getUnits()->push_back(unit);
+		_battleGame->getUnits().push_back(unit);
 		unitPlaced = true;
 	}
 
@@ -1100,7 +1100,7 @@ BattleUnit* NextTurnState::addReinforcement(const ReinforcementsData &wave, Unit
  */
 bool NextTurnState::placeReinforcementNearFriend(BattleUnit *unit)
 {
-	if (_battleGame->getUnits()->empty())
+	if (_battleGame->getUnits().empty())
 	{
 		return false;
 	}
@@ -1111,7 +1111,7 @@ bool NextTurnState::placeReinforcementNearFriend(BattleUnit *unit)
 		bool largeUnit = false;
 		while (entryPoint == TileEngine::invalid && tries)
 		{
-			BattleUnit* k = _battleGame->getUnits()->at(RNG::generate(0, _battleGame->getUnits()->size() - 1));
+			BattleUnit* k = _battleGame->getUnits().at(RNG::generate(0, _battleGame->getUnits().size() - 1));
 			if (k->getFaction() == unit->getFaction() && k->getPosition() != TileEngine::invalid && k->getArmor()->getSize() >= unit->getArmor()->getSize())
 			{
 				entryPoint = k->getPosition();

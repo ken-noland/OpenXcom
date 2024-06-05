@@ -99,7 +99,7 @@ CommendationState::CommendationState(std::vector<Soldier*> soldiersMedalled)
 
 		for (auto* soldier : soldiersMedalled)
 		{
-			for (auto* soldierComm : *soldier->getDiary()->getSoldierCommendations())
+			for (SoldierCommendations* soldierComm : soldier->getDiary()->getSoldierCommendations())
 			{
 				if (soldierComm->getType() == commType && soldierComm->isNew() && noun == "noNoun")
 				{

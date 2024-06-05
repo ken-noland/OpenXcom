@@ -277,7 +277,7 @@ void ActionMenuState::btnActionMenuItemClick(Action *action)
 	{
 		if (action->getSender() == _actionMenu[i])
 		{
-			btnID = i;
+			btnID = (int)i;
 		}
 	}
 
@@ -335,7 +335,7 @@ void ActionMenuState::handleAction()
 		{
 			BattleUnit *targetUnit = 0;
 			TileEngine *tileEngine = _game->getSavedGame()->getSavedBattle()->getTileEngine();
-			for (auto* bu : *_game->getSavedGame()->getSavedBattle()->getUnits())
+			for (BattleUnit* bu : _game->getSavedGame()->getSavedBattle()->getUnits())
 			{
 				// we can heal a unit that is at the same position, unconscious and healable(=woundable)
 				if (bu->getPosition() == _action->actor->getPosition() &&

@@ -196,7 +196,7 @@ void SkillMenuState::btnActionMenuItemClick(Action *action)
 	{
 		if (action->getSender() == _actionMenu[i])
 		{
-			btnID = i;
+			btnID = (int)i;
 			break;
 		}
 	}
@@ -288,7 +288,7 @@ void SkillMenuState::chooseWeaponForSkill(BattleAction* action, const std::vecto
 					return;
 				}
 				// check inventory
-				for (auto invItem : *unit->getInventory())
+				for (BattleItem* invItem : unit->getInventory())
 				{
 					if (invItem->getRules() == itemRule)
 					{
@@ -304,7 +304,7 @@ void SkillMenuState::chooseWeaponForSkill(BattleAction* action, const std::vecto
 	if (compatibleBattleType != BT_NONE)
 	{
 		// check inventory
-		for (auto invItem : *unit->getInventory())
+		for (BattleItem* invItem : unit->getInventory())
 		{
 			// Note: checkHandsOnly is not considered here
 			if (invItem->getRules()->getBattleType() == compatibleBattleType)

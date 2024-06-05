@@ -56,7 +56,7 @@ SoldiersAIState::SoldiersAIState(std::vector<Soldier*>& soldiers)
  */
 SoldiersAIState::SoldiersAIState(const Craft* craft)
 {
-	for (auto* soldier : *craft->getBase()->getSoldiers())
+	for (Soldier* soldier : craft->getBase()->getSoldiers())
 	{
 		if (soldier->getCraft() == craft)
 			_soldiers.push_back(soldier);

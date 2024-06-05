@@ -61,7 +61,7 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 	if (useCustomSound)
 	{
 		auto& sounds = _game->getMod()->getSelectBaseSounds();
-		int soundId = sounds.empty() ? Mod::NO_SOUND : sounds[RNG::generate(0, sounds.size() - 1)];
+		int soundId = sounds.empty() ? Mod::NO_SOUND : sounds[RNG::generate(0, (int)sounds.size() - 1)];
 		if (soundId != Mod::NO_SOUND)
 		{
 			_customSound = _game->getMod()->getSound("GEO.CAT", soundId);
@@ -168,11 +168,11 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 	_selCrafts.clear();
 
 	int row = 0;
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
 		if (_base != 0 && xbase != _base)
 			continue;
-		for (auto* xcraft : *xbase->getCrafts())
+		for (Craft* xcraft : xbase->getCrafts())
 		{
 			std::ostringstream ssStatus;
 			std::string status = xcraft->getStatus();
@@ -453,13 +453,13 @@ void InterceptState::lstCraftsRightClick(Action *)
 		_game->popState();
 
 		bool found = false;
-		for (auto* xbase : *_game->getSavedGame()->getBases())
+		for (Base* xbase : _game->getSavedGame()->getBases())
 		{
 			if (_base != 0 && xbase != _base)
 				continue;
-			for (size_t ci = 0; ci < xbase->getCrafts()->size(); ++ci)
+			for (size_t ci = 0; ci < xbase->getCrafts().size(); ++ci)
 			{
-				if (c == xbase->getCrafts()->at(ci))
+				if (c == xbase->getCrafts().at(ci))
 				{
 					_game->pushState(new CraftInfoState(xbase, ci));
 					found = true;

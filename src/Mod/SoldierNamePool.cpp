@@ -130,22 +130,22 @@ std::string SoldierNamePool::genName(SoldierGender *gender, int femaleFrequency)
 	if (!female)
 	{
 		*gender = GENDER_MALE;
-		size_t first = RNG::generate(0, _maleFirst.size() - 1);
+		size_t first = RNG::generate(0, (int)_maleFirst.size() - 1);
 		name << _maleFirst[first];
 		if (!_maleLast.empty())
 		{
-			size_t last = RNG::generate(0, _maleLast.size() - 1);
+			size_t last = RNG::generate(0, (int)_maleLast.size() - 1);
 			name << " " << _maleLast[last];
 		}
 	}
 	else
 	{
 		*gender = GENDER_FEMALE;
-		size_t first = RNG::generate(0, _femaleFirst.size() - 1);
+		size_t first = RNG::generate(0, (int)_femaleFirst.size() - 1);
 		name << _femaleFirst[first];
 		if (!_femaleLast.empty())
 		{
-			size_t last = RNG::generate(0, _femaleLast.size() - 1);
+			size_t last = RNG::generate(0, (int)_femaleLast.size() - 1);
 			name << " " << _femaleLast[last];
 		}
 	}
@@ -165,12 +165,12 @@ std::string SoldierNamePool::genCallsign(const SoldierGender gender) const
 	{
 		if (gender == GENDER_MALE)
 		{
-			size_t first = RNG::generate(0, _maleCallsign.size() - 1);
+			size_t first = RNG::generate(0, (int)_maleCallsign.size() - 1);
 			callsign = _maleCallsign[first];
 		}
 		else
 		{
-			size_t first = RNG::generate(0, _femaleCallsign.size() - 1);
+			size_t first = RNG::generate(0, (int)_femaleCallsign.size() - 1);
 			callsign = _femaleCallsign[first];
 		}
 	}
@@ -209,7 +209,7 @@ size_t SoldierNamePool::genLook(size_t numLooks)
 		++look;
 	}
 
-	return RNG::generate(0, numLooks - 1);
+	return RNG::generate(0, (int)numLooks - 1);
 }
 
 }

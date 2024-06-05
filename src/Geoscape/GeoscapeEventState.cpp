@@ -129,7 +129,7 @@ GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : _eventRule(
 void GeoscapeEventState::eventLogic()
 {
 	SavedGame *save = _game->getSavedGame();
-	Base *hq = save->getBases()->front();
+	Base *hq = save->getBases().front();
 	const Mod *mod = _game->getMod();
 	const RuleEvent &rule = _eventRule;
 
@@ -137,18 +137,18 @@ void GeoscapeEventState::eventLogic()
 	City* city = nullptr;
 	if (!rule.getRegionList().empty())
 	{
-		size_t pickRegion = RNG::generate(0, rule.getRegionList().size() - 1);
-		auto regionName = rule.getRegionList().at(pickRegion);
+		size_t pickRegion = RNG::generate(0, (int)rule.getRegionList().size() - 1);
+		std::string regionName = rule.getRegionList().at(pickRegion);
 		regionRule = _game->getMod()->getRegion(regionName, true);
 		std::string place = tr(regionName);
 
 		if (rule.isCitySpecific())
 		{
-			size_t cities = regionRule->getCities()->size();
+			size_t cities = regionRule->getCities().size();
 			if (cities > 0)
 			{
-				size_t pickCity = RNG::generate(0, cities - 1);
-				city = regionRule->getCities()->at(pickCity);
+				size_t pickCity = RNG::generate(0, (int)cities - 1);
+				city = regionRule->getCities().at(pickCity);
 				place = city->getName(_game->getLanguage());
 			}
 		}
@@ -165,11 +165,11 @@ void GeoscapeEventState::eventLogic()
 	{
 		if (!rule.isCitySpecific())
 		{
-			size_t cities = regionRule->getCities()->size();
+			size_t cities = regionRule->getCities().size();
 			if (cities > 0)
 			{
-				size_t pickCity = RNG::generate(0, cities - 1);
-				city = regionRule->getCities()->at(pickCity);
+				size_t pickCity = RNG::generate(0, (int)cities - 1);
+				city = regionRule->getCities().at(pickCity);
 			}
 		}
 	}
@@ -177,7 +177,7 @@ void GeoscapeEventState::eventLogic()
 	// 1. give/take score points
 	if (regionRule)
 	{
-		for (auto region : *_game->getSavedGame()->getRegions())
+		for (Region* region : _game->getSavedGame()->getRegions())
 		{
 			if (region->getRules() == regionRule)
 			{
@@ -202,13 +202,13 @@ void GeoscapeEventState::eventLogic()
 		{
 			Transfer* t = new Transfer(24);
 			t->setScientists(rule.getSpawnedPersons());
-			hq->getTransfers()->push_back(t);
+			hq->getTransfers().push_back(t);
 		}
 		else if (spawnedPersonType == "STR_ENGINEER")
 		{
 			Transfer* t = new Transfer(24);
 			t->setEngineers(rule.getSpawnedPersons());
-			hq->getTransfers()->push_back(t);
+			hq->getTransfers().push_back(t);
 		}
 		else
 		{
@@ -230,7 +230,7 @@ void GeoscapeEventState::eventLogic()
 						s->genName();
 					}
 					t->setSoldier(s);
-					hq->getTransfers()->push_back(t);
+					hq->getTransfers().push_back(t);
 				}
 			}
 		}
@@ -259,7 +259,7 @@ void GeoscapeEventState::eventLogic()
 
 	if (!rule.getRandomItemList().empty())
 	{
-		size_t pickItem = RNG::generate(0, rule.getRandomItemList().size() - 1);
+		size_t pickItem = RNG::generate(0, (int)rule.getRandomItemList().size() - 1);
 		const RuleItem *randomItem = mod->getItem(rule.getRandomItemList().at(pickItem), true);
 		if (randomItem)
 		{
@@ -269,7 +269,7 @@ void GeoscapeEventState::eventLogic()
 
 	if (!rule.getRandomMultiItemList().empty())
 	{
-		size_t pickItem = RNG::generate(0, rule.getRandomMultiItemList().size() - 1);
+		size_t pickItem = RNG::generate(0, (int)rule.getRandomMultiItemList().size() - 1);
 		auto& sublist = rule.getRandomMultiItemList().at(pickItem);
 		for (auto& pair : sublist)
 		{
@@ -300,7 +300,7 @@ void GeoscapeEventState::eventLogic()
 		{
 			Transfer* t = new Transfer(1);
 			t->setItems(mod->getItem(ti.first, true), ti.second);
-			hq->getTransfers()->push_back(t);
+			hq->getTransfers().push_back(t);
 		}
 
 		std::ostringstream ss;
@@ -318,7 +318,7 @@ void GeoscapeEventState::eventLogic()
 		{
 			// same as manufacture
 			craft->checkup();
-			hq->getCrafts()->push_back(craft);
+			hq->getCrafts().push_back(craft);
 		}
 		else
 		{
@@ -326,7 +326,7 @@ void GeoscapeEventState::eventLogic()
 			craft->setStatus("STR_REFUELLING");
 			Transfer* t = new Transfer(1);
 			t->setCraft(craft);
-			hq->getTransfers()->push_back(t);
+			hq->getTransfers().push_back(t);
 		}
 	}
 
@@ -345,7 +345,7 @@ void GeoscapeEventState::eventLogic()
 	std::vector<const RuleResearch*> topicsToCheck;
 	if (!possibilities.empty())
 	{
-		size_t pickResearch = RNG::generate(0, possibilities.size() - 1);
+		size_t pickResearch = RNG::generate(0, (int)possibilities.size() - 1);
 		const RuleResearch *eventResearch = possibilities.at(pickResearch);
 
 		bool alreadyResearched = false;
@@ -425,7 +425,7 @@ void GeoscapeEventState::btnOkClick(Action *)
 {
 	_game->popState();
 
-	Base *base = _game->getSavedGame()->getBases()->front();
+	Base *base = _game->getSavedGame()->getBases().front();
 	if (_game->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && base != 0 && base->storesOverfull())
 	{
 		_game->pushState(new SellState(base, 0));

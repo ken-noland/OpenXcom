@@ -362,7 +362,7 @@ void Game::run()
 				// Update our FPS delay time based on the time of the last draw.
 				int fps = SDL_GetAppState() & SDL_APPINPUTFOCUS ? Options::FPS : Options::FPSInactive;
 
-				_timeUntilNextFrame = (1000.0f / fps) - (SDL_GetTicks() - _timeOfLastFrame);
+				_timeUntilNextFrame = (int)((1000.0f / fps) - (SDL_GetTicks() - _timeOfLastFrame));
 			}
 			else
 			{
@@ -436,11 +436,11 @@ void Game::setVolume(int sound, int music, int ui)
 	{
 		if (sound >= 0)
 		{
-			sound = volumeExponent(sound) * (double)SDL_MIX_MAXVOLUME;
+			sound = (int)(volumeExponent(sound) * (double)SDL_MIX_MAXVOLUME);
 			Mix_Volume(-1, sound);
 			if (_save && _save->getSavedBattle())
 			{
-				Mix_Volume(3, sound * _save->getSavedBattle()->getAmbientVolume());
+				Mix_Volume(3, (int)(sound * _save->getSavedBattle()->getAmbientVolume()));
 			}
 			else
 			{
@@ -452,12 +452,12 @@ void Game::setVolume(int sound, int music, int ui)
 		}
 		if (music >= 0)
 		{
-			music = volumeExponent(music) * (double)SDL_MIX_MAXVOLUME;
+			music = (int)(volumeExponent(music) * (double)SDL_MIX_MAXVOLUME);
 			Mix_VolumeMusic(music);
 		}
 		if (ui >= 0)
 		{
-			ui = volumeExponent(ui) * (double)SDL_MIX_MAXVOLUME;
+			ui = (int)(volumeExponent(ui) * (double)SDL_MIX_MAXVOLUME);
 			Mix_Volume(1, ui);
 			Mix_Volume(2, ui);
 		}

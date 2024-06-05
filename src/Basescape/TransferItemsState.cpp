@@ -139,28 +139,28 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	_cats.push_back("STR_ALL_ITEMS");
 	_cats.push_back("STR_ITEMS_AT_DESTINATION");
 
-	for (auto* soldier : *_baseFrom->getSoldiers())
+	for (Soldier* soldier : _baseFrom->getSoldiers())
 	{
 		if (_debriefingState) break;
 		if (soldier->getCraft() == 0)
 		{
 			TransferRow row = { TRANSFER_SOLDIER, soldier, soldier->getName(true), (int)(5 * _distance), 1, 0, 0, -4, 0, 0, (int)(5 * _distance) };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory((int)_items.size() - 1);
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
 			}
 		}
 	}
-	for (auto* craft : *_baseFrom->getCrafts())
+	for (Craft* craft : _baseFrom->getCrafts())
 	{
 		if (_debriefingState) break;
 		if (craft->getStatus() != "STR_OUT" || (Options::canTransferCraftsWhileAirborne && craft->getFuel() >= craft->getFuelLimit(_baseTo)))
 		{
 			TransferRow row = { TRANSFER_CRAFT, craft, craft->getName(_game->getLanguage()),  (int)(25 * _distance), 1, 0, 0, -3, 0, 0, (int)(25 * _distance) };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory((int)_items.size() - 1);
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -171,7 +171,7 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	{
 		TransferRow row = { TRANSFER_SCIENTIST, 0, tr("STR_SCIENTIST"),  (int)(5 * _distance), _baseFrom->getAvailableScientists(), _baseTo->getAvailableScientists(), 0, -2, 0, 0, _baseFrom->getAvailableScientists() * (int)(5 * _distance) };
 		_items.push_back(row);
-		std::string cat = getCategory(_items.size() - 1);
+		std::string cat = getCategory((int)_items.size() - 1);
 		if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 		{
 			_cats.push_back(cat);
@@ -181,13 +181,13 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	{
 		TransferRow row = { TRANSFER_ENGINEER, 0, tr("STR_ENGINEER"),  (int)(5 * _distance), _baseFrom->getAvailableEngineers(), _baseTo->getAvailableEngineers(), 0, -1, 0, 0, _baseFrom->getAvailableEngineers() * (int)(5 * _distance) };
 		_items.push_back(row);
-		std::string cat = getCategory(_items.size() - 1);
+		std::string cat = getCategory((int)_items.size() - 1);
 		if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 		{
 			_cats.push_back(cat);
 		}
 	}
-	for (auto& itemType : _game->getMod()->getItemsList())
+	for (const std::string& itemType : _game->getMod()->getItemsList())
 	{
 		RuleItem *rule = _game->getMod()->getItem(itemType, true);
 		int qty = _baseFrom->getStorageItems()->getItem(rule);
@@ -199,7 +199,7 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 		{
 			TransferRow row = { TRANSFER_ITEM, rule, tr(itemType),  (int)(1 * _distance), qty, _baseTo->getStorageItems()->getItem(rule), 0, rule->getListOrder(), rule->getSize(), qty * rule->getSize(), qty * (int)(1 * _distance) };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory((int)_items.size() - 1);
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -214,7 +214,7 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 
 		// first find all relevant item categories
 		std::vector<std::string> tempCats;
-		for (const auto& transferRow : _items)
+		for (const TransferRow& transferRow : _items)
 		{
 			if (transferRow.type == TRANSFER_ITEM)
 			{
@@ -423,14 +423,14 @@ void TransferItemsState::updateList()
 					continue;
 				}
 			}
-			else if (!specialCategory && !belongsToCategory(i, cat))
+			else if (!specialCategory && !belongsToCategory((int)i, cat))
 			{
 				continue;
 			}
 		}
 		else
 		{
-			if (!specialCategory && cat != getCategory(i))
+			if (!specialCategory && cat != getCategory((int)i))
 			{
 				continue;
 			}
@@ -469,7 +469,7 @@ void TransferItemsState::updateList()
 		ssQtyDst << _items[i].qtyDst;
 		ssAmount << _items[i].amount;
 		_lstItems->addRow(4, name.c_str(), ssQtySrc.str().c_str(), ssAmount.str().c_str(), ssQtyDst.str().c_str());
-		_rows.push_back(i);
+		_rows.push_back((int)i);
 		if (_items[i].amount > 0)
 		{
 			_lstItems->setRowColor(_rows.size() - 1, _lstItems->getSecondaryColor());
@@ -511,7 +511,7 @@ void TransferItemsState::completeTransfer()
 {
 	int time = (int)floor(6 + _distance / 10.0);
 	_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() - _total);
-	for (const auto& transferRow : _items)
+	for (const TransferRow& transferRow : _items)
 	{
 		if (transferRow.amount > 0)
 		{
@@ -521,7 +521,7 @@ void TransferItemsState::completeTransfer()
 			switch (transferRow.type)
 			{
 			case TRANSFER_SOLDIER:
-				for (auto soldierIt = _baseFrom->getSoldiers()->begin(); soldierIt != _baseFrom->getSoldiers()->end(); ++soldierIt)
+				for (auto soldierIt = _baseFrom->getSoldiers().begin(); soldierIt != _baseFrom->getSoldiers().end(); ++soldierIt)
 				{
 					soldier = (*soldierIt);
 					if (soldier == transferRow.rule)
@@ -530,8 +530,8 @@ void TransferItemsState::completeTransfer()
 						soldier->setTraining(false);
 						t = new Transfer(time);
 						t->setSoldier(soldier);
-						_baseTo->getTransfers()->push_back(t);
-						_baseFrom->getSoldiers()->erase(soldierIt);
+						_baseTo->getTransfers().push_back(t);
+						_baseFrom->getSoldiers().erase(soldierIt);
 						break;
 					}
 				}
@@ -539,7 +539,7 @@ void TransferItemsState::completeTransfer()
 			case TRANSFER_CRAFT:
 				craft = (Craft*)transferRow.rule;
 				// Transfer soldiers inside craft
-				for (auto soldierIt = _baseFrom->getSoldiers()->begin(); soldierIt != _baseFrom->getSoldiers()->end();)
+				for (auto soldierIt = _baseFrom->getSoldiers().begin(); soldierIt != _baseFrom->getSoldiers().end();)
 				{
 					soldier = (*soldierIt);
 					if (soldier->getCraft() == craft)
@@ -548,15 +548,15 @@ void TransferItemsState::completeTransfer()
 						soldier->setTraining(false);
 						if (craft->getStatus() == "STR_OUT")
 						{
-							_baseTo->getSoldiers()->push_back(soldier);
+							_baseTo->getSoldiers().push_back(soldier);
 						}
 						else
 						{
 							t = new Transfer(time);
 							t->setSoldier(soldier);
-							_baseTo->getTransfers()->push_back(t);
+							_baseTo->getTransfers().push_back(t);
 						}
-						soldierIt = _baseFrom->getSoldiers()->erase(soldierIt);
+						soldierIt = _baseFrom->getSoldiers().erase(soldierIt);
 					}
 					else
 					{
@@ -569,7 +569,7 @@ void TransferItemsState::completeTransfer()
 				if (craft->getStatus() == "STR_OUT")
 				{
 					bool returning = (craft->getDestination() == (Target*)craft->getBase());
-					_baseTo->getCrafts()->push_back(craft);
+					_baseTo->getCrafts().push_back(craft);
 					craft->setBase(_baseTo, false);
 					if (craft->getFuel() <= craft->getFuelLimit(_baseTo))
 					{
@@ -586,27 +586,27 @@ void TransferItemsState::completeTransfer()
 				{
 					t = new Transfer(time);
 					t->setCraft(craft);
-					_baseTo->getTransfers()->push_back(t);
+					_baseTo->getTransfers().push_back(t);
 				}
 				break;
 			case TRANSFER_SCIENTIST:
 				_baseFrom->setScientists(_baseFrom->getScientists() - transferRow.amount);
 				t = new Transfer(time);
 				t->setScientists(transferRow.amount);
-				_baseTo->getTransfers()->push_back(t);
+				_baseTo->getTransfers().push_back(t);
 				break;
 			case TRANSFER_ENGINEER:
 				_baseFrom->setEngineers(_baseFrom->getEngineers() - transferRow.amount);
 				t = new Transfer(time);
 				t->setEngineers(transferRow.amount);
-				_baseTo->getTransfers()->push_back(t);
+				_baseTo->getTransfers().push_back(t);
 				break;
 			case TRANSFER_ITEM:
 				RuleItem *item = (RuleItem*)transferRow.rule;
 				_baseFrom->getStorageItems()->removeItem(item, transferRow.amount);
 				t = new Transfer(time);
 				t->setItems(item, transferRow.amount);
-				_baseTo->getTransfers()->push_back(t);
+				_baseTo->getTransfers().push_back(t);
 				if (_debriefingState != 0)
 				{
 					// remember the decreased amount for next sell/transfer

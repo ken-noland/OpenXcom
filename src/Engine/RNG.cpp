@@ -152,7 +152,7 @@ int generate(int min, int max)
  */
 double generate(double min, double max)
 {
-	double num = x.next();
+	double num = (double)x.next();
 	return (num / ((double)UINT64_MAX / (max - min)) + min);
 }
 

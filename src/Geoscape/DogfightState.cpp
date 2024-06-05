@@ -259,7 +259,7 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 		_weaponFireCountdown[i] = 0;
 		_tractorLockedOn[i] = false;
 
-		CraftWeapon* w = _craft->getWeapons()->at(i);
+		CraftWeapon* w = _craft->getWeapons().at(i);
 		if (w)
 		{
 			_weaponEnabled[i] = !w->isDisabled();
@@ -498,9 +498,9 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 	if (_craft->getInterceptionOrder() == 0)
 	{
 		int maxInterceptionOrder = 0;
-		for (auto* xbase : *_game->getSavedGame()->getBases())
+		for (Base* xbase : _game->getSavedGame()->getBases())
 		{
-			for (auto* xcraft : *xbase->getCrafts())
+			for (Craft* xcraft : xbase->getCrafts())
 			{
 				if (xcraft->getInterceptionOrder() > maxInterceptionOrder)
 				{
@@ -531,7 +531,7 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 
 	for (int i = 0; i < _weaponNum; ++i)
 	{
-		CraftWeapon *w = _craft->getWeapons()->at(i);
+		CraftWeapon *w = _craft->getWeapons().at(i);
 
 		// Slot empty or no sprite, skip!
 		if (w == 0 || w->getRules()->getSprite() < 0)
@@ -609,7 +609,7 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 
 	for (int i = 0; i < _weaponNum; ++i)
 	{
-		if (_craft->getWeapons()->at(i) == 0)
+		if (_craft->getWeapons().at(i) == 0)
 		{
 			_weapon[i]->setVisible(false);
 			_range[i]->setVisible(false);
@@ -642,15 +642,15 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 
 	for (int i = 0; i < _weaponNum; ++i)
 	{
-		if (_craft->getWeapons()->at(i))
+		if (_craft->getWeapons().at(i))
 		{
 			if (!_ufoIsAttacking)
 			{
-				_weaponFireInterval[i] = _craft->getWeapons()->at(i)->getRules()->getStandardReload();
+				_weaponFireInterval[i] = _craft->getWeapons().at(i)->getRules()->getStandardReload();
 			}
 			else
 			{
-				_weaponFireInterval[i] = _craft->getWeapons()->at(i)->getRules()->getAggressiveReload();
+				_weaponFireInterval[i] = _craft->getWeapons().at(i)->getRules()->getAggressiveReload();
 			}
 		}
 	}
@@ -734,7 +734,7 @@ void DogfightState::think()
 		// can't be done in the constructor (recoloring the ammo text doesn't work)
 		for (int i = 0; i < _weaponNum; ++i)
 		{
-			if (_craft->getWeapons()->at(i) && !_weaponEnabled[i])
+			if (_craft->getWeapons().at(i) && !_weaponEnabled[i])
 			{
 				recolor(i, _weaponEnabled[i]);
 			}
@@ -744,7 +744,7 @@ void DogfightState::think()
 		// Note: init() is never called for DogfightState, so we'll do it here instead
 		{
 			auto& sounds = _game->getMod()->getStartDogfightSounds();
-			int soundId = sounds.empty() ? Mod::NO_SOUND : sounds[RNG::generate(0, sounds.size() - 1)];
+			int soundId = sounds.empty() ? Mod::NO_SOUND : sounds[RNG::generate(0, (int)sounds.size() - 1)];
 			if (soundId != Mod::NO_SOUND)
 			{
 				auto* customSound = _game->getMod()->getSound("GEO.CAT", soundId);
@@ -983,7 +983,7 @@ void DogfightState::update()
 			else if (Options::dogfightAI)
 			{
 				int maxRange = 0;
-				for (CraftWeapon *wpn : *(_craft->getWeapons()))
+				for (CraftWeapon *wpn : _craft->getWeapons())
 				{
 					if (wpn == NULL)
 						continue;
@@ -1304,7 +1304,7 @@ void DogfightState::update()
 			if (_projectiles.empty())
 			{
 				bool hasNoAmmo = true;
-				for (auto cw : *_craft->getWeapons())
+				for (CraftWeapon* cw : _craft->getWeapons())
 				{
 					if (cw && cw->getAmmo() > 0)
 					{
@@ -1328,7 +1328,7 @@ void DogfightState::update()
 		// Handle weapons and craft distance.
 		for (int i = 0; i < _weaponNum; ++i)
 		{
-			CraftWeapon *w = _craft->getWeapons()->at(i);
+			CraftWeapon *w = _craft->getWeapons().at(i);
 			if (w == 0)
 			{
 				continue;
@@ -1572,7 +1572,7 @@ void DogfightState::update()
 			{
 				if (_ufo->getShotDownByCraftId() == _craft->getUniqueId())
 				{
-					for (auto* country : *_game->getSavedGame()->getCountries())
+					for (Country* country : _game->getSavedGame()->getCountries())
 					{
 						if (country->getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
 						{
@@ -1580,7 +1580,7 @@ void DogfightState::update()
 							break;
 						}
 					}
-					for (auto* region : *_game->getSavedGame()->getRegions())
+					for (Region* region : _game->getSavedGame()->getRegions())
 					{
 						if (region->getRules()->insideRegion(_ufo->getLongitude(), _ufo->getLatitude()))
 						{
@@ -1599,7 +1599,7 @@ void DogfightState::update()
 				{
 					setStatus("STR_UFO_CRASH_LANDS");
 					_game->getMod()->getSound("GEO.CAT", Mod::UFO_CRASH)->play(); //10
-					for (auto* country : *_game->getSavedGame()->getCountries())
+					for (Country* country : _game->getSavedGame()->getCountries())
 					{
 						if (country->getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
 						{
@@ -1607,7 +1607,7 @@ void DogfightState::update()
 							break;
 						}
 					}
-					for (auto* region : *_game->getSavedGame()->getRegions())
+					for (Region* region : _game->getSavedGame()->getRegions())
 					{
 						if (region->getRules()->insideRegion(_ufo->getLongitude(), _ufo->getLatitude()))
 						{
@@ -1700,7 +1700,7 @@ void DogfightState::update()
 				_ufo->setSpeed(0);
 				_ufo->setStatus(Ufo::DESTROYED);
 				_destroyUfo = true;
-				for (auto* country : *_game->getSavedGame()->getCountries())
+				for (Country* country : _game->getSavedGame()->getCountries())
 				{
 					if (country->getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
 					{
@@ -1708,7 +1708,7 @@ void DogfightState::update()
 						break;
 					}
 				}
-				for (auto* region : *_game->getSavedGame()->getRegions())
+				for (Region* region : _game->getSavedGame()->getRegions())
 				{
 					if (region->getRules()->insideRegion(_ufo->getLongitude(), _ufo->getLatitude()))
 					{
@@ -1746,7 +1746,7 @@ void DogfightState::update()
  */
 void DogfightState::fireWeapon(int i)
 {
-	CraftWeapon *w1 = _craft->getWeapons()->at(i);
+	CraftWeapon *w1 = _craft->getWeapons().at(i);
 	if (w1->setAmmo(w1->getAmmo() - 1))
 	{
 		_weaponFireCountdown[i] = _weaponFireInterval[i];
@@ -1814,7 +1814,7 @@ void DogfightState::ufoFireWeapon()
 void DogfightState::minimumDistance()
 {
 	int max = 0;
-	for (auto* cw : *_craft->getWeapons())
+	for (CraftWeapon* cw : _craft->getWeapons())
 	{
 		if (cw == 0)
 			continue;
@@ -1840,7 +1840,7 @@ void DogfightState::minimumDistance()
 void DogfightState::maximumDistance()
 {
 	int min = 1000;
-	for (auto* cw : *_craft->getWeapons())
+	for (CraftWeapon* cw : _craft->getWeapons())
 	{
 		if (cw == 0)
 			continue;
@@ -1964,7 +1964,7 @@ void DogfightState::btnCautiousPress(Action *)
 			setStatus("STR_CAUTIOUS_ATTACK");
 			for (int i = 0; i < _weaponNum; ++i)
 			{
-				CraftWeapon* w = _craft->getWeapons()->at(i);
+				CraftWeapon* w = _craft->getWeapons().at(i);
 				if (w != 0)
 				{
 					_weaponFireInterval[i] = w->getRules()->getCautiousReload();
@@ -1977,7 +1977,7 @@ void DogfightState::btnCautiousPress(Action *)
 			setStatus("STR_EVASIVE_MANEUVERS");
 			for (int i = 0; i < _weaponNum; ++i)
 			{
-				CraftWeapon* w = _craft->getWeapons()->at(i);
+				CraftWeapon* w = _craft->getWeapons().at(i);
 				if (w != 0)
 				{
 					// double the craft's reload time to balance halving the HK's chance to hit
@@ -2015,7 +2015,7 @@ void DogfightState::btnStandardPress(Action *)
 		setStatus("STR_STANDARD_ATTACK");
 		for (int i = 0; i < _weaponNum; ++i)
 		{
-			CraftWeapon* w = _craft->getWeapons()->at(i);
+			CraftWeapon* w = _craft->getWeapons().at(i);
 			if (w != 0)
 			{
 				_weaponFireInterval[i] = w->getRules()->getStandardReload();
@@ -2050,7 +2050,7 @@ void DogfightState::btnAggressivePress(Action *)
 		setStatus("STR_AGGRESSIVE_ATTACK");
 		for (int i = 0; i < _weaponNum; ++i)
 		{
-			CraftWeapon* w = _craft->getWeapons()->at(i);
+			CraftWeapon* w = _craft->getWeapons().at(i);
 			if (w != 0)
 			{
 				_weaponFireInterval[i] = w->getRules()->getAggressiveReload();
@@ -2285,7 +2285,7 @@ void DogfightState::weaponClick(Action * a)
 
 			if (Options::oxceRememberDisabledCraftWeapons)
 			{
-				CraftWeapon* w = _craft->getWeapons()->at(i);
+				CraftWeapon* w = _craft->getWeapons().at(i);
 				if (w)
 				{
 					w->setDisabled(!_weaponEnabled[i]);

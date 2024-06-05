@@ -231,9 +231,9 @@ void Tile::saveBinary(Uint8** buffer) const
 	boolFields |= isUfoDoorOpen(O_WESTWALL) ? 8 : 0; // west
 	boolFields |= isUfoDoorOpen(O_NORTHWALL) ? 0x10 : 0; // north?
 	serializeInt(buffer, def.boolFields, boolFields);
-	serializeInt(buffer, def._lastExploredByHostile, static_cast<Uint8>(_lastExploredByHostile));
-	serializeInt(buffer, def._lastExploredByNeutral, static_cast<Uint8>(_lastExploredByNeutral));
-	serializeInt(buffer, def._lastExploredByPlayer, static_cast<Uint8>(_lastExploredByPlayer));
+	serializeInt(buffer, (Uint8)def._lastExploredByHostile, _lastExploredByHostile);
+	serializeInt(buffer, (Uint8)def._lastExploredByNeutral, _lastExploredByNeutral);
+	serializeInt(buffer, (Uint8)def._lastExploredByPlayer, _lastExploredByPlayer);
 }
 
 /**
@@ -972,9 +972,9 @@ void Tile::prepareNewTurn(bool smokeDamage)
  * Get the inventory on this tile.
  * @return pointer to a vector of battle items.
  */
-std::vector<BattleItem *> *Tile::getInventory()
+std::vector<BattleItem *>& Tile::getInventory()
 {
-	return &_inventory;
+	return _inventory;
 }
 
 

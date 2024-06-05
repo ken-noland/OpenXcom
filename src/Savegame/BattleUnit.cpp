@@ -1879,7 +1879,7 @@ int BattleUnit::damage(Position relative, int damage, const RuleDamageType *type
 
 		if (type->ArmorEffectiveness > 0.0f)
 		{
-			damage -= getArmor(side) * type->ArmorEffectiveness;
+			damage -= (int)(getArmor(side) * type->ArmorEffectiveness);
 		}
 
 		if (damage > 0)
@@ -2491,9 +2491,9 @@ bool BattleUnit::hasVisibleUnit(const BattleUnit *unit) const
  * Get the pointer to the vector of visible units.
  * @return pointer to vector.
  */
-std::vector<BattleUnit*> *BattleUnit::getVisibleUnits()
+std::vector<BattleUnit*>& BattleUnit::getVisibleUnits()
 {
-	return &_visibleUnits;
+	return _visibleUnits;
 }
 
 /**
@@ -2527,9 +2527,9 @@ bool BattleUnit::addToVisibleTiles(Tile *tile)
  * Get the pointer to the vector of visible tiles.
  * @return pointer to vector.
  */
-const std::vector<Tile*> *BattleUnit::getVisibleTiles()
+const std::vector<Tile*>& BattleUnit::getVisibleTiles()
 {
-	return &_visibleTiles;
+	return _visibleTiles;
 }
 
 /**
@@ -2566,18 +2566,18 @@ bool BattleUnit::addToNoLofTiles(Tile *tile)
  * Get the pointer to the vector of lof tiles.
  * @return pointer to vector.
  */
-const std::vector<Tile *> *BattleUnit::getLofTiles()
+const std::vector<Tile *>& BattleUnit::getLofTiles()
 {
-	return &_lofTiles;
+	return _lofTiles;
 }
 
 /**
  * Get the pointer to the vector of nolof tiles.
  * @return pointer to vector.
  */
-const std::vector<Tile *> *BattleUnit::getNoLofTiles()
+const std::vector<Tile *>& BattleUnit::getNoLofTiles()
 {
-	return &_noLofTiles;
+	return _noLofTiles;
 }
 
 /**
@@ -3112,9 +3112,9 @@ int BattleUnit::getFire() const
  * Get the pointer to the vector of inventory items.
  * @return pointer to vector.
  */
-std::vector<BattleItem*> *BattleUnit::getInventory()
+std::vector<BattleItem*>& BattleUnit::getInventory()
 {
-	return &_inventory;
+	return _inventory;
 }
 
 /**
@@ -3195,7 +3195,7 @@ bool BattleUnit::addItem(BattleItem *item, const Mod *mod, bool allowSecondClip,
 			int tally = 0;
 			if (!allowInfinite)
 			{
-				for (auto* bi : *getInventory())
+				for (BattleItem* bi : getInventory())
 				{
 					if (rule->getType() == bi->getRules()->getType())
 					{
@@ -3695,7 +3695,7 @@ BattleItem *BattleUnit::getItem(const RuleInventory *slot, int x, int y) const
 	// Ground items
 	else if (_tile != 0)
 	{
-		for (auto* bi : *_tile->getInventory())
+		for (BattleItem* bi : _tile->getInventory())
 		{
 			if (bi->occupiesSlot(x, y))
 			{
@@ -3911,7 +3911,7 @@ bool BattleUnit::reloadAmmo(bool justCheckIfICould)
 		auto tuCost = getTimeUnits() + 1;
 		auto slotAmmo = 0;
 
-		for (auto* bi : *getInventory())
+		for (BattleItem* bi : getInventory())
 		{
 			int slot = ruleWeapon->getSlotForAmmo(bi->getRules());
 			if (slot != -1 && !weapon->getAmmoForSlot(slot))
@@ -4447,7 +4447,7 @@ void BattleUnit::heal(UnitBodyPart part, int woundAmount, int healthAmount)
  */
 void BattleUnit::painKillers(int moraleAmount, float painKillersStrength)
 {
-	int lostHealth = (getBaseStats()->health - _health) * painKillersStrength;
+	int lostHealth = (int)((getBaseStats()->health - _health) * painKillersStrength);
 	if (lostHealth > _moraleRestored)
 	{
 		_morale = std::min(100, (lostHealth - _moraleRestored + _morale));
@@ -4899,7 +4899,7 @@ int BattleUnit::getRandomAggroSound() const
 {
 	if (hasAggroSound())
 	{
-		return _aggroSound[RNG::generate(0, _aggroSound.size() - 1)];
+		return _aggroSound[RNG::generate(0, (int)_aggroSound.size() - 1)];
 	}
 	return -1;
 }
@@ -5244,13 +5244,13 @@ void BattleUnit::adjustStats(const StatAdjustment &adjustment)
 {
 	_stats += UnitStats::percent(_stats, adjustment.statGrowth, adjustment.growthMultiplier);
 
-	_stats.firing *= adjustment.aimMultiplier;
+	_stats.firing = (UnitStats::Type)(_stats.firing * adjustment.aimMultiplier);
 	_stats += adjustment.statGrowthAbs;
 
 	for (int i = 0; i < SIDE_MAX; ++i)
 	{
-		_maxArmor[i] *= adjustment.armorMultiplier;
-		_maxArmor[i] += adjustment.armorMultiplierAbs;
+		_maxArmor[i] = (UnitStats::Type)(_maxArmor[i] * adjustment.armorMultiplier);
+		_maxArmor[i] = (UnitStats::Type)(_maxArmor[i] + adjustment.armorMultiplierAbs);
 		_currentArmor[i] = _maxArmor[i];
 	}
 
@@ -5449,7 +5449,7 @@ void BattleUnit::calculateEnviDamage(Mod *mod, SavedBattleGame *save)
 		_hitByFire = true;
 		damage(Position(0, 0, 0), _fireMaxHit, mod->getDamageType(DT_IN), save, { });
 		// try to set the unit on fire.
-		if (RNG::percent(40 * getArmor()->getDamageModifier(DT_IN)))
+		if (RNG::percent((int)(40 * getArmor()->getDamageModifier(DT_IN))))
 		{
 			int burnTime = RNG::generate(0, int(5.0f * getArmor()->getDamageModifier(DT_IN)));
 			if (getFire() < burnTime)
@@ -6073,12 +6073,12 @@ bool BattleUnit::isLeeroyJenkins(bool ignoreBrutal) const
 float BattleUnit::getAggressiveness() const
 {
 	if (getFaction() == FACTION_PLAYER)
-		return getAggression();
+		return (float)getAggression();
 	float aggressiveness = 0;
 	if (Options::aggressionMode == 1)
-		aggressiveness = getAggression();
+		aggressiveness = (float)getAggression();
 	else
-		return Options::aggressionMode;
+		return (float)Options::aggressionMode;
 	return aggressiveness;
 }
 
@@ -6593,7 +6593,7 @@ void getVisibleUnitsCountScript(BattleUnit *bu, int &ret)
 	{
 
 		auto visibleUnits = bu->getVisibleUnits();
-		ret = visibleUnits->size();
+		ret = (int)visibleUnits.size();
 	}
 }
 
@@ -6713,7 +6713,7 @@ void getInventoryItemScript(BattleUnit* bu, BattleItem *&foundItem, const RuleIt
 	foundItem = nullptr;
 	if (bu)
 	{
-		for (auto* i : *bu->getInventory())
+		for (BattleItem* i : bu->getInventory())
 		{
 			if (i->getRules() == itemRules)
 			{
@@ -6729,7 +6729,7 @@ void getInventoryItemScript1(BattleUnit* bu, BattleItem *&foundItem, const RuleI
 	foundItem = nullptr;
 	if (bu)
 	{
-		for (auto* i : *bu->getInventory())
+		for (BattleItem* i : bu->getInventory())
 		{
 			if (i->getSlot() == inv && i->getRules() == itemRules)
 			{
@@ -6745,7 +6745,7 @@ void getInventoryItemScript2(BattleUnit* bu, BattleItem *&foundItem, const RuleI
 	foundItem = nullptr;
 	if (bu)
 	{
-		for (auto* i : *bu->getInventory())
+		for (BattleItem* i : bu->getInventory())
 		{
 			if (i->getSlot() == inv)
 			{
