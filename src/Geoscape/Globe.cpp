@@ -258,7 +258,7 @@ struct CreateShadow
 		int offset = Clamp((int)full, 0, GlobeStaticData::shade_gradient_max - 1);
 		int i = static_data.shade_gradient[offset];
 
-		int middle = (static_data.shade_seq[offset] + static_data.shade_step[offset] * rem) - GlobeStaticData::shade_step_max / 2;
+		int middle = (int)((static_data.shade_seq[offset] + static_data.shade_step[offset] * rem) - GlobeStaticData::shade_step_max / 2);
 		i += middle / GlobeStaticData::shade_step_max;
 		i += (static_data.getValueNoise(noise) < (middle % GlobeStaticData::shade_step_max));
 
@@ -575,7 +575,7 @@ void Globe::setZoom(size_t zoom)
 	_zoom = Clamp(zoom, (size_t)0u, _zoomRadius.size() - 1);
 	_zoomTexture = (2 - (int)floor(_zoom / 2.0)) * (_texture->getTotalFrames() / 3);
 	_radius = _zoomRadius[_zoom];
-	_game->getSavedGame()->setGlobeZoom(_zoom);
+	_game->getSavedGame()->setGlobeZoom((int)_zoom);
 	if (_isMouseScrolling)
 	{
 		_lonBeforeMouseScrolling = _cenLon;
@@ -971,7 +971,7 @@ void Globe::draw()
 void Globe::drawOcean()
 {
 	lock();
-	drawCircle(_cenX+1, _cenY, _radius+20, OCEAN_COLOR);
+	drawCircle(_cenX+1, _cenY, (Sint16)(_radius+20), OCEAN_COLOR);
 //	ShaderDraw<Ocean>(ShaderSurface(this));
 	unlock();
 }
@@ -997,7 +997,7 @@ void Globe::drawLand()
 		}
 
 		// Apply textures according to zoom and shade
-		drawTexturedPolygon(x, y, polygon->getPoints(), _texture->getFrame(polygon->getTexture() + _zoomTexture), 0, 0);
+		drawTexturedPolygon(x, y, polygon->getPoints(), _texture->getFrame(polygon->getTexture() + (int)_zoomTexture), 0, 0);
 	}
 }
 
@@ -1132,13 +1132,13 @@ void Globe::XuLine(Surface* surface, Surface* src, double x1, double y1, double 
 		tcol=src->getPixel((int)x0,(int)y0);
 		if (tcol)
 		{
-			if (CreateShadow::isOcean(tcol))
+			if (CreateShadow::isOcean((Uint8)tcol))
 			{
-				tcol = CreateShadow::getOceanShadow(shade + 8);
+				tcol = CreateShadow::getOceanShadow((Uint8)(shade + 8));
 			}
 			else
 			{
-				tcol = CreateShadow::getLandShadow(tcol, shade * 3);
+				tcol = CreateShadow::getLandShadow((Uint8)tcol, (Uint8)(shade * 3));
 			}
 			surface->setPixel((int)x0,(int)y0,tcol);
 		}
@@ -1315,12 +1315,12 @@ void Globe::drawVHLine(Surface *surface, double lon1, double lat1, double lon2, 
 
 	if (fabs(sx)<0.01)
 	{
-		seg = std::abs(sy/(2*M_PI)*48);
+		seg = (int)std::abs(sy/(2*M_PI)*48);
 		if (seg == 0) ++seg;
 	}
 	else
 	{
-		seg = std::abs(sx/(2*M_PI)*96);
+		seg = (int)std::abs(sx / (2 * M_PI) * 96);
 		if (seg == 0) ++seg;
 	}
 

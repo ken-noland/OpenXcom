@@ -4687,7 +4687,7 @@ void GeoscapeState::updateSlackingIndicator()
 
 void GeoscapeState::cbxRegionChange(Action *)
 {
-	int index = _cbxRegion->getSelected();
+	int index = (int)_cbxRegion->getSelected();
 	if (index < 1)
 	{
 		_game->getSavedGame()->debugRegion = nullptr;
@@ -4763,7 +4763,7 @@ void GeoscapeState::updateZoneInfo()
 
 void GeoscapeState::cbxCountryChange(Action *)
 {
-	int index = _cbxCountry->getSelected();
+	int index = (int)_cbxCountry->getSelected();
 	if (index < 1)
 	{
 		_game->getSavedGame()->debugCountry = nullptr;

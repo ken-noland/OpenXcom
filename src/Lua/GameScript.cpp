@@ -104,7 +104,8 @@ void GameScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
 	_onSaveGame.registerApi(luaState, parentTableIndex);
 
 	//using lambdas to register functions for the game table.
-	createFunction(luaState, "get_base_num", []() -> int { return 42; });
+	auto constexpr get_base_num = []() -> int { return 42; };
+	createFunction<get_base_num>(luaState, "get_base_num");
 }
 
 

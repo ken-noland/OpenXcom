@@ -120,18 +120,18 @@ template <typename Ret, typename... Args>
 class LuaSimpleCallback : public LuaCallback<Ret, Args...>
 {
 public:
-	LuaSimpleCallback(const std::string& name) : LuaCallback(name) {}
+	LuaSimpleCallback(const std::string& name) : LuaCallback<Ret, Args...>(name) {}
 
 	/// calls all registered callbacks with the given arguments
 	inline Ret dispatchCallback(Args&&... args)
 	{
-		for (const LuaCallbackData& callback : getCallbacks())
+		for (const LuaCallbackData& callback : LuaCallback<Ret, Args...>::getCallbacks())
 		{
 			lua_State* luaState = callback.luaState;
 			lua_rawgeti(luaState, LUA_REGISTRYINDEX, callback.functionRef); // Get the function
 
 			// Push the arguments onto the Lua stack
-			pushArguments(luaState, std::forward<Args>(args)...);
+			LuaCallback<Ret, Args...>::pushArguments(luaState, std::forward<Args>(args)...);
 
 			// Call the function with the arguments
 			if (lua_pcall(luaState, sizeof...(args), 1, 0) != LUA_OK)
@@ -156,7 +156,7 @@ template <typename Ret, typename... Args>
 class LuaAccumulatorCallback : public LuaCallback<Ret, Args...>
 {
 public:
-	LuaAccumulatorCallback(const std::string& name) : LuaCallback(name) {}
+	LuaAccumulatorCallback(const std::string& name) : LuaCallback<Ret, Args...>(name) {}
 
 	/// calls all registered callbacks with the given arguments, passing the results from one callback to the next and returning the result
 	inline Ret dispatchCallback(Ret defaultValue, Args&&... args)
@@ -168,13 +168,13 @@ public:
 		static_assert(std::is_same_v<Ret, std::decay_t<Ret>>, "The first template argument must be the same as the default value");
 
 		Ret result = std::move(defaultValue);
-		for (const LuaCallback& callback : getCallbacks())
+		for (const LuaCallbackData& callback : LuaCallback<Ret, Args...>::getCallbacks())
 		{
 			lua_State* luaState = callback.luaState;
 			lua_rawgeti(luaState, LUA_REGISTRYINDEX, callback.functionRef); // Get the function
 
 			// Push the arguments onto the Lua stack
-			pushArguments(luaState, std::forward<Args>(args)...);
+			LuaCallback<Ret, Args...>::pushArguments(luaState, std::forward<Args>(args)...);
 
 			// Call the function with the arguments
 			if (lua_pcall(luaState, sizeof...(args), 1, 0) != LUA_OK)
@@ -184,7 +184,7 @@ public:
 			}
 			else
 			{
-				result = fromLuaArg<Ret>(L, -1);
+				result = fromLuaArg<Ret>(luaState, -1);
 			}
 		}
 

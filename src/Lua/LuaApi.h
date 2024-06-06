@@ -68,15 +68,15 @@ protected:
 	template <auto Function>
 	inline void createFunction(lua_State* luaState, const std::string& functionName);
 
-	template <typename Ret, typename... Args>
-	inline void createFunction(lua_State* L, const std::string& functionName, Ret (*func)(Args...));
+	//template <typename Ret, typename... Args>
+	//inline void createFunction(lua_State* L, const std::string& functionName, Ret (*func)(Args...));
 
-	template <typename Ret, typename... Args>
-	inline void createFunction(lua_State* L, const std::string& functionName, std::function<Ret(Args...)> func);
+	//template <typename Ret, typename... Args>
+	//inline void createFunction(lua_State* L, const std::string& functionName, std::function<Ret(Args...)> func);
 
-	// Deduction guide for lambda or other callable types
-	template <typename Func>
-	inline void createFunction(lua_State* L, const std::string& functionName, Func func);
+	//// Deduction guide for lambda or other callable types
+	//template <typename Func>
+	//inline void createFunction(lua_State* L, const std::string& functionName, Func func);
 
 public:
 	LuaApi(const std::string& name);
@@ -141,6 +141,12 @@ Ret callMemberFunction(lua_State* luaState, Ret (Owner::*func)(Args...), Owner* 
 	return (obj->*func)(fromLua<Args>(luaState, I + 2)...);
 }
 
+template <typename Ret, typename... Args, std::size_t... I>
+Ret callCFunction(lua_State* luaState, Ret (*func)(Args...), std::index_sequence<I...>)
+{
+	return (*func)(fromLua<Args>(luaState, I + 2)...);
+}
+
 template <typename Ret, typename Owner, typename... Args>
 int functionWrapper(lua_State* luaState, Ret (Owner::*func)(Args...))
 {
@@ -156,35 +162,33 @@ int functionWrapper(lua_State* luaState, Ret (Owner::*func)(Args...))
 		Ret result = callMemberFunction(luaState, func, ownerPtr, std::index_sequence_for<Args...>{});
 		toLua<Ret>(luaState, result);
 		return 1;
-	} else {
+	}
+	else
+	{
 		callMemberFunction(luaState, func, ownerPtr, std::index_sequence_for<Args...>{});
+		return 0;
+	}
+}
+
+template <typename Ret, typename Owner, typename... Args>
+int functionWrapper(lua_State* luaState, Ret (*func)(Args...))
+{
+	// Call the C-style function
+	if constexpr (!std::is_void<Ret>::value)
+	{
+		Ret result = callCFunction(luaState, func, std::index_sequence_for<Args...>{});
+		toLua<Ret>(luaState, result);
+		return 1;
+	}
+	else
+	{
+		callCFunction(luaState, func, std::index_sequence_for<Args...>{});
 		return 0;
 	}
 }
 
 template <auto Function>
 void LuaApi::createFunction(lua_State* luaState, const std::string& functionName)
-{
-	using FunctionDecl = decltype(Function);
-	using Traits = FunctionTraits<FunctionDecl>;
-	using ReturnType = typename Traits::ReturnType;
-	using ClassType = typename Traits::ClassType;
-
-	// Define the function wrapper
-	lua_CFunction luaFunction = [](lua_State* luaState) -> int
-	{
-		return functionWrapper<ReturnType, ClassType>(luaState, Function);
-	};
-
-	// Push the function
-	lua_pushcfunction(luaState, reinterpret_cast<lua_CFunction>(luaFunction));
-
-	// tableName[functionName] = function
-	lua_setfield(luaState, -2, functionName.c_str());
-}
-
-template <typename Ret, typename... Args>
-inline void LuaApi::createFunction(lua_State* L, const std::string& functionName, Ret (*func)(Args...))
 {
 	//using FunctionDecl = decltype(Function);
 	//using Traits = FunctionTraits<FunctionDecl>;
@@ -204,20 +208,36 @@ inline void LuaApi::createFunction(lua_State* L, const std::string& functionName
 	//lua_setfield(luaState, -2, functionName.c_str());
 }
 
-template <typename Ret, typename... Args>
-inline void LuaApi::createFunction(lua_State* L, const std::string& functionName, std::function<Ret(Args...)> func)
-{
-}
-
-template <typename Func>
-inline void LuaApi::createFunction(lua_State* L, const std::string& functionName, Func func)
-{
-	using Traits = FunctionTraits<std::decay_t<Func> >;
-	using Ret = typename Traits::ReturnType;
-	using Args = typename Traits::ArgsTuple;
-
-	createFunction(L, functionName, Traits::FunctionType(func));
-}
+//template <typename Ret, typename... Args>
+//inline void LuaApi::createFunction(lua_State* luaState, const std::string& functionName, Ret (*func)(Args...))
+//{
+//	// Define the function wrapper
+//	lua_CFunction luaFunction = [](lua_State* luaState) -> int
+//	{
+//		return functionWrapper<Ret, void, Args...>(luaState, (Ret(*)(Args...))nullptr);
+//	};
+//
+//	// Push the function
+//	lua_pushcfunction(luaState, reinterpret_cast<lua_CFunction>(luaFunction));
+//
+//	// tableName[functionName] = function
+//	lua_setfield(luaState, -2, functionName.c_str());
+//}
+//
+//template <typename Ret, typename... Args>
+//inline void LuaApi::createFunction(lua_State* L, const std::string& functionName, std::function<Ret(Args...)> func)
+//{
+//}
+//
+//template <typename Func>
+//inline void LuaApi::createFunction(lua_State* L, const std::string& functionName, Func func)
+//{
+//	using Traits = FunctionTraits<std::decay_t<Func> >;
+//	using Ret = typename Traits::ReturnType;
+//	using Args = typename Traits::ArgsTuple;
+//
+//	createFunction(L, functionName, Traits::FunctionType(func));
+//}
 
 /// Static function to act as a trampoline for member functions
 template <typename Owner, int (Owner::*func)(lua_State*)>

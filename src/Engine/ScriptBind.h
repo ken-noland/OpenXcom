@@ -76,14 +76,14 @@ struct ParserWriter
 		ScriptRefData finalLabel = { };
 	};
 
-	template<typename T, typename = typename std::enable_if_t<std::is_pod<T>::value>>
+	template <typename T, typename = typename std::enable_if_t<std::is_trivially_copyable<T>::value> >
 	class ReservedPos
 	{
 		ProgPos _pos;
-		ReservedPos(ProgPos pos) : _pos{ pos }
+		ReservedPos(ProgPos pos) : _pos{pos}
 		{
-
 		}
+
 		ProgPos getPos()
 		{
 			return _pos;

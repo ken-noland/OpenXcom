@@ -170,7 +170,7 @@ OptionsGeoscapeState::~OptionsGeoscapeState()
  */
 void OptionsGeoscapeState::cbxDragScrollChange(Action *)
 {
-	Options::geoDragScrollButton = _cbxDragScroll->getSelected();
+	Options::geoDragScrollButton = (int)_cbxDragScroll->getSelected();
 }
 
 /**

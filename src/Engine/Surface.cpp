@@ -389,7 +389,7 @@ void Surface::loadImage(const std::string &filename)
 				if (bpp == 8)
 				{
 					*this = Surface(width, height, 0, 0);
-					setPalette((SDL_Color*)color->palette, 0, color->palettesize);
+					setPalette((SDL_Color*)color->palette, 0, (int)color->palettesize);
 
 					ShaderDrawFunc(
 						[](Uint8& dest, unsigned char& src)
