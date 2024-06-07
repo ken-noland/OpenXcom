@@ -372,26 +372,21 @@ inline int pairsFunction(lua_State* luaState)
 template <auto ContainerFunction>
 inline void LuaApi::registerContainer(lua_State* luaState, const std::string& tableName, int parentIndex)
 {
-	auto tempLambda = []() -> const std::vector<float>&
-	{
-		return globalVector;
-	};
-
 	//okay, so to do this, we need to grab the lambda, which will be used to get a reference to the
 	// container, then we need to register __index and __pair metamethods which always call the lambda
 	// to get the container itself.
-	using Container = typename FunctionTraits<decltype(tempLambda)>::ReturnType;
+	using Container = typename FunctionTraits<decltype(ContainerFunction)>::ReturnType;
 
 	lua_newtable(luaState); // Create a new table
 	lua_newtable(luaState); // Create the metatable
 
     // Set the __index metamethod to a function that handles access
-	lua_CFunction containerIndexPtr = static_cast<lua_CFunction>(containerIndex<Container, tempLambda>);
+	lua_CFunction containerIndexPtr = static_cast<lua_CFunction>(containerIndex<Container, ContainerFunction>);
 	lua_pushcfunction(luaState, containerIndexPtr);
 	lua_setfield(luaState, -2, "__index");
 
     // Set the __pairs metamethod to a function that returns keys
-	lua_CFunction pairsFunctionPtr = static_cast<lua_CFunction>(pairsFunction<Container, tempLambda>);
+	lua_CFunction pairsFunctionPtr = static_cast<lua_CFunction>(pairsFunction<Container, ContainerFunction>);
 	lua_pushcfunction(luaState, pairsFunctionPtr);
 	lua_setfield(luaState, -2, "__pairs");
 

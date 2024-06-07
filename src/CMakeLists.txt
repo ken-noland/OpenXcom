@@ -412,6 +412,7 @@ set ( ufopedia_src
 
 set ( lua_src
   Lua/BasescapeScript.cpp
+  Lua/BaseScript.cpp
   Lua/BattlescapeScript.cpp
   Lua/GameScript.cpp
   Lua/GeoscapeScript.cpp

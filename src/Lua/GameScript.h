@@ -20,6 +20,7 @@
 
 #include "LuaApi.h"
 #include "LuaDispatch.h"
+#include "BaseScript.h"
 #include "GeoscapeScript.h"
 #include "BattlescapeScript.h"
 #include "BasescapeScript.h"

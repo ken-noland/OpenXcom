@@ -111,8 +111,8 @@ protected:
 
 	virtual void onRegisterApi(lua_State* luaState, int parentTableIndex) override
 	{
-		registerClassLuaFunction<LuaCallback, &LuaCallback::registerCallback>(luaState, "registerCallback");
-		registerClassLuaFunction<LuaCallback, &LuaCallback::unregisterCallback>(luaState, "unregisterCallback");
+		registerClassLuaFunction<LuaCallback, &LuaCallback::registerCallback>(luaState, "register_callback");
+		registerClassLuaFunction<LuaCallback, &LuaCallback::unregisterCallback>(luaState, "unregister_callback");
 	}
 };
 

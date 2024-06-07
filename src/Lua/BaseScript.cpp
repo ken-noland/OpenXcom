@@ -24,13 +24,26 @@ namespace OpenXcom
 namespace Lua
 {
 
-BaseScript::BaseScript()
+BaseScript::BaseScript() : LuaApi("base")
 {
 }
 
 BaseScript::~BaseScript()
 {
 }
+
+template <>
+void toLua(lua_State* L, Base* arg)
+{
+}
+
+template <>
+Base* fromLua(lua_State* luaState, int index)
+{
+	return nullptr;
+}
+
+
 
 } // namespace Lua
 
