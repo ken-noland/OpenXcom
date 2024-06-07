@@ -30,9 +30,12 @@ int OpenXcom::Lua::pushTableWithUserdata(lua_State* luaState, void* userData)
 	lua_newtable(luaState); // Create a new table
 	lua_newtable(luaState); // Create the metatable
 
-	// Store the userdata in the metatable
-	lua_pushlightuserdata(luaState, userData);
-	lua_setfield(luaState, -2, "__userdata");
+	if (userData != nullptr)
+	{
+		// Store the userdata in the metatable
+		lua_pushlightuserdata(luaState, userData);
+		lua_setfield(luaState, -2, "__userdata");
+	}
 
 	lua_setmetatable(luaState, -2); // Set the metatable for the new table
 

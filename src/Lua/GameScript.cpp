@@ -104,10 +104,11 @@ void GameScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
 	_onSaveGame.registerApi(luaState, parentTableIndex);
 
 	//using lambdas to register functions for the game table.
-	auto constexpr get_base_num = []() -> int { return 42; };
-	createFunction<get_base_num>(luaState, "get_base_num");
-}
+	registerFunction<[]() -> int { return 2; }>(luaState, "test_ret_2");
 
+	registerContainer<[]() -> const std::vector<Base*>& { getGame()->getSavedGame()->getBases(); }>(luaState, "bases", parentTableIndex);
+
+}
 
 } // namespace Lua
 

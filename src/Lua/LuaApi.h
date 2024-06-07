@@ -20,8 +20,10 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <functional>
 #include "../Engine/Logger.h"
+#include "LuaArg.h"
 
 extern "C"
 {
@@ -52,31 +54,24 @@ protected:
 	/// Helper function to create a table. Returns the index of the table on the stack. If userData
 	/// is provided, it will be stored in the table's metatable. This function pushes the table on
 	/// the stack, then calls the onTableCreated function, then pops the table off the stack.
-	int createTable(lua_State* luaState, const std::string tableName, void* userData = nullptr, int parentIndex = LUA_REGISTRYINDEX, std::function<void(int)> onTableCreated = nullptr);
+	int registerTable(lua_State* luaState, const std::string tableName, void* userData = nullptr, int parentIndex = LUA_REGISTRYINDEX, std::function<void(lua_State*, int)> onTableCreated = nullptr);
 
 
 	/// Helper function to create a function in the table.
-	void createLuaFunction(lua_State* luaState, const std::string functionName, lua_CFunction function);
+	void registerLuaFunction(lua_State* luaState, const std::string functionName, lua_CFunction function);
 
 	/// Helper function to create a class function in the table. This method passes the lua_State to
-	/// the member function to allow it to decide what to do with it.
+	/// the member function to allow it to decide what to do with it. KN NOTE: I could probably phase this one out.
 	template <typename Owner, int (Owner::*func)(lua_State* luaState)>
-	inline void createClassLuaFunction(lua_State* luaState, const std::string functionName);
+	inline void registerClassLuaFunction(lua_State* luaState, const std::string functionName);
 
 	/// Helper function to create a class function in the table. This method automatically extracts the
 	/// function parameters and populates it with the correct values.
 	template <auto Function>
-	inline void createFunction(lua_State* luaState, const std::string& functionName);
+	inline void registerFunction(lua_State* luaState, const std::string& functionName);
 
-	//template <typename Ret, typename... Args>
-	//inline void createFunction(lua_State* L, const std::string& functionName, Ret (*func)(Args...));
-
-	//template <typename Ret, typename... Args>
-	//inline void createFunction(lua_State* L, const std::string& functionName, std::function<Ret(Args...)> func);
-
-	//// Deduction guide for lambda or other callable types
-	//template <typename Func>
-	//inline void createFunction(lua_State* L, const std::string& functionName, Func func);
+	template <auto Container>
+	inline void registerContainer(lua_State* luaState, const std::string& tableName, int parentIndex = LUA_REGISTRYINDEX);
 
 public:
 	LuaApi(const std::string& name);
@@ -98,6 +93,8 @@ struct FunctionTraits<_ReturnType (_ClassType::*)(_Args...)>
 	using ClassType = _ClassType;
 	using ArgsTuple = std::tuple<_Args...>;
 	using FunctionType = ReturnType(ClassType::*)(_Args...);
+
+	using ClassMemberFunction = std::true_type;
 };
 
 // Partial specialization for function pointers
@@ -107,6 +104,8 @@ struct FunctionTraits<_ReturnType (*)(_Args...)>
 	using ReturnType = _ReturnType;
 	using ArgsTuple = std::tuple<_Args...>;
 	using FunctionType = ReturnType(*)(_Args...);
+
+	using ClassMemberFunction = std::false_type;
 };
 
 // General case for callables
@@ -123,6 +122,8 @@ struct FunctionTraits<_ReturnType (_ClassType::*)(_Args...) const>
 	using ClassType = _ClassType;
 	using ArgsTuple = std::tuple<_Args...>;
 	using FunctionType = ReturnType (*)(_Args...);
+
+	using ClassMemberFunction = std::false_type;
 };
 
 template <typename Ret, typename... Args>
@@ -132,23 +133,20 @@ template <typename Ret, typename... Args>
 struct RetArgsTupleToFunction<Ret, std::tuple<Args...> >
 {
 	using FunctionSignature = Ret(Args...);
+
+	using ClassMemberFunction = std::false_type;
 };
 
-// Helper function to call member function with variadic arguments
+/// Helper function to call member function with variadic arguments
 template <typename Ret, typename Owner, typename... Args, std::size_t... I>
 Ret callMemberFunction(lua_State* luaState, Ret (Owner::*func)(Args...), Owner* obj, std::index_sequence<I...>)
 {
 	return (obj->*func)(fromLua<Args>(luaState, I + 2)...);
 }
 
-template <typename Ret, typename... Args, std::size_t... I>
-Ret callCFunction(lua_State* luaState, Ret (*func)(Args...), std::index_sequence<I...>)
-{
-	return (*func)(fromLua<Args>(luaState, I + 2)...);
-}
-
+/// Call the member function and return the result using the helper from above
 template <typename Ret, typename Owner, typename... Args>
-int functionWrapper(lua_State* luaState, Ret (Owner::*func)(Args...))
+int memberFunctionWrapper(lua_State* luaState, Ret (Owner::*func)(Args...))
 {
 	// Get the object instance from the table's metatable
 	lua_getmetatable(luaState, 1);
@@ -170,7 +168,15 @@ int functionWrapper(lua_State* luaState, Ret (Owner::*func)(Args...))
 	}
 }
 
-template <typename Ret, typename Owner, typename... Args>
+/// Helper function to call C-style function with variadic arguments
+template <typename Ret, typename... Args, std::size_t... I>
+Ret callCFunction(lua_State* luaState, Ret (*func)(Args...), std::index_sequence<I...>)
+{
+	return (*func)(fromLua<Args>(luaState, I + 2)...);
+}
+
+/// Call the C-style function and return the result using the helper from above
+template <typename Ret, typename... Args>
 int functionWrapper(lua_State* luaState, Ret (*func)(Args...))
 {
 	// Call the C-style function
@@ -187,57 +193,215 @@ int functionWrapper(lua_State* luaState, Ret (*func)(Args...))
 	}
 }
 
+/// Register function.
 template <auto Function>
-void LuaApi::createFunction(lua_State* luaState, const std::string& functionName)
+void LuaApi::registerFunction(lua_State* luaState, const std::string& functionName)
 {
-	//using FunctionDecl = decltype(Function);
-	//using Traits = FunctionTraits<FunctionDecl>;
-	//using ReturnType = typename Traits::ReturnType;
-	//using ClassType = typename Traits::ClassType;
+	using FunctionDecl = decltype(Function);
+	using Traits = FunctionTraits<FunctionDecl>;
+	using ReturnType = typename Traits::ReturnType;
+	using ClassType = typename Traits::ClassType;
 
-	//// Define the function wrapper
-	//lua_CFunction luaFunction = [](lua_State* luaState) -> int
-	//{
-	//	return functionWrapper<ReturnType, ClassType>(luaState, Function);
-	//};
+	lua_CFunction luaFunction = nullptr;
 
-	//// Push the function
-	//lua_pushcfunction(luaState, reinterpret_cast<lua_CFunction>(luaFunction));
+	if constexpr (Traits::ClassMemberFunction::value)
+	{
+		luaFunction = [](lua_State* luaState) -> int
+		{
+			return memberFunctionWrapper<ReturnType, ClassType>(luaState, Function);
+		};
+	}
+	else
+	{
+		luaFunction = [](lua_State* luaState) -> int
+		{
+			return functionWrapper(luaState, (typename Traits::FunctionType)Function);
+		};
+	}
 
-	//// tableName[functionName] = function
-	//lua_setfield(luaState, -2, functionName.c_str());
+	// Push the function
+	lua_pushcfunction(luaState, reinterpret_cast<lua_CFunction>(luaFunction));
+
+	// tableName[functionName] = function
+	lua_setfield(luaState, -2, functionName.c_str());
 }
 
-//template <typename Ret, typename... Args>
-//inline void LuaApi::createFunction(lua_State* luaState, const std::string& functionName, Ret (*func)(Args...))
+
+//// Example function to handle table access
+//int accessTableItem(lua_State* L)
 //{
-//	// Define the function wrapper
-//	lua_CFunction luaFunction = [](lua_State* luaState) -> int
-//	{
-//		return functionWrapper<Ret, void, Args...>(luaState, (Ret(*)(Args...))nullptr);
-//	};
-//
-//	// Push the function
-//	lua_pushcfunction(luaState, reinterpret_cast<lua_CFunction>(luaFunction));
-//
-//	// tableName[functionName] = function
-//	lua_setfield(luaState, -2, functionName.c_str());
+//	const char* key = luaL_checkstring(L, 2);
+//	std::string value = std::string("Value for ") + key;
+//	lua_pushstring(L, value.c_str());
+//	return 1;
 //}
-//
-//template <typename Ret, typename... Args>
-//inline void LuaApi::createFunction(lua_State* L, const std::string& functionName, std::function<Ret(Args...)> func)
-//{
-//}
-//
-//template <typename Func>
-//inline void LuaApi::createFunction(lua_State* L, const std::string& functionName, Func func)
-//{
-//	using Traits = FunctionTraits<std::decay_t<Func> >;
-//	using Ret = typename Traits::ReturnType;
-//	using Args = typename Traits::ArgsTuple;
-//
-//	createFunction(L, functionName, Traits::FunctionType(func));
-//}
+
+
+template<typename T>
+inline void Testy()
+{
+	int i = 0;
+}
+
+// Static global vector of floats
+static std::vector<float> globalVector = {1.1f, 2.2f, 3.3f};
+
+// Templated IteratorState
+template <typename Container>
+struct IteratorState;
+
+template <typename T>
+struct IteratorState<const std::vector<T> &>
+{
+	using Iterator = typename std::vector<T>::const_iterator;
+	Iterator iter;
+	Iterator end;
+};
+
+template <typename K, typename V>
+struct IteratorState<const std::map<K, V> &>
+{
+	using Iterator = typename std::map<K, V>::const_iterator;
+	Iterator iter;
+	Iterator end;
+};
+
+// Predeclaration of containerIndex function templates
+template <typename Container, auto GetContainerFunction>
+inline int containerIndex(lua_State* luaState);
+
+template <typename T, auto GetContainerFunction>
+inline int containerIndex(lua_State* luaState);
+
+template <typename K, typename V, auto GetContainerFunction>
+inline int containerIndex(lua_State* luaState);
+
+// Specialization for std::vector
+template <typename T, auto GetContainerFunction>
+inline int containerIndex(lua_State* luaState)
+{
+	const auto& container = GetContainerFunction();
+	int index = fromLua<int>(luaState, 2) - 1; // Lua is 1-based, C++ is 0-based
+	if (index < 0 || index >= static_cast<int>(container.size()))
+	{
+		return luaL_error(luaState, "Index out of bounds");
+	}
+	toLua(luaState, container[index]);
+	return 1;
+}
+
+// Specialization for std::map
+template <typename K, typename V, auto GetContainerFunction>
+inline int containerIndex(lua_State* luaState)
+{
+	const auto& container = GetContainerFunction();
+	K key = fromLua<K>(luaState, 2);
+	auto it = container.find(key);
+	if (it == container.end())
+	{
+		return luaL_error(luaState, "Key not found");
+	}
+	toLua(luaState, it->second);
+	return 1;
+}
+
+// Templated iterator function
+template <typename Container, auto GetContainerFunction>
+inline int iteratorFunction(lua_State* luaState);
+
+template <typename T, auto GetContainerFunction>
+inline int iteratorFunction(lua_State* luaState);
+
+template <typename K, typename V, auto GetContainerFunction>
+inline int iteratorFunction(lua_State* luaState);
+
+// Specialization for std::vector
+template <typename T, auto GetContainerFunction>
+inline int iteratorFunction(lua_State* luaState)
+{
+	using IterState = IteratorState<T>;
+	IterState* state = static_cast<IterState*>(lua_touserdata(luaState, lua_upvalueindex(1)));
+	const auto& container = GetContainerFunction();
+	if (state->iter != state->end)
+	{
+		toLua(luaState, std::distance(container.begin(), state->iter) + 1); // Lua index
+		toLua(luaState, *state->iter);
+		++(state->iter);
+		return 2;
+	}
+	return 0; // No more elements
+}
+
+// Specialization for std::map
+template <typename K, typename V, auto GetContainerFunction>
+inline int iteratorFunction(lua_State* luaState)
+{
+	using IterState = IteratorState<std::map<K, V> >;
+	IterState* state = static_cast<IterState*>(lua_touserdata(luaState, lua_upvalueindex(1)));
+	const auto& container = GetContainerFunction();
+	if (state->iter != state->end)
+	{
+		toLua(luaState, state->iter->first);  // Map key
+		toLua(luaState, state->iter->second); // Map value
+		++(state->iter);
+		return 2;
+	}
+	return 0; // No more elements
+}
+
+// Templated pairs function to initialize iteration
+template <typename Container, auto GetContainerFunction>
+inline int pairsFunction(lua_State* luaState)
+{
+	using IterState = IteratorState<Container>;
+	IterState* state = static_cast<IterState*>(lua_newuserdata(luaState, sizeof(IterState)));
+	const Container& container = GetContainerFunction();
+
+	new (state) IterState(); // Placement new for container
+	state->iter = container.begin();
+	state->end = container.end();
+
+	lua_pushcclosure(luaState, iteratorFunction<Container, GetContainerFunction>, 1);
+	lua_pushvalue(luaState, 1); // Push the table as the second value
+	lua_pushnil(luaState);      // Initial key value
+	return 3;
+}
+
+
+/// Register a container with a lambda that returns the container
+template <auto ContainerFunction>
+inline void LuaApi::registerContainer(lua_State* luaState, const std::string& tableName, int parentIndex)
+{
+	auto tempLambda = []() -> const std::vector<float>&
+	{
+		return globalVector;
+	};
+
+	//okay, so to do this, we need to grab the lambda, which will be used to get a reference to the
+	// container, then we need to register __index and __pair metamethods which always call the lambda
+	// to get the container itself.
+	using Container = typename FunctionTraits<decltype(tempLambda)>::ReturnType;
+
+	lua_newtable(luaState); // Create a new table
+	lua_newtable(luaState); // Create the metatable
+
+    // Set the __index metamethod to a function that handles access
+	lua_CFunction containerIndexPtr = static_cast<lua_CFunction>(containerIndex<Container, tempLambda>);
+	lua_pushcfunction(luaState, containerIndexPtr);
+	lua_setfield(luaState, -2, "__index");
+
+    // Set the __pairs metamethod to a function that returns keys
+	lua_CFunction pairsFunctionPtr = static_cast<lua_CFunction>(pairsFunction<Container, tempLambda>);
+	lua_pushcfunction(luaState, pairsFunctionPtr);
+	lua_setfield(luaState, -2, "__pairs");
+
+	lua_setmetatable(luaState, -2); // Set the metatable for the new table
+
+	int tableIndex = lua_gettop(luaState);
+
+	lua_pushvalue(luaState, tableIndex);                    // Duplicate the new table
+	lua_setfield(luaState, parentIndex, tableName.c_str()); // Set the new table as a field in the parent table
+}
 
 /// Static function to act as a trampoline for member functions
 template <typename Owner, int (Owner::*func)(lua_State*)>
@@ -256,10 +420,13 @@ int memberLuaFunctionWrapper(lua_State* luaState)
 
 /// Helper function to create a class function in the table.
 template <typename Owner, int (Owner::*func)(lua_State*)>
-inline void LuaApi::createClassLuaFunction(lua_State* luaState, const std::string functionName)
+inline void LuaApi::registerClassLuaFunction(lua_State* luaState, const std::string functionName)
 {
+	// Push the function
 	lua_pushcfunction(luaState, reinterpret_cast<lua_CFunction>(memberLuaFunctionWrapper<Owner, func>)); // Push the function
-	lua_setfield(luaState, -2, functionName.c_str());                // tableName[functionName] = function
+
+	// tableName[functionName] = function
+	lua_setfield(luaState, -2, functionName.c_str()); // tableName[functionName] = function
 }
 
 } // namespace Lua
