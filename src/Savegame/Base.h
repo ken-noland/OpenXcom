@@ -150,19 +150,19 @@ public:
 	/// Gets the base's marker sprite.
 	int getMarker() const override;
 	/// Gets the base's facilities.
-	std::vector<BaseFacility*> *getFacilities();
+	std::vector<BaseFacility*>& getFacilities();
 	/// Gets the base's soldiers.
-	std::vector<Soldier*> *getSoldiers();
+	std::vector<Soldier*>& getSoldiers();
 	/// Pre-calculates soldier stats with various bonuses.
 	void prepareSoldierStatsWithBonuses();
 	/// Gets the base's crafts.
-	std::vector<Craft*> *getCrafts() {	return &_crafts; }
+	std::vector<Craft*>& getCrafts() {	return _crafts; }
 	/// Gets the base's crafts.
-	const std::vector<Craft*> *getCrafts() const { return &_crafts; }
+	const std::vector<Craft*>& getCrafts() const { return _crafts; }
 	/// Gets the base's transfers.
-	std::vector<Transfer*> *getTransfers() { return &_transfers; }
+	std::vector<Transfer*>& getTransfers() { return _transfers; }
 	/// Gets the base's transfers.
-	const std::vector<Transfer*> *getTransfers() const { return &_transfers; }
+	const std::vector<Transfer*>& getTransfers() const { return _transfers; }
 	/// Gets the base's items.
 	ItemContainer *getStorageItems() { return _items; }
 	/// Gets the base's items.
@@ -306,11 +306,11 @@ public:
 	/// Setup base defenses.
 	void setupDefenses(AlienMission* am);
 	/// Get a list of Defensive Facilities
-	std::vector<BaseFacility*> *getDefenses();
+	std::vector<BaseFacility*>& getDefenses();
 	/// Gets the base's vehicles.
-	std::vector<Vehicle*> *getVehicles();
+	std::vector<Vehicle*>& getVehicles();
 	/// Gets the list of recently destroyed base facilities.
-	std::map<const RuleBaseFacility*, int> *getDestroyedFacilitiesCache() { return &_destroyedFacilitiesCache; }
+	std::map<const RuleBaseFacility*, int>& getDestroyedFacilitiesCache() { return _destroyedFacilitiesCache; }
 	/// Damage and/or destroy facilities after a missile impact.
 	void damageFacilities(Ufo *ufo);
 	/// Damage a given facility.

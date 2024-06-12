@@ -1523,7 +1523,7 @@ std::vector<PathfindingNode*> Pathfinding::findReachablePathFindingNodes(BattleU
 	if (Options::aiPerformanceOptimization)
 	{
 		int myUnits = 0;
-		for (BattleUnit *bu : *(_save->getUnits()))
+		for (BattleUnit *bu : _save->getUnits())
 		{
 			if (bu->getFaction() == unit->getFaction() && !bu->isOut())
 				++myUnits;

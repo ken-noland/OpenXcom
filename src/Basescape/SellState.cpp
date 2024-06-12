@@ -182,28 +182,28 @@ void SellState::delayedInit()
 
 	_cats.push_back("STR_ALL_ITEMS");
 
-	for (auto* soldier : *_base->getSoldiers())
+	for (Soldier* soldier : _base->getSoldiers())
 	{
 		if (_debriefingState) break;
 		if (soldier->getCraft() == 0)
 		{
 			TransferRow row = { TRANSFER_SOLDIER, soldier, soldier->getName(true), 0, 1, 0, 0, -4, 0, 0, 0 };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
 			}
 		}
 	}
-	for (auto* craft : *_base->getCrafts())
+	for (Craft* craft : _base->getCrafts())
 	{
 		if (_debriefingState) break;
 		if (craft->getStatus() != "STR_OUT")
 		{
 			TransferRow row = { TRANSFER_CRAFT, craft, craft->getName(_game->getLanguage()), craft->getRules()->getSellCost(), 1, 0, 0, -3, 0, 0, craft->getRules()->getSellCost() };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -214,7 +214,7 @@ void SellState::delayedInit()
 	{
 		TransferRow row = { TRANSFER_SCIENTIST, 0, tr("STR_SCIENTIST"), 0, _base->getAvailableScientists(), 0, 0, -2, 0, 0, 0 };
 		_items.push_back(row);
-		std::string cat = getCategory(_items.size() - 1);
+		std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 		if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 		{
 			_cats.push_back(cat);
@@ -224,13 +224,13 @@ void SellState::delayedInit()
 	{
 		TransferRow row = { TRANSFER_ENGINEER, 0, tr("STR_ENGINEER"), 0, _base->getAvailableEngineers(), 0, 0, -1, 0, 0, 0 };
 		_items.push_back(row);
-		std::string cat = getCategory(_items.size() - 1);
+		std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 		if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 		{
 			_cats.push_back(cat);
 		}
 	}
-	for (auto& itemType : _game->getMod()->getItemsList())
+	for (const std::string& itemType : _game->getMod()->getItemsList())
 	{
 		const RuleItem *rule = _game->getMod()->getItem(itemType, true);
 		int qty = 0;
@@ -243,7 +243,7 @@ void SellState::delayedInit()
 			qty = _base->getStorageItems()->getItem(rule);
 			if (Options::storageLimitsEnforced && (_origin == OPT_BATTLESCAPE || overfullCritical))
 			{
-				for (auto* transfer : *_base->getTransfers())
+				for (Transfer* transfer : _base->getTransfers())
 				{
 					if (transfer->getItems() == rule)
 					{
@@ -254,7 +254,7 @@ void SellState::delayedInit()
 						qty += overfullCritical ? transfer->getCraft()->getTotalItemCount(rule) : transfer->getCraft()->getItems()->getItem(rule);
 					}
 				}
-				for (auto* craft : *_base->getCrafts())
+				for (Craft* craft : _base->getCrafts())
 				{
 					qty +=  overfullCritical ? craft->getTotalItemCount(rule) : craft->getItems()->getItem(rule);
 				}
@@ -270,7 +270,7 @@ void SellState::delayedInit()
 				_spaceChange -= qty * rule->getSize();
 			}
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -285,7 +285,7 @@ void SellState::delayedInit()
 
 		// first find all relevant item categories
 		std::vector<std::string> tempCats;
-		for (const auto& transferRow : _items)
+		for (const TransferRow& transferRow : _items)
 		{
 			if (transferRow.type == TRANSFER_ITEM)
 			{
@@ -310,7 +310,7 @@ void SellState::delayedInit()
 			_cats.push_back("STR_ALL_ITEMS");
 			_vanillaCategories = _cats.size();
 		}
-		for (auto& categoryName : _game->getMod()->getItemCategoriesList())
+		for (const std::string& categoryName : _game->getMod()->getItemCategoriesList())
 		{
 			if (std::find(tempCats.begin(), tempCats.end(), categoryName) != tempCats.end())
 			{
@@ -506,14 +506,14 @@ void SellState::updateList()
 					continue;
 				}
 			}
-			else if (categoryFilterEnabled && !belongsToCategory(i, selectedCategory))
+			else if (categoryFilterEnabled && !belongsToCategory(static_cast<int>(i), selectedCategory))
 			{
 				continue;
 			}
 		}
 		else
 		{
-			if (categoryFilterEnabled && selectedCategory != getCategory(i))
+			if (categoryFilterEnabled && selectedCategory != getCategory(static_cast<int>(i)))
 			{
 				continue;
 			}
@@ -546,7 +546,7 @@ void SellState::updateList()
 		ssAmount << _items[i].amount;
 		int64_t adjustedCost = _items[i].cost;
 		_lstItems->addRow(4, name.c_str(), ssQty.str().c_str(), ssAmount.str().c_str(), Unicode::formatFunding(adjustedCost).c_str());
-		_rows.push_back(i);
+		_rows.push_back(static_cast<int>(i));
 		if (_items[i].amount > 0)
 		{
 			_lstItems->setRowColor(_rows.size() - 1, _lstItems->getSecondaryColor());
@@ -611,7 +611,7 @@ void SellState::btnOkClick(Action *)
 			}
 		};
 
-		for (auto*& w :* craft2->getWeapons())
+		for (CraftWeapon* w : craft2->getWeapons())
 		{
 			if (w != nullptr)
 			{
@@ -631,7 +631,7 @@ void SellState::btnOkClick(Action *)
 		}
 
 		Collections::deleteIf(
-			*craft2->getVehicles(),
+			craft2->getVehicles(),
 			[&](Vehicle* v)
 			{
 				auto clipType = v->getRules()->getVehicleClipAmmo();
@@ -659,7 +659,7 @@ void SellState::btnOkClick(Action *)
 	Soldier* tmpSoldier;
 	Craft* tmpCraft;
 
-	for (const auto& transferRow : _items)
+	for (const TransferRow& transferRow : _items)
 	{
 		if (transferRow.amount > 0)
 		{
@@ -667,7 +667,7 @@ void SellState::btnOkClick(Action *)
 			{
 			case TRANSFER_SOLDIER:
 				tmpSoldier = (Soldier*)transferRow.rule;
-				for (auto soldierIt = _base->getSoldiers()->begin(); soldierIt != _base->getSoldiers()->end(); ++soldierIt)
+				for (auto soldierIt = _base->getSoldiers().begin(); soldierIt != _base->getSoldiers().end(); ++soldierIt)
 				{
 					if (*soldierIt == tmpSoldier)
 					{
@@ -675,7 +675,7 @@ void SellState::btnOkClick(Action *)
 						{
 							_base->getStorageItems()->addItem(tmpSoldier->getArmor()->getStoreItem());
 						}
-						_base->getSoldiers()->erase(soldierIt);
+						_base->getSoldiers().erase(soldierIt);
 						break;
 					}
 				}
@@ -699,7 +699,7 @@ void SellState::btnOkClick(Action *)
 					int toRemove = cleanUpContainer(_base->getStorageItems(), item, transferRow.amount);
 
 					// if we still need to remove any, remove them from the crafts first, and keep a running tally
-					for (auto* craft : *_base->getCrafts())
+					for (Craft* craft : _base->getCrafts())
 					{
 						if (toRemove <= 0) break; // loop finished
 						toRemove = cleanUpContainer(craft->getItems(), item, toRemove);
@@ -710,16 +710,16 @@ void SellState::btnOkClick(Action *)
 					}
 
 					// if there are STILL any left to remove, take them from the transfers, and if necessary, delete it.
-					for (auto transferIt = _base->getTransfers()->begin(); transferIt != _base->getTransfers()->end() && toRemove;)
+					for (auto transferIt = _base->getTransfers().begin(); transferIt != _base->getTransfers().end() && toRemove;)
 					{
-						auto* transfer = (*transferIt);
+						Transfer* transfer = (*transferIt);
 						if (transfer->getItems() == item)
 						{
 							if (transfer->getQuantity() <= toRemove)
 							{
 								toRemove -= transfer->getQuantity();
 								delete transfer;
-								transferIt = _base->getTransfers()->erase(transferIt);
+								transferIt = _base->getTransfers().erase(transferIt);
 							}
 							else
 							{

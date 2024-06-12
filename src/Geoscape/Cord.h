@@ -73,7 +73,7 @@ struct Cord
 	{
 		return *this;
 	}
-	inline Cord operator -()
+	inline Cord operator -() const
 	{
 		return Cord(-x, -y, -z);
 	}
@@ -106,7 +106,7 @@ struct Cord
 		z -= c.z;
 		return *this;
 	}
-	inline bool operator ==(const Cord& c)
+	inline bool operator ==(const Cord& c) const
 	{
 		return AreSame(x, c.x) && AreSame(y, c.y) && AreSame(z, c.z);
 	}

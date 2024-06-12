@@ -44,6 +44,8 @@ namespace Options
 #include "Options.inc.h"
 #undef OPT
 
+//KN NOTE: So options are basically a static object. 
+
 std::string _dataFolder;
 std::vector<std::string> _dataList;
 std::string _userFolder;

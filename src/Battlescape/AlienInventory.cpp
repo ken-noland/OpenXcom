@@ -159,7 +159,7 @@ void AlienInventory::drawItems()
 	if (_selUnit != 0)
 	{
 		SurfaceSet *texture = _game->getMod()->getSurfaceSet("BIGOBS.PCK");
-		for (const auto* item : *_selUnit->getInventory())
+		for (const BattleItem* item : _selUnit->getInventory())
 		{
 			if (item->getSlot()->getType() == INV_HAND)
 			{

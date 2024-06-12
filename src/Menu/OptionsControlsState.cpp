@@ -157,7 +157,7 @@ void OptionsControlsState::updateList()
 		_offsetGeneralMin = row;
 		_lstControls->setCellColor(_offsetGeneralMin, 0, _colorGroup);
 		addControls(_controlsGeneral[idx]);
-		row += _controlsGeneral[idx].size();
+		row += (int)_controlsGeneral[idx].size();
 		_offsetGeneralMax = row;
 	}
 	if (_controlsGeo[idx].size() > 0)
@@ -168,7 +168,7 @@ void OptionsControlsState::updateList()
 		_offsetGeoMin = row;
 		_lstControls->setCellColor(_offsetGeoMin, 0, _colorGroup);
 		addControls(_controlsGeo[idx]);
-		row += _controlsGeo[idx].size();
+		row += (int)_controlsGeo[idx].size();
 		_offsetGeoMax = row;
 	}
 	if (_controlsBase[idx].size() > 0)
@@ -179,7 +179,7 @@ void OptionsControlsState::updateList()
 		_offsetBaseMin = row;
 		_lstControls->setCellColor(_offsetBaseMin, 0, _colorGroup);
 		addControls(_controlsBase[idx]);
-		row += _controlsBase[idx].size();
+		row += (int)_controlsBase[idx].size();
 		_offsetBaseMax = row;
 	}
 	if (_controlsBattle[idx].size() > 0)
@@ -190,7 +190,7 @@ void OptionsControlsState::updateList()
 		_offsetBattleMin = row;
 		_lstControls->setCellColor(_offsetBattleMin, 0, _colorGroup);
 		addControls(_controlsBattle[idx]);
-		row += _controlsBattle[idx].size();
+		row += (int)_controlsBattle[idx].size();
 		_offsetBattleMax = row;
 	}
 }
@@ -240,7 +240,7 @@ void OptionsControlsState::addControls(const std::vector<OptionInfo> &keys)
  */
 OptionInfo *OptionsControlsState::getControl(size_t sel)
 {
-	int selInt = sel;
+	int selInt = (int)sel;
 	OptionOwner idx = _owner == _btnOXC ? OPTION_OXC : _owner == _btnOXCE ? OPTION_OXCE : OPTION_OTHER;
 
 	if (selInt > _offsetGeneralMin && selInt <= _offsetGeneralMax)

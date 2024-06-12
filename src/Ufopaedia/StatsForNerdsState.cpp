@@ -440,29 +440,29 @@ void StatsForNerdsState::btnPreviewClick(Action *)
 			// we use NEGATIVE soldier IDs to make sure there is not even a theoretical chance of modifying real geoscape soldiers during the preview
 			int newId = -(i + 1);
 			Soldier* soldier = new Soldier(soldierRule, defaultArmor, 0 /*nationality*/, newId);
-			base->getSoldiers()->push_back(soldier);
+			base->getSoldiers().push_back(soldier);
 			soldier->setName("Position" + std::to_string(newId));
 		}
 	}
 	// now clean up from the previous preview
 	{
-		for (auto* soldier : *base->getSoldiers())
+		for (Soldier* soldier : base->getSoldiers())
 		{
 			soldier->setCraft(nullptr);
 		}
-		for (auto* craft : *base->getCrafts())
+		for (Craft* craft : base->getCrafts())
 		{
 			delete craft;
 		}
-		base->getCrafts()->clear();
+		base->getCrafts().clear();
 	}
 	// and finally create the craft we need
 	RuleCraft* craftRule = mod->getCraft(_topicId);
 	Craft* c = new Craft(craftRule, base, RuleCraft::DUMMY_CRAFT_ID); // a negative integer
-	base->getCrafts()->push_back(c);
+	base->getCrafts().push_back(c);
 	c->setName(tr(craftRule->getType()));
 	int max = craftRule->getMaxUnitsLimit();
-	for (auto* soldier : *base->getSoldiers())
+	for (Soldier* soldier : base->getSoldiers())
 	{
 		soldier->setCraft(c);
 		max--;
@@ -1711,7 +1711,7 @@ void StatsForNerdsState::addSpriteResourcePath(std::ostringstream &ss, Mod *mod,
 		for (auto extraSprite : i->second)
 		{
 			// strip mod offset from the in-game ID
-			int originalSpriteId = resourceId - (extraSprite->getModOwner()->offset);
+			size_t originalSpriteId = resourceId - (extraSprite->getModOwner()->getOffset());
 
 			auto mapOfSprites = extraSprite->getSprites();
 			auto individualSprite = mapOfSprites->find(originalSpriteId);
@@ -1719,7 +1719,7 @@ void StatsForNerdsState::addSpriteResourcePath(std::ostringstream &ss, Mod *mod,
 			{
 				std::ostringstream numbers;
 				resetStream(numbers);
-				numbers << "  " << originalSpriteId << " + " << extraSprite->getModOwner()->offset;
+				numbers << "  " << originalSpriteId << " + " << extraSprite->getModOwner()->getOffset();
 
 				resetStream(ss);
 				ss << individualSprite->second;
@@ -1752,7 +1752,7 @@ void StatsForNerdsState::addSoundVectorResourcePaths(std::ostringstream &ss, Mod
 			for (auto resourceId : resourceIds)
 			{
 				// strip mod offset from the in-game ID
-				int originalSoundId = resourceId - (resourceSet.second->getModOwner()->offset);
+				int originalSoundId = resourceId - (resourceSet.second->getModOwner()->getOffset());
 
 				auto mapOfSounds = resourceSet.second->getSounds();
 				auto individualSound = mapOfSounds->find(originalSoundId);
@@ -1760,7 +1760,7 @@ void StatsForNerdsState::addSoundVectorResourcePaths(std::ostringstream &ss, Mod
 				{
 					std::ostringstream numbers;
 					resetStream(numbers);
-					numbers << "  " << originalSoundId << " + " << resourceSet.second->getModOwner()->offset;
+					numbers << "  " << originalSoundId << " + " << resourceSet.second->getModOwner()->getOffset();
 
 					resetStream(ss);
 					ss << individualSound->second;
@@ -2388,8 +2388,8 @@ void StatsForNerdsState::initItemList()
 
 		addSection("{Mod info}", "", _white);
 		{
-			addSingleString(ss, mod->getModCreatingRule(itemRule)->name, "createdByMod");
-			addSingleString(ss, mod->getModLastUpdatingRule(itemRule)->name, "updatedByMod");
+			addSingleString(ss, mod->getModCreatingRule(itemRule)->getName(), "createdByMod");
+			addSingleString(ss, mod->getModLastUpdatingRule(itemRule)->getName(), "updatedByMod");
 			endHeading();
 		}
 	}
@@ -2893,8 +2893,8 @@ void StatsForNerdsState::initArmorList()
 
 		addSection("{Mod info}", "", _white);
 		{
-			addSingleString(ss, mod->getModCreatingRule(armorRule)->name, "createdByMod");
-			addSingleString(ss, mod->getModLastUpdatingRule(armorRule)->name, "updatedByMod");
+			addSingleString(ss, mod->getModCreatingRule(armorRule)->getName(), "createdByMod");
+			addSingleString(ss, mod->getModLastUpdatingRule(armorRule)->getName(), "updatedByMod");
 			endHeading();
 		}
 	}
@@ -2958,8 +2958,8 @@ void StatsForNerdsState::initSoldierBonusList()
 
 		addSection("{Mod info}", "", _white);
 		{
-			addSingleString(ss, mod->getModCreatingRule(bonusRule)->name, "createdByMod");
-			addSingleString(ss, mod->getModLastUpdatingRule(bonusRule)->name, "updatedByMod");
+			addSingleString(ss, mod->getModCreatingRule(bonusRule)->getName(), "createdByMod");
+			addSingleString(ss, mod->getModLastUpdatingRule(bonusRule)->getName(), "updatedByMod");
 			endHeading();
 		}
 	}
@@ -3184,8 +3184,8 @@ void StatsForNerdsState::initFacilityList()
 
 		addSection("{Mod info}", "", _white);
 		{
-			addSingleString(ss, mod->getModCreatingRule(facilityRule)->name, "createdByMod");
-			addSingleString(ss, mod->getModLastUpdatingRule(facilityRule)->name, "updatedByMod");
+			addSingleString(ss, mod->getModCreatingRule(facilityRule)->getName(), "createdByMod");
+			addSingleString(ss, mod->getModLastUpdatingRule(facilityRule)->getName(), "updatedByMod");
 			endHeading();
 		}
 	}
@@ -3447,8 +3447,8 @@ void StatsForNerdsState::initCraftList()
 
 		addSection("{Mod info}", "", _white);
 		{
-			addSingleString(ss, mod->getModCreatingRule(craftRule)->name, "createdByMod");
-			addSingleString(ss, mod->getModLastUpdatingRule(craftRule)->name, "updatedByMod");
+			addSingleString(ss, mod->getModCreatingRule(craftRule)->getName(), "createdByMod");
+			addSingleString(ss, mod->getModLastUpdatingRule(craftRule)->getName(), "updatedByMod");
 			endHeading();
 		}
 	}
@@ -3611,7 +3611,7 @@ void StatsForNerdsState::initUfoList()
 		// spread 100-200%
 		double avgFireRate = fireCountdown * 1.5;
 		double avgDpm = avgDamage * (totalAccuracy / 100.0) * (60.0 / avgFireRate);
-		addInteger(ss, Round(avgDpm), "_averageDPM");
+		addInteger(ss, (const int)Round(avgDpm), "_averageDPM");
 
 		endHeading();
 	}
@@ -3699,8 +3699,8 @@ void StatsForNerdsState::initUfoList()
 
 		addSection("{Mod info}", "", _white);
 		{
-			addSingleString(ss, mod->getModCreatingRule(ufoRule)->name, "createdByMod");
-			addSingleString(ss, mod->getModLastUpdatingRule(ufoRule)->name, "updatedByMod");
+			addSingleString(ss, mod->getModCreatingRule(ufoRule)->getName(), "createdByMod");
+			addSingleString(ss, mod->getModLastUpdatingRule(ufoRule)->getName(), "updatedByMod");
 			endHeading();
 		}
 	}
@@ -3817,8 +3817,8 @@ void StatsForNerdsState::initCraftWeaponList()
 
 		addSection("{Mod info}", "", _white);
 		{
-			addSingleString(ss, mod->getModCreatingRule(craftWeaponRule)->name, "createdByMod");
-			addSingleString(ss, mod->getModLastUpdatingRule(craftWeaponRule)->name, "updatedByMod");
+			addSingleString(ss, mod->getModCreatingRule(craftWeaponRule)->getName(), "createdByMod");
+			addSingleString(ss, mod->getModLastUpdatingRule(craftWeaponRule)->getName(), "updatedByMod");
 			endHeading();
 		}
 	}

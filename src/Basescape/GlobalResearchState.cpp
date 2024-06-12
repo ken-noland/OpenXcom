@@ -176,9 +176,9 @@ void GlobalResearchState::fillProjectList()
 	int allocatedScientists = 0;
 	int freeLaboratories = 0;
 
-	for (Base *xbase : *_game->getSavedGame()->getBases())
+	for (Base *xbase : _game->getSavedGame()->getBases())
 	{
-		auto& baseProjects = xbase->getResearch();
+		const std::vector<ResearchProject*>& baseProjects = xbase->getResearch();
 		if (!baseProjects.empty() || xbase->getScientists() > 0)
 		{
 			std::string baseName = xbase->getName(_game->getLanguage());
@@ -189,7 +189,7 @@ void GlobalResearchState::fillProjectList()
 			_bases.push_back(0);
 			_topics.push_back(0);
 		}
-		for (const auto* proj : baseProjects)
+		for (const ResearchProject* proj : baseProjects)
 		{
 			std::ostringstream sstr;
 			sstr << proj->getAssigned();

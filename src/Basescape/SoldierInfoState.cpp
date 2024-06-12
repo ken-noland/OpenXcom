@@ -60,7 +60,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 {
 	if (_base == 0)
 	{
-		_list = _game->getSavedGame()->getDeadSoldiers();
+		_list = &_game->getSavedGame()->getDeadSoldiers();
 		if (_soldierId >= _list->size())
 		{
 			_soldierId = 0;
@@ -72,7 +72,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 	}
 	else
 	{
-		_list = _base->getSoldiers();
+		_list = &_base->getSoldiers();
 	}
 
 	// Create objects
@@ -762,7 +762,7 @@ void SoldierInfoState::btnFlagClick(Action *action)
 	const std::vector<SoldierNamePool*> &names = _soldier->getRules()->getNames();
 	if (!names.empty())
 	{
-		const int max = names.size();
+		const int max = (int)names.size();
 		if (temp > max - 1)
 		{
 			temp = 0;

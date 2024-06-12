@@ -69,7 +69,7 @@ CraftEquipmentState::CraftEquipmentState(Base *base, size_t craft) :
 	_lstScroll(0), _sel(0), _craft(craft), _base(base), _totalItems(0), _totalItemStorageSize(0.0), _ammoColor(0),
 	_reload(true), _returningFromGlobalTemplates(false), _returningFromInventory(false), _firstInit(true), _isNewBattle(false)
 {
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	bool craftHasACrew = c->getNumTotalSoldiers() > 0;
 	_isNewBattle = _game->getSavedGame()->getMonthsPassed() == -1;
 
@@ -252,7 +252,7 @@ void CraftEquipmentState::init()
 
 	_game->getSavedGame()->setBattleGame(0);
 
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	c->setInBattlescape(false);
 
 	// don't reload after closing error popups
@@ -331,7 +331,7 @@ void CraftEquipmentState::initList()
 	bool categoryNotEquipped = (selectedCategory == "STR_NOT_EQUIPPED");
 	bool shareAmmoCategories = _game->getMod()->getShareAmmoCategories();
 
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 
 	// reset
 	_totalItems = 0;
@@ -644,7 +644,7 @@ void CraftEquipmentState::lstEquipmentMousePress(Action *action)
  */
 void CraftEquipmentState::updateQuantity()
 {
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	RuleItem *item = _game->getMod()->getItem(_items[_sel], true);
 	int cQty = 0;
 	if (item->getVehicleUnit())
@@ -721,7 +721,7 @@ void CraftEquipmentState::moveLeft()
  */
 void CraftEquipmentState::moveLeftByValue(int change)
 {
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	const RuleItem *item = _game->getMod()->getItem(_items[_sel], true);
 	int cQty = 0;
 	if (item->getVehicleUnit()) cQty = c->getVehicleCount(_items[_sel]);
@@ -760,7 +760,7 @@ void CraftEquipmentState::moveLeftByValue(int change)
 				_base->getStorageItems()->addItem(ammo, ammoPerVehicle * change);
 			}
 			// now delete the vehicles from the craft.
-			Collections::deleteIf(*c->getVehicles(), change,
+			Collections::deleteIf(c->getVehicles(), change,
 				[&](Vehicle* v)
 				{
 					return v->getRules() == item;
@@ -773,7 +773,7 @@ void CraftEquipmentState::moveLeftByValue(int change)
 			{
 				_base->getStorageItems()->addItem(item, change);
 			}
-			Collections::deleteIf(*c->getVehicles(), change,
+			Collections::deleteIf(c->getVehicles(), change,
 				[&](Vehicle* v)
 				{
 					return v->getRules() == item;
@@ -811,7 +811,7 @@ void CraftEquipmentState::moveRight()
  */
 void CraftEquipmentState::moveRightByValue(int change, bool suppressErrors)
 {
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *craft = _base->getCrafts().at(_craft);
 	const RuleItem *item = _game->getMod()->getItem(_items[_sel], true);
 	int bqty = _base->getStorageItems()->getItem(item);
 	if (_isNewBattle)
@@ -829,7 +829,7 @@ void CraftEquipmentState::moveRightByValue(int change, bool suppressErrors)
 	{
 		int size = item->getVehicleUnit()->getArmor()->getTotalSize();
 		// Check if there's enough room
-		int room = c->validateAddingVehicles(size);
+		int room = craft->validateAddingVehicles(size);
 		if (room > 0)
 		{
 			change = std::min(room, change);
@@ -852,8 +852,8 @@ void CraftEquipmentState::moveRightByValue(int change, bool suppressErrors)
 							_base->getStorageItems()->removeItem(ammo, ammoPerVehicle);
 							_base->getStorageItems()->removeItem(item);
 						}
-						c->getVehicles()->push_back(new Vehicle(item, item->getVehicleClipSize(), size));
-						c->resetCustomDeployment(); // adding a vehicle into a craft invalidates a custom craft deployment
+						craft->getVehicles().push_back(new Vehicle(item, item->getVehicleClipSize(), size));
+						craft->resetCustomDeployment(); // adding a vehicle into a craft invalidates a custom craft deployment
 					}
 				}
 				else
@@ -871,8 +871,8 @@ void CraftEquipmentState::moveRightByValue(int change, bool suppressErrors)
 			else
 				for (int i = 0; i < change; ++i)
 				{
-					c->getVehicles()->push_back(new Vehicle(item, item->getVehicleClipSize(), size));
-					c->resetCustomDeployment(); // adding a vehicle into a craft invalidates a custom craft deployment
+					craft->getVehicles().push_back(new Vehicle(item, item->getVehicleClipSize(), size));
+					craft->resetCustomDeployment(); // adding a vehicle into a craft invalidates a custom craft deployment
 					if (!_isNewBattle)
 					{
 						_base->getStorageItems()->removeItem(item);
@@ -882,27 +882,27 @@ void CraftEquipmentState::moveRightByValue(int change, bool suppressErrors)
 	}
 	else
 	{
-		if (_totalItems + change > c->getMaxItemsClamped())
+		if (_totalItems + change > craft->getMaxItemsClamped())
 		{
 			if (!suppressErrors)
 			{
 				_timerRight->stop();
-				LocalizedText msg(tr("STR_NO_MORE_EQUIPMENT_ALLOWED", c->getMaxItemsClamped()));
+				LocalizedText msg(tr("STR_NO_MORE_EQUIPMENT_ALLOWED", craft->getMaxItemsClamped()));
 				_game->pushState(new ErrorMessageState(msg, _palette, _game->getMod()->getInterface("craftEquipment")->getElement("errorMessage")->color, "BACK04.SCR", _game->getMod()->getInterface("craftEquipment")->getElement("errorPalette")->color));
 				_reload = false;
 			}
-			change = c->getMaxItemsClamped() - _totalItems;
+			change = craft->getMaxItemsClamped() - _totalItems;
 			if (change < 0)
 			{
 				// if the player is already over the maximum (e.g. after a mod update), don't go into some ridiculous minus values
 				change = 0;
 			}
 		}
-		if (_totalItemStorageSize + (change * item->getSize()) > c->getMaxStorageSpaceClamped() + 0.05)
+		if (_totalItemStorageSize + (change * item->getSize()) > craft->getMaxStorageSpaceClamped() + 0.05)
 		{
 			if (item->getSize() > 0.0)
 			{
-				change = (int)floor((c->getMaxStorageSpaceClamped() + 0.05 - _totalItemStorageSize) / item->getSize());
+				change = (int)floor((craft->getMaxStorageSpaceClamped() + 0.05 - _totalItemStorageSize) / item->getSize());
 			}
 			if (change < 0)
 			{
@@ -912,12 +912,12 @@ void CraftEquipmentState::moveRightByValue(int change, bool suppressErrors)
 			if (!suppressErrors)
 			{
 				_timerRight->stop();
-				LocalizedText msg(tr("STR_NO_MORE_EQUIPMENT_ALLOWED_BY_SIZE").arg(c->getMaxStorageSpaceClamped()));
+				LocalizedText msg(tr("STR_NO_MORE_EQUIPMENT_ALLOWED_BY_SIZE").arg(craft->getMaxStorageSpaceClamped()));
 				_game->pushState(new ErrorMessageState(msg, _palette, _game->getMod()->getInterface("craftEquipment")->getElement("errorMessage")->color, "BACK04.SCR", _game->getMod()->getInterface("craftEquipment")->getElement("errorPalette")->color));
 				_reload = false;
 			}
 		}
-		c->getItems()->addItem(item, change);
+		craft->getItems()->addItem(item, change);
 		_totalItems += change;
 		_totalItemStorageSize += change * item->getSize();
 		if (!_isNewBattle)
@@ -941,7 +941,7 @@ void CraftEquipmentState::btnClearClick(Action *)
 	// in New Battle, clear also stuff that is not displayed on the GUI (for whatever reason)
 	if (_isNewBattle)
 	{
-		Craft* c = _base->getCrafts()->at(_craft);
+		Craft* c = _base->getCrafts().at(_craft);
 		c->getItems()->clear();
 	}
 }
@@ -953,7 +953,7 @@ void CraftEquipmentState::btnClearClick(Action *)
  */
 void CraftEquipmentState::btnInventoryClick(Action *)
 {
-	Craft *craft = _base->getCrafts()->at(_craft);
+	Craft *craft = _base->getCrafts().at(_craft);
 	if (craft->getNumTotalSoldiers() > 0)
 	{
 		if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
@@ -1006,7 +1006,7 @@ void CraftEquipmentState::saveGlobalLoadout(int index)
 	ItemContainer *tmpl = _game->getSavedGame()->getGlobalCraftLoadout(index);
 	tmpl->clear();
 
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 	// save only what is visible on the screen (can be DIFFERENT than what's really in the craft for various reasons)
 	for (const auto& itemType : _items)
 	{
@@ -1038,7 +1038,7 @@ void CraftEquipmentState::loadGlobalLoadout(int index, bool onlyAddItems)
 	_cbxFilterBy->setSelected(0);
 	initList();
 
-	Craft* c = _base->getCrafts()->at(_craft);
+	Craft* c = _base->getCrafts().at(_craft);
 
 	ItemContainer craftItemsBackup;
 	std::vector<Vehicle*> craftVehiclesBackup;
@@ -1046,7 +1046,7 @@ void CraftEquipmentState::loadGlobalLoadout(int index, bool onlyAddItems)
 	{
 		// remember for later, make copies
 		craftItemsBackup = *c->getItems();
-		craftVehiclesBackup = *c->getVehicles();
+		craftVehiclesBackup = c->getVehicles();
 	}
 	else
 	{
@@ -1069,7 +1069,7 @@ void CraftEquipmentState::loadGlobalLoadout(int index, bool onlyAddItems)
 	// lastly check and report what's missing
 	std::string craftName = c->getName(_game->getLanguage());
 	std::vector<ReequipStat> _missingItems;
-	for (const auto& templateItem : *tmpl->getContents())
+	for (const std::pair<const RuleItem*, int>& templateItem : tmpl->getContents())
 	{
 		const RuleItem *item = templateItem.first;
 		if (item)

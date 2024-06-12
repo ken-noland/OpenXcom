@@ -971,8 +971,8 @@ void BattlescapeState::mapOver(Action *action)
 
 			int barWidth = _game->getScreen()->getCursorLeftBlackBand();
 			int barHeight = _game->getScreen()->getCursorTopBlackBand();
-			int cursorX = _cursorPosition.x + Round(delta.x * action->getXScale());
-			int cursorY = _cursorPosition.y + Round(delta.y * action->getYScale());
+			int cursorX = (int)(_cursorPosition.x + Round(delta.x * action->getXScale()));
+			int cursorY = (int)(_cursorPosition.y + Round(delta.y * action->getYScale()));
 			_cursorPosition.x = Clamp(cursorX, barWidth, _game->getScreen()->getWidth() - barWidth - (int)(Round(action->getXScale())));
 			_cursorPosition.y = Clamp(cursorY, barHeight, _game->getScreen()->getHeight() - barHeight - (int)(Round(action->getYScale())));
 
@@ -1605,11 +1605,11 @@ void BattlescapeState::btnVisibleUnitClick(Action *action)
 		if (position == TileEngine::invalid)
 		{
 			bool found = false;
-			for (auto* unit : *_save->getUnits())
+			for (BattleUnit* unit : _save->getUnits())
 			{
 				if (!unit->isOut())
 				{
-					for (const auto* invItem : *unit->getInventory())
+					for (const BattleItem* invItem : unit->getInventory())
 					{
 						if (invItem->getUnit() && invItem->getUnit() == _visibleUnit[btnID])
 						{
@@ -2210,7 +2210,7 @@ void BattlescapeState::updateSoldierInfo(bool checkFOV)
 
 	// go through all units visible to the selected soldier (or other unit, e.g. mind-controlled enemy)
 	int j = 0;
-	for (auto* bu : *battleUnit->getVisibleUnits())
+	for (BattleUnit* bu : battleUnit->getVisibleUnits())
 	{
 		if (j >= VISIBLE_MAX) break; // loop finished
 		_btnVisibleUnit[j]->setTooltip(_txtVisibleUnitTooltip[j]);
@@ -2224,7 +2224,7 @@ void BattlescapeState::updateSoldierInfo(bool checkFOV)
 	_numberOfDirectlyVisibleUnits = j;
 
 	// go through all units on the map
-	for (auto* bu : *_save->getUnits())
+	for (BattleUnit* bu : _save->getUnits())
 	{
 		if (j >= VISIBLE_MAX) break; // loop finished
 		// check if they are hostile and visible (by any friendly unit)
@@ -2232,7 +2232,7 @@ void BattlescapeState::updateSoldierInfo(bool checkFOV)
 		{
 			bool alreadyShown = false;
 			// check if they are not already shown (e.g. because we see them directly)
-			for (auto* bu2 : *battleUnit->getVisibleUnits())
+			for (BattleUnit* bu2 : battleUnit->getVisibleUnits())
 			{
 				if (bu->getId() == bu2->getId())
 				{
@@ -2255,7 +2255,7 @@ void BattlescapeState::updateSoldierInfo(bool checkFOV)
 
 	{
 		// go through all wounded units under player's control (incl. unconscious)
-		for (auto* bu : *_save->getUnits())
+		for (BattleUnit* bu : _save->getUnits())
 		{
 			if (j >= VISIBLE_MAX) break; // loop finished
 			if (bu->getFaction() == FACTION_PLAYER && bu->getStatus() != STATUS_DEAD && !bu->isIgnored() && bu->getFatalWounds() > 0 && bu->indicatorsAreEnabled())
@@ -2274,7 +2274,7 @@ void BattlescapeState::updateSoldierInfo(bool checkFOV)
 
 	{
 		// first show all stunned allies with negative health regen (usually caused by high stun level)
-		for (auto* bu : *_save->getUnits())
+		for (BattleUnit* bu : _save->getUnits())
 		{
 			if (j >= VISIBLE_MAX) break; // loop finished
 			if (bu->getOriginalFaction() == FACTION_PLAYER && bu->getStatus() == STATUS_UNCONSCIOUS && bu->hasNegativeHealthRegen() && bu->indicatorsAreEnabled())
@@ -2288,7 +2288,7 @@ void BattlescapeState::updateSoldierInfo(bool checkFOV)
 		}
 
 		// then show all standing units under player's control with high stun level
-		for (auto* bu : *_save->getUnits())
+		for (BattleUnit* bu : _save->getUnits())
 		{
 			if (j >= VISIBLE_MAX) break; // loop finished
 			if (bu->getFaction() == FACTION_PLAYER && !(bu->isOut()) && bu->getHealth() > 0 && bu->indicatorsAreEnabled())
@@ -2619,7 +2619,9 @@ inline void BattlescapeState::handle(Action *action)
 
 			if (Options::touchEnabled == false && _isMouseScrolling && !Options::battleDragScrollInvert)
 			{
-				_map->setSelectorPosition((_cursorPosition.x - _game->getScreen()->getCursorLeftBlackBand()) / action->getXScale(), (_cursorPosition.y - _game->getScreen()->getCursorTopBlackBand()) / action->getYScale());
+				_map->setSelectorPosition(
+					(int)((_cursorPosition.x - _game->getScreen()->getCursorLeftBlackBand()) / action->getXScale()),
+					(int)((_cursorPosition.y - _game->getScreen()->getCursorTopBlackBand()) / action->getYScale()));
 			}
 
 			if (Options::oxceThumbButtons && action->getDetails()->type == SDL_MOUSEBUTTONDOWN)
@@ -2695,7 +2697,7 @@ inline void BattlescapeState::handle(Action *action)
 					ss << tr("STR_NO_EXPERIENCE_YET");
 					ss << "\n\n";
 					bool first = true;
-					for (auto* bu : *_save->getUnits())
+					for (BattleUnit* bu : _save->getUnits())
 					{
 						if (bu->getOriginalFaction() == FACTION_PLAYER && !bu->isOut())
 						{
@@ -2859,7 +2861,7 @@ inline void BattlescapeState::handle(Action *action)
 								// "ctrl-k" - kill all aliens
 								debug("Influenza bacterium dispersed");
 							}
-							for (auto* bu : *_save->getUnits())
+							for (BattleUnit* bu : _save->getUnits())
 							{
 								if (unitUnderTheCursor && unitUnderTheCursor == bu)
 								{
@@ -3316,13 +3318,13 @@ void BattlescapeState::finishBattle(bool abort, int inExitArea)
 	// please drop all borrowed xcom equipment now, so that we can recover it
 	// thank you!
 	std::vector<BattleItem*> itemsToDrop;
-	for (auto* unit : *_save->getUnits())
+	for (BattleUnit* unit : _save->getUnits())
 	{
 		bool relevantUnitType = unit->getOriginalFaction() == FACTION_NEUTRAL || unit->isSummonedPlayerUnit();
 		if (relevantUnitType && !unit->isOut())
 		{
 			itemsToDrop.clear();
-			for (auto* item : *unit->getInventory())
+			for (BattleItem* item : unit->getInventory())
 			{
 				if (item->getXCOMProperty() || item->getUnit())
 				{
@@ -3344,7 +3346,7 @@ void BattlescapeState::finishBattle(bool abort, int inExitArea)
 	AlienDeployment *ruleDeploy = _game->getMod()->getDeployment(_save->getMissionType());
 	if (!ruleDeploy)
 	{
-		for (auto* ufo : *_game->getSavedGame()->getUfos())
+		for (Ufo* ufo : _game->getSavedGame()->getUfos())
 		{
 			if (ufo->isInBattlescape())
 			{
@@ -3395,10 +3397,10 @@ void BattlescapeState::finishBattle(bool abort, int inExitArea)
 			_game->getSavedGame()->setBattleGame(0);
 
 			// unmark all craft and all bases (current craft would be enough, but better safe than sorry)
-			for (auto* xbase : *_game->getSavedGame()->getBases())
+			for (Base* xbase : _game->getSavedGame()->getBases())
 			{
 				xbase->setInBattlescape(false);
-				for (auto* craft : *xbase->getCrafts())
+				for (Craft* craft : xbase->getCrafts())
 				{
 					craft->setInBattlescape(false);
 				}
@@ -3614,7 +3616,7 @@ void BattlescapeState::txtTooltipInExtra(Action *action, bool leftHand, bool spe
 
 			// search for target on the ground
 			bool onGround = false;
-			for (auto* bu : *_save->getUnits())
+			for (BattleUnit* bu : _save->getUnits())
 			{
 				if (targetUnit) break; // loop finished
 				// we can heal a unit that is at the same position, unconscious and healable(=woundable)
@@ -3882,7 +3884,7 @@ void BattlescapeState::stopScrolling(Action *action)
 	{
 		SDL_WarpMouse(_cursorPosition.x, _cursorPosition.y);
 		action->setMouseAction(_cursorPosition.x, _cursorPosition.y, _map->getX(), _map->getY());
-		_map->setSelectorPosition(action->getAbsoluteXMouse(), action->getAbsoluteYMouse());
+		_map->setSelectorPosition((int)action->getAbsoluteXMouse(), (int)action->getAbsoluteYMouse());
 	}
 	// reset our "mouse position stored" flag
 	_cursorPosition.z = 0;
@@ -3909,7 +3911,7 @@ bool BattlescapeState::isBusy() const
 void BattlescapeState::btnAIClick(Action *action)
 {
 	std::vector<BattleUnit*> units;
-	for (auto* bu : *_battleGame->getSave()->getUnits())
+	for (BattleUnit* bu : _battleGame->getSave()->getUnits())
 	{
 		if (bu->getFaction() == FACTION_PLAYER && !bu->isOut()) {units.push_back(bu);}
 	}
@@ -4108,7 +4110,7 @@ void BattlescapeState::readyItem(BattleType battleType, ItemDamageType itemDamag
 	bool picked = false;
 	bool primed = false;
 
-	for (BattleItem* battleItem : *unit->getInventory())
+	for (BattleItem* battleItem : unit->getInventory())
 	{
 		const RuleItem* ruleItem = battleItem->getRules();
 

@@ -155,7 +155,7 @@ productionProgress_e Production::step(Base * b, SavedGame * g, const Mod *m, Lan
 				Craft *craft = new Craft(ruleCraft, b, g->getId(ruleCraft->getType()));
 				craft->initFixedWeapons(m);
 				craft->checkup();
-				b->getCrafts()->push_back(craft);
+				b->getCrafts().push_back(craft);
 			}
 			else
 			{
@@ -176,7 +176,7 @@ productionProgress_e Production::step(Base * b, SavedGame * g, const Mod *m, Lan
 						}
 						if (i.first->getBattleType() == BT_NONE)
 						{
-							for (auto* c : *b->getCrafts())
+							for (Craft* c : b->getCrafts())
 							{
 								c->reuseItem(i.first);
 							}
@@ -206,7 +206,7 @@ productionProgress_e Production::step(Base * b, SavedGame * g, const Mod *m, Lan
 							_randomProductionInfo[i.first->getType()] += i.second;
 							if (i.first->getBattleType() == BT_NONE)
 							{
-								for (auto* c : *b->getCrafts())
+								for (Craft* c : b->getCrafts())
 								{
 									c->reuseItem(i.first);
 								}
@@ -225,13 +225,13 @@ productionProgress_e Production::step(Base * b, SavedGame * g, const Mod *m, Lan
 				{
 					Transfer *t = new Transfer(24);
 					t->setScientists(1);
-					b->getTransfers()->push_back(t);
+					b->getTransfers().push_back(t);
 				}
 				else if (spawnedPersonType == "STR_ENGINEER")
 				{
 					Transfer *t = new Transfer(24);
 					t->setEngineers(1);
-					b->getTransfers()->push_back(t);
+					b->getTransfers().push_back(t);
 				}
 				else
 				{
@@ -251,7 +251,7 @@ productionProgress_e Production::step(Base * b, SavedGame * g, const Mod *m, Lan
 							s->genName();
 						}
 						t->setSoldier(s);
-						b->getTransfers()->push_back(t);
+						b->getTransfers().push_back(t);
 					}
 				}
 			}
@@ -306,7 +306,7 @@ void Production::startItem(Base * b, SavedGame * g, const Mod *m) const
 	for (const auto& i : _rules->getRequiredCrafts())
 	{
 		// Find suitable craft
-		for (auto* c : *b->getCrafts())
+		for (Craft* c : b->getCrafts())
 		{
 			if (c->getRules() == i.first)
 			{

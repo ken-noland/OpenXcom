@@ -105,7 +105,7 @@ BaseDefenseState::BaseDefenseState(Base *base, Ufo *ufo, GeoscapeState *state) :
 	_lstDefenses->setColumns(3, 134, 70, 50);
 	_lstDefenses->setFlooding(true);
 	_gravShields = _base->getGravShields();
-	_defenses = _base->getDefenses()->size();
+	_defenses = (int)_base->getDefenses().size();
 	_timer = new Timer(250);
 	_timer->onTimer((StateHandler)&BaseDefenseState::nextStep);
 
@@ -190,7 +190,7 @@ void BaseDefenseState::nextStep()
 
 
 
-		BaseFacility* def = _base->getDefenses()->at(_attacks);
+		BaseFacility* def = _base->getDefenses().at(_attacks);
 		const RuleItem* ammo = (def)->getRules()->getAmmoItem();
 		int ammoNeeded = (def)->getRules()->getAmmoNeeded();
 		bool hasOwnAmmo = def->getRules()->getAmmoMax() > 0;
@@ -321,8 +321,8 @@ void BaseDefenseState::btnOkClick(Action *)
 			if (!am)
 			{
 				// backwards-compatibility
-				RuleRegion* regionRule = _game->getSavedGame()->getRegions()->front()->getRules(); // wrong, but that's how it is in OXC
-				for (const auto* region : *_game->getSavedGame()->getRegions())
+				RuleRegion* regionRule = _game->getSavedGame()->getRegions().front()->getRules(); // wrong, but that's how it is in OXC
+				for (const Region* region : _game->getSavedGame()->getRegions())
 				{
 					if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
 					{

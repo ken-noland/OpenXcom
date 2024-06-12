@@ -300,6 +300,7 @@ set ( mod_src
   Mod/MapScript.cpp
   Mod/MCDPatch.cpp
   Mod/Mod.cpp
+  Mod/ModFile.cpp
   Mod/Polygon.cpp
   Mod/Polyline.cpp
   Mod/RuleAlienMission.cpp
@@ -410,6 +411,15 @@ set ( ufopedia_src
 )
 
 set ( lua_src
+  Lua/BasescapeScript.cpp
+  Lua/BattlescapeScript.cpp
+  Lua/GameScript.cpp
+  Lua/GeoscapeScript.cpp
+  Lua/LuaApi.cpp
+  Lua/LuaArg.cpp
+  Lua/LuaDispatch.cpp
+  Lua/LuaHelpers.cpp
+  Lua/LuaMod.cpp
   Lua/LuaState.cpp
 )
 
@@ -641,7 +651,7 @@ if (( APPLE AND CREATE_BUNDLE ) OR CPACK_GENERATOR STREQUAL "7Z" )
   set ( CMAKE_INSTALL_BINDIR "." )
 endif ()
 
-add_executable ( openxcom  ${application_type} ${openxcom_src} ${openxcom_icon} )
+add_executable ( openxcom  ${application_type} ${openxcom_src} ${openxcom_icon}  "Lua/LuaArg.h")
 
 if (MSVC)
     target_compile_options(openxcom PRIVATE /bigobj)

@@ -95,7 +95,7 @@ public:
 	/// Save a diary.
 	YAML::Node save() const;
 	/// Update the diary statistics.
-	void updateDiary(BattleUnitStatistics*, std::vector<MissionStatistics*>*, Mod*);
+	void updateDiary(BattleUnitStatistics*, std::vector<MissionStatistics*>&, Mod*);
 	/// Get the list of kills, mapped by rank.
 	std::map<std::string, int> getAlienRankTotal() const;
 	/// Get the list of kills, mapped by race.
@@ -105,21 +105,21 @@ public:
 	/// Get the list of kills, mapped by weapon ammo used.
 	std::map<std::string, int> getWeaponAmmoTotal() const;
 	/// Get the list of missions, mapped by region.
-	std::map<std::string, int> getRegionTotal(std::vector<MissionStatistics*>*) const;
+	std::map<std::string, int> getRegionTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the list of missions, mapped by country.
-	std::map<std::string, int> getCountryTotal(std::vector<MissionStatistics*>*) const;
+	std::map<std::string, int> getCountryTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the list of missions, mapped by type.
-	std::map<std::string, int> getTypeTotal(std::vector<MissionStatistics*>*) const;
+	std::map<std::string, int> getTypeTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the list of missions, mapped by UFO.
-	std::map<std::string, int> getUFOTotal(std::vector<MissionStatistics*>*) const;
+	std::map<std::string, int> getUFOTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the total number of kills.
 	int getKillTotal() const;
 	/// Get the total number of missions.
 	int getMissionTotal() const;
 	/// Get the total number of missions filtered by modder's criteria.
-	int getMissionTotalFiltered(std::vector<MissionStatistics*>*, const RuleCommendations* rule) const;
+	int getMissionTotalFiltered(std::vector<MissionStatistics*>&, const RuleCommendations* rule) const;
 	/// Get the total number of wins.
-	int getWinTotal(std::vector<MissionStatistics*>*) const;
+	int getWinTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the total number of stuns.
 	int getStunTotal() const;
 	/// Get the total number of psi panics.
@@ -129,9 +129,9 @@ public:
 	/// Get the total number of days wounded.
 	int getDaysWoundedTotal() const;
 	/// Get the solder's commendations.
-	std::vector<SoldierCommendations*> *getSoldierCommendations();
+	std::vector<SoldierCommendations*>& getSoldierCommendations();
 	/// Manage commendations, return true if a medal is awarded.
-	bool manageCommendations(Mod*, std::vector<MissionStatistics*>*);
+	bool manageCommendations(Mod*, std::vector<MissionStatistics*>&);
 	/// Increment the soldier's service time.
 	void addMonthlyService();
 	/// Get the total months in service.
@@ -160,23 +160,23 @@ public:
 	/// Get the total number of reaction fire kills.
 	int getReactionFireKillTotal(Mod*) const;
 	/// Get the total number of terror missions.
-	int getTerrorMissionTotal(std::vector<MissionStatistics*>*) const;
+	int getTerrorMissionTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the total number of night missions.
-	int getNightMissionTotal(std::vector<MissionStatistics*>*, const Mod* mod) const;
+	int getNightMissionTotal(std::vector<MissionStatistics*>&, const Mod* mod) const;
 	/// Get the total number of night terror missions.
-	int getNightTerrorMissionTotal(std::vector<MissionStatistics*>*, const Mod* mod) const;
+	int getNightTerrorMissionTotal(std::vector<MissionStatistics*>&, const Mod* mod) const;
 	/// Get the total number of base defense missions.
-	int getBaseDefenseMissionTotal(std::vector<MissionStatistics*>*) const;
+	int getBaseDefenseMissionTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the total number of alien base assaults.
-	int getAlienBaseAssaultTotal(std::vector<MissionStatistics*>*) const;
+	int getAlienBaseAssaultTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the total number of important missions.
-	int getImportantMissionTotal(std::vector<MissionStatistics*>*) const;
+	int getImportantMissionTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the total score.
-	int getScoreTotal(std::vector<MissionStatistics*>*) const;
+	int getScoreTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the Valiant Crux total.
-	int getValiantCruxTotal(std::vector<MissionStatistics*>*) const;
+	int getValiantCruxTotal(std::vector<MissionStatistics*>&) const;
 	/// Get the loot value total.
-	int getLootValueTotal(std::vector<MissionStatistics*>*) const;
+	int getLootValueTotal(std::vector<MissionStatistics*>&) const;
 };
 
 }

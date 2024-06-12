@@ -79,7 +79,7 @@ SoldierAvatarState::SoldierAvatarState(Base *base, size_t soldier) : _base(base)
 	_btnOk->onMouseClick((ActionHandler)&SoldierAvatarState::btnOkClick);
 	_btnOk->onKeyboardPress((ActionHandler)&SoldierAvatarState::btnOkClick, Options::keyOk);
 
-	Soldier *s = _base->getSoldiers()->at(_soldier);
+	Soldier *s = _base->getSoldiers().at(_soldier);
 	_origAvatar = SoldierAvatar("original", s->getGender(), s->getLook(), s->getLookVariant());
 	initPreview(s);
 
@@ -193,7 +193,7 @@ SoldierAvatarState::~SoldierAvatarState()
  */
 void SoldierAvatarState::btnCancelClick(Action *)
 {
-	Soldier *soldier = _base->getSoldiers()->at(_soldier);
+	Soldier *soldier = _base->getSoldiers().at(_soldier);
 
 	// revert the avatar to original
 	soldier->setGender(_origAvatar.getGender());
@@ -218,7 +218,7 @@ void SoldierAvatarState::btnOkClick(Action *)
  */
 void SoldierAvatarState::lstAvatarClick(Action *)
 {
-	Soldier *soldier = _base->getSoldiers()->at(_soldier);
+	Soldier *soldier = _base->getSoldiers().at(_soldier);
 
 	// change the avatar
 	soldier->setGender(_avatars[_lstAvatar->getSelectedRow()].getGender());

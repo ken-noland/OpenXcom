@@ -373,7 +373,7 @@ public:
 	/// Is the given unit among this unit's visible units?
 	bool hasVisibleUnit(const BattleUnit *unit) const;
 	/// Get the list of visible units.
-	std::vector<BattleUnit*> *getVisibleUnits();
+	std::vector<BattleUnit*>& getVisibleUnits();
 	/// Clear visible units.
 	void clearVisibleUnits();
 	/// Add unit to visible tiles.
@@ -398,11 +398,11 @@ public:
 		return _noLofTilesLookup.find(tile) != _noLofTilesLookup.end(); // find?
 	}
 	/// Get the list of visible tiles.
-	const std::vector<Tile*> *getVisibleTiles();
+	const std::vector<Tile*>& getVisibleTiles();
 	/// Get the list of lof tiles.
-	const std::vector<Tile *> *getLofTiles();
+	const std::vector<Tile *>& getLofTiles();
 	/// Get the list of no lof tiles.
-	const std::vector<Tile *> *getNoLofTiles();
+	const std::vector<Tile *>& getNoLofTiles();
 	/// Clear visible tiles.
 	void clearVisibleTiles();
 	/// Clear lof tiles
@@ -437,7 +437,7 @@ public:
 	int getFire() const;
 
 	/// Get the list of items in the inventory.
-	std::vector<BattleItem*> *getInventory();
+	std::vector<BattleItem*>& getInventory();
 	/// Fit item into inventory slot.
 	bool fitItemToInventory(const RuleInventory *slot, BattleItem *item, bool testMode = false);
 	/// Add item to unit.

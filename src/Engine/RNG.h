@@ -85,7 +85,7 @@ namespace RNG
 		if (list.empty())
 			return;
 		for (size_t i = list.size() - 1; i > 0; --i)
-			std::swap(list[i], list[generate(0, i)]);
+			std::swap(list[i], list[generate(0, (int)i)]);
 	}
 }
 

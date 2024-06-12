@@ -130,7 +130,11 @@ struct OxceVersionDate
 		size_t offset = data.find(" (v");
 		if (offset != std::string::npos && data.size() >= offset + 14 && data[offset + 2] == 'v' && data[offset + 7] == '-' && data[offset + 10] == '-' && data[offset + 13] == ')')
 		{
+			#ifdef _MSC_VER
+			correct = (sscanf_s(data.data() + offset, " (v%4d-%2d-%2d)", &year, &month, &day) == 3);
+			#else
 			correct = (std::sscanf(data.data() + offset, " (v%4d-%2d-%2d)", &year, &month, &day) == 3);
+			#endif
 		}
 
 		if (!correct)
@@ -200,13 +204,13 @@ bool Mod::EXTENDED_EXPERIENCE_AWARD_SYSTEM;
 
 constexpr size_t MaxDifficultyLevels = 5;
 
-
 /// Special value for default string different to empty one.
-const std::string Mod::STR_NULL = { '\0' };
+const std::string Mod::STR_NULL = {'\0'};
 /// Predefined name for first loaded mod that have all original data
 const std::string ModNameMaster = "master";
 /// Predefined name for current mod that is loading rulesets.
 const std::string ModNameCurrent = "current";
+
 
 /// Reduction of size allocated for transparency LUTs.
 const size_t ModTransparencySizeReduction = 100;
@@ -324,13 +328,13 @@ class ModScriptGlobal : public ScriptGlobal
 		if (node)
 		{
 			auto name = node.as<std::string>();
-			if (name == ModNameMaster)
+			if (name == "master")
 			{
 				value = 0;
 			}
-			else if (name == ModNameCurrent)
+			else if (name == "current")
 			{
-				value = _modCurr;
+				value = (int)_modCurr;
 			}
 			else
 			{
@@ -406,7 +410,8 @@ public:
 /**
  * Creates an empty mod.
  */
-Mod::Mod() :
+Mod::Mod(const ModFile& modFiles) :
+	_modFiles(modFiles),
 	_inventoryOverlapsPaperdoll(false),
 	_maxViewDistance(20), _maxDarknessToSeeUnits(9), _maxStaticLightDistance(16), _maxDynamicLightDistance(24), _enhancedLighting(0),
 	_costHireEngineer(0), _costHireScientist(0),
@@ -937,7 +942,7 @@ Music *Mod::getRandomMusic(const std::string &name) const
 		}
 		else
 		{
-			return music[RNG::seedless(0, music.size() - 1)];
+			return music[RNG::seedless(0, static_cast<int>(music.size() - 1))];
 		}
 	}
 }
@@ -1219,7 +1224,7 @@ void Mod::verifySoundOffset(const std::string &parent, const std::vector<int>& s
  */
 int Mod::getModOffset() const
 {
-	return _modCurrent->offset;
+	return (int)_modCurrent->getOffset();
 }
 
 
@@ -1615,7 +1620,7 @@ void loadRuleInfoHelper(const YAML::Node &node, const char* nodeName, const char
 void Mod::loadOffsetNode(const std::string &parent, int& offset, const YAML::Node &node, int shared, const std::string &set, size_t multiplier, size_t sizeScale) const
 {
 	assert(_modCurrent);
-	const ModData* curr = _modCurrent;
+	const ModInfo* curr = _modCurrent;
 	if (node.IsScalar())
 	{
 		offset = node.as<int>();
@@ -1626,7 +1631,7 @@ void Mod::loadOffsetNode(const std::string &parent, int& offset, const YAML::Nod
 		std::string mod = node["mod"].as<std::string>();
 		if (mod == ModNameMaster)
 		{
-			curr = &_modData.at(0);
+			curr = _modFiles.getModData().at(0);
 		}
 		else if (mod == ModNameCurrent)
 		{
@@ -1634,13 +1639,13 @@ void Mod::loadOffsetNode(const std::string &parent, int& offset, const YAML::Nod
 		}
 		else
 		{
-			const ModData* n = 0;
-			for (size_t i = 0; i < _modData.size(); ++i)
+			const ModInfo* n = 0;
+			for (size_t i = 0; i < _modFiles.getModData().size(); ++i)
 			{
-				const ModData& d = _modData[i];
-				if (d.name == mod)
+				const ModInfo* d = _modFiles.getModData()[i];
+				if (d->getName() == mod)
 				{
-					n = &d;
+					n = d;
 					break;
 				}
 			}
@@ -1678,15 +1683,15 @@ void Mod::loadOffsetNode(const std::string &parent, int& offset, const YAML::Nod
 	else
 	{
 		int f = offset;
-		f *= multiplier;
-		if ((size_t)f > curr->size / sizeScale)
+		f *= (int)multiplier;
+		if ((size_t)f > curr->getSize() / sizeScale)
 		{
 			std::ostringstream err;
-			err << "offset '" << offset << "' exceeds mod size limit " << (curr->size / multiplier / sizeScale) << " in set '" << set << "'";
+			err << "offset '" << offset << "' exceeds mod size limit " << (curr->getSize() / multiplier / sizeScale) << " in set '" << set << "'";
 			throw LoadRuleException(parent, node, err.str());
 		}
 		if (f >= shared)
-			f += curr->offset / sizeScale;
+			f += (int)(curr->getOffset() / sizeScale);
 		offset = f;
 	}
 }
@@ -1814,7 +1819,7 @@ int Mod::getOffset(int id, int max) const
 {
 	assert(_modCurrent);
 	if (id > max)
-		return id + _modCurrent->offset;
+		return id + (int)_modCurrent->getOffset();
 	else
 		return id;
 }
@@ -1856,9 +1861,9 @@ void Mod::loadBaseFunction(const std::string& parent, RuleBaseFacilityFunctions&
 			}
 		}
 		catch(LoadRuleException& ex)
-		{
+		{	
 			//context is already included in exception, no need add more
-			throw;
+			(void)ex; throw;
 		}
 		catch(Exception& ex)
 		{
@@ -2116,9 +2121,7 @@ static void throwModOnErrorHelper(const std::string& modId, const std::string& e
 void Mod::loadAll()
 {
 	ModScript parser{ _scriptGlobal, this };
-	const FileMap::RSOrder& mods = FileMap::getRulesets();
 
-	Log(LOG_INFO) << "Loading begins...";
 	if (Options::oxceModValidationLevel < LOG_ERROR)
 	{
 		Log(LOG_ERROR) << "Validation of mod data disabled, game can crash when run";
@@ -2128,42 +2131,18 @@ void Mod::loadAll()
 		Log(LOG_WARNING) << "Validation of mod data reduced, game can behave incorrectly";
 	}
 	_scriptGlobal->beginLoad();
-	_modData.clear();
-	_modData.resize(mods.size());
-
-	std::set<std::string> usedModNames;
-	usedModNames.insert(ModNameMaster);
-	usedModNames.insert(ModNameCurrent);
-
-
-	// calculated offsets and other things for all mods
-	size_t offset = 0;
-	for (size_t i = 0; mods.size() > i; ++i)
-	{
-		const std::string& modId = mods[i].name;
-		if (usedModNames.insert(modId).second == false)
-		{
-			throwModOnErrorHelper(modId, "this mod name is already used");
-		}
-		_scriptGlobal->addMod(mods[i].name, 1000 * (int)offset);
-		const ModInfo *modInfo = &Options::getModInfos().at(modId);
-		size_t size = modInfo->getReservedSpace();
-		_modData[i].name = modId;
-		_modData[i].offset = 1000 * offset;			//KN NOTE: WTF?
-		_modData[i].info = modInfo;
-		_modData[i].size = 1000 * size;
-		offset += size;
-	}
 
 	Log(LOG_INFO) << "Pre-loading rulesets...";
 	// load rulesets that can affect loading vanilla resources
-	for (size_t i = 0; _modData.size() > i; ++i)
+	for (const ModInfo* modInfo : _modFiles.getModData())
 	{
-		_modCurrent = &_modData.at(i);
-		const ModInfo *info = _modCurrent->info;
-		if (!info->getResourceConfigFile().empty())
+		_modCurrent = modInfo;
+
+		_scriptGlobal->addMod(modInfo->getName(), (int)modInfo->getOffset());
+
+		if (!_modCurrent->getResourceConfigFile().empty())
 		{
-			auto file = FileMap::getModRuleFile(_modCurrent->info, _modCurrent->info->getResourceConfigFile());
+			auto file = FileMap::getModRuleFile(_modCurrent, _modCurrent->getResourceConfigFile());
 			if (file)
 			{
 				loadResourceConfigFile(*file);
@@ -2173,7 +2152,7 @@ void Mod::loadAll()
 
 	Log(LOG_INFO) << "Loading vanilla resources...";
 	// vanilla resources load
-	_modCurrent = &_modData.at(0);
+	_modCurrent = _modFiles.getModData()[0];
 	loadVanillaResources();
 	_surfaceOffsetBasebits = _sets["BASEBITS.PCK"]->getMaxSharedFrames();
 	_surfaceOffsetBigobs = _sets["BIGOBS.PCK"]->getMaxSharedFrames();
@@ -2187,38 +2166,24 @@ void Mod::loadAll()
 
 	Log(LOG_INFO) << "Loading rulesets...";
 	// load rest rulesets
-	for (size_t i = 0; mods.size() > i; ++i)
+	for (const ModInfo* modInfo : _modFiles.getModData())
 	{
 		try
 		{
-			_modCurrent = &_modData.at(i);
-			_scriptGlobal->setMod((int)_modCurrent->offset);
-			loadMod(mods[i].files, parser);
+			_modCurrent = modInfo;
+			_scriptGlobal->setMod((int)_modCurrent->getOffset());
+			loadMod(modInfo->getRulesetFiles(), parser);
 		}
 		catch (Exception &e)
 		{
-			const std::string &modId = mods[i].name;
+			const std::string& modId = modInfo->getName();
 			throwModOnErrorHelper(modId, e.what());
 		}
 	}
 
 	// back master
-	_modCurrent = &_modData.at(0);
+	_modCurrent = _modFiles.getModData()[0];
 	Log(LOG_INFO) << "Loading rulesets done.";
-
-	Log(LOG_INFO) << "Loading Lua...";
-	for (const ModData& modData : _modData)
-	{
-		//okay, so this gets a bit tricky. The whole "mod" part was originally developed just to allow cascading rulesets, so
-		// there is no central "mod" object that I can utilize for the LuaState object. What this means is that I have to
-		// manage the life-cycle of the Lua stuff separately from everything else.
-		if (modData.info->hasLua())
-		{
-			std::filesystem::path luaPath = modData.info->getPath() / modData.info->getLuaScript();
-			_luaMods.push_back(LuaState(luaPath, &modData));
-		}
-	}
-	Log(LOG_INFO) << "Loading Lua done.";
 
 	_scriptGlobal->endLoad();
 
@@ -2328,7 +2293,7 @@ void Mod::loadAll()
 				checkForSoftError(true, "mod", "Both '" + _finalResearch->getName() + "' and '" + r.second->getName() + "' research are marked as 'unlockFinalMission: true'", LOG_INFO);
 
 				// to make old mods semi-compatible with new code we decide that last updated rule will be consider final research. This could make false-positive as last update could not touch this flag.
-				if (getModLastUpdatingRule(r.second)->offset < getModLastUpdatingRule(_finalResearch)->offset)
+				if (getModLastUpdatingRule(r.second)->getOffset() < getModLastUpdatingRule(_finalResearch)->getOffset())
 				{
 					continue;
 				}
@@ -2397,6 +2362,7 @@ void Mod::loadAll()
 		Options::save();
 	}
 
+	//KN NOTE: Why is this here?
 	// fixed user options
 	if (!_fixedUserOptions.empty())
 	{
@@ -2427,7 +2393,6 @@ void Mod::loadAll()
 		}
 	}
 
-	Log(LOG_INFO) << "Loading ended.";
 
 	sortLists();
 	modResources();
@@ -2441,7 +2406,7 @@ void Mod::loadAll()
  */
 void Mod::loadMod(const std::vector<FileMap::FileRecord> &rulesetFiles, ModScript &parsers)
 {
-	for (const auto& filerec : rulesetFiles)
+	for (const FileMap::FileRecord& filerec : rulesetFiles)
 	{
 		Log(LOG_VERBOSE) << "- " << filerec.fullpath;
 		try
@@ -2536,8 +2501,8 @@ void Mod::loadResourceConfigFile(const FileMap::FileRecord &filerec)
 
 	if (const YAML::Node& luts = doc["transparencyLUTs"])
 	{
-		const size_t start = _modCurrent->offset / ModTransparencySizeReduction;
-		const size_t limit =  _modCurrent->size / ModTransparencySizeReduction;
+		const size_t start = _modCurrent->getOffset() / ModTransparencySizeReduction;
+		const size_t limit = _modCurrent->getSize() / ModTransparencySizeReduction;
 		size_t curr = 0;
 
 		_transparencies.resize(start + limit);
@@ -2582,7 +2547,7 @@ void Mod::loadResourceConfigFile(const FileMap::FileRecord &filerec)
 							taint.r = Clamp((int)(color.r * to), 0, 255);
 							taint.g = Clamp((int)(color.g * to), 0, 255);
 							taint.b = Clamp((int)(color.b * to), 0, 255);
-							taint.unused = 255 * co;
+							taint.unused = (Uint8)(255 * co);
 							_transparencies[start + curr][opacity] = taint;
 						};
 					}
@@ -2690,7 +2655,7 @@ void Mod::loadConstants(const YAML::Node &node)
  */
 void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 {
-	auto doc = filerec.getYAML();
+	YAML::Node doc = filerec.getYAML();
 
 	auto loadDocInfoHelper = [&](const char* nodeName)
 	{
@@ -2707,10 +2672,10 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	{
 		if (const YAML::Node& t = extended["tagsFile"])
 		{
-			auto filePath = t.as<std::string>();
-			auto file = FileMap::getModRuleFile(_modCurrent->info, filePath);
+			std::filesystem::path filePath = t.as<std::string>();
+			const FileMap::FileRecord* file = FileMap::getModRuleFile(_modCurrent, filePath);
 
-			if (false == checkForSoftError(file == nullptr, "extended", t, "Unknown file name for 'tagsFile': '" + filePath + "'", LOG_ERROR))
+			if (false == checkForSoftError(file == nullptr, "extended", t, "Unknown file name for 'tagsFile': '" + filePath.string() + "'", LOG_ERROR))
 			{
 				//copy only tags and load them in current file.
 				YAML::Node tempTags = file->getYAML()["extended"]["tags"];
@@ -3379,10 +3344,10 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 				type = (*i)["typeSingle"].as<std::string>();
 			}
 			ExtraSprites *extraSprites = new ExtraSprites();
-			const ModData* data = _modCurrent;
+			const ModInfo* data = _modCurrent;
 			// doesn't support modIndex
 			if (type == "TEXTURE.DAT")
-				data = &_modData.at(0);
+				data = _modFiles.getModData()[0];
 			extraSprites->load(*i, data);
 			_extraSprites[type].push_back(extraSprites);
 		}
@@ -3522,7 +3487,7 @@ void Mod::loadFile(const FileMap::FileRecord &filerec, ModScript &parsers)
 	count = 0;
 	for (YAML::const_iterator i = doc["armorMultipliersAbs"].begin(); i != doc["armorMultipliersAbs"].end() && count < MaxDifficultyLevels; ++i)
 	{
-		_statAdjustment[count].armorMultiplierAbs = (*i).as<double>(_statAdjustment[count].armorMultiplierAbs);
+		_statAdjustment[count].armorMultiplierAbs = (int)((*i).as<double>(_statAdjustment[count].armorMultiplierAbs));
 		++count;
 	}
 	count = 0;
@@ -3609,11 +3574,11 @@ T *Mod::loadRule(const YAML::Node &node, std::map<std::string, T*> *map, std::ve
 		}
 		return name;
 	};
-	auto addTracking = [&](std::unordered_map<const void*, const ModData*>& track, const auto* t)
+	auto addTracking = [&](std::unordered_map<const void*, const ModInfo*>& track, const auto* t)
 	{
 		track[static_cast<const void*>(t)] = _modCurrent;
 	};
-	auto removeTracking = [&]( std::unordered_map<const void*, const ModData*>& track, const auto* t)
+	auto removeTracking = [&](std::unordered_map<const void*, const ModInfo*>& track, const auto* t)
 	{
 		track.erase(static_cast<const void*>(t));
 	};
@@ -3776,11 +3741,11 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 	{
 		RuleCountry *countryRule = getCountry(countryName);
 		if (!countryRule->getLonMin().empty())
-			save->getCountries()->push_back(new Country(countryRule));
+			save->getCountries().push_back(new Country(countryRule));
 	}
 	// Adjust funding to total $6M
-	int missing = ((_initialFunding - save->getCountryFunding()/1000) / (int)save->getCountries()->size()) * 1000;
-	for (auto* country : *save->getCountries())
+	int missing = ((_initialFunding - save->getCountryFunding()/1000) / (int)save->getCountries().size()) * 1000;
+	for (Country* country : save->getCountries())
 	{
 		int funding = country->getFunding().back() + missing;
 		if (funding < 0)
@@ -3796,35 +3761,35 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 	{
 		RuleRegion *regionRule = getRegion(regionName);
 		if (!regionRule->getLonMin().empty())
-			save->getRegions()->push_back(new Region(regionRule));
+			save->getRegions().push_back(new Region(regionRule));
 	}
 
 	// Set up starting base
 	const YAML::Node &startingBaseByDiff = getStartingBase(diff);
 	Base *base = new Base(this);
 	base->load(startingBaseByDiff, save, true);
-	save->getBases()->push_back(base);
+	save->getBases().push_back(base);
 
 	// Correct IDs
-	for (auto* craft : *base->getCrafts())
+	for (Craft* craft : base->getCrafts())
 	{
 		save->getId(craft->getRules()->getType());
 	}
 
 	// Remove craft weapons if needed
-	for (auto* craft : *base->getCrafts())
+	for (Craft* craft : base->getCrafts())
 	{
 		if (craft->getMaxUnitsRaw() < 0 || craft->getMaxVehiclesAndLargeSoldiersRaw() < 0)
 		{
 			size_t weaponIndex = 0;
-			for (auto* current : *craft->getWeapons())
+			for (CraftWeapon* current : craft->getWeapons())
 			{
 				base->getStorageItems()->addItem(current->getRules()->getLauncherItem());
 				base->getStorageItems()->addItem(current->getRules()->getClipItem(), current->getClipsLoaded());
 				craft->addCraftStats(-current->getRules()->getBonusStats());
 				craft->setShield(craft->getShield());
 				delete current;
-				craft->getWeapons()->at(weaponIndex) = 0;
+				craft->getWeapons().at(weaponIndex) = 0;
 				weaponIndex++;
 			}
 		}
@@ -3882,20 +3847,20 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			RuleSoldier* ruleSoldier = getSoldier(randomTypes[i], true);
 			int nationality = save->selectSoldierNationalityByLocation(this, ruleSoldier, nullptr); // -1 (unfortunately the first base is not placed yet)
 			Soldier *soldier = genSoldier(save, ruleSoldier, nationality);
-			base->getSoldiers()->push_back(soldier);
+			base->getSoldiers().push_back(soldier);
 			// Award soldier a special 'original eight' commendation
 			if (_commendations.find("STR_MEDAL_ORIGINAL8_NAME") != _commendations.end())
 			{
 				SoldierDiary *diary = soldier->getDiary();
 				diary->awardOriginalEightCommendation(this);
-				for (auto* comm : *diary->getSoldierCommendations())
+				for (SoldierCommendations* comm : diary->getSoldierCommendations())
 				{
 					comm->makeOld();
 				}
 			}
 		}
 		// Assign pilots to craft (interceptors first, transport last) and non-pilots to transports only
-		for (auto* soldier : *base->getSoldiers())
+		for (Soldier* soldier : base->getSoldiers())
 		{
 			if (soldier->getArmor()->getSize() > 1)
 			{
@@ -3904,7 +3869,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			else if (soldier->getRules()->getAllowPiloting())
 			{
 				Craft *found = 0;
-				for (auto* craft : *base->getCrafts())
+				for (Craft* craft : base->getCrafts())
 				{
 					CraftPlacementErrors err = craft->validateAddingSoldier(craft->getSpaceAvailable(), soldier);
 					if (!found && craft->getRules()->getAllowLanding() && err == CPE_None)
@@ -3923,7 +3888,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			else
 			{
 				Craft *found = 0;
-				for (auto* craft : *base->getCrafts())
+				for (Craft* craft : base->getCrafts())
 				{
 					CraftPlacementErrors err = craft->validateAddingSoldier(craft->getSpaceAvailable(), soldier);
 					if (craft->getRules()->getAllowLanding() && err == CPE_None)
@@ -4976,10 +4941,10 @@ Soldier *Mod::genSoldier(SavedGame *save, const RuleSoldier* ruleSoldier, int na
 		delete soldier;
 		soldier = new Soldier(const_cast<RuleSoldier*>(ruleSoldier), ruleSoldier->getDefaultArmor(), nationality, newId);
 		duplicate = false;
-		for (auto* xbase : *save->getBases())
+		for (Base* xbase : save->getBases())
 		{
 			if (duplicate) break; // loop finished
-			for (auto* xsoldier : *xbase->getSoldiers())
+			for (Soldier* xsoldier : xbase->getSoldiers())
 			{
 				if (duplicate) break; // loop finished
 				if (xsoldier->getName() == soldier->getName())
@@ -4987,7 +4952,7 @@ Soldier *Mod::genSoldier(SavedGame *save, const RuleSoldier* ruleSoldier, int na
 					duplicate = true;
 				}
 			}
-			for (auto* transfer : *xbase->getTransfers())
+			for (Transfer* transfer : xbase->getTransfers())
 			{
 				if (duplicate) break; // loop finished
 				if (transfer->getType() == TRANSFER_SOLDIER && transfer->getSoldier()->getName() == soldier->getName())
@@ -5332,7 +5297,7 @@ void Mod::loadVanillaResources()
 	{
 		std::string s = "GEODATA/PALETTES.DAT";
 		_palettes[pal[i]] = new Palette();
-		_palettes[pal[i]]->loadDat(s, 256, Palette::palOffset(i));
+		_palettes[pal[i]]->loadDat(s, 256, Palette::palOffset((int)i));
 	}
 	{
 		std::string s1 = "GEODATA/BACKPALS.DAT";
@@ -5367,7 +5332,7 @@ void Mod::loadVanillaResources()
 		{ 3, 3, 6, 255 } };
 		for (size_t i = 0; i < ARRAYLEN(gradient); ++i)
 		{
-			SDL_Color *color = _palettes[s2]->getColors(Palette::backPos + 16 + i);
+			SDL_Color* color = _palettes[s2]->getColors(Palette::backPos + 16 + (int)i);
 			*color = gradient[i];
 		}
 		//_palettes[s2]->savePalMod("../../../customPalettes.rul", "PAL_BATTLESCAPE_CUSTOM", "PAL_BATTLESCAPE");
@@ -5891,7 +5856,7 @@ void Mod::loadBattlescapeResources()
 				//Palette fix for ION armor
 				if (j == 2)
 				{
-					int size = xcom_2->getTotalFrames();
+					int size = (int)xcom_2->getTotalFrames();
 					for (int i = 0; i < size; ++i)
 					{
 						Surface *surf = xcom_2->getFrame(i);
@@ -6266,7 +6231,7 @@ Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFi
 				if (track < adlibcat->size())
 				{
 					music = new AdlibMusic(rule->getNormalization());
-					music->load(adlibcat->getRWops(track));
+					music->load(adlibcat->getRWops((Uint32)track));
 				}
 				// separate intro music
 				else if (aintrocat)
@@ -6275,7 +6240,7 @@ Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFi
 					if (track < aintrocat->size())
 					{
 						music = new AdlibMusic(rule->getNormalization());
-						music->load(aintrocat->getRWops(track));
+						music->load(aintrocat->getRWops((Uint32)track));
 					}
 					else
 					{
@@ -6291,7 +6256,7 @@ Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFi
 			// DOS MIDI
 			if (gmcat && track < gmcat->size())
 			{
-				music = gmcat->loadMIDI(track);
+				music = gmcat->loadMIDI((unsigned int)track);
 			}
 		}
 		// Try digital tracks

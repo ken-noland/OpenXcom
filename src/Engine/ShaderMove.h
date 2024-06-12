@@ -84,7 +84,7 @@ struct controler<ShaderMove<Pixel> > : public controler_base<typename ShaderMove
 
 	typedef controler_base<PixelPtr, PixelRef> base_type;
 
-	controler(const ShaderMove<Pixel>& f) : base_type(f.ptr(), f.getDomain(), f.getImage(), std::make_pair(sizeof(Pixel), f.pitch()))
+	controler(const ShaderMove<Pixel>& f) : base_type(f.ptr(), f.getDomain(), f.getImage(), std::make_pair((int)sizeof(Pixel), f.pitch()))
 	{
 
 	}

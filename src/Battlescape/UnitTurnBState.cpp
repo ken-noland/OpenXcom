@@ -75,10 +75,10 @@ void UnitTurnBState::init()
 		if (_action.type == BA_NONE)
 		{
 			// try to open a door
-			int visibleTilesBefore = _unit->getVisibleTiles()->size();
+			int visibleTilesBefore = (int)_unit->getVisibleTiles().size();
 			int door = _parent->getTileEngine()->unitOpensDoor(_unit, true);
 			// when unit sees more tiles than it did before, the door was opened and it shall proceed. When tiles are same or lower it is done.
-			if (_unit->isAIControlled() && _unit->getVisibleTiles()->size() > visibleTilesBefore)
+			if (_unit->isAIControlled() && _unit->getVisibleTiles().size() > visibleTilesBefore)
 			{
 				if (Options::traceAI)
 				{
@@ -126,7 +126,7 @@ void UnitTurnBState::think()
 			{
 				Log(LOG_INFO) << "Found new units while turning. Letting my allies know about it.";
 			}
-			for (BattleUnit* unit : *(_parent->getSave()->getUnits()))
+			for (BattleUnit* unit : _parent->getSave()->getUnits())
 			{
 				if (unit->isOut())
 					continue;
@@ -139,7 +139,7 @@ void UnitTurnBState::think()
 		_parent->getTileEngine()->calculateFOV(_unit);
 		if (_chargeTUs && _unit->getFaction() == _parent->getSave()->getSide() && _parent->getPanicHandled() && _action.type == BA_NONE && _unit->getUnitsSpottedThisTurn().size() > unitSpotted)
 		{
-			for (BattleUnit *unit : *(_parent->getSave()->getUnits()))
+			for (BattleUnit *unit : _parent->getSave()->getUnits())
 			{
 				if (unit->isOut())
 					continue;

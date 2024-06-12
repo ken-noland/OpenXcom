@@ -223,7 +223,7 @@ void OptionsBattlescapeState::cbxEdgeScrollChange(Action *)
  */
 void OptionsBattlescapeState::cbxDragScrollChange(Action *)
 {
-	Options::battleDragScrollButton = _cbxDragScroll->getSelected();
+	Options::battleDragScrollButton = (int)_cbxDragScroll->getSelected();
 }
 
 /**

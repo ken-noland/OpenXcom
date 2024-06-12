@@ -49,7 +49,7 @@ ExtraSounds::~ExtraSounds()
  * @param node YAML node.
  * @param modIndex The internal index of the associated mod.
  */
-void ExtraSounds::load(const YAML::Node &node, const ModData* current)
+void ExtraSounds::load(const YAML::Node& node, const ModInfo* current)
 {
 	_type = node["type"].as<std::string>(_type);
 	_sounds = node["files"].as< std::map<int, std::string> >(_sounds);
@@ -127,13 +127,13 @@ void ExtraSounds::loadSound(SoundSet *set, int index, const std::string &fileNam
 	int indexWithOffset = index;
 	if (indexWithOffset >= set->getMaxSharedSounds())
 	{
-		if ((size_t)indexWithOffset >= _current->size)
+		if ((size_t)indexWithOffset >= _current->getSize())
 		{
 			std::ostringstream err;
-			err << "ExtraSounds '" << _type << "' sound '" << indexWithOffset << "' exceeds mod '"<< _current->name <<"' size limit " << _current->size;
+			err << "ExtraSounds '" << _type << "' sound '" << indexWithOffset << "' exceeds mod '"<< _current->getName() <<"' size limit " << _current->getSize();
 			throw Exception(err.str());
 		}
-		indexWithOffset += _current->offset;
+		indexWithOffset += _current->getOffset();
 	}
 
 	Sound *sound = set->getSound(indexWithOffset);

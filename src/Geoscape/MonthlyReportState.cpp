@@ -347,10 +347,10 @@ void MonthlyReportState::btnOkClick(Action*)
 		_game->popState();
 		// Award medals for service time
 		// Iterate through all your bases
-		for (auto* xbase : *_game->getSavedGame()->getBases())
+		for (Base* xbase : _game->getSavedGame()->getBases())
 		{
 			// Iterate through all your soldiers
-			for (auto* soldier : *xbase->getSoldiers())
+			for (Soldier* soldier : xbase->getSoldiers())
 			{
 				// Award medals to eligible soldiers
 				soldier->getDiary()->addMonthlyService();
@@ -366,7 +366,7 @@ void MonthlyReportState::btnOkClick(Action*)
 		}
 
 		bool psi = false;
-		for (auto* xbase : *_game->getSavedGame()->getBases())
+		for (Base* xbase : _game->getSavedGame()->getBases())
 		{
 			psi = psi || xbase->getAvailablePsiLabs();
 		}
@@ -440,13 +440,13 @@ void MonthlyReportState::calculateChanges()
 	int xcomSubTotal = 0;
 	int xcomTotal = 0;
 	int alienTotal = 0;
-	int monthOffset = _game->getSavedGame()->getFundsList().size() - 2;
-	int lastMonthOffset = _game->getSavedGame()->getFundsList().size() - 3;
+	int monthOffset = (int)_game->getSavedGame()->getFundsList().size() - 2;
+	int lastMonthOffset = (int)_game->getSavedGame()->getFundsList().size() - 3;
 	if (lastMonthOffset < 0)
 		lastMonthOffset += 2;
 	// update activity meters, calculate a total score based on regional activity
 	// and gather last month's score
-	for (auto* region : *_game->getSavedGame()->getRegions())
+	for (Region* region : _game->getSavedGame()->getRegions())
 	{
 		region->newMonth();
 		if (region->getActivityXcom().size() > 2)
@@ -474,8 +474,8 @@ void MonthlyReportState::calculateChanges()
 	{
 		pactScore = infiltration->getPoints();
 	}
-	int averageFunding = _game->getSavedGame()->getCountryFunding() / _game->getSavedGame()->getCountries()->size() / 1000 * 1000;
-	for (auto* country : *_game->getSavedGame()->getCountries())
+	int averageFunding = (int)(_game->getSavedGame()->getCountryFunding() / _game->getSavedGame()->getCountries().size() / 1000 * 1000);
+	for (Country* country : _game->getSavedGame()->getCountries())
 	{
 		// check pact status before and after, because scripting can arbitrarily form/break pacts
 		bool wasInPact = country->getPact();

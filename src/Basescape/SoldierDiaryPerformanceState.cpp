@@ -50,11 +50,11 @@ SoldierDiaryPerformanceState::SoldierDiaryPerformanceState(Base *base, size_t so
 {
 	if (_base == 0)
 	{
-		_list = _game->getSavedGame()->getDeadSoldiers();
+		_list = &_game->getSavedGame()->getDeadSoldiers();
 	}
 	else
 	{
-		_list = _base->getSoldiers();
+		_list = &_base->getSoldiers();
 	}
 
 	// Create objects
@@ -318,7 +318,7 @@ void SoldierDiaryPerformanceState::init()
 	else if (_display == DIARY_COMMENDATIONS && !_game->getMod()->getCommendationsList().empty())
 	{
 		// pre-calc translations
-		for (auto* sc : *_soldier->getDiary()->getSoldierCommendations())
+		for (SoldierCommendations* sc : _soldier->getDiary()->getSoldierCommendations())
 		{
 			if (sc->getNoun() != "noNoun")
 			{
@@ -378,7 +378,7 @@ void SoldierDiaryPerformanceState::drawSprites()
 	}
 
 	int vectorPosition = 0; // Where we are currently located in the vector
-	int scrollDepth = _lstCommendations->getScroll(); // So we know where to start
+	int scrollDepth = (int)_lstCommendations->getScroll(); // So we know where to start
 
 	for (const auto& pair : _sortedCommendations)
 	{
@@ -513,7 +513,7 @@ void SoldierDiaryPerformanceState::think()
 	if ((unsigned int)_lastScrollPos != _lstCommendations->getScroll())
 	{
 		drawSprites();
-		_lastScrollPos = _lstCommendations->getScroll();
+		_lastScrollPos = (int)_lstCommendations->getScroll();
 	}
 }
 

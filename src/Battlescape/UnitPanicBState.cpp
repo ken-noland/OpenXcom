@@ -90,10 +90,10 @@ void UnitPanicBState::think()
 				if (canShoot)
 				{
 					// if we see enemies, shoot at the closest living one.
-					if (!_unit->getVisibleUnits()->empty())
+					if (!_unit->getVisibleUnits().empty())
 					{
 						int dist = 255;
-						for (auto* bu : *_unit->getVisibleUnits())
+						for (BattleUnit* bu : _unit->getVisibleUnits())
 						{
 							int newDist = Position::distance2d(_unit->getPosition(), bu->getPosition());
 							if (newDist < dist)

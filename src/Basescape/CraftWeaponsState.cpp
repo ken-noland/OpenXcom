@@ -48,7 +48,7 @@ namespace OpenXcom
  * @param craft ID of the selected craft.
  * @param weapon ID of the selected weapon.
  */
-CraftWeaponsState::CraftWeaponsState(Base *base, size_t craft, size_t weapon) : _base(base), _craft(base->getCrafts()->at(craft)), _weapon(weapon)
+CraftWeaponsState::CraftWeaponsState(Base *base, size_t craft, size_t weapon) : _base(base), _craft(base->getCrafts().at(craft)), _weapon(weapon)
 {
 	_screen = false;
 
@@ -95,8 +95,8 @@ CraftWeaponsState::CraftWeaponsState(Base *base, size_t craft, size_t weapon) : 
 	_txtAmmunition->setWordWrap(true);
 	_txtAmmunition->setVerticalAlign(ALIGN_BOTTOM);
 
-	const std::string slotName = _craft->getRules()->getWeaponSlotString(weapon);
-	CraftWeapon *current = _craft->getWeapons()->at(_weapon);
+	const std::string slotName = _craft->getRules()->getWeaponSlotString((int)weapon);
+	CraftWeapon *current = _craft->getWeapons().at(_weapon);
 	if (current != 0)
 	{
 		_txtCurrentWeapon->setText(tr(slotName).arg(tr(current->getRules()->getType())));
@@ -123,7 +123,7 @@ CraftWeaponsState::CraftWeaponsState(Base *base, size_t craft, size_t weapon) : 
 		{
 			isResearched = _game->getSavedGame()->isResearched(w->getClipItem()->getRequirements());
 		}
-		if (isResearched && _base->getStorageItems()->getItem(w->getLauncherItem()) > 0 && c->isValidWeaponSlot(weapon, w->getWeaponType()))
+		if (isResearched && _base->getStorageItems()->getItem(w->getLauncherItem()) > 0 && c->isValidWeaponSlot((int)weapon, w->getWeaponType()))
 		{
 			_weapons.push_back(w);
 			std::ostringstream ss, ss2;
@@ -166,7 +166,7 @@ void CraftWeaponsState::btnCancelClick(Action *)
  */
 void CraftWeaponsState::lstWeaponsClick(Action *)
 {
-	CraftWeapon *current = _craft->getWeapons()->at(_weapon);
+	CraftWeapon *current = _craft->getWeapons().at(_weapon);
 
 	const RuleCraftWeapon* refWeapon = _weapons[_lstWeapons->getSelectedRow()];
 	const RuleCraftWeapon* currWeapon = current ? current->getRules() : nullptr;
@@ -283,7 +283,7 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 		// Make sure any extra shield is removed from craft too when the shield capacity decreases (exploit protection)
 		_craft->setShield(_craft->getShield());
 		delete current;
-		_craft->getWeapons()->at(_weapon) = 0;
+		_craft->getWeapons().at(_weapon) = 0;
 	}
 
 	// Equip new weapon
@@ -292,7 +292,7 @@ void CraftWeaponsState::lstWeaponsClick(Action *)
 		CraftWeapon *sel = new CraftWeapon(_weapons[_lstWeapons->getSelectedRow()], 0);
 		_craft->addCraftStats(sel->getRules()->getBonusStats());
 		_base->getStorageItems()->removeItem(sel->getRules()->getLauncherItem());
-		_craft->getWeapons()->at(_weapon) = sel;
+		_craft->getWeapons().at(_weapon) = sel;
 	}
 
 	_craft->checkup();

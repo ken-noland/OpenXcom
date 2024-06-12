@@ -320,7 +320,7 @@ void Inventory::drawItems()
 	{
 		SurfaceSet *texture = _game->getMod()->getSurfaceSet("BIGOBS.PCK");
 		// Soldier items
-		for (auto* invItem : *_selUnit->getInventory())
+		for (BattleItem* invItem : _selUnit->getInventory())
 		{
 			const Surface *frame = invItem->getBigSprite(texture, save, _animFrame);
 
@@ -374,7 +374,7 @@ void Inventory::drawItems()
 		// Ground items
 		int fatalWounds = 0;
 		auto& occupiedSlots = *clearOccupiedSlotsCache();
-		for (auto* groundItem : *_selUnit->getTile()->getInventory())
+		for (BattleItem* groundItem : _selUnit->getTile()->getInventory())
 		{
 			const Surface *frame = groundItem->getBigSprite(texture, save, _animFrame);
 			// note that you can make items invisible by setting their width or height to 0 (for example used with tank corpse items)
@@ -522,7 +522,7 @@ bool Inventory::overlapItems(BattleUnit *unit, BattleItem *item, const RuleInven
 {
 	if (slot->getType() != INV_GROUND)
 	{
-		for (const auto* bi : *unit->getInventory())
+		for (const BattleItem* bi : unit->getInventory())
 		{
 			if (bi->getSlot() == slot && bi->occupiesSlot(x, y, item))
 			{
@@ -532,7 +532,7 @@ bool Inventory::overlapItems(BattleUnit *unit, BattleItem *item, const RuleInven
 	}
 	else if (unit->getTile() != 0)
 	{
-		for (const auto* bi : *unit->getTile()->getInventory())
+		for (const BattleItem* bi : unit->getTile()->getInventory())
 		{
 			if (bi->occupiesSlot(x, y, item))
 			{
@@ -1333,7 +1333,7 @@ bool Inventory::unload(bool quickUnload)
 	RuleInventory *FirstFreeHand = _inventorySlotRightHand;
 	RuleInventory *SecondFreeHand = _inventorySlotLeftHand;
 
-	for (auto* bi : *_selUnit->getInventory())
+	for (BattleItem* bi : _selUnit->getInventory())
 	{
 		if (bi->getSlot()->getType() == INV_HAND && bi != _selItem)
 		{
@@ -1512,7 +1512,7 @@ void Inventory::arrangeGround(int alterOffset)
 		auto& occupiedSlots = *clearOccupiedSlotsCache();
 
 		// Move items out of the way and find which stack they'll end up in within the inventory.
-		for (auto& bi : *(_selUnit->getTile()->getInventory()))
+		for (BattleItem* bi : _selUnit->getTile()->getInventory())
 		{
 			// first move all items out of the way - a big number in X direction
 			bi->setSlot(ground);

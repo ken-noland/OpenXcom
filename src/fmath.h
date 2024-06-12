@@ -150,5 +150,5 @@ inline double Nautical(double x)
  */
 inline int XcomDistance(double nautical)
 {
-	return nautical * 60.0 * (180.0 / M_PI);
+	return static_cast<int>(nautical * 60.0 * (180.0 / M_PI));
 }

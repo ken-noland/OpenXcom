@@ -175,7 +175,7 @@ bool RuleRegion::insideRegion(double lon, double lat, bool ignoreTechnicalRegion
  * Gets the list of cities contained in this region.
  * @return Pointer to a list.
  */
-std::vector<City*> *RuleRegion::getCities()
+std::vector<City*>& RuleRegion::getCities()
 {
 	// Build a cached list of all mission zones that are cities
 	// Saves us from constantly searching for them
@@ -192,7 +192,7 @@ std::vector<City*> *RuleRegion::getCities()
 			}
 		}
 	}
-	return &_cities;
+	return _cities;
 }
 
 /**

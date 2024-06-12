@@ -50,11 +50,11 @@ SoldierDiaryOverviewState::SoldierDiaryOverviewState(Base *base, size_t soldierI
 {
 	if (_base == 0)
 	{
-		_list = _game->getSavedGame()->getDeadSoldiers();
+		_list = &_game->getSavedGame()->getDeadSoldiers();
 	}
 	else
 	{
-		_list = _base->getSoldiers();
+		_list = &_base->getSoldiers();
 	}
 
 	// Create objects
@@ -215,7 +215,7 @@ void SoldierDiaryOverviewState::init()
 	_lstDiary->clearList();
 
 	unsigned int row = 0;
-	for (const auto* missionStats : *_game->getSavedGame()->getMissionStatistics())
+	for (const MissionStatistics* missionStats : _game->getSavedGame()->getMissionStatistics())
 	{
 		int missionId = missionStats->id;
 		bool wasOnMission = false;

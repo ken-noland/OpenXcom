@@ -34,6 +34,8 @@
 #include "../Engine/Sound.h"
 #include "../Engine/Unicode.h"
 #include "../Mod/RuleInterface.h"
+#include "../Lua/LuaMod.h"
+#include "../Lua/GameScript.h"
 #include "StatisticsState.h"
 
 namespace OpenXcom

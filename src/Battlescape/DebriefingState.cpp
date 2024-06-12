@@ -375,7 +375,7 @@ void DebriefingState::applyVisibility()
 
 	// Set text on toggle button accordingly
 	_btnSell->setVisible(showItems && _showSellButton);
-	_btnTransfer->setVisible(showItems && _showSellButton && _game->getSavedGame()->getBases()->size() > 1);
+	_btnTransfer->setVisible(showItems && _showSellButton && _game->getSavedGame()->getBases().size() > 1);
 	if (showScore)
 	{
 		_btnStats->setText(tr("STR_STATS"));
@@ -604,8 +604,8 @@ void DebriefingState::init()
 	SavedBattleGame *battle = save->getSavedBattle();
 
 	_missionStatistics->daylight = save->getSavedBattle()->getGlobalShade();
-	_missionStatistics->id = _game->getSavedGame()->getMissionStatistics()->size();
-	_game->getSavedGame()->getMissionStatistics()->push_back(_missionStatistics);
+	_missionStatistics->id = (int)_game->getSavedGame()->getMissionStatistics().size();
+	_game->getSavedGame()->getMissionStatistics().push_back(_missionStatistics);
 
 	// Award Best-of commendations.
 	int bestScoreID[7] = {0, 0, 0, 0, 0, 0, 0};
@@ -614,7 +614,7 @@ void DebriefingState::init()
 	int bestOverallScore = 0;
 
 	// Check to see if any of the dead soldiers were exceptional.
-	for (auto* deadUnit : *battle->getUnits())
+	for (BattleUnit* deadUnit : battle->getUnits())
 	{
 		if (!deadUnit->getGeoscapeSoldier() || deadUnit->getStatus() != STATUS_DEAD)
 		{
@@ -623,9 +623,9 @@ void DebriefingState::init()
 
 		/// Post-mortem kill award
 		int killTurn = -1;
-		for (auto* killerUnit : *battle->getUnits())
+		for (BattleUnit* killerUnit : battle->getUnits())
 		{
-			for (auto* kill : killerUnit->getStatistics()->kills)
+			for (BattleUnitKills* kill : killerUnit->getStatistics()->kills)
 			{
 				if (kill->id == deadUnit->getId())
 				{
@@ -641,7 +641,7 @@ void DebriefingState::init()
 		int postMortemKills = 0;
 		if (killTurn != -1)
 		{
-			for (auto* deadUnitKill : deadUnit->getStatistics()->kills)
+			for (BattleUnitKills* deadUnitKill : deadUnit->getStatistics()->kills)
 			{
 				if (deadUnitKill->turn > killTurn && deadUnitKill->faction == FACTION_HOSTILE)
 				{
@@ -660,7 +660,7 @@ void DebriefingState::init()
 
 		/// Best-of awards
 		// Find the best soldier per rank by comparing score.
-		for (auto* deadSoldier : *_game->getSavedGame()->getDeadSoldiers())
+		for (Soldier* deadSoldier : _game->getSavedGame()->getDeadSoldiers())
 		{
 			int score = deadSoldier->getDiary()->getScoreTotal(_game->getSavedGame()->getMissionStatistics());
 
@@ -683,7 +683,7 @@ void DebriefingState::init()
 		}
 	}
 	// Now award those soldiers commendations!
-	for (auto* deadUnit : *battle->getUnits())
+	for (BattleUnit* deadUnit : battle->getUnits())
 	{
 		if (!deadUnit->getGeoscapeSoldier() || deadUnit->getStatus() != STATUS_DEAD)
 		{
@@ -699,13 +699,13 @@ void DebriefingState::init()
 		}
 	}
 
-	for (auto* bu : *battle->getUnits())
+	for (BattleUnit* bu : battle->getUnits())
 	{
 		if (bu->getGeoscapeSoldier())
 		{
 			int soldierAlienKills = 0;
 			int soldierAlienStuns = 0;
-			for (auto* kill : bu->getStatistics()->kills)
+			for (BattleUnitKills* kill : bu->getStatistics()->kills)
 			{
 				if (kill->faction == FACTION_HOSTILE && kill->status == STATUS_DEAD)
 				{
@@ -738,7 +738,7 @@ void DebriefingState::init()
 			{
 				int martyrKills = 0; // How many aliens were killed on the same turn?
 				int martyrTurn = -1;
-				for (auto* unitKill : bu->getStatistics()->kills)
+				for (BattleUnitKills* unitKill : bu->getStatistics()->kills)
 				{
 					if ( unitKill->id == bu->getId() )
 					{
@@ -746,7 +746,7 @@ void DebriefingState::init()
 						break;
 					}
 				}
-				for (auto* unitKill : bu->getStatistics()->kills)
+				for (BattleUnitKills* unitKill : bu->getStatistics()->kills)
 				{
 					if (unitKill->turn == martyrTurn && unitKill->faction == FACTION_HOSTILE)
 					{
@@ -782,7 +782,7 @@ void DebriefingState::init()
 	_positiveScore = (total > 0);
 
 	std::vector<Soldier*> participants;
-	for (auto* bu : *_game->getSavedGame()->getSavedBattle()->getUnits())
+	for (BattleUnit* bu : _game->getSavedGame()->getSavedBattle()->getUnits())
 	{
 		if (bu->getGeoscapeSoldier())
 		{
@@ -908,7 +908,7 @@ void DebriefingState::btnOkClick(Action *)
 				_game->pushState(new CannotReequipState(_missingItems, _base));
 			}
 			// remove the wounded soldiers (and their items too if needed); this was moved here from BattleUnit::postMissionProcedures()
-			for (auto* soldier : *_base->getSoldiers())
+			for (Soldier* soldier : _base->getSoldiers())
 			{
 				if (soldier->getCraft() != nullptr && soldier->isWounded())
 				{
@@ -1025,7 +1025,7 @@ void DebriefingState::prepareDebriefing()
 	// OXCE: Don't forget about UFO landings/crash sites
 	if (!ruleDeploy)
 	{
-		for (auto* ufo : *save->getUfos())
+		for (Ufo* ufo : save->getUfos())
 		{
 			if (ufo->isInBattlescape())
 			{
@@ -1097,14 +1097,14 @@ void DebriefingState::prepareDebriefing()
 	_missionStatistics->type = battle->getMissionType();
 	_stats.push_back(new DebriefingStat(_game->getMod()->getAlienFuelName(), true));
 
-	for (auto* xbase : *save->getBases())
+	for (Base* xbase : save->getBases())
 	{
 		// in case we have a craft - check which craft it is about
-		for (auto* xcraft : *xbase->getCrafts())
+		for (Craft* xcraft : xbase->getCrafts())
 		{
 			if (xcraft->isInBattlescape())
 			{
-				for (auto* region : *save->getRegions())
+				for (Region* region : save->getRegions())
 				{
 					if (region->getRules()->insideRegion(xcraft->getLongitude(), xcraft->getLatitude()))
 					{
@@ -1113,7 +1113,7 @@ void DebriefingState::prepareDebriefing()
 						break;
 					}
 				}
-				for (auto* country : *save->getCountries())
+				for (Country* country : save->getCountries())
 				{
 					if (country->getRules()->insideCountry(xcraft->getLongitude(), xcraft->getLatitude()))
 					{
@@ -1168,7 +1168,7 @@ void DebriefingState::prepareDebriefing()
 			target = base->getType();
 			base->setInBattlescape(false);
 			base->cleanupDefenses(false);
-			for (auto* region : *save->getRegions())
+			for (Region* region : save->getRegions())
 			{
 				if (region->getRules()->insideRegion(base->getLongitude(), base->getLatitude()))
 				{
@@ -1177,7 +1177,7 @@ void DebriefingState::prepareDebriefing()
 					break;
 				}
 			}
-			for (auto* country : *save->getCountries())
+			for (Country* country : save->getCountries())
 			{
 				if (country->getRules()->insideCountry(base->getLongitude(), base->getLatitude()))
 				{
@@ -1187,7 +1187,7 @@ void DebriefingState::prepareDebriefing()
 				}
 			}
 			// Loop through the UFOs and see which one is sitting on top of the base... that is probably the one attacking you.
-			for (auto* ufo : *save->getUfos())
+			for (Ufo* ufo : save->getUfos())
 			{
 				if (AreSame(ufo->getLongitude(), base->getLongitude()) && AreSame(ufo->getLatitude(), base->getLatitude()))
 				{
@@ -1205,7 +1205,7 @@ void DebriefingState::prepareDebriefing()
 			save->stopHuntingXcomCrafts(base);
 
 			std::vector<BaseFacility*> toBeDamaged;
-			for (auto* fac : *base->getFacilities())
+			for (BaseFacility* fac : base->getFacilities())
 			{
 				// this facility was demolished
 				if (battle->getModuleMap()[fac->getX()][fac->getY()].second == 0)
@@ -1228,14 +1228,14 @@ void DebriefingState::prepareDebriefing()
 	}
 
 	// mission site disappears (even when you abort)
-	for (auto msIt = save->getMissionSites()->begin(); msIt != save->getMissionSites()->end(); ++msIt)
+	for (auto msIt = save->getMissionSites().begin(); msIt != save->getMissionSites().end(); ++msIt)
 	{
 		MissionSite* ms = (*msIt);
 		if (ms->isInBattlescape())
 		{
 			_missionStatistics->alienRace = ms->getAlienRace();
 			delete ms;
-			save->getMissionSites()->erase(msIt);
+			save->getMissionSites().erase(msIt);
 			break;
 		}
 	}
@@ -1243,7 +1243,7 @@ void DebriefingState::prepareDebriefing()
 	// lets see what happens with units
 
 	// manual update state of all units
-	for (auto unit : *battle->getUnits())
+	for (BattleUnit* unit : battle->getUnits())
 	{
 		// scripts (or some bugs in the game) could make aliens or soldiers that have "unresolved" stun or death state.
 		// Note: resolves the "last bleeding alien" too
@@ -1267,7 +1267,7 @@ void DebriefingState::prepareDebriefing()
 	// first, we evaluate how many surviving XCom units there are, and how many are conscious
 	// and how many have died (to use for commendations)
 	int deadSoldiers = 0;
-	for (auto* bu : *battle->getUnits())
+	for (BattleUnit* bu : battle->getUnits())
 	{
 		if (bu->getOriginalFaction() == FACTION_PLAYER && bu->getStatus() != STATUS_DEAD)
 		{
@@ -1304,7 +1304,7 @@ void DebriefingState::prepareDebriefing()
 	if (playersUnconscious + playersMIA == playersSurvived)
 	{
 		playersSurvived = playersMIA;
-		for (auto* bu : *battle->getUnits())
+		for (BattleUnit* bu : battle->getUnits())
 		{
 			if (bu->getOriginalFaction() == FACTION_PLAYER && bu->getStatus() != STATUS_DEAD)
 			{
@@ -1325,7 +1325,7 @@ void DebriefingState::prepareDebriefing()
 	}
 
 	// if it's a UFO, let's see what happens to it
-	for (auto ufoIt = save->getUfos()->begin(); ufoIt != save->getUfos()->end(); ++ufoIt)
+	for (auto ufoIt = save->getUfos().begin(); ufoIt != save->getUfos().end(); ++ufoIt)
 	{
 		Ufo* ufo = (*ufoIt);
 		if (ufo->isInBattlescape())
@@ -1428,7 +1428,7 @@ void DebriefingState::prepareDebriefing()
 					}
 				}
 				delete ufo;
-				save->getUfos()->erase(ufoIt);
+				save->getUfos().erase(ufoIt);
 			}
 			break;
 		}
@@ -1451,7 +1451,7 @@ void DebriefingState::prepareDebriefing()
 
 	if (playersSurvived == 1)
 	{
-		for (auto* bu : *battle->getUnits())
+		for (BattleUnit* bu : battle->getUnits())
 		{
 			// if only one soldier survived, give him a medal! (unless he killed all the others...)
 			if (bu->getStatus() != STATUS_DEAD && bu->getOriginalFaction() == FACTION_PLAYER && !bu->getStatistics()->hasFriendlyFired() && deadSoldiers != 0)
@@ -1467,7 +1467,7 @@ void DebriefingState::prepareDebriefing()
 		}
 	}
 	// alien base disappears (if you didn't abort)
-	for (auto abIt = save->getAlienBases()->begin(); abIt != save->getAlienBases()->end(); ++abIt)
+	for (auto abIt = save->getAlienBases().begin(); abIt != save->getAlienBases().end(); ++abIt)
 	{
 		AlienBase* ab = (*abIt);
 		if (ab->isInBattlescape())
@@ -1496,7 +1496,7 @@ void DebriefingState::prepareDebriefing()
 				}
 				save->clearLinksForAlienBase(ab, _game->getMod());
 				delete ab;
-				save->getAlienBases()->erase(abIt);
+				save->getAlienBases().erase(abIt);
 				break;
 			}
 			else
@@ -1509,7 +1509,7 @@ void DebriefingState::prepareDebriefing()
 
 	// transform all zombie-like units to spawned ones
 	std::vector<BattleUnit*> waitingTransformations;
-	for (auto* bu : *battle->getUnits())
+	for (BattleUnit* bu : battle->getUnits())
 	{
 		if (bu->getSpawnUnit() && (!bu->isOut() || bu->isIgnored()))
 		{
@@ -1535,7 +1535,7 @@ void DebriefingState::prepareDebriefing()
 		{
 			//simplified handling for unit from previous stage
 			BattleUnit *newUnit = battle->createTempUnit(bu->getSpawnUnit(), bu->getSpawnUnitFaction());
-			battle->getUnits()->push_back(newUnit);
+			battle->getUnits().push_back(newUnit);
 			newUnit->convertToFaction(faction);
 		}
 		else
@@ -1548,7 +1548,7 @@ void DebriefingState::prepareDebriefing()
 
 	// time to care for units.
 	bool psiStrengthEval = (Options::psiStrengthEval && save->isResearched(_game->getMod()->getPsiRequirements()));
-	for (auto* bunit : *battle->getUnits())
+	for (BattleUnit* bunit : battle->getUnits())
 	{
 		UnitStatus status = bunit->getStatus();
 		UnitFaction faction = bunit->getFaction();
@@ -1561,7 +1561,7 @@ void DebriefingState::prepareDebriefing()
 			Position pos = bunit->getPosition();
 			if (pos == TileEngine::invalid)
 			{
-				for (auto* bi : *battle->getItems())
+				for (BattleItem* bi : battle->getItems())
 				{
 					if (bi->getUnit() && bi->getUnit() == bunit)
 					{
@@ -1792,7 +1792,7 @@ void DebriefingState::prepareDebriefing()
 	}
 	if ((aborted || playersSurvived == 0) && target == "STR_BASE")
 	{
-		for (auto* xcraft : *base->getCrafts())
+		for (Craft* xcraft : base->getCrafts())
 		{
 			addStat("STR_XCOM_CRAFT_LOST", 1, -xcraft->getRules()->getScore());
 		}
@@ -1810,7 +1810,7 @@ void DebriefingState::prepareDebriefing()
 		int vipSubtotal = battle->getSavedVIPs() + battle->getLostVIPs();
 
 		// 2. add non-fake civilian VIPs, no scoring
-		for (auto unit : *battle->getUnits())
+		for (BattleUnit* unit : battle->getUnits())
 		{
 			if (unit->isVIP() && unit->getOriginalFaction() == FACTION_NEUTRAL && !unit->isResummonedFakeCivilian())
 			{
@@ -1935,9 +1935,9 @@ void DebriefingState::prepareDebriefing()
 					if (battle->getTile(i)->getMapData(tp))
 					{
 						size_t specialType = battle->getTile(i)->getMapData(tp)->getSpecialType();
-						if (specialType != nonRecoverType && specialType < (size_t)DEATH_TRAPS && _recoveryStats.find(specialType) != _recoveryStats.end())
+						if (specialType != nonRecoverType && specialType < (size_t)DEATH_TRAPS && _recoveryStats.find((int)specialType) != _recoveryStats.end())
 						{
-							addStat(_recoveryStats[specialType]->name, 1, _recoveryStats[specialType]->value);
+							addStat(_recoveryStats[(int)specialType]->name, 1, _recoveryStats[(int)specialType]->value);
 						}
 					}
 				}
@@ -2152,7 +2152,7 @@ void DebriefingState::prepareDebriefing()
 		if (!_destroyBase)
 		{
 			// reequip crafts (only those on the base) after a base defense mission
-			for (auto* xcraft : *base->getCrafts())
+			for (Craft* xcraft : base->getCrafts())
 			{
 				if (xcraft->getStatus() != "STR_OUT")
 					reequipCraft(base, xcraft, false);
@@ -2160,7 +2160,7 @@ void DebriefingState::prepareDebriefing()
 		}
 		else if (save->getMonthsPassed() != -1)
 		{
-			for (auto xbaseIt = save->getBases()->begin(); xbaseIt != save->getBases()->end(); ++xbaseIt)
+			for (auto xbaseIt = save->getBases().begin(); xbaseIt != save->getBases().end(); ++xbaseIt)
 			{
 				Base* xbase = (*xbaseIt);
 				if (xbase == base)
@@ -2168,7 +2168,7 @@ void DebriefingState::prepareDebriefing()
 					save->stopHuntingXcomCrafts(xbase); // destroyed together with the base
 					delete xbase;
 					base = 0; // To avoid similar (potential) problems as with the deleted craft
-					save->getBases()->erase(xbaseIt);
+					save->getBases().erase(xbaseIt);
 					break;
 				}
 			}
@@ -2179,7 +2179,7 @@ void DebriefingState::prepareDebriefing()
 	{
 		// clean up remaining armor backups
 		// Note: KIA and MIA soldiers have been handled already, only survivors can have non-empty values
-		for (auto* soldier : *base->getSoldiers())
+		for (Soldier* soldier : base->getSoldiers())
 		{
 			if (soldier->getReplacedArmor())
 			{
@@ -2258,7 +2258,7 @@ void DebriefingState::prepareDebriefing()
  */
 void DebriefingState::reequipCraft(Base *base, Craft *craft, bool vehicleItemsCanBeDestroyed)
 {
-	auto craftItemsCopy = *craft->getItems()->getContents();
+	std::map<const RuleItem*, int> craftItemsCopy = craft->getItems()->getContents();
 	for (const auto& pair : craftItemsCopy)
 	{
 		int qty = base->getStorageItems()->getItem(pair.first);
@@ -2278,7 +2278,7 @@ void DebriefingState::reequipCraft(Base *base, Craft *craft, bool vehicleItemsCa
 
 	// Now let's see the vehicles
 	ItemContainer craftVehicles;
-	for (auto* vehicle : *craft->getVehicles())
+	for (Vehicle* vehicle : craft->getVehicles())
 	{
 		craftVehicles.addItem(vehicle->getRules());
 	}
@@ -2287,15 +2287,15 @@ void DebriefingState::reequipCraft(Base *base, Craft *craft, bool vehicleItemsCa
 	// Erase the current vehicles, because we have to reAdd them (cause we want to redistribute their ammo)
 	if (vehicleItemsCanBeDestroyed)
 	{
-		for (auto* vehicle : *craft->getVehicles())
+		for (Vehicle* vehicle : craft->getVehicles())
 		{
 			delete vehicle;
 		}
 	}
-	craft->getVehicles()->clear();
+	craft->getVehicles().clear();
 
 	// Ok, now read those vehicles
-	for (const auto& pair : *craftVehicles.getContents())
+	for (const std::pair<const RuleItem*, int>& pair : craftVehicles.getContents())
 	{
 		int qty = base->getStorageItems()->getItem(pair.first);
 		const RuleItem *tankRule = pair.first;
@@ -2311,7 +2311,7 @@ void DebriefingState::reequipCraft(Base *base, Craft *craft, bool vehicleItemsCa
 		{ // so this tank does NOT require ammo
 			for (int j = 0; j < canBeAdded; ++j)
 			{
-				craft->getVehicles()->push_back(new Vehicle(tankRule, tankRule->getVehicleClipSize(), size));
+				craft->getVehicles().push_back(new Vehicle(tankRule, tankRule->getVehicleClipSize(), size));
 			}
 			base->getStorageItems()->removeItem(pair.first, canBeAdded);
 		}
@@ -2332,7 +2332,7 @@ void DebriefingState::reequipCraft(Base *base, Craft *craft, bool vehicleItemsCa
 			{
 				for (int j = 0; j < canBeAdded; ++j)
 				{
-					craft->getVehicles()->push_back(new Vehicle(tankRule, tankRule->getVehicleClipSize(), size));
+					craft->getVehicles().push_back(new Vehicle(tankRule, tankRule->getVehicleClipSize(), size));
 					base->getStorageItems()->removeItem(ammo, ammoPerVehicle);
 				}
 				base->getStorageItems()->removeItem(pair.first, canBeAdded);
@@ -2426,7 +2426,7 @@ void DebriefingState::addItemsToBaseStores(const std::string &itemType, Base *ba
  * @param from Items recovered from the battlescape.
  * @param base Base to add items to.
  */
-void DebriefingState::recoverItems(std::vector<BattleItem*> *from, Base *base, Craft* craft)
+void DebriefingState::recoverItems(std::vector<BattleItem*>& from, Base *base, Craft* craft)
 {
 	auto checkForRecovery = [&](BattleItem* item, const RuleItem *rule)
 	{
@@ -2463,7 +2463,7 @@ void DebriefingState::recoverItems(std::vector<BattleItem*> *from, Base *base, C
 		}
 	};
 
-	for (auto* bi : *from)
+	for (BattleItem* bi : from)
 	{
 		const RuleItem *rule = bi->getRules();
 		if (rule->getName() == _game->getMod()->getAlienFuelName())
@@ -2567,7 +2567,7 @@ void DebriefingState::recoverItems(std::vector<BattleItem*> *from, Base *base, C
 				}
 				if (rule->getBattleType() == BT_NONE)
 				{
-					for (auto* xcraft : *base->getCrafts())
+					for (Craft* xcraft : base->getCrafts())
 					{
 						xcraft->reuseItem(rule);
 					}
@@ -2608,13 +2608,13 @@ void DebriefingState::recoverCivilian(BattleUnit *from, Base *base, Craft* craft
 	{
 		Transfer *t = new Transfer(24);
 		t->setScientists(1);
-		base->getTransfers()->push_back(t);
+		base->getTransfers().push_back(t);
 	}
 	else if (rule->isRecoverableAsEngineer())
 	{
 		Transfer *t = new Transfer(24);
 		t->setEngineers(1);
-		base->getTransfers()->push_back(t);
+		base->getTransfers().push_back(t);
 	}
 	else
 	{
@@ -2639,7 +2639,7 @@ void DebriefingState::recoverCivilian(BattleUnit *from, Base *base, Craft* craft
 				s->genName();
 			}
 			t->setSoldier(s);
-			base->getTransfers()->push_back(t);
+			base->getTransfers().push_back(t);
 		}
 		else
 		{
@@ -2657,7 +2657,7 @@ void DebriefingState::recoverCivilian(BattleUnit *from, Base *base, Craft* craft
 					if (killPrisonersAutomatically)
 					{
 						// check also other bases, maybe we can transfer/redirect prisoners there
-						for (auto* xbase : *_game->getSavedGame()->getBases())
+						for (Base* xbase : _game->getSavedGame()->getBases())
 						{
 							if (xbase->getAvailableContainment(ruleLiveAlienItem->getPrisonType()) > 0)
 							{
@@ -2733,7 +2733,7 @@ void DebriefingState::recoverAlien(BattleUnit *from, Base *base, Craft* craft)
 	if (killPrisonersAutomatically)
 	{
 		// check also other bases, maybe we can transfer/redirect prisoners there
-		for (auto* xbase : *_game->getSavedGame()->getBases())
+		for (Base* xbase : _game->getSavedGame()->getBases())
 		{
 			if (xbase->getAvailableContainment(ruleLiveAlienItem->getPrisonType()) > 0)
 			{

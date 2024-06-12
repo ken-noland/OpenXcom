@@ -77,11 +77,11 @@ void SelectStartFacilityState::populateBuildList()
  */
 void SelectStartFacilityState::btnOkClick(Action *)
 {
-	for (auto* fac : *_base->getFacilities())
+	for (BaseFacility* fac : _base->getFacilities())
 	{
 		delete fac;
 	}
-	_base->getFacilities()->clear();
+	_base->getFacilities().clear();
 	_game->popState();
 	_game->popState();
 	_game->pushState(new PlaceLiftState(_base, _globe, true));

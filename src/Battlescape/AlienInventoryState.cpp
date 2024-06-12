@@ -337,7 +337,7 @@ void AlienInventoryState::calculateMeleeWeapon(BattleUnit* unit, BattleItem* wea
 			float penalty = 1.0f - arc * victim->getArmor()->getMeleeDodgeBackPenalty() / 4.0f;
 			if (penalty > 0)
 			{
-				hitChance -= victim->getArmor()->getMeleeDodge(victim) * penalty;
+				hitChance -= (int)(victim->getArmor()->getMeleeDodge(victim) * penalty);
 			}
 		}
 		ss << "hitChance " << hitChance << "% ";
@@ -412,7 +412,7 @@ void AlienInventoryState::calculateRangedWeapon(BattleUnit* unit, BattleItem* we
 					float penalty = 1.0f - arc * victim->getArmor()->getMeleeDodgeBackPenalty() / 4.0f;
 					if (penalty > 0)
 					{
-						hitChance -= victim->getArmor()->getMeleeDodge(victim) * penalty;
+						hitChance -= (int)(victim->getArmor()->getMeleeDodge(victim) * penalty);
 					}
 				}
 				ss << "cqcChance " << hitChance << "% ";

@@ -19,9 +19,13 @@
  */
 
 #include "LuaState.h"
+#include "LuaApi.h"
 #include "../Engine/Logger.h"
 
 namespace OpenXcom
+{
+
+namespace Lua
 {
 
 //we have to use globals to store some of the data needed for the C style callbacks
@@ -66,11 +70,15 @@ int LuaPanic(lua_State* luaState)
 	return 0; /* return to Lua to abort */
 }
 
-LuaState::LuaState(const std::filesystem::path& scriptPath, const ModData* modData)
+LuaState::LuaState(const std::filesystem::path& scriptPath, const ModInfo* modData, std::initializer_list<LuaApi*> apis)
+	:
+	_modData(modData)
 {
 	_state = nullptr;
 	_error = false;
 	_errorString = "";
+
+	loadScript(scriptPath, apis);
 }
 
 LuaState::~LuaState()
@@ -87,12 +95,12 @@ const std::filesystem::path& LuaState::getScriptPath() const
 	return _scriptPath;
 }
 
-const ModData* LuaState::getModData() const
+const ModInfo* LuaState::getModData() const
 {
 	return _modData;
 }
 
-bool LuaState::loadScript(const std::filesystem::path& filename)
+bool LuaState::loadScript(const std::filesystem::path& filename, const std::initializer_list<LuaApi*>& apis)
 {
 	// check the file exists
 	if (!std::filesystem::exists(filename))
@@ -126,6 +134,12 @@ bool LuaState::loadScript(const std::filesystem::path& filename)
 	luaL_setfuncs(_state, overrides, 0);
 	lua_pop(_state, 1);
 
+	// add the APIs
+	for (LuaApi* api : apis)
+	{
+		api->registerApi(_state);
+	}
+
 	// load the script
 	CurrentScriptPath = _scriptPath;
 	if (luaL_loadfile(_state, filename.string().c_str()) != LUA_OK)
@@ -146,7 +160,9 @@ bool LuaState::loadScript(const std::filesystem::path& filename)
 	}
 	CurrentScriptPath.clear();
 
-	return false;
+	return true;
 }
 
-}
+} // namespace Lua
+
+} // namespace OpenXcom

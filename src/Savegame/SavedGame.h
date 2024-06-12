@@ -252,17 +252,17 @@ public:
 	/// Resets the list of object IDs.
 	void setAllIds(const std::map<std::string, int> &ids);
 	/// Gets the list of countries.
-	std::vector<Country*> *getCountries();
+	std::vector<Country*>& getCountries();
 	/// Gets the list of countries.
 	[[nodiscard]] const std::vector<Country*>* getCountries() const { return &_countries; }
 	/// Gets the total country funding.
 	int getCountryFunding() const;
 	/// Gets the list of regions.
-	std::vector<Region*> *getRegions();
+	std::vector<Region*>& getRegions();
 	/// Gets the list of bases.
-	std::vector<Base*> *getBases();
+	std::vector<Base*>& getBases();
 	/// Gets the list of bases.
-	const std::vector<Base*> *getBases() const;
+	const std::vector<Base*>& getBases() const;
 	// Gets the index of visible Bases
 	size_t getVisibleBasesIndex();
 	// Sets the index of visible Bases
@@ -270,13 +270,13 @@ public:
 	/// Gets the total base maintenance.
 	int getBaseMaintenance() const;
 	/// Gets the list of UFOs.
-	std::vector<Ufo*> *getUfos();
+	std::vector<Ufo*>& getUfos();
 	/// Gets the list of UFOs.
-	const std::vector<Ufo*> *getUfos() const;
+	const std::vector<Ufo*>& getUfos() const;
 	/// Gets the list of waypoints.
-	std::vector<Waypoint*> *getWaypoints();
+	std::vector<Waypoint*>& getWaypoints();
 	/// Gets the list of mission sites.
-	std::vector<MissionSite*> *getMissionSites();
+	std::vector<MissionSite*>& getMissionSites();
 	/// Gets the current battle game.
 	SavedBattleGame *getSavedBattle();
 	/// Sets the current battle game.
@@ -362,7 +362,7 @@ public:
 	/// Gets the (approximate) number of idle days since the soldier's last mission.
 	int getSoldierIdleDays(const Soldier *soldier);
 	///  Returns the list of alien bases.
-	std::vector<AlienBase*> *getAlienBases();
+	std::vector<AlienBase*>& getAlienBases();
 	/// Sets debug mode.
 	void setDebugMode();
 	/// Gets debug mode.
@@ -446,7 +446,7 @@ public:
 	/// checks if an event has been generated previously
 	bool wasEventGenerated(const std::string& eventName);
 	/// Gets the list of dead soldiers.
-	std::vector<Soldier*> *getDeadSoldiers();
+	std::vector<Soldier*>& getDeadSoldiers();
 	/// Gets a list of all active soldiers.
 	std::vector<Soldier*> getAllActiveSoldiers() const;
 	/// Gets the last selected player base.
@@ -476,7 +476,7 @@ public:
 	/// Gets the global craft loadout at specified index.
 	ItemContainer *getGlobalCraftLoadout(int index);
 	/// Gets the list of missions statistics
-	std::vector<MissionStatistics*> *getMissionStatistics();
+	std::vector<MissionStatistics*>& getMissionStatistics();
 	/// Adds a UFO to the ignore list.
 	void addUfoToIgnoreList(int ufoId);
 	/// Checks if a UFO is on the ignore list.

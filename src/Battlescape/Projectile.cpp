@@ -835,12 +835,12 @@ void Projectile::applyAccuracy(Position origin, Position *target, double accurac
 			accuracy *= noLOSAccuracyPenalty / 100.0;
 		}
 
-		int deviation = RNG::generate(0, 100) - (accuracy * 100);
+		int deviation = RNG::generate(0, 100) - (int)(accuracy * 100);
 
 		// Alternative throwing mechanic
 		if (_action.type == BA_THROW && Options::battleAltGrenades)
 		{
-			int maxDistanceWithoutPenalty = sqrt(accuracy * 100) * 3;
+			int maxDistanceWithoutPenalty = (int)(sqrt(accuracy * 100) * 3);
 			int penalty = std::max( 0, (distanceTiles - maxDistanceWithoutPenalty)*16 );
 			deviation += RNG::generate(0, penalty);
 
@@ -947,7 +947,7 @@ Position Projectile::getPositionFromStart(const std::vector<Position>& trajector
  */
 Position Projectile::getPositionFromEnd(const std::vector<Position>& trajectory, int pos)
 {
-	return getPositionFromStart(trajectory, trajectory.size() + pos - 1);
+	return getPositionFromStart(trajectory, (int)(trajectory.size() + pos - 1));
 }
 
 /**

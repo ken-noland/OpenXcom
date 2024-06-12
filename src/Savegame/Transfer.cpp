@@ -303,11 +303,11 @@ void Transfer::advance(Base *base)
 	{
 		if (_soldier != 0)
 		{
-			base->getSoldiers()->push_back(_soldier);
+			base->getSoldiers().push_back(_soldier);
 		}
 		else if (_craft != 0)
 		{
-			base->getCrafts()->push_back(_craft);
+			base->getCrafts().push_back(_craft);
 			_craft->setBase(base);
 			_craft->checkup();
 		}

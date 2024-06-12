@@ -233,9 +233,9 @@ double ItemContainer::getTotalSize(const Mod *mod) const
  * Returns all the items currently contained within.
  * @return List of contents.
  */
-const std::map<const RuleItem*, int> *ItemContainer::getContents() const
+const std::map<const RuleItem*, int>& ItemContainer::getContents() const
 {
-	return &_qty;
+	return _qty;
 }
 
 }

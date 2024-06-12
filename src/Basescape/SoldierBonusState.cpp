@@ -78,7 +78,7 @@ SoldierBonusState::SoldierBonusState(Base *base, size_t soldier) : _base(base), 
 	_btnCancel->onMouseClick((ActionHandler)&SoldierBonusState::btnCancelClick);
 	_btnCancel->onKeyboardPress((ActionHandler)&SoldierBonusState::btnCancelClick, Options::keyCancel);
 
-	Soldier *s = _base ? _base->getSoldiers()->at(_soldier) : _game->getSavedGame()->getDeadSoldiers()->at(_soldier);
+	Soldier *s = _base ? _base->getSoldiers().at(_soldier) : _game->getSavedGame()->getDeadSoldiers().at(_soldier);
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SOLDIER_BONUSES_FOR").arg(s->getName()));
 

@@ -124,7 +124,7 @@ void StatisticsState::listStats()
 	_txtTitle->setText(ss.str());
 
 	int totalScore = sumVector(save->getResearchScores());
-	for (auto* region : *save->getRegions())
+	for (Region* region : save->getRegions())
 	{
 		totalScore += sumVector(region->getActivityXcom()) - sumVector(region->getActivityAlien());
 	}
@@ -136,7 +136,7 @@ void StatisticsState::listStats()
 	int alienBasesDestroyed = 0, xcomBasesLost = 0;
 	int missionsWin = 0, missionsLoss = 0, nightMissions = 0;
 	int bestScore = -9999, worstScore = 9999;
-	for (const auto* ms : *save->getMissionStatistics())
+	for (const MissionStatistics* ms : save->getMissionStatistics())
 	{
 		if (ms->success)
 		{
@@ -166,13 +166,13 @@ void StatisticsState::listStats()
 	worstScore = (worstScore == 9999) ? 0 : worstScore;
 
 	std::vector<Soldier*> allSoldiers;
-	for (auto* xbase : *save->getBases())
+	for (Base* xbase : save->getBases())
 	{
-		allSoldiers.insert(allSoldiers.end(), xbase->getSoldiers()->begin(), xbase->getSoldiers()->end());
+		allSoldiers.insert(allSoldiers.end(), xbase->getSoldiers().begin(), xbase->getSoldiers().end());
 	}
-	allSoldiers.insert(allSoldiers.end(), save->getDeadSoldiers()->begin(), save->getDeadSoldiers()->end());
-	int soldiersRecruited = allSoldiers.size();
-	int soldiersLost = save->getDeadSoldiers()->size();
+	allSoldiers.insert(allSoldiers.end(), save->getDeadSoldiers().begin(), save->getDeadSoldiers().end());
+	int soldiersRecruited = (int)allSoldiers.size();
+	int soldiersLost = (int)save->getDeadSoldiers().size();
 
 	int aliensKilled = 0, aliensCaptured = 0, friendlyKills = 0;
 	int daysWounded = 0, longestMonths = 0;
@@ -249,7 +249,7 @@ void StatisticsState::listStats()
 
 	std::map<std::string, int> ids = save->getAllIds();
 	int alienBases = alienBasesDestroyed;
-	for (const auto* ab : *save->getAlienBases())
+	for (const AlienBase* ab : save->getAlienBases())
 	{
 		if (ab->isDiscovered())
 		{
@@ -264,16 +264,16 @@ void StatisticsState::listStats()
 		totalCrafts += std::max(0, ids[craftType] - 1);
 	}
 
-	int xcomBases = save->getBases()->size() + xcomBasesLost;
+	int xcomBases = (int)save->getBases().size() + xcomBasesLost;
 	int currentScientists = 0, currentEngineers = 0;
-	for (const auto* xbase : *save->getBases())
+	for (const Base* xbase : save->getBases())
 	{
 		currentScientists += xbase->getTotalScientists();
 		currentEngineers += xbase->getTotalEngineers();
 	}
 
 	int countriesLost = 0;
-	for (const auto* country : *save->getCountries())
+	for (const Country* country : save->getCountries())
 	{
 		if (country->getPact())
 		{
@@ -281,7 +281,7 @@ void StatisticsState::listStats()
 		}
 	}
 
-	int researchDone = save->getDiscoveredResearch().size();
+	int researchDone = (int)save->getDiscoveredResearch().size();
 
 	std::string difficulty[] = { "STR_1_BEGINNER", "STR_2_EXPERIENCED", "STR_3_VETERAN", "STR_4_GENIUS", "STR_5_SUPERHUMAN" };
 

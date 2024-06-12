@@ -231,7 +231,7 @@ GeoscapeCraftState::GeoscapeCraftState(Craft *craft, Globe *globe, Waypoint *way
 			continue;
 		}
 
-		CraftWeapon *w1 = _craft->getWeapons()->at(i);
+		CraftWeapon *w1 = _craft->getWeapons().at(i);
 		if (w1 != 0)
 		{
 			_txtWeaponName[i]->setText(tr(wName).arg(tr(w1->getRules()->getType())));
@@ -371,7 +371,7 @@ void GeoscapeCraftState::btnCancelClick(Action *)
 	if (_waypoint != 0)
 	{
 		_waypoint->setId(_game->getSavedGame()->getId("STR_WAY_POINT"));
-		_game->getSavedGame()->getWaypoints()->push_back(_waypoint);
+		_game->getSavedGame()->getWaypoints().push_back(_waypoint);
 		_craft->setDestination(_waypoint);
 	}
 	// Cancel

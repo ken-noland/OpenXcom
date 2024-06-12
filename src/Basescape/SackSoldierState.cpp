@@ -75,7 +75,7 @@ SackSoldierState::SackSoldierState(Base *base, size_t soldierId) : _base(base), 
 	_txtTitle->setText(tr("STR_SACK"));
 
 	std::ostringstream ss;
-	ss << _base->getSoldiers()->at(_soldierId)->getName(true) << "?";
+	ss << _base->getSoldiers().at(_soldierId)->getName(true) << "?";
 
 	_txtSoldier->setAlign(ALIGN_CENTER);
 	_txtSoldier->setText(ss.str());
@@ -96,12 +96,12 @@ SackSoldierState::~SackSoldierState()
  */
 void SackSoldierState::btnOkClick(Action *)
 {
-	Soldier *soldier = _base->getSoldiers()->at(_soldierId);
+	Soldier *soldier = _base->getSoldiers().at(_soldierId);
 	if (soldier->getArmor()->getStoreItem())
 	{
 		_base->getStorageItems()->addItem(soldier->getArmor()->getStoreItem());
 	}
-	_base->getSoldiers()->erase(_base->getSoldiers()->begin() + _soldierId);
+	_base->getSoldiers().erase(_base->getSoldiers().begin() + _soldierId);
 	delete soldier;
 	_game->popState();
 }

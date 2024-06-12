@@ -348,7 +348,7 @@ void ConfirmDestinationState::btnOkClick(Action *)
 	if (w != 0 && w->getId() == 0)
 	{
 		w->setId(_game->getSavedGame()->getId("STR_WAY_POINT"));
-		_game->getSavedGame()->getWaypoints()->push_back(w);
+		_game->getSavedGame()->getWaypoints().push_back(w);
 	}
 
 	// first selected _craft (first shift-clicked craft) is wing leader; the other crafts follow the wing leader
@@ -430,15 +430,15 @@ void ConfirmDestinationState::btnTransferClick(Action *)
 	{
 		// Transfer soldiers inside craft
 		Base *currentBase = _crafts.front()->getBase();
-		for (auto soldierIt = currentBase->getSoldiers()->begin(); soldierIt != currentBase->getSoldiers()->end();)
+		for (auto soldierIt = currentBase->getSoldiers().begin(); soldierIt != currentBase->getSoldiers().end();)
 		{
 			Soldier* soldier = (*soldierIt);
 			if (soldier->getCraft() == _crafts.front())
 			{
 				soldier->setPsiTraining(false);
 				soldier->setTraining(false);
-				targetBase->getSoldiers()->push_back(soldier);
-				soldierIt = currentBase->getSoldiers()->erase(soldierIt);
+				targetBase->getSoldiers().push_back(soldier);
+				soldierIt = currentBase->getSoldiers().erase(soldierIt);
 			}
 			else
 			{
@@ -448,7 +448,7 @@ void ConfirmDestinationState::btnTransferClick(Action *)
 
 		// Transfer craft
 		currentBase->removeCraft(_crafts.front(), false);
-		targetBase->getCrafts()->push_back(_crafts.front());
+		targetBase->getCrafts().push_back(_crafts.front());
 		_crafts.front()->setBase(targetBase, false);
 		_crafts.front()->returnToBase();
 		_crafts.front()->setStatus("STR_OUT");

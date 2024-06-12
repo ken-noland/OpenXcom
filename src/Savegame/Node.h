@@ -62,7 +62,7 @@ public:
 	/// get the node's id
 	int getID() const;
 	/// get the node's paths
-	std::vector<int> *getNodeLinks();
+	std::vector<int>& getNodeLinks();
 	/// Gets node's rank.
 	NodeRank getRank() const;
 	/// Gets node's priority.

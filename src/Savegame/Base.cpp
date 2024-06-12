@@ -276,7 +276,7 @@ void Base::finishLoading(const YAML::Node &node, SavedGame *save)
  */
 void Base::calculateServices(SavedGame* save)
 {
-	for (const auto* country : *save->getCountries())
+	for (const Country* country : save->getCountries())
 	{
 		if (country->getRules()->insideCountry(_lon, _lat))
 		{
@@ -285,7 +285,7 @@ void Base::calculateServices(SavedGame* save)
 			break;
 		}
 	}
-	for (const auto* region : *save->getRegions())
+	for (const auto* region : save->getRegions())
 	{
 		if (region->getRules()->insideRegion(_lon, _lat))
 		{
@@ -436,18 +436,18 @@ int Base::getMarker() const
  * Returns the list of facilities in the base.
  * @return Pointer to the facility list.
  */
-std::vector<BaseFacility*> *Base::getFacilities()
+std::vector<BaseFacility*>& Base::getFacilities()
 {
-	return &_facilities;
+	return _facilities;
 }
 
 /**
  * Returns the list of soldiers in the base.
  * @return Pointer to the soldier list.
  */
-std::vector<Soldier*> *Base::getSoldiers()
+std::vector<Soldier*>& Base::getSoldiers()
 {
-	return &_soldiers;
+	return _soldiers;
 }
 
 /**
@@ -455,7 +455,7 @@ std::vector<Soldier*> *Base::getSoldiers()
  */
 void Base::prepareSoldierStatsWithBonuses()
 {
-	for (auto soldier : _soldiers)
+	for (Soldier* soldier : _soldiers)
 	{
 		soldier->prepareStatsWithBonuses(_mod);
 	}
@@ -623,7 +623,7 @@ int Base::getTotalSoldiers() const
 			total += transfer->getQuantity();
 		}
 	}
-	return total;
+	return (int)total;
 }
 
 /**
@@ -731,9 +731,9 @@ int Base::getTotalOtherStaffAndInventoryCost(int& staffCount, int& inventoryCoun
 			}
 		}
 	}
-	for (const auto& storeItem : *_items->getContents())
+	for (const std::pair<const RuleItem*, int>& storeItem : _items->getContents())
 	{
-		auto* ruleItem = storeItem.first;
+		const RuleItem* ruleItem = storeItem.first;
 		if (ruleItem->getMonthlySalary() != 0)
 		{
 			staffCount += storeItem.second;
@@ -745,11 +745,11 @@ int Base::getTotalOtherStaffAndInventoryCost(int& staffCount, int& inventoryCoun
 			totalCost += ruleItem->getMonthlyMaintenance() * storeItem.second;
 		}
 	}
-	for (auto* xcraft : _crafts)
+	for (Craft* xcraft : _crafts)
 	{
-		for (const auto& craftItem : *xcraft->getItems()->getContents())
+		for (const std::pair<const RuleItem*, int>& craftItem : xcraft->getItems()->getContents())
 		{
-			auto* ruleItem = craftItem.first;
+			const RuleItem* ruleItem = craftItem.first;
 			if (ruleItem->getMonthlySalary() != 0)
 			{
 				staffCount += craftItem.second;
@@ -761,7 +761,7 @@ int Base::getTotalOtherStaffAndInventoryCost(int& staffCount, int& inventoryCoun
 				totalCost += ruleItem->getMonthlyMaintenance() * craftItem.second;
 			}
 		}
-		for (auto* vehicle : *xcraft->getVehicles())
+		for (Vehicle* vehicle : xcraft->getVehicles())
 		{
 			auto ruleItem = vehicle->getRules();
 			if (ruleItem->getMonthlySalary() != 0)
@@ -880,7 +880,7 @@ bool Base::storesOverfullCritical() const
 {
 	int capacity = getAvailableStores() * 100;
 	double total = getUsedStores(true);
-	int used = total * 100;
+	int used = (int)(total * 100);
 	return used > capacity;
 }
 
@@ -997,7 +997,7 @@ int Base::getUsedHangars() const
 			total += (prod->getAmountTotal() - prod->getAmountProduced());
 		}
 	}
-	return total;
+	return (int)total;
 }
 
 /**
@@ -1045,7 +1045,7 @@ int Base::getUsedHangars(int hangarType) const
 			total += (prod->getAmountTotal() - prod->getAmountProduced());
 		}
 	}
-	return total;
+	return (int)total;
 }
 
 /**
@@ -1706,7 +1706,7 @@ int Base::getUsedContainment(int prisonType, bool onlyExternal) const
 		return total;
 	}
 
-	for (const auto& pair : *_items->getContents())
+	for (const std::pair<const RuleItem*, int>& pair : _items->getContents())
 	{
 		rule = pair.first;
 		if (rule->isAlien() && rule->getPrisonType() == prisonType)
@@ -1833,7 +1833,7 @@ void Base::setupDefenses(AlienMission* am)
 	{
 		if (xcraft->getStatus() != "STR_OUT")
 		{
-			for (auto* vehicle : *xcraft->getVehicles())
+			for (Vehicle* vehicle : xcraft->getVehicles())
 			{
 				_vehicles.push_back(vehicle);
 			}
@@ -1841,7 +1841,7 @@ void Base::setupDefenses(AlienMission* am)
 	}
 
 	// add vehicles left on the base
-	for (auto iter = _items->getContents()->begin(); iter != _items->getContents()->end(); )
+	for (auto iter = _items->getContents().begin(); iter != _items->getContents().end(); )
 	{
 		int itemQty = iter->second;
 		const RuleItem *rule = iter->first;
@@ -1880,15 +1880,15 @@ void Base::setupDefenses(AlienMission* am)
 				_items->removeItem(rule, canBeAdded);
 			}
 
-			iter = _items->getContents()->begin(); // we have to start over because iterator is broken because of the removeItem
+			iter = _items->getContents().begin(); // we have to start over because iterator is broken because of the removeItem
 		}
 		else ++iter;
 	}
 }
 
-std::vector<BaseFacility*> *Base::getDefenses()
+std::vector<BaseFacility*>& Base::getDefenses()
 {
-	return &_defenses;
+	return _defenses;
 }
 
 /**
@@ -1896,9 +1896,9 @@ std::vector<BaseFacility*> *Base::getDefenses()
  * in the base.
  * @return Pointer to vehicle list.
  */
-std::vector<Vehicle*> *Base::getVehicles()
+std::vector<Vehicle*>& Base::getVehicles()
 {
-	return &_vehicles;
+	return _vehicles;
 }
 
 /**
@@ -2122,11 +2122,11 @@ void Base::destroyFacility(BASEFACILITIESITERATOR facility)
 					}
 				}
 				// remove all items
-				while (!(craft->getItems()->getContents()->empty()))
+				while (!(craft->getItems()->getContents().empty()))
 				{
-					auto i = craft->getItems()->getContents()->begin();
-					_items->addItem(i->first, i->second);
-					craft->getItems()->removeItem(i->first, i->second);
+					const std::pair<const RuleItem*, int>& content = *craft->getItems()->getContents().begin();
+					_items->addItem(content.first, content.second);
+					craft->getItems()->removeItem(content.first, content.second);
 				}
 				Collections::deleteIf(_crafts, 1,
 					[&](Craft* c)

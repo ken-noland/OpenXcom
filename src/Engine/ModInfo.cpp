@@ -297,6 +297,24 @@ bool ModInfo::isParentMasterOk(const ModInfo* parentMod) const
 }
 
 /**
+ *
+ */
+size_t ModInfo::getOffset() const
+{
+	return _offset;
+}
+
+/**
+ *
+ */
+size_t ModInfo::getSize() const
+{
+	return _size;
+}
+
+
+
+/**
  * Checks if a given mod can be activated.
  * It must either be:
  * - a Master mod
@@ -313,7 +331,10 @@ bool ModInfo::canActivate(const std::string &curMaster) const
 
 const std::vector<std::string> &ModInfo::getExternalResourceDirs() const { return _externalResourceDirs; }
 
-
+const ModInfo::RulesetFiles& ModInfo::getRulesetFiles() const
+{
+	return _rulesetFiles;
+}
 
 #ifdef OXCE_AUTO_TEST
 

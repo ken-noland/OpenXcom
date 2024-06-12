@@ -155,9 +155,9 @@ void Tile::loadBinary(Uint8 *buffer, Tile::SerializationKey& serKey)
 	_objectsCache[O_FLOOR].discovered = (boolFields & 4) ? 1 : 0;
 	_objectsCache[O_WESTWALL].currentFrame = (boolFields & 8) ? 7 : 0;
 	_objectsCache[O_NORTHWALL].currentFrame = (boolFields & 0x10) ? 7 : 0;
-	_lastExploredByHostile = unserializeInt(&buffer, serKey._lastExploredByHostile);
-	_lastExploredByNeutral = unserializeInt(&buffer, serKey._lastExploredByNeutral);
-	_lastExploredByPlayer = unserializeInt(&buffer, serKey._lastExploredByPlayer);
+	_lastExploredByHostile = unserializeInt(&buffer, static_cast < Uint8>(serKey._lastExploredByHostile));
+	_lastExploredByNeutral = unserializeInt(&buffer, static_cast<Uint8>(serKey._lastExploredByNeutral));
+	_lastExploredByPlayer = unserializeInt(&buffer, static_cast<Uint8>(serKey._lastExploredByPlayer));
 	if (_fire || _smoke)
 	{
 		_animationOffset = RNG::seedless(0, 3);
@@ -231,9 +231,9 @@ void Tile::saveBinary(Uint8** buffer) const
 	boolFields |= isUfoDoorOpen(O_WESTWALL) ? 8 : 0; // west
 	boolFields |= isUfoDoorOpen(O_NORTHWALL) ? 0x10 : 0; // north?
 	serializeInt(buffer, def.boolFields, boolFields);
-	serializeInt(buffer, def._lastExploredByHostile, _lastExploredByHostile);
-	serializeInt(buffer, def._lastExploredByNeutral, _lastExploredByNeutral);
-	serializeInt(buffer, def._lastExploredByPlayer, _lastExploredByPlayer);
+	serializeInt(buffer, (Uint8)def._lastExploredByHostile, _lastExploredByHostile);
+	serializeInt(buffer, (Uint8)def._lastExploredByNeutral, _lastExploredByNeutral);
+	serializeInt(buffer, (Uint8)def._lastExploredByPlayer, _lastExploredByPlayer);
 }
 
 /**
@@ -972,9 +972,9 @@ void Tile::prepareNewTurn(bool smokeDamage)
  * Get the inventory on this tile.
  * @return pointer to a vector of battle items.
  */
-std::vector<BattleItem *> *Tile::getInventory()
+std::vector<BattleItem *>& Tile::getInventory()
 {
-	return &_inventory;
+	return _inventory;
 }
 
 
@@ -1196,12 +1196,12 @@ void getPositionZScript(const Tile *t, int &ret)
 
 void getDistanceTileScript(const Tile *t, int &ret, const Tile *other)
 {
-	ret = t && other ? Position::distance(t->getPosition(), other->getPosition()) : -1;
+	ret = static_cast<int>(t && other ? Position::distance(t->getPosition(), other->getPosition()) : -1);
 }
 
 void getDistanceVoxelScript(const Tile *t, int &ret, const Tile *other)
 {
-	ret = t && other ? Position::distance(t->getPosition().toVoxel(), other->getPosition().toVoxel()) : -1;
+	ret = static_cast<int>(t && other ? Position::distance(t->getPosition().toVoxel(), other->getPosition().toVoxel()) : -1);
 }
 
 void getFloorSpecialTileTypeScript(const Tile *t, int &ret)

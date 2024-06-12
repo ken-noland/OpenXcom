@@ -144,15 +144,15 @@ void DismantleFacilityState::btnOkClick(Action *)
 			_fac->setAmmo(0);
 		}
 
-		for (auto facIt = _base->getFacilities()->begin(); facIt != _base->getFacilities()->end(); ++facIt)
+		for (auto facIt = _base->getFacilities().begin(); facIt != _base->getFacilities().end(); ++facIt)
 		{
 			if (*facIt == _fac)
 			{
-				_base->getFacilities()->erase(facIt);
+				_base->getFacilities().erase(facIt);
 				// Determine if we leave behind any facilities when this one is removed
 				if (_fac->getBuildTime() == 0 && _fac->getRules()->getLeavesBehindOnSell().size() != 0)
 				{
-					const auto &facList = _fac->getRules()->getLeavesBehindOnSell();
+					const std::vector<const RuleBaseFacility*>& facList = _fac->getRules()->getLeavesBehindOnSell();
 					if (facList.at(0)->getPlaceSound() != Mod::NO_SOUND)
 					{
 						_game->getMod()->getSound("GEO.CAT", facList.at(0)->getPlaceSound())->play();
@@ -175,7 +175,7 @@ void DismantleFacilityState::btnOkClick(Action *)
 						{
 							fac->setIfHadPreviousFacility(true);
 						}
-						_base->getFacilities()->push_back(fac);
+						_base->getFacilities().push_back(fac);
 					}
 					else
 					{
@@ -200,7 +200,7 @@ void DismantleFacilityState::btnOkClick(Action *)
 								{
 									fac->setIfHadPreviousFacility(true);
 								}
-								_base->getFacilities()->push_back(fac);
+								_base->getFacilities().push_back(fac);
 
 								++j;
 								if (j == facList.size())
@@ -223,11 +223,11 @@ void DismantleFacilityState::btnOkClick(Action *)
 	// Remove whole base if it's the access lift
 	else
 	{
-		for (auto xbaseIt = _game->getSavedGame()->getBases()->begin(); xbaseIt != _game->getSavedGame()->getBases()->end(); ++xbaseIt)
+		for (auto xbaseIt = _game->getSavedGame()->getBases().begin(); xbaseIt != _game->getSavedGame()->getBases().end(); ++xbaseIt)
 		{
 			if (*xbaseIt == _base)
 			{
-				_game->getSavedGame()->getBases()->erase(xbaseIt);
+				_game->getSavedGame()->getBases().erase(xbaseIt);
 				delete _base;
 				break;
 			}

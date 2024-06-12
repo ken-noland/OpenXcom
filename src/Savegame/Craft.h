@@ -172,7 +172,7 @@ public:
 	/// Gets the craft's amount of equipment.
 	int getNumEquipment() const;
 	/// Gets the craft's weapons.
-	std::vector<CraftWeapon*> *getWeapons();
+	std::vector<CraftWeapon*>& getWeapons();
 	/// Gets the craft's items.
 	ItemContainer *getItems();
 	/// Gets the craft's items equipped by the soldiers.
@@ -180,7 +180,7 @@ public:
 	/// Gets the craft's items not equipped by the soldiers.
 	ItemContainer* getExtraItems();
 	/// Gets the craft's vehicles.
-	std::vector<Vehicle*> *getVehicles();
+	std::vector<Vehicle*>& getVehicles();
 	/// Calculates (and stores) the sum of all equipment of all soldiers on the craft.
 	void calculateTotalSoldierEquipment();
 

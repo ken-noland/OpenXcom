@@ -139,15 +139,26 @@ void PlaceLiftState::viewClick(Action *)
 	BaseFacility *fac = new BaseFacility(_lift, _base);
 	fac->setX(_view->getGridX());
 	fac->setY(_view->getGridY());
-	_base->getFacilities()->push_back(fac);
+	_base->getFacilities().push_back(fac);
 	if (fac->getRules()->getPlaceSound() != Mod::NO_SOUND)
 	{
 		_game->getMod()->getSound("GEO.CAT", fac->getRules()->getPlaceSound())->play();
 	}
 	_game->popState();
-	_game->getSavedGame()->setVisibleBasesIndex(_game->getSavedGame()->getBases()->size()>=MiniBaseView::MAX_VISIBLE_BASES?_game->getSavedGame()->getBases()->size()-MiniBaseView::MAX_VISIBLE_BASES:0);
+
+	std::size_t visibleBasesIndex;
+	std::size_t numBases = _game->getSavedGame()->getBases().size();
+	if (numBases >= MiniBaseView::MAX_VISIBLE_BASES)
+	{
+		visibleBasesIndex = numBases - MiniBaseView::MAX_VISIBLE_BASES;
+	}
+	else
+	{
+		visibleBasesIndex = 0;
+	}
+
 	BasescapeState *bState = new BasescapeState(_base, _globe);
-	_game->getSavedGame()->setSelectedBase(_game->getSavedGame()->getBases()->size() - 1);
+	_game->getSavedGame()->setSelectedBase(numBases - 1);
 	_game->pushState(bState);
 	if (_first)
 	{

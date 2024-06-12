@@ -60,10 +60,10 @@ PlaceFacilityState::PlaceFacilityState(Base *base, const RuleBaseFacility *rule,
 	_numCost = new Text(110, 17, 202, 70);
 	_numResources = new Text(110, 25, 202, 87);
 	const size_t resourceTextOffset = 9*std::min((size_t)3, (_origFac == nullptr ? _rule->getBuildCostItems().size() : 0));
-	_txtTime = new Text(110, 9, 202, 90+resourceTextOffset);
-	_numTime = new Text(110, 17, 202, 98+resourceTextOffset);
-	_txtMaintenance = new Text(110, 9, 202, 118+resourceTextOffset);
-	_numMaintenance = new Text(110, 17, 202, 126+resourceTextOffset);
+	_txtTime = new Text(110, 9, 202, static_cast<int>(90 + resourceTextOffset));
+	_numTime = new Text(110, 17, 202, static_cast<int>(98 + resourceTextOffset));
+	_txtMaintenance = new Text(110, 9, 202, static_cast<int>(118+resourceTextOffset));
+	_numMaintenance = new Text(110, 17, 202, static_cast<int>(126+resourceTextOffset));
 
 	// Set palette
 	setInterface("placeFacility");
@@ -277,9 +277,9 @@ void PlaceFacilityState::viewClick(Action *)
 			double reducedBuildTime = 0.0;
 			bool buildingOver = false;
 			const BaseAreaSubset areaToBuildOver = BaseAreaSubset(_rule->getSizeX(), _rule->getSizeY()).offset(_view->getGridX(), _view->getGridY());
-			for (int i = _base->getFacilities()->size() - 1; i >= 0; --i)
+			for (std::size_t i = static_cast<int>(_base->getFacilities().size() - 1); i >= 0; --i)
 			{
-				BaseFacility *checkFacility = _base->getFacilities()->at(i);
+				BaseFacility *checkFacility = _base->getFacilities().at(i);
 				if (BaseAreaSubset::intersection(areaToBuildOver, checkFacility->getPlacement()))
 				{
 					// Get a refund from the facility we're building over
@@ -320,7 +320,7 @@ void PlaceFacilityState::viewClick(Action *)
 					}
 
 					// Remove the facility from the base
-					_base->getFacilities()->erase(_base->getFacilities()->begin() + i);
+					_base->getFacilities().erase(_base->getFacilities().begin() + i);
 					delete checkFacility;
 				}
 
@@ -337,7 +337,7 @@ void PlaceFacilityState::viewClick(Action *)
 				int reducedBuildTimeRounded = (int)std::round(reducedBuildTime);
 				fac->setBuildTime(std::max(1, fac->getBuildTime() - reducedBuildTimeRounded));
 			}
-			_base->getFacilities()->push_back(fac);
+			_base->getFacilities().push_back(fac);
 			if (fac->getRules()->getPlaceSound() != Mod::NO_SOUND)
 			{
 				_game->getMod()->getSound("GEO.CAT", fac->getRules()->getPlaceSound())->play();

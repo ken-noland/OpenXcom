@@ -202,7 +202,7 @@ PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(bas
 	{
 		if (!rule->getRequiresBuyCountry().empty())
 		{
-			for (const auto* country : *_game->getSavedGame()->getCountries())
+			for (const Country* country : _game->getSavedGame()->getCountries())
 			{
 				if (country->getPact() && country->getRules()->getType() == rule->getRequiresBuyCountry())
 				{
@@ -223,7 +223,7 @@ PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(bas
 		{
 			TransferRow row = { TRANSFER_SOLDIER, rule, tr(rule->getType()), rule->getBuyCost(), _base->getSoldierCountAndSalary(rule->getType()).first, 0, 0, -4, 0, 0, 0 };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -235,7 +235,7 @@ PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(bas
 	{
 		TransferRow row = { TRANSFER_SCIENTIST, 0, tr("STR_SCIENTIST"), _game->getMod()->getHireScientistCost(), _base->getTotalScientists(), 0, 0, -3, 0, 0, 0 };
 		_items.push_back(row);
-		std::string cat = getCategory(_items.size() - 1);
+		std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 		if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 		{
 			_cats.push_back(cat);
@@ -246,7 +246,7 @@ PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(bas
 	{
 		TransferRow row = { TRANSFER_ENGINEER, 0, tr("STR_ENGINEER"), _game->getMod()->getHireEngineerCost(), _base->getTotalEngineers(), 0, 0, -2, 0, 0, 0 };
 		_items.push_back(row);
-		std::string cat = getCategory(_items.size() - 1);
+		std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 		if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 		{
 			_cats.push_back(cat);
@@ -259,7 +259,7 @@ PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(bas
 		{
 			TransferRow row = { TRANSFER_CRAFT, rule, tr(rule->getType()), rule->getBuyCost(), _base->getCraftCount(rule), 0, 0, -1, 0, 0, 0 };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -273,7 +273,7 @@ PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(bas
 		{
 			TransferRow row = { TRANSFER_ITEM, rule, tr(rule->getType()), rule->getBuyCostAdjusted(_base, _game->getSavedGame()), _base->getStorageItems()->getItem(rule), 0, 0, rule->getListOrder(), 0, 0, 0 };
 			_items.push_back(row);
-			std::string cat = getCategory(_items.size() - 1);
+			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
 			{
 				_cats.push_back(cat);
@@ -590,7 +590,7 @@ void PurchaseState::updateList()
 		// filter
 		if (categoryMissing)
 		{
-			int missingQty = getMissingQty(i);
+			int missingQty = getMissingQty(static_cast<int>(i));
 			if (missingQty > 0)
 			{
 				if (!_autoBuyDone)
@@ -616,7 +616,7 @@ void PurchaseState::updateList()
 		}
 		else
 		{
-			bool hidden = isHidden(i);
+			bool hidden = isHidden(static_cast<int>(i));
 			if (categoryHidden)
 			{
 				if (!hidden)
@@ -638,14 +638,14 @@ void PurchaseState::updateList()
 						continue;
 					}
 				}
-				else if (categoryFilterEnabled && !belongsToCategory(i, selectedCategory))
+				else if (categoryFilterEnabled && !belongsToCategory(static_cast<int>(i), selectedCategory))
 				{
 					continue;
 				}
 			}
 			else
 			{
-				if (categoryFilterEnabled && selectedCategory != getCategory(i))
+				if (categoryFilterEnabled && selectedCategory != getCategory(static_cast<int>(i)))
 				{
 					continue;
 				}
@@ -678,7 +678,7 @@ void PurchaseState::updateList()
 		ssQty << _items[i].qtySrc;
 		ssAmount << _items[i].amount;
 		_lstItems->addRow(4, name.c_str(), Unicode::formatFunding(_items[i].cost).c_str(), ssQty.str().c_str(), ssAmount.str().c_str());
-		_rows.push_back(i);
+		_rows.push_back(static_cast<int>(i));
 		if (_items[i].amount > 0)
 		{
 			_lstItems->setRowColor(_rows.size() - 1, _lstItems->getSecondaryColor());
@@ -739,18 +739,18 @@ void PurchaseState::btnOkClick(Action *)
 					t = new Transfer(time);
 					int nationality = _game->getSavedGame()->selectSoldierNationalityByLocation(_game->getMod(), rule, _base);
 					t->setSoldier(_game->getMod()->genSoldier(_game->getSavedGame(), rule, nationality));
-					_base->getTransfers()->push_back(t);
+					_base->getTransfers().push_back(t);
 				}
 				break;
 			case TRANSFER_SCIENTIST:
 				t = new Transfer(_game->getMod()->getPersonnelTime());
 				t->setScientists(transferRow.amount);
-				_base->getTransfers()->push_back(t);
+				_base->getTransfers().push_back(t);
 				break;
 			case TRANSFER_ENGINEER:
 				t = new Transfer(_game->getMod()->getPersonnelTime());
 				t->setEngineers(transferRow.amount);
-				_base->getTransfers()->push_back(t);
+				_base->getTransfers().push_back(t);
 				break;
 			case TRANSFER_CRAFT:
 				for (int c = 0; c < transferRow.amount; c++)
@@ -767,7 +767,7 @@ void PurchaseState::btnOkClick(Action *)
 					craft->initFixedWeapons(_game->getMod());
 					craft->setStatus("STR_REFUELLING");
 					t->setCraft(craft);
-					_base->getTransfers()->push_back(t);
+					_base->getTransfers().push_back(t);
 				}
 				break;
 			case TRANSFER_ITEM:
@@ -781,7 +781,7 @@ void PurchaseState::btnOkClick(Action *)
 					}
 					t = new Transfer(rule->getTransferTime());
 					t->setItems(rule, transferRow.amount);
-					_base->getTransfers()->push_back(t);
+					_base->getTransfers().push_back(t);
 					if (_parent && !_missingItemsMap.empty() && _missingItemsMap.find(rule) != _missingItemsMap.end())
 					{
 						// remember the decreased amount for next buy
@@ -1074,7 +1074,7 @@ void PurchaseState::increaseByValue(int change)
 
 	if (errorMessage.empty())
 	{
-		int maxByMoney = (_game->getSavedGame()->getFunds() - _total) / getRow().cost;
+		int maxByMoney = static_cast<int>((_game->getSavedGame()->getFunds() - _total) / getRow().cost);
 		if (maxByMoney >= 0)
 			change = std::min(maxByMoney, change);
 		switch (getRow().type)

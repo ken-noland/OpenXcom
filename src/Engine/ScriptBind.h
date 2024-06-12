@@ -76,14 +76,14 @@ struct ParserWriter
 		ScriptRefData finalLabel = { };
 	};
 
-	template<typename T, typename = typename std::enable_if_t<std::is_pod<T>::value>>
+	template <typename T, typename = typename std::enable_if_t<std::is_trivially_copyable<T>::value> >
 	class ReservedPos
 	{
 		ProgPos _pos;
-		ReservedPos(ProgPos pos) : _pos{ pos }
+		ReservedPos(ProgPos pos) : _pos{pos}
 		{
-
 		}
+
 		ProgPos getPos()
 		{
 			return _pos;
@@ -303,7 +303,11 @@ struct SumListIndexImpl<MaxSize>
 	{
 		static constexpr int offset = 0;
 
+		#ifndef _MSC_VER
 		[[gnu::always_inline]]
+		#else
+		__forceinline
+		#endif
 		static RetEnum func(ScriptWorkerBase &, const Uint8 *, ProgPos &)
 		{
 			return RetError;
@@ -934,14 +938,22 @@ struct FuncVer<Func, Ver, ListTag<Pos...>>
 	using GetTypeAt = GetType<GetType<Args, CurrPos>, Args::pos(Ver, CurrPos)>;
 
 	template<int CurrPos>
+	#ifndef _MSC_VER
 	[[gnu::always_inline]]
+	#else
+	__forceinline
+	#endif
 	static typename GetTypeAt<CurrPos>::ReturnType get(ScriptWorkerBase& sw, const Uint8* procArgs, ProgPos& curr)
 	{
 		constexpr int offs = Args::offset(Ver, CurrPos);
 		return GetTypeAt<CurrPos>::get(sw, procArgs + offs, curr);
 	}
 
+	#ifndef _MSC_VER
 	[[gnu::always_inline]]
+	#else
+	__forceinline
+	#endif
 	static RetEnum func(ScriptWorkerBase& sw, const Uint8* procArgs, ProgPos& curr)
 	{
 		return Func::func(get<Pos>(sw, procArgs, curr)...);

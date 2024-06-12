@@ -168,9 +168,9 @@ BaseInfoState::BaseInfoState(Base *base, BasescapeState *state) : _base(base), _
 
 	_mini->setTexture(_game->getMod()->getSurfaceSet("BASEBITS.PCK"));
 	_mini->setBases(_game->getSavedGame()->getBases());
-	for (size_t i = 0; i < _game->getSavedGame()->getBases()->size(); ++i)
+	for (size_t i = 0; i < _game->getSavedGame()->getBases().size(); ++i)
 	{
-		if (_game->getSavedGame()->getBases()->at(i) == _base)
+		if (_game->getSavedGame()->getBases().at(i) == _base)
 		{
 			_mini->setSelectedBase(i);
 			break;
@@ -520,10 +520,10 @@ void BaseInfoState::edtBaseChange(Action *)
 void BaseInfoState::miniClick(Action *)
 {
 	size_t base = _mini->getHoveredBase();
-	if (base < _game->getSavedGame()->getBases()->size())
+	if (base < _game->getSavedGame()->getBases().size())
 	{
 		_mini->setSelectedBase(base);
-		_base = _game->getSavedGame()->getBases()->at(base);
+		_base = _game->getSavedGame()->getBases().at(base);
 		_state->setBase(_base);
 		init();
 	}
@@ -548,12 +548,12 @@ void BaseInfoState::handleKeyPress(Action *action)
 			Options::keyBaseSelect8
 		};
 		int key = action->getDetails()->key.keysym.sym;
-		for (size_t i = 0; i < _game->getSavedGame()->getBases()->size(); ++i)
+		for (size_t i = 0; i < _game->getSavedGame()->getBases().size(); ++i)
 		{
 			if (key == baseKeys[i])
 			{
 				_mini->setSelectedBase(i);
-				_base = _game->getSavedGame()->getBases()->at(i);
+				_base = _game->getSavedGame()->getBases().at(i);
 				_state->setBase(_base);
 				init();
 				break;

@@ -320,11 +320,11 @@ namespace OpenXcom
 		if (article->section == UFOPAEDIA_COMMENDATIONS)
 		{
 			// 1. check living soldiers
-			for (auto* xbase : *save->getBases())
+			for (Base* xbase : save->getBases())
 			{
-				for (auto* soldier : *xbase->getSoldiers())
+				for (Soldier* soldier : xbase->getSoldiers())
 				{
-					for (auto* comm : *soldier->getDiary()->getSoldierCommendations())
+					for (SoldierCommendations* comm : soldier->getDiary()->getSoldierCommendations())
 					{
 						if (comm->getType() == article->getMainTitle())
 						{
@@ -335,9 +335,9 @@ namespace OpenXcom
 			}
 
 			// 2. check dead soldiers
-			for (std::vector<Soldier*>::reverse_iterator deadManIt = save->getDeadSoldiers()->rbegin(); deadManIt != save->getDeadSoldiers()->rend(); ++deadManIt)
+			for (std::vector<Soldier*>::reverse_iterator deadManIt = save->getDeadSoldiers().rbegin(); deadManIt != save->getDeadSoldiers().rend(); ++deadManIt)
 			{
-				for (auto* comm : *(*deadManIt)->getDiary()->getSoldierCommendations())
+				for (SoldierCommendations* comm : (*deadManIt)->getDiary()->getSoldierCommendations())
 				{
 					if (comm->getType() == article->getMainTitle())
 					{

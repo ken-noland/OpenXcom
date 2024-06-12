@@ -22,6 +22,7 @@
 #include <map>
 #include <vector>
 #include <yaml-cpp/yaml.h>
+#include "FileRecord.h"
 
 namespace OpenXcom
 {
@@ -43,12 +44,23 @@ typedef std::pair<std::string, ModInfoNormalizedVersion> ModInfoVersion;
  */
 class ModInfo
 {
+public:
+	using RulesetFiles = std::vector<FileMap::FileRecord>;
+
 private:
+	friend class ModFile;	//needed so it can set the offset and size
+
 	const std::filesystem::path _path;
 	std::string _name, _desc, _author, _url, _id, _master;
 	std::string _versionDisplay;
 	ModInfoVersion _version;
 	bool _isMaster;
+
+	/// Offset that mod use is common sets
+	size_t _offset;
+	/// Maximum size allowed by mod in common sets
+	size_t _size;
+
 	int _reservedSpace;
 	bool _engineOk;
 	std::string _requiredExtendedEngine;
@@ -59,9 +71,15 @@ private:
 	std::string _resourceConfigFile;
 	std::vector<std::string> _externalResourceDirs;
 
+	RulesetFiles _rulesetFiles;
 	std::filesystem::path _luaScript;
 
-  public:
+	// private setters for offset and size to limit it to ModFile
+	inline void setOffset(size_t offset) { _offset = offset; }
+	inline void setSize(size_t size) { _size = size; }
+	inline void setRulesetFiles(const RulesetFiles& rulesetFiles) { _rulesetFiles = rulesetFiles; }
+
+public:
 	/// Creates default metadata for a mod at the specified path.
 	ModInfo(const std::filesystem::path& path);
 	/// Loads the metadata from YAML.
@@ -96,6 +114,12 @@ private:
 	/// Is parent mod is in required version?
 	bool isParentMasterOk(const ModInfo* parentMod) const;
 
+	/// get the offset
+	size_t getOffset() const;
+
+	/// get the size
+	size_t getSize() const;
+
 	/// Gets whether this mod can be activated.
 	bool canActivate(const std::string &curMaster) const;
 	/// Gets size of mod, bigger mod reserve more values in common collections/surfacesets.
@@ -112,6 +136,9 @@ private:
 	const std::string &getResourceConfigFile() const;
 	/// Gets the list of external resource dirs to load for this mod.
 	const std::vector<std::string> &getExternalResourceDirs() const;
+
+	/// Get the list of files used by this mod for Rulesets.
+	const RulesetFiles &getRulesetFiles() const;	//KN TODO: is there any difference between this and the above?
 };
 
 }

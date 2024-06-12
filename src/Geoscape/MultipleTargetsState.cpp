@@ -51,7 +51,7 @@ MultipleTargetsState::MultipleTargetsState(std::vector<Target*> targets, std::ve
 
 	if (_targets.size() > 1)
 	{
-		int winHeight = BUTTON_HEIGHT * _targets.size() + SPACING * (_targets.size() - 1) + MARGIN * 2;
+		int winHeight = (int)(BUTTON_HEIGHT * _targets.size() + SPACING * (_targets.size() - 1) + MARGIN * 2);
 		int winY = (200 - winHeight) / 2;
 		int btnY = winY + MARGIN;
 

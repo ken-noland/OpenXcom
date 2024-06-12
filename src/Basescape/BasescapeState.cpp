@@ -192,7 +192,7 @@ BasescapeState::~BasescapeState()
 {
 	// Clean up any temporary bases
 	bool exists = false;
-	for (const auto* xbase : *_game->getSavedGame()->getBases())
+	for (const Base* xbase : _game->getSavedGame()->getBases())
 	{
 		if (xbase == _base)
 		{
@@ -221,7 +221,7 @@ void BasescapeState::init()
 	_edtBase->setText(_base->getName());
 
 	// Get area
-	for (const auto* region : *_game->getSavedGame()->getRegions())
+	for (const Region* region : _game->getSavedGame()->getRegions())
 	{
 		if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
 		{
@@ -231,7 +231,7 @@ void BasescapeState::init()
 	}
 
 	_txtFunds->setText(tr("STR_FUNDS").arg(Unicode::formatFunding(_game->getSavedGame()->getFunds())));
-	_btnNewBase->setVisible(_game->getSavedGame()->getBases()->size() < Options::maxNumberOfBases);
+	_btnNewBase->setVisible(_game->getSavedGame()->getBases().size() < Options::maxNumberOfBases);
 
 	if (!_game->getMod()->getNewBaseUnlockResearch().empty())
 	{
@@ -249,13 +249,13 @@ void BasescapeState::init()
  */
 void BasescapeState::setBase(Base *base)
 {
-	if (!_game->getSavedGame()->getBases()->empty())
+	if (!_game->getSavedGame()->getBases().empty())
 	{
 		// Check if base still exists
 		bool exists = false;
-		for (size_t i = 0; i < _game->getSavedGame()->getBases()->size(); ++i)
+		for (size_t i = 0; i < _game->getSavedGame()->getBases().size(); ++i)
 		{
-			if (_game->getSavedGame()->getBases()->at(i) == base)
+			if (_game->getSavedGame()->getBases().at(i) == base)
 			{
 				_base = base;
 				_mini->setSelectedBase(i);
@@ -267,7 +267,7 @@ void BasescapeState::setBase(Base *base)
 		// If base was removed, select first one and reset index of visible bases
 		if (!exists)
 		{
-			_base = _game->getSavedGame()->getBases()->front();
+			_base = _game->getSavedGame()->getBases().front();
 			_mini->setSelectedBase(0);
 			_game->getSavedGame()->setSelectedBase(0);
 			_mini->setVisibleBasesIndex(0);
@@ -401,7 +401,7 @@ void BasescapeState::viewLeftClick(Action *)
 		}
 		else
 		{
-			if (fac->getRules()->isLift() && _base->getFacilities()->size() > 1)
+			if (fac->getRules()->isLift() && _base->getFacilities().size() > 1)
 			{
 				// Note: vehicles will not be deployed in the base preview
 				if (_base->getAvailableSoldiers(true, true) > 0/* || !_base->getVehicles()->empty()*/)
@@ -516,9 +516,9 @@ void BasescapeState::viewRightClick(Action *)
 			_game->pushState(new CraftsState(_base));
 		}
 		else
-			for (size_t craft = 0; craft < _base->getCrafts()->size(); ++craft)
+			for (size_t craft = 0; craft < _base->getCrafts().size(); ++craft)
 			{
-				if (_view->getSelectedCraft() == _base->getCrafts()->at(craft))
+				if (_view->getSelectedCraft() == _base->getCrafts().at(craft))
 				{
 					_game->pushState(new CraftInfoState(_base, craft));
 					break;
@@ -615,9 +615,9 @@ void BasescapeState::viewMouseOut(Action *)
 void BasescapeState::miniLeftClick(Action *)
 {
 	size_t base = _mini->getHoveredBase();
-	if (base < _game->getSavedGame()->getBases()->size())
+	if (base < _game->getSavedGame()->getBases().size())
 	{
-		_base = _game->getSavedGame()->getBases()->at(base + _mini->getVisibleBasesIndex());
+		_base = _game->getSavedGame()->getBases().at(base + _mini->getVisibleBasesIndex());
 		init();
 	}
 }
@@ -630,7 +630,7 @@ void BasescapeState::miniLeftClick(Action *)
 void BasescapeState::miniRightClick(Action*)
 {
 	size_t baseIndex = _mini->getHoveredBase();
-	size_t numBases = _game->getSavedGame()->getBases()->size();
+	size_t numBases = _game->getSavedGame()->getBases().size();
 	if (numBases > MiniBaseView::MAX_VISIBLE_BASES)
 	{ // More bases than MiniBaseView::MAX_VISIBLE_BASES
 		if (baseIndex == MiniBaseView::MAX_VISIBLE_BASES - 1)
@@ -659,9 +659,9 @@ void BasescapeState::miniMiddleClick(Action *)
 {
 	size_t baseIndex = _mini->getHoveredBase() + _mini->getVisibleBasesIndex();
 
-	if (baseIndex > 0 && baseIndex < _game->getSavedGame()->getBases()->size())
+	if (baseIndex > 0 && baseIndex < _game->getSavedGame()->getBases().size())
 	{
-		auto& bases = *_game->getSavedGame()->getBases();
+		std::vector<Base*>& bases = _game->getSavedGame()->getBases();
 
 		// only able to move the currently selected base
 		if (bases[baseIndex] == _base)
@@ -691,11 +691,11 @@ void BasescapeState::handleKeyPress(Action *action)
 			Options::keyBaseSelect8
 		};
 		int key = action->getDetails()->key.keysym.sym;
-		for (size_t i = 0; i < _game->getSavedGame()->getBases()->size(); ++i)
+		for (size_t i = 0; i < _game->getSavedGame()->getBases().size(); ++i)
 		{
 			if (key == baseKeys[i])
 			{
-				_base = _game->getSavedGame()->getBases()->at(i);
+				_base = _game->getSavedGame()->getBases().at(i);
 				init();
 				break;
 			}
@@ -717,7 +717,7 @@ void BasescapeState::edtBaseChange(Action *)
  */
 void BasescapeState::updateArrows()
 {
-	size_t numBases = _game->getSavedGame()->getBases()->size();
+	size_t numBases = _game->getSavedGame()->getBases().size();
 	if(_mini->getVisibleBasesIndex() > 0)
 	{
 		_leftArrow->setText("<");	

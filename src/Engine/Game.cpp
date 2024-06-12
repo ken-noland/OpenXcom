@@ -31,6 +31,7 @@
 #include "../Interface/Cursor.h"
 #include "../Interface/FpsCounter.h"
 #include "../Mod/Mod.h"
+#include "../Mod/ModFile.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/SavedBattleGame.h"
 #include "Action.h"
@@ -46,10 +47,29 @@
 #include "../fallthrough.h"
 #include "../Geoscape/GeoscapeState.h"
 
+#include "../Lua/LuaMod.h"
+
 namespace OpenXcom
 {
 
 const double Game::VOLUME_GRADIENT = 10.0;
+
+// Function that returns a reference to a thread-local Game* pointer
+Game*& _GamePtr()
+{
+	static thread_local Game* ptr = nullptr;
+	return ptr;
+}
+
+void setThreadLocalGame(Game* gameInstance)
+{
+	_GamePtr() = gameInstance;
+}
+
+Game* getGame()
+{
+	return _GamePtr();
+}
 
 /**
  * Starts up all the SDL subsystems,
@@ -57,9 +77,11 @@ const double Game::VOLUME_GRADIENT = 10.0;
  * also creates the base game lua state.
  * @param title Title of the game window.
  */
-Game::Game(const std::string &title) : _screen(0), _cursor(0), _lang(0), _save(0), _mod(0), _quit(false), _init(false), _update(false),  _mouseActive(true), _timeUntilNextFrame(0),
+Game::Game(const std::string &title) : _screen(0), _cursor(0), _lang(0), _save(0), _quit(false), _init(false), _update(false),  _mouseActive(true), _timeUntilNextFrame(0),
 	_ctrl(false), _alt(false), _shift(false), _rmb(false), _mmb(false)
 {
+	setThreadLocalGame(this);
+
 	Options::reload = false;
 	Options::mute = false;
 
@@ -126,7 +148,7 @@ Game::~Game()
 	delete _cursor;
 	delete _lang;
 	delete _save;
-	delete _mod;
+	_mod.reset();
 	delete _screen;
 	delete _fpsCounter;
 
@@ -340,7 +362,7 @@ void Game::run()
 				// Update our FPS delay time based on the time of the last draw.
 				int fps = SDL_GetAppState() & SDL_APPINPUTFOCUS ? Options::FPS : Options::FPSInactive;
 
-				_timeUntilNextFrame = (1000.0f / fps) - (SDL_GetTicks() - _timeOfLastFrame);
+				_timeUntilNextFrame = (int)((1000.0f / fps) - (SDL_GetTicks() - _timeOfLastFrame));
 			}
 			else
 			{
@@ -414,11 +436,11 @@ void Game::setVolume(int sound, int music, int ui)
 	{
 		if (sound >= 0)
 		{
-			sound = volumeExponent(sound) * (double)SDL_MIX_MAXVOLUME;
+			sound = (int)(volumeExponent(sound) * (double)SDL_MIX_MAXVOLUME);
 			Mix_Volume(-1, sound);
 			if (_save && _save->getSavedBattle())
 			{
-				Mix_Volume(3, sound * _save->getSavedBattle()->getAmbientVolume());
+				Mix_Volume(3, (int)(sound * _save->getSavedBattle()->getAmbientVolume()));
 			}
 			else
 			{
@@ -430,12 +452,12 @@ void Game::setVolume(int sound, int music, int ui)
 		}
 		if (music >= 0)
 		{
-			music = volumeExponent(music) * (double)SDL_MIX_MAXVOLUME;
+			music = (int)(volumeExponent(music) * (double)SDL_MIX_MAXVOLUME);
 			Mix_VolumeMusic(music);
 		}
 		if (ui >= 0)
 		{
-			ui = volumeExponent(ui) * (double)SDL_MIX_MAXVOLUME;
+			ui = (int)(volumeExponent(ui) * (double)SDL_MIX_MAXVOLUME);
 			Mix_Volume(1, ui);
 			Mix_Volume(2, ui);
 		}
@@ -503,9 +525,22 @@ void Game::setSavedGame(SavedGame *save)
 void Game::loadMods()
 {
 	Mod::resetGlobalStatics();
-	delete _mod;
-	_mod = new Mod();
+
+	Log(LOG_INFO) << "Loading begins...";
+
+	//files
+	_modFiles = std::make_unique<ModFile>();
+	_modFiles->loadAll();
+
+	//base game and rulesets
+	_mod = std::make_unique<Mod>(*_modFiles);
 	_mod->loadAll();
+
+	//lua
+	_luaMod = std::make_unique<Lua::LuaMod>(*this, *_modFiles); // KN TODO: pass in game functions as a function pointer interface instead of the whole game object
+	_luaMod->loadAll();
+
+	Log(LOG_INFO) << "Loading ended.";
 }
 
 /**

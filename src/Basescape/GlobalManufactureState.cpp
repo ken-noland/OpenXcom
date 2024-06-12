@@ -200,7 +200,7 @@ void GlobalManufactureState::fillProductionList()
 	int allocatedEngineers = 0;
 	int freeWorkshops = 0;
 
-	for (Base *xbase : *_game->getSavedGame()->getBases())
+	for (Base *xbase : _game->getSavedGame()->getBases())
 	{
 		auto& baseProductions = xbase->getProductions();
 		if (!baseProductions.empty() || xbase->getEngineers() > 0)

@@ -367,7 +367,7 @@ void Map::refreshAIProgress(int progress)
 void Map::setPalette(const SDL_Color *colors, int firstcolor, int ncolors)
 {
 	Surface::setPalette(colors, firstcolor, ncolors);
-	for (auto* mds : *_save->getMapDataSets())
+	for (MapDataSet* mds : _save->getMapDataSets())
 	{
 		mds->getSurfaceset()->setPalette(colors, firstcolor, ncolors);
 	}
@@ -657,7 +657,7 @@ void Map::drawUnit(UnitSprite &unitSprite, Tile *unitTile, Tile *currTile, Posit
 	}
 
 	Position tileScreenPosition;
-	_camera->convertMapToScreen(unitTile->getPosition() + Position(0,0, (-unitFromBelow) + (+unitFromAbove)), &tileScreenPosition);
+	_camera->convertMapToScreen(unitTile->getPosition() + Position(0,0, -static_cast<int>(unitFromBelow) + static_cast<int>(unitFromAbove)), &tileScreenPosition);
 	tileScreenPosition += _camera->getMapOffset();
 
 	//get shade helpers
@@ -1505,7 +1505,7 @@ void Map::drawTerrain(Surface *surface)
 											{
 												selectedOrigin = origin;
 												selectedOriginType = relPos;
-												maxVoxels = exposedVoxels.size();
+												maxVoxels = (int)exposedVoxels.size();
 												maxExposure = exposure; // Save for later use
 											}
 										}
@@ -1518,7 +1518,7 @@ void Map::drawTerrain(Surface *surface)
 										action->target = Position{itX, itY, itZ}; // Needed inside getOriginVoxel() to get direction
 										Position origin = _save->getTileEngine()->getOriginVoxel(*action, shooterUnit->getTile());
 										Position targetPos = action->target.toVoxel() + Position{8, 8, 0};
-										distanceVoxels = Position::distance( origin, targetPos );
+										distanceVoxels = (int)Position::distance( origin, targetPos );
 									}
 
 									distanceTiles = distanceVoxels / Position::TileXY + 1; // Should never be 0
@@ -1767,11 +1767,11 @@ void Map::drawTerrain(Surface *surface)
 									{
 										if (rule->getBattleType() == BT_PSIAMP)
 										{
-											float attackStrength = BattleUnit::getPsiAccuracy(attack);
+											float attackStrength = (float)BattleUnit::getPsiAccuracy(attack);
 											float defenseStrength = 30.0f; // indicator ignores: +victim->getArmor()->getPsiDefence(victim);
 
 											float dis = Position::distance(action->actor->getPosition().toVoxel(), Position(itX, itY, itZ).toVoxel());
-											int min = attackStrength - defenseStrength - rule->getPsiAccuracyRangeReduction(dis);
+											int min = (int)(attackStrength - defenseStrength - rule->getPsiAccuracyRangeReduction(dis));
 											int max = min + 55;
 											if (max <= 0)
 											{
@@ -1786,7 +1786,7 @@ void Map::drawTerrain(Surface *surface)
 										{
 											int totalDamage = 0;
 											totalDamage += rule->getPowerBonus(attack);
-											totalDamage -= rule->getPowerRangeReduction(distanceTiles * 16);
+											totalDamage -= (int)rule->getPowerRangeReduction((float)(distanceTiles * 16));
 											if (totalDamage < 0) totalDamage = 0;
 											if (_cursorType != CT_WAYPOINT)
 												ss << "\n";
@@ -1995,7 +1995,7 @@ void Map::drawTerrain(Surface *surface)
 	// Draw motion scanner arrows
 	if (_isAltPressed && _save->getSide() == FACTION_PLAYER && this->getCursorType() != CT_NONE)
 	{
-		for (auto myUnit : *_save->getUnits())
+		for (BattleUnit* myUnit : _save->getUnits())
 		{
 			Position temp;
 			if (myUnit->getFaction() != FACTION_PLAYER && !myUnit->isOut())
@@ -2237,7 +2237,7 @@ int Map::reShade(Tile *tile)
 	}
 
 	// hybrid night vision (local)
-	for (const auto* bu : *_save->getUnits())
+	for (const BattleUnit* bu : _save->getUnits())
 	{
 		if (bu->getFaction() == FACTION_PLAYER && !bu->isOut())
 		{
@@ -2328,7 +2328,7 @@ void Map::animate(bool redraw)
 	{
 		auto& v = _vaporParticles[i];
 		int posX = i % _camera->getMapSizeX();
-		int posY = i / _camera->getMapSizeX();
+		int posY = (int)(i / _camera->getMapSizeX());
 
 		Collections::removeIf(
 			v,
@@ -2388,7 +2388,7 @@ void Map::animate(bool redraw)
 	}
 
 	// animate certain units (large flying units have a propulsion animation)
-	for (auto* bu : *_save->getUnits())
+	for (BattleUnit* bu : _save->getUnits())
 	{
 		const Position pos = bu->getPosition();
 
@@ -2827,7 +2827,7 @@ int Map::getSoundAngle(const Position& pos) const
 	// we use +- 80 instead of +- 90, so as not to go ALL the way left or right
 	// which would effectively mute the sound out of one speaker.
 	// since Mix_SetPosition uses modulo 360, we can't feed it a negative number, so add 360 instead.
-	return 360 + (relativePosition.x / (midPoint / 80.0));
+	return (int)(360 + (relativePosition.x / (midPoint / 80.f)));
 }
 
 /**

@@ -262,16 +262,45 @@ constexpr bool ArgIsPtrE(ArgEnum arg)
  * @param varType Type of variable/value we try pass to operation.
  * @return Zero if incompatible, 255 if both types are same.
  */
-constexpr int ArgCompatible(ArgEnum argType, ArgEnum varType, size_t overloadSize)
+constexpr size_t ArgCompatible(ArgEnum argType, ArgEnum varType, size_t overloadSize)
 {
-	return
-		argType == ArgInvalid ? 0 :
-		ArgIsVar(argType) && argType != varType ? 0 :
-		ArgBase(argType) != ArgBase(varType) ? 0 :
-		ArgIsReg(argType) != ArgIsReg(varType) ? 0 :
-		ArgIsPtr(argType) != ArgIsPtr(varType) ? 0 :
-		ArgIsPtrE(argType) && !ArgIsPtrE(varType) ? 0 :
-			255 - (ArgIsPtrE(argType) != ArgIsPtrE(varType) ? 128 : 0) - (ArgIsVar(argType) != ArgIsVar(varType) ? 64 : 0) - (overloadSize > 8 ? 8 : overloadSize);
+	if (argType == ArgInvalid)
+	{
+		return 0;
+	}
+	if (ArgIsVar(argType) && argType != varType)
+	{
+		return 0;
+	}
+	if (ArgBase(argType) != ArgBase(varType))
+	{
+		return 0;
+	}
+	if (ArgIsReg(argType) != ArgIsReg(varType))
+	{
+		return 0;
+	}
+	if (ArgIsPtr(argType) != ArgIsPtr(varType))
+	{
+		return 0;
+	}
+	if (ArgIsPtrE(argType) && !ArgIsPtrE(varType))
+	{
+		return 0;
+	}
+
+	size_t compatibility = 255;
+	if (ArgIsPtrE(argType) != ArgIsPtrE(varType))
+	{
+		compatibility -= 128;
+	}
+	if (ArgIsVar(argType) != ArgIsVar(varType))
+	{
+		compatibility -= 64;
+	}
+	compatibility -= (overloadSize > 8 ? 8 : overloadSize);
+
+	return compatibility;
 }
 
 /**
@@ -631,7 +660,7 @@ class ScriptWorkerBase
 	void forRegImplLoop(helper::PosTag<RegSet>, const T& arg)
 	{
 		using CurrentType =helper::Decay<typename std::tuple_element<I, T>::type>;
-		constexpr int CurrentOffset = offset<void, Args...>(I, BaseOffset);
+		constexpr size_t CurrentOffset = offset<void, Args...>(I, BaseOffset);
 
 		ref<CurrentType>(CurrentOffset) = std::get<I>(arg);
 	}

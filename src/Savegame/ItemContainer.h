@@ -66,7 +66,7 @@ public:
 	/// Clear all content.
 	void clear() { _qty.clear(); }
 	/// Gets all the items in the container.
-	const std::map<const RuleItem*, int> *getContents() const;
+	const std::map<const RuleItem*, int>& getContents() const;
 };
 
 }

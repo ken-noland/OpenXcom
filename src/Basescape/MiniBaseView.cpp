@@ -49,9 +49,9 @@ MiniBaseView::~MiniBaseView()
  * Changes the current list of bases to display.
  * @param bases Pointer to base list to display.
  */
-void MiniBaseView::setBases(std::vector<Base*> *bases)
+void MiniBaseView::setBases(std::vector<Base*>& bases)
 {
-	_bases = bases;
+	_bases = &bases;
 	_redraw = true;
 }
 
@@ -144,7 +144,7 @@ void MiniBaseView::setVisibleBasesIndex(size_t newVisibleBasesIndex)
 void MiniBaseView::draw()
 {
 	Surface::draw();
-	for (size_t i = 0; i < MAX_VISIBLE_BASES; ++i)
+	for (Sint16 i = 0; i < (Sint16)MAX_VISIBLE_BASES; ++i)
 	{
 		// Draw base squares
 		if ((i + _visibleBasesIndex) == _base)
@@ -163,7 +163,7 @@ void MiniBaseView::draw()
 		{
 			SDL_Rect r;
 			lock();
-			for (const auto* fac : *_bases->at(i + _visibleBasesIndex)->getFacilities())
+			for (const BaseFacility* fac : _bases->at(i + _visibleBasesIndex)->getFacilities())
 			{
 				int color;
 				if (fac->getDisabled())

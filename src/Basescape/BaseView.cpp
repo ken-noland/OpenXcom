@@ -108,7 +108,7 @@ void BaseView::setBase(Base *base)
 	}
 
 	// Fill grid with base facilities
-	for (auto* fac : *_base->getFacilities())
+	for (BaseFacility* fac : _base->getFacilities())
 	{
 		for (int y = fac->getY(); y < fac->getY() + fac->getRules()->getSizeY(); ++y)
 		{
@@ -377,7 +377,7 @@ void BaseView::reCalcQueuedBuildings()
 {
 	setBase(_base);
 	std::vector<BaseFacility*> facilities;
-	for (auto* fac : *_base->getFacilities())
+	for (BaseFacility* fac : _base->getFacilities())
 	{
 		if (fac->getAdjustedBuildTime() > 0)
 		{
@@ -493,13 +493,13 @@ void BaseView::draw()
 		}
 	}
 
-	for (auto *craft : *_base->getCrafts())  // Reset 'assigned state' to crafts at base
+	for (Craft* craft : _base->getCrafts()) // Reset 'assigned state' to crafts at base
 	{
 		craft->setIsAssignedToSlot(false);	
 		craft->setBaseEscapePosition(Position(-1,-1,-1)); // -1,-1,-1 is "craft not assigned"			
 	}	
 
-	for (const auto* fac : *_base->getFacilities())
+	for (const BaseFacility* fac : _base->getFacilities())
 	{
 		// Draw facility shape
 		int num = 0;
@@ -524,7 +524,7 @@ void BaseView::draw()
 		}
 	}
 
-	for (const auto* fac : *_base->getFacilities())
+	for (const BaseFacility* fac : _base->getFacilities())
 	{
 		// Draw connectors
 		if (fac->isBuiltOrHadPreviousFacility() && !fac->getRules()->connectorsDisabled())
@@ -564,7 +564,7 @@ void BaseView::draw()
 	}
 
 	// TODO: make const in the future
-	for (auto* fac : *_base->getFacilities())
+	for (BaseFacility* fac : _base->getFacilities())
 	{
 		// Draw facility graphic
 		int num = 0;
@@ -588,19 +588,19 @@ void BaseView::draw()
 		fac->clearCraftsForDrawing(); 
 		if (fac->getBuildTime() == 0 && fac->getRules()->getCrafts() > 0)
 		{
-			auto craftIt = _base->getCrafts()->begin();
+			auto craftIt = _base->getCrafts().begin();
 			std::vector<Position> drawnPositions;
 			for (const auto &p : fac->getRules()->getCraftSlots())
 			{			
-				while((craftIt != _base->getCrafts()->end()) && (((*craftIt)->getStatus() == "STR_OUT") ||  (*craftIt)->getIsAssignedToSlot() || (fac->getRules()->getHangarType() !=  (*craftIt)->getRules()->getHangarType())))
+				while((craftIt != _base->getCrafts().end()) && (((*craftIt)->getStatus() == "STR_OUT") ||  (*craftIt)->getIsAssignedToSlot() || (fac->getRules()->getHangarType() !=  (*craftIt)->getRules()->getHangarType())))
 						++craftIt;	
-				if ((craftIt != _base->getCrafts()->end()) && std::find(drawnPositions.begin(), drawnPositions.end(), p) == drawnPositions.end()) 
+				if ((craftIt != _base->getCrafts().end()) && std::find(drawnPositions.begin(), drawnPositions.end(), p) == drawnPositions.end()) 
 				{
 					Surface *frame = _texture->getFrame((*craftIt)->getSkinSprite() + 33);		
 					int spriteWidthOffset= frame->getWidth()/2;  
 					int spriteHeightOffset= frame->getHeight()/2;	
-					int fx = (fac->getX() * GRID_SIZE) + ((fac->getRules()->getSizeX()) * GRID_SIZE) / 2.0 - spriteWidthOffset + p.x;
-					int fy = (fac->getY() * GRID_SIZE) + ((fac->getRules()->getSizeY()) * GRID_SIZE) / 2.0 + - spriteHeightOffset + p.y;	
+					int fx = static_cast<int>((fac->getX() * GRID_SIZE) + ((fac->getRules()->getSizeX()) * GRID_SIZE) / 2.0 - spriteWidthOffset + p.x);
+					int fy = static_cast<int>((fac->getY() * GRID_SIZE) + ((fac->getRules()->getSizeY()) * GRID_SIZE) / 2.0 + - spriteHeightOffset + p.y);
 					(*craftIt)->setBaseEscapePosition(Position(fx,fy,0));					
 					frame->blitNShade(this, fx, fy);
 					fac->addCraftForDrawing(*craftIt);
@@ -685,7 +685,11 @@ void BaseView::mouseOver(Action *action, State *state)
 	{
 		_selFacility = _facilities[_gridX][_gridY];
 		if ((_selFacility != 0)  && !(_selFacility->getCraftsForDrawing().empty())){
-			    Position mousePos(action->getRelativeXMouse()/action->getXScale(),action->getRelativeYMouse()/action->getYScale(),0);
+				Position mousePos(
+					static_cast<int>(action->getRelativeXMouse()/action->getXScale()),
+					static_cast<int>(action->getRelativeYMouse()/action->getYScale()),
+					0);
+
 				int dist=-1, newDist;
 				for (auto *craft : _selFacility->getCraftsForDrawing())
 				{

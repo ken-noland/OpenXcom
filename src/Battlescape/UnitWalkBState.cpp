@@ -227,7 +227,7 @@ void UnitWalkBState::think()
 			// If our friends have already passed, wake them up again:
 			if (unitSpotted)
 			{
-				for (BattleUnit *unit : *(_parent->getSave()->getUnits()))
+				for (BattleUnit *unit : _parent->getSave()->getUnits())
 				{
 					if (unit->isOut())
 						continue;
@@ -445,7 +445,7 @@ void UnitWalkBState::think()
 		unitSpotted = (!_action.ignoreSpottedEnemies && !_falling && !_action.desperate && _unit->getStatus() != STATUS_PANICKING && _numUnitsSpotted != _unit->getUnitsSpottedThisTurn().size());
 		if (unitSpotted)
 		{
-			for (BattleUnit *unit : *(_parent->getSave()->getUnits()))
+			for (BattleUnit *unit : _parent->getSave()->getUnits())
 			{
 				if (unit->isOut())
 					continue;

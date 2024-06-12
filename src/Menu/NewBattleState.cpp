@@ -265,7 +265,7 @@ NewBattleState::NewBattleState() :
 	difficulty.push_back(tr("STR_5_SUPERHUMAN"));
 	_cbxDifficulty->setOptions(difficulty);
 
-	_slrAlienTech->setRange(0, _game->getMod()->getAlienItemLevels().size()-1);
+	_slrAlienTech->setRange(0, (int)_game->getMod()->getAlienItemLevels().size()-1);
 	if (_game->getMod()->getAlienItemLevels().size() <= 1)
 	{
 		_slrAlienTech->setVisible(false);
@@ -370,7 +370,7 @@ void NewBattleState::load(const std::string &filename)
 			_cbxMission->setSelected(std::min(doc["mission"].as<size_t>(0), _missionTypes.size() - 1));
 			cbxMissionChange(0);
 			_cbxCraft->setSelected(std::min(doc["craft"].as<size_t>(0), _crafts.size() - 1));
-			_slrDarkness->setValue(doc["darkness"].as<size_t>(0));
+			_slrDarkness->setValue((int)doc["darkness"].as<size_t>(0));
 			_cbxTerrain->setSelected(std::min(doc["terrain"].as<size_t>(0), _terrainTypes.size() - 1));
 			cbxTerrainChange(0);
 			{
@@ -379,7 +379,7 @@ void NewBattleState::load(const std::string &filename)
 			}
 			_cbxAlienRace->setSelected(std::min(doc["alienRace"].as<size_t>(0), _alienRaces.size() - 1));
 			_cbxDifficulty->setSelected(doc["difficulty"].as<size_t>(0));
-			_slrAlienTech->setValue(doc["alienTech"].as<size_t>(0));
+			_slrAlienTech->setValue((int)doc["alienTech"].as<size_t>(0));
 
 			if (doc["base"])
 			{
@@ -388,7 +388,7 @@ void NewBattleState::load(const std::string &filename)
 
 				Base *base = new Base(mod);
 				base->load(doc["base"], save, false);
-				save->getBases()->push_back(base);
+				save->getBases().push_back(base);
 
 				// Add research
 				for (auto& pair : mod->getResearchMap())
@@ -408,15 +408,15 @@ void NewBattleState::load(const std::string &filename)
 				}
 
 				// Fix invalid contents
-				if (base->getCrafts()->empty())
+				if (base->getCrafts().empty())
 				{
 					std::string craftType = _crafts[_cbxCraft->getSelected()];
 					_craft = new Craft(_game->getMod()->getCraft(craftType), base, save->getId(craftType));
-					base->getCrafts()->push_back(_craft);
+					base->getCrafts().push_back(_craft);
 				}
 				else
 				{
-					_craft = base->getCrafts()->front();
+					_craft = base->getCrafts().front();
 				}
 
 				_game->setSavedGame(save);
@@ -450,7 +450,7 @@ void NewBattleState::save(const std::string &filename)
 	node["alienRace"] = _cbxAlienRace->getSelected();
 	node["difficulty"] = _cbxDifficulty->getSelected();
 	node["alienTech"] = _slrAlienTech->getValue();
-	node["base"] = _game->getSavedGame()->getBases()->front()->save();
+	node["base"] = _game->getSavedGame()->getBases().front()->save();
 	out << node;
 
 	std::string filepath = Options::getMasterUserFolder() + filename + ".cfg";
@@ -472,29 +472,29 @@ void NewBattleState::initSave()
 	Base *base = new Base(mod);
 	const YAML::Node &starter = _game->getMod()->getDefaultStartingBase();
 	base->load(starter, save, true, true);
-	save->getBases()->push_back(base);
+	save->getBases().push_back(base);
 
 	// Kill everything we don't want in this base
-	for (auto* soldier : *base->getSoldiers())
+	for (Soldier* soldier : base->getSoldiers())
 	{
 		delete soldier;
 	}
-	base->getSoldiers()->clear();
-	for (auto* xcraft : *base->getCrafts())
+	base->getSoldiers().clear();
+	for (Craft* xcraft : base->getCrafts())
 	{
 		delete xcraft;
 	}
-	base->getCrafts()->clear();
+	base->getCrafts().clear();
 	base->getStorageItems()->clear();
 
 	_craft = new Craft(mod->getCraft(_crafts[_cbxCraft->getSelected()]), base, 1);
-	base->getCrafts()->push_back(_craft);
+	base->getCrafts().push_back(_craft);
 
 	// Generate soldiers
 	bool psiStrengthEval = (Options::psiStrengthEval && save->isResearched(mod->getPsiRequirements()));
 	for (int i = 0; i < 30; ++i)
 	{
-		int randomType = RNG::generate(0, mod->getSoldiersList().size() - 1);
+		int randomType = RNG::generate(0, (int)mod->getSoldiersList().size() - 1);
 		RuleSoldier* ruleSoldier = mod->getSoldier(mod->getSoldiersList().at(randomType), true);
 		int nationality = save->selectSoldierNationalityByLocation(mod, ruleSoldier, nullptr); // -1
 		Soldier *soldier = mod->genSoldier(save, ruleSoldier, nationality);
@@ -525,7 +525,7 @@ void NewBattleState::initSave()
 		// update again, could have been changed since soldier creation
 		soldier->calcStatString(mod->getStatStrings(), psiStrengthEval);
 
-		base->getSoldiers()->push_back(soldier);
+		base->getSoldiers().push_back(soldier);
 
 		int space = _craft->getSpaceAvailable();
 		if (_craft->validateAddingSoldier(space, soldier) == CPE_None)
@@ -606,7 +606,7 @@ void NewBattleState::btnOkClick(Action *)
 		b->setAlienRace(_alienRaces[_cbxAlienRace->getSelected()]);
 		_craft->setDestination(b);
 		bgen.setAlienBase(b);
-		_game->getSavedGame()->getAlienBases()->push_back(b);
+		_game->getSavedGame()->getAlienBases().push_back(b);
 	}
 	// ufo assault
 	else if (_craft && _game->getMod()->getUfo(_missionTypes[_cbxMission->getSelected()]))
@@ -626,7 +626,7 @@ void NewBattleState::btnOkClick(Action *)
 			u->setStatus(Ufo::CRASHED);
 			bgame->setMissionType("STR_UFO_CRASH_RECOVERY");
 		}
-		_game->getSavedGame()->getUfos()->push_back(u);
+		_game->getSavedGame()->getUfos().push_back(u);
 	}
 	// mission site
 	else
@@ -638,7 +638,7 @@ void NewBattleState::btnOkClick(Action *)
 		m->setAlienRace(_alienRaces[_cbxAlienRace->getSelected()]);
 		_craft->setDestination(m);
 		bgen.setMissionSite(m);
-		_game->getSavedGame()->getMissionSites()->push_back(m);
+		_game->getSavedGame()->getMissionSites().push_back(m);
 	}
 
 	if (_craft)
@@ -687,16 +687,16 @@ void NewBattleState::btnRandomClick(Action *)
 {
 	initSave();
 
-	_cbxMission->setSelected(RNG::generate(0, _missionTypes.size()-1));
+	_cbxMission->setSelected(RNG::generate(0, (int)_missionTypes.size()-1));
 	cbxMissionChange(0);
-	_cbxCraft->setSelected(RNG::generate(0, _crafts.size() - 1));
+	_cbxCraft->setSelected(RNG::generate(0, (int)_crafts.size() - 1));
 	cbxCraftChange(0);
 	_slrDarkness->setValue(RNG::generate(0, 15));
-	_cbxTerrain->setSelected(RNG::generate(0, _terrainTypes.size() - 1));
+	_cbxTerrain->setSelected(RNG::generate(0, (int)_terrainTypes.size() - 1));
 	cbxTerrainChange(0);
-	_cbxAlienRace->setSelected(RNG::generate(0, _alienRaces.size()-1));
+	_cbxAlienRace->setSelected(RNG::generate(0, (int)_alienRaces.size()-1));
 	_cbxDifficulty->setSelected(RNG::generate(0, 4));
-	_slrAlienTech->setValue(RNG::generate(0, _game->getMod()->getAlienItemLevels().size()-1));
+	_slrAlienTech->setValue(RNG::generate(0, (int)_game->getMod()->getAlienItemLevels().size()-1));
 }
 
 /**
@@ -705,7 +705,7 @@ void NewBattleState::btnRandomClick(Action *)
  */
 void NewBattleState::btnEquipClick(Action *)
 {
-	_game->pushState(new CraftInfoState(_game->getSavedGame()->getBases()->front(), 0));
+	_game->pushState(new CraftInfoState(_game->getSavedGame()->getBases().front(), 0));
 }
 
 /**
@@ -768,7 +768,7 @@ void NewBattleState::cbxCraftChange(Action *)
 	Craft* tmpCraft = new Craft(_craft->getRules(), _craft->getBase(), 0);
 
 	// temporarily re-assign all soldiers to a dummy craft
-	for (auto* soldier : *_craft->getBase()->getSoldiers())
+	for (Soldier* soldier : _craft->getBase()->getSoldiers())
 	{
 		if (soldier->getCraft() == _craft)
 		{
@@ -777,7 +777,7 @@ void NewBattleState::cbxCraftChange(Action *)
 		}
 	}
 	// try assigning all soldiers back while validating constraints
-	for (auto* soldier : *_craft->getBase()->getSoldiers())
+	for (Soldier* soldier : _craft->getBase()->getSoldiers())
 	{
 		if (count <= 0)
 		{

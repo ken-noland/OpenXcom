@@ -73,7 +73,7 @@ private:
 	std::map<OpenXcom::Country*, int> _hiddenAlienActivityCountries;
 
 	/// Update list of active crafts.
-	const std::vector<Craft*>* updateActiveCrafts();
+	const std::vector<Craft*>& updateActiveCrafts();
 
 	void cbxRegionChange(Action *action);
 	void cbxZoneChange(Action *action);
@@ -104,7 +104,7 @@ public:
 	void baseHunting();
 	/// Trigger whenever 30 minutes pass.
 	void time30Minutes();
-	void ufoDetection(Ufo* ufo, const std::vector<Craft*>* activeCrafts);
+	void ufoDetection(Ufo* ufo, const std::vector<Craft*>& activeCrafts);
 	/// Trigger whenever 1 hour passes.
 	void time1Hour();
 	/// Trigger whenever 1 day passes.

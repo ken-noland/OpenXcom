@@ -92,13 +92,13 @@ TransferBaseState::TransferBaseState(Base *base, DebriefingState *debriefingStat
 	_lstBases->onMouseClick((ActionHandler)&TransferBaseState::lstBasesClick);
 
 	int row = 0;
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
 		if (xbase != _base)
 		{
 			// Get area
 			std::string area;
-			for (const auto* region : *_game->getSavedGame()->getRegions())
+			for (const Region* region : _game->getSavedGame()->getRegions())
 			{
 				if (region->getRules()->insideRegion(xbase->getLongitude(), xbase->getLatitude()))
 				{

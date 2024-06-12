@@ -106,7 +106,7 @@ BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles
 
 	if (_missiles && _partialDestruction)
 	{
-		for (const auto& each : *_base->getDestroyedFacilitiesCache())
+		for (const std::pair<const RuleBaseFacility*, int>& each : _base->getDestroyedFacilitiesCache())
 		{
 			std::ostringstream ss;
 			ss << each.second;
@@ -125,8 +125,8 @@ BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles
 	if (!am)
 	{
 		// backwards-compatibility
-		RuleRegion* regionRule = _game->getSavedGame()->getRegions()->front()->getRules(); // wrong, but that's how it is in OXC
-		for (const auto* region : *_game->getSavedGame()->getRegions())
+		RuleRegion* regionRule = _game->getSavedGame()->getRegions().front()->getRules(); // wrong, but that's how it is in OXC
+		for (const Region* region : _game->getSavedGame()->getRegions())
 		{
 			if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
 			{
@@ -166,14 +166,14 @@ void BaseDestroyedState::btnOkClick(Action *)
 		return;
 	}
 
-	for (auto xbaseIt = _game->getSavedGame()->getBases()->begin(); xbaseIt != _game->getSavedGame()->getBases()->end(); ++xbaseIt)
+	for (auto xbaseIt = _game->getSavedGame()->getBases().begin(); xbaseIt != _game->getSavedGame()->getBases().end(); ++xbaseIt)
 	{
 		Base* xbase = (*xbaseIt);
 		if (xbase == _base)
 		{
 			_game->getSavedGame()->stopHuntingXcomCrafts(xbase); // destroyed together with the base
 			delete xbase;
-			_game->getSavedGame()->getBases()->erase(xbaseIt);
+			_game->getSavedGame()->getBases().erase(xbaseIt);
 			break;
 		}
 	}

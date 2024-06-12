@@ -19,8 +19,8 @@
  */
 #include <list>
 #include <string>
+#include <memory>
 #include <SDL.h>
-#include "../Lua/LuaState.h"
 
 namespace OpenXcom
 {
@@ -35,6 +35,12 @@ class ModInfo;
 class FpsCounter;
 class Action;
 class GeoscapeState;
+class ModFile;
+
+namespace Lua
+{
+class LuaMod;
+}
 
 /**
  * The core of the game engine, manages the game's entire contents and structure.
@@ -51,7 +57,16 @@ private:
 	Language *_lang;
 	std::list<State*> _states, _deleted;
 	SavedGame *_save;
-	Mod *_mod;
+
+	/// list of mods and their files
+	std::unique_ptr<ModFile> _modFiles;
+
+	/// rules, y-scripts and other data from mods
+	std::unique_ptr<Mod> _mod;
+
+	/// Lua mods
+	std::unique_ptr<Lua::LuaMod> _luaMod;
+
 	bool _quit, _init, _update;
 	FpsCounter *_fpsCounter;
 	bool _mouseActive;
@@ -92,7 +107,9 @@ public:
 	/// Sets a new saved game for the game.
 	void setSavedGame(SavedGame *save);
 	/// Gets the currently loaded mod.
-	Mod *getMod() const { return _mod; }
+	Mod *getMod() const { return _mod.get(); }
+	/// Gets the currently loaded Lua mod.
+	Lua::LuaMod& getLuaMod() const { return *_luaMod.get(); }
 	/// Loads the mods specified in the game options.
 	void loadMods();
 	/// Sets whether the mouse cursor is activated.
@@ -163,5 +180,9 @@ public:
 	/// Gets the geoScapeState
 	GeoscapeState *getGeoscapeState() const;
 };
+
+/// Global function that retrieve a thread local Game object.
+Game* getGame();
+
 
 }

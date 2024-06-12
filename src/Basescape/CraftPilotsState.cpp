@@ -94,7 +94,7 @@ CraftPilotsState::CraftPilotsState(Base *base, size_t craft) : _base(base), _cra
 	_btnOk->onKeyboardPress((ActionHandler)&CraftPilotsState::btnOkClick, Options::keyOk);
 	_btnOk->onKeyboardPress((ActionHandler)&CraftPilotsState::btnOkClick, Options::keyCancel);
 
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 
 	_txtTitle->setBig();
 	_txtTitle->setAlign(ALIGN_CENTER);
@@ -127,7 +127,7 @@ CraftPilotsState::CraftPilotsState(Base *base, size_t craft) : _base(base), _cra
 	_txtDodgeBonus->setText(tr("STR_DODGE_BONUS"));
 	_txtApproachSpeed->setText(tr("STR_APPROACH_SPEED"));
 
-	for (auto* soldier : *_base->getSoldiers())
+	for (Soldier* soldier : _base->getSoldiers())
 	{
 		if (soldier->getCraft() == c)
 		{
@@ -160,7 +160,7 @@ void CraftPilotsState::updateUI()
 {
 	_lstPilots->clearList();
 
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 
 	const std::vector<Soldier*> pilots = c->getPilotList(false);
 	for (const auto* pilot : pilots)
@@ -209,7 +209,7 @@ void CraftPilotsState::updateUI()
 	_btnAdd->setVisible((int)(_lstPilots->getTexts()) < c->getRules()->getPilots());
 
 	int availablePilots = 0;
-	for (const auto* soldier : *_base->getSoldiers())
+	for (const Soldier* soldier : _base->getSoldiers())
 	{
 		// must be on board & able to drive
 		if (soldier->getCraft() == c && soldier->getRules()->getAllowPiloting())
@@ -244,7 +244,7 @@ void CraftPilotsState::btnAddClick(Action *)
 */
 void CraftPilotsState::btnRemoveAllClick(Action *)
 {
-	Craft *c = _base->getCrafts()->at(_craft);
+	Craft *c = _base->getCrafts().at(_craft);
 
 	c->removeAllPilots();
 

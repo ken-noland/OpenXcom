@@ -176,7 +176,7 @@ void NewGameState::btnOkClick(Action *)
 	_game->setState(gs);
 	gs->init();
 
-	auto base = _game->getSavedGame()->getBases()->back();
+	Base* base = _game->getSavedGame()->getBases().back();
 	if (base->getMarker() != -1)
 	{
 		// location known already

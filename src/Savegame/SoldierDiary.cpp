@@ -181,10 +181,10 @@ YAML::Node SoldierDiary::save() const
  * @param unitStatistics BattleUnitStatistics to get stats from.
  * @param missionStatistics MissionStatistics to get stats from.
  */
-void SoldierDiary::updateDiary(BattleUnitStatistics *unitStatistics, std::vector<MissionStatistics*> *allMissionStatistics, Mod *rules)
+void SoldierDiary::updateDiary(BattleUnitStatistics *unitStatistics, std::vector<MissionStatistics*>& allMissionStatistics, Mod *rules)
 {
-	if (allMissionStatistics->empty()) return;
-	auto* missionStatistics = allMissionStatistics->back();
+	if (allMissionStatistics.empty()) return;
+	auto* missionStatistics = allMissionStatistics.back();
 	auto& unitKills = unitStatistics->kills;
 	for (auto* buk : unitKills)
 	{
@@ -261,9 +261,9 @@ void SoldierDiary::updateDiary(BattleUnitStatistics *unitStatistics, std::vector
  * Get soldier commendations.
  * @return SoldierCommendations list of soldier's commendations.
  */
-std::vector<SoldierCommendations*> *SoldierDiary::getSoldierCommendations()
+std::vector<SoldierCommendations*>& SoldierDiary::getSoldierCommendations()
 {
-	return &_commendations;
+	return _commendations;
 }
 
 /**
@@ -271,7 +271,7 @@ std::vector<SoldierCommendations*> *SoldierDiary::getSoldierCommendations()
  * Award new ones, if deserved.
  * @return bool Has a commendation been awarded?
  */
-bool SoldierDiary::manageCommendations(Mod *mod, std::vector<MissionStatistics*> *missionStatistics)
+bool SoldierDiary::manageCommendations(Mod *mod, std::vector<MissionStatistics*>& missionStatistics)
 {
 	const int BATTLE_TYPES = 13;
 	const std::string battleTypeArray[BATTLE_TYPES] = { "BT_NONE", "BT_FIREARM", "BT_AMMO", "BT_MELEE", "BT_GRENADE",
@@ -713,11 +713,11 @@ std::map<std::string, int> SoldierDiary::getWeaponAmmoTotal() const
  *  Get a map of the amount of missions done in each region.
  *  @param MissionStatistics
  */
-std::map<std::string, int> SoldierDiary::getRegionTotal(std::vector<MissionStatistics*> *missionStatistics) const
+std::map<std::string, int> SoldierDiary::getRegionTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	std::map<std::string, int> regionTotal;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int missionId : _missionIdList)
 		{
@@ -735,11 +735,11 @@ std::map<std::string, int> SoldierDiary::getRegionTotal(std::vector<MissionStati
  *  Get a map of the amount of missions done in each country.
  *  @param MissionStatistics
  */
-std::map<std::string, int> SoldierDiary::getCountryTotal(std::vector<MissionStatistics*> *missionStatistics) const
+std::map<std::string, int> SoldierDiary::getCountryTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	std::map<std::string, int> countryTotal;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int missionId : _missionIdList)
 		{
@@ -757,11 +757,11 @@ std::map<std::string, int> SoldierDiary::getCountryTotal(std::vector<MissionStat
  *  Get a map of the amount of missions done in each type.
  *  @param MissionStatistics
  */
-std::map<std::string, int> SoldierDiary::getTypeTotal(std::vector<MissionStatistics*> *missionStatistics) const
+std::map<std::string, int> SoldierDiary::getTypeTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	std::map<std::string, int> typeTotal;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int missionId : _missionIdList)
 		{
@@ -779,11 +779,11 @@ std::map<std::string, int> SoldierDiary::getTypeTotal(std::vector<MissionStatist
  *  Get a map of the amount of missions done in each UFO.
  *  @param MissionStatistics
  */
-std::map<std::string, int> SoldierDiary::getUFOTotal(std::vector<MissionStatistics*> *missionStatistics) const
+std::map<std::string, int> SoldierDiary::getUFOTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	std::map<std::string, int> ufoTotal;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int missionId : _missionIdList)
 		{
@@ -826,12 +826,12 @@ int SoldierDiary::getMissionTotal() const
 /**
  *
  */
-int SoldierDiary::getMissionTotalFiltered(std::vector<MissionStatistics*>* missionStatistics, const RuleCommendations* rule) const
+int SoldierDiary::getMissionTotalFiltered(std::vector<MissionStatistics*>& missionStatistics, const RuleCommendations* rule) const
 {
 	if (!rule->getMissionTypeNames().empty())
 	{
 		int total = 0;
-		for (const auto* ms : *missionStatistics)
+		for (const MissionStatistics* ms : missionStatistics)
 		{
 			if (ms->success)
 			{
@@ -849,7 +849,7 @@ int SoldierDiary::getMissionTotalFiltered(std::vector<MissionStatistics*>* missi
 	else if (!rule->getMissionMarkerNames().empty())
 	{
 		int total = 0;
-		for (const auto* ms : *missionStatistics)
+		for (const MissionStatistics* ms : missionStatistics)
 		{
 			if (ms->success)
 			{
@@ -872,11 +872,11 @@ int SoldierDiary::getMissionTotalFiltered(std::vector<MissionStatistics*>* missi
  *  Get the total if wins.
  *  @param Mission Statistics
  */
-int SoldierDiary::getWinTotal(std::vector<MissionStatistics*> *missionStatistics) const
+int SoldierDiary::getWinTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	int winTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int missionId : _missionIdList)
 		{
@@ -1072,12 +1072,12 @@ int SoldierDiary::getTrapKillTotal(Mod *mod) const
  *  Get the total of terror missions.
  *  @param Mission Statistics
  */
-int SoldierDiary::getTerrorMissionTotal(std::vector<MissionStatistics*> *missionStatistics) const
+int SoldierDiary::getTerrorMissionTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	/// Not a UFO, not the base, not the alien base or colony
 	int terrorMissionTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int misionId : _missionIdList)
 		{
@@ -1098,11 +1098,11 @@ int SoldierDiary::getTerrorMissionTotal(std::vector<MissionStatistics*> *mission
  *  Get the total of night missions.
  *  @param Mission Statistics
  */
-int SoldierDiary::getNightMissionTotal(std::vector<MissionStatistics*> *missionStatistics, const Mod* mod) const
+int SoldierDiary::getNightMissionTotal(std::vector<MissionStatistics*>& missionStatistics, const Mod* mod) const
 {
 	int nightMissionTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int misionId : _missionIdList)
 		{
@@ -1123,11 +1123,11 @@ int SoldierDiary::getNightMissionTotal(std::vector<MissionStatistics*> *missionS
  *  Get the total of night terror missions.
  *  @param Mission Statistics
  */
-int SoldierDiary::getNightTerrorMissionTotal(std::vector<MissionStatistics*> *missionStatistics, const Mod* mod) const
+int SoldierDiary::getNightTerrorMissionTotal(std::vector<MissionStatistics*>& missionStatistics, const Mod* mod) const
 {
 	int nightTerrorMissionTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int misionId : _missionIdList)
 		{
@@ -1148,11 +1148,11 @@ int SoldierDiary::getNightTerrorMissionTotal(std::vector<MissionStatistics*> *mi
  *  Get the total of base defense missions.
  *  @param Mission Statistics
  */
-int SoldierDiary::getBaseDefenseMissionTotal(std::vector<MissionStatistics*> *missionStatistics) const
+int SoldierDiary::getBaseDefenseMissionTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	int baseDefenseMissionTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int misionId : _missionIdList)
 		{
@@ -1173,11 +1173,11 @@ int SoldierDiary::getBaseDefenseMissionTotal(std::vector<MissionStatistics*> *mi
  *  Get the total of alien base assaults.
  *  @param Mission Statistics
  */
-int SoldierDiary::getAlienBaseAssaultTotal(std::vector<MissionStatistics*> *missionStatistics) const
+int SoldierDiary::getAlienBaseAssaultTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	int alienBaseAssaultTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int misionId : _missionIdList)
 		{
@@ -1198,11 +1198,11 @@ int SoldierDiary::getAlienBaseAssaultTotal(std::vector<MissionStatistics*> *miss
  *  Get the total of important missions.
  *  @param Mission Statistics
  */
-int SoldierDiary::getImportantMissionTotal(std::vector<MissionStatistics*> *missionStatistics) const
+int SoldierDiary::getImportantMissionTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	int importantMissionTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int misionId : _missionIdList)
 		{
@@ -1223,11 +1223,11 @@ int SoldierDiary::getImportantMissionTotal(std::vector<MissionStatistics*> *miss
  *  Get the total score.
  *  @param Mission Statistics
  */
-int SoldierDiary::getScoreTotal(std::vector<MissionStatistics*> *missionStatistics) const
+int SoldierDiary::getScoreTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	int scoreTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int misionId : _missionIdList)
 		{
@@ -1245,11 +1245,11 @@ int SoldierDiary::getScoreTotal(std::vector<MissionStatistics*> *missionStatisti
  *  Get the Valiant Crux total.
  *  @param Mission Statistics
  */
-int SoldierDiary::getValiantCruxTotal(std::vector<MissionStatistics*> *missionStatistics) const
+int SoldierDiary::getValiantCruxTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	int valiantCruxTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int misionId : _missionIdList)
 		{
@@ -1267,11 +1267,11 @@ int SoldierDiary::getValiantCruxTotal(std::vector<MissionStatistics*> *missionSt
  *  Get the loot value total.
  *  @param Mission Statistics
  */
-int SoldierDiary::getLootValueTotal(std::vector<MissionStatistics*> *missionStatistics) const
+int SoldierDiary::getLootValueTotal(std::vector<MissionStatistics*>& missionStatistics) const
 {
 	int lootValueTotal = 0;
 
-	for (const auto* ms : *missionStatistics)
+	for (const MissionStatistics* ms : missionStatistics)
 	{
 		for (int misionId : _missionIdList)
 		{

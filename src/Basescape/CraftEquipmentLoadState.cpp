@@ -79,7 +79,7 @@ CraftEquipmentLoadState::CraftEquipmentLoadState(CraftEquipmentState *parent) : 
 	for (int i = 0; i < SavedGame::MAX_CRAFT_LOADOUT_TEMPLATES; ++i)
 	{
 		ItemContainer *item = _game->getSavedGame()->getGlobalCraftLoadout(i);
-		if (item->getContents()->empty())
+		if (item->getContents().empty())
 		{
 			_lstLoadout->addRow(1, tr("STR_EMPTY_SLOT_N").arg(i + 1).c_str());
 		}

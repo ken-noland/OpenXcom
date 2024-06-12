@@ -132,9 +132,9 @@ void GlobalAlienContainmentState::fillPrisonerList()
 	// determine prison types used in the game
 	std::set<int> prisonTypes = { 0 };
 	bool noTypes = true;
-	for (auto& facType : _game->getMod()->getBaseFacilitiesList())
+	for (const std::string& facType : _game->getMod()->getBaseFacilitiesList())
 	{
-		auto* facRule = _game->getMod()->getBaseFacility(facType);
+		RuleBaseFacility* facRule = _game->getMod()->getBaseFacility(facType);
 		if (facRule->getPrisonType() > 0)
 		{
 			prisonTypes.insert(facRule->getPrisonType());
@@ -142,7 +142,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
 		}
 	}
 
-	for (auto* xbase : *_game->getSavedGame()->getBases())
+	for (Base* xbase : _game->getSavedGame()->getBases())
 	{
 		bool displayed = false;
 		int totalBaseCapacity = 0;
@@ -153,7 +153,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
 		{
 			totalBaseCapacity += xbase->getAvailableContainment(prisonType);
 
-			for(auto* baseFacility : *xbase->getFacilities())
+			for (BaseFacility* baseFacility : xbase->getFacilities())
 			{
 				if(baseFacility->getRules()->getAliens() > 0 && baseFacility->getRules()->getPrisonType() == prisonType)
 				{

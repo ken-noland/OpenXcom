@@ -91,7 +91,7 @@ public:
 	/// Calculates the distance in 3d.
 	static float distance(Position pos1, Position pos2)
 	{
-		return std::sqrt(distanceSq(pos1, pos2));
+		return std::sqrtf(static_cast<float>(distanceSq(pos1, pos2)));
 	}
 
 	/**

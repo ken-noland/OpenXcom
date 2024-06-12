@@ -209,7 +209,7 @@ MapBlock* RuleTerrain::getRandomMapBlock(int maxSizeX, int maxSizeY, int group, 
 
 	if (compliantMapBlocks.empty()) return 0;
 
-	size_t n = RNG::generate(0, compliantMapBlocks.size() - 1);
+	size_t n = RNG::generate(0, (int)compliantMapBlocks.size() - 1);
 
 	return compliantMapBlocks[n];
 }
@@ -246,7 +246,7 @@ MapData *RuleTerrain::getMapData(unsigned int *id, int *mapDataSetID) const
 		{
 			break;
 		}
-		*id -= mdf->getSize();
+		*id -= (int)mdf->getSize();
 		(*mapDataSetID)++;
 	}
 	if (iter == _mapDataSets.end())
@@ -304,7 +304,7 @@ const std::string& RuleTerrain::getRandomMapScript() const
 {
 	if (!_mapScripts.empty())
 	{
-		size_t pick = RNG::generate(0, _mapScripts.size() - 1);
+		size_t pick = RNG::generate(0, (int)_mapScripts.size() - 1);
 		return _mapScripts[pick];
 	}
 	return _mapScript;

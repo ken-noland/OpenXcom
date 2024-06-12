@@ -85,7 +85,7 @@ SoldierTransformState::SoldierTransformState(Base* base, size_t soldier) : _base
 	_btnCancel->onMouseClick((ActionHandler)&SoldierTransformState::btnCancelClick);
 	_btnCancel->onKeyboardPress((ActionHandler)&SoldierTransformState::btnCancelClick, Options::keyCancel);
 
-	Soldier *s = _base->getSoldiers()->at(_soldier);
+	Soldier *s = _base->getSoldiers().at(_soldier);
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_TRANSFORMATION_FOR").arg(s->getName()));
 
@@ -252,7 +252,7 @@ void SoldierTransformState::lstTransformationClick(Action *)
 
 	if (transformationRule)
 	{
-		Soldier* soldier = _base->getSoldiers()->at(_soldier);
+		Soldier* soldier = _base->getSoldiers().at(_soldier);
 
 		_game->popState();
 		_game->pushState(new SoldierTransformationState(transformationRule, _base, soldier, nullptr));

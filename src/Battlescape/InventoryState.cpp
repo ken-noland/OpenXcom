@@ -82,7 +82,7 @@ InventoryState::InventoryState(bool tu, BattlescapeState *parent, Base *base, bo
 	if (Options::oxceAlternateCraftEquipmentManagement && !_tu && _base && _noCraft)
 	{
 		// deassign all soldiers
-		for (auto* soldier : *_base->getSoldiers())
+		for (Soldier* soldier : _base->getSoldiers())
 		{
 			_backup[soldier] = soldier->getCraft();
 			if (soldier->getCraft() && soldier->getCraft()->getStatus() != "STR_OUT")
@@ -689,7 +689,7 @@ void InventoryState::updateStats()
  */
 void InventoryState::saveEquipmentLayout()
 {
-	for (auto* bu : *_battleGame->getUnits())
+	for (BattleUnit* bu : _battleGame->getUnits())
 	{
 		// we need X-Com soldiers only
 		if (bu->getGeoscapeSoldier() == 0) continue;
@@ -708,7 +708,7 @@ void InventoryState::saveEquipmentLayout()
 
 		// save the soldier's items
 		// note: with using getInventory() we are skipping the ammos loaded, (they're not owned) because we handle the loaded-ammos separately (inside)
-		for (auto* bi : *bu->getInventory())
+		for (BattleItem* bi : bu->getInventory())
 		{
 			// skip fixed items
 			if (bi->getRules()->isFixed())
@@ -752,11 +752,11 @@ void InventoryState::btnArmorClick(Action *action)
 	if (!(s->getCraft() && s->getCraft()->getStatus() == "STR_OUT"))
 	{
 		size_t soldierIndex = 0;
-		for (auto soldierIt = _base->getSoldiers()->begin(); soldierIt != _base->getSoldiers()->end(); ++soldierIt)
+		for (auto soldierIt = _base->getSoldiers().begin(); soldierIt != _base->getSoldiers().end(); ++soldierIt)
 		{
 			if ((*soldierIt)->getId() == s->getId())
 			{
-				soldierIndex = soldierIt - _base->getSoldiers()->begin();
+				soldierIndex = soldierIt - _base->getSoldiers().begin();
 			}
 		}
 
@@ -790,11 +790,11 @@ void InventoryState::btnArmorClickRight(Action *action)
 	if (!(s->getCraft() && s->getCraft()->getStatus() == "STR_OUT"))
 	{
 		size_t soldierIndex = 0;
-		for (auto soldierIt = _base->getSoldiers()->begin(); soldierIt != _base->getSoldiers()->end(); ++soldierIt)
+		for (auto soldierIt = _base->getSoldiers().begin(); soldierIt != _base->getSoldiers().end(); ++soldierIt)
 		{
 			if ((*soldierIt)->getId() == s->getId())
 			{
-				soldierIndex = soldierIt - _base->getSoldiers()->begin();
+				soldierIndex = soldierIt - _base->getSoldiers().begin();
 			}
 		}
 
@@ -1071,7 +1071,7 @@ void InventoryState::btnOkClick(Action *)
 		if (Options::oxceAlternateCraftEquipmentManagement && !_tu && _base && _noCraft)
 		{
 			// assign all soldiers back, if possible
-			for (auto* soldier : *_base->getSoldiers())
+			for (Soldier* soldier : _base->getSoldiers())
 			{
 				Craft* c = _backup[soldier];
 				if (!soldier->getCraft() && c && c->getStatus() != "STR_OUT")
@@ -1226,7 +1226,7 @@ void InventoryState::_createInventoryTemplate(std::vector<EquipmentLayoutItem*> 
 	// copy inventory instead of just keeping a pointer to it.  that way
 	// create/apply can be used as an undo button for a single unit and will
 	// also work as expected if inventory is modified after 'create' is clicked
-	for (const auto* bi : *_battleGame->getSelectedUnit()->getInventory())
+	for (const BattleItem* bi : _battleGame->getSelectedUnit()->getInventory())
 	{
 		// skip fixed items
 		if (bi->getRules()->isFixed())
@@ -1322,7 +1322,7 @@ void InventoryState::_applyInventoryTemplate(std::vector<EquipmentLayoutItem*> &
 {
 	BattleUnit               *unit          = _battleGame->getSelectedUnit();
 	Tile                     *groundTile    = unit->getTile();
-	std::vector<BattleItem*> *groundInv     = groundTile->getInventory();
+	std::vector<BattleItem*>& groundInv     = groundTile->getInventory();
 
 	_battleGame->getTileEngine()->itemDropInventory(groundTile, unit, true, false);
 
@@ -1330,7 +1330,7 @@ void InventoryState::_applyInventoryTemplate(std::vector<EquipmentLayoutItem*> &
 	// from the ground.  if any item is not found on the ground, display warning
 	// message, but continue attempting to fulfill the template as best we can
 	bool itemMissing = false;
-	for (const auto* equipmentLayoutItem : inventoryTemplate)
+	for (const EquipmentLayoutItem* equipmentLayoutItem : inventoryTemplate)
 	{
 		// search for template item in ground inventory
 		bool found = false;
@@ -1347,7 +1347,7 @@ void InventoryState::_applyInventoryTemplate(std::vector<EquipmentLayoutItem*> &
 			matchedAmmo[slot] = nullptr;
 		}
 
-		for (BattleItem* groundItem : *groundInv)
+		for (BattleItem* groundItem : groundInv)
 		{
 			// if we find the appropriate ammo, remember it for later for if we find
 			// the right weapon but with the wrong ammo
@@ -1401,7 +1401,7 @@ void InventoryState::_applyInventoryTemplate(std::vector<EquipmentLayoutItem*> &
 
 		if (equipmentLayoutItem->isFixed())
 		{
-			for (BattleItem* fixedItem : *unit->getInventory())
+			for (BattleItem* fixedItem : unit->getInventory())
 			{
 				if (fixedItem->getRules()->isFixed() == false)
 				{
@@ -1646,7 +1646,7 @@ void InventoryState::onAutoequip(Action *)
 
 	BattleUnit               *unit          = _battleGame->getSelectedUnit();
 	Tile                     *groundTile    = unit->getTile();
-	std::vector<BattleItem*>  groundInv     = *groundTile->getInventory();
+	std::vector<BattleItem*>  groundInv     = groundTile->getInventory();
 	Mod                      *mod           = _game->getMod();
 	RuleInventory            *groundRuleInv = mod->getInventoryGround();
 	int                       worldShade    = _battleGame->getGlobalShade();
@@ -1953,10 +1953,10 @@ void InventoryState::onMoveGroundInventoryToBase(Action *)
 	}
 
 	Tile                     *groundTile = unit->getTile();
-	std::vector<BattleItem*> *groundInv = groundTile->getInventory();
+	std::vector<BattleItem*> &groundInv = groundTile->getInventory();
 
 	// step 1: move stuff from craft to base
-	for (auto* bi : *groundInv)
+	for (BattleItem* bi : groundInv)
 	{
 		const auto& weaponType = bi->getRules();
 		// check all ammo slots first
@@ -1979,11 +1979,11 @@ void InventoryState::onMoveGroundInventoryToBase(Action *)
 	}
 
 	// step 2: clear ground
-	for (auto itemIt = groundInv->begin(); itemIt != groundInv->end(); )
+	for (auto itemIt = groundInv.begin(); itemIt != groundInv.end(); )
 	{
 		BattleItem* item = (*itemIt);
 		item->setOwner(NULL);
-		itemIt = groundInv->erase(itemIt);
+		itemIt = groundInv.erase(itemIt);
 		_game->getSavedGame()->getSavedBattle()->removeItem(item);
 	}
 

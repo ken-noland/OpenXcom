@@ -121,13 +121,13 @@ void SoldierDiaryMissionState::init()
 		_game->popState();
 		return;
 	}
-	std::vector<MissionStatistics*> *missionStatistics = _game->getSavedGame()->getMissionStatistics();
+	std::vector<MissionStatistics*>& missionStatistics = _game->getSavedGame()->getMissionStatistics();
 	unsigned int missionId = _soldier->getDiary()->getMissionIdList().at(_rowEntry);
-	if (missionId > missionStatistics->size())
+	if (missionId > missionStatistics.size())
 	{
 		missionId = 0;
 	}
-	MissionStatistics *ms = missionStatistics->at(missionId);
+	MissionStatistics *ms = missionStatistics.at(missionId);
 
 	int daysWounded = 0;
 	auto injuryIt = ms->injuryList.find(_soldier->getId());
