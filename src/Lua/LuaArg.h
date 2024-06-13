@@ -45,6 +45,8 @@ template <> void toLua(lua_State* L, float arg);
 template <> void toLua(lua_State* L, double arg);
 template <> void toLua(lua_State* L, const std::string& arg);
 template <> void toLua(lua_State* L, const char* arg);
+template <> void toLua(lua_State* L, size_t arg);
+template <> void toLua(lua_State* L, __int64 arg);
 
 
 template <typename T>
@@ -59,6 +61,8 @@ template <> float fromLua(lua_State* luaState, int index);
 template <> double fromLua(lua_State* luaState, int index);
 template <> std::string fromLua(lua_State* luaState, int index);
 template <> const char* fromLua(lua_State* luaState, int index);
+template <> size_t fromLua(lua_State* luaState, int index);
+template <> __int64 fromLua(lua_State* luaState, int index);
 
 } // namespace Lua
 

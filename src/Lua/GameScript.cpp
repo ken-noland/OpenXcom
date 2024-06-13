@@ -28,6 +28,35 @@ namespace OpenXcom
 namespace Lua
 {
 
+GameScript::GameScript(Game& game)
+	:
+	LuaApi("game"),
+	_game(game),
+	_onLoadGame("on_load_game"),
+	_onSaveGame("on_save_game")
+{
+}
+
+GameScript::~GameScript()
+{
+}
+
+void GameScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
+{
+	_geoscapeScript.registerApi(luaState, parentTableIndex);
+
+	_onLoadGame.registerApi(luaState, parentTableIndex);
+	_onSaveGame.registerApi(luaState, parentTableIndex);
+
+	//using lambdas to register functions for the game table.
+	registerFunction<[]() -> int { return 2; }>(luaState, "test_ret_2");
+
+	registerContainer<
+		[]() -> const std::vector<Base*>& { return getGame()->getSavedGame()->getBases(); },
+		[]() -> bool { return getGame()->getSavedGame() != nullptr; }
+	>(luaState, "bases", parentTableIndex);
+}
+
 	
 void yamlNodeToLua(lua_State* L, const YAML::Node& node)
 {
@@ -67,8 +96,6 @@ YAML::Node luaToYamlNode(lua_State* luaState, int index)
 	return node;
 }
 
-
-
 // specialization of template functions to allow for serialization of YAML
 template <>
 void toLua(lua_State* L, const YAML::Node& arg)
@@ -81,33 +108,6 @@ YAML::Node fromLua(lua_State* luaState, int index)
 {
 	return luaToYamlNode(luaState, index);
 }
-
-
-GameScript::GameScript(Game& game)
-	:
-	LuaApi("game"),
-	_game(game),
-	_onLoadGame("on_load_game"),
-	_onSaveGame("on_save_game")
-{
-}
-
-GameScript::~GameScript()
-{
-}
-
-void GameScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
-{
-	_geoscapeScript.registerApi(luaState, parentTableIndex);
-
-	_onLoadGame.registerApi(luaState, parentTableIndex);
-	_onSaveGame.registerApi(luaState, parentTableIndex);
-
-	//using lambdas to register functions for the game table.
-	auto constexpr get_base_num = []() -> int { return 42; };
-	createFunction<get_base_num>(luaState, "get_base_num");
-}
-
 
 } // namespace Lua
 

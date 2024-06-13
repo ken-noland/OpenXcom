@@ -168,8 +168,14 @@ void LoadGameState::think()
 		SavedGame *s = new SavedGame();
 		try
 		{
-			s->load(_filename, _game->getMod(), _game->getLanguage());
+			YAML::Node save;
+			s->load(_filename, _game->getMod(), _game->getLanguage(), save);
 			_game->setSavedGame(s);
+
+			
+			getGame()->getLuaMod().getGameScript().onLoadGame().dispatchCallback(save);
+
+
 			if (_game->getSavedGame()->getEnding() != END_NONE)
 			{
 				Options::baseXResolution = Screen::ORIGINAL_WIDTH;

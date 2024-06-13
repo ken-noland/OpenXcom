@@ -300,9 +300,14 @@ void StartState::addLine(const std::string &str)
  * @param game_ptr Pointer to the game.
  * @return Thread status, 0 = ok
  */
+
+extern void setThreadLocalGame(Game* gameInstance);
+
 int StartState::load(void *game_ptr)
 {
 	Game *game = (Game*)game_ptr;
+	setThreadLocalGame(game);
+
 	try
 	{
 		Log(LOG_INFO) << "Loading data...";

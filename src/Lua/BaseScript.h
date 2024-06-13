@@ -17,19 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "LuaApi.h"
+#include "LuaArg.h"
 
 namespace OpenXcom
 {
 
+class Base;
+
 namespace Lua
 {
 
-class BaseScript
-{
-public:
-	BaseScript();
-	~BaseScript();
-};
+template <> void toLua(lua_State* L, Base* arg);
+template <> Base* fromLua(lua_State* luaState, int index);
 
 } // namespace Lua
 } // namespace OpenXcom
