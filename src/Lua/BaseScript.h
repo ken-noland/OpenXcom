@@ -31,12 +31,5 @@ namespace Lua
 template <> void toLua(lua_State* L, Base* arg);
 template <> Base* fromLua(lua_State* luaState, int index);
 
-class BaseScript : public LuaApi
-{
-public:
-	BaseScript();
-	~BaseScript();
-};
-
 } // namespace Lua
 } // namespace OpenXcom

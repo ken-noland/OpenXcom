@@ -16,12 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "BaseScript.h"
 #include "SoldierScript.h"
-#include "LuaHelpers.h"
 #include "LuaContainer.h"
+#include "LuaProperty.h"
+#include "LuaHelpers.h"
 
-#include "../Savegame/Base.h"
+#include "../Savegame/Soldier.h"
+
 
 namespace OpenXcom
 {
@@ -30,12 +31,32 @@ namespace Lua
 {
 
 template <>
-void toLua(lua_State* luaState, Base* arg)
+void toLua(lua_State* luaState, Soldier* arg)
 {
-	int tableIndex = pushTableWithUserdata(luaState, arg);
+//	int tableIndex = pushTableWithUserdata(luaState, arg);
+
+	int tableIndex = pushTableWithUserdataAndProperties(luaState, arg, [](lua_State* luaState, int index) {
+		lua_pushstring(luaState, "name");
+		lua_pushstring(luaState, "Soldier 1");
+		lua_settable(luaState, index);
+
+		lua_pushstring(luaState, "health");
+		lua_pushinteger(luaState, 100);
+		lua_settable(luaState, index);
+
+		lua_pushstring(luaState, "morale");
+		lua_pushinteger(luaState, -2);
+		lua_settable(luaState, index);
+	});
+
+	//int top = lua_gettop(luaState);
+
+	//registerProperty<
+
+	//>(luaState, "name", tableIndex);
 
 	//lua_pushstring(luaState, "name");
-	//lua_pushstring(luaState, "Base 1");
+	//lua_pushstring(luaState, "Soldier 1");
 	//lua_settable(luaState, -3);
 
 	//lua_pushstring(luaState, "health");
@@ -46,17 +67,14 @@ void toLua(lua_State* luaState, Base* arg)
 	//lua_pushinteger(luaState, -2);
 	//lua_settable(luaState, -3);
 
-	registerContainer<[](Base* base) -> const std::vector<Soldier*>& { return base->getSoldiers(); }>(luaState, "soldiers", tableIndex, arg);
 }
 
 template <>
-Base* fromLua(lua_State* luaState, int index)
+Soldier* fromLua(lua_State* luaState, int index)
 {
 	// not going to be implemented
 	return nullptr;
 }
-
-
 
 } // namespace Lua
 

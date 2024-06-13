@@ -190,7 +190,7 @@ public:
 	/// Gets list of saves in the user directory.
 	static std::vector<SaveInfo> getList(Language *lang, bool autoquick);
 	/// Loads a saved game from YAML.
-	void load(const std::string &filename, Mod *mod, Language *lang);
+	void load(const std::string& filename, Mod* mod, Language* lang, YAML::Node& doc);
 	/// Saves a saved game to YAML.
 	void save(const std::string &filename, Mod *mod) const;
 	/// Gets the game name.

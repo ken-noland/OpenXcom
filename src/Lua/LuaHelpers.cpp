@@ -41,3 +41,4 @@ int OpenXcom::Lua::pushTableWithUserdata(lua_State* luaState, void* userData)
 
 	return lua_gettop(luaState);
 }
+

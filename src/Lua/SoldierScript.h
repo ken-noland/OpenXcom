@@ -17,22 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-extern "C"
-{
-	struct lua_State;
-}
+#include "LuaApi.h"
+#include "LuaArg.h"
 
 namespace OpenXcom
 {
 
+class Soldier;
+
 namespace Lua
 {
 
-/// Pushes a table with the given userdata onto the stack.
-int pushTableWithUserdata(lua_State* luaState, void* userdata);
-
+template <>
+void toLua(lua_State* L, Soldier* arg);
+template <>
+Soldier* fromLua(lua_State* luaState, int index);
 
 } // namespace Lua
-
 } // namespace OpenXcom

@@ -378,7 +378,7 @@ SaveInfo SavedGame::getSaveInfo(const std::string &file, Language *lang)
  * @param mod Mod for the saved game.
  * @param lang Loaded language.
  */
-void SavedGame::load(const std::string &filename, Mod *mod, Language *lang)
+void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML::Node& doc)
 {
 	std::string filepath = Options::getMasterUserFolder() + filename;
 	std::vector<YAML::Node> file = YAML::LoadAll(*CrossPlatform::readFile(filepath));
@@ -396,7 +396,7 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang)
 	_ironman = brief["ironman"].as<bool>(_ironman);
 
 	// Get full save data
-	YAML::Node doc = file[1];
+	doc = file[1];
 	_difficulty = (GameDifficulty)doc["difficulty"].as<int>(_difficulty);
 	_end = (GameEnding)doc["end"].as<int>(_end);
 	if (doc["rng"] && (_ironman || !Options::newSeedOnLoad))
@@ -745,8 +745,6 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang)
 	}
 
 	_scriptValues.load(doc, mod->getScriptGlobal());
-
-	getGame()->getLuaMod().getGameScript().onLoadGame().dispatchCallback(doc);
 }
 
 /**

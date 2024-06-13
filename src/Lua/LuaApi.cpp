@@ -48,7 +48,7 @@ void LuaApi::popTable(lua_State* luaState)
 }
 
 /// Creates a new table and sets the metatable to the userdata. Allows a callback to be called after the table is created, but before it is popped off the stack
-int LuaApi::registerTable(lua_State* luaState, const std::string tableName, void* userData, int parentIndex, std::function<void(lua_State*, int)> onTableCreated)
+int LuaApi::registerTable(lua_State* luaState, const std::string tableName, bool shouldPushTable, void* userData, int parentIndex, std::function<void(lua_State*, int)> onTableCreated)
 {
 	int tableIndex = pushTable(luaState, userData);
 
@@ -69,7 +69,10 @@ int LuaApi::registerTable(lua_State* luaState, const std::string tableName, void
 		onTableCreated(luaState, tableIndex);
 	}
 
-	popTable(luaState);
+	if (!shouldPushTable)
+	{
+		popTable(luaState);
+	}
 
 	return tableIndex;
 }
@@ -85,7 +88,7 @@ void LuaApi::registerLuaFunction(lua_State* luaState, const std::string function
 void LuaApi::registerApi(lua_State* luaState, int parentTableIndex)
 {
 	// create a new table with the name of the API
-	int tableIndex = registerTable(luaState, _name, this, parentTableIndex, [this](lua_State* luaState, int tableIndex)
+	int tableIndex = registerTable(luaState, _name, false, this, parentTableIndex, [this](lua_State* luaState, int tableIndex)
 	{
 		// Register API-specific functions and values
         onRegisterApi(luaState, tableIndex);

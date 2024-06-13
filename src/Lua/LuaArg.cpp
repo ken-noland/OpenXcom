@@ -58,13 +58,13 @@ void toLua(lua_State* L, const char* arg)
 template <>
 void toLua(lua_State* L, size_t arg)
 {
-	lua_pushnumber(L, (lua_Number)arg);
+	lua_pushinteger(L, (lua_Integer)arg);
 }
 
 template <>
 void toLua(lua_State* L, __int64 arg)
 {
-	lua_pushnumber(L, (lua_Number)arg);
+	lua_pushinteger(L, (lua_Integer)arg);
 }
 
 template <>
@@ -76,13 +76,13 @@ int fromLua(lua_State* luaState, int index)
 template <>
 float fromLua(lua_State* luaState, int index)
 {
-	return static_cast<float>(lua_tointeger(luaState, index));
+	return static_cast<float>(lua_tonumber(luaState, index));
 }
 
 template <>
 double fromLua(lua_State* luaState, int index)
 {
-	return static_cast<double>(lua_tointeger(luaState, index));
+	return static_cast<double>(lua_tonumber(luaState, index));
 }
 
 template <>
