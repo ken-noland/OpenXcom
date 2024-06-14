@@ -61,7 +61,9 @@ public:
 	/// Gets the country's ruleset.
 	const RuleCountry *getRules() const;
 	/// Gets the country's funding.
-	std::vector<int> &getFunding();
+	[[nodiscard]] std::vector<int>& getFunding() { return _funding; }
+	/// Gets the country's funding.
+	[[nodiscard]] const std::vector<int>& getFunding() const { return _funding; }
 	/// Sets the country's funding.
 	void setFunding(int funding);
 
@@ -72,9 +74,13 @@ public:
 	/// add alien activity in this country
 	void addActivityAlien(int activity);
 	/// get xcom activity to this country
-	std::vector<int> &getActivityXcom();
+	[[nodiscard]] std::vector<int>& getActivityXcom() { return _activityXcom; }
 	/// get xcom activity to this country
-	std::vector<int> &getActivityAlien();
+	[[nodiscard]] const std::vector<int>& getActivityXcom() const { return _activityXcom; }
+	/// get xcom activity to this country
+	[[nodiscard]] std::vector<int>& getActivityAlien() { return _activityAlien; }
+	/// get xcom activity to this country
+	[[nodiscard]] const std::vector<int>& getActivityAlien() const { return _activityAlien; }
 	/// store last month's counters, start new counters, set this month's change.
 	void newMonth(int xcomTotal, int alienTotal, int pactScore, int averageFunding, const SavedGame* save);
 	/// are we signing a new pact?
@@ -90,7 +96,7 @@ public:
 	/// sign a pact immediately
 	void setPact();
 	/// can be (re)infiltrated?
-	bool canBeInfiltrated();
+	[[nodiscard]] const bool canBeInfiltrated() const;
 
 private:
 	int getCurrentFunding() const { return _funding.back(); }

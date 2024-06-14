@@ -474,36 +474,37 @@ void MonthlyReportState::calculateChanges()
 	{
 		pactScore = infiltration->getPoints();
 	}
-	int averageFunding = (int)(_game->getSavedGame()->getCountryFunding() / _game->getSavedGame()->getCountries().size() / 1000 * 1000);
-	for (Country* country : _game->getSavedGame()->getCountries())
+	auto countries = _game->getSavedGame()->getRegistry().view<Country>();
+	int averageFunding = (int)(_game->getSavedGame()->getCountryFunding() / countries.size() / 1000 * 1000);
+	for (auto&& [id, country] : countries.each())
 	{
 		// check pact status before and after, because scripting can arbitrarily form/break pacts
-		bool wasInPact = country->getPact();
+		bool wasInPact = country.getPact();
 
 		// determine satisfaction level, sign pacts, adjust funding
 		// and update activity meters,
-		country->newMonth(xcomTotal, alienTotal, pactScore, averageFunding, _game->getSavedGame());
+		country.newMonth(xcomTotal, alienTotal, pactScore, averageFunding, _game->getSavedGame());
 		// and after they've made their decisions, calculate the difference, and add
 		// them to the appropriate lists.
-		_fundingDiff += country->getFunding().back() - country->getFunding().at(country->getFunding().size() - 2);
+		_fundingDiff += country.getFunding().back() - country.getFunding().at(country.getFunding().size() - 2);
 
-		bool isInPact = country->getPact();
+		bool isInPact = country.getPact();
 		if (!wasInPact && isInPact) // signed a new pact this month
 		{
-			_pactList.push_back(country->getRules()->getType());
+			_pactList.push_back(country.getRules()->getType());
 		}
 		else if (wasInPact && !isInPact) // renounced a pact this month
 		{
-			_cancelPactList.push_back(country->getRules()->getType());
+			_cancelPactList.push_back(country.getRules()->getType());
 		}
 
-		switch (country->getSatisfaction())
+		switch (country.getSatisfaction())
 		{
 		case Country::Satisfaction::UNHAPPY:
-			_sadList.push_back(country->getRules()->getType());
+			_sadList.push_back(country.getRules()->getType());
 			break;
 		case Country::Satisfaction::HAPPY:
-			_happyList.push_back(country->getRules()->getType());
+			_happyList.push_back(country.getRules()->getType());
 			break;
 		default:
 			break;

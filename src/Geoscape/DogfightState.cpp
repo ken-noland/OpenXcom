@@ -1572,11 +1572,11 @@ void DogfightState::update()
 			{
 				if (_ufo->getShotDownByCraftId() == _craft->getUniqueId())
 				{
-					for (Country* country : _game->getSavedGame()->getCountries())
+					for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 					{
-						if (country->getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
+						if (country.getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
 						{
-							country->addActivityXcom(_ufo->getRules()->getScore()*2);
+							country.addActivityXcom(_ufo->getRules()->getScore()*2);
 							break;
 						}
 					}
@@ -1599,11 +1599,11 @@ void DogfightState::update()
 				{
 					setStatus("STR_UFO_CRASH_LANDS");
 					_game->getMod()->getSound("GEO.CAT", Mod::UFO_CRASH)->play(); //10
-					for (Country* country : _game->getSavedGame()->getCountries())
+					for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 					{
-						if (country->getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
+						if (country.getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
 						{
-							country->addActivityXcom(_ufo->getRules()->getScore());
+							country.addActivityXcom(_ufo->getRules()->getScore());
 							break;
 						}
 					}
@@ -1700,11 +1700,11 @@ void DogfightState::update()
 				_ufo->setSpeed(0);
 				_ufo->setStatus(Ufo::DESTROYED);
 				_destroyUfo = true;
-				for (Country* country : _game->getSavedGame()->getCountries())
+				for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 				{
-					if (country->getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
+					if (country.getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
 					{
-						country->addActivityXcom(_ufo->getRules()->getScore());
+						country.addActivityXcom(_ufo->getRules()->getScore());
 						break;
 					}
 				}

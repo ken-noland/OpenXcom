@@ -273,9 +273,9 @@ void StatisticsState::listStats()
 	}
 
 	int countriesLost = 0;
-	for (const Country* country : save->getCountries())
+	for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
 	{
-		if (country->getPact())
+		if (country.getPact())
 		{
 			countriesLost++;
 		}

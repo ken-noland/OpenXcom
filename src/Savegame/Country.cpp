@@ -104,15 +104,6 @@ const RuleCountry* Country::getRules() const
 }
 
 /**
- * Returns the country's current monthly funding.
- * @return Monthly funding.
- */
-std::vector<int>& Country::getFunding()
-{
-	return _funding;
-}
-
-/**
  * Changes the country's current monthly funding.
  * @param funding Monthly funding.
  */
@@ -148,24 +139,6 @@ void Country::addActivityXcom(int activity)
 void Country::addActivityAlien(int activity)
 {
 	_activityAlien.back() += activity;
-}
-
-/**
- * Gets the country's xcom activity level.
- * @return activity level.
- */
-std::vector<int>& Country::getActivityXcom()
-{
-	return _activityXcom;
-}
-
-/**
- * Gets the country's alien activity level.
- * @return activity level.
- */
-std::vector<int>& Country::getActivityAlien()
-{
-	return _activityAlien;
 }
 
 /**
@@ -342,7 +315,7 @@ void Country::setPact()
 /**
  * can be (re)infiltrated?
  */
-bool Country::canBeInfiltrated()
+const bool Country::canBeInfiltrated() const
 {
 	if (!_pact && !_newPact)
 	{

@@ -1113,11 +1113,11 @@ void DebriefingState::prepareDebriefing()
 						break;
 					}
 				}
-				for (Country* country : save->getCountries())
+				for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 				{
-					if (country->getRules()->insideCountry(xcraft->getLongitude(), xcraft->getLatitude()))
+					if (country.getRules()->insideCountry(xcraft->getLongitude(), xcraft->getLatitude()))
 					{
-						_country = country;
+						_country = &country;
 						_missionStatistics->country = _country->getRules()->getType();
 						break;
 					}
@@ -1177,11 +1177,11 @@ void DebriefingState::prepareDebriefing()
 					break;
 				}
 			}
-			for (Country* country : save->getCountries())
+			for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 			{
-				if (country->getRules()->insideCountry(base->getLongitude(), base->getLatitude()))
+				if (country.getRules()->insideCountry(base->getLongitude(), base->getLatitude()))
 				{
-					_country = country;
+					_country = &country;
 					_missionStatistics->country = _country->getRules()->getType();
 					break;
 				}

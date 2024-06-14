@@ -72,11 +72,11 @@ AlienBaseState::AlienBaseState(AlienBase *base, GeoscapeState *state) : _state(s
 
 	// Check location of base
 	std::string regionName, countryName;
-	for (const Country* country : _game->getSavedGame()->getCountries())
+	for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
 	{
-		if (country->getRules()->insideCountry(_base->getLongitude(), _base->getLatitude()))
+		if (country.getRules()->insideCountry(_base->getLongitude(), _base->getLatitude()))
 		{
-			countryName = tr(country->getRules()->getType());
+			countryName = tr(country.getRules()->getType());
 			break;
 		}
 	}

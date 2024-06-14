@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <functional>
 #include <ctime>
+#include <ranges>
 #include <yaml-cpp/yaml.h>
 #include "../version.h"
 #include "../Engine/Logger.h"
@@ -138,10 +139,10 @@ SavedGame::SavedGame() :
 SavedGame::~SavedGame()
 {
 	delete _time;
-	for (auto* country : _countries)
-	{
-		delete country;
-	}
+	// for (auto* country : _countries)
+	// {
+	// 	delete country;
+	// }
 	for (auto* region : _regions)
 	{
 		delete region;
@@ -426,9 +427,9 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 		std::string type = (*i)["type"].as<std::string>();
 		if (mod->getCountry(type))
 		{
-			Country *c = new Country(mod->getCountry(type), false);
-			c->load(*i, mod->getScriptGlobal());
-			_countries.push_back(c);
+			entt::entity entity = _registry.create();
+			Country& newCountry = _registry.emplace<Country>(entity, mod->getCountry(type), false);
+			newCountry.load(*i, mod->getScriptGlobal());
 		}
 		else
 		{
@@ -823,9 +824,9 @@ void SavedGame::save(const std::string &filename, Mod *mod) const
 	node["globeLat"] = serializeDouble(_globeLat);
 	node["globeZoom"] = _globeZoom;
 	node["ids"] = _ids;
-	for (const auto* country : _countries)
+	for (auto&& [id, country] : _registry.view<Country>().each())
 	{
-		node["countries"].push_back(country->save(mod->getScriptGlobal()));
+		node["countries"].push_back(country.save(mod->getScriptGlobal()));
 	}
 	for (const auto* region : _regions)
 	{
@@ -1303,10 +1304,10 @@ void SavedGame::setAllIds(const std::map<std::string, int> &ids)
  * Returns the list of countries in the game world.
  * @return Pointer to country list.
  */
-std::vector<Country*>& SavedGame::getCountries()
-{
-	return _countries;
-}
+// std::vector<Country*>& SavedGame::getCountries()
+// {
+// 	return _countries;
+// }
 
 /**
  * Adds up the monthly funding of all the countries.
@@ -1315,9 +1316,9 @@ std::vector<Country*>& SavedGame::getCountries()
 int SavedGame::getCountryFunding() const
 {
 	int total = 0;
-	for (auto* country : _countries)
+	for (auto&& [id, country] : _registry.view<const Country>().each())
 	{
-		total += country->getFunding().back();
+		total += country.getFunding().back();
 	}
 	return total;
 }
@@ -2631,25 +2632,18 @@ Region *SavedGame::locateRegion(const Target &target) const
  * Find the country containing this location.
  * @param lon The longitude.
  * @param lat The latitude.
- * @return Pointer to the country, or 0.
+ * @return Pointer to the country, or nullptr.
  */
-Country* SavedGame::locateCountry(double lon, double lat) const
+const Country* SavedGame::locateCountry(double lon, double lat) const
 {
-	Country* found = nullptr;
-	for (auto* country : _countries)
+	for (auto&& [id, country] : _registry.view<Country>().each())
 	{
-		if (country->getRules()->insideCountry(lon, lat))
+		if (country.getRules()->insideCountry(lon, lat))
 		{
-			found = country;
-			break;
+			return &country;
 		}
 	}
-	if (found)
-	{
-		return found;
-	}
-	//Log(LOG_DEBUG) << "Failed to find a country at location [" << lon << ", " << lat << "].";
-	return 0;
+	return nullptr;
 }
 
 /**
@@ -2657,7 +2651,7 @@ Country* SavedGame::locateCountry(double lon, double lat) const
  * @param target The target to locate.
  * @return Pointer to the country, or 0.
  */
-Country* SavedGame::locateCountry(const Target& target) const
+const Country* SavedGame::locateCountry(const Target& target) const
 {
 	return locateCountry(target.getLongitude(), target.getLatitude());
 }
@@ -2674,7 +2668,7 @@ int SavedGame::selectSoldierNationalityByLocation(const Mod* mod, const RuleSold
 
 	if (mod->getHireByCountryOdds() > 0 && RNG::percent(mod->getHireByCountryOdds()))
 	{
-		Country* country = locateCountry(*target);
+		const Country* country = locateCountry(*target);
 		if (country)
 		{
 			int nationality = 0;
@@ -3174,11 +3168,11 @@ void SavedGame::clearLinksForAlienBase(AlienBase* alienBase, const Mod* mod)
 	// If there was a pact with this base, cancel it?
 	if (mod->getAllowCountriesToCancelAlienPact() && !alienBase->getPactCountry().empty())
 	{
-		for (auto* country : _countries)
+		for (auto&& [id, country] : _registry.view<Country>().each())
 		{
-			if (country->getRules()->getType() == alienBase->getPactCountry())
+			if (country.getRules()->getType() == alienBase->getPactCountry())
 			{
-				country->setCancelPact();
+				country.setCancelPact();
 				break;
 			}
 		}

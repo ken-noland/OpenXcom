@@ -54,11 +54,12 @@ namespace OpenXcom
 HiddenAlienActivityState::HiddenAlienActivityState
 (
 	GeoscapeState* state,
+	SavedGame& save,
 	std::map<OpenXcom::Region*, int> displayHiddenAlienActivityRegions,
-	std::map<OpenXcom::Country*, int> displayHiddenAlienActivityCountries
+	std::unordered_map<entt::entity, int> displayHiddenAlienActivityCountries
 )
 	:
-	_state(state),
+	_state(state), _save(save),
 	_displayHiddenAlienActivityRegions(displayHiddenAlienActivityRegions),
 	_displayHiddenAlienActivityCountries(displayHiddenAlienActivityCountries)
 {
@@ -159,10 +160,9 @@ HiddenAlienActivityState::HiddenAlienActivityState
 
 	}
 
-	for (std::pair<Country* const, int> displayHiddenAlienActivitycountryEntry : _displayHiddenAlienActivityCountries)
+	for (auto &&[id, activity] : _displayHiddenAlienActivityCountries)
 	{
-		Country* country = displayHiddenAlienActivitycountryEntry.first;
-		int activity = displayHiddenAlienActivitycountryEntry.second;
+		const Country& country = _save.getRegistry().get<Country>(id);
 
 		std::ostringstream ossName;
 		std::ostringstream ossValue;
@@ -171,7 +171,7 @@ HiddenAlienActivityState::HiddenAlienActivityState
 			ossName << Unicode::TOK_COLOR_FLIP;
 			ossValue << Unicode::TOK_COLOR_FLIP;
 		}
-		ossName << tr(country->getRules()->getType());
+		ossName << tr(country.getRules()->getType());
 		ossValue << std::to_string(activity);
 
 		if (Options::displayHiddenAlienActivity == 2)

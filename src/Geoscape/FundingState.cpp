@@ -18,6 +18,7 @@
  */
 #include "FundingState.h"
 #include <sstream>
+#include <entt/entt.hpp>
 #include "../Engine/Game.h"
 #include "../Mod/Mod.h"
 #include "../Engine/LocalizedText.h"
@@ -131,12 +132,12 @@ FundingState::FundingState()
 
 	_fundingCountryOrder = FC_NONE;
 
-	for (Country* country : _game->getSavedGame()->getCountries())
+	for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
 	{
 		_fundingCountryList.push_back(FundingCountry(
-			tr(country->getRules()->getType()),
-			country->getFunding().back(),
-			country->getFunding().size() > 1 ? country->getFunding().back() - country->getFunding().at(country->getFunding().size() - 2) : 0)
+			tr(country.getRules()->getType()),
+			country.getFunding().back(),
+			country.getFunding().size() > 1 ? country.getFunding().back() - country.getFunding().at(country.getFunding().size() - 2) : 0)
 		);
 	}
 }
@@ -257,7 +258,7 @@ void FundingState::updateList()
 		_lstCountries->addRow(3, country.name.c_str(), ss.str().c_str(), ss2.str().c_str());
 	}
 	_lstCountries->addRow(2, tr("STR_TOTAL_UC").c_str(), Unicode::formatFunding(_game->getSavedGame()->getCountryFunding()).c_str());
-	_lstCountries->setRowColor(_game->getSavedGame()->getCountries().size(), _txtCountry->getColor());
+	_lstCountries->setRowColor(_game->getSavedGame()->getRegistry().view<const Country>().size(), _txtCountry->getColor());
 }
 
 /**

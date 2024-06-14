@@ -276,12 +276,12 @@ void Base::finishLoading(const YAML::Node &node, SavedGame *save)
  */
 void Base::calculateServices(SavedGame* save)
 {
-	for (const Country* country : save->getCountries())
+	for (const auto&& [id, country] : save->getRegistry().view<const Country>().each())
 	{
-		if (country->getRules()->insideCountry(_lon, _lat))
+		if (country.getRules()->insideCountry(_lon, _lat))
 		{
-			_provideBaseFunc |= country->getRules()->getProvidedBaseFunc();
-			_forbiddenBaseFunc |= country->getRules()->getForbiddenBaseFunc();
+			_provideBaseFunc |= country.getRules()->getProvidedBaseFunc();
+			_forbiddenBaseFunc |= country.getRules()->getForbiddenBaseFunc();
 			break;
 		}
 	}

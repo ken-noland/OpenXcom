@@ -250,10 +250,10 @@ void AlienMission::think(Game &engine, const Globe &globe)
 	}
 	if (_rule.getObjective() == OBJECTIVE_INFILTRATION && _nextWave == _rule.getWaveCount())
 	{
-		for (Country* country : game.getCountries())
+		for (auto&& [id, country] : game.getRegistry().view<Country>().each())
 		{
 			RuleRegion *region = mod.getRegion(_region, true);
-			if (country->canBeInfiltrated() && region->insideRegion(country->getRules()->getLabelLongitude(), country->getRules()->getLabelLatitude()))
+			if (country.canBeInfiltrated() && region->insideRegion(country.getRules()->getLabelLongitude(), country.getRules()->getLabelLatitude()))
 			{
 				std::pair<double, double> pos;
 				int tries = 0;
@@ -302,7 +302,7 @@ void AlienMission::think(Game &engine, const Globe &globe)
 					alienBaseType = chooseAlienBaseType(mod, dummyArea);
 					wantsToSpawnFakeUnderwater = RNG::percent(alienBaseType->getFakeUnderwaterSpawnChance());
 
-					const RuleCountry* cRule = country->getRules();
+					const RuleCountry* cRule = country.getRules();
 					int pick = 0;
 					double lonMini, lonMaxi, latMini, latMaxi;
 					while (!found)
@@ -342,9 +342,9 @@ void AlienMission::think(Game &engine, const Globe &globe)
 				if (tries < 100 || mod.getAllowAlienBasesOnWrongTextures())
 				{
 					// only create a pact if the base is going to be spawned too
-					country->setNewPact();
+					country.setNewPact();
 
-					spawnAlienBase(country, engine, pos, alienBaseType);
+					spawnAlienBase(&country, engine, pos, alienBaseType);
 
 					// if the base can't be spawned for this country, try the next country
 					break;
@@ -1148,11 +1148,11 @@ void AlienMission::addScore(double lon, double lat, SavedGame &game) const
 			break;
 		}
 	}
-	for (Country* country : game.getCountries())
+	for (auto&& [id, country] : game.getRegistry().view<Country>().each())
 	{
-		if (country->getRules()->insideCountry(lon, lat))
+		if (country.getRules()->insideCountry(lon, lat))
 		{
-			country->addActivityAlien(_rule.getPoints());
+			country.addActivityAlien(_rule.getPoints());
 			break;
 		}
 	}

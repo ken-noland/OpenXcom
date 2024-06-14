@@ -3741,18 +3741,22 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 	{
 		RuleCountry *countryRule = getCountry(countryName);
 		if (!countryRule->getLonMin().empty())
-			save->getCountries().push_back(new Country(countryRule));
+		{
+			entt::entity countryId = save->getRegistry().create();
+			save->getRegistry().emplace<Country>(countryId, countryRule);
+		}
 	}
 	// Adjust funding to total $6M
-	int missing = ((_initialFunding - save->getCountryFunding()/1000) / (int)save->getCountries().size()) * 1000;
-	for (Country* country : save->getCountries())
+	auto countries = save->getRegistry().view<Country>();
+	int missing = ((_initialFunding - save->getCountryFunding()/1000) / (int) countries.size()) * 1000;
+	for (auto&& [id, country] : countries.each())
 	{
-		int funding = country->getFunding().back() + missing;
+		int funding = country.getFunding().back() + missing;
 		if (funding < 0)
 		{
-			funding = country->getFunding().back();
+			funding = country.getFunding().back();
 		}
-		country->setFunding(funding);
+		country.setFunding(funding);
 	}
 	save->setFunds(save->getCountryFunding());
 

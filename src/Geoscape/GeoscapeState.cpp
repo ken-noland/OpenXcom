@@ -464,9 +464,12 @@ GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomO
 
 		std::vector<std::string> countryList;
 		countryList.push_back("All countries");
-		for (Country* c : _game->getSavedGame()->getCountries())
+		_debugComboBoxEntityToIndex.emplace(0, entt::null);
+		int index = 1;
+		for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
 		{
-			countryList.push_back(tr(c->getRules()->getType()));
+			_debugComboBoxEntityToIndex.emplace(index++, id);
+			countryList.push_back(tr(country.getRules()->getType()));
 		}
 		_cbxCountry->setOptions(countryList, false);
 		_cbxCountry->setVisible(false);
@@ -602,10 +605,10 @@ void GeoscapeState::handle(Action *action)
 					region->getActivityXcom().at(invertedEntry) = 0;
 					region->getActivityAlien().at(invertedEntry) = 0;
 				}
-				for (Country* country : _game->getSavedGame()->getCountries())
+				for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 				{
-					country->getActivityXcom().at(invertedEntry) = 0;
-					country->getActivityAlien().at(invertedEntry) = 0;
+					country.getActivityXcom().at(invertedEntry) = 0;
+					country.getActivityAlien().at(invertedEntry) = 0;
 				}
 			}
 			// "ctrl-7"
@@ -1116,11 +1119,11 @@ void GeoscapeState::time5Seconds()
 			Craft* xcraft = (*craftIt);
 			if (xcraft->isDestroyed())
 			{
-				for (Country* country : _game->getSavedGame()->getCountries())
+				for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 				{
-					if (country->getRules()->insideCountry(xcraft->getLongitude(), xcraft->getLatitude()))
+					if (country.getRules()->insideCountry(xcraft->getLongitude(), xcraft->getLatitude()))
 					{
-						country->addActivityXcom(-xcraft->getRules()->getScore());
+						country.addActivityXcom(-xcraft->getRules()->getScore());
 						break;
 					}
 				}
@@ -1807,11 +1810,11 @@ bool GeoscapeState::processMissionSite(MissionSite *site)
 	{
 		region->addActivityAlien(score);
 	}
-	for (Country* country : _game->getSavedGame()->getCountries())
+	for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 	{
-		if (country->getRules()->insideCountry(site->getLongitude(), site->getLatitude()))
+		if (country.getRules()->insideCountry(site->getLongitude(), site->getLatitude()))
 		{
-			country->addActivityAlien(score);
+			country.addActivityAlien(score);
 			break;
 		}
 	}
@@ -1931,10 +1934,10 @@ void GeoscapeState::time30Minutes()
 	// hidden alien activity variables
 
 	OpenXcom::Region *ufoRegion;
-	OpenXcom::Country *ufoCountry;
+	entt::entity ufoCountry = entt::null;
 
 	std::map<OpenXcom::Region*, int> hiddenUfoRegions;
-	std::map<OpenXcom::Country*, int> hiddenUfoCountries;
+	std::unordered_map<entt::entity, int> hiddenUfoCountries;
 
 	// Handle UFO detection and give aliens points
 	for (Ufo* ufo : _game->getSavedGame()->getUfos())
@@ -1954,7 +1957,6 @@ void GeoscapeState::time30Minutes()
 		case Ufo::FLYING:
 
 			ufoRegion = nullptr;
-			ufoCountry = nullptr;
 
 			// Get area
 			for (Region* region : _game->getSavedGame()->getRegions())
@@ -1967,12 +1969,12 @@ void GeoscapeState::time30Minutes()
 				}
 			}
 			// Get country
-			for (Country* country : _game->getSavedGame()->getCountries())
+			for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 			{
-				if (country->getRules()->insideCountry(ufo->getLongitude(), ufo->getLatitude()))
+				if (country.getRules()->insideCountry(ufo->getLongitude(), ufo->getLatitude()))
 				{
-					ufoCountry = country;
-					country->addActivityAlien(points);
+					ufoCountry = id;
+					country.addActivityAlien(points);
 					break;
 				}
 			}
@@ -1989,7 +1991,7 @@ void GeoscapeState::time30Minutes()
 				{
 					hiddenUfoRegions[ufoRegion]++;
 				}
-				if (ufoCountry != nullptr)
+				if (ufoCountry != entt::null)
 				{
 					hiddenUfoCountries[ufoCountry]++;
 				}
@@ -2008,7 +2010,7 @@ void GeoscapeState::time30Minutes()
 	if (Options::displayHiddenAlienActivity != 0)
 	{
 		std::map<Region*, int> displayHiddenAlienActivityRegions;
-		std::map<Country*, int> displayHiddenAlienActivityCountries;
+		std::unordered_map<entt::entity, int> displayHiddenAlienActivityCountries;
 		bool displayHiddenAlienActivityPopup = false;
 
 		for (Region* region : _game->getSavedGame()->getRegions())
@@ -2055,25 +2057,25 @@ void GeoscapeState::time30Minutes()
 
 		}
 
-		for (Country* country : _game->getSavedGame()->getCountries())
+		for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 		{
 			// old value
 
-			int oldHiddenAlienActivity = _hiddenAlienActivityCountries[country];
+			int oldHiddenAlienActivity = _hiddenAlienActivityCountries[id];
 
-			if (hiddenUfoCountries.find(country) != hiddenUfoCountries.end()) // there are hidden UFOs
+			if (hiddenUfoCountries.find(id) != hiddenUfoCountries.end()) // there are hidden UFOs
 			{
 				// increment points
 
-				_hiddenAlienActivityCountries[country] += hiddenUfoCountries[country];
+				_hiddenAlienActivityCountries[id] += hiddenUfoCountries[id];
 
 				// check if we reached notification threshold
 
 				if (
-					Options::displayHiddenAlienActivity == 1 && oldHiddenAlienActivity < HIDDEN_ALIEN_ACTIVITY_THRESHOLD && _hiddenAlienActivityCountries[country] >= HIDDEN_ALIEN_ACTIVITY_THRESHOLD ||
+					Options::displayHiddenAlienActivity == 1 && oldHiddenAlienActivity < HIDDEN_ALIEN_ACTIVITY_THRESHOLD && _hiddenAlienActivityCountries[id] >= HIDDEN_ALIEN_ACTIVITY_THRESHOLD ||
 					Options::displayHiddenAlienActivity == 2)
 				{
-					displayHiddenAlienActivityCountries[country] = _hiddenAlienActivityCountries[country];
+					displayHiddenAlienActivityCountries[id] = _hiddenAlienActivityCountries[id];
 					displayHiddenAlienActivityPopup = true;
 				}
 			}
@@ -2081,13 +2083,13 @@ void GeoscapeState::time30Minutes()
 			{
 				// reset accumulated activity
 
-				_hiddenAlienActivityCountries.erase(country);
+				_hiddenAlienActivityCountries.erase(id);
 
 				// show information for detailed notification if activity ceased
 
 				if (Options::displayHiddenAlienActivity == 2 && oldHiddenAlienActivity > 0)
 				{
-					displayHiddenAlienActivityCountries[country] = 0;
+					displayHiddenAlienActivityCountries[id] = 0;
 					displayHiddenAlienActivityPopup = true;
 				}
 			}
@@ -2097,7 +2099,7 @@ void GeoscapeState::time30Minutes()
 
 		if (displayHiddenAlienActivityPopup)
 		{
-			popup(new HiddenAlienActivityState(this, displayHiddenAlienActivityRegions, displayHiddenAlienActivityCountries));
+			popup(new HiddenAlienActivityState(this, *_game->getSavedGame(), displayHiddenAlienActivityRegions, displayHiddenAlienActivityCountries));
 		}
 
 	}
@@ -2792,11 +2794,11 @@ void GeoscapeState::time1Day()
 				break;
 			}
 		}
-		for (Country* country : saveGame->getCountries())
+		for (auto&& [id, country] : _game->getSavedGame()->getRegistry().view<Country>().each())
 		{
-			if (country->getRules()->insideCountry(ab->getLongitude(), ab->getLatitude()))
+			if (country.getRules()->insideCountry(ab->getLongitude(), ab->getLatitude()))
 			{
-				country->addActivityAlien(ab->getDeployment()->getPoints());
+				country.addActivityAlien(ab->getDeployment()->getPoints());
 				break;
 			}
 		}
@@ -3612,7 +3614,7 @@ void GeoscapeState::determineAlienMissions()
 		{
 			xcomBaseRegions.insert(region->getRules()->getType());
 		}
-		Country* country = save->locateCountry(*xcomBase);
+		const Country* country = save->locateCountry(*xcomBase);
 		if (country)
 		{
 			xcomBaseCountries.insert(country->getRules()->getType());
@@ -4766,18 +4768,18 @@ void GeoscapeState::cbxCountryChange(Action *)
 	int index = (int)_cbxCountry->getSelected();
 	if (index < 1)
 	{
-		_game->getSavedGame()->debugCountry = nullptr;
+		_game->getSavedGame()->debugCountry = entt::null;
 	}
 	else
 	{
-		_game->getSavedGame()->debugCountry = _game->getSavedGame()->getCountries()[index - 1];
+		_game->getSavedGame()->debugCountry = _debugComboBoxEntityToIndex[index - 1];
 	}
 
 	std::ostringstream ss;
 	auto* save = _game->getSavedGame();
-	if (save->debugCountry)
+	if (save->debugCountry != entt::null)
 	{
-		auto* countryRule = save->debugCountry->getRules();
+		auto* countryRule = save->getRegistry().get<Country>(save->debugCountry).getRules();
 		if (save->debugType == 0)
 		{
 			ss << "country: " << tr(countryRule->getType()) << " [" << countryRule->getType() << "]" << std::endl;

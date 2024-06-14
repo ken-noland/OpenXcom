@@ -160,11 +160,11 @@ SavedGame *SaveConverter::loadOriginal()
 	_save->getIncomes().clear();
 	for (size_t i = 0; i < _rules->getCountries().size(); ++i)
 	{
-		Country *country = new Country(_mod->getCountry(_rules->getCountries()[i], true));
-		country->getActivityAlien().clear();
-		country->getActivityXcom().clear();
-		country->getFunding().clear();
-		_save->getCountries().push_back(country);
+		entt::entity newCountryId = _save->getRegistry().create();
+		Country& newCountry =  _save->getRegistry().emplace<Country>(newCountryId, _mod->getCountry(_rules->getCountries()[i], true));
+		newCountry.getActivityAlien().clear();
+		newCountry.getActivityXcom().clear();
+		newCountry.getFunding().clear();
 	}
 	for (size_t i = 0; i < _rules->getRegions().size(); ++i)
 	{
@@ -281,10 +281,10 @@ void SaveConverter::loadDatIGlob()
 	graphVector(_save->getResearchScores(), month, _year != _mod->getStartingTime().getYear());
 	for (size_t i = 0; i < _rules->getCountries().size(); ++i)
 	{
-		Country *country = _save->getCountries().at(i);
-		graphVector(country->getActivityAlien(), month, _year != _mod->getStartingTime().getYear());
-		graphVector(country->getActivityXcom(), month, _year != _mod->getStartingTime().getYear());
-		graphVector(country->getFunding(), month, _year != _mod->getStartingTime().getYear());
+		// Country *country = _save->getCountries().at(i);
+		// graphVector(country->getActivityAlien(), month, _year != _mod->getStartingTime().getYear());
+		// graphVector(country->getActivityXcom(), month, _year != _mod->getStartingTime().getYear());
+		// graphVector(country->getFunding(), month, _year != _mod->getStartingTime().getYear());
 	}
 	for (size_t i = 0; i < _rules->getRegions().size(); ++i)
 	{
@@ -417,7 +417,7 @@ void SaveConverter::loadDatXcom()
 		// country
 		if (j < _rules->getCountries().size())
 		{
-			_save->getCountries().at(j)->getActivityXcom().push_back(score);
+			// _save->getCountries().at(j)->getActivityXcom().push_back(score);
 		}
 		// region
 		else
@@ -446,7 +446,7 @@ void SaveConverter::loadDatAlien()
 		// country
 		if (j < _rules->getCountries().size())
 		{
-			_save->getCountries().at(j)->getActivityAlien().push_back(score);
+			// _save->getCountries().at(j)->getActivityAlien().push_back(score);
 		}
 		// region
 		else
@@ -477,7 +477,7 @@ void SaveConverter::loadDatDiplom()
 	for (size_t i = 0; i < _rules->getCountries().size(); ++i)
 	{
 		char *cdata = (data + i * ENTRY_SIZE);
-		Country *country = _save->getCountries().at(i);
+		// Country *country = _save->getCountries().at(i);
 
 		int satisfaction = load<Sint16>(cdata + 0x02);
 		for (size_t j = 0; j < MONTHS; ++j)
@@ -485,15 +485,15 @@ void SaveConverter::loadDatDiplom()
 			int funding = load<Sint16>(cdata + 0x04 + j * sizeof(Sint16));
 			funding *= 1000;
 			income[j] += funding;
-			country->getFunding().push_back(funding);
+			// country->getFunding().push_back(funding);
 		}
 		bool pact = satisfaction == 0;
 		bool newPact = load<Sint16>(cdata + 0x1E) != 0;
 
-		if (pact)
-			country->setPact();
-		if (newPact)
-			country->setNewPact();
+		// if (pact)
+		// 	country->setPact();
+		// if (newPact)
+		// 	country->setNewPact();
 	}
 	_save->getIncomes() = income;
 }

@@ -202,9 +202,9 @@ PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(bas
 	{
 		if (!rule->getRequiresBuyCountry().empty())
 		{
-			for (const Country* country : _game->getSavedGame()->getCountries())
+			for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
 			{
-				if (country->getPact() && country->getRules()->getType() == rule->getRequiresBuyCountry())
+				if (country.getPact() && country.getRules()->getType() == rule->getRequiresBuyCountry())
 				{
 					return false;
 				}

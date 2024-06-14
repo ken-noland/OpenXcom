@@ -505,7 +505,7 @@ add_library(lua STATIC  ${lua_SOURCE_DIR}/lapi.c
                         ${lua_SOURCE_DIR}/lundump.c
                         ${lua_SOURCE_DIR}/lutf8lib.c
                         ${lua_SOURCE_DIR}/lvm.c
-                        ${lua_SOURCE_DIR}/lzio.c)
+                        ${lua_SOURCE_DIR}/lzio.c "Savegame/EntityManager.h")
 
 target_include_directories(lua PUBLIC ${lua_SOURCE_DIR}/src)
 
@@ -653,7 +653,7 @@ if (( APPLE AND CREATE_BUNDLE ) OR CPACK_GENERATOR STREQUAL "7Z" )
   set ( CMAKE_INSTALL_BINDIR "." )
 endif ()
 
-add_executable ( openxcom  ${application_type} ${openxcom_src} ${openxcom_icon}  "Lua/LuaArg.h")
+add_executable ( openxcom  ${application_type} ${openxcom_src} ${openxcom_icon}  "Lua/LuaArg.h" "Savegame/EntityManager.h")
 
 if (MSVC)
     target_compile_options(openxcom PRIVATE /bigobj)

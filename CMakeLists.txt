@@ -149,6 +149,7 @@ set ( OPENXCOM_VERSION_GIT "${GIT_STATE}" CACHE STRING "Git version string (afte
 
 configure_file("${CMAKE_SOURCE_DIR}/src/git_version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/git_version.h" )
 include_directories ( "${CMAKE_CURRENT_BINARY_DIR}" )
+include_directories ( ${DEPS_DIR}/entt/single_include )
 
 if ( BUILD_PACKAGE )
   set ( CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${GIT_STATE}" )
@@ -234,3 +235,4 @@ endif ()
 
 add_subdirectory ( docs )
 add_subdirectory ( src )
+add_subdirectory ( deps/entt )

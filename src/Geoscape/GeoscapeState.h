@@ -21,6 +21,7 @@
 #include "../Savegame/Region.h"
 #include "../Savegame/Country.h"
 #include <list>
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
@@ -70,7 +71,9 @@ private:
 
 	// hidden alien activity accumulators
 	std::map<OpenXcom::Region*, int> _hiddenAlienActivityRegions;
-	std::map<OpenXcom::Country*, int> _hiddenAlienActivityCountries;
+	std::map<entt::entity, int> _hiddenAlienActivityCountries;
+
+	std::unordered_map<int, entt::entity> _debugComboBoxEntityToIndex;
 
 	/// Update list of active crafts.
 	const std::vector<Craft*>& updateActiveCrafts();

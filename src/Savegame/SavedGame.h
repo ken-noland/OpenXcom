@@ -23,6 +23,7 @@
 #include <string>
 #include <time.h>
 #include <stdint.h>
+#include <entt/entt.hpp>
 #include "GameTime.h"
 #include "../Mod/RuleAlienMission.h"
 #include "../Mod/RuleEvent.h"
@@ -106,7 +107,7 @@ struct SaveInfo
 class SavedGame
 {
 public:
-	Country *debugCountry = nullptr;
+	entt::entity debugCountry = entt::null;
 	Region *debugRegion = nullptr;
 	int debugType = 0;
 	size_t debugZone = 0;
@@ -134,7 +135,8 @@ private:
 	double _globeLon, _globeLat;
 	int _globeZoom;
 	std::map<std::string, int> _ids;
-	std::vector<Country*> _countries;
+	entt::registry _registry;
+	// std::vector<Country*> _countries;
 	std::vector<Region*> _regions;
 	std::vector<Base*> _bases;
 	std::vector<Ufo*> _ufos;
@@ -251,10 +253,8 @@ public:
 	const std::map<std::string, int> &getAllIds() const;
 	/// Resets the list of object IDs.
 	void setAllIds(const std::map<std::string, int> &ids);
-	/// Gets the list of countries.
-	std::vector<Country*>& getCountries();
-	/// Gets the list of countries.
-	[[nodiscard]] const std::vector<Country*>* getCountries() const { return &_countries; }
+	const entt::registry& getRegistry() const { return _registry; }
+	entt::registry& getRegistry() { return _registry; }
 	/// Gets the total country funding.
 	int getCountryFunding() const;
 	/// Gets the list of regions.
@@ -414,9 +414,9 @@ public:
 	/// Locate a region containing a Target.
 	Region *locateRegion(const Target &target) const;
 	/// Locate a country containing a position.
-	Country* locateCountry(double lon, double lat) const;
+	const Country* locateCountry(double lon, double lat) const;
 	/// Locate a country containing a Target.
-	Country* locateCountry(const Target& target) const;
+	const Country* locateCountry(const Target& target) const;
 	/// Select a soldier nationality based on mod rules and location on the globe.
 	int selectSoldierNationalityByLocation(const Mod* mod, const RuleSoldier* rule, const Target* target) const;
 	/// Return the month counter.

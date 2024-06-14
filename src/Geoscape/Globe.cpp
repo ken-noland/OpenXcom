@@ -1391,22 +1391,22 @@ void Globe::drawDetail()
 		label->setAlign(ALIGN_CENTER);
 
 		Sint16 x, y;
-		for (Country* country : _game->getSavedGame()->getCountries())
+		for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
 		{
 			// Don't draw if label is facing back
-			if (pointBack(country->getRules()->getLabelLongitude(), country->getRules()->getLabelLatitude()))
+			if (pointBack(country.getRules()->getLabelLongitude(), country.getRules()->getLabelLatitude()))
 				continue;
 
 			// Convert coordinates
-			polarToCart(country->getRules()->getLabelLongitude(), country->getRules()->getLabelLatitude(), &x, &y);
+			polarToCart(country.getRules()->getLabelLongitude(), country.getRules()->getLabelLatitude(), &x, &y);
 
 			label->setX(x - 75);
 			label->setY(y);
-			label->setText(_game->getLanguage()->getString(country->getRules()->getType()));
+			label->setText(_game->getLanguage()->getString(country.getRules()->getType()));
 			label->setColor(COUNTRY_LABEL_COLOR);
-			if (country->getRules()->getLabelColor() > 0)
+			if (country.getRules()->getLabelColor() > 0)
 			{
-				label->setColor(country->getRules()->getLabelColor());
+				label->setColor(country.getRules()->getLabelColor());
 			}
 			label->blit(_countries->getSurface());
 		}
@@ -1502,18 +1502,18 @@ void Globe::drawDetail()
 		if (debugType == 0)
 		{
 			color = 0;
-			for (Country* country : _game->getSavedGame()->getCountries())
+			for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
 			{
-				if (_game->getSavedGame()->debugCountry && _game->getSavedGame()->debugCountry != country)
+				if (_game->getSavedGame()->debugCountry != id)
 					continue;
 
 				color += 10;
-				for (size_t k = 0; k != country->getRules()->getLatMax().size(); ++k)
+				for (size_t k = 0; k != country.getRules()->getLatMax().size(); ++k)
 				{
-					double lon2 = country->getRules()->getLonMax().at(k);
-					double lon1 = country->getRules()->getLonMin().at(k);
-					double lat2 = country->getRules()->getLatMax().at(k);
-					double lat1 = country->getRules()->getLatMin().at(k);
+					double lon2 = country.getRules()->getLonMax().at(k);
+					double lon1 = country.getRules()->getLonMin().at(k);
+					double lat2 = country.getRules()->getLatMax().at(k);
+					double lat1 = country.getRules()->getLatMin().at(k);
 
 					drawVHLine(_countries, lon1, lat1, lon2, lat1, color);
 					drawVHLine(_countries, lon1, lat2, lon2, lat2, color);
