@@ -45,7 +45,7 @@ OptionsDefaultsState::OptionsDefaultsState(OptionsOrigin origin, OptionsBaseStat
 	_txtTitle = new Text(246, 32, 37, 70);
 
 	// Set palette
-	setInterface("optionsMenu", false, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("optionsMenu", false, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "confirmDefaults", "optionsMenu");
 	add(_btnYes, "confirmDefaults", "optionsMenu");
@@ -91,7 +91,7 @@ OptionsDefaultsState::~OptionsDefaultsState()
 void OptionsDefaultsState::btnYesClick(Action *action)
 {
 	Options::resetDefault(false);
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
 		// my development/debug defaults
 		Options::debug = true;
@@ -115,8 +115,8 @@ void OptionsDefaultsState::btnYesClick(Action *action)
 		Options::skipNextTurnScreen = true;
 		Options::alienBleeding = true;
 	}
-	_game->loadLanguages();
-	_game->popState();
+	getGame()->loadLanguages();
+	getGame()->popState();
 	_state->btnOkClick(action);
 }
 
@@ -126,7 +126,7 @@ void OptionsDefaultsState::btnYesClick(Action *action)
  */
 void OptionsDefaultsState::btnNoClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

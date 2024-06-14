@@ -84,7 +84,7 @@ ConfirmLandingState::ConfirmLandingState(Craft *craft, Texture *missionTexture, 
 	_btnYes->onMouseClick((ActionHandler)&ConfirmLandingState::btnYesClick);
 	_btnYes->onKeyboardPress((ActionHandler)&ConfirmLandingState::btnYesClick, Options::keyOk);
 
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
 		_btnNo->setText(tr("STR_PATROL"));
 	}
@@ -103,8 +103,8 @@ ConfirmLandingState::ConfirmLandingState(Craft *craft, Texture *missionTexture, 
 	_txtMessage->setAlign(ALIGN_CENTER);
 	_txtMessage->setWordWrap(true);
 	_txtMessage->setText(tr("STR_CRAFT_READY_TO_LAND_NEAR_DESTINATION")
-						 .arg(_craft->getName(_game->getLanguage()))
-						 .arg(_craft->getDestination()->getName(_game->getLanguage())));
+						 .arg(_craft->getName(getGame()->getLanguage()))
+						 .arg(_craft->getDestination()->getName(getGame()->getLanguage())));
 
 	_txtBegin->setBig();
 	_txtBegin->setAlign(ALIGN_CENTER);
@@ -112,7 +112,7 @@ ConfirmLandingState::ConfirmLandingState(Craft *craft, Texture *missionTexture, 
 	ss << Unicode::TOK_COLOR_FLIP << tr("STR_BEGIN_MISSION");
 	_txtBegin->setText(ss.str());
 
-	SurfaceSet *sprites = _game->getMod()->getSurfaceSet("DayNightIndicator", false);
+	SurfaceSet *sprites = getGame()->getMod()->getSurfaceSet("DayNightIndicator", false);
 	if (sprites != 0)
 	{
 		if (_shade <= 0)
@@ -120,7 +120,7 @@ ConfirmLandingState::ConfirmLandingState(Craft *craft, Texture *missionTexture, 
 			// day (0)
 			sprites->getFrame(0)->blitNShade(_sprite, 0, 0);
 		}
-		else if (_shade > _game->getMod()->getMaxDarknessToSeeUnits())
+		else if (_shade > getGame()->getMod()->getMaxDarknessToSeeUnits())
 		{
 			// night (10-15); note: this is configurable in the ruleset (in OXCE only)
 			sprites->getFrame(1)->blitNShade(_sprite, 0, 0);
@@ -149,7 +149,7 @@ void ConfirmLandingState::init()
 	State::init();
 	Base* b = dynamic_cast<Base*>(_craft->getDestination());
 	if (b == _craft->getBase())
-		_game->popState();
+		getGame()->popState();
 }
 
 /**
@@ -169,17 +169,17 @@ std::string ConfirmLandingState::checkStartingCondition()
 		{
 			ufoMissionName = u->getRules()->getType() + "_UNDERWATER";
 		}
-		ruleDeploy = _game->getMod()->getDeployment(ufoMissionName);
+		ruleDeploy = getGame()->getMod()->getDeployment(ufoMissionName);
 	}
 	else if (m != 0)
 	{
-		ruleDeploy = _game->getMod()->getDeployment(m->getDeployment()->getType());
+		ruleDeploy = getGame()->getMod()->getDeployment(m->getDeployment()->getType());
 	}
 	else if (b != 0)
 	{
-		AlienRace *race = _game->getMod()->getAlienRace(b->getAlienRace());
-		ruleDeploy = _game->getMod()->getDeployment(race->getBaseCustomMission());
-		if (!ruleDeploy) ruleDeploy = _game->getMod()->getDeployment(b->getDeployment()->getType());
+		AlienRace *race = getGame()->getMod()->getAlienRace(b->getAlienRace());
+		ruleDeploy = getGame()->getMod()->getDeployment(race->getBaseCustomMission());
+		if (!ruleDeploy) ruleDeploy = getGame()->getMod()->getDeployment(b->getDeployment()->getType());
 	}
 	else
 	{
@@ -193,10 +193,10 @@ std::string ConfirmLandingState::checkStartingCondition()
 		return "";
 	}
 
-	RuleStartingCondition *rule = _game->getMod()->getStartingCondition(ruleDeploy->getStartingCondition());
+	RuleStartingCondition *rule = getGame()->getMod()->getStartingCondition(ruleDeploy->getStartingCondition());
 	if (!rule && _missionTexture)
 	{
-		rule = _game->getMod()->getStartingCondition(_missionTexture->getStartingCondition());
+		rule = getGame()->getMod()->getStartingCondition(_missionTexture->getStartingCondition());
 	}
 	if (rule != 0)
 	{
@@ -241,19 +241,19 @@ void ConfirmLandingState::btnYesClick(Action *)
 	if (!message.empty())
 	{
 		_craft->returnToBase();
-		_game->popState();
-		_game->pushState(new CraftErrorState(0, message));
+		getGame()->popState();
+		getGame()->pushState(new CraftErrorState(0, message));
 		return;
 	}
 
-	_game->popState();
+	getGame()->popState();
 	Ufo* u = dynamic_cast<Ufo*>(_craft->getDestination());
 	MissionSite* m = dynamic_cast<MissionSite*>(_craft->getDestination());
 	AlienBase* b = dynamic_cast<AlienBase*>(_craft->getDestination());
 
-	SavedBattleGame *bgame = new SavedBattleGame(_game->getMod(), _game->getLanguage());
-	_game->getSavedGame()->setBattleGame(bgame);
-	BattlescapeGenerator bgen(_game);
+	SavedBattleGame *bgame = new SavedBattleGame(getGame()->getMod(), getGame()->getLanguage());
+	getGame()->getSavedGame()->setBattleGame(bgame);
+	BattlescapeGenerator bgen(getGame());
 	bgen.setWorldTexture(_missionTexture, _globeTexture);
 	bgen.setWorldShade(_shade);
 	bgen.setCraft(_craft);
@@ -264,11 +264,11 @@ void ConfirmLandingState::btnYesClick(Action *)
 		else
 			bgame->setMissionType("STR_UFO_GROUND_ASSAULT");
 		bgen.setUfo(u);
-		const AlienDeployment *customWeaponDeploy = _game->getMod()->getDeployment(u->getCraftStats().craftCustomDeploy);
+		const AlienDeployment *customWeaponDeploy = getGame()->getMod()->getDeployment(u->getCraftStats().craftCustomDeploy);
 		if (_missionTexture && _missionTexture->isFakeUnderwater())
 		{
 			const std::string ufoUnderwaterMissionName = u->getRules()->getType() + "_UNDERWATER";
-			const AlienDeployment *ufoUnderwaterMission = _game->getMod()->getDeployment(ufoUnderwaterMissionName, true);
+			const AlienDeployment *ufoUnderwaterMission = getGame()->getMod()->getDeployment(ufoUnderwaterMissionName, true);
 			bgen.setAlienCustomDeploy(customWeaponDeploy, ufoUnderwaterMission);
 		}
 		else
@@ -286,11 +286,11 @@ void ConfirmLandingState::btnYesClick(Action *)
 	}
 	else if (b != 0)
 	{
-		AlienRace *race = _game->getMod()->getAlienRace(b->getAlienRace());
+		AlienRace *race = getGame()->getMod()->getAlienRace(b->getAlienRace());
 		bgame->setMissionType(b->getDeployment()->getType());
 		bgen.setAlienBase(b);
 		bgen.setAlienRace(b->getAlienRace());
-		bgen.setAlienCustomDeploy(_game->getMod()->getDeployment(race->getBaseCustomDeploy()), _game->getMod()->getDeployment(race->getBaseCustomMission()));
+		bgen.setAlienCustomDeploy(getGame()->getMod()->getDeployment(race->getBaseCustomDeploy()), getGame()->getMod()->getDeployment(race->getBaseCustomMission()));
 		bgen.setWorldTexture(0, _globeTexture);
 	}
 	else
@@ -298,7 +298,7 @@ void ConfirmLandingState::btnYesClick(Action *)
 		throw Exception("No mission available!");
 	}
 	bgen.run();
-	_game->pushState(new BriefingState(_craft));
+	getGame()->pushState(new BriefingState(_craft));
 }
 
 /**
@@ -307,7 +307,7 @@ void ConfirmLandingState::btnYesClick(Action *)
  */
 void ConfirmLandingState::btnNoClick(Action *)
 {
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
 		_craft->setDestination(0);
 	}
@@ -315,7 +315,7 @@ void ConfirmLandingState::btnNoClick(Action *)
 	{
 		_craft->returnToBase();
 	}
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -324,7 +324,7 @@ void ConfirmLandingState::btnNoClick(Action *)
  */
 void ConfirmLandingState::togglePatrolButton(Action *)
 {
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
 		_btnNo->setText(tr("STR_PATROL"));
 	}

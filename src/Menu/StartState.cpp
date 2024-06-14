@@ -57,7 +57,7 @@ StartState::StartState() : _anim(0)
 	Screen::updateScale(Options::battlescapeScale, Options::baseXBattlescape, Options::baseYBattlescape, false);
 	Options::baseXResolution = Options::displayWidth;
 	Options::baseYResolution = Options::displayHeight;
-	_game->getScreen()->resetDisplay(false, true);
+	getGame()->getScreen()->resetDisplay(false, true);
 
 	// Create objects
 	_thread = 0;
@@ -91,8 +91,8 @@ StartState::StartState() : _anim(0)
 	_timer->start();
 
 	// Hide UI
-	_game->getCursor()->setVisible(false);
-	_game->getFpsCounter()->setVisible(false);
+	getGame()->getCursor()->setVisible(false);
+	getGame()->getFpsCounter()->setVisible(false);
 
 	if (Options::reload)
 	{
@@ -138,15 +138,15 @@ void StartState::init()
 	if (!Options::mute && Options::reload)
 	{
 		Mix_CloseAudio();
-		_game->initAudio();
+		getGame()->initAudio();
 	}
 
 	// Load the game data in a separate thread
-	_thread = SDL_CreateThread(load, (void*)_game);
+	_thread = SDL_CreateThread(load, (void*)getGame());
 	if (_thread == 0)
 	{
 		// If we can't create the thread, just load it as usual
-		load((void*)_game);
+		load((void*)getGame());
 	}
 }
 
@@ -174,17 +174,17 @@ void StartState::think()
 	case LOADING_SUCCESSFUL:
 		CrossPlatform::flashWindow();
 		Log(LOG_INFO) << "OpenXcom started successfully!";
-		_game->setState(new GoToMainMenuState(true));
+		getGame()->setState(new GoToMainMenuState(true));
 		if (_oldMaster != Options::getActiveMaster() && Options::playIntro)
 		{
-			_game->pushState(new CutsceneState("intro"));
+			getGame()->pushState(new CutsceneState("intro"));
 		}
 		if (Options::reload)
 		{
 			Options::reload = false;
 		}
-		_game->getCursor()->setVisible(true);
-		_game->getFpsCounter()->setVisible(Options::fpsCounter);
+		getGame()->getCursor()->setVisible(true);
+		getGame()->getFpsCounter()->setVisible(Options::fpsCounter);
 		break;
 	default:
 		break;
@@ -203,7 +203,7 @@ void StartState::handle(Action *action)
 	{
 		if (action->getDetails()->type == SDL_KEYDOWN)
 		{
-			_game->quit();
+			getGame()->quit();
 		}
 	}
 }

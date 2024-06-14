@@ -76,7 +76,7 @@ ResearchRequiredState::ResearchRequiredState(RuleItem *item)
  */
 void ResearchRequiredState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

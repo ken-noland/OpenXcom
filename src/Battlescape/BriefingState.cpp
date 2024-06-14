@@ -57,7 +57,7 @@ BriefingState::BriefingState(Craft *craft, Base *base, bool infoOnly, BriefingDa
 {
 	Options::baseXResolution = Options::baseXGeoscape;
 	Options::baseYResolution = Options::baseYGeoscape;
-	_game->getScreen()->resetDisplay(false);
+	getGame()->getScreen()->resetDisplay(false);
 
 	_screen = true;
 	// Create objects
@@ -68,9 +68,9 @@ BriefingState::BriefingState(Craft *craft, Base *base, bool infoOnly, BriefingDa
 	_txtCraft = new Text(300, 17, 16, 56);
 	_txtBriefing = new Text(274, 94, 16, 72);
 
-	auto battleSave = _game->getSavedGame()->getSavedBattle();
+	auto battleSave = getGame()->getSavedGame()->getSavedBattle();
 	std::string mission = battleSave->getMissionType();
-	AlienDeployment *deployment = _game->getMod()->getDeployment(mission);
+	AlienDeployment *deployment = getGame()->getMod()->getDeployment(mission);
 	Ufo * ufo = 0;
 	if (!deployment && craft)
 	{
@@ -83,7 +83,7 @@ BriefingState::BriefingState(Craft *craft, Base *base, bool infoOnly, BriefingDa
 				// fake underwater UFO
 				ufoMissionName = battleSave->getAlienCustomMission();
 			}
-			deployment = _game->getMod()->getDeployment(ufoMissionName);
+			deployment = getGame()->getMod()->getDeployment(ufoMissionName);
 		}
 	}
 
@@ -93,13 +93,13 @@ BriefingState::BriefingState(Craft *craft, Base *base, bool infoOnly, BriefingDa
 	{
 		setStandardPalette("PAL_GEOSCAPE", 0);
 		_musicId = "GMDEFEND";
-		_window->setBackground(_game->getMod()->getSurface("BACK16.SCR"));
+		_window->setBackground(getGame()->getMod()->getSurface("BACK16.SCR"));
 	}
 	else
 	{
 		BriefingData data = customBriefing ? *customBriefing : deployment->getBriefingData();
 		setStandardPalette("PAL_GEOSCAPE", data.palette);
-		_window->setBackground(_game->getMod()->getSurface(data.background));
+		_window->setBackground(getGame()->getMod()->getSurface(data.background));
 		_txtCraft->setY(56 + data.textOffset);
 		_txtBriefing->setY(72 + data.textOffset);
 		_txtTarget->setVisible(data.showTarget);
@@ -141,11 +141,11 @@ BriefingState::BriefingState(Craft *craft, Base *base, bool infoOnly, BriefingDa
 	{
 		if (craft->getDestination())
 		{
-			s = craft->getDestination()->getName(_game->getLanguage());
+			s = craft->getDestination()->getName(getGame()->getLanguage());
 			battleSave->setMissionTarget(s);
 		}
 
-		s = tr("STR_CRAFT_").arg(craft->getName(_game->getLanguage()));
+		s = tr("STR_CRAFT_").arg(craft->getName(getGame()->getLanguage()));
 		battleSave->setMissionCraftOrBase(s);
 	}
 	else if (base)
@@ -157,22 +157,22 @@ BriefingState::BriefingState(Craft *craft, Base *base, bool infoOnly, BriefingDa
 	// random operation names
 	if (craft || base)
 	{
-		if (!_game->getMod()->getOperationNamesFirst().empty())
+		if (!getGame()->getMod()->getOperationNamesFirst().empty())
 		{
 			std::ostringstream ss;
-			int pickFirst = RNG::seedless(0, (int)_game->getMod()->getOperationNamesFirst().size() - 1);
-			ss << _game->getMod()->getOperationNamesFirst().at(pickFirst);
-			if (!_game->getMod()->getOperationNamesLast().empty())
+			int pickFirst = RNG::seedless(0, (int)getGame()->getMod()->getOperationNamesFirst().size() - 1);
+			ss << getGame()->getMod()->getOperationNamesFirst().at(pickFirst);
+			if (!getGame()->getMod()->getOperationNamesLast().empty())
 			{
-				int pickLast = RNG::seedless(0, (int)_game->getMod()->getOperationNamesLast().size() - 1);
-				ss << " " << _game->getMod()->getOperationNamesLast().at(pickLast);
+				int pickLast = RNG::seedless(0, (int)getGame()->getMod()->getOperationNamesLast().size() - 1);
+				ss << " " << getGame()->getMod()->getOperationNamesLast().at(pickLast);
 			}
 			s = ss.str();
 			battleSave->setMissionTarget(s);
 		}
 	}
 
-	if (!_game->getMod()->getOperationNamesFirst().empty())
+	if (!getGame()->getMod()->getOperationNamesFirst().empty())
 		_txtTarget->setText(tr("STR_OPERATION_UC").arg(battleSave->getMissionTarget()));
 	else
 		_txtTarget->setText(battleSave->getMissionTarget());
@@ -237,14 +237,14 @@ void BriefingState::init()
 
 	if (!_cutsceneId.empty())
 	{
-		_game->pushState(new CutsceneState(_cutsceneId));
+		getGame()->pushState(new CutsceneState(_cutsceneId));
 
 		// don't play the cutscene again when we return to this state
 		_cutsceneId = "";
 	}
 	else
 	{
-		_game->getMod()->playMusic(_musicId);
+		getGame()->getMod()->playMusic(_musicId);
 	}
 }
 
@@ -254,36 +254,36 @@ void BriefingState::init()
  */
 void BriefingState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	Options::baseXResolution = Options::baseXBattlescape;
 	Options::baseYResolution = Options::baseYBattlescape;
-	_game->getScreen()->resetDisplay(false);
+	getGame()->getScreen()->resetDisplay(false);
 	if (_infoOnly) return;
 
 	BattlescapeState *bs = new BattlescapeState;
 	bs->getBattleGame()->spawnFromPrimedItems();
 	auto tally = bs->getBattleGame()->tallyUnits();
-	bool isPreview = _game->getSavedGame()->getSavedBattle()->isPreview();
+	bool isPreview = getGame()->getSavedGame()->getSavedBattle()->isPreview();
 	if (tally.liveAliens > 0 || isPreview)
 	{
-		_game->pushState(bs);
-		_game->getSavedGame()->getSavedBattle()->setBattleState(bs);
-		_game->pushState(new NextTurnState(_game->getSavedGame()->getSavedBattle(), bs));
+		getGame()->pushState(bs);
+		getGame()->getSavedGame()->getSavedBattle()->setBattleState(bs);
+		getGame()->pushState(new NextTurnState(getGame()->getSavedGame()->getSavedBattle(), bs));
 		if (isPreview)
 		{
 			// skip InventoryState
-			_game->getSavedGame()->getSavedBattle()->startFirstTurn();
+			getGame()->getSavedGame()->getSavedBattle()->startFirstTurn();
 			return;
 		}
-		_game->pushState(new InventoryState(false, bs, 0));
+		getGame()->pushState(new InventoryState(false, bs, 0));
 	}
 	else
 	{
 		Options::baseXResolution = Options::baseXGeoscape;
 		Options::baseYResolution = Options::baseYGeoscape;
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 		delete bs;
-		_game->pushState(new AliensCrashState);
+		getGame()->pushState(new AliensCrashState);
 	}
 }
 

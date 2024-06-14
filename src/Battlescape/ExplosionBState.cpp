@@ -104,7 +104,7 @@ void ExplosionBState::init()
 		else
 		{
 			_power += itemRule->getPowerBonus(_attack);
-			_power -= itemRule->getPowerRangeReduction(_range);
+			_power -= (int)itemRule->getPowerRangeReduction((int)_range);
 
 			_radius = itemRule->getExplosionRadius(_attack);
 			_damageType = itemRule->getDamageType();

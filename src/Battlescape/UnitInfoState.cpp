@@ -53,9 +53,9 @@ UnitInfoState::UnitInfoState(BattleUnit *unit, BattlescapeState *parent, bool fr
 	{
 		Options::baseXResolution = Screen::ORIGINAL_WIDTH;
 		Options::baseYResolution = Screen::ORIGINAL_HEIGHT;
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 	}
-	_battleGame = _game->getSavedGame()->getSavedBattle();
+	_battleGame = getGame()->getSavedGame()->getSavedBattle();
 
 	// Create objects
 	_bg = new Surface(320, 200, 0, 0);
@@ -64,7 +64,7 @@ UnitInfoState::UnitInfoState(BattleUnit *unit, BattlescapeState *parent, bool fr
 
 	int yPos = 38;
 	int step = 9;
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		yPos = 30;
 	}
@@ -124,7 +124,7 @@ UnitInfoState::UnitInfoState(BattleUnit *unit, BattlescapeState *parent, bool fr
 	_barStrength = new Bar(150, 5, 170, yPos + 1);
 	yPos += step;
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		_txtMana = new Text(140, 9, 8, yPos);
 		_numMana = new Text(18, 9, 150, yPos);
@@ -223,7 +223,7 @@ UnitInfoState::UnitInfoState(BattleUnit *unit, BattlescapeState *parent, bool fr
 	add(_numStrength);
 	add(_barStrength, "barStrength", "stats", 0);
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		add(_txtMana);
 		add(_numMana);
@@ -267,14 +267,14 @@ UnitInfoState::UnitInfoState(BattleUnit *unit, BattlescapeState *parent, bool fr
 	centerAllSurfaces();
 
 	// Set up objects
-	_game->getMod()->getSurface("UNIBORD.PCK")->blitNShade(_bg, 0, 0);
+	getGame()->getMod()->getSurface("UNIBORD.PCK")->blitNShade(_bg, 0, 0);
 
 	_exit->onMouseClick((ActionHandler)&UnitInfoState::exitClick);
 	_exit->onKeyboardPress((ActionHandler)&UnitInfoState::exitClick, Options::keyCancel);
 	_exit->onKeyboardPress((ActionHandler)&UnitInfoState::exitClick, Options::keyBattleStats);
 
-	Uint8 color = _game->getMod()->getInterface("stats")->getElement("text")->color;
-	Uint8 color2 = _game->getMod()->getInterface("stats")->getElement("text")->color2;
+	Uint8 color = getGame()->getMod()->getInterface("stats")->getElement("text")->color;
+	Uint8 color2 = getGame()->getMod()->getInterface("stats")->getElement("text")->color2;
 
 	_txtName->setAlign(ALIGN_CENTER);
 	_txtName->setBig();
@@ -379,7 +379,7 @@ UnitInfoState::UnitInfoState(BattleUnit *unit, BattlescapeState *parent, bool fr
 
 	_barStrength->setScale(1.0);
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		_txtMana->setColor(color);
 		_txtMana->setHighContrast(true);
@@ -494,7 +494,7 @@ void UnitInfoState::init()
 		ss << tr(_unit->getRankString());
 		ss << " ";
 	}
-	ss << _unit->getName(_game->getLanguage(), BattlescapeGame::_debugPlay);
+	ss << _unit->getName(getGame()->getLanguage(), BattlescapeGame::_debugPlay);
 	_txtName->setBig();
 	_txtName->setText(ss.str());
 
@@ -563,9 +563,9 @@ void UnitInfoState::init()
 	_barStrength->setMax(_unit->getBaseStats()->strength);
 	_barStrength->setValue(_unit->getBaseStats()->strength);
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
-		if (_game->getSavedGame()->isManaUnlocked(_game->getMod()))
+		if (getGame()->getSavedGame()->isManaUnlocked(getGame()->getMod()))
 		{
 			ss.str("");
 			ss << _unit->getMana();
@@ -590,7 +590,7 @@ void UnitInfoState::init()
 	{
 		psiSkillWithoutAnyBonuses = _unit->getGeoscapeSoldier()->getCurrentStats()->psiSkill;
 	}
-	if (psiSkillWithoutAnyBonuses > 0 || (Options::psiStrengthEval && _game->getSavedGame()->isResearched(_game->getMod()->getPsiRequirements())))
+	if (psiSkillWithoutAnyBonuses > 0 || (Options::psiStrengthEval && getGame()->getSavedGame()->isResearched(getGame()->getMod()->getPsiRequirements())))
 	{
 		ss.str("");
 		ss << _unit->getBaseStats()->psiStrength;
@@ -669,7 +669,7 @@ void UnitInfoState::handle(Action *action)
 	State::handle(action);
 	if (action->getDetails()->type == SDL_MOUSEBUTTONDOWN)
 	{
-		if (_game->isRightClick(action))
+		if (getGame()->isRightClick(action))
 		{
 			exitClick(action);
 			return;
@@ -747,9 +747,9 @@ void UnitInfoState::exitClick(Action *)
 	if (!_fromInventory && Options::maximizeInfoScreens)
 	{
 		Screen::updateScale(Options::battlescapeScale, Options::baseXBattlescape, Options::baseYBattlescape, true);
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 	}
-	_game->popState();
+	getGame()->popState();
 }
 
 }

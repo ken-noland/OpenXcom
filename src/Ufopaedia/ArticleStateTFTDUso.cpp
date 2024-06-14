@@ -35,9 +35,9 @@ namespace OpenXcom
 	{
 		_txtInfo->setHeight(112);
 
-		_btnInfo->setVisible(_game->getMod()->getShowPediaInfoButton());
+		_btnInfo->setVisible(getGame()->getMod()->getShowPediaInfoButton());
 
-		RuleUfo *ufo = _game->getMod()->getUfo(defs->id, true);
+		RuleUfo *ufo = getGame()->getMod()->getUfo(defs->id, true);
 
 		_lstInfo = new TextList(150, 50, 168, 142);
 		add(_lstInfo);

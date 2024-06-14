@@ -112,7 +112,7 @@ GlobalResearchState::~GlobalResearchState()
  */
 void GlobalResearchState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -126,16 +126,16 @@ void GlobalResearchState::onSelectBase(Action *)
 	if (base)
 	{
 		// close this window
-		_game->popState();
+		getGame()->popState();
 
 		// close Research UI (goes back to BaseView)
 		if (_openedFromBasescape)
 		{
-			_game->popState();
+			getGame()->popState();
 		}
 
 		// open new window
-		_game->pushState(new ResearchState(base));
+		getGame()->pushState(new ResearchState(base));
 	}
 }
 
@@ -149,7 +149,7 @@ void GlobalResearchState::onOpenTechTreeViewer(Action *)
 
 	if (selectedTopic)
 	{
-		_game->pushState(new TechTreeViewerState(selectedTopic, 0));
+		getGame()->pushState(new TechTreeViewerState(selectedTopic, 0));
 	}
 }
 
@@ -176,12 +176,12 @@ void GlobalResearchState::fillProjectList()
 	int allocatedScientists = 0;
 	int freeLaboratories = 0;
 
-	for (Base *xbase : _game->getSavedGame()->getBases())
+	for (Base *xbase : getGame()->getSavedGame()->getBases())
 	{
 		const std::vector<ResearchProject*>& baseProjects = xbase->getResearch();
 		if (!baseProjects.empty() || xbase->getScientists() > 0)
 		{
-			std::string baseName = xbase->getName(_game->getLanguage());
+			std::string baseName = xbase->getName(getGame()->getLanguage());
 			_lstResearch->addRow(4, baseName.c_str(), "", "", "");
 			_lstResearch->setRowColor(_lstResearch->getLastRowIndex(), _lstResearch->getSecondaryColor());
 

@@ -100,7 +100,7 @@ ManufactureState::ManufactureState(Base *base) : _base(base)
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_CURRENT_PRODUCTION"));
 
-	_txtFunds->setText(tr("STR_CURRENT_FUNDS").arg(Unicode::formatFunding(_game->getSavedGame()->getFunds())));
+	_txtFunds->setText(tr("STR_CURRENT_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
 
 	_txtItem->setText(tr("STR_ITEM"));
 
@@ -162,7 +162,7 @@ void ManufactureState::init()
  */
 void ManufactureState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -171,7 +171,7 @@ void ManufactureState::btnOkClick(Action *)
  */
 void ManufactureState::onCurrentGlobalProductionClick(Action *)
 {
-	_game->pushState(new GlobalManufactureState(true));
+	getGame()->pushState(new GlobalManufactureState(true));
 }
 
 /**
@@ -180,7 +180,7 @@ void ManufactureState::onCurrentGlobalProductionClick(Action *)
  */
 void ManufactureState::btnNewProductionClick(Action *)
 {
-	_game->pushState(new NewManufactureListState(_base));
+	getGame()->pushState(new NewManufactureListState(_base));
 }
 
 /**
@@ -237,7 +237,7 @@ void ManufactureState::fillProductionList(size_t scrl)
 void ManufactureState::lstManufactureClickLeft(Action *)
 {
 	const std::vector<Production*> productions(_base->getProductions());
-	_game->pushState(new ManufactureInfoState(_base, productions[_lstManufacture->getSelectedRow()]));
+	getGame()->pushState(new ManufactureInfoState(_base, productions[_lstManufacture->getSelectedRow()]));
 }
 
 /**
@@ -248,14 +248,14 @@ void ManufactureState::lstManufactureClickMiddle(Action *)
 {
 	const std::vector<Production*> productions(_base->getProductions());
 	const RuleManufacture *selectedTopic = productions[_lstManufacture->getSelectedRow()]->getRules();
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
 		std::string articleId = selectedTopic->getName();
-		Ufopaedia::openArticle(_game, articleId);
+		Ufopaedia::openArticle(getGame(), articleId);
 	}
 	else
 	{
-		_game->pushState(new TechTreeViewerState(0, selectedTopic));
+		getGame()->pushState(new TechTreeViewerState(0, selectedTopic));
 	}
 }
 
@@ -271,7 +271,7 @@ void ManufactureState::lstManufactureMousePress(Action *action)
 	}
 
 	int change = Options::oxceManufactureScrollSpeed;
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 		change = Options::oxceManufactureScrollSpeedWithCtrl;
 
 	Production *selectedProject = _base->getProductions()[_lstManufacture->getSelectedRow()];

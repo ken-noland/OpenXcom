@@ -145,63 +145,63 @@ ExtendedBattlescapeLinksState::ExtendedBattlescapeLinksState(BattlescapeState* p
 
 void ExtendedBattlescapeLinksState::btnTouchClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->toggleTouchButtons(false, false);
 }
 
 void ExtendedBattlescapeLinksState::btnNightVisionClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnNightVisionClick(nullptr);
 }
 
 void ExtendedBattlescapeLinksState::btnPersonalLightsClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnPersonalLightingClick(nullptr);
 }
 
 void ExtendedBattlescapeLinksState::btnBrightnessClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->getMap()->toggleDebugVisionMode();
 }
 
 void ExtendedBattlescapeLinksState::btnTurnDiaryClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	if (Options::oxceDisableHitLog)
 	{
-		_game->pushState(new InfoboxState(tr("STR_THIS_FEATURE_IS_DISABLED_4")));
+		getGame()->pushState(new InfoboxState(tr("STR_THIS_FEATURE_IS_DISABLED_4")));
 	}
 	else
 	{
 		// turn diary
-		_game->pushState(new TurnDiaryState(_save->getHitLog()));
+		getGame()->pushState(new TurnDiaryState(_save->getHitLog()));
 	}
 }
 
 void ExtendedBattlescapeLinksState::btnBriefingClick(Action *)
 {
-	_game->popState();
-	_game->pushState(new BriefingState(0, 0, true));
+	getGame()->popState();
+	getGame()->pushState(new BriefingState(0, 0, true));
 }
 
 void ExtendedBattlescapeLinksState::btnNotesClick(Action *)
 {
-	_game->popState();
-	_game->pushState(new NotesState(OPT_BATTLESCAPE));
+	getGame()->popState();
+	getGame()->pushState(new NotesState(OPT_BATTLESCAPE));
 }
 
 void ExtendedBattlescapeLinksState::btnMusicClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnSelectMusicTrackClick(nullptr);
 }
 
 void ExtendedBattlescapeLinksState::btnKillAllClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 
 	if (!Options::debug)
 	{
@@ -217,7 +217,7 @@ void ExtendedBattlescapeLinksState::btnKillAllClick(Action *)
 		{
 			if (unit->getOriginalFaction() == FACTION_HOSTILE && !unit->isOut())
 			{
-				unit->damage(Position(0, 0, 0), 1000, _game->getMod()->getDamageType(DT_MELEE), _save, { });
+				unit->damage(Position(0, 0, 0), 1000, getGame()->getMod()->getDamageType(DT_MELEE), _save, { });
 			}
 		}
 		_save->getBattleGame()->checkForCasualties(nullptr, BattleActionAttack{}, true, false);
@@ -237,7 +237,7 @@ void ExtendedBattlescapeLinksState::btnKillAllClick(Action *)
  */
 void ExtendedBattlescapeLinksState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

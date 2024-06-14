@@ -60,7 +60,7 @@ namespace OpenXcom
 CraftInfoState::CraftInfoState(Base *base, size_t craftId) : _base(base), _craftId(craftId), _craft(0)
 {
 	// Create objects
-	if (_game->getSavedGame()->getMonthsPassed() != -1)
+	if (getGame()->getSavedGame()->getMonthsPassed() != -1)
 	{
 		_window = new Window(this, 320, 200, 0, 0, POPUP_BOTH);
 	}
@@ -75,7 +75,7 @@ CraftInfoState::CraftInfoState(Base *base, size_t craftId) : _base(base), _craft
 		_weaponNum = RuleCraft::WeaponMax;
 
 	int showNewBattle = 0;
-	if (_game->getSavedGame()->getDebugMode() && _game->getSavedGame()->getMonthsPassed() != -1)
+	if (getGame()->getSavedGame()->getDebugMode() && getGame()->getSavedGame()->getMonthsPassed() != -1)
 	{
 		// only the first craft can be used
 		if (_craftId == 0 && _craft->getRules()->isForNewBattle())
@@ -223,10 +223,10 @@ void CraftInfoState::init()
 {
 	State::init();
 
-	_edtCraft->setText(_craft->getName(_game->getLanguage()));
+	_edtCraft->setText(_craft->getName(getGame()->getLanguage()));
 
 	_sprite->clear();
-	SurfaceSet *texture = _game->getMod()->getSurfaceSet("BASEBITS.PCK");
+	SurfaceSet *texture = getGame()->getMod()->getSurfaceSet("BASEBITS.PCK");
 	texture->getFrame(_craft->getSkinSprite() + 33)->blitNShade(_sprite, 0, 0);
 
 	std::ostringstream firlsLine;
@@ -273,7 +273,7 @@ void CraftInfoState::init()
 
 		Surface *frame1 = texture->getFrame(38);
 
-		SurfaceSet *customArmorPreviews = _game->getMod()->getSurfaceSet("CustomArmorPreviews");
+		SurfaceSet *customArmorPreviews = getGame()->getMod()->getSurfaceSet("CustomArmorPreviews");
 		int x = 0;
 		for (const Soldier* soldier : _base->getSoldiers())
 		{
@@ -299,7 +299,7 @@ void CraftInfoState::init()
 
 		Surface *frame2 = texture->getFrame(40);
 
-		SurfaceSet *customItemPreviews = _game->getMod()->getSurfaceSet("CustomItemPreviews");
+		SurfaceSet *customItemPreviews = getGame()->getMod()->getSurfaceSet("CustomItemPreviews");
 		x = 0;
 		for (const Vehicle* vehicle : _craft->getVehicles())
 		{
@@ -475,7 +475,7 @@ std::string CraftInfoState::formatTime(int total)
  */
 void CraftInfoState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -487,7 +487,7 @@ void CraftInfoState::btnUfopediaClick(Action *)
 	if (_craft)
 	{
 		std::string articleId = _craft->getRules()->getType();
-		Ufopaedia::openArticle(_game, articleId);
+		Ufopaedia::openArticle(getGame(), articleId);
 	}
 }
 
@@ -497,7 +497,7 @@ void CraftInfoState::btnUfopediaClick(Action *)
  */
 void CraftInfoState::btnNewBattleClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 
 	size_t mission = 0;
 	size_t craft = 0;
@@ -533,9 +533,9 @@ void CraftInfoState::btnNewBattleClick(Action *)
 
 	// index of the craft type in the New Battle combobox
 	size_t idx = 0;
-	for (auto& craftType : _game->getMod()->getCraftsList())
+	for (auto& craftType : getGame()->getMod()->getCraftsList())
 	{
-		const RuleCraft* rule = _game->getMod()->getCraft(craftType);
+		const RuleCraft* rule = getGame()->getMod()->getCraft(craftType);
 		if (rule->isForNewBattle())
 		{
 			if (rule == _craft->getRules())
@@ -552,7 +552,7 @@ void CraftInfoState::btnNewBattleClick(Action *)
 	}
 
 	// transfer also the difficulty
-	difficulty = _game->getSavedGame()->getDifficulty();
+	difficulty = getGame()->getSavedGame()->getDifficulty();
 
 	YAML::Emitter out;
 	YAML::Node node;
@@ -583,7 +583,7 @@ void CraftInfoState::btnWClick(Action * act)
 	{
 		if (act->getSender() == _btnW[i])
 		{
-			_game->pushState(new CraftWeaponsState(_base, _craftId, i));
+			getGame()->pushState(new CraftWeaponsState(_base, _craftId, i));
 			return;
 		}
 	}
@@ -637,7 +637,7 @@ void CraftInfoState::btnCraftIconClick(Action *action)
 		_txtSkin->setText(tr("STR_CRAFT_SKIN_ID").arg(_craft->getSkinIndex()));
 
 		_sprite->clear();
-		SurfaceSet* texture = _game->getMod()->getSurfaceSet("BASEBITS.PCK");
+		SurfaceSet* texture = getGame()->getMod()->getSurfaceSet("BASEBITS.PCK");
 		texture->getFrame(_craft->getSkinSprite() + 33)->blitNShade(_sprite, 0, 0);
 	}
 }
@@ -648,7 +648,7 @@ void CraftInfoState::btnCraftIconClick(Action *action)
  */
 void CraftInfoState::btnCrewClick(Action *)
 {
-	_game->pushState(new CraftSoldiersState(_base, _craftId));
+	getGame()->pushState(new CraftSoldiersState(_base, _craftId));
 }
 
 /**
@@ -657,7 +657,7 @@ void CraftInfoState::btnCrewClick(Action *)
  */
 void CraftInfoState::btnEquipClick(Action *)
 {
-	_game->pushState(new CraftEquipmentState(_base, _craftId));
+	getGame()->pushState(new CraftEquipmentState(_base, _craftId));
 }
 
 /**
@@ -666,7 +666,7 @@ void CraftInfoState::btnEquipClick(Action *)
  */
 void CraftInfoState::btnArmorClick(Action *)
 {
-	_game->pushState(new CraftArmorState(_base, _craftId));
+	getGame()->pushState(new CraftArmorState(_base, _craftId));
 }
 
 /**
@@ -675,7 +675,7 @@ void CraftInfoState::btnArmorClick(Action *)
  */
 void CraftInfoState::btnPilotsClick(Action *)
 {
-	_game->pushState(new CraftPilotsState(_base, _craftId));
+	getGame()->pushState(new CraftPilotsState(_base, _craftId));
 }
 
 /**
@@ -684,7 +684,7 @@ void CraftInfoState::btnPilotsClick(Action *)
  */
 void CraftInfoState::edtCraftChange(Action *action)
 {
-	if (_edtCraft->getText() == _craft->getDefaultName(_game->getLanguage()))
+	if (_edtCraft->getText() == _craft->getDefaultName(getGame()->getLanguage()))
 	{
 		_craft->setName("");
 	}
@@ -695,14 +695,14 @@ void CraftInfoState::edtCraftChange(Action *action)
 	if (action->getDetails()->key.keysym.sym == SDLK_RETURN ||
 		action->getDetails()->key.keysym.sym == SDLK_KP_ENTER)
 	{
-		_edtCraft->setText(_craft->getName(_game->getLanguage()));
+		_edtCraft->setText(_craft->getName(getGame()->getLanguage()));
 	}
 }
 
 /// Handler for clicking the AI button.
 void CraftInfoState::btnAIClick(Action *action)
 {
-	_game->pushState(new SoldiersAIState(_craft));
+	getGame()->pushState(new SoldiersAIState(_craft));
 }
 
 }

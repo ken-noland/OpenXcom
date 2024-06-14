@@ -42,7 +42,7 @@ namespace OpenXcom
  */
 SelectStartFacilityState::SelectStartFacilityState(Base *base, State *state, Globe *globe) : BuildFacilitiesState(base, state), _globe(globe)
 {
-	_facilities = _game->getMod()->getCustomBaseFacilities(_game->getSavedGame()->getDifficulty());
+	_facilities = getGame()->getMod()->getCustomBaseFacilities(getGame()->getSavedGame()->getDifficulty());
 
 	_btnOk->setText(tr("STR_RESET"));
 	_btnOk->onMouseClick((ActionHandler)&SelectStartFacilityState::btnOkClick);
@@ -82,9 +82,9 @@ void SelectStartFacilityState::btnOkClick(Action *)
 		delete fac;
 	}
 	_base->getFacilities().clear();
-	_game->popState();
-	_game->popState();
-	_game->pushState(new PlaceLiftState(_base, _globe, true));
+	getGame()->popState();
+	getGame()->popState();
+	getGame()->pushState(new PlaceLiftState(_base, _globe, true));
 }
 
 /**
@@ -93,7 +93,7 @@ void SelectStartFacilityState::btnOkClick(Action *)
  */
 void SelectStartFacilityState::lstFacilitiesClick(Action *)
 {
-	_game->pushState(new PlaceStartFacilityState(_base, this, _facilities[_lstFacilities->getSelectedRow()]));
+	getGame()->pushState(new PlaceStartFacilityState(_base, this, _facilities[_lstFacilities->getSelectedRow()]));
 }
 
 /**
@@ -105,8 +105,8 @@ void SelectStartFacilityState::facilityBuilt()
 	_facilities.erase(_facilities.begin() + _lstFacilities->getSelectedRow());
 	if (_facilities.empty())
 	{
-		_game->popState();
-		_game->popState(); // return to geoscape, force timer to start.
+		getGame()->popState();
+		getGame()->popState(); // return to geoscape, force timer to start.
 	}
 	else
 	{

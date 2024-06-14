@@ -418,16 +418,16 @@ void VideoState::init()
 			// ensure user can hear both music and sound effects for the
 			// vanilla intro sequence
 			Options::musicVolume = Options::soundVolume = std::max(prevMusicVol, prevSoundVol);
-			_game->setVolume(Options::soundVolume, Options::musicVolume, -1);
+			getGame()->setVolume(Options::soundVolume, Options::musicVolume, -1);
 		}
 	}
-	_game->getCursor()->setVisible(false);
+	getGame()->getCursor()->setVisible(false);
 
 	int dx = (Options::baseXResolution - Screen::ORIGINAL_WIDTH) / 2;
 	int dy = (Options::baseYResolution - Screen::ORIGINAL_HEIGHT) / 2;
 
 	// We can only do a fade out in 8bpp, otherwise instantly end it
-	bool fade = (_game->getScreen()->getSurface()->format->BitsPerPixel == 8);
+	bool fade = (getGame()->getScreen()->getSurface()->format->BitsPerPixel == 8);
 	const int FADE_DELAY = 45;
 	const int FADE_STEPS = 20;
 
@@ -436,9 +436,9 @@ void VideoState::init()
 	for (const auto& videoFileName : *_videos)
 	{
 		bool useInternalAudio = true;
-		if (!_tracks->empty() && _tracks->size() > audioCounter && _game->getMod()->getMusic(_tracks->at(audioCounter)))
+		if (!_tracks->empty() && _tracks->size() > audioCounter && getGame()->getMod()->getMusic(_tracks->at(audioCounter)))
 		{
-			_game->getMod()->getMusic(_tracks->at(audioCounter))->play(0);
+			getGame()->getMod()->getMusic(_tracks->at(audioCounter))->play(0);
 			useInternalAudio = false;
 		}
 		audioCounter++;
@@ -455,12 +455,12 @@ void VideoState::init()
 
 		if (_useUfoAudioSequence)
 		{
-			audioSequence = new AudioSequence(_game->getMod(), flcPlayer);
+			audioSequence = new AudioSequence(getGame()->getMod(), flcPlayer);
 		}
 
 		flcPlayer->init(videoFileName.c_str(),
 			 _useUfoAudioSequence ? &audioHandler : NULL,
-			 _game, useInternalAudio, dx, dy);
+			 getGame(), useInternalAudio, dx, dy);
 		flcPlayer->play(_useUfoAudioSequence);
 		if (_useUfoAudioSequence)
 		{
@@ -510,7 +510,7 @@ void VideoState::init()
 	{
 		SDL_Color pal[256];
 		SDL_Color pal2[256];
-		memcpy(pal, _game->getScreen()->getPalette(), sizeof(SDL_Color) * 256);
+		memcpy(pal, getGame()->getScreen()->getPalette(), sizeof(SDL_Color) * 256);
 		for (int i = FADE_STEPS; i > 0; --i)
 		{
 			SDL_Event event;
@@ -522,19 +522,19 @@ void VideoState::init()
 				pal2[color].b = (((int)pal[color].b) * i) / 20;
 				pal2[color].unused = pal[color].unused;
 			}
-			_game->getScreen()->setPalette(pal2, 0, 256, true);
-			_game->getScreen()->flip();
+			getGame()->getScreen()->setPalette(pal2, 0, 256, true);
+			getGame()->getScreen()->flip();
 			SDL_Delay(FADE_DELAY);
 		}
 	}
-	_game->getScreen()->clear();
-	_game->getScreen()->flip();
+	getGame()->getScreen()->clear();
+	getGame()->getScreen()->flip();
 
 	if (_useUfoAudioSequence)
 	{
 		Options::musicVolume = prevMusicVol;
 		Options::soundVolume = prevSoundVol;
-		_game->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
+		getGame()->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
 	}
 
 #ifndef __NO_MUSIC
@@ -542,9 +542,9 @@ void VideoState::init()
 	Music::stop();
 #endif
 
-	_game->getCursor()->setVisible(true);
+	getGame()->getCursor()->setVisible(true);
 	CutsceneState::resetDisplay(wasLetterboxed);
-	_game->popState();
+	getGame()->popState();
 }
 
 }

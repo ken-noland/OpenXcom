@@ -49,7 +49,6 @@ class State
 	friend class Timer;
 
 protected:
-	static Game *_game;
 	std::vector<Surface*> _surfaces;
 	bool _screen;
 	bool _soundPlayed;
@@ -109,8 +108,6 @@ public:
 	void lowerAllSurfaces();
 	/// switch the colours to use the battlescape palette.
 	void applyBattlescapeTheme(const std::string& category);
-	/// Sets game object pointer
-	static void setGamePtr(Game* game);
 	/// Sets a modal surface.
 	void setModal(InteractiveSurface *surface);
 

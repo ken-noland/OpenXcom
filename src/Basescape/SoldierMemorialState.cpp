@@ -94,9 +94,9 @@ SoldierMemorialState::SoldierMemorialState()
 
 	_txtDate->setText(tr("STR_DATE_UC"));
 
-	size_t lost = _game->getSavedGame()->getDeadSoldiers().size();
+	size_t lost = getGame()->getSavedGame()->getDeadSoldiers().size();
 	size_t recruited = lost;
-	for (const auto* xbase : _game->getSavedGame()->getBases())
+	for (const auto* xbase : getGame()->getSavedGame()->getBases())
 	{
 		recruited += xbase->getTotalSoldiers();
 	}
@@ -142,8 +142,8 @@ void SoldierMemorialState::init()
  */
 void SoldierMemorialState::btnOkClick(Action *)
 {
-	_game->popState();
-	_game->getMod()->playMusic("GMGEO");
+	getGame()->popState();
+	getGame()->getMod()->playMusic("GMGEO");
 }
 
 /**
@@ -180,7 +180,7 @@ void SoldierMemorialState::btnQuickSearchApply(Action *)
 */
 void SoldierMemorialState::btnStatisticsClick(Action *)
 {
-	_game->pushState(new StatisticsState);
+	getGame()->pushState(new StatisticsState);
 }
 
 /**
@@ -189,7 +189,7 @@ void SoldierMemorialState::btnStatisticsClick(Action *)
  */
 void SoldierMemorialState::lstSoldiersClick(Action *)
 {
-	_game->pushState(new SoldierInfoState(0, _indices[_lstSoldiers->getSelectedRow()]));
+	getGame()->pushState(new SoldierInfoState(0, _indices[_lstSoldiers->getSelectedRow()]));
 }
 
 /**
@@ -204,7 +204,7 @@ void SoldierMemorialState::fillMemorialList()
 	_indices.clear();
 
 	int index = -1;
-	for (std::vector<Soldier *>::reverse_iterator i = _game->getSavedGame()->getDeadSoldiers().rbegin(); i != _game->getSavedGame()->getDeadSoldiers().rend(); ++i)
+	for (std::vector<Soldier *>::reverse_iterator i = getGame()->getSavedGame()->getDeadSoldiers().rbegin(); i != getGame()->getSavedGame()->getDeadSoldiers().rend(); ++i)
 	{
 		++index;
 		const Soldier* deadSoldier = (*i);
@@ -223,7 +223,7 @@ void SoldierMemorialState::fillMemorialList()
 		const SoldierDeath *death = deadSoldier->getDeath();
 
 		std::ostringstream saveDay, saveMonth, saveYear;
-		saveDay << death->getTime()->getDayString(_game->getLanguage());
+		saveDay << death->getTime()->getDayString(getGame()->getLanguage());
 		saveMonth << tr(death->getTime()->getMonthString());
 		saveYear << death->getTime()->getYear();
 		_lstSoldiers->addRow(5, deadSoldier->getName().c_str(), tr(deadSoldier->getRankString()).c_str(), saveDay.str().c_str(), saveMonth.str().c_str(), saveYear.str().c_str());

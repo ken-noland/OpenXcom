@@ -100,7 +100,7 @@ AllocateTrainingState::AllocateTrainingState(Base *base) : _sel(0), _base(base),
 
 	_btnPlus->setText("+");
 	_btnPlus->setPressed(false);
-	if (_game->getMod()->getSoldierBonusList().empty())
+	if (getGame()->getMod()->getSoldierBonusList().empty())
 	{
 		// no soldier bonuses in the mod = button not needed
 		_btnPlus->setVisible(false);
@@ -135,8 +135,8 @@ AllocateTrainingState::AllocateTrainingState(Base *base) : _sel(0), _base(base),
 
 #define PUSH_IN(strId, functor) \
 	sortOptions.push_back(tr(strId)); \
-	_sortFunctors.push_back(new SortFunctor(_game, functor)); \
-	_sortFunctorsPlus.push_back(new SortFunctor(_game, functor));
+	_sortFunctors.push_back(new SortFunctor(getGame(), functor)); \
+	_sortFunctorsPlus.push_back(new SortFunctor(getGame(), functor));
 
 	PUSH_IN("STR_ID", idStat);
 	PUSH_IN("STR_NAME_UC", nameStat);
@@ -146,7 +146,7 @@ AllocateTrainingState::AllocateTrainingState(Base *base) : _sel(0), _base(base),
 	PUSH_IN("STR_MISSIONS2", missionsStat);
 	PUSH_IN("STR_KILLS2", killsStat);
 	PUSH_IN("STR_WOUND_RECOVERY2", woundRecoveryStat);
-	if (_game->getMod()->isManaFeatureEnabled() && !_game->getMod()->getReplenishManaAfterMission())
+	if (getGame()->getMod()->isManaFeatureEnabled() && !getGame()->getMod()->getReplenishManaAfterMission())
 	{
 		PUSH_IN("STR_MANA_MISSING", manaMissingStat);
 	}
@@ -155,8 +155,8 @@ AllocateTrainingState::AllocateTrainingState(Base *base) : _sel(0), _base(base),
 
 #define PUSH_IN(strId, functor, functorPlus) \
 	sortOptions.push_back(tr(strId)); \
-	_sortFunctors.push_back(new SortFunctor(_game, functor)); \
-	_sortFunctorsPlus.push_back(new SortFunctor(_game, functorPlus));
+	_sortFunctors.push_back(new SortFunctor(getGame(), functor)); \
+	_sortFunctorsPlus.push_back(new SortFunctor(getGame(), functorPlus));
 
 	PUSH_IN("STR_TIME_UNITS", tuStatBase, tuStatPlus);
 	PUSH_IN("STR_STAMINA", staminaStatBase, staminaStatPlus);
@@ -167,7 +167,7 @@ AllocateTrainingState::AllocateTrainingState(Base *base) : _sel(0), _base(base),
 	PUSH_IN("STR_THROWING_ACCURACY", throwingStatBase, throwingStatPlus);
 	PUSH_IN("STR_MELEE_ACCURACY", meleeStatBase, meleeStatPlus);
 	PUSH_IN("STR_STRENGTH", strengthStatBase, strengthStatPlus);
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		// "unlock" is checked later
 		PUSH_IN("STR_MANA_POOL", manaStatBase, manaStatPlus);
@@ -232,7 +232,7 @@ void AllocateTrainingState::cbxSortByChange(Action *action)
 		{
 			std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(), *compFunc);
 		}
-		if (_game->isShiftPressed())
+		if (getGame()->isShiftPressed())
 		{
 			std::reverse(_base->getSoldiers().begin(), _base->getSoldiers().end());
 		}
@@ -264,7 +264,7 @@ void AllocateTrainingState::cbxSortByChange(Action *action)
 void AllocateTrainingState::btnOkClick(Action *)
 {
 	// Note: statString updates not necessary
-	_game->popState();
+	getGame()->popState();
 }
 
 /**

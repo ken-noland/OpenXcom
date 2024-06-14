@@ -35,7 +35,7 @@ namespace OpenXcom
 
 	ArticleStateCraftWeapon::ArticleStateCraftWeapon(ArticleDefinitionCraftWeapon *defs, std::shared_ptr<ArticleCommonState> state) : ArticleState(defs->id, std::move(state))
 	{
-		RuleCraftWeapon *weapon = _game->getMod()->getCraftWeapon(defs->id, true);
+		RuleCraftWeapon *weapon = getGame()->getMod()->getCraftWeapon(defs->id, true);
 
 		CraftWeaponCategory category = CWC_WEAPON;
 		int offset = 0;
@@ -59,18 +59,18 @@ namespace OpenXcom
 		// Set palette
 		if (defs->customPalette)
 		{
-			setCustomPalette(_game->getMod()->getSurface(defs->image_id)->getPalette(), Mod::BATTLESCAPE_CURSOR);
+			setCustomPalette(getGame()->getMod()->getSurface(defs->image_id)->getPalette(), Mod::BATTLESCAPE_CURSOR);
 		}
 		else
 		{
 			setStandardPalette("PAL_BATTLEPEDIA");
 		}
 
-		_buttonColor = _game->getMod()->getInterface("articleCraftWeapon")->getElement("button")->color;
-		_textColor = _game->getMod()->getInterface("articleCraftWeapon")->getElement("text")->color;
-		_textColor2 = _game->getMod()->getInterface("articleCraftWeapon")->getElement("text")->color2;
-		_listColor1 = _game->getMod()->getInterface("articleCraftWeapon")->getElement("list")->color;
-		_listColor2 = _game->getMod()->getInterface("articleCraftWeapon")->getElement("list")->color2;
+		_buttonColor = getGame()->getMod()->getInterface("articleCraftWeapon")->getElement("button")->color;
+		_textColor = getGame()->getMod()->getInterface("articleCraftWeapon")->getElement("text")->color;
+		_textColor2 = getGame()->getMod()->getInterface("articleCraftWeapon")->getElement("text")->color2;
+		_listColor1 = getGame()->getMod()->getInterface("articleCraftWeapon")->getElement("list")->color;
+		_listColor2 = getGame()->getMod()->getInterface("articleCraftWeapon")->getElement("list")->color2;
 
 		ArticleState::initLayout();
 
@@ -78,12 +78,12 @@ namespace OpenXcom
 		add(_txtTitle);
 
 		// Set up objects
-		_game->getMod()->getSurface(defs->image_id)->blitNShade(_bg, 0, 0);
+		getGame()->getMod()->getSurface(defs->image_id)->blitNShade(_bg, 0, 0);
 		_btnOk->setColor(_buttonColor);
 		_btnPrev->setColor(_buttonColor);
 		_btnNext->setColor(_buttonColor);
 		_btnInfo->setColor(_buttonColor);
-		_btnInfo->setVisible(_game->getMod()->getShowPediaInfoButton());
+		_btnInfo->setVisible(getGame()->getMod()->getShowPediaInfoButton());
 
 		_txtTitle->setColor(_textColor);
 		_txtTitle->setBig();

@@ -90,7 +90,7 @@ AllocatePsiTrainingState::AllocatePsiTrainingState(Base *base) : _sel(0), _base(
 
 	_btnPlus->setText("+");
 	_btnPlus->setPressed(false);
-	if (_game->getMod()->getSoldierBonusList().empty())
+	if (getGame()->getMod()->getSoldierBonusList().empty())
 	{
 		// no soldier bonuses in the mod = button not needed
 		_btnPlus->setVisible(false);
@@ -123,8 +123,8 @@ AllocatePsiTrainingState::AllocatePsiTrainingState(Base *base) : _sel(0), _base(
 
 #define PUSH_IN(strId, functor) \
 	sortOptions.push_back(tr(strId)); \
-	_sortFunctors.push_back(new SortFunctor(_game, functor)); \
-	_sortFunctorsPlus.push_back(new SortFunctor(_game, functor));
+	_sortFunctors.push_back(new SortFunctor(getGame(), functor)); \
+	_sortFunctorsPlus.push_back(new SortFunctor(getGame(), functor));
 
 	PUSH_IN("STR_ID", idStat);
 	PUSH_IN("STR_NAME_UC", nameStat);
@@ -134,7 +134,7 @@ AllocatePsiTrainingState::AllocatePsiTrainingState(Base *base) : _sel(0), _base(
 	PUSH_IN("STR_MISSIONS2", missionsStat);
 	PUSH_IN("STR_KILLS2", killsStat);
 	PUSH_IN("STR_WOUND_RECOVERY2", woundRecoveryStat);
-	if (_game->getMod()->isManaFeatureEnabled() && !_game->getMod()->getReplenishManaAfterMission())
+	if (getGame()->getMod()->isManaFeatureEnabled() && !getGame()->getMod()->getReplenishManaAfterMission())
 	{
 		PUSH_IN("STR_MANA_MISSING", manaMissingStat);
 	}
@@ -143,8 +143,8 @@ AllocatePsiTrainingState::AllocatePsiTrainingState(Base *base) : _sel(0), _base(
 
 #define PUSH_IN(strId, functor, functorPlus) \
 	sortOptions.push_back(tr(strId)); \
-	_sortFunctors.push_back(new SortFunctor(_game, functor)); \
-	_sortFunctorsPlus.push_back(new SortFunctor(_game, functorPlus));
+	_sortFunctors.push_back(new SortFunctor(getGame(), functor)); \
+	_sortFunctorsPlus.push_back(new SortFunctor(getGame(), functorPlus));
 
 	PUSH_IN("STR_TIME_UNITS", tuStatBase, tuStatPlus);
 	PUSH_IN("STR_STAMINA", staminaStatBase, staminaStatPlus);
@@ -155,7 +155,7 @@ AllocatePsiTrainingState::AllocatePsiTrainingState(Base *base) : _sel(0), _base(
 	PUSH_IN("STR_THROWING_ACCURACY", throwingStatBase, throwingStatPlus);
 	PUSH_IN("STR_MELEE_ACCURACY", meleeStatBase, meleeStatPlus);
 	PUSH_IN("STR_STRENGTH", strengthStatBase, strengthStatPlus);
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		// "unlock" is checked later
 		PUSH_IN("STR_MANA_POOL", manaStatBase, manaStatPlus);
@@ -219,7 +219,7 @@ void AllocatePsiTrainingState::cbxSortByChange(Action *action)
 		{
 			std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(), *compFunc);
 		}
-		if (_game->isShiftPressed())
+		if (getGame()->isShiftPressed())
 		{
 			std::reverse(_base->getSoldiers().begin(), _base->getSoldiers().end());
 		}
@@ -251,12 +251,12 @@ void AllocatePsiTrainingState::cbxSortByChange(Action *action)
 void AllocatePsiTrainingState::btnOkClick(Action *)
 {
 	// Note: statString updates are needed only because of the potential "psiTraining" attribute change
-	bool psiStrengthEval = (Options::psiStrengthEval && _game->getSavedGame()->isResearched(_game->getMod()->getPsiRequirements()));
+	bool psiStrengthEval = (Options::psiStrengthEval && getGame()->getSavedGame()->isResearched(getGame()->getMod()->getPsiRequirements()));
 	for (Soldier* soldier : _base->getSoldiers())
 	{
-		soldier->calcStatString(_game->getMod()->getStatStrings(), psiStrengthEval);
+		soldier->calcStatString(getGame()->getMod()->getStatStrings(), psiStrengthEval);
 	}
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -302,7 +302,7 @@ void AllocatePsiTrainingState::initList(size_t scrl)
 		std::ostringstream ssStr;
 		std::ostringstream ssSkl;
 		_soldiers.push_back(soldier);
-		if (soldier->getCurrentStats()->psiSkill > 0 || (Options::psiStrengthEval && _game->getSavedGame()->isResearched(_game->getMod()->getPsiRequirements())))
+		if (soldier->getCurrentStats()->psiSkill > 0 || (Options::psiStrengthEval && getGame()->getSavedGame()->isResearched(getGame()->getMod()->getPsiRequirements())))
 		{
 			ssStr << "   " << stats->psiStrength;
 			if (Options::allowPsiStrengthImprovement) ssStr << "/+" << soldier->getPsiStrImprovement();

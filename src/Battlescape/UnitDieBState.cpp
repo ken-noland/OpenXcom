@@ -175,21 +175,20 @@ void UnitDieBState::think()
 		_parent->popState();
 		if (_unit->getOriginalFaction() == FACTION_PLAYER)
 		{
-			Game *game = _parent->getSave()->getBattleState()->getGame();
 			if (_unit->getStatus() == STATUS_DEAD)
 			{
 				if (_damageType->ResistType == DT_NONE && !_unit->getSpawnUnit())
 				{
-					game->pushState(new InfoboxOKState(game->getLanguage()->getString("STR_HAS_DIED_FROM_A_FATAL_WOUND", _unit->getGender()).arg(_unit->getName(game->getLanguage()))));
+					getGame()->pushState(new InfoboxOKState(getGame()->getLanguage()->getString("STR_HAS_DIED_FROM_A_FATAL_WOUND", _unit->getGender()).arg(_unit->getName(getGame()->getLanguage()))));
 				}
 				else if (Options::battleNotifyDeath && _unit->getGeoscapeSoldier() != 0)
 				{
-					game->pushState(new InfoboxState(game->getLanguage()->getString("STR_HAS_BEEN_KILLED", _unit->getGender()).arg(_unit->getName(game->getLanguage()))));
+					getGame()->pushState(new InfoboxState(getGame()->getLanguage()->getString("STR_HAS_BEEN_KILLED", _unit->getGender()).arg(_unit->getName(getGame()->getLanguage()))));
 				}
 			}
 			else if (_unit->indicatorsAreEnabled())
 			{
-				game->pushState(new InfoboxOKState(game->getLanguage()->getString("STR_HAS_BECOME_UNCONSCIOUS", _unit->getGender()).arg(_unit->getName(game->getLanguage()))));
+				getGame()->pushState(new InfoboxOKState(getGame()->getLanguage()->getString("STR_HAS_BECOME_UNCONSCIOUS", _unit->getGender()).arg(_unit->getName(getGame()->getLanguage()))));
 			}
 		}
 		// if all units from either faction are killed - auto-end the mission.

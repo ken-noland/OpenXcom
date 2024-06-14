@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#include "LuaArg.h"
 
 namespace OpenXcom
 {
@@ -127,10 +127,40 @@ inline int propertiesTableIterator(lua_State* luaState)
 		}
 	}
 
-	// Iterating over the __properties table
+    // Iterating over the __properties table
 	if (lua_next(luaState, tableIndex) != 0)
 	{
-		return 2; // Return key and value
+		// Stack now: [..., key, value]
+		lua_getfield(luaState, -1, "getter"); // Stack now: [..., key, value, getter]
+		if (lua_islightuserdata(luaState, -1))
+		{
+			auto getter = reinterpret_cast<int (*)(lua_State*, void*)>(lua_touserdata(luaState, -1));
+
+			// Get the metatable of the __properties table
+			if(!lua_getmetatable(luaState, -2))   // Stack now: [..., key, value, getter, metatable]
+			{
+				return luaL_error(luaState, "Internal error: no metatable for __properties table");
+			}
+
+			// Get the __userdata from the metatable
+			lua_getfield(luaState, -1, "__userdata"); // Stack now: [..., key, value, getter, metatable, __userdata]
+			void* userdata = lua_touserdata(luaState, -1);
+
+			// Pop the userdata, metatable, getter, and value
+			lua_pop(luaState, 4); // Stack now: [..., key]
+
+			// Call the getter function
+			getter(luaState, userdata); // Stack now: [..., key, value]
+
+			return 2; // Return key and value
+		}
+		else
+		{
+			// Remove non-function value (getter)
+			lua_pop(luaState, 1); // Stack now: [..., key, value]
+		}
+
+		return 2;                    // Return key and value
 	}
 
 	return 0; // No more elements
@@ -177,11 +207,6 @@ inline int pushTableWithUserdataAndProperties(lua_State* luaState, void* userdat
 	lua_newtable(luaState);                     // Create the __properties table
 	lua_pushvalue(luaState, -1);                // Duplicate the __properties table
 	lua_setfield(luaState, -3, "__properties"); // Set the __properties field in the metatable
-
-	lua_pushstring(luaState, "prop1");
-	lua_pushstring(luaState, "Property 1");
-	lua_settable(luaState, -3);
-
 	lua_pop(luaState, 1);                       // Pop the __properties table
 
 	// Set the __index metamethod
@@ -201,32 +226,68 @@ inline int pushTableWithUserdataAndProperties(lua_State* luaState, void* userdat
 	return tableIndex;
 }
 
+
+template <auto GetterFunction>
+inline int callGetter(lua_State* luaState, void* userdata)
+{
+	using GetterType = decltype(GetterFunction);
+	using ReturnType = typename FunctionTraits<GetterType>::ReturnType;
+	using ArgsTuple = typename FunctionTraits<GetterType>::ArgsTuple;
+
+	// Call the getter function and push the result to the Lua stack
+	if constexpr (std::is_member_function_pointer_v<GetterType>)
+	{
+		// Member function pointer
+		auto object = static_cast<std::remove_pointer_t<std::tuple_element_t<0, ArgsTuple> >*>(userdata);
+		ReturnType result = (object->*GetterFunction)();
+		toLua(luaState, result);
+	}
+	else if constexpr (std::tuple_size_v<ArgsTuple> == 1 && std::is_pointer_v<std::tuple_element_t<0, ArgsTuple> >)
+	{
+		// Free function or lambda with one argument
+		ReturnType result = GetterFunction(static_cast<std::remove_pointer_t<std::tuple_element_t<0, ArgsTuple> >*>(userdata));
+		toLua<ReturnType>(luaState, result);
+	}
+	else
+	{
+		static_assert(std::is_invocable_v<GetterType>, "Unsupported getter function type");
+	}
+
+	return 1; // Return the number of results
+}
+
+template <auto SetterFunction>
+inline int callSetter(lua_State* luaState, void* userdata)
+{
+	return 0;
+}
+
 /// Registers a property within the metatable of tableIndex. 
-template<auto GetterFunction, auto SetterFunction>
-inline void registerProperty(lua_State* luaState, const std::string& name, int tableIndex, void* userData)
+template<auto GetterFunction, auto SetterFunction = nullptr, typename UserdataType>
+inline void registerProperty(lua_State* luaState, const std::string& name, int tableIndex, UserdataType* userData)
 {
 	// Ensure the table at tableIndex has a metatable
 	luaL_checktype(luaState, tableIndex, LUA_TTABLE);
 	if (lua_getmetatable(luaState, tableIndex) == 0)
 	{
 		luaL_error(luaState, "Table at index %d has no metatable", tableIndex);
-	}
+	}	// stack looks like: [.., metatable]
 
 	// Get the __properties table from the metatable
 	lua_getfield(luaState, -1, "__properties");
 	if (!lua_istable(luaState, -1))
 	{
 		luaL_error(luaState, "__properties is not a table");
-	}
+	}	// stack looks like: [.., metatable, __properties]
 
 	// Create the property table with getter and setter
 	lua_newtable(luaState); // Create the property table
-	lua_pushlightuserdata(luaState, (void*)GetterFunction);
+	lua_pushlightuserdata(luaState, (void*)callGetter<GetterFunction>);
 	lua_setfield(luaState, -2, "getter");
 
 	if constexpr (SetterFunction != nullptr)
 	{
-		lua_pushlightuserdata(luaState, (void*)SetterFunction);
+		lua_pushlightuserdata(luaState, (void*)callSetter<SetterFunction>);
 		lua_setfield(luaState, -2, "setter");
 	}
 
@@ -240,7 +301,7 @@ inline void registerProperty(lua_State* luaState, const std::string& name, int t
 	lua_setfield(luaState, -2, name.c_str());
 
 	// Clean up the stack
-	lua_pop(luaState, 2); // Pop the __properties table and the parent metatable
+	lua_pop(luaState, 2); // stack looks like: [..]
 }
 
 

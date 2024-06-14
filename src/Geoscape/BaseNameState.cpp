@@ -77,20 +77,20 @@ BaseNameState::BaseNameState(Base *base, Globe *globe, bool first, bool fixedLoc
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_BASE_NAME"));
 
-	if (!_game->getMod()->getBaseNamesFirst().empty())
+	if (!getGame()->getMod()->getBaseNamesFirst().empty())
 	{
 		std::ostringstream ss;
-		int pickFirst = RNG::seedless(0, (int)_game->getMod()->getBaseNamesFirst().size() - 1);
-		ss << _game->getMod()->getBaseNamesFirst().at(pickFirst);
-		if (!_game->getMod()->getBaseNamesMiddle().empty())
+		int pickFirst = RNG::seedless(0, (int)getGame()->getMod()->getBaseNamesFirst().size() - 1);
+		ss << getGame()->getMod()->getBaseNamesFirst().at(pickFirst);
+		if (!getGame()->getMod()->getBaseNamesMiddle().empty())
 		{
-			int pickMiddle = RNG::seedless(0, (int)_game->getMod()->getBaseNamesMiddle().size() - 1);
-			ss << " " << _game->getMod()->getBaseNamesMiddle().at(pickMiddle);
+			int pickMiddle = RNG::seedless(0, (int)getGame()->getMod()->getBaseNamesMiddle().size() - 1);
+			ss << " " << getGame()->getMod()->getBaseNamesMiddle().at(pickMiddle);
 		}
-		if (!_game->getMod()->getBaseNamesLast().empty())
+		if (!getGame()->getMod()->getBaseNamesLast().empty())
 		{
-			int pickLast = RNG::seedless(0, (int)_game->getMod()->getBaseNamesLast().size() - 1);
-			ss << " " << _game->getMod()->getBaseNamesLast().at(pickLast);
+			int pickLast = RNG::seedless(0, (int)getGame()->getMod()->getBaseNamesLast().size() - 1);
+			ss << " " << getGame()->getMod()->getBaseNamesLast().at(pickLast);
 		}
 		_edtName->setText(ss.str());
 		_btnOk->setVisible(true);
@@ -139,20 +139,20 @@ void BaseNameState::btnOkClick(Action *)
 	if (!_edtName->getText().empty())
 	{
 		_base->setName(_edtName->getText());
-		_game->popState(); // pop BaseNameState
+		getGame()->popState(); // pop BaseNameState
 
 		if (!_fixedLocation)
 		{
-			_game->popState(); // pop ConfirmNewBaseState or BuildNewBaseState
+			getGame()->popState(); // pop ConfirmNewBaseState or BuildNewBaseState
 			if (!_first)
 			{
-				_game->popState(); // pop BuildNewBaseState
+				getGame()->popState(); // pop BuildNewBaseState
 			}
 		}
 
 		if (!_first || Options::customInitialBase)
 		{
-			_game->pushState(new PlaceLiftState(_base, _globe, _first));
+			getGame()->pushState(new PlaceLiftState(_base, _globe, _first));
 		}
 	}
 }

@@ -50,6 +50,12 @@ void toLua(lua_State* L, const std::string& arg)
 }
 
 template <>
+void toLua(lua_State* L, std::string arg)
+{
+	lua_pushstring(L, arg.c_str());
+}
+
+template <>
 void toLua(lua_State* L, const char* arg)
 {
 	lua_pushstring(L, arg);

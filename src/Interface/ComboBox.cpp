@@ -319,7 +319,7 @@ void ComboBox::setDropdown(int options)
  */
 void ComboBox::setOptions(const std::vector<std::string> &options, bool translate)
 {
-	setDropdown(options.size());
+	setDropdown((int)options.size());
 	_list->clearList();
 	for (const auto& option : options)
 	{

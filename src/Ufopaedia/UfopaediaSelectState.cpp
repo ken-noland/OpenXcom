@@ -67,7 +67,7 @@ namespace OpenXcom
 
 		_colorNormal = _lstSelection->getColor();
 		_colorNew = Options::oxceHighlightNewTopics ? _lstSelection->getSecondaryColor() : _colorNormal;
-		_colorHidden = _game->getMod()->getInterface("ufopaedia")->getElement("listExtended")->color;
+		_colorHidden = getGame()->getMod()->getInterface("ufopaedia")->getElement("listExtended")->color;
 
 		centerAllSurfaces();
 
@@ -122,7 +122,7 @@ namespace OpenXcom
 	 */
 	void UfopaediaSelectState::btnOkClick(Action *)
 	{
-		_game->popState();
+		getGame()->popState();
 	}
 
 	/**
@@ -132,7 +132,7 @@ namespace OpenXcom
 	void UfopaediaSelectState::lstSelectionClick(Action *)
 	{
 		_lstScroll = _lstSelection->getScroll();
-		Ufopaedia::openArticle(_game, _filtered_article_list[_lstSelection->getSelectedRow()]);
+		Ufopaedia::openArticle(getGame(), _filtered_article_list[_lstSelection->getSelectedRow()]);
 	}
 
 	/**
@@ -143,14 +143,14 @@ namespace OpenXcom
 	{
 		// change status
 		const std::string rule = _filtered_article_list[_lstSelection->getSelectedRow()]->id;
-		int oldState = _game->getSavedGame()->getUfopediaRuleStatus(rule);
+		int oldState = getGame()->getSavedGame()->getUfopediaRuleStatus(rule);
 		int newState = (oldState + 1) % ArticleDefinition::PEDIA_STATUSES;
 		if (!Options::oxceHighlightNewTopics)
 		{
 			// only switch between hidden and not hidden
 			newState = (oldState == ArticleDefinition::PEDIA_STATUS_HIDDEN) ? ArticleDefinition::PEDIA_STATUS_NORMAL : ArticleDefinition::PEDIA_STATUS_HIDDEN;
 		}
-		_game->getSavedGame()->setUfopediaRuleStatus(rule, newState);
+		getGame()->getSavedGame()->setUfopediaRuleStatus(rule, newState);
 
 		if (newState == ArticleDefinition::PEDIA_STATUS_HIDDEN)
 		{
@@ -219,7 +219,7 @@ namespace OpenXcom
 
 		_lstSelection->clearList();
 		_article_list.clear();
-		Ufopaedia::list(_game->getSavedGame(), _game->getMod(), _section, _article_list);
+		Ufopaedia::list(getGame()->getSavedGame(), getGame()->getMod(), _section, _article_list);
 		_filtered_article_list.clear();
 		size_t selectedFilter = _cbxFilter->getSelected();
 
@@ -228,7 +228,7 @@ namespace OpenXcom
 		int ruleStatus = 0;
 		for (auto* articleDef : _article_list)
 		{
-			ruleStatus = _game->getSavedGame()->getUfopediaRuleStatus(articleDef->id);
+			ruleStatus = getGame()->getSavedGame()->getUfopediaRuleStatus(articleDef->id);
 
 			// filter
 			if (selectedFilter == 0)
@@ -249,7 +249,7 @@ namespace OpenXcom
 			{
 				if (_isCommendationsSection)
 				{
-					if (Ufopaedia::isAwardedCommendation(_game->getSavedGame(), articleDef))
+					if (Ufopaedia::isAwardedCommendation(getGame()->getSavedGame(), articleDef))
 					{
 						continue;
 					}
@@ -280,7 +280,7 @@ namespace OpenXcom
 			if (markAllAsSeen)
 			{
 				// remember all listed articles as seen/normal
-				_game->getSavedGame()->setUfopediaRuleStatus(articleDef->id, ArticleDefinition::PEDIA_STATUS_NORMAL);
+				getGame()->getSavedGame()->setUfopediaRuleStatus(articleDef->id, ArticleDefinition::PEDIA_STATUS_NORMAL);
 			}
 			else
 			{

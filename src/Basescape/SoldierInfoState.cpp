@@ -60,7 +60,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 {
 	if (_base == 0)
 	{
-		_list = &_game->getSavedGame()->getDeadSoldiers();
+		_list = &getGame()->getSavedGame()->getDeadSoldiers();
 		if (_soldierId >= _list->size())
 		{
 			_soldierId = 0;
@@ -99,7 +99,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 
 	int yPos = 80;
 	int step = 11;
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		yPos = 81;
 		step = 10;
@@ -150,7 +150,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 	_barStrength = new Bar(170, 7, 150, yPos);
 	yPos += step;
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		_txtMana = new Text(120, 9, 6, yPos);
 		_numMana = new Text(18, 9, 131, yPos);
@@ -227,7 +227,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 	add(_numStrength, "numbers", "soldierInfo");
 	add(_barStrength, "barStrength", "soldierInfo");
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		add(_txtMana, "text2", "soldierInfo");
 		add(_numMana, "numbers", "soldierInfo");
@@ -245,7 +245,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 	centerAllSurfaces();
 
 	// Set up objects
-	_game->getMod()->getSurface("BACK06.SCR")->blitNShade(_bg, 0, 0);
+	getGame()->getMod()->getSurface("BACK06.SCR")->blitNShade(_bg, 0, 0);
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&SoldierInfoState::btnOkClick);
@@ -287,7 +287,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 	std::vector<RuleSoldierTransformation*> availableTransformations;
 	if (_base)
 	{
-		_game->getSavedGame()->getAvailableTransformations(availableTransformations, _game->getMod(), _base);
+		getGame()->getSavedGame()->getAvailableTransformations(availableTransformations, getGame()->getMod(), _base);
 	}
 	if (availableTransformations.empty())
 	{
@@ -302,7 +302,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 	if (_base != 0)
 	{
 		// Ignore also if flags are used to indicate number of kills
-		if (_game->getMod()->getFlagByKills().empty())
+		if (getGame()->getMod()->getFlagByKills().empty())
 		{
 			_flag->onMouseClick((ActionHandler)&SoldierInfoState::btnFlagClick, SDL_BUTTON_LEFT);
 			_flag->onMouseClick((ActionHandler)&SoldierInfoState::btnFlagClick, SDL_BUTTON_RIGHT);
@@ -356,7 +356,7 @@ SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimit
 
 	_barStrength->setScale(1.0);
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		_txtMana->setText(tr("STR_MANA_POOL"));
 		_barMana->setScale(1.0);
@@ -388,7 +388,7 @@ void SoldierInfoState::init()
 	State::init();
 	if (_list->empty())
 	{
-		_game->popState();
+		getGame()->popState();
 		return;
 	}
 	if (_soldierId >= _list->size())
@@ -402,11 +402,11 @@ void SoldierInfoState::init()
 	const UnitStats *current = _soldier->getCurrentStats();
 	const UnitStats max = _soldier->getRules()->getStatCaps();
 
-	bool hasBonus = _soldier->prepareStatsWithBonuses(_game->getMod()); // refresh all bonuses
+	bool hasBonus = _soldier->prepareStatsWithBonuses(getGame()->getMod()); // refresh all bonuses
 	UnitStats withArmor = *_soldier->getStatsWithAllBonuses();
 	_btnBonuses->setVisible(hasBonus);
 
-	SurfaceSet *texture = _game->getMod()->getSurfaceSet("BASEBITS.PCK");
+	SurfaceSet *texture = getGame()->getMod()->getSurfaceSet("BASEBITS.PCK");
 	auto frame = texture->getFrame(_soldier->getRankSprite());
 	if (frame)
 	{
@@ -415,7 +415,7 @@ void SoldierInfoState::init()
 
 	std::ostringstream flagId;
 	flagId << "Flag";
-	const std::vector<int> mapping = _game->getMod()->getFlagByKills();
+	const std::vector<int> mapping = getGame()->getMod()->getFlagByKills();
 	if (mapping.empty())
 	{
 		flagId << _soldier->getNationality() + _soldier->getRules()->getFlagOffset();
@@ -433,7 +433,7 @@ void SoldierInfoState::init()
 		}
 		flagId << index + _soldier->getRules()->getFlagOffset();
 	}
-	Surface *flagTexture = _game->getMod()->getSurface(flagId.str().c_str(), false);
+	Surface *flagTexture = getGame()->getMod()->getSurface(flagId.str().c_str(), false);
 	_flag->clear();
 	if (flagTexture != 0)
 	{
@@ -477,7 +477,7 @@ void SoldierInfoState::init()
 
 	_btnArmor->setText(wsArmor);
 
-	_btnSack->setVisible(_game->getSavedGame()->getMonthsPassed() > -1 && !(_soldier->getCraft() && _soldier->getCraft()->getStatus() == "STR_OUT"));
+	_btnSack->setVisible(getGame()->getSavedGame()->getMonthsPassed() > -1 && !(_soldier->getCraft() && _soldier->getCraft()->getStatus() == "STR_OUT"));
 
 	_txtRank->setText(tr("STR_RANK_").arg(tr(_soldier->getRankString())));
 
@@ -495,7 +495,7 @@ void SoldierInfoState::init()
 	}
 	else
 	{
-		craft = _soldier->getCraft()->getName(_game->getLanguage());
+		craft = _soldier->getCraft()->getName(getGame()->getLanguage());
 	}
 	_txtCraft->setText(tr("STR_CRAFT_").arg(craft));
 
@@ -533,9 +533,9 @@ void SoldierInfoState::init()
 
 	_txtPsionic->setVisible(_soldier->isInPsiTraining());
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
-		if (_game->getSavedGame()->isManaUnlocked(_game->getMod()))
+		if (getGame()->getSavedGame()->isManaUnlocked(getGame()->getMod()))
 		{
 			formatStat(current->mana, max.mana, withArmor.mana, initial->mana, _numMana, _barMana);
 
@@ -551,7 +551,7 @@ void SoldierInfoState::init()
 		}
 	}
 
-	if (current->psiSkill > 0 || (Options::psiStrengthEval && _game->getSavedGame()->isResearched(_game->getMod()->getPsiRequirements())))
+	if (current->psiSkill > 0 || (Options::psiStrengthEval && getGame()->getSavedGame()->isResearched(getGame()->getMod()->getPsiRequirements())))
 	{
 		formatStat(current->psiStrength, max.psiStrength, withArmor.psiStrength, initial->psiStrength, _numPsiStrength, _barPsiStrength);
 
@@ -658,15 +658,15 @@ void SoldierInfoState::edtSoldierChange(Action *)
 void SoldierInfoState::btnOkClick(Action *)
 {
 
-	_game->popState();
-	if (_game->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && _base != 0 && _base->storesOverfull())
+	getGame()->popState();
+	if (getGame()->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && _base != 0 && _base->storesOverfull())
 	{
 		if (_forceLimits)
 		{
 			// Note: we could sell a currently opened craft here and crash the game
-			_game->pushState(new SellState(_base, 0));
+			getGame()->pushState(new SellState(_base, 0));
 		}
-		_game->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(_base->getName()), _palette, _game->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", _game->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
+		getGame()->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(_base->getName()), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
 	}
 }
 
@@ -703,7 +703,7 @@ void SoldierInfoState::btnArmorClick(Action *)
 {
 	if (!_soldier->getCraft() || (_soldier->getCraft() && _soldier->getCraft()->getStatus() != "STR_OUT"))
 	{
-		_game->pushState(new SoldierArmorState(_base, _soldierId, SA_GEOSCAPE));
+		getGame()->pushState(new SoldierArmorState(_base, _soldierId, SA_GEOSCAPE));
 	}
 }
 
@@ -713,7 +713,7 @@ void SoldierInfoState::btnArmorClick(Action *)
  */
 void SoldierInfoState::btnBonusesClick(Action *)
 {
-	_game->pushState(new SoldierBonusState(_base, _soldierId));
+	getGame()->pushState(new SoldierBonusState(_base, _soldierId));
 }
 
 /**
@@ -722,7 +722,7 @@ void SoldierInfoState::btnBonusesClick(Action *)
  */
 void SoldierInfoState::btnTransformationsClick(Action*)
 {
-	_game->pushState(new SoldierTransformState(_base, _soldierId));
+	getGame()->pushState(new SoldierTransformState(_base, _soldierId));
 }
 
 /**
@@ -731,7 +731,7 @@ void SoldierInfoState::btnTransformationsClick(Action*)
  */
 void SoldierInfoState::btnSackClick(Action *)
 {
-	_game->pushState(new SackSoldierState(_base, _soldierId));
+	getGame()->pushState(new SackSoldierState(_base, _soldierId));
 }
 
 /**
@@ -740,7 +740,7 @@ void SoldierInfoState::btnSackClick(Action *)
  */
 void SoldierInfoState::btnDiaryClick(Action *)
 {
-	_game->pushState(new SoldierDiaryOverviewState(_base, _soldierId, this));
+	getGame()->pushState(new SoldierDiaryOverviewState(_base, _soldierId, this));
 }
 
 /**
@@ -789,7 +789,7 @@ void SoldierInfoState::btnRankClick(Action *)
 {
 	if (Options::oxceManualPromotions)
 	{
-		_game->pushState(new SoldierRankState(_base, _soldierId));
+		getGame()->pushState(new SoldierRankState(_base, _soldierId));
 	}
 }
 

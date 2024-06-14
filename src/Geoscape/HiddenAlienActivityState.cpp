@@ -201,7 +201,7 @@ HiddenAlienActivityState::~HiddenAlienActivityState()
 void HiddenAlienActivityState::btnOkClick(Action*)
 {
 	_state->timerReset();
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -210,7 +210,7 @@ void HiddenAlienActivityState::btnOkClick(Action*)
  */
 void HiddenAlienActivityState::btnCancelClick(Action*)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

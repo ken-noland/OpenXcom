@@ -59,7 +59,7 @@ SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(_base-
 	bool isPsiBtnVisible = Options::anytimePsiTraining && _base->getAvailablePsiLabs() > 0;
 	bool isTrnBtnVisible = _base->getAvailableTraining() > 0;
 	std::vector<RuleSoldierTransformation* > availableTransformations;
-	_game->getSavedGame()->getAvailableTransformations(availableTransformations, _game->getMod(), _base);
+	getGame()->getSavedGame()->getAvailableTransformations(availableTransformations, getGame()->getMod(), _base);
 	bool isTransformationAvailable = availableTransformations.size() > 0;
 
 	// Always show Combo Box and Three buttons: one button for actions(Memorial, Trainings, Transormations,...)
@@ -125,9 +125,9 @@ SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(_base-
 	}
 	if (refreshDeadSoldierStats)
 	{
-		for (Soldier* deadMan : _game->getSavedGame()->getDeadSoldiers())
+		for (Soldier* deadMan : getGame()->getSavedGame()->getDeadSoldiers())
 		{
-			deadMan->prepareStatsWithBonuses(_game->getMod()); // refresh stats for sorting
+			deadMan->prepareStatsWithBonuses(getGame()->getMod()); // refresh stats for sorting
 		}
 	}
 	_availableOptions.push_back("STR_AI_LISTBUTTON");
@@ -142,7 +142,7 @@ SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(_base-
 	_craftOptions.push_back("STR_NOT_ASSIGNED");
 	for (size_t craft = 0; craft < _base->getCrafts().size(); ++craft)
 	{
-       _craftOptions.push_back( _base->getCrafts().at(craft)->getName(_game->getLanguage()));
+       _craftOptions.push_back( _base->getCrafts().at(craft)->getName(getGame()->getLanguage()));
 	}
 	_cbxFilterByCraft->setOptions(_craftOptions, true);
 	_cbxFilterByCraft->setSelected(0);
@@ -165,7 +165,7 @@ SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(_base-
 
 #define PUSH_IN(strId, functor) \
 	sortOptions.push_back(tr(strId)); \
-	_sortFunctors.push_back(new SortFunctor(_game, functor));
+	_sortFunctors.push_back(new SortFunctor(getGame(), functor));
 
 	PUSH_IN("STR_ID", idStat);
 	PUSH_IN("STR_NAME_UC", nameStat);
@@ -176,7 +176,7 @@ SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(_base-
 	PUSH_IN("STR_MISSIONS2", missionsStat);
 	PUSH_IN("STR_KILLS2", killsStat);
 	PUSH_IN("STR_WOUND_RECOVERY2", woundRecoveryStat);
-	if (_game->getMod()->isManaFeatureEnabled() && !_game->getMod()->getReplenishManaAfterMission())
+	if (getGame()->getMod()->isManaFeatureEnabled() && !getGame()->getMod()->getReplenishManaAfterMission())
 	{
 		PUSH_IN("STR_MANA_MISSING", manaMissingStat);
 	}
@@ -189,7 +189,7 @@ SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(_base-
 	PUSH_IN("STR_THROWING_ACCURACY", throwingStat);
 	PUSH_IN("STR_MELEE_ACCURACY", meleeStat);
 	PUSH_IN("STR_STRENGTH", strengthStat);
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		// "unlock" is checked later
 		PUSH_IN("STR_MANA_POOL", manaStat);
@@ -234,7 +234,7 @@ SoldiersState::~SoldiersState()
  */
 void SoldiersState::cbxSortByChange(Action *action)
 {
-	bool ctrlPressed = _game->isCtrlPressed();
+	bool ctrlPressed = getGame()->isCtrlPressed();
 	size_t selIdx = _cbxSortBy->getSelected();
 	if (selIdx == (size_t)-1)
 	{
@@ -293,7 +293,7 @@ void SoldiersState::cbxSortByChange(Action *action)
 			{
 				std::stable_sort(_base->getSoldiers().begin(), _base->getSoldiers().end(), *compFunc);
 			}
-			if (_game->isShiftPressed())
+			if (getGame()->isShiftPressed())
 			{
 				std::reverse(_base->getSoldiers().begin(), _base->getSoldiers().end());
 			}
@@ -328,7 +328,7 @@ void SoldiersState::init()
 	State::init();
 
 	// resets the savegame when coming back from the inventory
-	_game->getSavedGame()->setBattleGame(0);
+	getGame()->getSavedGame()->setBattleGame(0);
 	_base->setInBattlescape(false);
 
 	_base->prepareSoldierStatsWithBonuses(); // refresh stats for sorting
@@ -385,7 +385,7 @@ void SoldiersState::initList(size_t scrl)
 		_lstSoldiers->setArrowColumn(-1, ARROW_VERTICAL);
 
 		// filtered list of soldiers eligible for transformation
-		RuleSoldierTransformation *transformationRule = _game->getMod()->getSoldierTransformation(selAction);
+		RuleSoldierTransformation *transformationRule = getGame()->getMod()->getSoldierTransformation(selAction);
 		if (transformationRule)
 		{
 			int idx = -1;
@@ -407,7 +407,7 @@ void SoldiersState::initList(size_t scrl)
 					_filteredIndicesOfSoldiers.push_back(idx);
 				}
 			}
-			for (Soldier* deadMan : _game->getSavedGame()->getDeadSoldiers())
+			for (Soldier* deadMan : getGame()->getSavedGame()->getDeadSoldiers())
 			{
 				if (deadMan->isEligibleForTransformation(transformationRule))
 				{
@@ -432,12 +432,12 @@ void SoldiersState::initList(size_t scrl)
 	unsigned int row = 0;
 	for (const auto* soldier : _filteredListOfSoldiers)
 	{
-		std::string craftString = soldier->getCraftString(_game->getLanguage(), recovery);
+		std::string craftString = soldier->getCraftString(getGame()->getLanguage(), recovery);
 
 		if (_dynGetter != NULL)
 		{
 			// call corresponding getter
-			int dynStat = (*_dynGetter)(_game, soldier);
+			int dynStat = (*_dynGetter)(getGame(), soldier);
 			std::ostringstream ss;
 			ss << dynStat;
 			_lstSoldiers->addRow(4, soldier->getName(true).c_str(), tr(soldier->getRankString()).c_str(), craftString.c_str(), ss.str().c_str());
@@ -578,7 +578,7 @@ void SoldiersState::moveSoldierDown(Action *action, unsigned int row, bool max)
  */
 void SoldiersState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -592,7 +592,7 @@ void SoldiersState::cbxScreenActionsChange(Action *action)
 	if (selAction == "STR_MEMORIAL")
 	{
 		_cbxScreenActions->setSelected(0);
-		_game->pushState(new SoldierMemorialState);
+		getGame()->pushState(new SoldierMemorialState);
 	}
 	else if (selAction == "STR_INVENTORY")
 	{
@@ -602,21 +602,21 @@ void SoldiersState::cbxScreenActionsChange(Action *action)
 	else if (selAction == "STR_AI_LISTBUTTON")
 	{
 		_cbxScreenActions->setSelected(0);
-		_game->pushState(new SoldiersAIState(_base->getSoldiers()));
+		getGame()->pushState(new SoldiersAIState(_base->getSoldiers()));
 	}
 	else if (selAction == "STR_PSI_TRAINING")
 	{
 		_cbxScreenActions->setSelected(0);
-		_game->pushState(new AllocatePsiTrainingState(_base));
+		getGame()->pushState(new AllocatePsiTrainingState(_base));
 	}
 	else if (selAction == "STR_TRAINING")
 	{
 		_cbxScreenActions->setSelected(0);
-		_game->pushState(new AllocateTrainingState(_base));
+		getGame()->pushState(new AllocateTrainingState(_base));
 	}
 	else if (selAction == "STR_TRANSFORMATIONS_OVERVIEW")
 	{
-		_game->pushState(new SoldierTransformationListState(_base, _cbxScreenActions));
+		getGame()->pushState(new SoldierTransformationListState(_base, _cbxScreenActions));
 	}
 	else
 	{
@@ -647,20 +647,20 @@ void SoldiersState::btnInventoryClick(Action *)
 {
 	if (_base->getAvailableSoldiers(true, true) > 0)
 	{
-		SavedBattleGame *bgame = new SavedBattleGame(_game->getMod(), _game->getLanguage());
-		_game->getSavedGame()->setBattleGame(bgame);
+		SavedBattleGame *bgame = new SavedBattleGame(getGame()->getMod(), getGame()->getLanguage());
+		getGame()->getSavedGame()->setBattleGame(bgame);
 		bgame->setMissionType("STR_BASE_DEFENSE");
 
-		if (_game->isCtrlPressed() && _game->isAltPressed())
+		if (getGame()->isCtrlPressed() && getGame()->isAltPressed())
 		{
-			_game->getSavedGame()->setDisableSoldierEquipment(true);
+			getGame()->getSavedGame()->setDisableSoldierEquipment(true);
 		}
-		BattlescapeGenerator bgen = BattlescapeGenerator(_game);
+		BattlescapeGenerator bgen = BattlescapeGenerator(getGame());
 		bgen.setBase(_base);
 		bgen.runInventory(0);
 
-		_game->getScreen()->clear();
-		_game->pushState(new InventoryState(false, 0, _base, true));
+		getGame()->getScreen()->clear();
+		getGame()->pushState(new InventoryState(false, 0, _base, true));
 	}
 }
 
@@ -683,7 +683,7 @@ void SoldiersState::lstSoldiersClick(Action *action)
 	}
 	if (selAction == "STR_SOLDIER_INFO")
 	{
-		_game->pushState(new SoldierInfoState(_base, _lstSoldiers->getSelectedRow()));
+		getGame()->pushState(new SoldierInfoState(_base, _lstSoldiers->getSelectedRow()));
 	}
 	else if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
 	{
@@ -693,16 +693,16 @@ void SoldiersState::lstSoldiersClick(Action *action)
 			int soldierId = _filteredIndicesOfSoldiers[idx];
 			if (soldierId > -1)
 			{
-				_game->pushState(new SoldierInfoState(_base, soldierId));
+				getGame()->pushState(new SoldierInfoState(_base, soldierId));
 			}
 		}
 	}
 	else
 	{
-		RuleSoldierTransformation *transformationRule = _game->getMod()->getSoldierTransformation(selAction);
+		RuleSoldierTransformation *transformationRule = getGame()->getMod()->getSoldierTransformation(selAction);
 		if (transformationRule)
 		{
-			_game->pushState(new SoldierTransformationState(
+			getGame()->pushState(new SoldierTransformationState(
 				transformationRule,
 				_base,
 				_filteredListOfSoldiers.at(_lstSoldiers->getSelectedRow()),
@@ -744,7 +744,7 @@ void SoldiersState::lstSoldiersMousePress(Action *action)
 /// Handler for clicking the AI button.
 void SoldiersState::btnAIClick(Action *action)
 {
-	_game->pushState(new SoldiersAIState(_base->getSoldiers()));
+	getGame()->pushState(new SoldiersAIState(_base->getSoldiers()));
 }
 
 }

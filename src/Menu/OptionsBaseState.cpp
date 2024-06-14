@@ -71,7 +71,7 @@ OptionsBaseState::OptionsBaseState(OptionsOrigin origin) : _origin(origin), _gro
 	_txtTooltip = new Text(305, 25, 8, 148);
 
 	// Set palette
-	setInterface("optionsMenu", false, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("optionsMenu", false, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "window", "optionsMenu");
 
@@ -138,22 +138,22 @@ OptionsBaseState::~OptionsBaseState()
 void OptionsBaseState::restart(OptionsOrigin origin)
 {
 	// Reset touch flags
-	_game->resetTouchButtonFlags();
+	getGame()->resetTouchButtonFlags();
 
 	if (origin == OPT_MENU)
 	{
-		_game->setState(new MainMenuState);
+		getGame()->setState(new MainMenuState);
 	}
 	else if (origin == OPT_GEOSCAPE)
 	{
-		_game->setState(new GeoscapeState);
+		getGame()->setState(new GeoscapeState);
 	}
 	else if (origin == OPT_BATTLESCAPE)
 	{
 		BattlescapeState *origBattleState = 0;
-		if (_game->getSavedGame() != 0 && _game->getSavedGame()->getSavedBattle() != 0)
+		if (getGame()->getSavedGame() != 0 && getGame()->getSavedGame()->getSavedBattle() != 0)
 		{
-			origBattleState = _game->getSavedGame()->getSavedBattle()->getBattleState();
+			origBattleState = getGame()->getSavedGame()->getSavedBattle()->getBattleState();
 		}
 		if (origBattleState != 0)
 		{
@@ -161,10 +161,10 @@ void OptionsBaseState::restart(OptionsOrigin origin)
 			origBattleState->resetPalettes();
 		}
 
-		_game->setState(new GeoscapeState);
+		getGame()->setState(new GeoscapeState);
 		BattlescapeState *bs = new BattlescapeState;
-		_game->pushState(bs);
-		_game->getSavedGame()->getSavedBattle()->setBattleState(bs);
+		getGame()->pushState(bs);
+		getGame()->getSavedGame()->getSavedBattle()->setBattleState(bs);
 	}
 }
 
@@ -211,13 +211,13 @@ void OptionsBaseState::btnOkClick(Action *)
 	dY = Options::baseYResolution - dY;
 	recenter(dX, dY);
 	Options::save();
-	_game->loadLanguages();
+	getGame()->loadLanguages();
 	SDL_WM_GrabInput(Options::captureMouse);
-	_game->getScreen()->resetDisplay();
-	_game->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
+	getGame()->getScreen()->resetDisplay();
+	getGame()->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
 	if (Options::reload && _origin == OPT_MENU)
 	{
-		_game->setState(new StartState);
+		getGame()->setState(new StartState);
 	}
 	else
 	{
@@ -229,7 +229,7 @@ void OptionsBaseState::btnOkClick(Action *)
 			Options::useHQXFilter != Options::newHQXFilter ||
 			Options::useOpenGLShader != Options::newOpenGLShader)
 		{
-			_game->pushState(new OptionsConfirmState(_origin));
+			getGame()->pushState(new OptionsConfirmState(_origin));
 		}
 		else
 		{
@@ -249,8 +249,8 @@ void OptionsBaseState::btnCancelClick(Action *)
 	SDL_WM_GrabInput(Options::captureMouse);
 	Screen::updateScale(Options::battlescapeScale, Options::baseXBattlescape, Options::baseYBattlescape, _origin == OPT_BATTLESCAPE);
 	Screen::updateScale(Options::geoscapeScale, Options::baseXGeoscape, Options::baseYGeoscape, _origin != OPT_BATTLESCAPE);
-	_game->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
-	_game->popState();
+	getGame()->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
+	getGame()->popState();
 }
 
 /**
@@ -259,7 +259,7 @@ void OptionsBaseState::btnCancelClick(Action *)
  */
 void OptionsBaseState::btnDefaultClick(Action *)
 {
-	_game->pushState(new OptionsDefaultsState(_origin, this));
+	getGame()->pushState(new OptionsDefaultsState(_origin, this));
 }
 
 void OptionsBaseState::btnGroupPress(Action *action)
@@ -267,41 +267,41 @@ void OptionsBaseState::btnGroupPress(Action *action)
 	Surface *sender = action->getSender();
 	//if (sender != _group)
 	{
-		_game->popState();
+		getGame()->popState();
 		if (sender == _btnVideo)
 		{
-			_game->pushState(new OptionsVideoState(_origin));
+			getGame()->pushState(new OptionsVideoState(_origin));
 		}
 		else if (sender == _btnAudio)
 		{
 			if (!Options::mute)
 			{
-				_game->pushState(new OptionsAudioState(_origin));
+				getGame()->pushState(new OptionsAudioState(_origin));
 			}
 			else
 			{
-				_game->pushState(new OptionsNoAudioState(_origin));
+				getGame()->pushState(new OptionsNoAudioState(_origin));
 			}
 		}
 		else if (sender == _btnControls)
 		{
-			_game->pushState(new OptionsControlsState(_origin));
+			getGame()->pushState(new OptionsControlsState(_origin));
 		}
 		else if (sender == _btnGeoscape)
 		{
-			_game->pushState(new OptionsGeoscapeState(_origin));
+			getGame()->pushState(new OptionsGeoscapeState(_origin));
 		}
 		else if (sender == _btnBattlescape)
 		{
-			_game->pushState(new OptionsBattlescapeState(_origin));
+			getGame()->pushState(new OptionsBattlescapeState(_origin));
 		}
 		else if (sender == _btnAdvanced)
 		{
-			_game->pushState(new OptionsAdvancedState(_origin));
+			getGame()->pushState(new OptionsAdvancedState(_origin));
 		}
 		else if (sender == _btnFolders)
 		{
-			_game->pushState(new OptionsFoldersState(_origin));
+			getGame()->pushState(new OptionsFoldersState(_origin));
 		}
 	}
 }

@@ -178,8 +178,8 @@ void RuleDamageType::load(const YAML::Node& node)
 	RadiusEffectiveness = node["RadiusEffectiveness"].as<float>(RadiusEffectiveness);
 	RadiusReduction = node["RadiusReduction"].as<float>(RadiusReduction);
 
-	FireThreshold = node["FireThreshold"].as<float>(FireThreshold);
-	SmokeThreshold = node["SmokeThreshold"].as<float>(SmokeThreshold);
+	FireThreshold = node["FireThreshold"].as<int>(FireThreshold);
+	SmokeThreshold = node["SmokeThreshold"].as<int>(SmokeThreshold);
 
 	ToHealth = node["ToHealth"].as<float>(ToHealth);
 	ToMana = node["ToMana"].as<float>(ToMana);

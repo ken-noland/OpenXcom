@@ -49,8 +49,8 @@ namespace OpenXcom
  */
 BuildNewBaseState::BuildNewBaseState(Base *base, Globe *globe, bool first) : _base(base), _globe(globe), _first(first), _oldlat(0), _oldlon(0), _mousex(0), _mousey(0)
 {
-	int dx = _game->getScreen()->getDX();
-	int dy = _game->getScreen()->getDY();
+	int dx = getGame()->getScreen()->getDX();
+	int dy = getGame()->getScreen()->getDY();
 	_screen = false;
 
 	_oldshowradar = Options::globeRadarLines;
@@ -235,22 +235,22 @@ void BuildNewBaseState::globeClick(Action *action)
 		if (_globe->insideLand(lon, lat))
 		{
 			bool fakeUnderwaterBasesUnlocked = true;
-			if (!_game->getMod()->getFakeUnderwaterBaseUnlockResearch().empty())
+			if (!getGame()->getMod()->getFakeUnderwaterBaseUnlockResearch().empty())
 			{
-				fakeUnderwaterBasesUnlocked = _game->getSavedGame()->isResearched(_game->getMod()->getFakeUnderwaterBaseUnlockResearch(), true);
+				fakeUnderwaterBasesUnlocked = getGame()->getSavedGame()->isResearched(getGame()->getMod()->getFakeUnderwaterBaseUnlockResearch(), true);
 			}
 			bool fakeUnderwaterTexture = _globe->insideFakeUnderwaterTexture(lon, lat);
 			if ((_first || !fakeUnderwaterBasesUnlocked) && fakeUnderwaterTexture)
 			{
 				// first (starting) base can't be fake underwater base
-				_game->pushState(new ErrorMessageState(tr("STR_XCOM_BASE_CANNOT_BE_BUILT"), _palette, _game->getMod()->getInterface("geoscape")->getElement("genericWindow")->color, "BACK01.SCR", _game->getMod()->getInterface("geoscape")->getElement("palette")->color));
+				getGame()->pushState(new ErrorMessageState(tr("STR_XCOM_BASE_CANNOT_BE_BUILT"), _palette, getGame()->getMod()->getInterface("geoscape")->getElement("genericWindow")->color, "BACK01.SCR", getGame()->getMod()->getInterface("geoscape")->getElement("palette")->color));
 			}
 			else
 			{
 				_base->setFakeUnderwater(fakeUnderwaterTexture);
 				_base->setLongitude(lon);
 				_base->setLatitude(lat);
-				_base->calculateServices(_game->getSavedGame());
+				_base->calculateServices(getGame()->getSavedGame());
 				for (Craft* craft : _base->getCrafts())
 				{
 					craft->setLongitude(lon);
@@ -258,17 +258,17 @@ void BuildNewBaseState::globeClick(Action *action)
 				}
 				if (_first)
 				{
-					_game->pushState(new BaseNameState(_base, _globe, _first, false));
+					getGame()->pushState(new BaseNameState(_base, _globe, _first, false));
 				}
 				else
 				{
-					_game->pushState(new ConfirmNewBaseState(_base, _globe));
+					getGame()->pushState(new ConfirmNewBaseState(_base, _globe));
 				}
 			}
 		}
 		else
 		{
-			_game->pushState(new ErrorMessageState(tr("STR_XCOM_BASE_CANNOT_BE_BUILT"), _palette, _game->getMod()->getInterface("geoscape")->getElement("genericWindow")->color, "BACK01.SCR", _game->getMod()->getInterface("geoscape")->getElement("palette")->color));
+			getGame()->pushState(new ErrorMessageState(tr("STR_XCOM_BASE_CANNOT_BE_BUILT"), _palette, getGame()->getMod()->getInterface("geoscape")->getElement("genericWindow")->color, "BACK01.SCR", getGame()->getMod()->getInterface("geoscape")->getElement("palette")->color));
 		}
 	}
 }
@@ -388,7 +388,7 @@ void BuildNewBaseState::btnZoomOutRightClick(Action *)
 void BuildNewBaseState::btnCancelClick(Action *)
 {
 	delete _base;
-	_game->popState();
+	getGame()->popState();
 }
 
 /**

@@ -80,7 +80,7 @@ UfoLostState::~UfoLostState()
  */
 void UfoLostState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

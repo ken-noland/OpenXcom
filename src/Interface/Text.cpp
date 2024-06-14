@@ -254,7 +254,7 @@ Uint8 Text::getSecondaryColor() const
 
 int Text::getNumLines() const
 {
-	return _wrap ? _lineHeight.size() : 1;
+	return _wrap ? (int)_lineHeight.size() : 1;
 }
 
 /**

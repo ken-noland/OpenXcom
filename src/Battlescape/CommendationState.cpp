@@ -76,7 +76,7 @@ CommendationState::CommendationState(std::vector<Soldier*> soldiersMedalled)
 
 	int row = 0;
 	int titleRow = 0;
-	const auto& commendationsList = _game->getMod()->getCommendationsList();
+	const auto& commendationsList = getGame()->getMod()->getCommendationsList();
 	bool modularCommendation;
 	std::string noun;
 	bool titleChosen = true;
@@ -180,7 +180,7 @@ CommendationState::~CommendationState()
 */
 void CommendationState::lstSoldiersMouseClick(Action *)
 {
-	Ufopaedia::openArticle(_game, _commendationsNames[_lstSoldiers->getSelectedRow()]);
+	Ufopaedia::openArticle(getGame(), _commendationsNames[_lstSoldiers->getSelectedRow()]);
 }
 
 /**
@@ -189,7 +189,7 @@ void CommendationState::lstSoldiersMouseClick(Action *)
  */
 void CommendationState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

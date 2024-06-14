@@ -70,7 +70,7 @@ LowFuelState::LowFuelState(Craft *craft, GeoscapeState *state) : _craft(craft), 
 
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setBig();
-	_txtTitle->setText(_craft->getName(_game->getLanguage()));
+	_txtTitle->setText(_craft->getName(getGame()->getLanguage()));
 
 	_txtMessage->setAlign(ALIGN_CENTER);
 	_txtMessage->setText(tr("STR_IS_LOW_ON_FUEL_RETURNING_TO_BASE"));
@@ -92,7 +92,7 @@ LowFuelState::~LowFuelState()
  */
 void LowFuelState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -102,7 +102,7 @@ void LowFuelState::btnOkClick(Action *)
 void LowFuelState::btnOk5SecsClick(Action *)
 {
 	_state->timerReset();
-	_game->popState();
+	getGame()->popState();
 }
 
 }

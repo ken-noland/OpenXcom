@@ -34,18 +34,6 @@ void toLua(lua_State* luaState, Base* arg)
 {
 	int tableIndex = pushTableWithUserdata(luaState, arg);
 
-	//lua_pushstring(luaState, "name");
-	//lua_pushstring(luaState, "Base 1");
-	//lua_settable(luaState, -3);
-
-	//lua_pushstring(luaState, "health");
-	//lua_pushinteger(luaState, 100);
-	//lua_settable(luaState, -3);
-
-	//lua_pushstring(luaState, "morale");
-	//lua_pushinteger(luaState, -2);
-	//lua_settable(luaState, -3);
-
 	registerContainer<[](Base* base) -> const std::vector<Soldier*>& { return base->getSoldiers(); }>(luaState, "soldiers", tableIndex, arg);
 }
 

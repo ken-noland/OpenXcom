@@ -101,11 +101,11 @@ MonthlyCostsState::MonthlyCostsState(Base *base) : _base(base)
 	_txtSalaries->setText(tr("STR_SALARIES"));
 
 	std::ostringstream ss;
-	ss << tr("STR_INCOME") << "=" << Unicode::formatFunding(_game->getSavedGame()->getCountryFunding());
+	ss << tr("STR_INCOME") << "=" << Unicode::formatFunding(getGame()->getSavedGame()->getCountryFunding());
 	_txtIncome->setText(ss.str());
 
 	std::ostringstream ss2;
-	ss2 << tr("STR_MAINTENANCE") << "=" << Unicode::formatFunding(_game->getSavedGame()->getBaseMaintenance());
+	ss2 << tr("STR_MAINTENANCE") << "=" << Unicode::formatFunding(getGame()->getSavedGame()->getBaseMaintenance());
 	_txtMaintenance->setText(ss2.str());
 
 //	_lstCrafts->setColumns(4, 125, 70, 44, 50);
@@ -115,10 +115,10 @@ MonthlyCostsState::MonthlyCostsState(Base *base) : _base(base)
 	_lstCrafts->setAlign(ALIGN_RIGHT, 3);
 	_lstCrafts->setDot(true);
 
-	for (auto& craftType : _game->getMod()->getCraftsList())
+	for (auto& craftType : getGame()->getMod()->getCraftsList())
 	{
-		RuleCraft *craft = _game->getMod()->getCraft(craftType);
-		if (craft->getRentCost() != 0 && _game->getSavedGame()->isResearched(craft->getRequirements()))
+		RuleCraft *craft = getGame()->getMod()->getCraft(craftType);
+		if (craft->getRentCost() != 0 && getGame()->getSavedGame()->isResearched(craft->getRequirements()))
 		{
 			auto count = _base->getCraftCount(craft);
 			if (count > 0 || craft->forceShowInMonthlyCosts())
@@ -137,12 +137,12 @@ MonthlyCostsState::MonthlyCostsState(Base *base) : _base(base)
 	_lstSalaries->setAlign(ALIGN_RIGHT, 3);
 	_lstSalaries->setDot(true);
 
-	auto& soldierTypes = _game->getMod()->getSoldiersList();
+	auto& soldierTypes = getGame()->getMod()->getSoldiersList();
 
 	bool dynamicSalaries = false;
 	for (auto& soldierType : soldierTypes)
 	{
-		if (_game->getMod()->getSoldier(soldierType)->isSalaryDynamic())
+		if (getGame()->getMod()->getSoldier(soldierType)->isSalaryDynamic())
 		{
 			dynamicSalaries = true;
 			break;
@@ -154,8 +154,8 @@ MonthlyCostsState::MonthlyCostsState(Base *base) : _base(base)
 		// vanilla
 		for (auto& soldierType : soldierTypes)
 		{
-			RuleSoldier *soldier = _game->getMod()->getSoldier(soldierType);
-			if (soldier->getSalaryCost(0) != 0 && _game->getSavedGame()->isResearched(soldier->getRequirements()))
+			RuleSoldier *soldier = getGame()->getMod()->getSoldier(soldierType);
+			if (soldier->getSalaryCost(0) != 0 && getGame()->getSavedGame()->isResearched(soldier->getRequirements()))
 			{
 				std::pair<int, int> info = _base->getSoldierCountAndSalary(soldierType);
 				std::ostringstream ss4;
@@ -190,10 +190,10 @@ MonthlyCostsState::MonthlyCostsState(Base *base) : _base(base)
 	}
 	std::ostringstream ss5;
 	ss5 << _base->getTotalEngineers();
-	_lstSalaries->addRow(4, tr("STR_ENGINEERS").c_str(), Unicode::formatFunding(_game->getMod()->getEngineerCost()).c_str(), ss5.str().c_str(), Unicode::formatFunding(_base->getTotalEngineers() * _game->getMod()->getEngineerCost()).c_str());
+	_lstSalaries->addRow(4, tr("STR_ENGINEERS").c_str(), Unicode::formatFunding(getGame()->getMod()->getEngineerCost()).c_str(), ss5.str().c_str(), Unicode::formatFunding(_base->getTotalEngineers() * getGame()->getMod()->getEngineerCost()).c_str());
 	std::ostringstream ss6;
 	ss6 << _base->getTotalScientists();
-	_lstSalaries->addRow(4, tr("STR_SCIENTISTS").c_str(), Unicode::formatFunding(_game->getMod()->getScientistCost()).c_str(), ss6.str().c_str(), Unicode::formatFunding(_base->getTotalScientists() * _game->getMod()->getScientistCost()).c_str());
+	_lstSalaries->addRow(4, tr("STR_SCIENTISTS").c_str(), Unicode::formatFunding(getGame()->getMod()->getScientistCost()).c_str(), ss6.str().c_str(), Unicode::formatFunding(_base->getTotalScientists() * getGame()->getMod()->getScientistCost()).c_str());
 	std::ostringstream ss6b;
 	int staffCount, inventoryCount;
 	int totalOtherCost = _base->getTotalOtherStaffAndInventoryCost(staffCount, inventoryCount);
@@ -229,7 +229,7 @@ MonthlyCostsState::~MonthlyCostsState()
  */
 void MonthlyCostsState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

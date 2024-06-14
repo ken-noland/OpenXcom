@@ -100,7 +100,7 @@ SoldierTransformState::SoldierTransformState(Base* base, size_t soldier) : _base
 	_sortName->onMouseClick((ActionHandler)&SoldierTransformState::sortNameClick);
 
 	std::vector<RuleSoldierTransformation*> availableTransformations;
-	_game->getSavedGame()->getAvailableTransformations(availableTransformations, _game->getMod(), _base);
+	getGame()->getSavedGame()->getAvailableTransformations(availableTransformations, getGame()->getMod(), _base);
 
 	for (auto* trRule : availableTransformations)
 	{
@@ -210,7 +210,7 @@ void SoldierTransformState::updateList()
  */
 void SoldierTransformState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -248,14 +248,14 @@ void SoldierTransformState::btnQuickSearchApply(Action*)
 void SoldierTransformState::lstTransformationClick(Action *)
 {
 	std::string trType = _transformations[_indices[_lstTransformations->getSelectedRow()]].type;
-	RuleSoldierTransformation* transformationRule = _game->getMod()->getSoldierTransformation(trType, false);
+	RuleSoldierTransformation* transformationRule = getGame()->getMod()->getSoldierTransformation(trType, false);
 
 	if (transformationRule)
 	{
 		Soldier* soldier = _base->getSoldiers().at(_soldier);
 
-		_game->popState();
-		_game->pushState(new SoldierTransformationState(transformationRule, _base, soldier, nullptr));
+		getGame()->popState();
+		getGame()->pushState(new SoldierTransformationState(transformationRule, _base, soldier, nullptr));
 	}
 }
 
@@ -266,11 +266,11 @@ void SoldierTransformState::lstTransformationClick(Action *)
 void SoldierTransformState::lstTransformationClickMiddle(Action*)
 {
 	std::string trType = _transformations[_indices[_lstTransformations->getSelectedRow()]].type;
-	RuleSoldierTransformation* transformationRule = _game->getMod()->getSoldierTransformation(trType, false);
+	RuleSoldierTransformation* transformationRule = getGame()->getMod()->getSoldierTransformation(trType, false);
 
 	if (transformationRule)
 	{
-		Ufopaedia::openArticle(_game, transformationRule->getName());
+		Ufopaedia::openArticle(getGame(), transformationRule->getName());
 	}
 }
 

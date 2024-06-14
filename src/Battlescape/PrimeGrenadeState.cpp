@@ -65,10 +65,10 @@ PrimeGrenadeState::PrimeGrenadeState(BattleAction *action, bool inInventoryView,
 	}
 	else
 	{
-		_game->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
+		getGame()->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
 	}
 
-	Element *grenadeBackground = _game->getMod()->getInterface("battlescape")->getElement("grenadeBackground");
+	Element *grenadeBackground = getGame()->getMod()->getInterface("battlescape")->getElement("grenadeBackground");
 
 	// Set up objects
 	add(_bg);
@@ -129,10 +129,10 @@ PrimeGrenadeState::~PrimeGrenadeState()
 void PrimeGrenadeState::handle(Action *action)
 {
 	State::handle(action);
-	if (action->getDetails()->type == SDL_MOUSEBUTTONDOWN && _game->isRightClick(action))
+	if (action->getDetails()->type == SDL_MOUSEBUTTONDOWN && getGame()->isRightClick(action))
 	{
 		if (!_inInventoryView) _action->value = -1;
-		_game->popState();
+		getGame()->popState();
 	}
 }
 
@@ -145,10 +145,10 @@ void PrimeGrenadeState::btnClick(Action *action)
 {
 	int btnID = -1;
 
-	if (_game->isRightClick(action))
+	if (getGame()->isRightClick(action))
 	{
 		if (!_inInventoryView) _action->value = btnID;
-		_game->popState();
+		getGame()->popState();
 		return;
 	}
 
@@ -170,15 +170,15 @@ void PrimeGrenadeState::btnClick(Action *action)
 			int sound = _grenadeInInventory->getRules()->getPrimeSound();
 			if (sound != Mod::NO_SOUND)
 			{
-				_game->getMod()->getSoundByDepth(_game->getSavedGame()->getSavedBattle()->getDepth(), sound)->play();
+				getGame()->getMod()->getSoundByDepth(getGame()->getSavedGame()->getSavedBattle()->getDepth(), sound)->play();
 			}
 		}
 		else
 		{
 			_action->value = btnID;
 		}
-		_game->popState();
-		if (!_inInventoryView) _game->popState();
+		getGame()->popState();
+		if (!_inInventoryView) getGame()->popState();
 	}
 }
 

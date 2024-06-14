@@ -44,7 +44,7 @@ InfoboxOKState::InfoboxOKState(const std::string &msg)
 	_txtTitle = new Text(255, 61, 33, 51);
 
 	// Set palette
-	_game->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
+	getGame()->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
 
 	add(_frame, "infoBoxOK", "battlescape");
 	add(_btnOk, "infoBoxOKButton", "battlescape");
@@ -69,7 +69,7 @@ InfoboxOKState::InfoboxOKState(const std::string &msg)
 	_txtTitle->setWordWrap(true);
 	_txtTitle->setText(msg);
 
-	_game->getCursor()->setVisible(true);
+	getGame()->getCursor()->setVisible(true);
 }
 
 /**
@@ -86,7 +86,7 @@ InfoboxOKState::~InfoboxOKState()
  */
 void InfoboxOKState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

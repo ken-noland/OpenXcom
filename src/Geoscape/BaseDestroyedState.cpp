@@ -47,7 +47,7 @@ BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles
 	int soundId = ufo->getRules()->getHitSound();
 	if (soundId != Mod::NO_SOUND)
 	{
-		_customSound = _game->getMod()->getSound("GEO.CAT", soundId);
+		_customSound = getGame()->getMod()->getSound("GEO.CAT", soundId);
 	}
 
 	// Create objects
@@ -125,8 +125,8 @@ BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles
 	if (!am)
 	{
 		// backwards-compatibility
-		RuleRegion* regionRule = _game->getSavedGame()->getRegions().front()->getRules(); // wrong, but that's how it is in OXC
-		for (const Region* region : _game->getSavedGame()->getRegions())
+		RuleRegion* regionRule = getGame()->getSavedGame()->getRegions().front()->getRules(); // wrong, but that's how it is in OXC
+		for (const Region* region : getGame()->getSavedGame()->getRegions())
 		{
 			if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
 			{
@@ -134,9 +134,9 @@ BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles
 				break;
 			}
 		}
-		am = _game->getSavedGame()->findAlienMission(regionRule->getType(), OBJECTIVE_RETALIATION);
+		am = getGame()->getSavedGame()->findAlienMission(regionRule->getType(), OBJECTIVE_RETALIATION);
 	}
-	_game->getSavedGame()->deleteRetaliationMission(am, _base);
+	getGame()->getSavedGame()->deleteRetaliationMission(am, _base);
 }
 
 /**
@@ -152,28 +152,28 @@ BaseDestroyedState::~BaseDestroyedState()
  */
 void BaseDestroyedState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 
 	if (_partialDestruction)
 	{
-		if (_game->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && _base != 0 && _base->storesOverfull())
+		if (getGame()->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && _base != 0 && _base->storesOverfull())
 		{
-			_game->pushState(new SellState(_base, 0, OPT_BATTLESCAPE));
-			_game->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(_base->getName()), _palette, _game->getMod()->getInterface("debriefing")->getElement("errorMessage")->color, "BACK01.SCR", _game->getMod()->getInterface("debriefing")->getElement("errorPalette")->color));
+			getGame()->pushState(new SellState(_base, 0, OPT_BATTLESCAPE));
+			getGame()->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(_base->getName()), _palette, getGame()->getMod()->getInterface("debriefing")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("debriefing")->getElement("errorPalette")->color));
 		}
 
 		// the base was damaged, but survived
 		return;
 	}
 
-	for (auto xbaseIt = _game->getSavedGame()->getBases().begin(); xbaseIt != _game->getSavedGame()->getBases().end(); ++xbaseIt)
+	for (auto xbaseIt = getGame()->getSavedGame()->getBases().begin(); xbaseIt != getGame()->getSavedGame()->getBases().end(); ++xbaseIt)
 	{
 		Base* xbase = (*xbaseIt);
 		if (xbase == _base)
 		{
-			_game->getSavedGame()->stopHuntingXcomCrafts(xbase); // destroyed together with the base
+			getGame()->getSavedGame()->stopHuntingXcomCrafts(xbase); // destroyed together with the base
 			delete xbase;
-			_game->getSavedGame()->getBases().erase(xbaseIt);
+			getGame()->getSavedGame()->getBases().erase(xbaseIt);
 			break;
 		}
 	}

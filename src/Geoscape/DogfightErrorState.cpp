@@ -69,7 +69,7 @@ DogfightErrorState::DogfightErrorState(Craft *craft, const std::string &msg) : _
 
 	_txtCraft->setAlign(ALIGN_CENTER);
 	_txtCraft->setBig();
-	_txtCraft->setText(_craft->getName(_game->getLanguage()));
+	_txtCraft->setText(_craft->getName(getGame()->getLanguage()));
 
 	_txtMessage->setAlign(ALIGN_CENTER);
 	_txtMessage->setWordWrap(true);
@@ -90,7 +90,7 @@ DogfightErrorState::~DogfightErrorState()
  */
 void DogfightErrorState::btnInterceptClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -100,7 +100,7 @@ void DogfightErrorState::btnInterceptClick(Action *)
 void DogfightErrorState::btnBaseClick(Action *)
 {
 	_craft->returnToBase();
-	_game->popState();
+	getGame()->popState();
 }
 
 }

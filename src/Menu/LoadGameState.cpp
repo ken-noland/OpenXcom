@@ -107,9 +107,9 @@ void LoadGameState::buildUi(SDL_Color *palette)
 	{
 		add(_txtStatus, "textLoad", "battlescape");
 		_txtStatus->setHighContrast(true);
-		if (_game->getSavedGame()->getSavedBattle()->getAmbientSound() != Mod::NO_SOUND)
+		if (getGame()->getSavedGame()->getSavedBattle()->getAmbientSound() != Mod::NO_SOUND)
 		{
-			_game->getMod()->getSoundByDepth(0, _game->getSavedGame()->getSavedBattle()->getAmbientSound())->stopLoop();
+			getGame()->getMod()->getSoundByDepth(0, getGame()->getSavedGame()->getSavedBattle()->getAmbientSound())->stopLoop();
 		}
 	}
 	else
@@ -134,7 +134,7 @@ void LoadGameState::init()
 	State::init();
 	if (_filename == SavedGame::QUICKSAVE && !CrossPlatform::fileExists(Options::getMasterUserFolder() + _filename))
 	{
-		_game->popState();
+		getGame()->popState();
 		return;
 	}
 }
@@ -152,57 +152,57 @@ void LoadGameState::think()
 	}
 	else
 	{
-		_game->popState();
+		getGame()->popState();
 
 		// Remember for later (palette reset)
 		BattlescapeState *origBattleState = 0;
-		if (_game->getSavedGame() != 0 && _game->getSavedGame()->getSavedBattle() != 0)
+		if (getGame()->getSavedGame() != 0 && getGame()->getSavedGame()->getSavedBattle() != 0)
 		{
-			origBattleState = _game->getSavedGame()->getSavedBattle()->getBattleState();
+			origBattleState = getGame()->getSavedGame()->getSavedBattle()->getBattleState();
 		}
 
 		// Reset touch flags
-		_game->resetTouchButtonFlags();
+		getGame()->resetTouchButtonFlags();
 
 		// Load the game
 		SavedGame *s = new SavedGame();
 		try
 		{
 			YAML::Node save;
-			s->load(_filename, _game->getMod(), _game->getLanguage(), save);
-			_game->setSavedGame(s);
+			s->load(_filename, getGame()->getMod(), getGame()->getLanguage(), save);
+			getGame()->setSavedGame(s);
 
 			
 			getGame()->getLuaMod().getGameScript().onLoadGame().dispatchCallback(save);
 
 
-			if (_game->getSavedGame()->getEnding() != END_NONE)
+			if (getGame()->getSavedGame()->getEnding() != END_NONE)
 			{
 				Options::baseXResolution = Screen::ORIGINAL_WIDTH;
 				Options::baseYResolution = Screen::ORIGINAL_HEIGHT;
-				_game->getScreen()->resetDisplay(false);
-				_game->setState(new StatisticsState);
+				getGame()->getScreen()->resetDisplay(false);
+				getGame()->setState(new StatisticsState);
 			}
 			else
 			{
 				Options::baseXResolution = Options::baseXGeoscape;
 				Options::baseYResolution = Options::baseYGeoscape;
-				_game->getScreen()->resetDisplay(false);
+				getGame()->getScreen()->resetDisplay(false);
 				if (origBattleState != 0)
 				{
 					// We need to reset palettes here already, can't wait for the destructor
 					origBattleState->resetPalettes();
 				}
-				_game->setState(new GeoscapeState);
-				if (_game->getSavedGame()->getSavedBattle() != 0)
+				getGame()->setState(new GeoscapeState);
+				if (getGame()->getSavedGame()->getSavedBattle() != 0)
 				{
-					_game->getSavedGame()->getSavedBattle()->loadMapResources(_game->getMod());
+					getGame()->getSavedGame()->getSavedBattle()->loadMapResources(getGame()->getMod());
 					Options::baseXResolution = Options::baseXBattlescape;
 					Options::baseYResolution = Options::baseYBattlescape;
-					_game->getScreen()->resetDisplay(false);
+					getGame()->getScreen()->resetDisplay(false);
 					BattlescapeState *bs = new BattlescapeState;
-					_game->pushState(bs);
-					_game->getSavedGame()->getSavedBattle()->setBattleState(bs);
+					getGame()->pushState(bs);
+					getGame()->getSavedGame()->getSavedBattle()->setBattleState(bs);
 				}
 			}
 
@@ -238,12 +238,12 @@ void LoadGameState::error(const std::string &msg, SavedGame *save)
 	std::ostringstream error;
 	error << tr("STR_LOAD_UNSUCCESSFUL") << Unicode::TOK_NL_SMALL << msg;
 	if (_origin != OPT_BATTLESCAPE)
-		_game->pushState(new ErrorMessageState(error.str(), _palette, _game->getMod()->getInterface("errorMessages")->getElement("geoscapeColor")->color, "BACK01.SCR", _game->getMod()->getInterface("errorMessages")->getElement("geoscapePalette")->color));
+		getGame()->pushState(new ErrorMessageState(error.str(), _palette, getGame()->getMod()->getInterface("errorMessages")->getElement("geoscapeColor")->color, "BACK01.SCR", getGame()->getMod()->getInterface("errorMessages")->getElement("geoscapePalette")->color));
 	else
-		_game->pushState(new ErrorMessageState(error.str(), _palette, _game->getMod()->getInterface("errorMessages")->getElement("battlescapeColor")->color, "TAC00.SCR", _game->getMod()->getInterface("errorMessages")->getElement("battlescapePalette")->color));
+		getGame()->pushState(new ErrorMessageState(error.str(), _palette, getGame()->getMod()->getInterface("errorMessages")->getElement("battlescapeColor")->color, "TAC00.SCR", getGame()->getMod()->getInterface("errorMessages")->getElement("battlescapePalette")->color));
 
-	if (_game->getSavedGame() == save)
-		_game->setSavedGame(0);
+	if (getGame()->getSavedGame() == save)
+		getGame()->setSavedGame(0);
 	else
 		delete save;
 }

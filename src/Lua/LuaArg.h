@@ -44,6 +44,7 @@ template <> void toLua(lua_State* L, int arg);
 template <> void toLua(lua_State* L, float arg);
 template <> void toLua(lua_State* L, double arg);
 template <> void toLua(lua_State* L, const std::string& arg);
+template <> void toLua(lua_State* L, std::string arg);
 template <> void toLua(lua_State* L, const char* arg);
 template <> void toLua(lua_State* L, size_t arg);
 template <> void toLua(lua_State* L, __int64 arg);

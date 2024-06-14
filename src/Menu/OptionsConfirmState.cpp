@@ -51,7 +51,7 @@ OptionsConfirmState::OptionsConfirmState(OptionsOrigin origin) : _origin(origin)
 	_timer = new Timer(1000);
 
 	// Set palette
-	setInterface("optionsMenu", false, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("optionsMenu", false, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "confirmVideo", "optionsMenu");
 	add(_btnYes, "confirmVideo", "optionsMenu");
@@ -127,7 +127,7 @@ void OptionsConfirmState::countdown()
  */
 void OptionsConfirmState::btnYesClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	OptionsBaseState::restart(_origin);
 }
 
@@ -141,8 +141,8 @@ void OptionsConfirmState::btnNoClick(Action *)
 	Screen::updateScale(Options::battlescapeScale, Options::baseXBattlescape, Options::baseYBattlescape, _origin == OPT_BATTLESCAPE);
 	Screen::updateScale(Options::geoscapeScale, Options::baseXGeoscape, Options::baseYGeoscape, _origin != OPT_BATTLESCAPE);
 	Options::save();
-	_game->getScreen()->resetDisplay();
-	_game->popState();
+	getGame()->getScreen()->resetDisplay();
+	getGame()->popState();
 	OptionsBaseState::restart(_origin);
 }
 

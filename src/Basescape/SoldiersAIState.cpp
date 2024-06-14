@@ -150,7 +150,7 @@ SoldiersAIState::~SoldiersAIState()
  */
 void SoldiersAIState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -173,7 +173,7 @@ void SoldiersAIState::initList(size_t scrl)
 	{
 		for (const auto* u : _units)
 		{
-			const std::string name = u->getGeoscapeSoldier() ? u->getGeoscapeSoldier()->getName(true, 19) : u->getName(_game->getLanguage());	//BattleUnit::getName has no maxLength parameter. Default value might change and Statstring might be way to long.
+			const std::string name = u->getGeoscapeSoldier() ? u->getGeoscapeSoldier()->getName(true, 19) : u->getName(getGame()->getLanguage());	//BattleUnit::getName has no maxLength parameter. Default value might change and Statstring might be way to long.
 			const std::string rank = u->getRankString();
 			_lstUnits->addRow(noCol, name.c_str(), tr(rank).c_str(), "", std::to_string(u->getAggression()).c_str());
 			allows.emplace_back(u->getAllowAutoCombat());

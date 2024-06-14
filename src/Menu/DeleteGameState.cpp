@@ -50,7 +50,7 @@ DeleteGameState::DeleteGameState(OptionsOrigin origin, const std::string &save) 
 	_txtMessage = new Text(246, 32, 37, 70);
 
 	// Set palette
-	setInterface("saveMenus", false, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("saveMenus", false, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "confirmDelete", "saveMenus");
 	add(_btnYes, "confirmDelete", "saveMenus");
@@ -91,19 +91,19 @@ DeleteGameState::~DeleteGameState()
 
 void DeleteGameState::btnNoClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 void DeleteGameState::btnYesClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	if (!CrossPlatform::deleteFile(_filename))
 	{
 		std::string error = tr("STR_DELETE_UNSUCCESSFUL");
 		if (_origin != OPT_BATTLESCAPE)
-			_game->pushState(new ErrorMessageState(error, _palette, _game->getMod()->getInterface("errorMessages")->getElement("geoscapeColor")->color, "BACK01.SCR", _game->getMod()->getInterface("errorMessages")->getElement("geoscapePalette")->color));
+			getGame()->pushState(new ErrorMessageState(error, _palette, getGame()->getMod()->getInterface("errorMessages")->getElement("geoscapeColor")->color, "BACK01.SCR", getGame()->getMod()->getInterface("errorMessages")->getElement("geoscapePalette")->color));
 		else
-			_game->pushState(new ErrorMessageState(error, _palette, _game->getMod()->getInterface("errorMessages")->getElement("battlescapeColor")->color, "TAC00.SCR", _game->getMod()->getInterface("errorMessages")->getElement("battlescapePalette")->color));
+			getGame()->pushState(new ErrorMessageState(error, _palette, getGame()->getMod()->getInterface("errorMessages")->getElement("battlescapeColor")->color, "TAC00.SCR", getGame()->getMod()->getInterface("errorMessages")->getElement("battlescapePalette")->color));
 	}
 }
 

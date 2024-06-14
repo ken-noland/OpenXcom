@@ -58,7 +58,7 @@ ConfirmEndMissionState::ConfirmEndMissionState(SavedBattleGame *battleGame, int 
 
 	// Set up objects
 	_window->setHighContrast(true);
-	_window->setBackground(_game->getMod()->getSurface("TAC00.SCR"));
+	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtTitle->setBig();
 	_txtTitle->setHighContrast(true);
@@ -101,7 +101,7 @@ ConfirmEndMissionState::~ConfirmEndMissionState()
  */
 void ConfirmEndMissionState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->requestEndTurn(false);
 }
 
@@ -111,7 +111,7 @@ void ConfirmEndMissionState::btnOkClick(Action *)
  */
 void ConfirmEndMissionState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 

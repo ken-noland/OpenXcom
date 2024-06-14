@@ -132,10 +132,10 @@ namespace OpenXcom
 		_state = std::move(state);
 
 		// remember this article as seen/normal
-		int ruleStatus = _game->getSavedGame()->getUfopediaRuleStatus(_id);
+		int ruleStatus = getGame()->getSavedGame()->getUfopediaRuleStatus(_id);
 		if (ruleStatus != ArticleDefinition::PEDIA_STATUS_HIDDEN)
 		{
-			_game->getSavedGame()->setUfopediaRuleStatus(_id, ArticleDefinition::PEDIA_STATUS_NORMAL);
+			getGame()->getSavedGame()->setUfopediaRuleStatus(_id, ArticleDefinition::PEDIA_STATUS_NORMAL);
 		}
 	}
 
@@ -251,7 +251,7 @@ namespace OpenXcom
 	 */
 	void ArticleState::btnOkClick(Action *)
 	{
-		_game->popState();
+		getGame()->popState();
 	}
 
 	/**
@@ -261,7 +261,7 @@ namespace OpenXcom
 	void ArticleState::btnResetMusicClick(Action *)
 	{
 		// reset that pesky interception music!
-		_game->getMod()->playMusic("GMGEO");
+		getGame()->getMod()->playMusic("GMGEO");
 	}
 
 	/**
@@ -270,7 +270,7 @@ namespace OpenXcom
 	 */
 	void ArticleState::btnPrevClick(Action *)
 	{
-		Ufopaedia::prev(_game, _state);
+		Ufopaedia::prev(getGame(), _state);
 	}
 
 	/**
@@ -279,7 +279,7 @@ namespace OpenXcom
 	 */
 	void ArticleState::btnNextClick(Action *)
 	{
-		Ufopaedia::next(_game, _state);
+		Ufopaedia::next(getGame(), _state);
 	}
 
 	/**
@@ -288,7 +288,7 @@ namespace OpenXcom
 	 */
 	void ArticleState::btnInfoClick(Action *)
 	{
-		Ufopaedia::openArticleDetail(_game, _id);
+		Ufopaedia::openArticleDetail(getGame(), _id);
 	}
 
 }

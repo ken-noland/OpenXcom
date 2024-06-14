@@ -50,19 +50,19 @@ void CutsceneState::init()
 	State::init();
 
 	// pop self off stack and replace with actual player state
-	_game->popState();
+	getGame()->popState();
 
-	const RuleVideo *videoRule = _game->getMod()->getVideo(_cutsceneId, true);
-	if (_game->getSavedGame() && _game->getSavedGame()->getEnding() != END_NONE)
+	const RuleVideo *videoRule = getGame()->getMod()->getVideo(_cutsceneId, true);
+	if (getGame()->getSavedGame() && getGame()->getSavedGame()->getEnding() != END_NONE)
 	{
-		if (_game->getSavedGame()->getMonthsPassed() > -1)
+		if (getGame()->getSavedGame()->getMonthsPassed() > -1)
 		{
-			_game->setState(new StatisticsState);
+			getGame()->setState(new StatisticsState);
 		}
 		else
 		{
-			_game->setSavedGame(0);
-			_game->setState(new GoToMainMenuState);
+			getGame()->setSavedGame(0);
+			getGame()->setState(new GoToMainMenuState);
 		}
 	}
 
@@ -78,11 +78,11 @@ void CutsceneState::init()
 
 	if (fmv && (!slide || Options::preferredVideo == VIDEO_FMV))
 	{
-		_game->pushState(new VideoState(videoRule->getVideos(), videoRule->getAudioTracks(), videoRule->useUfoAudioSequence()));
+		getGame()->pushState(new VideoState(videoRule->getVideos(), videoRule->getAudioTracks(), videoRule->useUfoAudioSequence()));
 	}
 	else if (slide && (!fmv || Options::preferredVideo == VIDEO_SLIDE))
 	{
-		_game->pushState(new SlideshowState(videoRule->getSlideshowHeader(), videoRule->getSlides()));
+		getGame()->pushState(new SlideshowState(videoRule->getSlideshowHeader(), videoRule->getSlides()));
 	}
 	else
 	{
@@ -96,7 +96,7 @@ bool CutsceneState::initDisplay()
 	Options::keepAspectRatio = true;
 	Options::baseXResolution = Screen::ORIGINAL_WIDTH;
 	Options::baseYResolution = Screen::ORIGINAL_HEIGHT;
-	_game->getScreen()->resetDisplay(false);
+	getGame()->getScreen()->resetDisplay(false);
 	return letterboxed;
 }
 
@@ -104,7 +104,7 @@ void CutsceneState::resetDisplay(bool wasLetterboxed)
 {
 	Options::keepAspectRatio = wasLetterboxed;
 	Screen::updateScale(Options::geoscapeScale, Options::baseXGeoscape, Options::baseYGeoscape, true);
-	_game->getScreen()->resetDisplay(false);
+	getGame()->getScreen()->resetDisplay(false);
 }
 
 }

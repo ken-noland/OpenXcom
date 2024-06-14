@@ -116,9 +116,9 @@ SoldierArmorState::SoldierArmorState(Base *base, size_t soldier, SoldierArmorOri
 	_sortName->setX(_sortName->getX() + _txtType->getTextWidth() + 4);
 	_sortName->onMouseClick((ActionHandler)&SoldierArmorState::sortNameClick);
 
-	for (auto* a : _game->getMod()->getArmorsForSoldiers())
+	for (auto* a : getGame()->getMod()->getArmorsForSoldiers())
 	{
-		if (a->getRequiredResearch() && !_game->getSavedGame()->isResearched(a->getRequiredResearch()))
+		if (a->getRequiredResearch() && !getGame()->getSavedGame()->isResearched(a->getRequiredResearch()))
 			continue;
 		if (!a->getCanBeUsedBy(s->getRules()))
 			continue;
@@ -129,7 +129,7 @@ SoldierArmorState::SoldierArmorState(Base *base, size_t soldier, SoldierArmorOri
 		else if (_base->getStorageItems()->getItem(a->getStoreItem()) > 0)
 		{
 			std::ostringstream ss;
-			if (_game->getSavedGame()->getMonthsPassed() > -1)
+			if (getGame()->getSavedGame()->getMonthsPassed() > -1)
 			{
 				ss << _base->getStorageItems()->getItem(a->getStoreItem());
 			}
@@ -249,7 +249,7 @@ void SoldierArmorState::updateList()
  */
 void SoldierArmorState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -288,17 +288,17 @@ void SoldierArmorState::lstArmorClick(Action *)
 {
 	Soldier *soldier = _base->getSoldiers().at(_soldier);
 	Armor *prev = soldier->getArmor();
-	Armor *next = _game->getMod()->getArmor(_armors[_indices[_lstArmor->getSelectedRow()]].type);
+	Armor *next = getGame()->getMod()->getArmor(_armors[_indices[_lstArmor->getSelectedRow()]].type);
 	Craft *craft = soldier->getCraft();
 	if (craft)
 	{
 		if (!craft->validateArmorChange(prev->getSize(), next->getSize()))
 		{
-			_game->pushState(new ErrorMessageState(tr("STR_NOT_ENOUGH_CRAFT_SPACE"), _palette, _game->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", _game->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
+			getGame()->pushState(new ErrorMessageState(tr("STR_NOT_ENOUGH_CRAFT_SPACE"), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
 			return;
 		}
 	}
-	if (_game->getSavedGame()->getMonthsPassed() != -1)
+	if (getGame()->getSavedGame()->getMonthsPassed() != -1)
 	{
 		if (prev->getStoreItem())
 		{
@@ -310,9 +310,9 @@ void SoldierArmorState::lstArmorClick(Action *)
 		}
 	}
 	soldier->setArmor(next, true);
-	_game->getSavedGame()->setLastSelectedArmor(next->getType());
+	getGame()->getSavedGame()->setLastSelectedArmor(next->getType());
 
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -321,9 +321,9 @@ void SoldierArmorState::lstArmorClick(Action *)
 */
 void SoldierArmorState::lstArmorClickMiddle(Action *action)
 {
-	auto armor = _game->getMod()->getArmor(_armors[_indices[_lstArmor->getSelectedRow()]].type, true);
+	auto armor = getGame()->getMod()->getArmor(_armors[_indices[_lstArmor->getSelectedRow()]].type, true);
 	std::string articleId = armor->getUfopediaType();
-	Ufopaedia::openArticle(_game, articleId);
+	Ufopaedia::openArticle(getGame(), articleId);
 }
 
 /**

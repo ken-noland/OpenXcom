@@ -182,9 +182,9 @@ OptionsAudioState::OptionsAudioState(OptionsOrigin origin) : OptionsBaseState(or
 	_txtCurrentMusic->setVisible(_origin == OPT_MENU);
 
 	// These options only apply to UFO
-	_txtSoundFormat->setVisible(_origin == OPT_MENU && _game->getMod()->getSoundDefinitions()->empty());
-	_cbxSoundFormat->setVisible(_origin == OPT_MENU && _game->getMod()->getSoundDefinitions()->empty());
-	_txtCurrentSound->setVisible(_origin == OPT_MENU && _game->getMod()->getSoundDefinitions()->empty());
+	_txtSoundFormat->setVisible(_origin == OPT_MENU && getGame()->getMod()->getSoundDefinitions()->empty());
+	_cbxSoundFormat->setVisible(_origin == OPT_MENU && getGame()->getMod()->getSoundDefinitions()->empty());
+	_txtCurrentSound->setVisible(_origin == OPT_MENU && getGame()->getMod()->getSoundDefinitions()->empty());
 
 	_txtOptions->setText(tr("STR_SOUND_OPTIONS"));
 
@@ -211,7 +211,7 @@ OptionsAudioState::~OptionsAudioState()
 void OptionsAudioState::slrMusicVolumeChange(Action *)
 {
 	Options::musicVolume = _slrMusicVolume->getValue();
-	_game->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
+	getGame()->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
 }
 
 /**
@@ -221,7 +221,7 @@ void OptionsAudioState::slrMusicVolumeChange(Action *)
 void OptionsAudioState::slrSoundVolumeChange(Action *)
 {
 	Options::soundVolume = _slrSoundVolume->getValue();
-	_game->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
+	getGame()->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
 }
 
 /**
@@ -230,7 +230,7 @@ void OptionsAudioState::slrSoundVolumeChange(Action *)
  */
 void OptionsAudioState::slrSoundVolumeRelease(Action *)
 {
-	_game->getMod()->getSound("GEO.CAT", Mod::UFO_FIRE)->play();
+	getGame()->getMod()->getSound("GEO.CAT", Mod::UFO_FIRE)->play();
 }
 
 /**
@@ -240,7 +240,7 @@ void OptionsAudioState::slrSoundVolumeRelease(Action *)
 void OptionsAudioState::slrUiVolumeChange(Action *)
 {
 	Options::uiVolume = _slrUiVolume->getValue();
-	_game->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
+	getGame()->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
 }
 
 /**

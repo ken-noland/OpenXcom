@@ -105,14 +105,14 @@ void BuildFacilitiesState::populateBuildList()
 	auto forbiddenBaseFunc = _base->getForbiddenBaseFunc({});
 	auto futureBaseFunc = _base->getFutureBaseFunc({});
 
-	for (auto& facilityType : _game->getMod()->getBaseFacilitiesList())
+	for (auto& facilityType : getGame()->getMod()->getBaseFacilitiesList())
 	{
-		RuleBaseFacility *rule = _game->getMod()->getBaseFacility(facilityType);
+		RuleBaseFacility *rule = getGame()->getMod()->getBaseFacility(facilityType);
 		if (!rule->isAllowedForBaseType(_base->isFakeUnderwater()))
 		{
 			continue;
 		}
-		if (rule->isLift() || !_game->getSavedGame()->isResearched(rule->getRequirements()))
+		if (rule->isLift() || !getGame()->getSavedGame()->isResearched(rule->getRequirements()))
 		{
 			continue;
 		}
@@ -190,7 +190,7 @@ void BuildFacilitiesState::init()
  */
 void BuildFacilitiesState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -205,7 +205,7 @@ void BuildFacilitiesState::lstFacilitiesClick(Action *action)
 	if (action->getDetails()->button.button == SDL_BUTTON_MIDDLE)
 	{
 		std::string tmp = (index >= _facilities.size()) ? _disabledFacilities[index - _facilities.size()]->getType() : _facilities[index]->getType();
-		Ufopaedia::openArticle(_game, tmp);
+		Ufopaedia::openArticle(getGame(), tmp);
 		return;
 	}
 
@@ -213,7 +213,7 @@ void BuildFacilitiesState::lstFacilitiesClick(Action *action)
 	{
 		return;
 	}
-	_game->pushState(new PlaceFacilityState(_base, _facilities[index]));
+	getGame()->pushState(new PlaceFacilityState(_base, _facilities[index]));
 }
 
 }

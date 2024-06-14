@@ -82,7 +82,7 @@ NewPossibleManufactureState::NewPossibleManufactureState(Base * base, const std:
 		}
 		std::ostringstream ss;
 		int i = 0;
-		for (const auto& serviceName : _game->getMod()->getBaseFunctionNames(requiredServices))
+		for (const auto& serviceName : getGame()->getMod()->getBaseFunctionNames(requiredServices))
 		{
 			if (i > 0)
 				ss << ", ";
@@ -112,7 +112,7 @@ NewPossibleManufactureState::NewPossibleManufactureState(Base * base, const std:
  */
 void NewPossibleManufactureState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -121,8 +121,8 @@ void NewPossibleManufactureState::btnOkClick(Action *)
  */
 void NewPossibleManufactureState::btnManufactureClick(Action *)
 {
-	_game->popState();
-	_game->pushState (new ManufactureState(_base));
+	getGame()->popState();
+	getGame()->pushState (new ManufactureState(_base));
 }
 
 }

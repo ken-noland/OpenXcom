@@ -81,7 +81,7 @@ NewPossibleCraftState::NewPossibleCraftState(Base * base, const std::vector<Rule
 		}
 		std::ostringstream ss;
 		int i = 0;
-		for (const auto& serviceName : _game->getMod()->getBaseFunctionNames(requiredServices))
+		for (const std::string& serviceName : getGame()->getMod()->getBaseFunctionNames(requiredServices))
 		{
 			if (i > 0)
 				ss << ", ";
@@ -111,7 +111,7 @@ NewPossibleCraftState::NewPossibleCraftState(Base * base, const std::vector<Rule
  */
 void NewPossibleCraftState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -120,8 +120,8 @@ void NewPossibleCraftState::btnOkClick(Action *)
  */
 void NewPossibleCraftState::btnPurchaseClick(Action *)
 {
-	_game->popState();
-	_game->pushState(new PurchaseState(_base));
+	getGame()->popState();
+	getGame()->pushState(new PurchaseState(_base));
 }
 
 }

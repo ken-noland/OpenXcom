@@ -55,7 +55,7 @@ Slider::Slider(int width, int height, int x, int y) : InteractiveSurface(width, 
 	_minX = _frame->getX();
 	_maxX = _frame->getX() + _frame->getWidth() - _button->getWidth();
 
-	setValue(_pos);
+	setValue((int)_pos);
 }
 
 /**
@@ -82,7 +82,7 @@ void Slider::setX(int x)
 
 	_minX = _frame->getX();
 	_maxX = _frame->getX() + _frame->getWidth() - _button->getWidth();
-	setValue(_pos);
+	setValue((int)_pos);
 }
 
 /**
@@ -175,7 +175,7 @@ void Slider::handle(Action *action, State *state)
 	//_button->handle(action, state);
 	if (_pressed && (action->getDetails()->type == SDL_MOUSEMOTION || action->getDetails()->type == SDL_MOUSEBUTTONDOWN))
 	{
-		int cursorX = action->getAbsoluteXMouse();
+		int cursorX = (int)action->getAbsoluteXMouse();
 		double buttonX = Clamp(cursorX + _offsetX, _minX, _maxX);
 		double pos = (buttonX - _minX) / (_maxX - _minX);
 		int value = _min + (int)Round((_max - _min) * pos);
@@ -271,7 +271,7 @@ void Slider::mousePress(Action *action, State *state)
 	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
 	{
 		_pressed = true;
-		int cursorX = action->getAbsoluteXMouse();
+		int cursorX = (int)action->getAbsoluteXMouse();
 		if (cursorX >= _button->getX() && cursorX < _button->getX() + _button->getWidth())
 		{
 			_offsetX = _button->getX() - cursorX;

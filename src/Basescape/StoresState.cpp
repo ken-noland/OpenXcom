@@ -188,7 +188,7 @@ StoresState::~StoresState()
  */
 void StoresState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -232,7 +232,7 @@ void StoresState::initList()
 	_itemList.clear();
 
 	// find relevant items
-	for (const std::string& itemType : _game->getMod()->getItemsList())
+	for (const std::string& itemType : getGame()->getMod()->getItemsList())
 	{
 		// quick search
 		if (!searchString.empty())
@@ -246,7 +246,7 @@ void StoresState::initList()
 		}
 
 		int qty = 0;
-		auto* rule = _game->getMod()->getItem(itemType, true);
+		auto* rule = getGame()->getMod()->getItem(itemType, true);
 		if (!grandTotal)
 		{
 			// items in stores from this base only
@@ -256,7 +256,7 @@ void StoresState::initList()
 		{
 
 			// items from all bases
-			for (Base* xbase : _game->getSavedGame()->getBases())
+			for (Base* xbase : getGame()->getSavedGame()->getBases())
 			{
 				// 1. items in base stores
 				qty += xbase->getStorageItems()->getItem(rule);
@@ -492,12 +492,12 @@ void StoresState::sortSpaceUsedClick(Action *)
  */
 void StoresState::lstStoresClick(Action* action)
 {
-	if (_game->isMiddleClick(action))
+	if (getGame()->isMiddleClick(action))
 	{
 		auto* rule = _itemList[_lstStores->getSelectedRow()].rule;
 
 		std::string articleId = rule->getUfopediaType();
-		Ufopaedia::openArticle(_game, articleId);
+		Ufopaedia::openArticle(getGame(), articleId);
 	}
 }
 

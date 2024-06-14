@@ -79,7 +79,7 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	// Set palette
 	setInterface("transferMenu");
 
-	_ammoColor = _game->getMod()->getInterface("transferMenu")->getElement("ammoColor")->color;
+	_ammoColor = getGame()->getMod()->getInterface("transferMenu")->getElement("ammoColor")->color;
 
 	add(_window, "window", "transferMenu");
 	add(_btnQuickSearch, "button", "transferMenu");
@@ -158,7 +158,7 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 		if (_debriefingState) break;
 		if (craft->getStatus() != "STR_OUT" || (Options::canTransferCraftsWhileAirborne && craft->getFuel() >= craft->getFuelLimit(_baseTo)))
 		{
-			TransferRow row = { TRANSFER_CRAFT, craft, craft->getName(_game->getLanguage()),  (int)(25 * _distance), 1, 0, 0, -3, 0, 0, (int)(25 * _distance) };
+			TransferRow row = { TRANSFER_CRAFT, craft, craft->getName(getGame()->getLanguage()),  (int)(25 * _distance), 1, 0, 0, -3, 0, 0, (int)(25 * _distance) };
 			_items.push_back(row);
 			std::string cat = getCategory((int)_items.size() - 1);
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
@@ -187,9 +187,9 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 			_cats.push_back(cat);
 		}
 	}
-	for (const std::string& itemType : _game->getMod()->getItemsList())
+	for (const std::string& itemType : getGame()->getMod()->getItemsList())
 	{
-		RuleItem *rule = _game->getMod()->getItem(itemType, true);
+		RuleItem *rule = getGame()->getMod()->getItem(itemType, true);
 		int qty = _baseFrom->getStorageItems()->getItem(rule);
 		if (_debriefingState != 0)
 		{
@@ -208,7 +208,7 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	}
 
 	_vanillaCategories = _cats.size();
-	if (_game->getMod()->getDisplayCustomCategories() > 0)
+	if (getGame()->getMod()->getDisplayCustomCategories() > 0)
 	{
 		bool hasUnassigned = false;
 
@@ -233,14 +233,14 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 			}
 		}
 		// then use them nicely in order
-		if (_game->getMod()->getDisplayCustomCategories() == 1)
+		if (getGame()->getMod()->getDisplayCustomCategories() == 1)
 		{
 			_cats.clear();
 			_cats.push_back("STR_ALL_ITEMS");
 			_cats.push_back("STR_ITEMS_AT_DESTINATION");
 			_vanillaCategories = _cats.size();
 		}
-		for (auto& categoryName : _game->getMod()->getItemCategoriesList())
+		for (auto& categoryName : getGame()->getMod()->getItemCategoriesList())
 		{
 			if (std::find(tempCats.begin(), tempCats.end(), categoryName) != tempCats.end())
 			{
@@ -319,9 +319,9 @@ std::string TransferItemsState::getCategory(int sel) const
 		}
 		if (rule->getBattleType() == BT_NONE)
 		{
-			if (_game->getMod()->isCraftWeaponStorageItem(rule))
+			if (getGame()->getMod()->isCraftWeaponStorageItem(rule))
 				return "STR_CRAFT_ARMAMENT";
-			if (_game->getMod()->isArmorStorageItem(rule))
+			if (getGame()->getMod()->isArmorStorageItem(rule))
 				return "STR_ARMORS"; // OXCE: armors
 			return "STR_COMPONENTS";
 		}
@@ -495,13 +495,13 @@ void TransferItemsState::btnOkClick(Action *)
 		double freeStoresFrom = _baseFrom->getAvailableStores() - _baseFrom->getUsedStores() + _iQty;
 		if (_iQty > 0.0 ? freeStoresTo < -0.00001 : freeStoresFrom < -0.00001)
 		{
-			RuleInterface *menuInterface = _game->getMod()->getInterface("transferMenu");
-			_game->pushState(new ErrorMessageState(tr("STR_NOT_ENOUGH_STORE_SPACE"), _palette, menuInterface->getElement("errorMessage")->color, "BACK13.SCR", menuInterface->getElement("errorPalette")->color));
+			RuleInterface *menuInterface = getGame()->getMod()->getInterface("transferMenu");
+			getGame()->pushState(new ErrorMessageState(tr("STR_NOT_ENOUGH_STORE_SPACE"), _palette, menuInterface->getElement("errorMessage")->color, "BACK13.SCR", menuInterface->getElement("errorPalette")->color));
 			return;
 		}
 	}
 
-	_game->pushState(new TransferConfirmState(_baseTo, this));
+	getGame()->pushState(new TransferConfirmState(_baseTo, this));
 }
 
 /**
@@ -510,7 +510,7 @@ void TransferItemsState::btnOkClick(Action *)
 void TransferItemsState::completeTransfer()
 {
 	int time = (int)floor(6 + _distance / 10.0);
-	_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() - _total);
+	getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() - _total);
 	for (const TransferRow& transferRow : _items)
 	{
 		if (transferRow.amount > 0)
@@ -629,8 +629,8 @@ void TransferItemsState::completeTransfer()
  */
 void TransferItemsState::btnCancelClick(Action *)
 {
-	_game->popState();
-	_game->popState();
+	getGame()->popState();
+	getGame()->popState();
 }
 
 /**
@@ -781,7 +781,7 @@ void TransferItemsState::lstItemsMousePress(Action *action)
 			RuleItem *rule = (RuleItem*)getRow().rule;
 			if (rule != 0)
 			{
-				_game->pushState(new ManufactureDependenciesTreeState(rule->getType()));
+				getGame()->pushState(new ManufactureDependenciesTreeState(rule->getType()));
 			}
 		}
 	}
@@ -793,16 +793,16 @@ void TransferItemsState::lstItemsMousePress(Action *action)
 			if (rule != 0)
 			{
 				std::string articleId = rule->getUfopediaType();
-				if (_game->isCtrlPressed())
+				if (getGame()->isCtrlPressed())
 				{
-					Ufopaedia::openArticle(_game, articleId);
+					Ufopaedia::openArticle(getGame(), articleId);
 				}
 				else
 				{
-					const RuleResearch* selectedTopic = _game->getMod()->getResearch(articleId, false);
+					const RuleResearch* selectedTopic = getGame()->getMod()->getResearch(articleId, false);
 					if (selectedTopic)
 					{
-						_game->pushState(new TechTreeViewerState(selectedTopic, 0));
+						getGame()->pushState(new TechTreeViewerState(selectedTopic, 0));
 					}
 				}
 			}
@@ -813,13 +813,13 @@ void TransferItemsState::lstItemsMousePress(Action *action)
 			if (rule != 0)
 			{
 				std::string articleId = rule->getRules()->getType();
-				if (_game->isCtrlPressed())
+				if (getGame()->isCtrlPressed())
 				{
-					Ufopaedia::openArticle(_game, articleId);
+					Ufopaedia::openArticle(getGame(), articleId);
 				}
 				else
 				{
-					_game->pushState(new TechTreeViewerState(0, 0, 0, rule->getRules()));
+					getGame()->pushState(new TechTreeViewerState(0, 0, 0, rule->getRules()));
 				}
 			}
 		}
@@ -871,7 +871,7 @@ void TransferItemsState::increaseByValue(int change)
 		}
 		else if (Options::storageLimitsEnforced)
 		{
-			auto used = craft->getTotalItemStorageSize(_game->getMod());
+			auto used = craft->getTotalItemStorageSize(getGame()->getMod());
 			if (used > 0.0 && _baseTo->storesOverfull(_iQty + used))
 			{
 				errorMessage = tr("STR_NOT_ENOUGH_STORE_SPACE_FOR_CRAFT");
@@ -910,7 +910,7 @@ void TransferItemsState::increaseByValue(int change)
 		case TRANSFER_CRAFT:
 			_tCQty[p]++;
 			_pQty += craft->getNumTotalSoldiers();
-			_iQty += craft->getTotalItemStorageSize(_game->getMod());
+			_iQty += craft->getTotalItemStorageSize(getGame()->getMod());
 			getRow().amount++;
 			if (!Options::canTransferCraftsWhileAirborne || craft->getStatus() != "STR_OUT")
 				_total += getRow().cost;
@@ -946,8 +946,8 @@ void TransferItemsState::increaseByValue(int change)
 	else
 	{
 		_timerInc->stop();
-		RuleInterface *menuInterface = _game->getMod()->getInterface("transferMenu");
-		_game->pushState(new ErrorMessageState(errorMessage, _palette, menuInterface->getElement("errorMessage")->color, "BACK13.SCR", menuInterface->getElement("errorPalette")->color));
+		RuleInterface *menuInterface = getGame()->getMod()->getInterface("transferMenu");
+		getGame()->pushState(new ErrorMessageState(errorMessage, _palette, menuInterface->getElement("errorMessage")->color, "BACK13.SCR", menuInterface->getElement("errorPalette")->color));
 		_errorShown = true;
 	}
 }
@@ -985,7 +985,7 @@ void TransferItemsState::decreaseByValue(int change)
 		p = craft->getRules()->getHangarType();		
 		_tCQty[p]--;
 		_pQty -= craft->getNumTotalSoldiers();
-		_iQty -= craft->getTotalItemStorageSize(_game->getMod());
+		_iQty -= craft->getTotalItemStorageSize(getGame()->getMod());
 		break;
 	case TRANSFER_ITEM:
 		const RuleItem *selItem = (RuleItem*)getRow().rule;
@@ -1067,13 +1067,13 @@ void TransferItemsState::cbxCategoryChange(Action *)
 {
 	_previousSort = _currentSort;
 
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
-		_currentSort = _game->isShiftPressed() ? TransferSortDirection::BY_UNIT_SIZE : TransferSortDirection::BY_TOTAL_SIZE;
+		_currentSort = getGame()->isShiftPressed() ? TransferSortDirection::BY_UNIT_SIZE : TransferSortDirection::BY_TOTAL_SIZE;
 	}
-	else if (_game->isAltPressed())
+	else if (getGame()->isAltPressed())
 	{
-		_currentSort = _game->isShiftPressed() ? TransferSortDirection::BY_UNIT_COST : TransferSortDirection::BY_TOTAL_COST;
+		_currentSort = getGame()->isShiftPressed() ? TransferSortDirection::BY_UNIT_COST : TransferSortDirection::BY_TOTAL_COST;
 	}
 	else
 	{

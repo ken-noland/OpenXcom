@@ -74,8 +74,8 @@ CraftPatrolState::CraftPatrolState(Craft *craft, Globe *globe) : _craft(craft), 
 	_txtDestination->setAlign(ALIGN_CENTER);
 	_txtDestination->setWordWrap(true);
 	_txtDestination->setText(tr("STR_CRAFT_HAS_REACHED_DESTINATION")
-							 .arg(_craft->getName(_game->getLanguage()))
-							 .arg(_craft->getDestination()->getName(_game->getLanguage())));
+							 .arg(_craft->getName(getGame()->getLanguage()))
+							 .arg(_craft->getDestination()->getName(getGame()->getLanguage())));
 
 	_txtPatrolling->setBig();
 	_txtPatrolling->setAlign(ALIGN_CENTER);
@@ -96,7 +96,7 @@ CraftPatrolState::~CraftPatrolState()
  */
 void CraftPatrolState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -105,8 +105,8 @@ void CraftPatrolState::btnOkClick(Action *)
  */
 void CraftPatrolState::btnRedirectClick(Action *)
 {
-	_game->popState();
-	_game->pushState(new GeoscapeCraftState(_craft, _globe, 0, false));
+	getGame()->popState();
+	getGame()->pushState(new GeoscapeCraftState(_craft, _globe, 0, false));
 }
 
 }

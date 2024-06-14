@@ -138,55 +138,55 @@ ExtendedInventoryLinksState::ExtendedInventoryLinksState(InventoryState* parent,
 
 void ExtendedInventoryLinksState::btnArmorClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnArmorClick(nullptr);
 }
 
 void ExtendedInventoryLinksState::btnAvatarClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnArmorClickRight(nullptr);
 }
 
 void ExtendedInventoryLinksState::btnEquipmentSaveClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnInventorySaveClick(nullptr);
 }
 
 void ExtendedInventoryLinksState::btnEquipmentLoadClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnInventoryLoadClick(nullptr);
 }
 
 void ExtendedInventoryLinksState::btnPersonalSaveClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnCreatePersonalTemplateClick(nullptr);
 }
 
 void ExtendedInventoryLinksState::btnPersonalLoadClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnApplyPersonalTemplateClick(nullptr);
 }
 
 void ExtendedInventoryLinksState::btnNotesClick(Action *)
 {
-	_game->popState();
-	_game->pushState(new NotesState(OPT_BATTLESCAPE));
+	getGame()->popState();
+	getGame()->pushState(new NotesState(OPT_BATTLESCAPE));
 }
 
 void ExtendedInventoryLinksState::btnUfopediaClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->btnUfopaediaClick(nullptr);
 }
 
 void ExtendedInventoryLinksState::btnAutoEquipClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_parent->onAutoequip(nullptr);
 }
 
@@ -196,7 +196,7 @@ void ExtendedInventoryLinksState::btnAutoEquipClick(Action *)
  */
 void ExtendedInventoryLinksState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

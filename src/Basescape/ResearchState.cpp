@@ -125,7 +125,7 @@ ResearchState::~ResearchState()
  */
 void ResearchState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -134,8 +134,8 @@ void ResearchState::btnOkClick(Action *)
  */
 void ResearchState::btnNewClick(Action *)
 {
-	bool sortByCost = _game->isCtrlPressed() && _game->isAltPressed();
-	_game->pushState(new NewResearchListState(_base, sortByCost));
+	bool sortByCost = getGame()->isCtrlPressed() && getGame()->isAltPressed();
+	getGame()->pushState(new NewResearchListState(_base, sortByCost));
 }
 
 /**
@@ -145,7 +145,7 @@ void ResearchState::btnNewClick(Action *)
 void ResearchState::onSelectProject(Action *)
 {
 	const std::vector<ResearchProject *> & baseProjects(_base->getResearch());
-	_game->pushState(new ResearchInfoState(_base, baseProjects[_lstResearch->getSelectedRow()]));
+	getGame()->pushState(new ResearchInfoState(_base, baseProjects[_lstResearch->getSelectedRow()]));
 }
 
 /**
@@ -156,7 +156,7 @@ void ResearchState::onOpenTechTreeViewer(Action *)
 {
 	const std::vector<ResearchProject *> & baseProjects(_base->getResearch());
 	const RuleResearch *selectedTopic = baseProjects[_lstResearch->getSelectedRow()]->getRules();
-	_game->pushState(new TechTreeViewerState(selectedTopic, 0));
+	getGame()->pushState(new TechTreeViewerState(selectedTopic, 0));
 }
 
 /**
@@ -171,7 +171,7 @@ void ResearchState::lstResearchMousePress(Action *action)
 	}
 
 	int change = Options::oxceResearchScrollSpeed;
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 		change = Options::oxceResearchScrollSpeedWithCtrl;
 
 	if (action->getDetails()->button.button == SDL_BUTTON_WHEELUP)
@@ -205,7 +205,7 @@ void ResearchState::lstResearchMousePress(Action *action)
  */
 void ResearchState::onCurrentGlobalResearchClick(Action *)
 {
-	_game->pushState(new GlobalResearchState(true));
+	getGame()->pushState(new GlobalResearchState(true));
 }
 /**
  * Updates the research list

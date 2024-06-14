@@ -64,7 +64,7 @@ InventorySaveState::InventorySaveState(InventoryState *parent) : _parent(parent)
 
 	// Set up objects
 	_window->setHighContrast(true);
-	_window->setBackground(_game->getMod()->getSurface("TAC00.SCR"));
+	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtTitle->setHighContrast(true);
 	_txtTitle->setAlign(ALIGN_CENTER);
@@ -99,9 +99,9 @@ InventorySaveState::InventorySaveState(InventoryState *parent) : _parent(parent)
 
 	for (int i = 0; i < Options::oxceMaxEquipmentLayoutTemplates; ++i)
 	{
-		std::vector<EquipmentLayoutItem*> *item = _game->getSavedGame()->getGlobalEquipmentLayout(i);
+		std::vector<EquipmentLayoutItem*> *item = getGame()->getSavedGame()->getGlobalEquipmentLayout(i);
 		std::ostringstream ss;
-		const std::string& armorName = _game->getSavedGame()->getGlobalEquipmentLayoutArmor(i);
+		const std::string& armorName = getGame()->getSavedGame()->getGlobalEquipmentLayoutArmor(i);
 		if (!armorName.empty())
 		{
 			ss << "[" << tr(armorName) << "] ";
@@ -112,7 +112,7 @@ InventorySaveState::InventorySaveState(InventoryState *parent) : _parent(parent)
 		}
 		else
 		{
-			const std::string &itemName = _game->getSavedGame()->getGlobalEquipmentLayoutName(i);
+			const std::string &itemName = getGame()->getSavedGame()->getGlobalEquipmentLayoutName(i);
 			if (itemName.empty())
 				ss << tr("STR_UNNAMED_SLOT_N").arg(i + 1);
 			else
@@ -136,7 +136,7 @@ InventorySaveState::~InventorySaveState()
 */
 void InventorySaveState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -177,7 +177,7 @@ void InventorySaveState::lstLayoutPress(Action *action)
 	}
 	_selected = _lstLayout->getCellText(_selectedRow, 0);
 
-	if (_game->isRightClick(action) && _edtSave->isFocused())
+	if (getGame()->isRightClick(action) && _edtSave->isFocused())
 	{
 		_previousSelectedRow = -1;
 		_selectedRow = -1;
@@ -187,7 +187,7 @@ void InventorySaveState::lstLayoutPress(Action *action)
 		_edtSave->setFocus(false, false);
 		_lstLayout->setScrolling(true);
 	}
-	if (_game->isLeftClick(action))
+	if (getGame()->isLeftClick(action))
 	{
 		_lstLayout->setCellText(_selectedRow, 0, "");
 
@@ -230,10 +230,10 @@ void InventorySaveState::saveTemplate(bool includingArmor)
 {
 	if (_selectedRow >= 0 && _selectedRow < Options::oxceMaxEquipmentLayoutTemplates)
 	{
-		_game->getSavedGame()->setGlobalEquipmentLayoutName(_selectedRow, _edtSave->getText());
+		getGame()->getSavedGame()->setGlobalEquipmentLayoutName(_selectedRow, _edtSave->getText());
 		_parent->saveGlobalLayout(_selectedRow, includingArmor);
 
-		_game->popState();
+		getGame()->popState();
 	}
 }
 

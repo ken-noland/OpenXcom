@@ -59,7 +59,7 @@ AbandonGameState::AbandonGameState(OptionsOrigin origin) : _origin(origin)
 	_txtTitle = new Text(206, 17, x+5, 70);
 
 	// Set palette
-	setInterface("geoscape", false, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("geoscape", false, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "genericWindow", "geoscape");
 	add(_btnYes, "genericButton2", "geoscape");
@@ -104,21 +104,21 @@ AbandonGameState::~AbandonGameState()
 void AbandonGameState::btnYesClick(Action *)
 {
 	// Reset touch flags
-	_game->resetTouchButtonFlags();
+	getGame()->resetTouchButtonFlags();
 
-	if (_origin == OPT_BATTLESCAPE && _game->getSavedGame()->getSavedBattle()->getAmbientSound() != Mod::NO_SOUND)
-		_game->getMod()->getSoundByDepth(0, _game->getSavedGame()->getSavedBattle()->getAmbientSound())->stopLoop();
-	if (!_game->getSavedGame()->isIronman())
+	if (_origin == OPT_BATTLESCAPE && getGame()->getSavedGame()->getSavedBattle()->getAmbientSound() != Mod::NO_SOUND)
+		getGame()->getMod()->getSoundByDepth(0, getGame()->getSavedGame()->getSavedBattle()->getAmbientSound())->stopLoop();
+	if (!getGame()->getSavedGame()->isIronman())
 	{
 		Screen::updateScale(Options::geoscapeScale, Options::baseXGeoscape, Options::baseYGeoscape, true);
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 
-		_game->setState(new MainMenuState);
-		_game->setSavedGame(0);
+		getGame()->setState(new MainMenuState);
+		getGame()->setSavedGame(0);
 	}
 	else
 	{
-		_game->pushState(new SaveGameState(OPT_GEOSCAPE, SAVE_IRONMAN_END, _palette));
+		getGame()->pushState(new SaveGameState(OPT_GEOSCAPE, SAVE_IRONMAN_END, _palette));
 	}
 }
 
@@ -128,7 +128,7 @@ void AbandonGameState::btnYesClick(Action *)
  */
 void AbandonGameState::btnNoClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

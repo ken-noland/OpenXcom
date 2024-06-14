@@ -52,8 +52,8 @@ GoToMainMenuState::~GoToMainMenuState()
 void GoToMainMenuState::init()
 {
 	Screen::updateScale(Options::geoscapeScale, Options::baseXGeoscape, Options::baseYGeoscape, true);
-	_game->getScreen()->resetDisplay(false);
-	_game->setState(new MainMenuState(_updateCheck));
+	getGame()->getScreen()->resetDisplay(false);
+	getGame()->setState(new MainMenuState(_updateCheck));
 }
 
 /**
@@ -198,7 +198,7 @@ MainMenuState::MainMenuState(bool updateCheck)
 void MainMenuState::init()
 {
 	State::init();
-	if (Options::getLoadLastSave() && _game->getSavedGame()->getList(_game->getLanguage(), true).size() > 0)
+	if (Options::getLoadLastSave() && getGame()->getSavedGame()->getList(getGame()->getLanguage(), true).size() > 0)
 	{
 		Log(LOG_INFO) << "Loading last saved game";
 		btnLoadClick(NULL);
@@ -219,7 +219,7 @@ MainMenuState::~MainMenuState()
  */
 void MainMenuState::btnNewGameClick(Action *)
 {
-	_game->pushState(new NewGameState);
+	getGame()->pushState(new NewGameState);
 }
 
 /**
@@ -228,7 +228,7 @@ void MainMenuState::btnNewGameClick(Action *)
  */
 void MainMenuState::btnNewBattleClick(Action *)
 {
-	_game->pushState(new NewBattleState);
+	getGame()->pushState(new NewBattleState);
 }
 
 /**
@@ -237,7 +237,7 @@ void MainMenuState::btnNewBattleClick(Action *)
  */
 void MainMenuState::btnLoadClick(Action *)
 {
-	_game->pushState(new ListLoadState(OPT_MENU));
+	getGame()->pushState(new ListLoadState(OPT_MENU));
 }
 
 /**
@@ -247,7 +247,7 @@ void MainMenuState::btnLoadClick(Action *)
 void MainMenuState::btnOptionsClick(Action *)
 {
 	Options::backupDisplay();
-	_game->pushState(new OptionsVideoState(OPT_MENU));
+	getGame()->pushState(new OptionsVideoState(OPT_MENU));
 }
 
 /**
@@ -256,7 +256,7 @@ void MainMenuState::btnOptionsClick(Action *)
 */
 void MainMenuState::btnModsClick(Action *)
 {
-	_game->pushState(new ModListState);
+	getGame()->pushState(new ModListState);
 }
 
 /**
@@ -265,7 +265,7 @@ void MainMenuState::btnModsClick(Action *)
  */
 void MainMenuState::btnQuitClick(Action *)
 {
-	_game->quit();
+	getGame()->quit();
 }
 
 /**
@@ -410,7 +410,7 @@ void MainMenuState::btnUpdateClick(Action*)
 			Log(LOG_ERROR) << "Step 10c: failed to open exe.new file for writing." << SDL_GetError();
 			return;
 		}
-		auto wsize = SDL_RWwrite(rwo_write, data, size, 1);
+		auto wsize = SDL_RWwrite(rwo_write, data, (int)size, 1);
 		if (wsize != 1) {
 			Log(LOG_ERROR) << "Step 10d: failed to write exe.new file." << SDL_GetError();
 			return;
@@ -470,8 +470,8 @@ void MainMenuState::btnUpdateClick(Action*)
 	}
 
 	Log(LOG_INFO) << "Update prepared, restarting.";
-	_game->setUpdateFlag(true);
-	_game->quit();
+	getGame()->setUpdateFlag(true);
+	getGame()->quit();
 #endif
 }
 

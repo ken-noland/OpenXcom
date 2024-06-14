@@ -38,10 +38,10 @@ namespace OpenXcom
 		// Set palette
 		setStandardPalette("PAL_UFOPAEDIA");
 
-		_buttonColor = _game->getMod()->getInterface("articleText")->getElement("button")->color;
-		_titleColor = _game->getMod()->getInterface("articleText")->getElement("title")->color;
-		_textColor1 = _game->getMod()->getInterface("articleText")->getElement("text")->color;
-		_textColor2 = _game->getMod()->getInterface("articleText")->getElement("text")->color2;
+		_buttonColor = getGame()->getMod()->getInterface("articleText")->getElement("button")->color;
+		_titleColor = getGame()->getMod()->getInterface("articleText")->getElement("title")->color;
+		_textColor1 = getGame()->getMod()->getInterface("articleText")->getElement("text")->color;
+		_textColor2 = getGame()->getMod()->getInterface("articleText")->getElement("text")->color2;
 
 		ArticleState::initLayout();
 
@@ -52,7 +52,7 @@ namespace OpenXcom
 		centerAllSurfaces();
 
 		// Set up objects
-		_game->getMod()->getSurface("BACK10.SCR")->blitNShade(_bg, 0, 0);
+		getGame()->getMod()->getSurface("BACK10.SCR")->blitNShade(_bg, 0, 0);
 		_btnOk->setColor(_buttonColor);
 		_btnPrev->setColor(_buttonColor);
 		_btnNext->setColor(_buttonColor);

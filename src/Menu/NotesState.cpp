@@ -52,7 +52,7 @@ NotesState::NotesState(OptionsOrigin origin) : _origin(origin), _previousSelecte
 	_btnDelete = new ToggleTextButton(288, 16, 16, 23);
 
 	// Set palette
-	setInterface("geoscape", true, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("geoscape", true, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "window", "noteMenu");
 	add(_txtTitle, "text", "noteMenu");
@@ -134,7 +134,7 @@ void NotesState::updateList()
 	int row = 0;
 	int color = _lstNotes->getSecondaryColor();
 
-	for (const auto& note : _game->getSavedGame()->getUserNotes())
+	for (const auto& note : getGame()->getSavedGame()->getUserNotes())
 	{
 		_lstNotes->addRow(1, note.c_str());
 		row++;
@@ -154,7 +154,7 @@ void NotesState::updateList()
  */
 void NotesState::btnCancelClick(Action*)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -271,7 +271,7 @@ void NotesState::btnSaveClick(Action*)
 	}
 
 	// overwrite everything, no way back :)
-	auto& notes = _game->getSavedGame()->getUserNotes();
+	auto& notes = getGame()->getSavedGame()->getUserNotes();
 	notes.clear();
 	if (_lstNotes->getTexts() > 1)
 	{
@@ -286,7 +286,7 @@ void NotesState::btnSaveClick(Action*)
 		}
 	}
 
-	_game->popState();
+	getGame()->popState();
 }
 
 }

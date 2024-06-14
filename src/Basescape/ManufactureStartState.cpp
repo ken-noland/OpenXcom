@@ -100,7 +100,7 @@ ManufactureStartState::ManufactureStartState(Base *base, RuleManufacture *item) 
 	_btnCancel->onMouseClick((ActionHandler)&ManufactureStartState::btnCancelClick);
 	_btnCancel->onKeyboardPress((ActionHandler)&ManufactureStartState::btnCancelClick, Options::keyCancel);
 
-	bool productionPossible = _item->haveEnoughMoneyForOneMoreUnit(_game->getSavedGame()->getFunds());
+	bool productionPossible = _item->haveEnoughMoneyForOneMoreUnit(getGame()->getSavedGame()->getFunds());
 	// check available workspace later
 	//int availableWorkSpace = _base->getFreeWorkshops();
 	//productionPossible &= (availableWorkSpace > 0);
@@ -176,7 +176,7 @@ ManufactureStartState::ManufactureStartState(Base *base, RuleManufacture *item) 
 	bool hasVanillaOutput = false;
 	if (_item->getProducedItems().size() == 1)
 	{
-		const RuleItem* match = _game->getMod()->getItem(_item->getName(), false);
+		const RuleItem* match = getGame()->getMod()->getItem(_item->getName(), false);
 		if (match)
 		{
 			auto iter = _item->getProducedItems().find(match);
@@ -217,9 +217,9 @@ ManufactureStartState::ManufactureStartState(Base *base, RuleManufacture *item) 
 	if (_item)
 	{
 		// mark new as normal
-		if (_game->getSavedGame()->getManufactureRuleStatus(_item->getName()) == RuleManufacture::MANU_STATUS_NEW)
+		if (getGame()->getSavedGame()->getManufactureRuleStatus(_item->getName()) == RuleManufacture::MANU_STATUS_NEW)
 		{
-			_game->getSavedGame()->setManufactureRuleStatus(_item->getName(), RuleManufacture::MANU_STATUS_NORMAL);
+			getGame()->getSavedGame()->setManufactureRuleStatus(_item->getName(), RuleManufacture::MANU_STATUS_NORMAL);
 		}
 	}
 }
@@ -230,7 +230,7 @@ ManufactureStartState::ManufactureStartState(Base *base, RuleManufacture *item) 
  */
 void ManufactureStartState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -241,11 +241,11 @@ void ManufactureStartState::btnStartClick(Action *)
 {
 	if (_item->getProducedCraft() && _base->getAvailableHangars(_item->getProducedCraft()->getHangarType()) - _base->getUsedHangars(_item->getProducedCraft()->getHangarType()) <= 0)
 	{
-		_game->pushState(new ErrorMessageState(tr("STR_NO_FREE_HANGARS_FOR_CRAFT_PRODUCTION"), _palette, _game->getMod()->getInterface("basescape")->getElement("errorMessage")->color, "BACK17.SCR", _game->getMod()->getInterface("basescape")->getElement("errorPalette")->color));
+		getGame()->pushState(new ErrorMessageState(tr("STR_NO_FREE_HANGARS_FOR_CRAFT_PRODUCTION"), _palette, getGame()->getMod()->getInterface("basescape")->getElement("errorMessage")->color, "BACK17.SCR", getGame()->getMod()->getInterface("basescape")->getElement("errorPalette")->color));
 	}
 	else
 	{
-		_game->pushState(new ManufactureInfoState(_base, _item));
+		getGame()->pushState(new ManufactureInfoState(_base, _item));
 	}
 }
 

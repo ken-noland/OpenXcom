@@ -38,11 +38,11 @@ namespace OpenXcom
 		Log(LOG_INFO) << _listStyle;
 		// get armor
 
-		Armor* armor = _game->getMod()->getArmor(defs->id, true);
+		Armor* armor = getGame()->getMod()->getArmor(defs->id, true);
 
 		// default page layout
 
-		_btnInfo->setVisible(_game->getMod()->getShowPediaInfoButton());
+		_btnInfo->setVisible(getGame()->getMod()->getShowPediaInfoButton());
 
 		// draw different list styles
 

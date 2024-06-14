@@ -77,7 +77,7 @@ TransferBaseState::TransferBaseState(Base *base, DebriefingState *debriefingStat
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_DESTINATION_BASE"));
 
-	_txtFunds->setText(tr("STR_CURRENT_FUNDS").arg(Unicode::formatFunding(_game->getSavedGame()->getFunds())));
+	_txtFunds->setText(tr("STR_CURRENT_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
 
 	_txtName->setText(tr("STR_NAME"));
 	_txtName->setBig();
@@ -92,13 +92,13 @@ TransferBaseState::TransferBaseState(Base *base, DebriefingState *debriefingStat
 	_lstBases->onMouseClick((ActionHandler)&TransferBaseState::lstBasesClick);
 
 	int row = 0;
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (Base* xbase : getGame()->getSavedGame()->getBases())
 	{
 		if (xbase != _base)
 		{
 			// Get area
 			std::string area;
-			for (const Region* region : _game->getSavedGame()->getRegions())
+			for (const Region* region : getGame()->getSavedGame()->getRegions())
 			{
 				if (region->getRules()->insideRegion(xbase->getLongitude(), xbase->getLatitude()))
 				{
@@ -128,7 +128,7 @@ TransferBaseState::~TransferBaseState()
  */
 void TransferBaseState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -137,7 +137,7 @@ void TransferBaseState::btnCancelClick(Action *)
  */
 void TransferBaseState::lstBasesClick(Action *)
 {
-	_game->pushState(new TransferItemsState(_base, _bases[_lstBases->getSelectedRow()], _debriefingState));
+	getGame()->pushState(new TransferItemsState(_base, _bases[_lstBases->getSelectedRow()], _debriefingState));
 }
 
 }

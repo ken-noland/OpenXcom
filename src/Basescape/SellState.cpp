@@ -107,7 +107,7 @@ void SellState::delayedInit()
 	// Set palette
 	setInterface("sellMenu");
 
-	_ammoColor = _game->getMod()->getInterface("sellMenu")->getElement("ammoColor")->color;
+	_ammoColor = getGame()->getMod()->getInterface("sellMenu")->getElement("ammoColor")->color;
 
 	add(_window, "window", "sellMenu");
 	add(_btnQuickSearch, "button", "sellMenu");
@@ -148,7 +148,7 @@ void SellState::delayedInit()
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELL_ITEMS_SACK_PERSONNEL"));
 
-	_txtFunds->setText(tr("STR_FUNDS").arg(Unicode::formatFunding(_game->getSavedGame()->getFunds())));
+	_txtFunds->setText(tr("STR_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
 
 	_txtSpaceUsed->setVisible(Options::storageLimitsEnforced);
 
@@ -201,7 +201,7 @@ void SellState::delayedInit()
 		if (_debriefingState) break;
 		if (craft->getStatus() != "STR_OUT")
 		{
-			TransferRow row = { TRANSFER_CRAFT, craft, craft->getName(_game->getLanguage()), craft->getRules()->getSellCost(), 1, 0, 0, -3, 0, 0, craft->getRules()->getSellCost() };
+			TransferRow row = { TRANSFER_CRAFT, craft, craft->getName(getGame()->getLanguage()), craft->getRules()->getSellCost(), 1, 0, 0, -3, 0, 0, craft->getRules()->getSellCost() };
 			_items.push_back(row);
 			std::string cat = getCategory(static_cast<int>(_items.size() - 1));
 			if (std::find(_cats.begin(), _cats.end(), cat) == _cats.end())
@@ -230,9 +230,9 @@ void SellState::delayedInit()
 			_cats.push_back(cat);
 		}
 	}
-	for (const std::string& itemType : _game->getMod()->getItemsList())
+	for (const std::string& itemType : getGame()->getMod()->getItemsList())
 	{
-		const RuleItem *rule = _game->getMod()->getItem(itemType, true);
+		const RuleItem *rule = getGame()->getMod()->getItem(itemType, true);
 		int qty = 0;
 		if (_debriefingState != 0)
 		{
@@ -262,8 +262,8 @@ void SellState::delayedInit()
 		}
 		if (qty > 0 && (Options::canSellLiveAliens || !rule->isAlien()))
 		{
-			TransferRow row = { TRANSFER_ITEM, rule, tr(itemType), rule->getSellCostAdjusted(_base, _game->getSavedGame()), qty, 0, 0, rule->getListOrder(), rule->getSize(), qty * rule->getSize(), (int64_t)qty * rule->getSellCostAdjusted(_base, _game->getSavedGame()) };
-			if ((_debriefingState != 0) && (_game->getSavedGame()->getAutosell(rule)))
+			TransferRow row = { TRANSFER_ITEM, rule, tr(itemType), rule->getSellCostAdjusted(_base, getGame()->getSavedGame()), qty, 0, 0, rule->getListOrder(), rule->getSize(), qty * rule->getSize(), (int64_t)qty * rule->getSellCostAdjusted(_base, getGame()->getSavedGame()) };
+			if ((_debriefingState != 0) && (getGame()->getSavedGame()->getAutosell(rule)))
 			{
 				row.amount = qty;
 				_total += row.cost * qty;
@@ -279,7 +279,7 @@ void SellState::delayedInit()
 	}
 
 	_vanillaCategories = _cats.size();
-	if (_game->getMod()->getDisplayCustomCategories() > 0)
+	if (getGame()->getMod()->getDisplayCustomCategories() > 0)
 	{
 		bool hasUnassigned = false;
 
@@ -304,13 +304,13 @@ void SellState::delayedInit()
 			}
 		}
 		// then use them nicely in order
-		if (_game->getMod()->getDisplayCustomCategories() == 1)
+		if (getGame()->getMod()->getDisplayCustomCategories() == 1)
 		{
 			_cats.clear();
 			_cats.push_back("STR_ALL_ITEMS");
 			_vanillaCategories = _cats.size();
 		}
-		for (const std::string& categoryName : _game->getMod()->getItemCategoriesList())
+		for (const std::string& categoryName : getGame()->getMod()->getItemCategoriesList())
 		{
 			if (std::find(tempCats.begin(), tempCats.end(), categoryName) != tempCats.end())
 			{
@@ -360,8 +360,8 @@ void SellState::init()
 
 	if (_reset)
 	{
-		_game->popState();
-		_game->pushState(new SellState(_base, _debriefingState, _origin));
+		getGame()->popState();
+		getGame()->pushState(new SellState(_base, _debriefingState, _origin));
 	}
 }
 
@@ -404,9 +404,9 @@ std::string SellState::getCategory(int sel) const
 		}
 		if (rule->getBattleType() == BT_NONE)
 		{
-			if (_game->getMod()->isCraftWeaponStorageItem(rule))
+			if (getGame()->getMod()->isCraftWeaponStorageItem(rule))
 				return "STR_CRAFT_ARMAMENT";
-			if (_game->getMod()->isArmorStorageItem(rule))
+			if (getGame()->getMod()->isArmorStorageItem(rule))
 				return "STR_ARMORS"; // OXCE: armors
 			return "STR_COMPONENTS";
 		}
@@ -564,7 +564,7 @@ void SellState::updateList()
  */
 void SellState::btnOkClick(Action *)
 {
-	_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() + _total);
+	getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() + _total);
 
 	auto cleanUpContainer = [&](ItemContainer* container, const RuleItem* rule, int toRemove) -> int
 	{
@@ -749,7 +749,7 @@ void SellState::btnOkClick(Action *)
 					_debriefingState->decreaseRecoveredItemCount(item, transferRow.amount);
 
 					// set autosell status if we sold all of the item
-					_game->getSavedGame()->setAutosell(item, (transferRow.qtySrc == transferRow.amount));
+					getGame()->getSavedGame()->setAutosell(item, (transferRow.qtySrc == transferRow.amount));
 				}
 
 				break;
@@ -760,7 +760,7 @@ void SellState::btnOkClick(Action *)
 			if (_debriefingState != 0 && transferRow.type == TRANSFER_ITEM)
 			{
 				// disable autosell since we haven't sold any of the item.
-				_game->getSavedGame()->setAutosell((RuleItem*)transferRow.rule, false);
+				getGame()->getSavedGame()->setAutosell((RuleItem*)transferRow.rule, false);
 			}
 		}
 	}
@@ -768,7 +768,7 @@ void SellState::btnOkClick(Action *)
 	{
 		_debriefingState->hideSellTransferButtons();
 	}
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -777,7 +777,7 @@ void SellState::btnOkClick(Action *)
  */
 void SellState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -788,7 +788,7 @@ void SellState::btnCancelClick(Action *)
 void SellState::btnTransferClick(Action *)
 {
 	_reset = true;
-	_game->pushState(new TransferBaseState(_base, nullptr));
+	getGame()->pushState(new TransferBaseState(_base, nullptr));
 }
 
 /**
@@ -943,7 +943,7 @@ void SellState::lstItemsMousePress(Action *action)
 			RuleItem *rule = (RuleItem*)getRow().rule;
 			if (rule != 0)
 			{
-				_game->pushState(new ManufactureDependenciesTreeState(rule->getType()));
+				getGame()->pushState(new ManufactureDependenciesTreeState(rule->getType()));
 			}
 		}
 	}
@@ -955,18 +955,18 @@ void SellState::lstItemsMousePress(Action *action)
 			if (rule != 0)
 			{
 				std::string articleId = rule->getUfopediaType();
-				const RuleResearch *selectedTopic = _game->getMod()->getResearch(articleId, false);
-				bool ctrlPressed = _game->isCtrlPressed();
+				const RuleResearch *selectedTopic = getGame()->getMod()->getResearch(articleId, false);
+				bool ctrlPressed = getGame()->isCtrlPressed();
 				if (selectedTopic && ctrlPressed)
 				{
-					Ufopaedia::openArticle(_game, articleId);
+					Ufopaedia::openArticle(getGame(), articleId);
 				}
 				else
 				{
-					const RuleResearch* selectedTopic = _game->getMod()->getResearch(articleId, false);
+					const RuleResearch* selectedTopic = getGame()->getMod()->getResearch(articleId, false);
 					if (selectedTopic)
 					{
-						_game->pushState(new TechTreeViewerState(selectedTopic, 0));
+						getGame()->pushState(new TechTreeViewerState(selectedTopic, 0));
 					}
 				}
 			}
@@ -977,13 +977,13 @@ void SellState::lstItemsMousePress(Action *action)
 			if (rule != 0)
 			{
 				std::string articleId = rule->getRules()->getType();
-				if (_game->isCtrlPressed())
+				if (getGame()->isCtrlPressed())
 				{
-					Ufopaedia::openArticle(_game, articleId);
+					Ufopaedia::openArticle(getGame(), articleId);
 				}
 				else
 				{
-					_game->pushState(new TechTreeViewerState(0, 0, 0, rule->getRules()));
+					getGame()->pushState(new TechTreeViewerState(0, 0, 0, rule->getRules()));
 				}
 			}
 		}
@@ -1113,13 +1113,13 @@ void SellState::cbxCategoryChange(Action *)
 {
 	_previousSort = _currentSort;
 
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
-		_currentSort = _game->isShiftPressed() ? TransferSortDirection::BY_UNIT_SIZE : TransferSortDirection::BY_TOTAL_SIZE;
+		_currentSort = getGame()->isShiftPressed() ? TransferSortDirection::BY_UNIT_SIZE : TransferSortDirection::BY_TOTAL_SIZE;
 	}
-	else if (_game->isAltPressed())
+	else if (getGame()->isAltPressed())
 	{
-		_currentSort = _game->isShiftPressed() ? TransferSortDirection::BY_UNIT_COST : TransferSortDirection::BY_TOTAL_COST;
+		_currentSort = getGame()->isShiftPressed() ? TransferSortDirection::BY_UNIT_COST : TransferSortDirection::BY_TOTAL_COST;
 	}
 	else
 	{

@@ -1203,7 +1203,7 @@ bool SavedBattleGame::canUseWeapon(const BattleItem* weapon, const BattleUnit* u
 	{
 		return false;
 	}
-	if (unit->getOriginalFaction() == FACTION_PLAYER && !_battleState->getGame()->getSavedGame()->isResearched(rule->getRequirements()))
+	if (unit->getOriginalFaction() == FACTION_PLAYER && !getGame()->getSavedGame()->isResearched(rule->getRequirements()))
 	{
 		return false;
 	}
@@ -1213,7 +1213,7 @@ bool SavedBattleGame::canUseWeapon(const BattleItem* weapon, const BattleUnit* u
 	}
 	if (rule->isManaRequired() && unit->getOriginalFaction() == FACTION_PLAYER)
 	{
-		if (!_rule->isManaFeatureEnabled() || !_battleState->getGame()->getSavedGame()->isManaUnlocked(_rule))
+		if (!_rule->isManaFeatureEnabled() || !getGame()->getSavedGame()->isManaUnlocked(_rule))
 		{
 			return false;
 		}
@@ -1823,7 +1823,7 @@ bool SavedBattleGame::isCtrlPressed(bool considerTouchButtons) const
 {
 	if (_battleState)
 	{
-		return _battleState->getGame()->isCtrlPressed(considerTouchButtons);
+		return getGame()->isCtrlPressed(considerTouchButtons);
 	}
 	return false;
 }
@@ -1835,7 +1835,7 @@ bool SavedBattleGame::isAltPressed(bool considerTouchButtons) const
 {
 	if (_battleState)
 	{
-		return _battleState->getGame()->isAltPressed(considerTouchButtons);
+		return getGame()->isAltPressed(considerTouchButtons);
 	}
 	return false;
 }
@@ -1847,7 +1847,7 @@ bool SavedBattleGame::isShiftPressed(bool considerTouchButtons) const
 {
 	if (_battleState)
 	{
-		return _battleState->getGame()->isShiftPressed(considerTouchButtons);
+		return getGame()->isShiftPressed(considerTouchButtons);
 	}
 	return false;
 }
@@ -2393,7 +2393,7 @@ Node *SavedBattleGame::getPatrolNode(bool scout, BattleUnit *unit, Node *fromNod
 	}
 
 	// scouts roam all over while all others shuffle around to adjacent nodes at most:
-	const int end = scout ? (int)getNodes().size() : fromNode->getNodeLinks().size();
+	const int end = scout ? (int)getNodes().size() : (int)fromNode->getNodeLinks().size();
 
 	for (int i = 0; i < end; ++i)
 	{
@@ -2599,7 +2599,7 @@ void SavedBattleGame::prepareNewTurn()
 		}
 	}
 
-	Mod *mod = getBattleState()->getGame()->getMod();
+	Mod *mod = getGame()->getMod();
 	for (BattleUnit* bu : getUnits())
 	{
 		bu->calculateEnviDamage(mod, this);
@@ -3098,7 +3098,7 @@ void SavedBattleGame::calculateModuleMap()
  */
 SavedGame *SavedBattleGame::getGeoscapeSave() const
 {
-	return _battleState->getGame()->getSavedGame();
+	return getGame()->getSavedGame();
 }
 
 /**
@@ -3518,7 +3518,7 @@ void flashMessageVariadicScriptImpl(SavedBattleGame* sbg, ScriptText message, Ar
 	{
 		return;
 	}
-	const Language *lang = sbg->getBattleState()->getGame()->getLanguage();
+	const Language *lang = getGame()->getLanguage();
 	LocalizedText translated = lang->getString(message);
 	(translated.arg(args), ...);
 	sbg->getBattleState()->warningRaw(translated);
@@ -3531,7 +3531,7 @@ void flashLongMessageVariadicScriptImpl(SavedBattleGame* sbg, ScriptText message
 	{
 		return;
 	}
-	const Language *lang = sbg->getBattleState()->getGame()->getLanguage();
+	const Language *lang = getGame()->getLanguage();
 	LocalizedText translated = lang->getString(message);
 	(translated.arg(args), ...);
 	sbg->getBattleState()->warningLongRaw(translated);

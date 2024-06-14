@@ -221,7 +221,7 @@ void AIModule::think(BattleAction *action)
 	action->type = BA_RETHINK;
 	action->actor = _unit;
 	action->weapon = _unit->getMainHandWeapon(false);
-	_attackAction.diff = _save->getBattleState()->getGame()->getSavedGame()->getDifficultyCoefficient();
+	_attackAction.diff = getGame()->getSavedGame()->getDifficultyCoefficient();
 	_attackAction.actor = _unit;
 	_attackAction.run = false;
 	_attackAction.weapon = action->weapon;
@@ -281,7 +281,7 @@ void AIModule::think(BattleAction *action)
 		return;
 	}
 
-	Mod *mod = _save->getBattleState()->getGame()->getMod();
+	Mod *mod = getGame()->getMod();
 	if (action->weapon)
 	{
 		const RuleItem *rule = action->weapon->getRules();
@@ -1955,7 +1955,7 @@ int AIModule::explosiveEfficacy(Position targetPos, BattleUnit *attackingUnit, i
 
 	if (diff == -1)
 	{
-		diff = _save->getBattleState()->getGame()->getSavedGame()->getDifficultyCoefficient();
+		diff = getGame()->getSavedGame()->getDifficultyCoefficient();
 	}
 	int distance = Position::distance2d(attackingUnit->getPosition(), targetPos);
 	int injurylevel = attackingUnit->getBaseStats()->health - attackingUnit->getHealth();

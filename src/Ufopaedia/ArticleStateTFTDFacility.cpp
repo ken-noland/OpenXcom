@@ -35,9 +35,9 @@ namespace OpenXcom
 	{
 		_txtInfo->setHeight(112);
 
-		_btnInfo->setVisible(_game->getMod()->getShowPediaInfoButton());
+		_btnInfo->setVisible(getGame()->getMod()->getShowPediaInfoButton());
 
-		RuleBaseFacility *facility = _game->getMod()->getBaseFacility(defs->id, true);
+		RuleBaseFacility *facility = getGame()->getMod()->getBaseFacility(defs->id, true);
 
 		_lstInfo = new TextList(150, 50, 168, 150);
 		add(_lstInfo);

@@ -84,7 +84,7 @@ PromotionsState::PromotionsState()
 	_lstSoldiers->setBackground(_window);
 	_lstSoldiers->setMargin(8);
 
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (Base* xbase : getGame()->getSavedGame()->getBases())
 	{
 		for (Soldier* soldier : xbase->getSoldiers())
 		{
@@ -119,7 +119,7 @@ PromotionsState::~PromotionsState()
  */
 void PromotionsState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

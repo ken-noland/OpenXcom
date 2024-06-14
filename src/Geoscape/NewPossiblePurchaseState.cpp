@@ -81,7 +81,7 @@ NewPossiblePurchaseState::NewPossiblePurchaseState(Base * base, const std::vecto
 		}
 		std::ostringstream ss;
 		int i = 0;
-		for (const auto& serviceName : _game->getMod()->getBaseFunctionNames(requiredServices))
+		for (const auto& serviceName : getGame()->getMod()->getBaseFunctionNames(requiredServices))
 		{
 			if (i > 0)
 				ss << ", ";
@@ -111,7 +111,7 @@ NewPossiblePurchaseState::NewPossiblePurchaseState(Base * base, const std::vecto
  */
 void NewPossiblePurchaseState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -120,8 +120,8 @@ void NewPossiblePurchaseState::btnOkClick(Action *)
  */
 void NewPossiblePurchaseState::btnPurchaseClick(Action *)
 {
-	_game->popState();
-	_game->pushState(new PurchaseState(_base));
+	getGame()->popState();
+	getGame()->pushState(new PurchaseState(_base));
 }
 
 }

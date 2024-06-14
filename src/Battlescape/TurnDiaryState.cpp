@@ -46,7 +46,7 @@ TurnDiaryState::TurnDiaryState(const HitLog *hitLog)
 	_lstTurnDiary = new TextList(180, 96, 65, 52);
 
 	// Set palette
-	_game->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
+	getGame()->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
 
 	add(_window, "messageWindowBorder", "battlescape");
 	add(_txtTitle, "messageWindows", "battlescape");
@@ -57,7 +57,7 @@ TurnDiaryState::TurnDiaryState(const HitLog *hitLog)
 
 	// Set up objects
 	_window->setHighContrast(true);
-	_window->setBackground(_game->getMod()->getSurface("TAC00.SCR"));
+	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setBig();
@@ -97,7 +97,7 @@ TurnDiaryState::TurnDiaryState(const HitLog *hitLog)
  */
 void TurnDiaryState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }
