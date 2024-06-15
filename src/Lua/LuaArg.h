@@ -54,7 +54,7 @@ template <typename T>
 inline T fromLua(lua_State* L, int index)
 {
 	// if you get this error, you need to specialize the fromLuaRet function for this type.
-	static_assert(sizeof(T) == 0, "No fromLuaRet function defined for this type");
+	static_assert(sizeof(T) == 0, "No fromLua function defined for this type");
 }
 
 template <> int fromLua(lua_State* luaState, int index);

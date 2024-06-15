@@ -259,7 +259,31 @@ inline int callGetter(lua_State* luaState, void* userdata)
 template <auto SetterFunction>
 inline int callSetter(lua_State* luaState, void* userdata)
 {
-	return 0;
+	using SetterType = decltype(SetterFunction);
+	using ArgsTuple = typename FunctionTraits<SetterType>::ArgsTuple;
+
+	// Call the setter function with the value from the Lua stack
+	if constexpr (std::is_member_function_pointer_v<SetterType>)
+	{
+		// Member function pointer
+		auto object = static_cast<std::remove_pointer_t<std::tuple_element_t<0, ArgsTuple> >*>(userdata);
+		using ArgType = std::remove_cvref_t<std::tuple_element_t<1, ArgsTuple> >;
+		ArgType value = fromLua<ArgType>(luaState, 1);
+		(object->*SetterFunction)(value);
+	}
+	else if constexpr (std::tuple_size_v<ArgsTuple> == 2 && std::is_pointer_v<std::tuple_element_t<0, ArgsTuple> >)
+	{
+		// Free function or lambda with two arguments
+		using ArgType = std::remove_cvref_t<std::tuple_element_t<1, ArgsTuple> >;
+		ArgType value = fromLua<ArgType>(luaState, 1);
+		SetterFunction(static_cast<std::remove_pointer_t<std::tuple_element_t<0, ArgsTuple> >*>(userdata), value);
+	}
+	else
+	{
+		static_assert(std::is_invocable_v<SetterType>, "Unsupported setter function type");
+	}
+
+	return 0; // Setters don't return any values
 }
 
 /// Registers a property within the metatable of tableIndex. 
