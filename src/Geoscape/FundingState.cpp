@@ -156,7 +156,7 @@ FundingState::~FundingState()
  */
 void FundingState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -258,7 +258,7 @@ void FundingState::updateList()
 		_lstCountries->addRow(3, country.name.c_str(), ss.str().c_str(), ss2.str().c_str());
 	}
 	_lstCountries->addRow(2, tr("STR_TOTAL_UC").c_str(), Unicode::formatFunding(_game->getSavedGame()->getCountryFunding()).c_str());
-	_lstCountries->setRowColor(_game->getSavedGame()->getRegistry().view<const Country>().size(), _txtCountry->getColor());
+	_lstCountries->setRowColor(getGame()->getSavedGame()->getRegistry().view<const Country>().size(), _txtCountry->getColor());
 }
 
 /**

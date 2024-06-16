@@ -295,7 +295,7 @@ Surface *ExtraSprites::getFrame(SurfaceSet *set, int index) const
 			err << "ExtraSprites '" << _type << "' frame '" << indexWithOffset << "' exceeds mod '"<< _current->getName() <<"' size limit " << _current->getSize();
 			throw Exception(err.str());
 		}
-		indexWithOffset += _current->getOffset();
+		indexWithOffset += (int)_current->getOffset();
 	}
 	else if (indexWithOffset < 0)
 	{

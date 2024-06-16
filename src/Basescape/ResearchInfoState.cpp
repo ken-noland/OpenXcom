@@ -165,7 +165,7 @@ void ResearchInfoState::buildUi()
 	if (_rule)
 	{
 		// mark new/hidden as normal
-		_game->getSavedGame()->setResearchRuleStatus(_rule->getName(), RuleResearch::RESEARCH_STATUS_NORMAL);
+		getGame()->getSavedGame()->setResearchRuleStatus(_rule->getName(), RuleResearch::RESEARCH_STATUS_NORMAL);
 	}
 }
 
@@ -184,7 +184,7 @@ ResearchInfoState::~ResearchInfoState()
  */
 void ResearchInfoState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -195,7 +195,7 @@ void ResearchInfoState::btnOkClick(Action *)
 void ResearchInfoState::btnCancelClick(Action *)
 {
 	_base->removeResearch(_project);
-	_game->popState();
+	getGame()->popState();
 }
 
 /**

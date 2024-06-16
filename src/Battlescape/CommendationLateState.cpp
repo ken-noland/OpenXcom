@@ -88,7 +88,7 @@ CommendationLateState::CommendationLateState(std::vector<Soldier*> soldiersMedal
 
     ***/
 
-	const auto& commendationsList = _game->getMod()->getCommendationsList();
+	const auto& commendationsList = getGame()->getMod()->getCommendationsList();
 	bool modularCommendation;
 	std::string noun;
 
@@ -192,7 +192,7 @@ CommendationLateState::~CommendationLateState()
 */
 void CommendationLateState::lstSoldiersMouseClick(Action *)
 {
-	Ufopaedia::openArticle(_game, _commendationsNames[_lstSoldiers->getSelectedRow()]);
+	Ufopaedia::openArticle(getGame(), _commendationsNames[_lstSoldiers->getSelectedRow()]);
 }
 
 /**
@@ -201,7 +201,7 @@ void CommendationLateState::lstSoldiersMouseClick(Action *)
  */
 void CommendationLateState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

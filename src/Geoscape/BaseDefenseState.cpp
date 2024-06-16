@@ -157,7 +157,7 @@ void BaseDefenseState::nextStep()
 					_lstDefenses->scrollDown(true);
 				}
 			}
-			_game->getMod()->getSound("GEO.CAT", Mod::UFO_EXPLODE)->play();
+			getGame()->getMod()->getSound("GEO.CAT", Mod::UFO_EXPLODE)->play();
 			if (++_explosionCount == 3)
 			{
 				_action = BDA_END;
@@ -219,7 +219,7 @@ void BaseDefenseState::nextStep()
 			else
 			{
 				_lstDefenses->setCellText(_row, 1, tr("STR_FIRING"));
-				_game->getMod()->getSound("GEO.CAT", (def)->getRules()->getFireSound())->play();
+				getGame()->getMod()->getSound("GEO.CAT", (def)->getRules()->getFireSound())->play();
 			}
 			_timer->setInterval(333);
 			_action = BDA_RESOLVE;
@@ -242,7 +242,7 @@ void BaseDefenseState::nextStep()
 			{
 				spendAmmo = true;
 				_lstDefenses->setCellText(_row, 2, tr("STR_HIT"));
-				_game->getMod()->getSound("GEO.CAT", (def)->getRules()->getHitSound())->play();
+				getGame()->getMod()->getSound("GEO.CAT", (def)->getRules()->getHitSound())->play();
 				int dmg = (def)->getRules()->getDefenseValue();
 				dmg = dmg / 2 + RNG::generate(0, dmg);
 				if (_ufo->getShield() > 0)
@@ -251,7 +251,7 @@ void BaseDefenseState::nextStep()
 					dmg = std::max(0, dmg - _ufo->getShield());
 					_ufo->setShield(_ufo->getShield() - shieldDamage);
 				}
-				_ufo->setDamage(_ufo->getDamage() + dmg, _game->getMod());
+				_ufo->setDamage(_ufo->getDamage() + dmg, getGame()->getMod());
 			}
 			if (spendAmmo && ammoNeeded > 0)
 			{
@@ -296,7 +296,7 @@ void BaseDefenseState::btnStartClick(Action *)
 void BaseDefenseState::btnOkClick(Action *)
 {
 	_timer->stop();
-	_game->popState();
+	getGame()->popState();
 	if (_ufo->getStatus() != Ufo::DESTROYED)
 	{
 		_state->handleBaseDefense(_base, _ufo);
@@ -312,7 +312,7 @@ void BaseDefenseState::btnOkClick(Action *)
 		}
 
 		// aliens are not stupid and should stop trying eventually
-		if (_ufo->getMission()->getRules().getObjective() == OBJECTIVE_RETALIATION && RNG::percent(_game->getMod()->getChanceToStopRetaliation()))
+		if (_ufo->getMission()->getRules().getObjective() == OBJECTIVE_RETALIATION && RNG::percent(getGame()->getMod()->getChanceToStopRetaliation()))
 		{
 			// unmark base...
 			_base->setRetaliationTarget(false);
@@ -321,8 +321,8 @@ void BaseDefenseState::btnOkClick(Action *)
 			if (!am)
 			{
 				// backwards-compatibility
-				RuleRegion* regionRule = _game->getSavedGame()->getRegions().front()->getRules(); // wrong, but that's how it is in OXC
-				for (const Region* region : _game->getSavedGame()->getRegions())
+				RuleRegion* regionRule = getGame()->getSavedGame()->getRegions().front()->getRules(); // wrong, but that's how it is in OXC
+				for (const Region* region : getGame()->getSavedGame()->getRegions())
 				{
 					if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
 					{
@@ -330,7 +330,7 @@ void BaseDefenseState::btnOkClick(Action *)
 						break;
 					}
 				}
-				am = _game->getSavedGame()->findAlienMission(regionRule->getType(), OBJECTIVE_RETALIATION);
+				am = getGame()->getSavedGame()->findAlienMission(regionRule->getType(), OBJECTIVE_RETALIATION);
 			}
 
 			if (am && am->getRules().isMultiUfoRetaliation())
@@ -341,7 +341,7 @@ void BaseDefenseState::btnOkClick(Action *)
 			else
 			{
 				// Delete the mission and any live UFOs
-				_game->getSavedGame()->deleteRetaliationMission(am, _base);
+				getGame()->getSavedGame()->deleteRetaliationMission(am, _base);
 			}
 		}
 	}

@@ -58,7 +58,7 @@ SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin) : _o
 	_lstTracks = new TextList(180, 96, x + 13, 52);
 
 	// Set palette
-	setInterface("selectMusicTrack", false, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("selectMusicTrack", false, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "window", "selectMusicTrack");
 	add(_txtTitle, "text", "selectMusicTrack");
@@ -86,9 +86,9 @@ SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin) : _o
 	_lstTracks->onMouseClick((ActionHandler)&SelectMusicTrackState::lstTrackClick);
 
 	const std::string search = _origin == SMT_BATTLESCAPE ? "GMTAC" : "GMGEO";
-	const std::string& currentName = _game->getMod()->getCurrentMusicTrack();
+	const std::string& currentName = getGame()->getMod()->getCurrentMusicTrack();
 	int currentTrackIndex = -1;
-	for (auto& pair : _game->getMod()->getMusicTrackList())
+	for (auto& pair : getGame()->getMod()->getMusicTrackList())
 	{
 		if (pair.first == currentName || pair.first.find(search) != std::string::npos)
 		{
@@ -109,7 +109,7 @@ SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin) : _o
 		applyBattlescapeTheme("selectMusicTrack");
 		if (currentTrackIndex > -1)
 		{
-			Element* element = _game->getMod()->getInterface("battlescape")->getElement("optionLists");
+			Element* element = getGame()->getMod()->getInterface("battlescape")->getElement("optionLists");
 			_lstTracks->setRowColor(currentTrackIndex, element->color2);
 		}
 	}
@@ -129,7 +129,7 @@ SelectMusicTrackState::~SelectMusicTrackState()
  */
 void SelectMusicTrackState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -140,9 +140,9 @@ void SelectMusicTrackState::lstTrackClick(Action *)
 {
 	Music *selected = _tracks[_lstTracks->getSelectedRow()];
 	selected->play();
-	_game->getMod()->setCurrentMusicTrack(_trackNames[_lstTracks->getSelectedRow()]);
+	getGame()->getMod()->setCurrentMusicTrack(_trackNames[_lstTracks->getSelectedRow()]);
 
-	_game->popState();
+	getGame()->popState();
 }
 
 }

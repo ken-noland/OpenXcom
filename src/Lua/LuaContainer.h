@@ -46,11 +46,6 @@ struct IteratorState<const std::map<K, V>&>
 	Iterator end;
 };
 
-template <typename Test>
-void Testy()
-{
-}
-
 template <typename Traits, auto GetContainerFunction>
 inline typename Traits::ReturnType getContainer(lua_State* luaState, int index = 1)
 {

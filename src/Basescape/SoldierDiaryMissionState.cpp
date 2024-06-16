@@ -118,10 +118,10 @@ void SoldierDiaryMissionState::init()
 	State::init();
 	if (_soldier->getDiary()->getMissionIdList().empty())
 	{
-		_game->popState();
+		getGame()->popState();
 		return;
 	}
-	std::vector<MissionStatistics*>& missionStatistics = _game->getSavedGame()->getMissionStatistics();
+	std::vector<MissionStatistics*>& missionStatistics = getGame()->getSavedGame()->getMissionStatistics();
 	unsigned int missionId = _soldier->getDiary()->getMissionIdList().at(_rowEntry);
 	if (missionId > missionStatistics.size())
 	{
@@ -147,7 +147,7 @@ void SoldierDiaryMissionState::init()
 	_txtLocation->setText(tr("STR_LOCATION").arg(tr(ms->getLocationString())));
 	_txtRace->setText(tr("STR_RACE_TYPE").arg(tr(ms->alienRace)));
 	_txtRace->setVisible(ms->alienRace != "STR_UNKNOWN");
-	_txtDaylight->setText(tr("STR_DAYLIGHT_TYPE").arg(tr(ms->getDaylightString(_game->getMod()))));
+	_txtDaylight->setText(tr("STR_DAYLIGHT_TYPE").arg(tr(ms->getDaylightString(getGame()->getMod()))));
 	_txtDaysWounded->setText(tr("STR_DAYS_WOUNDED").arg(daysWounded));
 	_txtDaysWounded->setVisible(daysWounded != 0);
 
@@ -172,7 +172,7 @@ void SoldierDiaryMissionState::init()
 		}
 
 		_lstKills->addRow(3, tr(battleUnitKills->getKillStatusString()).c_str(),
-							 battleUnitKills->getUnitName(_game->getLanguage()).c_str(),
+							 battleUnitKills->getUnitName(getGame()->getLanguage()).c_str(),
 							 tr(battleUnitKills->weapon).c_str());
 	}
 
@@ -189,7 +189,7 @@ void SoldierDiaryMissionState::init()
  */
 void SoldierDiaryMissionState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**

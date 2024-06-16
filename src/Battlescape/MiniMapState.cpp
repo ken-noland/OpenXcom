@@ -45,11 +45,11 @@ MiniMapState::MiniMapState (Camera * camera, SavedBattleGame * battleGame)
 	{
 		Options::baseXResolution = Screen::ORIGINAL_WIDTH;
 		Options::baseYResolution = Screen::ORIGINAL_HEIGHT;
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 	}
 
 	_bg = new Surface(320, 200);
-	_miniMapView = new MiniMapView(221, 148, 48, 16, _game, camera, battleGame);
+	_miniMapView = new MiniMapView(221, 148, 48, 16, getGame(), camera, battleGame);
 	_btnLvlUp = new BattlescapeButton(18, 20, 24, 62);
 	_btnLvlDwn = new BattlescapeButton(18, 20, 24, 88);
 	_btnOk = new BattlescapeButton(32, 32, 275, 145);
@@ -59,7 +59,7 @@ MiniMapState::MiniMapState (Camera * camera, SavedBattleGame * battleGame)
 	battleGame->setPaletteByDepth(this);
 
 	add(_bg);
-	_game->getMod()->getSurface("SCANBORD.PCK")->blitNShade(_bg, 0, 0);
+	getGame()->getMod()->getSurface("SCANBORD.PCK")->blitNShade(_bg, 0, 0);
 	add(_miniMapView);
 	add(_btnLvlUp, "buttonUp", "minimap", _bg);
 	add(_btnLvlDwn, "buttonDown", "minimap", _bg);
@@ -68,7 +68,7 @@ MiniMapState::MiniMapState (Camera * camera, SavedBattleGame * battleGame)
 
 	centerAllSurfaces();
 
-	if (_game->getScreen()->getDY() > 50)
+	if (getGame()->getScreen()->getDY() > 50)
 	{
 		_screen = false;
 		_bg->drawRect(46, 14, 223, 151, Palette::blockOffset(15)+15);
@@ -125,9 +125,9 @@ void MiniMapState::btnOkClick(Action *)
 	if (Options::maximizeInfoScreens)
 	{
 		Screen::updateScale(Options::battlescapeScale, Options::baseXBattlescape, Options::baseYBattlescape, true);
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 	}
-	_game->popState();
+	getGame()->popState();
 }
 
 /**

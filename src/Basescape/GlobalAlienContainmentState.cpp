@@ -132,9 +132,9 @@ void GlobalAlienContainmentState::fillPrisonerList()
 	// determine prison types used in the game
 	std::set<int> prisonTypes = { 0 };
 	bool noTypes = true;
-	for (const std::string& facType : _game->getMod()->getBaseFacilitiesList())
+	for (const std::string& facType : getGame()->getMod()->getBaseFacilitiesList())
 	{
-		RuleBaseFacility* facRule = _game->getMod()->getBaseFacility(facType);
+		RuleBaseFacility* facRule = getGame()->getMod()->getBaseFacility(facType);
 		if (facRule->getPrisonType() > 0)
 		{
 			prisonTypes.insert(facRule->getPrisonType());
@@ -142,7 +142,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
 		}
 	}
 
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (Base* xbase : getGame()->getSavedGame()->getBases())
 	{
 		bool displayed = false;
 		int totalBaseCapacity = 0;
@@ -175,14 +175,14 @@ void GlobalAlienContainmentState::fillPrisonerList()
 			for (const auto* proj : xbase->getResearch())
 			{
 				const RuleResearch* research = proj->getRules();
-				const RuleItem* item = _game->getMod()->getItem(research->getName()); // don't use getNeededItem()
+				const RuleItem* item = getGame()->getMod()->getItem(research->getName()); // don't use getNeededItem()
 				if (research->needItem() && research->destroyItem() && item && item->isAlien() && item->getPrisonType() == prisonType)
 				{
 					researchList.push_back(research->getName());
 				}
 			}
 
-			std::string baseNameAndPrisonType = xbase->getName(_game->getLanguage());
+			std::string baseNameAndPrisonType = xbase->getName(getGame()->getLanguage());
 			if (!noTypes)
 			{
 				baseNameAndPrisonType = baseNameAndPrisonType + " - " + std::string(trAlt("STR_PRISON_TYPE", prisonType));
@@ -192,9 +192,9 @@ void GlobalAlienContainmentState::fillPrisonerList()
 			_topics.push_back(std::make_tuple("", nullptr, 0));
 			displayed = true;
 
-			for (auto& itemType : _game->getMod()->getItemsList())
+			for (auto& itemType : getGame()->getMod()->getItemsList())
 			{
-				RuleItem* rule = _game->getMod()->getItem(itemType, true);
+				RuleItem* rule = getGame()->getMod()->getItem(itemType, true);
 				if (rule->isAlien() && rule->getPrisonType() == prisonType)
 				{
 					int qty = xbase->getStorageItems()->getItem(rule);
@@ -231,7 +231,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
 
 		if (!displayed && totalBaseCapacity > 0)
 		{
-			_lstPrisoners->addRow(3, xbase->getName(_game->getLanguage()).c_str(), "", "");
+			_lstPrisoners->addRow(3, xbase->getName(getGame()->getLanguage()).c_str(), "", "");
 			_lstPrisoners->setRowColor(_lstPrisoners->getLastRowIndex(), _lstPrisoners->getSecondaryColor());
 			_topics.push_back(std::make_tuple("", nullptr, 0));
 
@@ -250,7 +250,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
  */
 void GlobalAlienContainmentState::btnOkClick(Action*)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -266,16 +266,16 @@ void GlobalAlienContainmentState::onSelectBase(Action*)
 	if (base)
 	{
 		// close this window
-		_game->popState();
+		getGame()->popState();
 
 		// close Manage Alien Containment UI (goes back to BaseView)
 		if (_openedFromBasescape)
 		{
-			_game->popState();
+			getGame()->popState();
 		}
 
 		// open new window
-		_game->pushState(new ManageAlienContainmentState(base, prisonType, OPT_GEOSCAPE));
+		getGame()->pushState(new ManageAlienContainmentState(base, prisonType, OPT_GEOSCAPE));
 	}
 }
 
@@ -286,11 +286,11 @@ void GlobalAlienContainmentState::onSelectBase(Action*)
 void GlobalAlienContainmentState::onOpenTechTreeViewer(Action*)
 {
 	auto& tuple = _topics[_lstPrisoners->getSelectedRow()];
-	const RuleResearch* selectedTopic = _game->getMod()->getResearch(std::get<0>(tuple));
+	const RuleResearch* selectedTopic = getGame()->getMod()->getResearch(std::get<0>(tuple));
 
 	if (selectedTopic)
 	{
-		_game->pushState(new TechTreeViewerState(selectedTopic, 0));
+		getGame()->pushState(new TechTreeViewerState(selectedTopic, 0));
 	}
 }
 

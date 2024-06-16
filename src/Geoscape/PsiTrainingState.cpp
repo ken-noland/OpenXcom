@@ -62,7 +62,7 @@ PsiTrainingState::PsiTrainingState()
 	_txtTitle->setText(tr("STR_PSIONIC_TRAINING"));
 
 	int buttons = 0;
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (Base* xbase : getGame()->getSavedGame()->getBases())
 	{
 		if (xbase->getAvailablePsiLabs())
 		{
@@ -97,7 +97,7 @@ PsiTrainingState::~PsiTrainingState()
  */
 void PsiTrainingState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -110,7 +110,7 @@ void PsiTrainingState::btnBaseXClick(Action *action)
 	{
 		if (action->getSender() == _btnBases[i])
 		{
-			_game->pushState(new AllocatePsiTrainingState(_bases.at(i)));
+			getGame()->pushState(new AllocatePsiTrainingState(_bases.at(i)));
 			break;
 		}
 	}

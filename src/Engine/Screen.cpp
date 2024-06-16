@@ -672,41 +672,41 @@ void Screen::updateScale(int type, int &width, int &height, bool change)
 	switch (type)
 	{
 	case SCALE_15X:
-		width = Screen::ORIGINAL_WIDTH * 1.5;
-		height = Screen::ORIGINAL_HEIGHT * 1.5;
+		width = (int)(Screen::ORIGINAL_WIDTH * 1.5);
+		height = (int)(Screen::ORIGINAL_HEIGHT * 1.5);
 		break;
 	case SCALE_2X:
-		width = Screen::ORIGINAL_WIDTH * 2;
-		height = Screen::ORIGINAL_HEIGHT * 2;
+		width = (int)(Screen::ORIGINAL_WIDTH * 2);
+		height = (int)(Screen::ORIGINAL_HEIGHT * 2);
 		break;
 	case SCALE_SCREEN_DIV_6:
-		width = Options::displayWidth / 6.0;
-		height = Options::displayHeight / pixelRatioY / 6.0;
+		width = (int)(Options::displayWidth / 6.0);
+		height = (int)(Options::displayHeight / pixelRatioY / 6.0);
 		break;
 	case SCALE_SCREEN_DIV_5:
-		width = Options::displayWidth / 5.0;
-		height = Options::displayHeight / pixelRatioY / 5.0;
+		width = (int)(Options::displayWidth / 5.0);
+		height = (int)(Options::displayHeight / pixelRatioY / 5.0);
 		break;
 	case SCALE_SCREEN_DIV_4:
-		width = Options::displayWidth / 4.0;
-		height = Options::displayHeight / pixelRatioY / 4.0;
+		width = (int)(Options::displayWidth / 4.0);
+		height = (int)(Options::displayHeight / pixelRatioY / 4.0);
 		break;
 	case SCALE_SCREEN_DIV_3:
-		width = Options::displayWidth / 3.0;
-		height = Options::displayHeight / pixelRatioY / 3.0;
+		width = (int)(Options::displayWidth / 3.0);
+		height = (int)(Options::displayHeight / pixelRatioY / 3.0);
 		break;
 	case SCALE_SCREEN_DIV_2:
-		width = Options::displayWidth / 2.0;
-		height = Options::displayHeight / pixelRatioY  / 2.0;
+		width = (int)(Options::displayWidth / 2.0);
+		height = (int)(Options::displayHeight / pixelRatioY  / 2.0);
 		break;
 	case SCALE_SCREEN:
-		width = Options::displayWidth;
-		height = Options::displayHeight / pixelRatioY;
+		width = (int)(Options::displayWidth);
+		height = (int)(Options::displayHeight / pixelRatioY);
 		break;
 	case SCALE_ORIGINAL:
 	default:
-		width = Screen::ORIGINAL_WIDTH;
-		height = Screen::ORIGINAL_HEIGHT;
+		width = (int)(Screen::ORIGINAL_WIDTH);
+		height = (int)(Screen::ORIGINAL_HEIGHT);
 		break;
 	}
 

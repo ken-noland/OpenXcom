@@ -36,12 +36,12 @@ namespace OpenXcom
 
 	ArticleStateTFTDItem::ArticleStateTFTDItem(ArticleDefinitionTFTD *defs, std::shared_ptr<ArticleCommonState> state) : ArticleStateTFTD(defs, std::move(state))
 	{
-		_btnInfo->setVisible(_game->getMod()->getShowPediaInfoButton());
+		_btnInfo->setVisible(getGame()->getMod()->getShowPediaInfoButton());
 
-		RuleItem *item = _game->getMod()->getItem(defs->weapon, false);
+		RuleItem *item = getGame()->getMod()->getItem(defs->weapon, false);
 		if (!item)
 		{
-			item = _game->getMod()->getItem(defs->id, true);
+			item = getGame()->getMod()->getItem(defs->id, true);
 		}
 
 		auto ammoSlot = defs->getAmmoSlotForPage(_state->current_page);
@@ -152,8 +152,8 @@ namespace OpenXcom
 					int currShow = 0;
 					for (auto* type : *ammo_data)
 					{
-						ArticleDefinition *ammo_article = _game->getMod()->getUfopaediaArticle(type->getType(), true);
-						if (Ufopaedia::isArticleAvailable(_game->getSavedGame(), ammo_article))
+						ArticleDefinition *ammo_article = getGame()->getMod()->getUfopaediaArticle(type->getType(), true);
+						if (Ufopaedia::isArticleAvailable(getGame()->getSavedGame(), ammo_article))
 						{
 							if (skipShow > 0)
 							{

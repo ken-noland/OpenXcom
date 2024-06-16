@@ -83,7 +83,7 @@ SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : _base(base), 
 	_lstRanks->setBackground(_window);
 	_lstRanks->setMargin(8);
 
-	PromotionOpenings openings = PromotionOpenings(_game->getSavedGame()->getAllActiveSoldiers(), _game->getMod());
+	PromotionOpenings openings = PromotionOpenings(getGame()->getSavedGame()->getAllActiveSoldiers(), getGame()->getMod());
 
 	// a copy is unavoidable here because me may want to modify this set.
 	std::vector<std::string> rankStringsCopy = soldier->getRules()->getRankStrings();
@@ -135,7 +135,7 @@ SoldierRankState::~SoldierRankState()
  */
 void SoldierRankState::btnCancelClick(Action*)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -150,7 +150,7 @@ void SoldierRankState::lstRankClick(Action*)
 		Soldier* soldier = _base->getSoldiers().at(_soldierId);
 		soldier->setRank(selectedRank.rank);
 
-		_game->popState();
+		getGame()->popState();
 	}
 }
 
@@ -161,7 +161,7 @@ void SoldierRankState::lstRankClick(Action*)
 void SoldierRankState::lstRankClickMiddle(Action* action)
 {
 	std::string articleId = _ranks[_lstRanks->getSelectedRow()].name;
-	Ufopaedia::openArticle(_game, articleId);
+	Ufopaedia::openArticle(getGame(), articleId);
 }
 
 }

@@ -45,7 +45,7 @@ MissionDetectedState::MissionDetectedState(MissionSite *mission, GeoscapeState *
 	int soundId = mission->getDeployment()->getAlertSound();
 	if (soundId != Mod::NO_SOUND)
 	{
-		_customSound = _game->getMod()->getSound("GEO.CAT", soundId);
+		_customSound = getGame()->getMod()->getSound("GEO.CAT", soundId);
 	}
 
 	// Create objects
@@ -69,7 +69,7 @@ MissionDetectedState::MissionDetectedState(MissionSite *mission, GeoscapeState *
 	centerAllSurfaces();
 
 	// Set up objects
-	_window->setBackground(_game->getMod()->getSurface(mission->getDeployment()->getAlertBackground()));
+	_window->setBackground(getGame()->getMod()->getSurface(mission->getDeployment()->getAlertBackground()));
 
 	_btnIntercept->setText(tr("STR_INTERCEPT"));
 	_btnIntercept->onMouseClick((ActionHandler)&MissionDetectedState::btnInterceptClick);
@@ -107,7 +107,7 @@ void MissionDetectedState::btnInterceptClick(Action *)
 {
 	_state->timerReset();
 	_state->getGlobe()->center(_mission->getLongitude(), _mission->getLatitude());
-	_game->pushState(new InterceptState(_state->getGlobe(), false, 0, _mission));
+	getGame()->pushState(new InterceptState(_state->getGlobe(), false, 0, _mission));
 }
 
 /**
@@ -118,7 +118,7 @@ void MissionDetectedState::btnCenterClick(Action *)
 {
 	_state->timerReset();
 	_state->getGlobe()->center(_mission->getLongitude(), _mission->getLatitude());
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -127,7 +127,7 @@ void MissionDetectedState::btnCenterClick(Action *)
  */
 void MissionDetectedState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

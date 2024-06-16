@@ -107,7 +107,7 @@ ListGamesState::ListGamesState(OptionsOrigin origin, int firstValidRow, bool aut
 	_btnDelete = new ToggleTextButton(288, 16, 16, 23);
 
 	// Set palette
-	setInterface("geoscape", true, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("geoscape", true, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "window", "saveMenus");
 	add(_btnCancel, "button", "saveMenus");
@@ -189,7 +189,7 @@ void ListGamesState::init()
 
 	try
 	{
-		_saves = SavedGame::getList(_game->getLanguage(), _autoquick);
+		_saves = SavedGame::getList(getGame()->getLanguage(), _autoquick);
 		_lstSaves->clearList();
 		sortList(Options::saveOrder);
 	}
@@ -273,7 +273,7 @@ void ListGamesState::updateList()
  */
 void ListGamesState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -308,7 +308,7 @@ void ListGamesState::lstSavesPress(Action *action)
 {
 	if ((action->getDetails()->button.button == SDL_BUTTON_RIGHT || _btnDelete->getPressed()) && _lstSaves->getSelectedRow() >= _firstValidRow)
 	{
-		_game->pushState(new DeleteGameState(_origin, _saves[_lstSaves->getSelectedRow() - _firstValidRow].fileName));
+		getGame()->pushState(new DeleteGameState(_origin, _saves[_lstSaves->getSelectedRow() - _firstValidRow].fileName));
 	}
 }
 

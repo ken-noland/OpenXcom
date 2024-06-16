@@ -1068,13 +1068,13 @@ public:
 	/// Gets a video for intro/outro etc.
 	RuleVideo *getVideo(const std::string &id, bool error = false) const;
 	const std::map<std::string, RuleMusic *> *getMusic() const;
-	const std::vector<std::string>* getArcScriptList() const;
+	const std::vector<std::string>& getArcScriptList() const;
 	RuleArcScript* getArcScript(const std::string& name, bool error = false) const;
-	const std::vector<std::string>* getEventScriptList() const;
+	const std::vector<std::string>& getEventScriptList() const;
 	RuleEventScript* getEventScript(const std::string& name, bool error = false) const;
-	const std::vector<std::string>* getEventList() const;
+	const std::vector<std::string>& getEventList() const;
 	RuleEvent* getEvent(const std::string& name, bool error = false) const;
-	const std::vector<std::string> *getMissionScriptList() const;
+	const std::vector<std::string>& getMissionScriptList() const;
 	RuleMissionScript *getMissionScript(const std::string &name, bool error = false) const;
 	/// Get global script data.
 	ScriptGlobal *getScriptGlobal() const;

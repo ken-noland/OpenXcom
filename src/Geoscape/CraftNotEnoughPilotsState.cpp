@@ -91,7 +91,7 @@ CraftNotEnoughPilotsState::~CraftNotEnoughPilotsState()
  */
 void CraftNotEnoughPilotsState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -107,8 +107,8 @@ void CraftNotEnoughPilotsState::btnAssignPilotsClick(Action *)
 		{
 			if (b->getCrafts().at(i) == _craft)
 			{
-				_game->popState();
-				_game->pushState(new CraftInfoState(_craft->getBase(), i));
+				getGame()->popState();
+				getGame()->pushState(new CraftInfoState(_craft->getBase(), i));
 				break;
 			}
 		}

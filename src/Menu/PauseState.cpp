@@ -65,7 +65,7 @@ PauseState::PauseState(OptionsOrigin origin) : _origin(origin)
 	_txtTitle = new Text(206, 17, x+5, 32);
 
 	// Set palette
-	setInterface("pauseMenu", false, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("pauseMenu", false, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "window", "pauseMenu");
 	add(_btnLoad, "button", "pauseMenu");
@@ -102,7 +102,7 @@ PauseState::PauseState(OptionsOrigin origin) : _origin(origin)
 	else if (origin == OPT_BATTLESCAPE)
 	{
 		_btnCancel->onKeyboardPress((ActionHandler)&PauseState::btnCancelClick, Options::keyBattleOptions);
-		if (!_game->getSavedGame()->getSavedBattle()->getBattleGame()->getStates().empty())
+		if (!getGame()->getSavedGame()->getSavedBattle()->getBattleGame()->getStates().empty())
 		{
 			_btnOptions->setVisible(false);
 		}
@@ -117,7 +117,7 @@ PauseState::PauseState(OptionsOrigin origin) : _origin(origin)
 		applyBattlescapeTheme("pauseMenu");
 	}
 
-	if (_game->getSavedGame()->isIronman())
+	if (getGame()->getSavedGame()->isIronman())
 	{
 		_btnLoad->setVisible(false);
 		_btnSave->setVisible(false);
@@ -139,7 +139,7 @@ PauseState::~PauseState()
  */
 void PauseState::btnLoadClick(Action *)
 {
-	_game->pushState(new ListLoadState(_origin));
+	getGame()->pushState(new ListLoadState(_origin));
 }
 
 /**
@@ -148,7 +148,7 @@ void PauseState::btnLoadClick(Action *)
  */
 void PauseState::btnSaveClick(Action *)
 {
-	_game->pushState(new ListSaveState(_origin));
+	getGame()->pushState(new ListSaveState(_origin));
 }
 
 /**
@@ -160,15 +160,15 @@ void PauseState::btnOptionsClick(Action *)
 	Options::backupDisplay();
 	if (_origin == OPT_GEOSCAPE)
 	{
-		_game->pushState(new OptionsGeoscapeState(_origin));
+		getGame()->pushState(new OptionsGeoscapeState(_origin));
 	}
 	else if (_origin == OPT_BATTLESCAPE)
 	{
-		_game->pushState(new OptionsBattlescapeState(_origin));
+		getGame()->pushState(new OptionsBattlescapeState(_origin));
 	}
 	else
 	{
-		_game->pushState(new OptionsVideoState(_origin));
+		getGame()->pushState(new OptionsVideoState(_origin));
 	}
 }
 
@@ -178,7 +178,7 @@ void PauseState::btnOptionsClick(Action *)
  */
 void PauseState::btnAbandonClick(Action *)
 {
-	_game->pushState(new AbandonGameState(_origin));
+	getGame()->pushState(new AbandonGameState(_origin));
 }
 
 /**
@@ -187,7 +187,7 @@ void PauseState::btnAbandonClick(Action *)
  */
 void PauseState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

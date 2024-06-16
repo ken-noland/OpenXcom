@@ -137,7 +137,7 @@ ConfirmDestinationState::ConfirmDestinationState(std::vector<Craft*> crafts, Tar
 	}
 	else
 	{
-		_txtTarget->setText(tr("STR_TARGET").arg(_target->getName(_game->getLanguage())));
+		_txtTarget->setText(tr("STR_TARGET").arg(_target->getName(getGame()->getLanguage())));
 	}
 
 	// ETA display
@@ -188,17 +188,17 @@ std::string ConfirmDestinationState::checkStartingCondition()
 	AlienDeployment *ruleDeploy = 0;
 	if (u != 0)
 	{
-		ruleDeploy = _game->getMod()->getDeployment(u->getRules()->getType()); // no need to check for fake underwater UFOs here
+		ruleDeploy = getGame()->getMod()->getDeployment(u->getRules()->getType()); // no need to check for fake underwater UFOs here
 	}
 	else if (m != 0)
 	{
-		ruleDeploy = _game->getMod()->getDeployment(m->getDeployment()->getType());
+		ruleDeploy = getGame()->getMod()->getDeployment(m->getDeployment()->getType());
 	}
 	else if (b != 0)
 	{
-		AlienRace *race = _game->getMod()->getAlienRace(b->getAlienRace());
-		ruleDeploy = _game->getMod()->getDeployment(race->getBaseCustomMission());
-		if (!ruleDeploy) ruleDeploy = _game->getMod()->getDeployment(b->getDeployment()->getType());
+		AlienRace *race = getGame()->getMod()->getAlienRace(b->getAlienRace());
+		ruleDeploy = getGame()->getMod()->getDeployment(race->getBaseCustomMission());
+		if (!ruleDeploy) ruleDeploy = getGame()->getMod()->getDeployment(b->getDeployment()->getType());
 	}
 	else
 	{
@@ -212,7 +212,7 @@ std::string ConfirmDestinationState::checkStartingCondition()
 		return "";
 	}
 
-	RuleStartingCondition *rule = _game->getMod()->getStartingCondition(ruleDeploy->getStartingCondition());
+	RuleStartingCondition *rule = getGame()->getMod()->getStartingCondition(ruleDeploy->getStartingCondition());
 	if (rule == 0)
 	{
 		// rule doesn't exist (mod upgrades?)
@@ -263,8 +263,8 @@ std::string ConfirmDestinationState::checkStartingCondition()
 		int i = 0;
 		for (auto& soldierType : list)
 		{
-			RuleSoldier* soldierTypeRule = _game->getMod()->getSoldier(soldierType, false);
-			if (soldierTypeRule && _game->getSavedGame()->isResearched(soldierTypeRule->getRequirements()))
+			RuleSoldier* soldierTypeRule = getGame()->getMod()->getSoldier(soldierType, false);
+			if (soldierTypeRule && getGame()->getSavedGame()->isResearched(soldierTypeRule->getRequirements()))
 			{
 				if (i > 0)
 					ss << ", ";
@@ -300,8 +300,8 @@ std::string ConfirmDestinationState::checkStartingCondition()
 	int i = 0;
 	for (auto& articleName : list)
 	{
-		ArticleDefinition *article = _game->getMod()->getUfopaediaArticle(articleName, false);
-		if (article && Ufopaedia::isArticleAvailable(_game->getSavedGame(), article))
+		ArticleDefinition *article = getGame()->getMod()->getUfopaediaArticle(articleName, false);
+		if (article && Ufopaedia::isArticleAvailable(getGame()->getSavedGame(), article))
 		{
 			if (i > 0)
 				ss << ", ";
@@ -327,9 +327,9 @@ void ConfirmDestinationState::btnOkClick(Action *)
 	std::string message = checkStartingCondition();
 	if (!message.empty())
 	{
-		_game->popState();
-		_game->popState();
-		_game->pushState(new CraftErrorState(0, message));
+		getGame()->popState();
+		getGame()->popState();
+		getGame()->pushState(new CraftErrorState(0, message));
 		return;
 	}
 
@@ -337,9 +337,9 @@ void ConfirmDestinationState::btnOkClick(Action *)
 	{
 		if (!craft->arePilotsOnboard())
 		{
-			_game->popState();
-			_game->popState();
-			_game->pushState(new CraftNotEnoughPilotsState(craft));
+			getGame()->popState();
+			getGame()->popState();
+			getGame()->pushState(new CraftNotEnoughPilotsState(craft));
 			return;
 		}
 	}
@@ -347,8 +347,8 @@ void ConfirmDestinationState::btnOkClick(Action *)
 	Waypoint *w = dynamic_cast<Waypoint*>(_target);
 	if (w != 0 && w->getId() == 0)
 	{
-		w->setId(_game->getSavedGame()->getId("STR_WAY_POINT"));
-		_game->getSavedGame()->getWaypoints().push_back(w);
+		w->setId(getGame()->getSavedGame()->getId("STR_WAY_POINT"));
+		getGame()->getSavedGame()->getWaypoints().push_back(w);
 	}
 
 	// first selected _craft (first shift-clicked craft) is wing leader; the other crafts follow the wing leader
@@ -364,7 +364,7 @@ void ConfirmDestinationState::btnOkClick(Action *)
 		{
 			if (!_crafts.front()->getRules()->getTakeoffSoundRaw().empty())
 			{
-				_game->getMod()->getSound("GEO.CAT", _crafts.front()->getRules()->getTakeoffSound())->play();
+				getGame()->getMod()->getSound("GEO.CAT", _crafts.front()->getRules()->getTakeoffSound())->play();
 			}
 		}
 	}
@@ -392,8 +392,8 @@ void ConfirmDestinationState::btnOkClick(Action *)
 		craft->setStatus("STR_OUT");
 	}
 
-	_game->popState();
-	_game->popState();
+	getGame()->popState();
+	getGame()->popState();
 }
 
 /**
@@ -414,7 +414,7 @@ void ConfirmDestinationState::btnTransferClick(Action *)
 	{
 		errorMessage = tr("STR_NO_FREE_ACCOMODATION_CREW");
 	}
-	else if (Options::storageLimitsEnforced && targetBase->storesOverfull(_crafts.front()->getTotalItemStorageSize(_game->getMod())))
+	else if (Options::storageLimitsEnforced && targetBase->storesOverfull(_crafts.front()->getTotalItemStorageSize(getGame()->getMod())))
 	{
 		errorMessage = tr("STR_NOT_ENOUGH_STORE_SPACE_FOR_CRAFT");
 	}
@@ -425,7 +425,7 @@ void ConfirmDestinationState::btnTransferClick(Action *)
 
 	// clicking transfer will start the craft moving or make us need to pick a new destination
 	// either way, we need to get rid of this confirming the destination state
-	_game->popState();
+	getGame()->popState();
 	if (errorMessage.empty())
 	{
 		// Transfer soldiers inside craft
@@ -458,12 +458,12 @@ void ConfirmDestinationState::btnTransferClick(Action *)
 		}
 
 		// pop the selecting the destination state
-		_game->popState();
+		getGame()->popState();
 	}
 	else
 	{
-		RuleInterface *menuInterface = _game->getMod()->getInterface("errorMessages");
-		_game->pushState(new ErrorMessageState(errorMessage, _palette, menuInterface->getElement("geoscapeColor")->color, "BACK13.SCR", menuInterface->getElement("geoscapePalette")->color));
+		RuleInterface *menuInterface = getGame()->getMod()->getInterface("errorMessages");
+		getGame()->pushState(new ErrorMessageState(errorMessage, _palette, menuInterface->getElement("geoscapeColor")->color, "BACK13.SCR", menuInterface->getElement("geoscapePalette")->color));
 	}
 }
 
@@ -478,7 +478,7 @@ void ConfirmDestinationState::btnCancelClick(Action *)
 	{
 		delete w;
 	}
-	_game->popState();
+	getGame()->popState();
 }
 
 }

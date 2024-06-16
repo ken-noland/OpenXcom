@@ -130,7 +130,7 @@ CraftPilotSelectState::~CraftPilotSelectState()
  */
 void CraftPilotSelectState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -143,7 +143,7 @@ void CraftPilotSelectState::lstPilotClick(Action *)
 	Craft *c = _base->getCrafts().at(_craft);
 	c->addPilot(pilotId);
 
-	_game->popState();
+	getGame()->popState();
 }
 
 }

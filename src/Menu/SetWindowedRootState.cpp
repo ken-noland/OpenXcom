@@ -50,7 +50,7 @@ SetWindowedRootState::SetWindowedRootState(OptionsOrigin origin, OptionsVideoSta
 	_edtWindowedModePositionY = new TextEdit(this, 40, 10, 190, 100);
 
 	// Set palette
-	setInterface("optionsMenu", false, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("optionsMenu", false, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "confirmVideo", "optionsMenu");
 	add(_btnOk, "confirmVideo", "optionsMenu");
@@ -129,7 +129,7 @@ void SetWindowedRootState::btnOkClick(Action *)
 	Options::newWindowedModePositionX = newWindowedModePositionX;
 	Options::newWindowedModePositionY = newWindowedModePositionY;
 
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -140,7 +140,7 @@ void SetWindowedRootState::btnCancelClick(Action *)
 {
 	_optionsVideoState->unpressRootWindowedMode();
 
-	_game->popState();
+	getGame()->popState();
 }
 
 }

@@ -214,16 +214,16 @@ void ManageAlienContainmentState::resetListAndTotals()
 	for (const auto* proj : _base->getResearch())
 	{
 		const RuleResearch *research = proj->getRules();
-		const RuleItem *item = _game->getMod()->getItem(research->getName()); // don't use getNeededItem()
+		const RuleItem *item = getGame()->getMod()->getItem(research->getName()); // don't use getNeededItem()
 		if (research->needItem() && research->destroyItem() && item && item->isAlien() && item->getPrisonType() == _prisonType)
 		{
 			researchList.push_back(research->getName());
 		}
 	}
 
-	for (auto& itemType : _game->getMod()->getItemsList())
+	for (auto& itemType : getGame()->getMod()->getItemsList())
 	{
-		RuleItem *rule = _game->getMod()->getItem(itemType, true);
+		RuleItem *rule = getGame()->getMod()->getItem(itemType, true);
 
 		int qty = _base->getStorageItems()->getItem(rule);
 		if (qty > 0 && rule->isAlien() && rule->getPrisonType() == _prisonType)
@@ -247,7 +247,7 @@ void ManageAlienContainmentState::resetListAndTotals()
 			std::string formattedCost = "";
 			if (Options::canSellLiveAliens)
 			{
-				int64_t adjustedCost = rule->getSellCostAdjusted(_base, _game->getSavedGame());
+				int64_t adjustedCost = rule->getSellCostAdjusted(_base, getGame()->getSavedGame());
 				formattedCost = Unicode::formatFunding(adjustedCost / 1000).append("K");
 			}
 
@@ -325,7 +325,7 @@ void ManageAlienContainmentState::btnOkClick(Action *)
  */
 void ManageAlienContainmentState::onGlobalAlienContainmentClick(Action *)
 {
-	_game->pushState(new GlobalAlienContainmentState(true));
+	getGame()->pushState(new GlobalAlienContainmentState(true));
 }
 
 /**
@@ -351,14 +351,14 @@ void ManageAlienContainmentState::dealWithSelectedAliens(bool sell)
 
 			if (sell)
 			{
-				int64_t adjustedCost = _game->getMod()->getItem(_aliens[i], true)->getSellCostAdjusted(_base, _game->getSavedGame());
+				int64_t adjustedCost = getGame()->getMod()->getItem(_aliens[i], true)->getSellCostAdjusted(_base, getGame()->getSavedGame());
 				adjustedCost = adjustedCost * _qtys[i];
-				_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() + adjustedCost);
+				getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() + adjustedCost);
 			}
 			else
 			{
 				// add the corpses
-				auto ruleUnit = _game->getMod()->getUnit(_aliens[i], false);
+				auto ruleUnit = getGame()->getMod()->getUnit(_aliens[i], false);
 				if (ruleUnit)
 				{
 					auto ruleCorpse = ruleUnit->getArmor()->getCorpseGeoscape();
@@ -370,7 +370,7 @@ void ManageAlienContainmentState::dealWithSelectedAliens(bool sell)
 			}
 		}
 	}
-	_game->popState();
+	getGame()->popState();
 
 	if (Options::storageLimitsEnforced && _base->storesOverfull())
 	{
@@ -380,8 +380,8 @@ void ManageAlienContainmentState::dealWithSelectedAliens(bool sell)
 		}
 		else
 		{
-			_game->pushState(new SellState(_base, 0, _origin));
-			_game->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(_base->getName()), _palette, _game->getMod()->getInterface("manageContainment")->getElement("errorMessage")->color, "BACK13.SCR", _game->getMod()->getInterface("manageContainment")->getElement("errorPalette")->color));
+			getGame()->pushState(new SellState(_base, 0, _origin));
+			getGame()->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(_base->getName()), _palette, getGame()->getMod()->getInterface("manageContainment")->getElement("errorMessage")->color, "BACK13.SCR", getGame()->getMod()->getInterface("manageContainment")->getElement("errorPalette")->color));
 		}
  	}
 }
@@ -392,7 +392,7 @@ void ManageAlienContainmentState::dealWithSelectedAliens(bool sell)
  */
 void ManageAlienContainmentState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -402,7 +402,7 @@ void ManageAlienContainmentState::btnCancelClick(Action *)
 */
 void ManageAlienContainmentState::btnTransferClick(Action *)
 {
-	_game->pushState(new TransferBaseState(_base, nullptr));
+	getGame()->pushState(new TransferBaseState(_base, nullptr));
 }
 
 /**
@@ -525,11 +525,11 @@ void ManageAlienContainmentState::lstItemsMousePress(Action *action)
 	}
 	else if (action->getDetails()->button.button == SDL_BUTTON_MIDDLE)
 	{
-		RuleResearch *selectedTopic = _game->getMod()->getResearch(_aliens[_sel]);
+		RuleResearch *selectedTopic = getGame()->getMod()->getResearch(_aliens[_sel]);
 		if (selectedTopic != 0)
 		{
 			_doNotReset = true;
-			_game->pushState(new TechTreeViewerState(selectedTopic, 0));
+			getGame()->pushState(new TechTreeViewerState(selectedTopic, 0));
 		}
 	}
 }
@@ -624,7 +624,7 @@ void ManageAlienContainmentState::updateStrings()
 		{
 			if (_qtys[i] > 0)
 			{
-				int64_t adjustedCost = _game->getMod()->getItem(_aliens[i])->getSellCostAdjusted(_base, _game->getSavedGame());
+				int64_t adjustedCost = getGame()->getMod()->getItem(_aliens[i])->getSellCostAdjusted(_base, getGame()->getSavedGame());
 				adjustedCost *= _qtys[i];
 				_total += adjustedCost;
 			}

@@ -94,7 +94,7 @@ ResearchCompleteState::ResearchCompleteState(const RuleResearch *newResearch, co
  */
 void ResearchCompleteState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -103,7 +103,7 @@ void ResearchCompleteState::btnOkClick(Action *)
  */
 void ResearchCompleteState::btnReportClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	std::string name;
 	std::string bonusName;
 	if (_bonus)
@@ -112,7 +112,7 @@ void ResearchCompleteState::btnReportClick(Action *)
 			bonusName = _bonus->getName();
 		else
 			bonusName = _bonus->getLookup();
-		Ufopaedia::openArticle(_game, bonusName);
+		Ufopaedia::openArticle(getGame(), bonusName);
 	}
 	if (_research)
 	{
@@ -120,7 +120,7 @@ void ResearchCompleteState::btnReportClick(Action *)
 			name = _research->getName();
 		else
 			name = _research->getLookup();
-		Ufopaedia::openArticle(_game, name);
+		Ufopaedia::openArticle(getGame(), name);
 	}
 }
 

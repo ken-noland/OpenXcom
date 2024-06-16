@@ -97,7 +97,7 @@ CraftErrorState::~CraftErrorState()
  */
 void CraftErrorState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -107,7 +107,7 @@ void CraftErrorState::btnOkClick(Action *)
 void CraftErrorState::btnOk5SecsClick(Action *)
 {
 	_state->timerReset();
-	_game->popState();
+	getGame()->popState();
 }
 
 }

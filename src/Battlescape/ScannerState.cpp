@@ -44,19 +44,19 @@ ScannerState::ScannerState (BattleAction *action) : _action(action)
 	{
 		Options::baseXResolution = Screen::ORIGINAL_WIDTH;
 		Options::baseYResolution = Screen::ORIGINAL_HEIGHT;
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 	}
 	_bg = new InteractiveSurface(320, 200);
 	_scan = new Surface(320, 200);
-	_scannerView = new ScannerView(152, 152, 56, 24, _game, _action->actor);
+	_scannerView = new ScannerView(152, 152, 56, 24, getGame(), _action->actor);
 
-	if (_game->getScreen()->getDY() > 50)
+	if (getGame()->getScreen()->getDY() > 50)
 	{
 		_screen = false;
 	}
 
 	// Set palette
-	_game->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
+	getGame()->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
 
 	add(_scan);
 	add(_scannerView);
@@ -64,8 +64,8 @@ ScannerState::ScannerState (BattleAction *action) : _action(action)
 
 	centerAllSurfaces();
 
-	_game->getMod()->getSurface("DETBORD.PCK")->blitNShade(_bg, 0, 0);
-	_game->getMod()->getSurface("DETBORD2.PCK")->blitNShade(_scan, 0, 0);
+	getGame()->getMod()->getSurface("DETBORD.PCK")->blitNShade(_bg, 0, 0);
+	getGame()->getMod()->getSurface("DETBORD2.PCK")->blitNShade(_scan, 0, 0);
 	_bg->onMouseClick((ActionHandler)&ScannerState::exitClick);
 	_bg->onKeyboardPress((ActionHandler)&ScannerState::exitClick, Options::keyCancel);
 
@@ -88,7 +88,7 @@ ScannerState::~ScannerState()
 void ScannerState::handle(Action *action)
 {
 	State::handle(action);
-	if (action->getDetails()->type == SDL_MOUSEBUTTONDOWN && _game->isRightClick(action))
+	if (action->getDetails()->type == SDL_MOUSEBUTTONDOWN && getGame()->isRightClick(action))
 	{
 		exitClick(action);
 	}
@@ -128,9 +128,9 @@ void ScannerState::exitClick(Action *)
 	if (Options::maximizeInfoScreens)
 	{
 		Screen::updateScale(Options::battlescapeScale, Options::baseXBattlescape, Options::baseYBattlescape, true);
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 	}
-	_game->popState();
+	getGame()->popState();
 }
 
 }

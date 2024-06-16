@@ -5099,9 +5099,9 @@ const std::map<std::string, RuleMusic *> *Mod::getMusic() const
 	return &_musicDefs;
 }
 
-const std::vector<std::string>* Mod::getArcScriptList() const
+const std::vector<std::string>& Mod::getArcScriptList() const
 {
-	return &_arcScriptIndex;
+	return _arcScriptIndex;
 }
 
 RuleArcScript* Mod::getArcScript(const std::string& name, bool error) const
@@ -5109,9 +5109,9 @@ RuleArcScript* Mod::getArcScript(const std::string& name, bool error) const
 	return getRule(name, "Arc Script", _arcScripts, error);
 }
 
-const std::vector<std::string>* Mod::getEventScriptList() const
+const std::vector<std::string>& Mod::getEventScriptList() const
 {
-	return &_eventScriptIndex;
+	return _eventScriptIndex;
 }
 
 RuleEventScript* Mod::getEventScript(const std::string& name, bool error) const
@@ -5119,9 +5119,9 @@ RuleEventScript* Mod::getEventScript(const std::string& name, bool error) const
 	return getRule(name, "Event Script", _eventScripts, error);
 }
 
-const std::vector<std::string>* Mod::getEventList() const
+const std::vector<std::string>& Mod::getEventList() const
 {
-	return &_eventIndex;
+	return _eventIndex;
 }
 
 RuleEvent* Mod::getEvent(const std::string& name, bool error) const
@@ -5129,9 +5129,9 @@ RuleEvent* Mod::getEvent(const std::string& name, bool error) const
 	return getRule(name, "Event", _events, error);
 }
 
-const std::vector<std::string> *Mod::getMissionScriptList() const
+const std::vector<std::string>& Mod::getMissionScriptList() const
 {
-	return &_missionScriptIndex;
+	return _missionScriptIndex;
 }
 
 RuleMissionScript *Mod::getMissionScript(const std::string &name, bool error) const

@@ -124,23 +124,23 @@ MedikitState::MedikitState (BattleUnit *targetUnit, BattleAction *action, TileEn
 	{
 		Options::baseXResolution = Screen::ORIGINAL_WIDTH;
 		Options::baseYResolution = Screen::ORIGINAL_HEIGHT;
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 	}
 
 	_item = action->weapon;
 	_bg = new Surface(320, 200);
 
 	// Set palette
-	_game->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
+	getGame()->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
 
-	if (_game->getScreen()->getDY() > 50)
+	if (getGame()->getScreen()->getDY() > 50)
 	{
 		_screen = false;
 		_bg->drawRect(67, 44, 190, 100, Palette::blockOffset(15)+15);
 	}
 	_partTxt = new Text(62, 9, 82, 120);
 	_woundTxt = new Text(14, 9, 145, 120);
-	_medikitView = new MedikitView(52, 58, 95, 60, _game, _targetUnit, _partTxt, _woundTxt);
+	_medikitView = new MedikitView(52, 58, 95, 60, getGame(), _targetUnit, _partTxt, _woundTxt);
 	_endButton = new InteractiveSurface(20, 20, 220, 140);
 	_stimulantButton = new MedikitButton(84);
 	_pkButton = new MedikitButton(48);
@@ -168,11 +168,11 @@ MedikitState::MedikitState (BattleUnit *targetUnit, BattleAction *action, TileEn
 	Surface *backgroundSprite = 0;
 	if (!_item->getRules()->getMediKitCustomBackground().empty())
 	{
-		backgroundSprite = _game->getMod()->getSurface(_item->getRules()->getMediKitCustomBackground(), false);
+		backgroundSprite = getGame()->getMod()->getSurface(_item->getRules()->getMediKitCustomBackground(), false);
 	}
 	if (!backgroundSprite)
 	{
-		backgroundSprite = _game->getMod()->getSurface("MEDIBORD.PCK");
+		backgroundSprite = getGame()->getMod()->getSurface("MEDIBORD.PCK");
 	}
 
 	backgroundSprite->blitNShade(_bg, 0, 0);
@@ -196,7 +196,7 @@ MedikitState::MedikitState (BattleUnit *targetUnit, BattleAction *action, TileEn
 void MedikitState::handle(Action *action)
 {
 	State::handle(action);
-	if (action->getDetails()->type == SDL_MOUSEBUTTONDOWN && _game->isRightClick(action))
+	if (action->getDetails()->type == SDL_MOUSEBUTTONDOWN && getGame()->isRightClick(action))
 	{
 		onEndClick(0);
 	}
@@ -211,9 +211,9 @@ void MedikitState::onEndClick(Action *)
 	if (Options::maximizeInfoScreens)
 	{
 		Screen::updateScale(Options::battlescapeScale, Options::baseXBattlescape, Options::baseYBattlescape, true);
-		_game->getScreen()->resetDisplay(false);
+		getGame()->getScreen()->resetDisplay(false);
 	}
-	_game->popState();
+	getGame()->popState();
 	_tileEngine->medikitRemoveIfEmpty(_action);
 }
 

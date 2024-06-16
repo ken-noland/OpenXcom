@@ -69,12 +69,12 @@ OptionsAdvancedState::OptionsAdvancedState(OptionsOrigin origin) : OptionsBaseSt
 
 	if (origin != OPT_BATTLESCAPE)
 	{
-		_greyedOutColor = _game->getMod()->getInterface("advancedMenu")->getElement("disabledUserOption")->color;
+		_greyedOutColor = getGame()->getMod()->getInterface("advancedMenu")->getElement("disabledUserOption")->color;
 		add(_lstOptions, "optionLists", "advancedMenu");
 	}
 	else
 	{
-		_greyedOutColor = _game->getMod()->getInterface("battlescape")->getElement("disabledUserOption")->color;
+		_greyedOutColor = getGame()->getMod()->getInterface("battlescape")->getElement("disabledUserOption")->color;
 		add(_lstOptions, "optionLists", "battlescape");
 	}
 
@@ -95,7 +95,7 @@ OptionsAdvancedState::OptionsAdvancedState(OptionsOrigin origin) : OptionsBaseSt
 
 	// how much room do we need for YES/NO
 	Text text = Text(100, 9, 0, 0);
-	text.initText(_game->getMod()->getFont("FONT_BIG"), _game->getMod()->getFont("FONT_SMALL"), _game->getLanguage());
+	text.initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
 	text.setText(tr("STR_YES"));
 	int yes = text.getTextWidth();
 	text.setText(tr("STR_NO"));
@@ -191,7 +191,7 @@ void OptionsAdvancedState::updateList()
 		_offsetGeneralMin = row;
 		_lstOptions->setCellColor(_offsetGeneralMin, 0, _colorGroup);
 		addSettings(_settingsGeneral[idx]);
-		row += _settingsGeneral[idx].size();
+		row += (int)_settingsGeneral[idx].size();
 		_offsetGeneralMax = row;
 	}
 	if (_settingsGeo[idx].size() > 0)
@@ -202,7 +202,7 @@ void OptionsAdvancedState::updateList()
 		_offsetGeoMin = row;
 		_lstOptions->setCellColor(_offsetGeoMin, 0, _colorGroup);
 		addSettings(_settingsGeo[idx]);
-		row += _settingsGeo[idx].size();
+		row += (int)_settingsGeo[idx].size();
 		_offsetGeoMax = row;
 	}
 	if (_settingsBase[idx].size() > 0)
@@ -213,7 +213,7 @@ void OptionsAdvancedState::updateList()
 		_offsetBaseMin = row;
 		_lstOptions->setCellColor(_offsetBaseMin, 0, _colorGroup);
 		addSettings(_settingsBase[idx]);
-		row += _settingsBase[idx].size();
+		row += (int)_settingsBase[idx].size();
 		_offsetBaseMax = row;
 	}
 	if (_settingsBattle[idx].size() > 0)
@@ -224,7 +224,7 @@ void OptionsAdvancedState::updateList()
 		_offsetBattleMin = row;
 		_lstOptions->setCellColor(_offsetBattleMin, 0, _colorGroup);
 		addSettings(_settingsBattle[idx]);
-		row += _settingsBattle[idx].size();
+		row += (int)_settingsBattle[idx].size();
 		_offsetBattleMax = row;
 	}
 	if (_settingsAI[idx].size() > 0)
@@ -235,7 +235,7 @@ void OptionsAdvancedState::updateList()
 		_offsetAIMin = row;
 		_lstOptions->setCellColor(_offsetAIMin, 0, _colorGroup);
 		addSettings(_settingsAI[idx]);
-		row += _settingsAI[idx].size();
+		row += (int)_settingsAI[idx].size();
 		_offsetAIMax = row;
 	}
 }
@@ -246,7 +246,7 @@ void OptionsAdvancedState::updateList()
  */
 void OptionsAdvancedState::addSettings(const std::vector<OptionInfo> &settings)
 {
-	auto& fixeduserOptions = _game->getMod()->getFixedUserOptions();
+	auto& fixeduserOptions = getGame()->getMod()->getFixedUserOptions();
 	for (const auto& optionInfo : settings)
 	{
 		std::string name = tr(optionInfo.description());
@@ -278,7 +278,7 @@ void OptionsAdvancedState::addSettings(const std::vector<OptionInfo> &settings)
  */
 OptionInfo *OptionsAdvancedState::getSetting(size_t sel)
 {
-	int selInt = sel;
+	int selInt = (int)sel;
 	OptionOwner idx = _owner == _btnOXC ? OPTION_OXC : _owner == _btnOXCE ? OPTION_OXCE : OPTION_OTHER;
 
 	if (selInt > _offsetGeneralMin && selInt <= _offsetGeneralMax)
@@ -323,7 +323,7 @@ void OptionsAdvancedState::lstOptionsClick(Action *action)
 	if (!setting) return;
 
 	// greyed out options are fixed, cannot be changed by the user
-	auto& fixeduserOptions = _game->getMod()->getFixedUserOptions();
+	auto& fixeduserOptions = getGame()->getMod()->getFixedUserOptions();
 	auto it = fixeduserOptions.find(setting->id());
 	if (it != fixeduserOptions.end())
 	{

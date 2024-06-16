@@ -52,7 +52,7 @@ namespace OpenXcom
 SoldierTransformationListState::SoldierTransformationListState(Base *base, ComboBox *screenActions) : _base(base), _screenActions(screenActions)
 {
 	// Calculate once
-	_game->getSavedGame()->getAvailableTransformations(_availableTransformations, _game->getMod(), _base);
+	getGame()->getSavedGame()->getAvailableTransformations(_availableTransformations, getGame()->getMod(), _base);
 
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);
@@ -97,7 +97,7 @@ SoldierTransformationListState::SoldierTransformationListState(Base *base, Combo
 
 	std::vector<std::string> availableOptions;
 	availableOptions.push_back("STR_ALL_SOLDIER_TYPES");
-	for (auto& soldierType : _game->getMod()->getSoldiersList())
+	for (auto& soldierType : getGame()->getMod()->getSoldiersList())
 	{
 		availableOptions.push_back(soldierType);
 	}
@@ -189,7 +189,7 @@ void SoldierTransformationListState::initList()
 			std::find(
 				transformationRule->getAllowedSoldierTypes().begin(),
 				transformationRule->getAllowedSoldierTypes().end(),
-				_game->getMod()->getSoldiersList().at(_cbxSoldierType->getSelected() - 1)) == transformationRule->getAllowedSoldierTypes().end())
+				getGame()->getMod()->getSoldiersList().at(_cbxSoldierType->getSelected() - 1)) == transformationRule->getAllowedSoldierTypes().end())
 		{
 			continue;
 		}
@@ -216,12 +216,12 @@ void SoldierTransformationListState::initList()
 		int projectsPossible = 10; // max
 		if (transformationRule->getCost() > 0)
 		{
-			int byFunds = (int)(_game->getSavedGame()->getFunds() / transformationRule->getCost());
+			int byFunds = (int)(getGame()->getSavedGame()->getFunds() / transformationRule->getCost());
 			projectsPossible = std::min(projectsPossible, byFunds);
 		}
 		for (auto item : transformationRule->getRequiredItems())
 		{
-			RuleItem* itemRule = _game->getMod()->getItem(item.first);
+			RuleItem* itemRule = getGame()->getMod()->getItem(item.first);
 			projectsPossible = std::min(projectsPossible, itemContainer->getItem(itemRule) / item.second);
 		}
 		if (projectsPossible <= 0)
@@ -253,7 +253,7 @@ void SoldierTransformationListState::initList()
 				++eligibleSoldiers;
 			}
 		}
-		for (const Soldier* deadMan : _game->getSavedGame()->getDeadSoldiers())
+		for (const Soldier* deadMan : getGame()->getSavedGame()->getDeadSoldiers())
 		{
 			if (deadMan->isEligibleForTransformation(transformationRule))
 			{
@@ -346,7 +346,7 @@ void SoldierTransformationListState::btnOnlyEligibleClick(Action *)
 void SoldierTransformationListState::btnOkClick(Action *)
 {
 	_screenActions->setSelected(0);
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -360,12 +360,12 @@ void SoldierTransformationListState::lstTransformationsClick(Action *action)
 	if (action->getDetails()->button.button == SDL_BUTTON_MIDDLE)
 	{
 		std::string articleId = _availableTransformations.at(transformationIndex)->getName();
-		Ufopaedia::openArticle(_game, articleId);
+		Ufopaedia::openArticle(getGame(), articleId);
 		return;
 	}
 
 	_screenActions->setSelected(_screenActions->getSelected() + transformationIndex + 1);
-	_game->popState();
+	getGame()->popState();
 }
 
 }

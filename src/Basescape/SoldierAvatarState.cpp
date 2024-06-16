@@ -94,16 +94,16 @@ SoldierAvatarState::SoldierAvatarState(Base *base, size_t soldier) : _base(base)
 	_lstAvatar->setMargin(8);
 
 	std::string prefix = "STR_AVATAR_NAME_";
-	for (int variant = 0; variant <= _game->getMod()->getMaxLookVariant(); ++variant)
+	for (int variant = 0; variant <= getGame()->getMod()->getMaxLookVariant(); ++variant)
 	{
-		if (!_game->isAltPressed())
+		if (!getGame()->isAltPressed())
 		{
 			_avatars.push_back(SoldierAvatar(prefix + std::to_string(variant * 8 + 1), GENDER_MALE, LOOK_BLONDE, variant));
 			_avatars.push_back(SoldierAvatar(prefix + std::to_string(variant * 8 + 2), GENDER_MALE, LOOK_BROWNHAIR, variant));
 			_avatars.push_back(SoldierAvatar(prefix + std::to_string(variant * 8 + 3), GENDER_MALE, LOOK_ORIENTAL, variant));
 			_avatars.push_back(SoldierAvatar(prefix + std::to_string(variant * 8 + 4), GENDER_MALE, LOOK_AFRICAN, variant));
 		}
-		if (!_game->isCtrlPressed())
+		if (!getGame()->isCtrlPressed())
 		{
 			_avatars.push_back(SoldierAvatar(prefix + std::to_string(variant * 8 + 5), GENDER_FEMALE, LOOK_BLONDE, variant));
 			_avatars.push_back(SoldierAvatar(prefix + std::to_string(variant * 8 + 6), GENDER_FEMALE, LOOK_BROWNHAIR, variant));
@@ -139,7 +139,7 @@ void SoldierAvatarState::initPreview(Soldier *s)
 	{
 		for (const auto& layer : s->getArmorLayers())
 		{
-			auto surf = _game->getMod()->getSurface(layer, true);
+			auto surf = getGame()->getMod()->getSurface(layer, true);
 			surf->blitNShade(_soldierSurface, 0, 0);
 		}
 	}
@@ -158,7 +158,7 @@ void SoldierAvatarState::initPreview(Soldier *s)
 			ss << (int)s->getLook() + (s->getLookVariant() & (RuleSoldier::LookVariantMask >> i)) * 4;
 			ss << ".SPK";
 			std::string debug = ss.str();
-			surf = _game->getMod()->getSurface(ss.str(), false);
+			surf = getGame()->getMod()->getSurface(ss.str(), false);
 			if (surf)
 			{
 				break;
@@ -169,11 +169,11 @@ void SoldierAvatarState::initPreview(Soldier *s)
 			ss.str("");
 			ss << look;
 			ss << ".SPK";
-			surf = _game->getMod()->getSurface(ss.str(), false);
+			surf = getGame()->getMod()->getSurface(ss.str(), false);
 		}
 		if (!surf)
 		{
-			surf = _game->getMod()->getSurface(look, true);
+			surf = getGame()->getMod()->getSurface(look, true);
 		}
 		surf->blitNShade(_soldierSurface, 0, 0);
 	}
@@ -200,7 +200,7 @@ void SoldierAvatarState::btnCancelClick(Action *)
 	soldier->setLook(_origAvatar.getLook());
 	soldier->setLookVariant(_origAvatar.getLookVariant());
 
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -209,7 +209,7 @@ void SoldierAvatarState::btnCancelClick(Action *)
  */
 void SoldierAvatarState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**

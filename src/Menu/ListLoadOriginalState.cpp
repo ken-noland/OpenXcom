@@ -57,7 +57,7 @@ ListLoadOriginalState::ListLoadOriginalState(OptionsOrigin origin) : _origin(ori
 	_txtDate = new Text(90, 9, 225, 24);
 
 	// Set palette
-	setInterface("geoscape", true, _game->getSavedGame() ? _game->getSavedGame()->getSavedBattle() : 0);
+	setInterface("geoscape", true, getGame()->getSavedGame() ? getGame()->getSavedGame()->getSavedBattle() : 0);
 
 	add(_window, "window", "saveMenus");
 	add(_btnNew, "button", "saveMenus");
@@ -107,7 +107,7 @@ ListLoadOriginalState::ListLoadOriginalState(OptionsOrigin origin) : _origin(ori
 	_txtDate->setText(tr("STR_DATE"));
 
 	std::string dots(80, '.');
-	SaveConverter::getList(_game->getLanguage(), _saves);
+	SaveConverter::getList(getGame()->getLanguage(), _saves);
 	for (int i = 0; i < SaveConverter::NUM_SAVES; ++i)
 	{
 		std::ostringstream ss;
@@ -148,7 +148,7 @@ void ListLoadOriginalState::init()
  */
 void ListLoadOriginalState::btnNewClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -157,8 +157,8 @@ void ListLoadOriginalState::btnNewClick(Action *)
  */
 void ListLoadOriginalState::btnCancelClick(Action *action)
 {
-	_game->popState();
-	_game->popState();
+	getGame()->popState();
+	getGame()->popState();
 	action->getDetails()->type = SDL_NOEVENT;
 }
 
@@ -183,29 +183,29 @@ void ListLoadOriginalState::btnSlotClick(Action *action)
 		{
 			std::ostringstream error;
 			error << tr("STR_LOAD_UNSUCCESSFUL") << Unicode::TOK_NL_SMALL << "Battlescape saves aren't supported.";
-			_game->pushState(new ErrorMessageState(error.str(), _palette, _game->getMod()->getInterface("errorMessages")->getElement("geoscapeColor")->color, "BACK01.SCR", _game->getMod()->getInterface("errorMessages")->getElement("geoscapePalette")->color));
+			getGame()->pushState(new ErrorMessageState(error.str(), _palette, getGame()->getMod()->getInterface("errorMessages")->getElement("geoscapeColor")->color, "BACK01.SCR", getGame()->getMod()->getInterface("errorMessages")->getElement("geoscapePalette")->color));
 
 		}
 		else
 		{
 			// Reset touch flags
-			_game->resetTouchButtonFlags();
+			getGame()->resetTouchButtonFlags();
 
-			SaveConverter converter(_saves[n].id, _game->getMod());
-			_game->setSavedGame(converter.loadOriginal());
+			SaveConverter converter(_saves[n].id, getGame()->getMod());
+			getGame()->setSavedGame(converter.loadOriginal());
 			Options::baseXResolution = Options::baseXGeoscape;
 			Options::baseYResolution = Options::baseYGeoscape;
-			_game->getScreen()->resetDisplay(false);
-			_game->setState(new GeoscapeState);
-			if (_game->getSavedGame()->getSavedBattle() != 0)
+			getGame()->getScreen()->resetDisplay(false);
+			getGame()->setState(new GeoscapeState);
+			if (getGame()->getSavedGame()->getSavedBattle() != 0)
 			{
-				_game->getSavedGame()->getSavedBattle()->loadMapResources(_game->getMod());
+				getGame()->getSavedGame()->getSavedBattle()->loadMapResources(getGame()->getMod());
 				Options::baseXResolution = Options::baseXBattlescape;
 				Options::baseYResolution = Options::baseYBattlescape;
-				_game->getScreen()->resetDisplay(false);
+				getGame()->getScreen()->resetDisplay(false);
 				BattlescapeState *bs = new BattlescapeState;
-				_game->pushState(bs);
-				_game->getSavedGame()->getSavedBattle()->setBattleState(bs);
+				getGame()->pushState(bs);
+				getGame()->getSavedGame()->getSavedBattle()->setBattleState(bs);
 			}
 		}
 	}

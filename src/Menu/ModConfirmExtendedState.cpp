@@ -99,7 +99,7 @@ namespace OpenXcom
 	 */
 	void ModConfirmExtendedState::btnYesClick(Action *)
 	{
-		_game->popState();
+		getGame()->popState();
 
 		if (_isMaster)
 		{
@@ -117,7 +117,7 @@ namespace OpenXcom
 	 */
 	void ModConfirmExtendedState::btnNoClick(Action *)
 	{
-		_game->popState();
+		getGame()->popState();
 
 		if (_isMaster)
 		{
@@ -147,7 +147,7 @@ namespace OpenXcom
 	{
 		if (isMasterNotValid(masterInfo))
 		{
-			_game->pushState(new ModConfirmExtendedState(state, masterInfo));
+			getGame()->pushState(new ModConfirmExtendedState(state, masterInfo));
 			return true;
 		}
 
@@ -158,7 +158,7 @@ namespace OpenXcom
 	{
 		if (isModNotValid(modInfo, masterInfo))
 		{
-			_game->pushState(new ModConfirmExtendedState(state, modInfo, masterInfo));
+			getGame()->pushState(new ModConfirmExtendedState(state, modInfo, masterInfo));
 			return true;
 		}
 

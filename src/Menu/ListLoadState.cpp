@@ -69,7 +69,7 @@ ListLoadState::~ListLoadState()
  */
 void ListLoadState::btnOldClick(Action *)
 {
-	_game->pushState(new ListLoadOriginalState(_origin));
+	getGame()->pushState(new ListLoadOriginalState(_origin));
 }
 
 /**
@@ -103,11 +103,11 @@ void ListLoadState::loadSave(size_t list_idx)
 	}
 	if (confirm)
 	{
-		_game->pushState(new ConfirmLoadState(_origin, saveInfo.fileName));
+		getGame()->pushState(new ConfirmLoadState(_origin, saveInfo.fileName));
 	}
 	else
 	{
-		_game->pushState(new LoadGameState(_origin, saveInfo.fileName, _palette));
+		getGame()->pushState(new LoadGameState(_origin, saveInfo.fileName, _palette));
 	}
 }
 void ListLoadState::init()

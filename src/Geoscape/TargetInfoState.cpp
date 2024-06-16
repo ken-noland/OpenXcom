@@ -87,7 +87,7 @@ TargetInfoState::TargetInfoState(Target *target, Globe *globe) : _target(target)
 	_edtTitle->setAlign(ALIGN_CENTER);
 	_edtTitle->setVerticalAlign(ALIGN_MIDDLE);
 	_edtTitle->setWordWrap(true);
-	_edtTitle->setText(_target->getName(_game->getLanguage()));
+	_edtTitle->setText(_target->getName(getGame()->getLanguage()));
 	_edtTitle->onChange((ActionHandler)&TargetInfoState::edtTitleChange);
 
 	_txtTargetted->setAlign(ALIGN_CENTER);
@@ -96,7 +96,7 @@ TargetInfoState::TargetInfoState(Target *target, Globe *globe) : _target(target)
 	std::ostringstream ss;
 	for (const auto* follower : *_target->getFollowers())
 	{
-		ss << follower->getName(_game->getLanguage()) << '\n';
+		ss << follower->getName(getGame()->getLanguage()) << '\n';
 	}
 	_txtFollowers->setText(ss.str());
 
@@ -106,13 +106,13 @@ TargetInfoState::TargetInfoState(Target *target, Globe *globe) : _target(target)
 
 	if (m != 0)
 	{
-		_deploymentRule = _game->getMod()->getDeployment(m->getDeployment()->getType());
+		_deploymentRule = getGame()->getMod()->getDeployment(m->getDeployment()->getType());
 	}
 	else if (b != 0)
 	{
-		AlienRace *race = _game->getMod()->getAlienRace(b->getAlienRace());
-		_deploymentRule = _game->getMod()->getDeployment(race->getBaseCustomMission());
-		if (!_deploymentRule) _deploymentRule = _game->getMod()->getDeployment(b->getDeployment()->getType());
+		AlienRace *race = getGame()->getMod()->getAlienRace(b->getAlienRace());
+		_deploymentRule = getGame()->getMod()->getDeployment(race->getBaseCustomMission());
+		if (!_deploymentRule) _deploymentRule = getGame()->getMod()->getDeployment(b->getDeployment()->getType());
 	}
 
 	if (_deploymentRule && !_deploymentRule->getAlertDescription().empty())
@@ -147,7 +147,7 @@ TargetInfoState::~TargetInfoState()
  */
 void TargetInfoState::btnInterceptClick(Action *)
 {
-	_game->pushState(new InterceptState(_globe, false, 0, _target));
+	getGame()->pushState(new InterceptState(_globe, false, 0, _target));
 }
 
 /**
@@ -156,7 +156,7 @@ void TargetInfoState::btnInterceptClick(Action *)
  */
 void TargetInfoState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -165,7 +165,7 @@ void TargetInfoState::btnOkClick(Action *)
  */
 void TargetInfoState::btnInfoClick(Action *)
 {
-	_game->pushState(new BriefingLightState(_deploymentRule));
+	getGame()->pushState(new BriefingLightState(_deploymentRule));
 }
 
 /**
@@ -174,7 +174,7 @@ void TargetInfoState::btnInfoClick(Action *)
  */
 void TargetInfoState::edtTitleChange(Action *action)
 {
-	if (_edtTitle->getText() == _target->getDefaultName(_game->getLanguage()))
+	if (_edtTitle->getText() == _target->getDefaultName(getGame()->getLanguage()))
 	{
 		_target->setName("");
 	}
@@ -185,7 +185,7 @@ void TargetInfoState::edtTitleChange(Action *action)
 	if (action->getDetails()->key.keysym.sym == SDLK_RETURN ||
 		action->getDetails()->key.keysym.sym == SDLK_KP_ENTER)
 	{
-		_edtTitle->setText(_target->getName(_game->getLanguage()));
+		_edtTitle->setText(_target->getName(getGame()->getLanguage()));
 	}
 }
 

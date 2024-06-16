@@ -53,11 +53,11 @@ SkillMenuState::SkillMenuState(BattleAction *action, int x, int y) : ActionMenuS
 	_screen = false;
 
 	// Set palette
-	_game->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
+	getGame()->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
 
 	for (int i = 0; i < (int)std::size(_actionMenu); ++i)
 	{
-		_actionMenu[i] = new ActionMenuItem(i, _game, x, y);
+		_actionMenu[i] = new ActionMenuItem(i, getGame(), x, y);
 		add(_actionMenu[i]);
 		_actionMenu[i]->setVisible(false);
 		_actionMenu[i]->onMouseClick((ActionHandler)&SkillMenuState::btnActionMenuItemClick);
@@ -148,7 +148,7 @@ void SkillMenuState::addItem(const RuleSkill* skill, int *id, SDLKey key)
 
 	if (_action->weapon)
 	{
-		int acc = BattleUnit::getFiringAccuracy(BattleActionAttack::GetBeforeShoot(ba, _action->actor, _action->weapon, _action->skillRules), _game->getMod());
+		int acc = BattleUnit::getFiringAccuracy(BattleActionAttack::GetBeforeShoot(ba, _action->actor, _action->weapon, _action->skillRules), getGame()->getMod());
 		if (ba == BA_THROW || ba == BA_AIMEDSHOT || ba == BA_SNAPSHOT || ba == BA_AUTOSHOT || ba == BA_LAUNCH || ba == BA_HIT)
 			s1 = tr("STR_ACCURACY_SHORT").arg(Unicode::formatPercentage(acc));
 	}
@@ -180,14 +180,14 @@ void SkillMenuState::addItem(const RuleSkill* skill, int *id, SDLKey key)
  */
 void SkillMenuState::btnActionMenuItemClick(Action *action)
 {
-	_game->getSavedGame()->getSavedBattle()->getPathfinding()->removePreview();
+	getGame()->getSavedGame()->getSavedBattle()->getPathfinding()->removePreview();
 
 	int btnID = -1;
 
-	if (_game->getSavedGame()->getSavedBattle()->isPreview())
+	if (getGame()->getSavedGame()->getSavedBattle()->isPreview())
 	{
 		_action->result = "STR_UNABLE_TO_USE_ALIEN_ARTIFACT_UNTIL_RESEARCHED";
-		_game->popState();
+		getGame()->popState();
 		return;
 	}
 
@@ -203,7 +203,7 @@ void SkillMenuState::btnActionMenuItemClick(Action *action)
 
 	if (btnID != -1)
 	{
-		TileEngine *tileEngine = _game->getSavedGame()->getSavedBattle()->getTileEngine();
+		TileEngine *tileEngine = getGame()->getSavedGame()->getSavedBattle()->getTileEngine();
 		const RuleSkill *selectedSkill = _actionMenu[btnID]->getSkill();
 		_action->skillRules = selectedSkill;
 		_action->type = _actionMenu[btnID]->getAction();
@@ -217,7 +217,7 @@ void SkillMenuState::btnActionMenuItemClick(Action *action)
 			_action->targeting = false;
 			_action->type = BA_NONE;
 			_action->skillRules = nullptr;
-			_game->popState();
+			getGame()->popState();
 			return;
 		}
 
@@ -229,7 +229,7 @@ void SkillMenuState::btnActionMenuItemClick(Action *action)
 			{
 				_action->result = "STR_SKILL_NEEDS_ITEM";
 				if (_action->type == BA_HIT) _action->type = BA_NONE; // OXC merge
-				_game->popState();
+				getGame()->popState();
 				return;
 			}
 		}
@@ -243,7 +243,7 @@ void SkillMenuState::btnActionMenuItemClick(Action *action)
 		else if (_action->type == BA_PRIME || _action->type == BA_UNPRIME)
 		{
 			// nothing, skill menu only supports instant grenades for now
-			_game->popState();
+			getGame()->popState();
 			return;
 		}
 

@@ -60,11 +60,11 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 
 	if (useCustomSound)
 	{
-		auto& sounds = _game->getMod()->getSelectBaseSounds();
+		auto& sounds = getGame()->getMod()->getSelectBaseSounds();
 		int soundId = sounds.empty() ? Mod::NO_SOUND : sounds[RNG::generate(0, (int)sounds.size() - 1)];
 		if (soundId != Mod::NO_SOUND)
 		{
-			_customSound = _game->getMod()->getSound("GEO.CAT", soundId);
+			_customSound = getGame()->getMod()->getSound("GEO.CAT", soundId);
 		}
 	}
 
@@ -168,7 +168,7 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 	_selCrafts.clear();
 
 	int row = 0;
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (Base* xbase : getGame()->getSavedGame()->getBases())
 	{
 		if (_base != 0 && xbase != _base)
 			continue;
@@ -335,7 +335,7 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 				ss << 0;
 			}
 			_crafts.push_back(xcraft);
-			_lstCrafts->addRow(4, xcraft->getName(_game->getLanguage()).c_str(), ssStatus.str().c_str(), xbase->getName().c_str(), ss.str().c_str());
+			_lstCrafts->addRow(4, xcraft->getName(getGame()->getLanguage()).c_str(), ssStatus.str().c_str(), xbase->getName().c_str(), ss.str().c_str());
 			if (hasEnoughPilots && status == "STR_READY")
 			{
 				_lstCrafts->setCellColor(row, 1, _lstCrafts->getSecondaryColor());
@@ -359,7 +359,7 @@ InterceptState::~InterceptState()
  */
 void InterceptState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -368,8 +368,8 @@ void InterceptState::btnCancelClick(Action *)
  */
 void InterceptState::btnGotoBaseClick(Action *)
 {
-	_game->popState();
-	_game->pushState(new BasescapeState(_base, _globe));
+	getGame()->popState();
+	getGame()->pushState(new BasescapeState(_base, _globe));
 }
 
 /**
@@ -392,7 +392,7 @@ void InterceptState::lstCraftsLeftClick(Action *)
 	Craft* c = _crafts[row];
 
 	// add and remove crafts to the wing to be created
-	if (_game->isShiftPressed())
+	if (getGame()->isShiftPressed())
 	{
 		// add craft to the list when it is not included yet
 		// limit to 4 (3+1 due to the dogfight window)
@@ -423,14 +423,14 @@ void InterceptState::lstCraftsLeftClick(Action *)
 			}
 			_selCrafts.insert(_selCrafts.begin(), c);
 
-			_game->popState();
+			getGame()->popState();
 			if (_target == 0)
 			{
-				_game->pushState(new SelectDestinationState(_selCrafts, _globe));
+				getGame()->pushState(new SelectDestinationState(_selCrafts, _globe));
 			}
 			else
 			{
-				_game->pushState(new ConfirmDestinationState(_selCrafts, _target));
+				getGame()->pushState(new ConfirmDestinationState(_selCrafts, _target));
 			}
 		 }
 	}
@@ -446,14 +446,14 @@ void InterceptState::lstCraftsRightClick(Action *)
 	if (c->getStatus() == "STR_OUT")
 	{
 		_globe->center(c->getLongitude(), c->getLatitude());
-		_game->popState();
+		getGame()->popState();
 	}
 	else
 	{
-		_game->popState();
+		getGame()->popState();
 
 		bool found = false;
-		for (Base* xbase : _game->getSavedGame()->getBases())
+		for (Base* xbase : getGame()->getSavedGame()->getBases())
 		{
 			if (_base != 0 && xbase != _base)
 				continue;
@@ -461,7 +461,7 @@ void InterceptState::lstCraftsRightClick(Action *)
 			{
 				if (c == xbase->getCrafts().at(ci))
 				{
-					_game->pushState(new CraftInfoState(xbase, ci));
+					getGame()->pushState(new CraftInfoState(xbase, ci));
 					found = true;
 					break;
 				}
@@ -481,7 +481,7 @@ void InterceptState::lstCraftsMiddleClick(Action *)
 	if (c)
 	{
 		std::string articleId = c->getRules()->getType();
-		Ufopaedia::openArticle(_game, articleId);
+		Ufopaedia::openArticle(getGame(), articleId);
 	}
 }
 

@@ -35,7 +35,7 @@ namespace OpenXcom
 	{
 		_txtInfo->setHeight(72);
 
-		RuleItem *item = _game->getMod()->getItem(defs->id, true);
+		RuleItem *item = getGame()->getMod()->getItem(defs->id, true);
 		Unit *unit = item->getVehicleUnit();
 		if (!unit)
 		{

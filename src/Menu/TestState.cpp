@@ -118,7 +118,7 @@ TestState::TestState()
 
 	_txtPalette->setText(tr("STR_PALETTE"));
 
-	for (auto pal : _game->getMod()->getPalettes())
+	for (auto pal : getGame()->getMod()->getPalettes())
 	{
 		if (pal.first.find("BACKUP_") != 0)
 		{
@@ -212,7 +212,7 @@ void TestState::btnRunClick(Action *action)
 */
 void TestState::btnCancelClick(Action *action)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -226,7 +226,7 @@ void TestState::cbxPaletteAction(Action *action)
 
 	PaletteActionType type = (PaletteActionType)_cbxPaletteAction->getSelected();
 
-	_game->pushState(new TestPaletteState(palette, type));
+	getGame()->pushState(new TestPaletteState(palette, type));
 }
 
 void TestState::testCase4()
@@ -237,24 +237,24 @@ void TestState::testCase4()
 
 	// build a list of all terrains
 	std::map<std::string, int> terrainMap;
-	for (auto &texturePair : _game->getMod()->getGlobe()->getTexturesRaw())
+	for (auto &texturePair : getGame()->getMod()->getGlobe()->getTexturesRaw())
 	{
 		for (auto &terrainCrit : *texturePair.second->getTerrain())
 			terrainMap[terrainCrit.name] += 1;
 		for (auto &baseTerrainCrit : *texturePair.second->getBaseTerrain())
 			terrainMap[baseTerrainCrit.name] += 1;
 	}
-	for (auto &terrainName : _game->getMod()->getTerrainList())
+	for (auto &terrainName : getGame()->getMod()->getTerrainList())
 	{
 		terrainMap[terrainName] += 1;
 	}
-	for (auto &deployName : _game->getMod()->getDeploymentsList())
+	for (auto &deployName : getGame()->getMod()->getDeploymentsList())
 	{
-		AlienDeployment *deployRule = _game->getMod()->getDeployment(deployName);
+		AlienDeployment *deployRule = getGame()->getMod()->getDeployment(deployName);
 		for (auto &terrainName : deployRule->getTerrains())
 			terrainMap[terrainName] += 1;
 	}
-	for (auto &mapScript : _game->getMod()->getMapScriptsRaw())
+	for (auto &mapScript : getGame()->getMod()->getMapScriptsRaw())
 	{
 		for (auto* mapScriptCommand : mapScript.second)
 		{
@@ -274,7 +274,7 @@ void TestState::testCase4()
 	Log(LOG_INFO) << "----------------------------------------------1. check terrain existence in ruleset";
 	for (auto &pair : terrainMap)
 	{
-		RuleTerrain *tRule = _game->getMod()->getTerrain(pair.first);
+		RuleTerrain *tRule = getGame()->getMod()->getTerrain(pair.first);
 		if (!tRule)
 		{
 			++total;
@@ -314,18 +314,18 @@ void TestState::testCase4()
 
 	for (auto &pair : terrainMap)
 	{
-		RuleTerrain *terrainRule = _game->getMod()->getTerrain(pair.first);
+		RuleTerrain *terrainRule = getGame()->getMod()->getTerrain(pair.first);
 		addMapblockAndDataset(terrainRule, blockMap, datasetMap);
 	}
-	for (auto &ufoName : _game->getMod()->getUfosList())
+	for (auto &ufoName : getGame()->getMod()->getUfosList())
 	{
-		RuleUfo *ufoRule = _game->getMod()->getUfo(ufoName);
+		RuleUfo *ufoRule = getGame()->getMod()->getUfo(ufoName);
 		RuleTerrain *terrainRule = ufoRule->getBattlescapeTerrainData();
 		addMapblockAndDataset(terrainRule, blockMap, datasetMap);
 	}
-	for (auto &craftName : _game->getMod()->getCraftsList())
+	for (auto &craftName : getGame()->getMod()->getCraftsList())
 	{
-		RuleCraft *craftRule = _game->getMod()->getCraft(craftName);
+		RuleCraft *craftRule = getGame()->getMod()->getCraft(craftName);
 		RuleTerrain *terrainRule = craftRule->getBattlescapeTerrainData();
 		addMapblockAndDataset(terrainRule, blockMap, datasetMap, craftRule->getMaxSkinIndex());
 	}
@@ -412,12 +412,12 @@ void TestState::testCase3()
 	_lstOutput->addRow(1, tr("STR_TESTS_STARTING").c_str());
 
 	std::map<const Armor *, std::map<std::string, int> > tagMatrix;
-	for (auto armorName : _game->getMod()->getArmorsList())
+	for (auto armorName : getGame()->getMod()->getArmorsList())
 	{
-		auto armorRule = _game->getMod()->getArmor(armorName, true);
+		auto armorRule = getGame()->getMod()->getArmor(armorName, true);
 		auto tagValues = armorRule->getScriptValuesRaw().getValuesRaw();
 		ArgEnum index = ScriptParserBase::getArgType<ScriptTag<Armor>>();
-		auto tagNames = _game->getMod()->getScriptGlobal()->getTagNames().at(index);
+		auto tagNames = getGame()->getMod()->getScriptGlobal()->getTagNames().at(index);
 		for (size_t i = 0; i < tagValues.size(); ++i)
 		{
 			auto nameAsString = tagNames.values[i].name.toString().substr(4);
@@ -446,9 +446,9 @@ void TestState::testCase3()
 		}
 		Log(LOG_INFO) << ssNames.str();
 	}
-	for (auto armorName : _game->getMod()->getArmorsList())
+	for (auto armorName : getGame()->getMod()->getArmorsList())
 	{
-		auto armorRule = _game->getMod()->getArmor(armorName, true);
+		auto armorRule = getGame()->getMod()->getArmor(armorName, true);
 		auto armorData = tagMatrix[armorRule];
 		std::ostringstream ss;
 		ss << ";" << armorName;
@@ -507,7 +507,7 @@ void TestState::testCase2()
 	}
 
 	int total = 0;
-	for (auto i : _game->getMod()->getExtraSprites())
+	for (auto i : getGame()->getMod()->getExtraSprites())
 	{
 		std::string sheetName = i.first;
 		if (sheetName.find("_CPAL") != std::string::npos)
@@ -663,15 +663,15 @@ void TestState::testCase1()
 	_lstOutput->addRow(1, tr("STR_CHECKING_TERRAIN").c_str());
 	int total = 0;
 	std::map<std::string, std::set<int>> uniqueResults;
-	for (auto terrainName : _game->getMod()->getTerrainList())
+	for (auto terrainName : getGame()->getMod()->getTerrainList())
 	{
-		RuleTerrain *terrainRule = _game->getMod()->getTerrain(terrainName);
+		RuleTerrain *terrainRule = getGame()->getMod()->getTerrain(terrainName);
 		total += checkMCD(terrainRule, uniqueResults);
 	}
 	_lstOutput->addRow(1, tr("STR_CHECKING_UFOS").c_str());
-	for (auto ufoName : _game->getMod()->getUfosList())
+	for (auto ufoName : getGame()->getMod()->getUfosList())
 	{
-		RuleUfo *ufoRule = _game->getMod()->getUfo(ufoName);
+		RuleUfo *ufoRule = getGame()->getMod()->getUfo(ufoName);
 		RuleTerrain *terrainRule = ufoRule->getBattlescapeTerrainData();
 		if (!terrainRule)
 		{
@@ -680,9 +680,9 @@ void TestState::testCase1()
 		total += checkMCD(terrainRule, uniqueResults);
 	}
 	_lstOutput->addRow(1, tr("STR_CHECKING_CRAFT").c_str());
-	for (auto craftName : _game->getMod()->getCraftsList())
+	for (auto craftName : getGame()->getMod()->getCraftsList())
 	{
-		RuleCraft *craftRule = _game->getMod()->getCraft(craftName);
+		RuleCraft *craftRule = getGame()->getMod()->getCraft(craftName);
 		RuleTerrain *terrainRule = craftRule->getBattlescapeTerrainData();
 		if (!terrainRule)
 		{
@@ -690,7 +690,7 @@ void TestState::testCase1()
 		}
 		for (int skinIndex = 0; skinIndex <= craftRule->getMaxSkinIndex(); ++skinIndex)
 		{
-			terrainRule->refreshMapDataSets(skinIndex, _game->getMod()); // change skin
+			terrainRule->refreshMapDataSets(skinIndex, getGame()->getMod()); // change skin
 			total += checkMCD(terrainRule, uniqueResults);
 		}
 	}
@@ -740,7 +740,7 @@ int TestState::checkMCD(RuleTerrain *terrainRule, std::map<std::string, std::set
 	for (auto myMapDataSet : *terrainRule->getMapDataSets())
 	{
 		int index = 0;
-		myMapDataSet->loadData(_game->getMod()->getMCDPatch(myMapDataSet->getName()), false);
+		myMapDataSet->loadData(getGame()->getMod()->getMCDPatch(myMapDataSet->getName()), false);
 		int size = (int)(myMapDataSet->getObjectsRaw()->size());
 		for (auto myMapData : *myMapDataSet->getObjectsRaw())
 		{
@@ -828,18 +828,18 @@ void TestState::testCase0()
 	_lstOutput->addRow(1, tr("STR_TESTS_STARTING").c_str());
 	_lstOutput->addRow(1, tr("STR_CHECKING_TERRAIN").c_str());
 	int total = 0;
-	for (auto& terrainName : _game->getMod()->getTerrainList())
+	for (auto& terrainName : getGame()->getMod()->getTerrainList())
 	{
-		RuleTerrain *terrRule = _game->getMod()->getTerrain(terrainName);
+		RuleTerrain *terrRule = getGame()->getMod()->getTerrain(terrainName);
 		for (auto* mapblock : *terrRule->getMapBlocks())
 		{
 			total += checkRMP(mapblock);
 		}
 	}
 	_lstOutput->addRow(1, tr("STR_CHECKING_UFOS").c_str());
-	for (auto& ufoName : _game->getMod()->getUfosList())
+	for (auto& ufoName : getGame()->getMod()->getUfosList())
 	{
-		RuleUfo *ufoRule = _game->getMod()->getUfo(ufoName);
+		RuleUfo *ufoRule = getGame()->getMod()->getUfo(ufoName);
 		if (ufoRule->getBattlescapeTerrainData())
 		{
 			for (auto* mapblock : *ufoRule->getBattlescapeTerrainData()->getMapBlocks())
@@ -849,9 +849,9 @@ void TestState::testCase0()
 		}
 	}
 	_lstOutput->addRow(1, tr("STR_CHECKING_CRAFT").c_str());
-	for (auto& craftName : _game->getMod()->getCraftsList())
+	for (auto& craftName : getGame()->getMod()->getCraftsList())
 	{
-		RuleCraft *craftRule = _game->getMod()->getCraft(craftName);
+		RuleCraft *craftRule = getGame()->getMod()->getCraft(craftName);
 		if (craftRule->getBattlescapeTerrainData())
 		{
 			for (auto* mapblock : *craftRule->getBattlescapeTerrainData()->getMapBlocks())

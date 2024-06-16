@@ -69,19 +69,19 @@ PlaceLiftState::PlaceLiftState(Base *base, Globe *globe, bool first) : _base(bas
 	// Set up objects
 	setWindowBackground(_window, "selectFacility");
 
-	auto* itf = _game->getMod()->getInterface("basescape")->getElement("trafficLights");
+	auto* itf = getGame()->getMod()->getInterface("basescape")->getElement("trafficLights");
 	if (itf)
 	{
 		_view->setOtherColors(itf->color, itf->color2, itf->border, !itf->TFTDMode);
 	}
-	_view->setTexture(_game->getMod()->getSurfaceSet("BASEBITS.PCK"));
+	_view->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
 	_view->setBase(_base);
 
 	_lift = nullptr;
-	for (auto& facilityType : _game->getMod()->getBaseFacilitiesList())
+	for (auto& facilityType : getGame()->getMod()->getBaseFacilitiesList())
 	{
-		auto* facilityRule = _game->getMod()->getBaseFacility(facilityType);
-		if (facilityRule->isLift() && facilityRule->isAllowedForBaseType(_base->isFakeUnderwater()) && _game->getSavedGame()->isResearched(facilityRule->getRequirements()))
+		auto* facilityRule = getGame()->getMod()->getBaseFacility(facilityType);
+		if (facilityRule->isLift() && facilityRule->isAllowedForBaseType(_base->isFakeUnderwater()) && getGame()->getSavedGame()->isResearched(facilityRule->getRequirements()))
 		{
 			_accessLifts.push_back(facilityRule);
 		}
@@ -142,12 +142,12 @@ void PlaceLiftState::viewClick(Action *)
 	_base->getFacilities().push_back(fac);
 	if (fac->getRules()->getPlaceSound() != Mod::NO_SOUND)
 	{
-		_game->getMod()->getSound("GEO.CAT", fac->getRules()->getPlaceSound())->play();
+		getGame()->getMod()->getSound("GEO.CAT", fac->getRules()->getPlaceSound())->play();
 	}
-	_game->popState();
+	getGame()->popState();
 
 	std::size_t visibleBasesIndex;
-	std::size_t numBases = _game->getSavedGame()->getBases().size();
+	std::size_t numBases = getGame()->getSavedGame()->getBases().size();
 	if (numBases >= MiniBaseView::MAX_VISIBLE_BASES)
 	{
 		visibleBasesIndex = numBases - MiniBaseView::MAX_VISIBLE_BASES;
@@ -158,11 +158,11 @@ void PlaceLiftState::viewClick(Action *)
 	}
 
 	BasescapeState *bState = new BasescapeState(_base, _globe);
-	_game->getSavedGame()->setSelectedBase(numBases - 1);
-	_game->pushState(bState);
+	getGame()->getSavedGame()->setSelectedBase(numBases - 1);
+	getGame()->pushState(bState);
 	if (_first)
 	{
-		_game->pushState(new SelectStartFacilityState(_base, bState, _globe));
+		getGame()->pushState(new SelectStartFacilityState(_base, bState, _globe));
 	}
 }
 
@@ -180,7 +180,7 @@ void PlaceLiftState::lstAccessLiftsClick(Action *action)
 
 	if (action->getDetails()->button.button == SDL_BUTTON_MIDDLE)
 	{
-		Ufopaedia::openArticle(_game, _accessLifts[index]->getType());
+		Ufopaedia::openArticle(getGame(), _accessLifts[index]->getType());
 		return;
 	}
 

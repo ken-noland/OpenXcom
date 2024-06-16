@@ -65,7 +65,7 @@ GeoscapeCraftState::GeoscapeCraftState(Craft *craft, Globe *globe, Waypoint *way
 		int soundId = craft->getRules()->getSelectSound();
 		if (soundId != Mod::NO_SOUND)
 		{
-			_customSound = _game->getMod()->getSound("GEO.CAT", soundId);
+			_customSound = getGame()->getMod()->getSound("GEO.CAT", soundId);
 		}
 	}
 
@@ -141,7 +141,7 @@ GeoscapeCraftState::GeoscapeCraftState(Craft *craft, Globe *globe, Waypoint *way
 	_btnCancel->onKeyboardPress((ActionHandler)&GeoscapeCraftState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setText(_craft->getName(_game->getLanguage()));
+	_txtTitle->setText(_craft->getName(getGame()->getLanguage()));
 
 	_txtStatus->setWordWrap(true);
 	std::string status;
@@ -180,12 +180,12 @@ GeoscapeCraftState::GeoscapeCraftState(Craft *craft, Globe *globe, Waypoint *way
 			}
 			else
 			{
-				status = tr("STR_DESTINATION_UC_").arg(u->getName(_game->getLanguage()));
+				status = tr("STR_DESTINATION_UC_").arg(u->getName(getGame()->getLanguage()));
 			}
 		}
 		else
 		{
-			status = tr("STR_DESTINATION_UC_").arg(_craft->getDestination()->getName(_game->getLanguage()));
+			status = tr("STR_DESTINATION_UC_").arg(_craft->getDestination()->getName(getGame()->getLanguage()));
 		}
 	}
 	_txtStatus->setText(tr("STR_STATUS_").arg(status));
@@ -322,7 +322,7 @@ GeoscapeCraftState::~GeoscapeCraftState()
  */
 void GeoscapeCraftState::btnBaseClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_craft->returnToBase();
 	delete _waypoint;
 	if (_craft->getRules()->canAutoPatrol())
@@ -338,8 +338,8 @@ void GeoscapeCraftState::btnBaseClick(Action *)
  */
 void GeoscapeCraftState::btnTargetClick(Action *)
 {
-	_game->popState();
-	_game->pushState(new SelectDestinationState(std::vector{ _craft }, _globe));
+	getGame()->popState();
+	getGame()->pushState(new SelectDestinationState(std::vector{ _craft }, _globe));
 	delete _waypoint;
 }
 
@@ -349,7 +349,7 @@ void GeoscapeCraftState::btnTargetClick(Action *)
  */
 void GeoscapeCraftState::btnPatrolClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 	_craft->setDestination(0);
 	delete _waypoint;
 	if (_craft->getRules()->canAutoPatrol())
@@ -370,12 +370,12 @@ void GeoscapeCraftState::btnCancelClick(Action *)
 	// Go to the last known UFO position
 	if (_waypoint != 0)
 	{
-		_waypoint->setId(_game->getSavedGame()->getId("STR_WAY_POINT"));
-		_game->getSavedGame()->getWaypoints().push_back(_waypoint);
+		_waypoint->setId(getGame()->getSavedGame()->getId("STR_WAY_POINT"));
+		getGame()->getSavedGame()->getWaypoints().push_back(_waypoint);
 		_craft->setDestination(_waypoint);
 	}
 	// Cancel
-	_game->popState();
+	getGame()->popState();
 }
 
 }

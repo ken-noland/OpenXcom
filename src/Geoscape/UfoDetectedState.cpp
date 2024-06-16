@@ -52,18 +52,18 @@ UfoDetectedState::UfoDetectedState(Ufo *ufo, GeoscapeState *state, bool detected
 	// Generate UFO ID
 	if (_ufo->getId() == 0)
 	{
-		_ufo->setId(_game->getSavedGame()->getId("STR_UFO"));
+		_ufo->setId(getGame()->getSavedGame()->getId("STR_UFO"));
 
 		int soundId = _ufo->getRules()->getAlertSound();
 		if (soundId != Mod::NO_SOUND)
 		{
-			_customSound = _game->getMod()->getSound("GEO.CAT", soundId);
+			_customSound = getGame()->getMod()->getSound("GEO.CAT", soundId);
 		}
 
 	}
 	if (_ufo->getAltitude() == "STR_GROUND" && _ufo->getLandId() == 0)
 	{
-		_ufo->setLandId(_game->getSavedGame()->getId("STR_LANDING_SITE"));
+		_ufo->setLandId(getGame()->getSavedGame()->getId("STR_LANDING_SITE"));
 	}
 
 	_screen = false;
@@ -125,7 +125,7 @@ UfoDetectedState::UfoDetectedState(Ufo *ufo, GeoscapeState *state, bool detected
 	_btnCentre->setText(tr("STR_CENTER_ON_UFO_TIME_5_SECONDS"));
 	_btnCentre->onMouseClick((ActionHandler)&UfoDetectedState::btnCentreClick);
 
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
 		_btnCancel->setText(tr("STR_IGNORE_UC"));
 	}
@@ -154,7 +154,7 @@ UfoDetectedState::UfoDetectedState(Ufo *ufo, GeoscapeState *state, bool detected
 	_txtHyperwave->setText(tr("STR_HYPER_WAVE_TRANSMISSIONS_ARE_DECODED"));
 
 	_txtUfo->setBig();
-	_txtUfo->setText(_ufo->getName(_game->getLanguage()));
+	_txtUfo->setText(_ufo->getName(getGame()->getLanguage()));
 
 	_lstInfo->setColumns(2, 77, 140);
 	_lstInfo->setDot(true);
@@ -167,13 +167,13 @@ UfoDetectedState::UfoDetectedState(Ufo *ufo, GeoscapeState *state, bool detected
 	std::string altitude = _ufo->getAltitude() == "STR_GROUND" ? "STR_GROUNDED" : _ufo->getAltitude();
 	// Let's assume if there's any underwater craft, the UFO are underwater too
 	bool underwater = false;
-	for (auto& craftType : _game->getMod()->getCraftsList())
+	for (auto& craftType : getGame()->getMod()->getCraftsList())
 	{
 		if (underwater)
 		{
 			break; // loop finished
 		}
-		underwater = _game->getMod()->getCraft(craftType)->isWaterOnly();
+		underwater = getGame()->getMod()->getCraft(craftType)->isWaterOnly();
 	}
 	if (underwater && !_state->getGlobe()->insideLand(_ufo->getLongitude(), _ufo->getLatitude()))
 	{
@@ -231,7 +231,7 @@ void UfoDetectedState::btnInterceptClick(Action *)
 {
 	_state->timerReset();
 	_state->getGlobe()->center(_ufo->getLongitude(), _ufo->getLatitude());
-	_game->pushState(new InterceptState(_state->getGlobe(), false, 0, _ufo));
+	getGame()->pushState(new InterceptState(_state->getGlobe(), false, 0, _ufo));
 }
 
 /**
@@ -242,7 +242,7 @@ void UfoDetectedState::btnCentreClick(Action *)
 {
 	_state->timerReset();
 	_state->getGlobe()->center(_ufo->getLongitude(), _ufo->getLatitude());
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -251,12 +251,12 @@ void UfoDetectedState::btnCentreClick(Action *)
  */
 void UfoDetectedState::btnCancelClick(Action *)
 {
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
 		// don't show UFO Detected window for this UFO anymore
-		_game->getSavedGame()->addUfoToIgnoreList(_ufo->getId());
+		getGame()->getSavedGame()->addUfoToIgnoreList(_ufo->getId());
 	}
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -265,7 +265,7 @@ void UfoDetectedState::btnCancelClick(Action *)
  */
 void UfoDetectedState::toggleCancel(Action *)
 {
-	if (_game->isCtrlPressed())
+	if (getGame()->isCtrlPressed())
 	{
 		_btnCancel->setText(tr("STR_IGNORE_UC"));
 	}

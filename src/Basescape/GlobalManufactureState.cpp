@@ -87,7 +87,7 @@ GlobalManufactureState::GlobalManufactureState(bool openedFromBasescape) : _open
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_PRODUCTION_OVERVIEW"));
 
-	_txtFunds->setText(tr("STR_CURRENT_FUNDS").arg(Unicode::formatFunding(_game->getSavedGame()->getFunds())));
+	_txtFunds->setText(tr("STR_CURRENT_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
 
 	_txtItem->setText(tr("STR_ITEM"));
 
@@ -128,7 +128,7 @@ GlobalManufactureState::~GlobalManufactureState()
  */
 void GlobalManufactureState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -142,16 +142,16 @@ void GlobalManufactureState::onSelectBase(Action *)
 	if (base)
 	{
 		// close this window
-		_game->popState();
+		getGame()->popState();
 
 		// close Manufacture UI (goes back to BaseView)
 		if (_openedFromBasescape)
 		{
-			_game->popState();
+			getGame()->popState();
 		}
 
 		// open new window
-		_game->pushState(new ManufactureState(base));
+		getGame()->pushState(new ManufactureState(base));
 	}
 }
 
@@ -165,14 +165,14 @@ void GlobalManufactureState::onOpenTechTreeViewer(Action *)
 
 	if (selectedTopic)
 	{
-		if (_game->isCtrlPressed())
+		if (getGame()->isCtrlPressed())
 		{
 			std::string articleId = selectedTopic->getName();
-			Ufopaedia::openArticle(_game, articleId);
+			Ufopaedia::openArticle(getGame(), articleId);
 		}
 		else
 		{
-			_game->pushState(new TechTreeViewerState(0, selectedTopic));
+			getGame()->pushState(new TechTreeViewerState(0, selectedTopic));
 		}
 	}
 }
@@ -200,12 +200,12 @@ void GlobalManufactureState::fillProductionList()
 	int allocatedEngineers = 0;
 	int freeWorkshops = 0;
 
-	for (Base *xbase : _game->getSavedGame()->getBases())
+	for (Base* xbase : getGame()->getSavedGame()->getBases())
 	{
 		auto& baseProductions = xbase->getProductions();
 		if (!baseProductions.empty() || xbase->getEngineers() > 0)
 		{
-			std::string baseName = xbase->getName(_game->getLanguage());
+			std::string baseName = xbase->getName(getGame()->getLanguage());
 			_lstManufacture->addRow(3, baseName.c_str(), "", "");
 			_lstManufacture->setRowColor(_lstManufacture->getLastRowIndex(), _lstManufacture->getSecondaryColor());
 

@@ -60,7 +60,7 @@ BriefingLightState::BriefingLightState(AlienDeployment *deployment)
 
 	BriefingData data = deployment->getBriefingData();
 	setStandardPalette("PAL_GEOSCAPE", data.palette);
-	_window->setBackground(_game->getMod()->getSurface(data.background));
+	_window->setBackground(getGame()->getMod()->getSurface(data.background));
 
 	add(_window, "window", "briefing");
 	add(_btnOk, "button", "briefing");
@@ -107,7 +107,7 @@ BriefingLightState::BriefingLightState(AlienDeployment *deployment)
 */
 void BriefingLightState::checkStartingCondition(AlienDeployment *deployment)
 {
-	const RuleStartingCondition *startingCondition = _game->getMod()->getStartingCondition(deployment->getStartingCondition());
+	const RuleStartingCondition *startingCondition = getGame()->getMod()->getStartingCondition(deployment->getStartingCondition());
 	if (startingCondition != 0)
 	{
 		auto list = startingCondition->getForbiddenArmors();
@@ -124,9 +124,9 @@ void BriefingLightState::checkStartingCondition(AlienDeployment *deployment)
 
 			for (auto& armorType : list)
 			{
-				Armor* armor = _game->getMod()->getArmor(armorType, false);
-				ArticleDefinition* article = _game->getMod()->getUfopaediaArticle(armor ? armor->getUfopediaType() : armorType, false);
-				if (article && Ufopaedia::isArticleAvailable(_game->getSavedGame(), article))
+				Armor* armor = getGame()->getMod()->getArmor(armorType, false);
+				ArticleDefinition* article = getGame()->getMod()->getUfopaediaArticle(armor ? armor->getUfopediaType() : armorType, false);
+				if (article && Ufopaedia::isArticleAvailable(getGame()->getSavedGame(), article))
 				{
 					std::string translation = tr(armorType);
 					_armorNameList.push_back(std::make_pair(armorType, translation));
@@ -166,7 +166,7 @@ BriefingLightState::~BriefingLightState()
  */
 void BriefingLightState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -196,11 +196,11 @@ void BriefingLightState::lstArmorsClick(Action* action)
 
 	auto idx = halfSize + _lstArmors->getSelectedRow();
 	const std::string& armorType = _armorNameList[idx].first;
-	Armor* armor = _game->getMod()->getArmor(armorType, false);
+	Armor* armor = getGame()->getMod()->getArmor(armorType, false);
 	if (armor)
 	{
 		std::string articleId = armor->getUfopediaType();
-		Ufopaedia::openArticle(_game, articleId);
+		Ufopaedia::openArticle(getGame(), articleId);
 	}
 }
 

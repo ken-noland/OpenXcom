@@ -36,7 +36,7 @@ namespace OpenXcom
 
 	ArticleStateUfo::ArticleStateUfo(ArticleDefinitionUfo *defs, std::shared_ptr<ArticleCommonState> state) : ArticleState(defs->id, std::move(state))
 	{
-		RuleUfo *ufo = _game->getMod()->getUfo(defs->id, true);
+		RuleUfo *ufo = getGame()->getMod()->getUfo(defs->id, true);
 
 		// add screen elements
 		_txtTitle = new Text(155, 32, 5, 24);
@@ -50,12 +50,12 @@ namespace OpenXcom
 		add(_txtTitle);
 
 		// Set up objects
-		_game->getMod()->getSurface("BACK11.SCR")->blitNShade(_bg, 0, 0);
+		getGame()->getMod()->getSurface("BACK11.SCR")->blitNShade(_bg, 0, 0);
 		_btnOk->setColor(Palette::blockOffset(8)+5);
 		_btnPrev->setColor(Palette::blockOffset(8)+5);
 		_btnNext->setColor(Palette::blockOffset(8)+5);
 		_btnInfo->setColor(Palette::blockOffset(8)+5);
-		_btnInfo->setVisible(_game->getMod()->getShowPediaInfoButton());
+		_btnInfo->setVisible(getGame()->getMod()->getShowPediaInfoButton());
 
 		_txtTitle->setColor(Palette::blockOffset(8)+5);
 		_txtTitle->setBig();
@@ -65,9 +65,9 @@ namespace OpenXcom
 		_image = new Surface(160, 52, 160, 6);
 		add(_image);
 
-		RuleInterface *dogfightInterface = _game->getMod()->getInterface("dogfight");
+		RuleInterface *dogfightInterface = getGame()->getMod()->getInterface("dogfight");
 
-		auto crop = _game->getMod()->getSurface("INTERWIN.DAT")->getCrop();
+		auto crop = getGame()->getMod()->getSurface("INTERWIN.DAT")->getCrop();
 		crop.setX(0);
 		crop.setY(0);
 		crop.getCrop()->x = 0;
@@ -84,7 +84,7 @@ namespace OpenXcom
 		}
 		else
 		{
-			crop = _game->getMod()->getSurface(ufo->getModSprite())->getCrop();
+			crop = getGame()->getMod()->getSurface(ufo->getModSprite())->getCrop();
 		}
 		crop.setX(0);
 		crop.setY(0);

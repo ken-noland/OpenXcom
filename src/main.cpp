@@ -119,7 +119,6 @@ int main(int argc, char *argv[])
 	Options::baseYResolution = Options::displayHeight;
 
 	game = new Game(title.str());
-	State::setGamePtr(game);
 	game->setState(new StartState);
 	game->run();
 

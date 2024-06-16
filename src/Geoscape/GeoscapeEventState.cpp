@@ -78,7 +78,7 @@ GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : _eventRule(
 	centerAllSurfaces();
 
 	// Set up objects
-	_window->setBackground(_game->getMod()->getSurface(_eventRule.getBackground()));
+	_window->setBackground(getGame()->getMod()->getSurface(_eventRule.getBackground()));
 
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setBig();
@@ -128,9 +128,9 @@ GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : _eventRule(
  */
 void GeoscapeEventState::eventLogic()
 {
-	SavedGame *save = _game->getSavedGame();
+	SavedGame *save = getGame()->getSavedGame();
 	Base *hq = save->getBases().front();
-	const Mod *mod = _game->getMod();
+	const Mod *mod = getGame()->getMod();
 	const RuleEvent &rule = _eventRule;
 
 	RuleRegion *regionRule = nullptr;
@@ -139,7 +139,7 @@ void GeoscapeEventState::eventLogic()
 	{
 		size_t pickRegion = RNG::generate(0, (int)rule.getRegionList().size() - 1);
 		std::string regionName = rule.getRegionList().at(pickRegion);
-		regionRule = _game->getMod()->getRegion(regionName, true);
+		regionRule = getGame()->getMod()->getRegion(regionName, true);
 		std::string place = tr(regionName);
 
 		if (rule.isCitySpecific())
@@ -149,7 +149,7 @@ void GeoscapeEventState::eventLogic()
 			{
 				size_t pickCity = RNG::generate(0, (int)cities - 1);
 				city = regionRule->getCities().at(pickCity);
-				place = city->getName(_game->getLanguage());
+				place = city->getName(getGame()->getLanguage());
 			}
 		}
 
@@ -177,7 +177,7 @@ void GeoscapeEventState::eventLogic()
 	// 1. give/take score points
 	if (regionRule)
 	{
-		for (Region* region : _game->getSavedGame()->getRegions())
+		for (Region* region : getGame()->getSavedGame()->getRegions())
 		{
 			if (region->getRules() == regionRule)
 			{
@@ -218,7 +218,7 @@ void GeoscapeEventState::eventLogic()
 				for (int i = 0; i < rule.getSpawnedPersons(); ++i)
 				{
 					Transfer* t = new Transfer(24);
-					int nationality = _game->getSavedGame()->selectSoldierNationalityByLocation(_game->getMod(), ruleSoldier, city);
+					int nationality = getGame()->getSavedGame()->selectSoldierNationalityByLocation(getGame()->getMod(), ruleSoldier, city);
 					Soldier* s = mod->genSoldier(save, ruleSoldier, nationality);
 					s->load(rule.getSpawnedSoldierTemplate(), mod, save, mod->getScriptGlobal(), true); // load from soldier template
 					if (!rule.getSpawnedPersonName().empty())
@@ -413,7 +413,7 @@ void GeoscapeEventState::init()
 
 	if (!_eventRule.getMusic().empty())
 	{
-		_game->getMod()->playMusic(_eventRule.getMusic());
+		getGame()->getMod()->playMusic(_eventRule.getMusic());
 	}
 }
 
@@ -423,22 +423,22 @@ void GeoscapeEventState::init()
  */
 void GeoscapeEventState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 
-	Base *base = _game->getSavedGame()->getBases().front();
-	if (_game->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && base != 0 && base->storesOverfull())
+	Base *base = getGame()->getSavedGame()->getBases().front();
+	if (getGame()->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && base != 0 && base->storesOverfull())
 	{
-		_game->pushState(new SellState(base, 0));
-		_game->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(base->getName()), _palette, _game->getMod()->getInterface("debriefing")->getElement("errorMessage")->color, "BACK01.SCR", _game->getMod()->getInterface("debriefing")->getElement("errorPalette")->color));
+		getGame()->pushState(new SellState(base, 0));
+		getGame()->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(base->getName()), _palette, getGame()->getMod()->getInterface("debriefing")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("debriefing")->getElement("errorPalette")->color));
 	}
 
 	if (!_bonusResearchName.empty())
 	{
-		Ufopaedia::openArticle(_game, _bonusResearchName);
+		Ufopaedia::openArticle(getGame(), _bonusResearchName);
 	}
 	if (!_researchName.empty())
 	{
-		Ufopaedia::openArticle(_game, _researchName);
+		Ufopaedia::openArticle(getGame(), _researchName);
 	}
 }
 

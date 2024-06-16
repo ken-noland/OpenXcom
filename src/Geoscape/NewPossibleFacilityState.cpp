@@ -82,7 +82,7 @@ NewPossibleFacilityState::NewPossibleFacilityState(Base *base, Globe *globe, con
 		}
 		std::ostringstream ss;
 		int i = 0;
-		for (const auto& serviceName : _game->getMod()->getBaseFunctionNames(requiredServices))
+		for (const std::string& serviceName : getGame()->getMod()->getBaseFunctionNames(requiredServices))
 		{
 			if (i > 0)
 				ss << ", ";
@@ -112,7 +112,7 @@ NewPossibleFacilityState::NewPossibleFacilityState(Base *base, Globe *globe, con
  */
 void NewPossibleFacilityState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -121,8 +121,8 @@ void NewPossibleFacilityState::btnOkClick(Action *)
  */
 void NewPossibleFacilityState::btnOpenClick(Action *)
 {
-	_game->popState();
-	_game->pushState(new BasescapeState(_base, _globe));
+	getGame()->popState();
+	getGame()->pushState(new BasescapeState(_base, _globe));
 }
 
 }

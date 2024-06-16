@@ -222,8 +222,6 @@ public:
 	void handleState();
 	/// Sets the state timer interval.
 	void setStateInterval(Uint32 interval);
-	/// Gets game.
-	Game *getGame() const;
 	/// Gets map.
 	Map *getMap() const;
 	/// Show debug message.

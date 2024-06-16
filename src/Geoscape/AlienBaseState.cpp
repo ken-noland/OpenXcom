@@ -80,7 +80,7 @@ AlienBaseState::AlienBaseState(AlienBase *base, GeoscapeState *state) : _state(s
 			break;
 		}
 	}
-	for (const Region* region : _game->getSavedGame()->getRegions())
+	for (const Region* region : getGame()->getSavedGame()->getRegions())
 	{
 		if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
 		{
@@ -120,7 +120,7 @@ void AlienBaseState::btnOkClick(Action *)
 {
 	_state->timerReset();
 	_state->getGlobe()->center(_base->getLongitude(), _base->getLatitude());
-	_game->popState();
+	getGame()->popState();
 }
 
 }

@@ -33,39 +33,16 @@ namespace Lua
 template <>
 void toLua(lua_State* luaState, Soldier* arg)
 {
-//	int tableIndex = pushTableWithUserdata(luaState, arg);
-
 	int tableIndex = pushTableWithUserdataAndProperties(luaState, arg, [](lua_State* luaState, int index) {
-		lua_pushstring(luaState, "name");
-		lua_pushstring(luaState, "Soldier 1");
-		lua_settable(luaState, index);
-
-		lua_pushstring(luaState, "health");
+		lua_pushstring(luaState, "SOME_CONSTANT");
 		lua_pushinteger(luaState, 100);
-		lua_settable(luaState, index);
-
-		lua_pushstring(luaState, "morale");
-		lua_pushinteger(luaState, -2);
 		lua_settable(luaState, index);
 	});
 
-	//int top = lua_gettop(luaState);
-
-	//registerProperty<
-
-	//>(luaState, "name", tableIndex);
-
-	//lua_pushstring(luaState, "name");
-	//lua_pushstring(luaState, "Soldier 1");
-	//lua_settable(luaState, -3);
-
-	//lua_pushstring(luaState, "health");
-	//lua_pushinteger(luaState, 100);
-	//lua_settable(luaState, -3);
-
-	//lua_pushstring(luaState, "morale");
-	//lua_pushinteger(luaState, -2);
-	//lua_settable(luaState, -3);
+	registerProperty<
+		[](const Soldier* soldier) -> std::string { return soldier->getName(); },
+		[](Soldier* soldier, const std::string& name) { soldier->setName(name); }
+	>(luaState, "name", tableIndex, arg);
 
 }
 

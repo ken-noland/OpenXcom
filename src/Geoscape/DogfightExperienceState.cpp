@@ -92,7 +92,7 @@ DogfightExperienceState::DogfightExperienceState()
 	_lstPilots->setDot(true);
 
 	_lstPilots->clearList();
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (Base* xbase : getGame()->getSavedGame()->getBases())
 	{
 		for (Soldier* soldier : xbase->getSoldiers())
 		{
@@ -120,7 +120,7 @@ DogfightExperienceState::DogfightExperienceState()
  */
 void DogfightExperienceState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

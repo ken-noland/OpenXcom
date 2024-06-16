@@ -96,7 +96,7 @@ ItemsArrivingState::ItemsArrivingState(GeoscapeState *state) : _state(state), _b
 	_lstTransfers->setBackground(_window);
 	_lstTransfers->setMargin(2);
 
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (Base* xbase : getGame()->getSavedGame()->getBases())
 	{
 		for (auto transferIt = xbase->getTransfers().begin(); transferIt != xbase->getTransfers().end();)
 		{
@@ -121,7 +121,7 @@ ItemsArrivingState::ItemsArrivingState(GeoscapeState *state) : _state(state), _b
 				// Remove transfer
 				std::ostringstream ss;
 				ss << transfer->getQuantity();
-				_lstTransfers->addRow(3, transfer->getName(_game->getLanguage()).c_str(), ss.str().c_str(), xbase->getName().c_str());
+				_lstTransfers->addRow(3, transfer->getName(getGame()->getLanguage()).c_str(), ss.str().c_str(), xbase->getName().c_str());
 				delete transfer;
 				transferIt = xbase->getTransfers().erase(transferIt);
 			}
@@ -146,7 +146,7 @@ ItemsArrivingState::~ItemsArrivingState()
  */
 void ItemsArrivingState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -156,8 +156,8 @@ void ItemsArrivingState::btnOkClick(Action *)
 void ItemsArrivingState::btnGotoBaseClick(Action *)
 {
 	_state->timerReset();
-	_game->popState();
-	_game->pushState(new BasescapeState(_base, _state->getGlobe()));
+	getGame()->popState();
+	getGame()->pushState(new BasescapeState(_base, _state->getGlobe()));
 }
 
 }

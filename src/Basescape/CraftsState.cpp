@@ -129,7 +129,7 @@ void CraftsState::init()
 		ss << craft->getNumWeapons() << "/" << craft->getRules()->getWeapons();
 		ss2 << craft->getNumTotalSoldiers();
 		ss3 << craft->getNumTotalVehicles();
-		_lstCrafts->addRow(5, craft->getName(_game->getLanguage()).c_str(), tr(craft->getStatus()).c_str(), ss.str().c_str(), ss2.str().c_str(), ss3.str().c_str());
+		_lstCrafts->addRow(5, craft->getName(getGame()->getLanguage()).c_str(), tr(craft->getStatus()).c_str(), ss.str().c_str(), ss2.str().c_str(), ss3.str().c_str());
 	}
 }
 
@@ -139,12 +139,12 @@ void CraftsState::init()
  */
 void CraftsState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 
-	if (_game->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && _base->storesOverfull())
+	if (getGame()->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && _base->storesOverfull())
 	{
-		_game->pushState(new SellState(_base, 0));
-		_game->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(_base->getName()), _palette, _game->getMod()->getInterface("craftSelect")->getElement("errorMessage")->color, "BACK01.SCR", _game->getMod()->getInterface("craftSelect")->getElement("errorPalette")->color));
+		getGame()->pushState(new SellState(_base, 0));
+		getGame()->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(_base->getName()), _palette, getGame()->getMod()->getInterface("craftSelect")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("craftSelect")->getElement("errorPalette")->color));
 	}
 }
 
@@ -157,14 +157,14 @@ void CraftsState::lstCraftsClick(Action *action)
 	auto& crafts = _base->getCrafts();
 	auto row = _lstCrafts->getSelectedRow();
 
-	if (_game->isLeftClick(action))
+	if (getGame()->isLeftClick(action))
 	{
 		if (crafts[row]->getStatus() != "STR_OUT")
 		{
-			_game->pushState(new CraftInfoState(_base, row));
+			getGame()->pushState(new CraftInfoState(_base, row));
 		}
 	}
-	else if (_game->isRightClick(action))
+	else if (getGame()->isRightClick(action))
 	{
 		if (row > 0)
 		{
@@ -181,10 +181,10 @@ void CraftsState::lstCraftsClick(Action *action)
 			init();
 		}
 	}
-	else if (_game->isMiddleClick(action))
+	else if (getGame()->isMiddleClick(action))
 	{
 		std::string articleId = crafts[row]->getRules()->getType();
-		Ufopaedia::openArticle(_game, articleId);
+		Ufopaedia::openArticle(getGame(), articleId);
 	}
 }
 

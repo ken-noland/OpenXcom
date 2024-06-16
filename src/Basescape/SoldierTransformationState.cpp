@@ -141,7 +141,7 @@ SoldierTransformationState::SoldierTransformationState(RuleSoldierTransformation
 
 	_lstRequiredItems->setColumns(3, 140, 75, 55);
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		_lstStatChanges->setColumns(14, 72, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 0);
 	}
@@ -188,7 +188,7 @@ void SoldierTransformationState::initTransformationData()
 	_lstRequiredItems->clearList();
 	_lstStatChanges->clearList();
 
-	bool transformationPossible = _game->getSavedGame()->getFunds() >= _transformationRule->getCost();
+	bool transformationPossible = getGame()->getSavedGame()->getFunds() >= _transformationRule->getCost();
 
 	if (_base->getAvailableQuarters() <= _base->getUsedQuarters() &&
 		(_transformationRule->isCreatingClone() ||
@@ -216,7 +216,7 @@ void SoldierTransformationState::initTransformationData()
 	{
 		std::ostringstream s1, s2;
 		s1 << requiredItem.second;
-		const auto* rule = _game->getMod()->getItem(requiredItem.first);
+		const auto* rule = getGame()->getMod()->getItem(requiredItem.first);
 		if (rule != 0)
 		{
 			s2 << _base->getStorageItems()->getItem(rule);
@@ -240,17 +240,17 @@ void SoldierTransformationState::initTransformationData()
 	}
 
 	UnitStats currentStats = *_sourceSoldier->getCurrentStats();
-	UnitStats changedStatsMin = _sourceSoldier->calculateStatChanges(_game->getMod(), _transformationRule, _sourceSoldier, 1, _sourceSoldier->getRules());
-	UnitStats changedStatsMax = _sourceSoldier->calculateStatChanges(_game->getMod(), _transformationRule, _sourceSoldier, 2, _sourceSoldier->getRules());
+	UnitStats changedStatsMin = _sourceSoldier->calculateStatChanges(getGame()->getMod(), _transformationRule, _sourceSoldier, 1, _sourceSoldier->getRules());
+	UnitStats changedStatsMax = _sourceSoldier->calculateStatChanges(getGame()->getMod(), _transformationRule, _sourceSoldier, 2, _sourceSoldier->getRules());
 	UnitStats bonusStats;
-	auto bonusRule = _game->getMod()->getSoldierBonus(_transformationRule->getSoldierBonusType(), false);
+	auto bonusRule = getGame()->getMod()->getSoldierBonus(_transformationRule->getSoldierBonusType(), false);
 	if (bonusRule)
 	{
 		bonusStats += *bonusRule->getStats();
 	}
 
 	bool showPsiSkill = currentStats.psiSkill > 0;
-	bool showPsiStrength = showPsiSkill || (Options::psiStrengthEval && _game->getSavedGame()->isResearched(_game->getMod()->getPsiRequirements()));
+	bool showPsiStrength = showPsiSkill || (Options::psiStrengthEval && getGame()->getSavedGame()->isResearched(getGame()->getMod()->getPsiRequirements()));
 
 	UnitStats rerollFlags = _transformationRule->getRerollStats();
 
@@ -263,9 +263,9 @@ void SoldierTransformationState::initTransformationData()
 		randomFlags += UnitStats::isRandom(_transformationRule->getPercentGainedMin(), _transformationRule->getPercentGainedMax());
 	}
 
-	if (_game->getMod()->isManaFeatureEnabled())
+	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
-		bool showMana = _game->getSavedGame()->isManaUnlocked(_game->getMod());
+		bool showMana = getGame()->getSavedGame()->isManaUnlocked(getGame()->getMod());
 
 		_lstStatChanges->addRow(14, "",
 			tr("STR_TIME_UNITS_ABBREVIATION").c_str(),
@@ -426,7 +426,7 @@ void SoldierTransformationState::initTransformationData()
  */
 void SoldierTransformationState::btnCancelClick(Action *action)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -436,11 +436,11 @@ void SoldierTransformationState::btnCancelClick(Action *action)
 void SoldierTransformationState::btnStartClick(Action *action)
 {
 	// Pay upfront, no refunds
-	_game->getSavedGame()->setFunds(_game->getSavedGame()->getFunds() - _transformationRule->getCost());
+	getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() - _transformationRule->getCost());
 
 	for (auto& requiredItem : _transformationRule->getRequiredItems())
 	{
-		const auto* rule = _game->getMod()->getItem(requiredItem.first);
+		const auto* rule = getGame()->getMod()->getItem(requiredItem.first);
 		if (rule != 0)
 		{
 			_base->getStorageItems()->removeItem(rule, requiredItem.second);
@@ -457,7 +457,7 @@ void SoldierTransformationState::btnStartClick(Action *action)
 		performTransformation();
 	}
 
-	_game->popState();
+	getGame()->popState();
 }
 
 void SoldierTransformationState::performTransformation()
@@ -466,11 +466,11 @@ void SoldierTransformationState::performTransformation()
 
 	if (_transformationRule->isCreatingClone())
 	{
-		int newId = _game->getSavedGame()->getId("STR_SOLDIER");
-		RuleSoldier *newSoldierType = _game->getMod()->getSoldier(_sourceSoldier->getRules()->getType());
+		int newId = getGame()->getSavedGame()->getId("STR_SOLDIER");
+		RuleSoldier *newSoldierType = getGame()->getMod()->getSoldier(_sourceSoldier->getRules()->getType());
 		if (!Mod::isEmptyRuleName(_transformationRule->getProducedSoldierType()))
 		{
-			newSoldierType = _game->getMod()->getSoldier(_transformationRule->getProducedSoldierType());
+			newSoldierType = getGame()->getMod()->getSoldier(_transformationRule->getProducedSoldierType());
 		}
 		destinationSoldier = new Soldier(
 			newSoldierType,
@@ -502,10 +502,10 @@ void SoldierTransformationState::performTransformation()
 		if (_sourceSoldier->getDeath())
 		{
 			// true resurrect = remove from Memorial Wall
-			auto it = find(_game->getSavedGame()->getDeadSoldiers().begin(), _game->getSavedGame()->getDeadSoldiers().end(), _sourceSoldier);
-			if (it != _game->getSavedGame()->getDeadSoldiers().end())
+			auto it = find(getGame()->getSavedGame()->getDeadSoldiers().begin(), getGame()->getSavedGame()->getDeadSoldiers().end(), _sourceSoldier);
+			if (it != getGame()->getSavedGame()->getDeadSoldiers().end())
 			{
-				_game->getSavedGame()->getDeadSoldiers().erase(it);
+				getGame()->getSavedGame()->getDeadSoldiers().erase(it);
 			}
 		}
 		else if (_transformationRule->getTransferTime() > 0)
@@ -527,7 +527,7 @@ void SoldierTransformationState::performTransformation()
 		_base->getTransfers().push_back(transfer);
 	}
 
-	destinationSoldier->transform(_game->getMod(), _transformationRule, _sourceSoldier, _base);
+	destinationSoldier->transform(getGame()->getMod(), _transformationRule, _sourceSoldier, _base);
 }
 
 void SoldierTransformationState::retire()
@@ -537,11 +537,11 @@ void SoldierTransformationState::retire()
 		if (_sourceSoldier->getDeath())
 		{
 			// I wonder if anyone will ever use THIS option
-			auto it = find(_game->getSavedGame()->getDeadSoldiers().begin(), _game->getSavedGame()->getDeadSoldiers().end(), _sourceSoldier);
-			if (it != _game->getSavedGame()->getDeadSoldiers().end())
+			auto it = find(getGame()->getSavedGame()->getDeadSoldiers().begin(), getGame()->getSavedGame()->getDeadSoldiers().end(), _sourceSoldier);
+			if (it != getGame()->getSavedGame()->getDeadSoldiers().end())
 			{
 				delete (*it);
-				_game->getSavedGame()->getDeadSoldiers().erase(it);
+				getGame()->getSavedGame()->getDeadSoldiers().erase(it);
 			}
 		}
 		else
@@ -559,7 +559,7 @@ void SoldierTransformationState::retire()
 	{
 		int transferTime = _transformationRule->getTransferTime() > 0 ? _transformationRule->getTransferTime() : 1;
 		Transfer *transfer = new Transfer(transferTime);
-		transfer->setItems(_game->getMod()->getItem(_transformationRule->getProducedItem(), true), 1);
+		transfer->setItems(getGame()->getMod()->getItem(_transformationRule->getProducedItem(), true), 1);
 		_base->getTransfers().push_back(transfer);
 	}
 }

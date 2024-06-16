@@ -68,7 +68,7 @@ AbortMissionState::AbortMissionState(SavedBattleGame *battleGame, BattlescapeSta
 
 	// Check available areas (maybe should be cached somewhere)
 	bool exit = false, craft = true;
-	AlienDeployment *deployment = _game->getMod()->getDeployment(_battleGame->getMissionType());
+	AlienDeployment *deployment = getGame()->getMod()->getDeployment(_battleGame->getMissionType());
 	if (deployment != 0)
 	{
 		exit = !deployment->getNextStage().empty() || deployment->getEscapeType() == ESCAPE_EXIT || deployment->getEscapeType() == ESCAPE_EITHER;
@@ -77,7 +77,7 @@ AbortMissionState::AbortMissionState(SavedBattleGame *battleGame, BattlescapeSta
 		{
 			lastUsedMapScript = deployment->getRandomMapScript(); // don't crash on old saves
 		}
-		const std::vector<MapScript*> *mapScriptEntries = _game->getMod()->getMapScript(lastUsedMapScript);
+		const std::vector<MapScript*> *mapScriptEntries = getGame()->getMod()->getMapScript(lastUsedMapScript);
 		if (mapScriptEntries != 0)
 		{
 			craft = false;
@@ -119,7 +119,7 @@ AbortMissionState::AbortMissionState(SavedBattleGame *battleGame, BattlescapeSta
 
 	// Set up objects
 	_window->setHighContrast(true);
-	_window->setBackground(_game->getMod()->getSurface("TAC00.SCR"));
+	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtInEntrance->setBig();
 	_txtInEntrance->setHighContrast(true);
@@ -210,11 +210,11 @@ void AbortMissionState::btnOkClick(Action *)
 			_battleGame->saveCustomCraftDeployment();
 		}
 
-		_game->popState();
+		getGame()->popState();
 		return;
 	}
 
-	_game->popState();
+	getGame()->popState();
 	_battleGame->setAborted(true);
 	_state->finishBattle(true, _inExit);
 }
@@ -225,7 +225,7 @@ void AbortMissionState::btnOkClick(Action *)
  */
 void AbortMissionState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 

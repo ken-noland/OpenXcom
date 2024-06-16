@@ -98,7 +98,7 @@ CraftPilotsState::CraftPilotsState(Base *base, size_t craft) : _base(base), _cra
 
 	_txtTitle->setBig();
 	_txtTitle->setAlign(ALIGN_CENTER);
-	_txtTitle->setText(tr("STR_PILOTS_FOR_CRAFT").arg(c->getName(_game->getLanguage())));
+	_txtTitle->setText(tr("STR_PILOTS_FOR_CRAFT").arg(c->getName(getGame()->getLanguage())));
 
 	_txtFiringAcc->setText(tr("STR_FIRING_ACCURACY"));
 	_txtFiringAcc->setAlign(ALIGN_RIGHT);
@@ -131,7 +131,7 @@ CraftPilotsState::CraftPilotsState(Base *base, size_t craft) : _base(base), _cra
 	{
 		if (soldier->getCraft() == c)
 		{
-			soldier->prepareStatsWithBonuses(_game->getMod()); // refresh soldier bonuses
+			soldier->prepareStatsWithBonuses(getGame()->getMod()); // refresh soldier bonuses
 		}
 	}
 }
@@ -175,17 +175,17 @@ void CraftPilotsState::updateUI()
 	}
 
 	std::ostringstream ss1;
-	int accBonus = c->getPilotAccuracyBonus(pilots, _game->getMod());
+	int accBonus = c->getPilotAccuracyBonus(pilots, getGame()->getMod());
 	ss1 << (accBonus > 0 ? "+" : "") << accBonus << "%";
 	_txtAccuracyBonusValue->setText(ss1.str().c_str());
 
 	std::ostringstream ss2;
-	int dodgeBonus = c->getPilotDodgeBonus(pilots, _game->getMod());
+	int dodgeBonus = c->getPilotDodgeBonus(pilots, getGame()->getMod());
 	ss2 << (dodgeBonus > 0 ? "+" : "") << dodgeBonus << "%";
 	_txtDodgeBonusValue->setText(ss2.str().c_str());
 
 	std::ostringstream ss3;
-	int approachSpeed = c->getPilotApproachSpeedModifier(pilots, _game->getMod());
+	int approachSpeed = c->getPilotApproachSpeedModifier(pilots, getGame()->getMod());
 	switch (approachSpeed)
 	{
 	case 1:
@@ -226,7 +226,7 @@ void CraftPilotsState::updateUI()
  */
 void CraftPilotsState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -235,7 +235,7 @@ void CraftPilotsState::btnOkClick(Action *)
 */
 void CraftPilotsState::btnAddClick(Action *)
 {
-	_game->pushState(new CraftPilotSelectState(_base, _craft));
+	getGame()->pushState(new CraftPilotSelectState(_base, _craft));
 }
 
 /**

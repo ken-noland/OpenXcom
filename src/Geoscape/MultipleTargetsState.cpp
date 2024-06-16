@@ -70,7 +70,7 @@ MultipleTargetsState::MultipleTargetsState(std::vector<Target*> targets, std::ve
 		for (size_t i = 0; i < _targets.size(); ++i)
 		{
 			TextButton *button = new TextButton(116, BUTTON_HEIGHT, 70, y);
-			button->setText(_targets[i]->getName(_game->getLanguage()));
+			button->setText(_targets[i]->getName(getGame()->getLanguage()));
 			button->onMouseClick((ActionHandler)&MultipleTargetsState::btnTargetClick);
 			add(button, "button", "multipleTargets");
 
@@ -114,7 +114,7 @@ void MultipleTargetsState::init()
  */
 void MultipleTargetsState::popupTarget(Target *target)
 {
-	_game->popState();
+	getGame()->popState();
 	if (_crafts.size() == 0)
 	{
 		Base* b = dynamic_cast<Base*>(target);
@@ -122,24 +122,24 @@ void MultipleTargetsState::popupTarget(Target *target)
 		Ufo* u = dynamic_cast<Ufo*>(target);
 		if (b != 0)
 		{
-			_game->pushState(new InterceptState(_state->getGlobe(), _useCustomSound, b));
+			getGame()->pushState(new InterceptState(_state->getGlobe(), _useCustomSound, b));
 		}
 		else if (c != 0)
 		{
-			_game->pushState(new GeoscapeCraftState(c, _state->getGlobe(), 0, _useCustomSound));
+			getGame()->pushState(new GeoscapeCraftState(c, _state->getGlobe(), 0, _useCustomSound));
 		}
 		else if (u != 0)
 		{
-			_game->pushState(new UfoDetectedState(u, _state, false, u->getHyperDetected()));
+			getGame()->pushState(new UfoDetectedState(u, _state, false, u->getHyperDetected()));
 		}
 		else
 		{
-			_game->pushState(new TargetInfoState(target, _state->getGlobe()));
+			getGame()->pushState(new TargetInfoState(target, _state->getGlobe()));
 		}
 	}
 	else
 	{
-		_game->pushState(new ConfirmDestinationState(_crafts, target));
+		getGame()->pushState(new ConfirmDestinationState(_crafts, target));
 	}
 }
 
@@ -149,7 +149,7 @@ void MultipleTargetsState::popupTarget(Target *target)
  */
 void MultipleTargetsState::btnCancelClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**

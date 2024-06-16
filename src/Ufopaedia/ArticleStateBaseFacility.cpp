@@ -37,7 +37,7 @@ namespace OpenXcom
 
 	ArticleStateBaseFacility::ArticleStateBaseFacility(ArticleDefinitionBaseFacility *defs, std::shared_ptr<ArticleCommonState> state) : ArticleState(defs->id, std::move(state))
 	{
-		RuleBaseFacility *facility = _game->getMod()->getBaseFacility(defs->id, true);
+		RuleBaseFacility *facility = getGame()->getMod()->getBaseFacility(defs->id, true);
 
 		// add screen elements
 		_txtTitle = new Text(200, 17, 10, 24);
@@ -51,12 +51,12 @@ namespace OpenXcom
 		add(_txtTitle);
 
 		// Set up objects
-		_game->getMod()->getSurface("BACK09.SCR")->blitNShade(_bg, 0, 0);
+		getGame()->getMod()->getSurface("BACK09.SCR")->blitNShade(_bg, 0, 0);
 		_btnOk->setColor(Palette::blockOffset(4));
 		_btnPrev->setColor(Palette::blockOffset(4));
 		_btnNext->setColor(Palette::blockOffset(4));
 		_btnInfo->setColor(Palette::blockOffset(4));
-		_btnInfo->setVisible(_game->getMod()->getShowPediaInfoButton());
+		_btnInfo->setVisible(getGame()->getMod()->getShowPediaInfoButton());
 
 		_txtTitle->setColor(Palette::blockOffset(13)+10);
 		_txtTitle->setBig();
@@ -71,7 +71,7 @@ namespace OpenXcom
 			16 + Mod::PEDIA_FACILITY_RENDER_PARAMETERS[3]);
 		add(_image);
 
-		SurfaceSet *graphic = _game->getMod()->getSurfaceSet("BASEBITS.PCK");
+		SurfaceSet *graphic = getGame()->getMod()->getSurfaceSet("BASEBITS.PCK");
 		Surface *frame;
 		int x_offset, y_offset;
 		int x_pos, y_pos;

@@ -71,8 +71,8 @@ SlideshowState::SlideshowState(const SlideshowHeader &slideshowHeader, const std
 	_transitionTimer = new Timer(transitionSeconds * 1000);
 	_transitionTimer->onTimer((StateHandler)&SlideshowState::screenTimer);
 
-	_game->getMod()->playMusic(_slideshowHeader.musicId);
-	_game->getCursor()->setVisible(false);
+	getGame()->getMod()->playMusic(_slideshowHeader.musicId);
+	getGame()->getCursor()->setVisible(false);
 	screenClick(0);
 }
 
@@ -135,9 +135,9 @@ void SlideshowState::screenClick(Action *action)
 void SlideshowState::screenSkip(Action *)
 {
 	// slideshow is over.  restore the screen scale and pop the state
-	_game->getCursor()->setVisible(true);
+	getGame()->getCursor()->setVisible(true);
 	CutsceneState::resetDisplay(_wasLetterboxed);
-	_game->popState();
+	getGame()->popState();
 }
 
 }

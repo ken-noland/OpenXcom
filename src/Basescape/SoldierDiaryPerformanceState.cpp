@@ -50,7 +50,7 @@ SoldierDiaryPerformanceState::SoldierDiaryPerformanceState(Base *base, size_t so
 {
 	if (_base == 0)
 	{
-		_list = &_game->getSavedGame()->getDeadSoldiers();
+		_list = &getGame()->getSavedGame()->getDeadSoldiers();
 	}
 	else
 	{
@@ -224,11 +224,11 @@ void SoldierDiaryPerformanceState::init()
 	_txtMedalLevel->setVisible(_display == DIARY_COMMENDATIONS);
 	_txtMedalInfo->setVisible(_display == DIARY_COMMENDATIONS);
 	_lstCommendations->setVisible(_display == DIARY_COMMENDATIONS);
-	_btnCommendations->setVisible(!_game->getMod()->getCommendationsList().empty());
+	_btnCommendations->setVisible(!getGame()->getMod()->getCommendationsList().empty());
 
 	if (_list->empty())
 	{
-		_game->popState();
+		getGame()->popState();
 		return;
 	}
 	if (_soldierId >= _list->size())
@@ -269,7 +269,7 @@ void SoldierDiaryPerformanceState::init()
 			}
 		}
 
-		if (_soldier->getCurrentStats()->psiSkill > 0 || (Options::psiStrengthEval && _game->getSavedGame()->isResearched(_game->getMod()->getPsiRequirements())))
+		if (_soldier->getCurrentStats()->psiSkill > 0 || (Options::psiStrengthEval && getGame()->getSavedGame()->isResearched(getGame()->getMod()->getPsiRequirements())))
 		{
 			_lstKillTotals->addRow(4, tr("STR_KILLS").arg(_soldier->getDiary()->getKillTotal()).c_str(),
 										tr("STR_STUNS").arg(_soldier->getDiary()->getStunTotal()).c_str(),
@@ -287,9 +287,9 @@ void SoldierDiaryPerformanceState::init()
 	else if (_display == DIARY_MISSIONS)
 	{
 		std::map<std::string, int> mapArray[] = {
-			_soldier->getDiary()->getRegionTotal(_game->getSavedGame()->getMissionStatistics()),
-			_soldier->getDiary()->getTypeTotal(_game->getSavedGame()->getMissionStatistics()),
-			_soldier->getDiary()->getUFOTotal(_game->getSavedGame()->getMissionStatistics())
+			_soldier->getDiary()->getRegionTotal(getGame()->getSavedGame()->getMissionStatistics()),
+			_soldier->getDiary()->getTypeTotal(getGame()->getSavedGame()->getMissionStatistics()),
+			_soldier->getDiary()->getUFOTotal(getGame()->getSavedGame()->getMissionStatistics())
 		};
 		std::string titleArray[] = { "STR_MISSIONS_BY_LOCATION", "STR_MISSIONS_BY_TYPE", "STR_MISSIONS_BY_UFO" };
 
@@ -311,11 +311,11 @@ void SoldierDiaryPerformanceState::init()
 		}
 
 		_lstMissionTotals->addRow(4, tr("STR_MISSIONS").arg(_soldier->getDiary()->getMissionTotal()).c_str(),
-									tr("STR_WINS").arg(_soldier->getDiary()->getWinTotal(_game->getSavedGame()->getMissionStatistics())).c_str(),
-									tr("STR_SCORE_VALUE").arg(_soldier->getDiary()->getScoreTotal(_game->getSavedGame()->getMissionStatistics())).c_str(),
+									tr("STR_WINS").arg(_soldier->getDiary()->getWinTotal(getGame()->getSavedGame()->getMissionStatistics())).c_str(),
+									tr("STR_SCORE_VALUE").arg(_soldier->getDiary()->getScoreTotal(getGame()->getSavedGame()->getMissionStatistics())).c_str(),
 									tr("STR_DAYS_WOUNDED").arg(_soldier->getDiary()->getDaysWoundedTotal()).c_str());
 	}
-	else if (_display == DIARY_COMMENDATIONS && !_game->getMod()->getCommendationsList().empty())
+	else if (_display == DIARY_COMMENDATIONS && !getGame()->getMod()->getCommendationsList().empty())
 	{
 		// pre-calc translations
 		for (SoldierCommendations* sc : _soldier->getDiary()->getSoldierCommendations())
@@ -367,8 +367,8 @@ void SoldierDiaryPerformanceState::drawSprites()
 	if (_display != DIARY_COMMENDATIONS) return;
 
 	// Commendation sprites
-	SurfaceSet* commendationSprite = _game->getMod()->getSurfaceSet("Commendations");
-	SurfaceSet* commendationDecoration = _game->getMod()->getSurfaceSet("CommendationDecorations");
+	SurfaceSet* commendationSprite = getGame()->getMod()->getSurfaceSet("Commendations");
+	SurfaceSet* commendationDecoration = getGame()->getMod()->getSurfaceSet("CommendationDecorations");
 
 	// Clear sprites
 	for (int i = 0; i != 10; ++i)
@@ -413,7 +413,7 @@ void SoldierDiaryPerformanceState::drawSprites()
 void SoldierDiaryPerformanceState::btnOkClick(Action *)
 {
 	_soldierDiaryOverviewState->setSoldierId(_soldierId);
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -499,7 +499,7 @@ void SoldierDiaryPerformanceState::lstInfoMouseOut(Action *)
 */
 void SoldierDiaryPerformanceState::lstInfoMouseClick(Action *)
 {
-	Ufopaedia::openArticle(_game, _commendationsNames[_lstCommendations->getSelectedRow()]);
+	Ufopaedia::openArticle(getGame(), _commendationsNames[_lstCommendations->getSelectedRow()]);
 }
 
 /**

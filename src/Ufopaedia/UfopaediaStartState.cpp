@@ -33,7 +33,7 @@
 
 namespace OpenXcom
 {
-	UfopaediaStartState::UfopaediaStartState() : _offset(0), _scroll(0), _maxButtons(0), _heightOffset(0), _windowOffset(0), _cats(_game->getMod()->getUfopaediaCategoryList())
+	UfopaediaStartState::UfopaediaStartState() : _offset(0), _scroll(0), _maxButtons(0), _heightOffset(0), _windowOffset(0), _cats(getGame()->getMod()->getUfopaediaCategoryList())
 	{
 		const int MAX_VANILLA_BUTTONS = 10;
 		const int SPACE_PER_BUTTON = 13;
@@ -41,7 +41,7 @@ namespace OpenXcom
 
 		_screen = false;
 
-		int extraSpace = (_game->getScreen()->getDY() * 2) + 20; // upper extra + lower extra + 20 pixels from the original
+		int extraSpace = (getGame()->getScreen()->getDY() * 2) + 20; // upper extra + lower extra + 20 pixels from the original
 		int maxButtons = (extraSpace / SPACE_PER_BUTTON) + MAX_VANILLA_BUTTONS;
 		_maxButtons = std::min(_cats.size(), (size_t)maxButtons);
 		maxButtons = (int)_maxButtons;
@@ -148,7 +148,7 @@ namespace OpenXcom
 	 */
 	void UfopaediaStartState::btnOkClick(Action *)
 	{
-		_game->popState();
+		getGame()->popState();
 	}
 
 	/**
@@ -161,7 +161,7 @@ namespace OpenXcom
 		{
 			if (action->getSender() == _btnSections[i])
 			{
-				_game->pushState(new UfopaediaSelectState(_cats[_offset + i], _heightOffset, _windowOffset));
+				getGame()->pushState(new UfopaediaSelectState(_cats[_offset + i], _heightOffset, _windowOffset));
 				break;
 			}
 		}

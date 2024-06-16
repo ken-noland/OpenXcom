@@ -104,7 +104,7 @@ T StatisticsState::sumVector(const std::vector<T> &vec) const
 
 void StatisticsState::listStats()
 {
-	SavedGame *save = _game->getSavedGame();
+	SavedGame *save = getGame()->getSavedGame();
 
 	std::ostringstream ss;
 	GameTime *time = save->getTime();
@@ -120,7 +120,7 @@ void StatisticsState::listStats()
 	{
 		ss << tr("STR_STATISTICS");
 	}
-	ss << Unicode::TOK_NL_SMALL << time->getDayString(_game->getLanguage()) << " " << tr(time->getMonthString()) << " " << time->getYear();
+	ss << Unicode::TOK_NL_SMALL << time->getDayString(getGame()->getLanguage()) << " " << tr(time->getMonthString()) << " " << time->getYear();
 	_txtTitle->setText(ss.str());
 
 	int totalScore = sumVector(save->getResearchScores());
@@ -148,7 +148,7 @@ void StatisticsState::listStats()
 		}
 		bestScore = std::max(bestScore, ms->score);
 		worstScore = std::min(worstScore, ms->score);
-		if (ms->isDarkness(_game->getMod()))
+		if (ms->isDarkness(getGame()->getMod()))
 		{
 			nightMissions++;
 		}
@@ -259,7 +259,7 @@ void StatisticsState::listStats()
 	int ufosDetected = std::max(0, ids["STR_UFO"] - 1);
 	int terrorSites = std::max(0, ids["STR_TERROR_SITE"] - 1);
 	int totalCrafts = 0;
-	for (const auto& craftType : _game->getMod()->getCraftsList())
+	for (const auto& craftType : getGame()->getMod()->getCraftsList())
 	{
 		totalCrafts += std::max(0, ids[craftType] - 1);
 	}
@@ -333,14 +333,14 @@ void StatisticsState::listStats()
  */
 void StatisticsState::btnOkClick(Action *)
 {
-	if (_game->getSavedGame()->getEnding() == END_NONE)
+	if (getGame()->getSavedGame()->getEnding() == END_NONE)
 	{
-		_game->popState();
+		getGame()->popState();
 	}
 	else
 	{
-		_game->setSavedGame(0);
-		_game->setState(new GoToMainMenuState);
+		getGame()->setSavedGame(0);
+		getGame()->setState(new GoToMainMenuState);
 	}
 }
 

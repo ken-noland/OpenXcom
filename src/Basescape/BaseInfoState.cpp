@@ -164,13 +164,13 @@ BaseInfoState::BaseInfoState(Base *base, BasescapeState *state) : _base(base), _
 		ss << "ALT";
 	}
 	ss << "BACK07.SCR";
-	_game->getMod()->getSurface(ss.str())->blitNShade(_bg, 0, 0);
+	getGame()->getMod()->getSurface(ss.str())->blitNShade(_bg, 0, 0);
 
-	_mini->setTexture(_game->getMod()->getSurfaceSet("BASEBITS.PCK"));
-	_mini->setBases(_game->getSavedGame()->getBases());
-	for (size_t i = 0; i < _game->getSavedGame()->getBases().size(); ++i)
+	_mini->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
+	_mini->setBases(getGame()->getSavedGame()->getBases());
+	for (size_t i = 0; i < getGame()->getSavedGame()->getBases().size(); ++i)
 	{
-		if (_game->getSavedGame()->getBases().at(i) == _base)
+		if (getGame()->getSavedGame()->getBases().at(i) == _base)
 		{
 			_mini->setSelectedBase(i);
 			break;
@@ -520,10 +520,10 @@ void BaseInfoState::edtBaseChange(Action *)
 void BaseInfoState::miniClick(Action *)
 {
 	size_t base = _mini->getHoveredBase();
-	if (base < _game->getSavedGame()->getBases().size())
+	if (base < getGame()->getSavedGame()->getBases().size())
 	{
 		_mini->setSelectedBase(base);
-		_base = _game->getSavedGame()->getBases().at(base);
+		_base = getGame()->getSavedGame()->getBases().at(base);
 		_state->setBase(_base);
 		init();
 	}
@@ -548,12 +548,12 @@ void BaseInfoState::handleKeyPress(Action *action)
 			Options::keyBaseSelect8
 		};
 		int key = action->getDetails()->key.keysym.sym;
-		for (size_t i = 0; i < _game->getSavedGame()->getBases().size(); ++i)
+		for (size_t i = 0; i < getGame()->getSavedGame()->getBases().size(); ++i)
 		{
 			if (key == baseKeys[i])
 			{
 				_mini->setSelectedBase(i);
-				_base = _game->getSavedGame()->getBases().at(i);
+				_base = getGame()->getSavedGame()->getBases().at(i);
 				_state->setBase(_base);
 				init();
 				break;
@@ -568,7 +568,7 @@ void BaseInfoState::handleKeyPress(Action *action)
  */
 void BaseInfoState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 /**
@@ -577,7 +577,7 @@ void BaseInfoState::btnOkClick(Action *)
  */
 void BaseInfoState::btnTransfersClick(Action *)
 {
-	_game->pushState(new TransfersState(_base));
+	getGame()->pushState(new TransfersState(_base));
 }
 
 /**
@@ -586,7 +586,7 @@ void BaseInfoState::btnTransfersClick(Action *)
  */
 void BaseInfoState::btnStoresClick(Action *)
 {
-	_game->pushState(new StoresState(_base));
+	getGame()->pushState(new StoresState(_base));
 }
 
 /**
@@ -595,7 +595,7 @@ void BaseInfoState::btnStoresClick(Action *)
  */
 void BaseInfoState::btnMonthlyCostsClick(Action *)
 {
-	_game->pushState(new MonthlyCostsState(_base));
+	getGame()->pushState(new MonthlyCostsState(_base));
 }
 
 }

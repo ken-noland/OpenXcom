@@ -90,7 +90,7 @@ TransfersState::TransfersState(Base *base) : _base(base)
 		std::ostringstream ss, ss2;
 		ss << transfer->getQuantity();
 		ss2 << transfer->getHours();
-		_lstTransfers->addRow(3, transfer->getName(_game->getLanguage()).c_str(), ss.str().c_str(), ss2.str().c_str());
+		_lstTransfers->addRow(3, transfer->getName(getGame()->getLanguage()).c_str(), ss.str().c_str(), ss2.str().c_str());
 	}
 }
 
@@ -108,7 +108,7 @@ TransfersState::~TransfersState()
  */
 void TransfersState::btnOkClick(Action *)
 {
-	_game->popState();
+	getGame()->popState();
 }
 
 }

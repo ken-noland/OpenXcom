@@ -62,8 +62,8 @@ void PlaceStartFacilityState::viewClick(Action *)
 {
 	if (_view->getPlacementError(_rule, nullptr, true))
 	{
-		_game->popState();
-		_game->pushState(new ErrorMessageState(tr("STR_CANNOT_BUILD_HERE"), _palette, _game->getMod()->getInterface("basescape")->getElement("errorMessage")->color, "BACK01.SCR", _game->getMod()->getInterface("basescape")->getElement("errorPalette")->color));
+		getGame()->popState();
+		getGame()->pushState(new ErrorMessageState(tr("STR_CANNOT_BUILD_HERE"), _palette, getGame()->getMod()->getInterface("basescape")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("basescape")->getElement("errorPalette")->color));
 	}
 	else
 	{
@@ -73,9 +73,9 @@ void PlaceStartFacilityState::viewClick(Action *)
 		_base->getFacilities().push_back(fac);
 		if (fac->getRules()->getPlaceSound() != Mod::NO_SOUND)
 		{
-			_game->getMod()->getSound("GEO.CAT", fac->getRules()->getPlaceSound())->play();
+			getGame()->getMod()->getSound("GEO.CAT", fac->getRules()->getPlaceSound())->play();
 		}
-		_game->popState();
+		getGame()->popState();
 		_select->facilityBuilt();
 	}
 }
