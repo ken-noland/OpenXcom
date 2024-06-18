@@ -46,7 +46,7 @@ namespace OpenXcom
  * By default states are full-screen.
  * @param game Pointer to the core game.
  */
-State::State(const std::string& name) : _screen(true), _soundPlayed(false), _modal(0), _ruleInterface(0), _ruleInterfaceParent(0), _customSound(nullptr)
+State::State(const std::string& name) : _name(name), _screen(true), _soundPlayed(false), _modal(0), _ruleInterface(0), _ruleInterfaceParent(0), _customSound(nullptr)
 {
 	// initialize palette to all black
 	memset(_palette, 0, sizeof(_palette));
@@ -75,6 +75,7 @@ void State::setInterface(const std::string& category, bool alterPal, SavedBattle
 	int backPal = -1;
 	std::string pal = "PAL_GEOSCAPE";
 
+	_interfaceCategory = category;
 	_ruleInterface = getGame()->getMod()->getInterface(category);
 	if (_ruleInterface)
 	{

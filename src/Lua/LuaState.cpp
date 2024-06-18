@@ -137,7 +137,7 @@ bool LuaState::loadScript(const std::filesystem::path& filename, const std::init
 	// add the APIs
 	for (LuaApi* api : apis)
 	{
-		api->registerApi(_state);
+		api->registerApi(_state);	//this will push a table onto the stack
 	}
 
 	// load the script

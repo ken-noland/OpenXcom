@@ -17,43 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "LuaState.h"
-#include <memory>
+
+#include "LuaApi.h"
+#include "LuaDispatch.h"
 
 namespace OpenXcom
 {
 
 class Game;
-class ModFile;
 
 namespace Lua
 {
 
-class GameScript;
-class UIScript;
-
-/// 
-class LuaMod
+class UIScript : public LuaApi
 {
 private:
 	Game& _game;
-	const ModFile& _modFiles;
 
-	using LuaMods = std::vector<std::unique_ptr<LuaState>>;
-	LuaMods _luaMods;
-
-	std::unique_ptr<GameScript> _luaGameScript;
-	std::unique_ptr<UIScript> _luaUIScript;
+	//this is just a test function which is triggered on a certain keypress, which allows us to output the state of the game at any given time.
+	using LuaOnTestEvent = LuaSimpleCallback<void>;
+	LuaOnTestEvent _onTestEvent;
 
 public:
-	LuaMod(Game& game, const ModFile& modFiles);
-	~LuaMod();
+	UIScript(Game& game);
+	~UIScript();
 
-	bool loadAll();
+	/// Registers the game API with the Lua state.
+	virtual void onRegisterApi(lua_State* luaState, int parentTableIndex) override;
 
-	inline GameScript& getGameScript() const { return *_luaGameScript; }
-	inline UIScript& getUIScript() const { return *_luaUIScript; }
-
+	LuaOnTestEvent& getOnTestEvent() { return _onTestEvent; }
 };
 
 } // namespace Lua

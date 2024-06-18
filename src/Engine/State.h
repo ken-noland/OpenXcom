@@ -55,6 +55,8 @@ protected:
 	bool _screen;
 	bool _soundPlayed;
 	InteractiveSurface *_modal;
+
+	std::string _interfaceCategory;
 	RuleInterface *_ruleInterface;
 	RuleInterface *_ruleInterfaceParent;
 	const Sound* _customSound;
@@ -68,6 +70,14 @@ public:
 	virtual ~State();
 
 	const std::string& getName() const { return _name; }
+
+	const std::string& getInterfaceCategory() const { return _interfaceCategory; }
+
+	bool IsSoundPlayed() const { return _soundPlayed; }
+
+	bool IsScreen() const { return _screen; }
+
+	const std::vector<Surface*>& getSurfaces() const { return _surfaces; }
 
 	/// Set interface rules.
 	void setInterface(const std::string &s, bool alterPal = false, SavedBattleGame *battleGame = 0);

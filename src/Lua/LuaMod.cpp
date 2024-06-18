@@ -20,6 +20,7 @@
 #include "LuaApi.h"
 #include "LuaState.h"
 #include "GameScript.h"
+#include "UIScript.h"
 #include "../Engine/Logger.h"
 #include "../Mod/ModFile.h"
 
@@ -45,6 +46,7 @@ bool LuaMod::loadAll()
 	Log(LOG_INFO) << "Loading Lua...";
 
 	_luaGameScript = std::make_unique<GameScript>(_game);
+	_luaUIScript = std::make_unique<UIScript>(_game);
 
 	// Load all the Lua scripts
 	for (const ModInfo* modData : _modFiles.getModData())
@@ -54,7 +56,11 @@ bool LuaMod::loadAll()
 			//construct a path to the lua file
 			std::filesystem::path luaPath = modData->getPath() / modData->getLuaScript();
 
-			std::unique_ptr<LuaState> luaState = std::make_unique<LuaState>(luaPath, modData, std::initializer_list<LuaApi*>{_luaGameScript.get()});
+			std::unique_ptr<LuaState> luaState = std::make_unique<LuaState>(luaPath, modData,
+				std::initializer_list<LuaApi*>{
+					_luaGameScript.get(),
+					_luaUIScript.get()
+			});
 
 			//initialize the lua state
 			_luaMods.push_back(std::move(luaState));

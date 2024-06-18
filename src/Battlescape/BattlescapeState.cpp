@@ -766,7 +766,7 @@ void BattlescapeState::init()
 
 		resetPalettes();
 		_save->setPaletteByDepth(this);
-		for (auto* surface : _surfaces)
+		for (Surface* surface : _surfaces)
 		{
 			surface->setPalette(_palette);
 		}

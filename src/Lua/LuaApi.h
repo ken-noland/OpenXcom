@@ -62,18 +62,10 @@ protected:
 	/// Helper function to create a function in the table.
 	void registerLuaFunction(lua_State* luaState, const std::string functionName, lua_CFunction function);
 
-	/// Helper function to create a class function in the table. This method passes the lua_State to
-	/// the member function to allow it to decide what to do with it. KN NOTE: I could probably phase this one out.
-	template <typename Owner, int (Owner::*func)(lua_State* luaState)>
-	inline void registerClassLuaFunction(lua_State* luaState, const std::string functionName);
-
 	/// Helper function to create a class function in the table. This method automatically extracts the
 	/// function parameters and populates it with the correct values.
 	template <auto Function>
 	inline void registerFunction(lua_State* luaState, const std::string& functionName);
-
-	template <auto GetContainerFunction, auto ContainerEnabledFunction = nullptr>
-	inline void registerContainer(lua_State* luaState, const std::string& tableName, int parentIndex = LUA_REGISTRYINDEX);
 
 public:
 	LuaApi(const std::string& name);
@@ -84,43 +76,10 @@ public:
 	virtual void onRegisterApi(lua_State* luaState, int parentTableIndex){};
 };
 
-/// Static function to act as a trampoline for member functions
-template <typename Owner, int (Owner::*func)(lua_State*)>
-int memberLuaFunctionWrapper(lua_State* luaState)
-{
-	// Get the object instance from the table's metatable
-	lua_getmetatable(luaState, 1);
-	lua_getfield(luaState, -1, "__userdata");
-	void* userdata = lua_touserdata(luaState, -1);
-	lua_pop(luaState, 2);
-
-	// Call the member function
-	Owner* obj = static_cast<Owner*>(userdata);
-	return (obj->*func)(luaState);
-}
-
-/// Helper function to create a class function in the table.
-template <typename Owner, int (Owner::*func)(lua_State*)>
-inline void LuaApi::registerClassLuaFunction(lua_State* luaState, const std::string functionName)	//KN NOTE: Maybe move this to LuaFunction.h? I'm not sure it's used anywhere anymore.
-{
-	// Push the function
-	lua_pushcfunction(luaState, reinterpret_cast<lua_CFunction>(memberLuaFunctionWrapper<Owner, func>)); // Push the function
-
-	// tableName[functionName] = function
-	lua_setfield(luaState, -2, functionName.c_str()); // tableName[functionName] = function
-}
-
-
 template <auto Function>
 inline void LuaApi::registerFunction(lua_State* luaState, const std::string& functionName)
 {
 	OpenXcom::Lua::registerFunction<Function>(luaState, functionName);
-}
-
-template <auto GetContainerFunction, auto ContainerEnabledFunction>
-inline void LuaApi::registerContainer(lua_State* luaState, const std::string& tableName, int parentIndex)
-{
-	OpenXcom::Lua::registerContainer<GetContainerFunction, ContainerEnabledFunction>(luaState, tableName, parentIndex, nullptr);
 }
 
 } // namespace Lua

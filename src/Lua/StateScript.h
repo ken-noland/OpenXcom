@@ -17,44 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "LuaState.h"
-#include <memory>
+#include "LuaArg.h"
 
 namespace OpenXcom
 {
 
-class Game;
-class ModFile;
+class State;
+class Surface;
 
 namespace Lua
 {
 
-class GameScript;
-class UIScript;
+template <> void toLua(lua_State* luaState, State* arg);
+template <> State* fromLua(lua_State* luaState, int index);
 
-/// 
-class LuaMod
-{
-private:
-	Game& _game;
-	const ModFile& _modFiles;
-
-	using LuaMods = std::vector<std::unique_ptr<LuaState>>;
-	LuaMods _luaMods;
-
-	std::unique_ptr<GameScript> _luaGameScript;
-	std::unique_ptr<UIScript> _luaUIScript;
-
-public:
-	LuaMod(Game& game, const ModFile& modFiles);
-	~LuaMod();
-
-	bool loadAll();
-
-	inline GameScript& getGameScript() const { return *_luaGameScript; }
-	inline UIScript& getUIScript() const { return *_luaUIScript; }
-
-};
+template <> void toLua(lua_State* luaState, Surface* arg);
+template <> Surface* fromLua(lua_State* luaState, int index);
 
 } // namespace Lua
 } // namespace OpenXcom

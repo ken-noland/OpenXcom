@@ -423,6 +423,8 @@ set ( lua_src
   Lua/LuaMod.cpp
   Lua/LuaState.cpp
   Lua/SoldierScript.cpp
+  Lua/StateScript.cpp
+  Lua/UIScript.cpp
 )
 
 set ( cxx_src

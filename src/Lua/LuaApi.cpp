@@ -19,6 +19,7 @@
  */
 #include "LuaApi.h"
 #include "LuaHelpers.h"
+#include "LuaProperty.h"
 
 namespace OpenXcom
 {
@@ -52,16 +53,7 @@ int LuaApi::registerTable(lua_State* luaState, const std::string tableName, bool
 {
 	int tableIndex = pushTable(luaState, userData);
 
-	if (parentIndex == LUA_REGISTRYINDEX)
-	{
-		lua_setglobal(luaState, tableName.c_str()); // Set the table as a global variable
-		lua_getglobal(luaState, _name.c_str()); 
-	}
-	else
-	{
-		lua_pushvalue(luaState, tableIndex);                    // Duplicate the new table
-		lua_setfield(luaState, parentIndex, tableName.c_str()); // Set the new table as a field in the parent table
-	}
+
 
 	//since we are pushing the table on the stack, and we need to clean it up afterwards, then a callback or lambda is needed
 	if(onTableCreated)
@@ -88,11 +80,22 @@ void LuaApi::registerLuaFunction(lua_State* luaState, const std::string function
 void LuaApi::registerApi(lua_State* luaState, int parentTableIndex)
 {
 	// create a new table with the name of the API
-	int tableIndex = registerTable(luaState, _name, false, this, parentTableIndex, [this](lua_State* luaState, int tableIndex)
-	{
+//	int tableIndex = registerTable(luaState, _name, false, this, parentTableIndex, 
+	int tableIndex = pushTableWithUserdataAndProperties(luaState, this, [this](lua_State* luaState, int tableIndex) {
 		// Register API-specific functions and values
-        onRegisterApi(luaState, tableIndex);
-	});
+		onRegisterApi(luaState, tableIndex);
+	}); // Stack now: [..., table]
+
+	if (parentTableIndex == LUA_REGISTRYINDEX)
+	{
+		// Set the table as a global variable
+		lua_setglobal(luaState, _name.c_str());                  // Stack now: [...]
+	}
+	else
+	{
+		// set the table as a field in the parent table
+		lua_setfield(luaState, parentTableIndex, _name.c_str()); // Stack now: [..., table]
+	}
 }
 
 } // namespace Lua

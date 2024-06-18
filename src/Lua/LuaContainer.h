@@ -17,8 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "LuaFunction.h"
+#include "LuaArg.h"
+
+#include <vector>
+#include <map>
 
 namespace OpenXcom
 {
@@ -28,7 +31,12 @@ namespace Lua
 
 // Templated IteratorState
 template <typename Container>
-struct IteratorState;
+struct IteratorState
+{
+	using Iterator = Container::const_iterator;
+	Iterator iter;
+	Iterator end;
+};
 
 template <typename T>
 struct IteratorState<const std::vector<T>&>
@@ -38,48 +46,67 @@ struct IteratorState<const std::vector<T>&>
 	Iterator end;
 };
 
-template <typename K, typename V>
-struct IteratorState<const std::map<K, V>&>
+//template <typename K, typename V>
+//struct IteratorState<const std::map<K, V>&>
+//{
+//	using Iterator = typename std::map<K, V>::const_iterator;
+//	Iterator iter;
+//	Iterator end;
+//};
+
+template <typename InstanceType>
+inline InstanceType* getInstanceFromUserdata(lua_State* luaState, int index)
 {
-	using Iterator = typename std::map<K, V>::const_iterator;
-	Iterator iter;
-	Iterator end;
-};
+	// Get the metatable of the table at the given index
+	if (!lua_getmetatable(luaState, index))
+	{
+		throw new std::exception("Error: No metatable found at the given index.");
+	}
+
+	// Get the __userdata field from the metatable
+	lua_getfield(luaState, -1, "__userdata");
+
+	if (!lua_islightuserdata(luaState, -1))
+	{
+		lua_pop(luaState, 2); // Pop the metatable and the invalid field
+		throw new std::exception("Error: __userdata field is not a userdata type.");
+	}
+
+	// Get the userdata
+	InstanceType* instance = static_cast<InstanceType*>(lua_touserdata(luaState, -1));
+	if (instance == nullptr)
+	{
+		// instance is nullptr here
+		throw new std::exception("Error: Instance is null");
+	}
+
+	// Pop the metatable and userdata from the stack
+	lua_pop(luaState, 2);
+
+	return instance;
+}
+
 
 template <typename Traits, auto GetContainerFunction>
 inline typename Traits::ReturnType getContainer(lua_State* luaState, int index = 1)
 {
+	using GetterType = decltype(GetContainerFunction);
 	using ArgsTuple = typename Traits::ArgsTuple;
-	if constexpr (std::tuple_size_v<ArgsTuple> == 1)
+
+	// Call the getter function and push the result to the Lua stack
+	if constexpr (std::is_member_function_pointer_v<GetterType>)
+	{
+		using InstanceType = std::remove_pointer_t<typename Traits::ClassType>;
+		InstanceType* instance = getInstanceFromUserdata<InstanceType>(luaState, index);
+
+		return (instance->*GetContainerFunction)();
+	}
+	else if constexpr (std::tuple_size_v<ArgsTuple> == 1)
 	{
 		if constexpr (std::is_pointer_v<std::tuple_element_t<0, ArgsTuple> >)
 		{
 			using InstanceType = std::remove_pointer_t<std::tuple_element_t<0, typename Traits::ArgsTuple> >;
-
-			// Get the metatable of the table at the given index
-			if (!lua_getmetatable(luaState, index))
-			{
-				throw new std::exception("Error: No metatable found at the given index.");
-			}
-
-			// Get the __userdata field from the metatable
-			lua_getfield(luaState, -1, "__userdata");
-
-			if (!lua_islightuserdata(luaState, -1))
-			{
-				lua_pop(luaState, 2); // Pop the metatable and the invalid field
-				throw new std::exception("Error: __userdata field is not a userdata type.");
-			}
-
-			// Get the userdata
-			InstanceType* instance = static_cast<InstanceType*>(lua_touserdata(luaState, -1));
-			if(instance == nullptr)
-			{
-				//instance is nullptr here
-			}
-
-			// Pop the metatable and userdata from the stack
-			lua_pop(luaState, 2);
+			InstanceType* instance = getInstanceFromUserdata<InstanceType>(luaState, index);
 
 			return GetContainerFunction(instance);
 		}
@@ -115,7 +142,11 @@ inline int containerIndex(lua_State* luaState)
 	{
 		return luaL_error(luaState, "Index out of bounds");
 	}
-	toLua(luaState, container[index]);
+
+	auto indexIt = container.begin();
+	std::advance(indexIt, index);
+
+	toLua(luaState, *indexIt);
 	return 1;
 }
 
@@ -169,8 +200,12 @@ inline int pairsFunction(lua_State* luaState)
 	state->end = container.end();
 
 	lua_pushcclosure(luaState, iteratorFunction<Traits, GetContainerFunction>, 1);
-	lua_pushvalue(luaState, 1); // Push the table as the second value
-	lua_pushnil(luaState);      // Initial key value
+
+	// Push the table as the second value
+	lua_pushvalue(luaState, 1);
+
+	// Initial key value
+	lua_pushnil(luaState);      // stack: table, nil
 	return 3;
 }
 
