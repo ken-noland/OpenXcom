@@ -42,7 +42,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-TransferBaseState::TransferBaseState(Base *base, DebriefingState *debriefingState) : _base(base), _debriefingState(debriefingState)
+TransferBaseState::TransferBaseState(Base* base, DebriefingState* debriefingState) : State("TransferBaseState"), _base(base), _debriefingState(debriefingState)
 {
 	// Create objects
 	_window = new Window(this, 280, 140, 20, 30);

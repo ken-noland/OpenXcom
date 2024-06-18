@@ -51,13 +51,11 @@ namespace OpenXcom
  * @param detected Was the UFO detected?
  * @param hyperwave Was it a hyperwave radar?
  */
-HiddenAlienActivityState::HiddenAlienActivityState
-(
-	GeoscapeState* state,
+HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
 	std::map<OpenXcom::Region*, int> displayHiddenAlienActivityRegions,
-	std::map<OpenXcom::Country*, int> displayHiddenAlienActivityCountries
-)
+	std::map<OpenXcom::Country*, int> displayHiddenAlienActivityCountries)
 	:
+	State("HiddenAlienActivityState"),
 	_state(state),
 	_displayHiddenAlienActivityRegions(displayHiddenAlienActivityRegions),
 	_displayHiddenAlienActivityCountries(displayHiddenAlienActivityCountries)

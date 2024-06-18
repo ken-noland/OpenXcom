@@ -39,6 +39,7 @@ namespace OpenXcom
  * @param soldiersMedalled List of soldiers with medals.
  */
 CommendationLateState::CommendationLateState(std::vector<Soldier*> soldiersMedalled)
+	: State("CommendationLateState")
 {
 	// Create object
 	_window = new Window(this, 320, 200, 0, 0);

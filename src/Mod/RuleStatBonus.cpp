@@ -63,47 +63,47 @@ float stat2(const BattleUnit *unit)
 
 float currentFatalWounds(const BattleUnit *unit)
 {
-	return unit->getFatalWounds();
+	return (float)unit->getFatalWounds();
 }
 
 float currentRank(const BattleUnit *unit)
 {
-	return unit->getRankInt();
+	return (float)unit->getRankInt();
 }
 
 float currentTimeUnits(const BattleUnit *unit)
 {
-	return unit->getTimeUnits();
+	return (float)unit->getTimeUnits();
 }
 
 float currentHealth(const BattleUnit *unit)
 {
-	return unit->getHealth();
+	return (float)unit->getHealth();
 }
 
 float currentMana(const BattleUnit* unit)
 {
-	return unit->getMana();
+	return (float)unit->getMana();
 }
 
 float currentEnergy(const BattleUnit *unit)
 {
-	return unit->getEnergy();
+	return (float)unit->getEnergy();
 }
 
 float currentMorale(const BattleUnit *unit)
 {
-	return unit->getMorale();
+	return (float)unit->getMorale();
 }
 
 float currentStun(const BattleUnit *unit)
 {
-	return unit->getStunlevel();
+	return (float)unit->getStunlevel();
 }
 
 float normalizedHelper(int val, int max)
 {
-	return max > 0 ? 1.0f * val / max : 0.0f;
+	return (float)(max > 0 ? 1.0f * val / max : 0.0f);
 }
 
 float normalizedTimeUnits(const BattleUnit *unit)

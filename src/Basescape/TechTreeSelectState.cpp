@@ -40,7 +40,7 @@ namespace OpenXcom
  * Initializes all the elements on the UI.
  * @param parent Pointer to parent state.
  */
-TechTreeSelectState::TechTreeSelectState(TechTreeViewerState *parent) : _parent(parent)
+TechTreeSelectState::TechTreeSelectState(TechTreeViewerState* parent) : State("TechTreeSelectState"), _parent(parent)
 {
 	_screen = false;
 

@@ -96,7 +96,7 @@ namespace OpenXcom
  * Initializes all the elements in the Battlescape screen.
  * @param game Pointer to the core game.
  */
-BattlescapeState::BattlescapeState() :
+BattlescapeState::BattlescapeState() : State("BattlescapeState"), 
 	_reserve(0), _touchButtonsEnabled(false), _touchButtonsEnabledLastTurn(false), _manaBarVisible(false),
 	_firstInit(true), _paletteResetNeeded(false), _paletteResetRequested(false),
 	_isMouseScrolling(false), _isMouseScrolled(false),

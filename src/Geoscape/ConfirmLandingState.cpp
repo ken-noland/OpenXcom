@@ -53,7 +53,8 @@ namespace OpenXcom
  * @param globeTexture Globe texture of the landing site.
  * @param shade Shade of the landing site.
  */
-ConfirmLandingState::ConfirmLandingState(Craft *craft, Texture *missionTexture, Texture *globeTexture, int shade) : _craft(craft), _missionTexture(missionTexture), _globeTexture(globeTexture), _shade(shade)
+ConfirmLandingState::ConfirmLandingState(Craft *craft, Texture *missionTexture, Texture *globeTexture, int shade)
+	: State("ConfirmLandingState"), _craft(craft), _missionTexture(missionTexture), _globeTexture(globeTexture), _shade(shade)
 {
 	_screen = false;
 

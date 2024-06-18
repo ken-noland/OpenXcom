@@ -35,7 +35,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the Turn Diary window.
  */
-TurnDiaryState::TurnDiaryState(const HitLog *hitLog)
+TurnDiaryState::TurnDiaryState(const HitLog *hitLog) : State("TurnDiaryState")
 {
 	_screen = false;
 

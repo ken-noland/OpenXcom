@@ -38,7 +38,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param possibilities List of newly possible ResearchProject
  */
-NewPossibleResearchState::NewPossibleResearchState(Base * base, const std::vector<RuleResearch *> & possibilities) : _base(base)
+NewPossibleResearchState::NewPossibleResearchState(Base* base, const std::vector<RuleResearch*>& possibilities) : State("NewPossibleResearchState"), _base(base)
 {
 	_screen = false;
 

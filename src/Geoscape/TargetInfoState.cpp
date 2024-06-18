@@ -42,7 +42,7 @@ namespace OpenXcom
  * @param target Pointer to the target to show info from.
  * @param globe Pointer to the Geoscape globe.
  */
-TargetInfoState::TargetInfoState(Target *target, Globe *globe) : _target(target), _globe(globe), _deploymentRule(0)
+TargetInfoState::TargetInfoState(Target* target, Globe* globe) : State("TargetInfoState"), _target(target), _globe(globe), _deploymentRule(0)
 {
 	_screen = false;
 

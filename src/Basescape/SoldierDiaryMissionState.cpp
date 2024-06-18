@@ -39,7 +39,7 @@ namespace OpenXcom
  * @param soldier Pointer to the selected soldier.
  * @param rowEntry number to get mission info from.
  */
-SoldierDiaryMissionState::SoldierDiaryMissionState(Soldier *soldier, int rowEntry) : _soldier(soldier), _rowEntry(rowEntry)
+SoldierDiaryMissionState::SoldierDiaryMissionState(Soldier* soldier, int rowEntry) : State("SoldierDiaryMissionState"), _soldier(soldier), _rowEntry(rowEntry)
 {
 	_screen = false;
 

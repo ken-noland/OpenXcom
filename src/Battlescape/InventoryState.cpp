@@ -74,7 +74,7 @@ static const int _applyTemplateBtnY  = 113;
  * @param parent Pointer to parent Battlescape.
  */
 InventoryState::InventoryState(bool tu, BattlescapeState *parent, Base *base, bool noCraft) :
-	_tu(tu), _noCraft(noCraft), _parent(parent), _base(base),
+	State("InventoryState"), _tu(tu), _noCraft(noCraft), _parent(parent), _base(base),
 	_resetCustomDeploymentBackup(false), _reloadUnit(false), _globalLayoutIndex(-1)
 {
 	_battleGame = getGame()->getSavedGame()->getSavedBattle();

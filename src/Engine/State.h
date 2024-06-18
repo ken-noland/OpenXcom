@@ -49,6 +49,8 @@ class State
 	friend class Timer;
 
 protected:
+	std::string _name;
+
 	std::vector<Surface*> _surfaces;
 	bool _screen;
 	bool _soundPlayed;
@@ -61,9 +63,12 @@ protected:
 	Uint8 _cursorColor;
 public:
 	/// Creates a new state linked to a game.
-	State();
+	State(const std::string& name);
 	/// Cleans up the state.
 	virtual ~State();
+
+	const std::string& getName() const { return _name; }
+
 	/// Set interface rules.
 	void setInterface(const std::string &s, bool alterPal = false, SavedBattleGame *battleGame = 0);
 	/// Set window background.

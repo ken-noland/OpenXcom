@@ -51,7 +51,7 @@ void Polyline::load(const YAML::Node &node)
 	delete[] _lon;
 
 	std::vector<double> coords = node.as< std::vector<double> >();
-	_points = coords.size() / 2;
+	_points = (int)(coords.size() / 2);
 	_lat = new double[_points];
 	_lon = new double[_points];
 

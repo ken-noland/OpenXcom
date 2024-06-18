@@ -401,7 +401,7 @@ void Projectile::applyAccuracy(Position origin, Position *target, double accurac
 		int targetSize = 0;
 		double sizeMultiplier = 0;
 		double exposure = 0.0;
-		int real_accuracy = ceil( accuracy * 100 ); // separate variable for realistic accuracy, just in case
+		int real_accuracy = (int)ceil( accuracy * 100 ); // separate variable for realistic accuracy, just in case
 
 		BattleUnit *shooterUnit = _action.actor;
 		bool isPlayer = (shooterUnit->getFaction() == FACTION_PLAYER);
@@ -458,7 +458,7 @@ void Projectile::applyAccuracy(Position origin, Position *target, double accurac
 
 				if ((int)tempVoxels.size() > exposedVoxelsCount)
 				{
-					exposedVoxelsCount = tempVoxels.size();
+					exposedVoxelsCount = (int)tempVoxels.size();
 					exposure = tempExposure;
 					selectedOriginType = relPos;
 					selectedOrigin = tempOrigin;
@@ -471,7 +471,7 @@ void Projectile::applyAccuracy(Position origin, Position *target, double accurac
 		else // Get distance to target empty tile
 		{
 			Position tempOrigin = _save->getTileEngine()->getOriginVoxel(_action, shooterUnit->getTile());
-			distanceVoxels = Position::distance( tempOrigin, *target );
+			distanceVoxels = (int)Position::distance( tempOrigin, *target );
 		}
 
 		distanceTiles = distanceVoxels / 16 + 1; // Should never be 0

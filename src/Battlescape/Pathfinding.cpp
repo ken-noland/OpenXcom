@@ -1530,7 +1530,7 @@ std::vector<PathfindingNode*> Pathfinding::findReachablePathFindingNodes(BattleU
 		}
 		float scaleFactor = (float)60 * 60 * 4 * 30 / (_save->getMapSizeXYZ() * myUnits);
 		if (scaleFactor < 1)
-			maxTilesToReturn *= scaleFactor;
+			maxTilesToReturn = (int)(maxTilesToReturn * scaleFactor);
 	}
 	int strictMaxTilesToReturn = _size;
 	while (!unvisited.empty())

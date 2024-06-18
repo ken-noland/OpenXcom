@@ -49,7 +49,7 @@ namespace OpenXcom
  * @param globe Pointer to the Geoscape globe.
  * @param waypoint Pointer to the last UFO position (if redirecting the craft).
  */
-GeoscapeCraftState::GeoscapeCraftState(Craft *craft, Globe *globe, Waypoint *waypoint, bool useCustomSound) : _craft(craft), _globe(globe), _waypoint(waypoint)
+GeoscapeCraftState::GeoscapeCraftState(Craft* craft, Globe* globe, Waypoint* waypoint, bool useCustomSound) : State("GeoscapeCraftState"), _craft(craft), _globe(globe), _waypoint(waypoint)
 {
 	_screen = false;
 

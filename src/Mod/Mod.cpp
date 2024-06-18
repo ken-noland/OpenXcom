@@ -3837,7 +3837,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			{
 				for (int s = 0; s < randomSoldiers; ++s)
 				{
-					randomTypes.push_back(soldierTypes[RNG::generate(0, soldierTypes.size() - 1)]);
+					randomTypes.push_back(soldierTypes[RNG::generate(0, (int)soldierTypes.size() - 1)]);
 				}
 			}
 		}
@@ -6386,7 +6386,7 @@ namespace
 template<size_t Mod::*f>
 void offset(const Mod *m, int &base, int modId)
 {
-	int baseMax = (m->*f);
+	int baseMax = (int)(m->*f);
 	if (base >= baseMax)
 	{
 		base += modId;

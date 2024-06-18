@@ -36,7 +36,7 @@ namespace OpenXcom
  * @param globe Pointer to the globe.
  * @param possibilities List of newly possible base facilities to build
  */
-NewPossibleFacilityState::NewPossibleFacilityState(Base *base, Globe *globe, const std::vector<RuleBaseFacility *> & possibilities) : _base(base), _globe(globe)
+NewPossibleFacilityState::NewPossibleFacilityState(Base* base, Globe* globe, const std::vector<RuleBaseFacility*>& possibilities) : State("NewPossibleFacilityState"), _base(base), _globe(globe)
 {
 	_screen = false;
 

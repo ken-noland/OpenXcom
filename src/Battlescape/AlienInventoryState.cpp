@@ -42,7 +42,7 @@ namespace OpenXcom
  * Initializes all the elements in the AlienInventory screen.
  * @param unit Pointer to the alien unit.
  */
-AlienInventoryState::AlienInventoryState(BattleUnit *unit)
+AlienInventoryState::AlienInventoryState(BattleUnit* unit) : State("AlienInventoryState")
 {
 	if (Options::maximizeInfoScreens)
 	{

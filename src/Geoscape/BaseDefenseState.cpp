@@ -50,7 +50,7 @@ namespace OpenXcom
  * @param ufo Pointer to the attacking ufo.
  * @param state Pointer to the Geoscape.
  */
-BaseDefenseState::BaseDefenseState(Base *base, Ufo *ufo, GeoscapeState *state) : _state(state)
+BaseDefenseState::BaseDefenseState(Base* base, Ufo* ufo, GeoscapeState* state) : State("BaseDefenseState"), _state(state)
 {
 	_base = base;
 	_action = BDA_NONE;

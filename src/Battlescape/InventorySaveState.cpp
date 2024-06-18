@@ -37,7 +37,7 @@ namespace OpenXcom
 /**
 * Initializes all the elements in the Save Inventory window.
 */
-InventorySaveState::InventorySaveState(InventoryState *parent) : _parent(parent), _previousSelectedRow(-1), _selectedRow(-1)
+InventorySaveState::InventorySaveState(InventoryState* parent) : State("InventorySaveState"), _parent(parent), _previousSelectedRow(-1), _selectedRow(-1)
 {
 	_screen = false;
 

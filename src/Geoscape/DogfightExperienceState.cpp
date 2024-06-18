@@ -35,7 +35,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the Dogfight Experience screen.
  */
-DogfightExperienceState::DogfightExperienceState()
+DogfightExperienceState::DogfightExperienceState() : State("DogfightExperienceState")
 {
 	_screen = false;
 

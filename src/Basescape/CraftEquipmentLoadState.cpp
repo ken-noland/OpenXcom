@@ -36,7 +36,7 @@ namespace OpenXcom
 /**
 * Initializes all the elements in the Load Craft Loadout window.
 */
-CraftEquipmentLoadState::CraftEquipmentLoadState(CraftEquipmentState *parent) : _parent(parent)
+CraftEquipmentLoadState::CraftEquipmentLoadState(CraftEquipmentState* parent) : State("CraftEquipmentLoadState"), _parent(parent)
 {
 	_screen = false;
 

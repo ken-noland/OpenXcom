@@ -37,7 +37,7 @@ namespace OpenXcom
  * Initializes all the elements in the Select Music Track window.
  * @param origin Where is the dialog called from?
  */
-SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin) : _origin(origin)
+SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin) : State("SelectMusicTrackState"), _origin(origin)
 {
 	_screen = false;
 

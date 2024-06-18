@@ -125,7 +125,7 @@ bool FlcPlayer::init(const char *filename, void(*frameCallBack)(), Game *game, b
 	auto size = file->tellg();
 	file->seekg(0, std::istream::beg);
 	_fileBuf = new Uint8[size];
-	_fileSize = size;
+	_fileSize = (int)size;
 	file->read((char *)_fileBuf, size);
 
 	_audioFrameData = _fileBuf + 128;
@@ -347,7 +347,7 @@ void FlcPlayer::decodeVideo(bool skipLastFrame)
 
 			if (_headerType == FLI_TYPE)
 			{
-				delay = _delayOverride > 0 ? _delayOverride : _headerSpeed * (1000.0 / 70.0);
+				delay = _delayOverride > 0 ? _delayOverride : (Uint32)(_headerSpeed * (1000.0 / 70.0));
 			}
 			else if (_useInternalAudio && !_frameCallBack) // this means TFTD videos are playing
 			{
@@ -479,7 +479,7 @@ void FlcPlayer::playAudioFrame(Uint16 sampleRate)
 
 		for (unsigned int i = 0; i < _audioFrameSize; i++)
 		{
-			loadingBuff->samples[loadingBuff->sampleCount + i] = (float)((_chunkData[i]) -128) * 240 * _volume;
+			loadingBuff->samples[loadingBuff->sampleCount + i] = (Sint16)((float)((_chunkData[i]) -128) * 240 * _volume);
 		}
 		loadingBuff->sampleCount += _audioFrameSize;
 

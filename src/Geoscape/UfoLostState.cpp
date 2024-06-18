@@ -32,7 +32,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param id Name of the UFO.
  */
-UfoLostState::UfoLostState(const std::string &id) : _id(id)
+UfoLostState::UfoLostState(const std::string& id) : State("UfoLostState"), _id(id)
 {
 	_screen = false;
 

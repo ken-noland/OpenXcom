@@ -40,7 +40,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the Craft Pilots screen.
  */
-CraftPilotsState::CraftPilotsState(Base *base, size_t craft) : _base(base), _craft(craft)
+CraftPilotsState::CraftPilotsState(Base* base, size_t craft) : State("CraftPilotsState"), _base(base), _craft(craft)
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

@@ -68,7 +68,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param globe Pointer to the Geoscape globe.
  */
-BasescapeState::BasescapeState(Base *base, Globe *globe) : _base(base), _globe(globe)
+BasescapeState::BasescapeState(Base* base, Globe* globe) : State("BasescapeState"), _base(base), _globe(globe)
 {
 	// Create objects
 	_txtFacility = new Text(192, 9, 0, 0);

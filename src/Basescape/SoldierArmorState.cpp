@@ -58,7 +58,7 @@ struct compareArmorName
  * @param base Pointer to the base to get info from.
  * @param soldier ID of the selected soldier.
  */
-SoldierArmorState::SoldierArmorState(Base *base, size_t soldier, SoldierArmorOrigin origin) : _base(base), _soldier(soldier), _origin(origin)
+SoldierArmorState::SoldierArmorState(Base* base, size_t soldier, SoldierArmorOrigin origin) : State("SoldierArmorState"), _base(base), _soldier(soldier), _origin(origin)
 {
 	_screen = false;
 

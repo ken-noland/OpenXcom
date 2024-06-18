@@ -34,7 +34,7 @@ Uint32 slowTick()
 	Uint64 new_time = ((Uint64)SDL_GetTicks()) << accurate;
 	false_time += (new_time - old_time) / Timer::gameSlowSpeed;
 	old_time = (Uint32)new_time;
-	return false_time >> accurate;
+	return (Uint32)(false_time >> accurate);
 }
 
 }//namespace

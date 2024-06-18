@@ -37,7 +37,7 @@ namespace OpenXcom
  * @param craft Pointer to the craft to display.
  * @param globe Pointer to the Geoscape globe.
  */
-CraftPatrolState::CraftPatrolState(Craft *craft, Globe *globe) : _craft(craft), _globe(globe)
+CraftPatrolState::CraftPatrolState(Craft* craft, Globe* globe) : State("CraftPatrolState"), _craft(craft), _globe(globe)
 {
 	_screen = false;
 

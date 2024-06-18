@@ -48,7 +48,7 @@ namespace OpenXcom
  * @param craft ID of the selected craft.
  * @param weapon ID of the selected weapon.
  */
-CraftWeaponsState::CraftWeaponsState(Base *base, size_t craft, size_t weapon) : _base(base), _craft(base->getCrafts().at(craft)), _weapon(weapon)
+CraftWeaponsState::CraftWeaponsState(Base* base, size_t craft, size_t weapon) : State("CraftWeaponsState"), _base(base), _craft(base->getCrafts().at(craft)), _weapon(weapon)
 {
 	_screen = false;
 

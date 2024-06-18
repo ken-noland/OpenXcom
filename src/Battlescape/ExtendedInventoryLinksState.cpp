@@ -35,7 +35,8 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the ExtendedInventoryLinksState screen.
  */
-ExtendedInventoryLinksState::ExtendedInventoryLinksState(InventoryState* parent, SavedBattleGame* save, bool inBase, bool beforeMission) : _parent(parent), _save(save)
+ExtendedInventoryLinksState::ExtendedInventoryLinksState(InventoryState* parent, SavedBattleGame* save, bool inBase, bool beforeMission)
+	: State("ExtendedInventoryLinksState"), _parent(parent), _save(save)
 {
 	_screen = false;
 

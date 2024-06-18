@@ -47,7 +47,7 @@ namespace OpenXcom
  * @param detected Was the UFO detected?
  * @param hyperwave Was it a hyperwave radar?
  */
-UfoDetectedState::UfoDetectedState(Ufo *ufo, GeoscapeState *state, bool detected, bool hyperwave) : _ufo(ufo), _state(state)
+UfoDetectedState::UfoDetectedState(Ufo* ufo, GeoscapeState* state, bool detected, bool hyperwave) : State("UfoDetectedState"), _ufo(ufo), _state(state)
 {
 	// Generate UFO ID
 	if (_ufo->getId() == 0)

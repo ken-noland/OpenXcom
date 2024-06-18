@@ -46,7 +46,7 @@ namespace OpenXcom
  * @param craft Pointer to the craft to target.
  * @param globe Pointer to the Geoscape globe.
  */
-SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe *globe) : _crafts(std::move(crafts)), _globe(globe)
+SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe* globe) : State("SelectDestinationState"), _crafts(std::move(crafts)), _globe(globe)
 {
 	int dx = getGame()->getScreen()->getDX();
 	int dy = getGame()->getScreen()->getDY();

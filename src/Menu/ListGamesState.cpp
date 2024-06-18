@@ -84,7 +84,8 @@ struct compareSaveTimestamp
  * @param firstValidRow First row containing saves.
  * @param autoquick Show auto/quick saved games?
  */
-ListGamesState::ListGamesState(OptionsOrigin origin, int firstValidRow, bool autoquick) : _origin(origin), _firstValidRow(firstValidRow), _autoquick(autoquick), _sortable(true)
+ListGamesState::ListGamesState(OptionsOrigin origin, int firstValidRow, bool autoquick)
+	: State("ListGamesState"), _origin(origin), _firstValidRow(firstValidRow), _autoquick(autoquick), _sortable(true)
 {
 	_screen = false;
 

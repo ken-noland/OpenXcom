@@ -40,7 +40,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the GlobalManufacture screen.
  */
-GlobalManufactureState::GlobalManufactureState(bool openedFromBasescape) : _openedFromBasescape(openedFromBasescape)
+GlobalManufactureState::GlobalManufactureState(bool openedFromBasescape) : State("GlobalManufactureState"), _openedFromBasescape(openedFromBasescape)
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

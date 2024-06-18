@@ -56,7 +56,7 @@ namespace OpenXcom
  * @param crafts Vector for the crafts part of a wing to retarget.
  * @param target Pointer to the selected target (NULL if it's just a point on the globe).
  */
-ConfirmDestinationState::ConfirmDestinationState(std::vector<Craft*> crafts, Target *target) : _crafts(std::move(crafts)), _target(target)
+ConfirmDestinationState::ConfirmDestinationState(std::vector<Craft*> crafts, Target* target) : State("ConfirmDestinationState"), _crafts(std::move(crafts)), _target(target)
 {
 	Waypoint *w = dynamic_cast<Waypoint*>(_target);
 	_screen = false;

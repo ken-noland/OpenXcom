@@ -38,7 +38,7 @@ namespace OpenXcom
  * @param missingItems List of items still needed for reequip.
  * @param base Relevant xcom base.
  */
-CannotReequipState::CannotReequipState(std::vector<ReequipStat> &missingItems, Base *base) : _missingItems(missingItems), _base(base)
+CannotReequipState::CannotReequipState(std::vector<ReequipStat>& missingItems, Base* base) : State("CannotReequipState"), _missingItems(missingItems), _base(base)
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

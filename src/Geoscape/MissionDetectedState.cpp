@@ -38,7 +38,7 @@ namespace OpenXcom
  * @param mission Pointer to the respective Mission Site.
  * @param state Pointer to the Geoscape.
  */
-MissionDetectedState::MissionDetectedState(MissionSite *mission, GeoscapeState *state) : _mission(mission), _state(state)
+MissionDetectedState::MissionDetectedState(MissionSite* mission, GeoscapeState* state) : State("MissionDetectedState"), _mission(mission), _state(state)
 {
 	_screen = false;
 

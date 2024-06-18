@@ -41,7 +41,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param origin Game section that originated this state.
  */
-PauseState::PauseState(OptionsOrigin origin) : _origin(origin)
+PauseState::PauseState(OptionsOrigin origin) : State("PauseState"), _origin(origin)
 {
 	_screen = false;
 

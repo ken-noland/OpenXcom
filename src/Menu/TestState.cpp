@@ -77,7 +77,7 @@ static std::map<int, PaletteTestMetadata> _paletteMetadataMap =
 /**
  * Initializes all the elements in the test screen.
  */
-TestState::TestState()
+TestState::TestState() : State("TestState")
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

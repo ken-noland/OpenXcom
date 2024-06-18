@@ -35,7 +35,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param possibilities List of newly possible craft to buy/rent
  */
-NewPossibleCraftState::NewPossibleCraftState(Base * base, const std::vector<RuleCraft *> & possibilities) : _base(base)
+NewPossibleCraftState::NewPossibleCraftState(Base* base, const std::vector<RuleCraft*>& possibilities) : State("NewPossibleCraftState"), _base(base)
 {
 	_screen = false;
 

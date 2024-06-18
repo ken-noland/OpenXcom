@@ -51,7 +51,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param craft ID of the selected craft.
  */
-CraftArmorState::CraftArmorState(Base *base, size_t craft) : _base(base), _craft(craft), _savedScrollPosition(0), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL)
+CraftArmorState::CraftArmorState(Base* base, size_t craft) : State("CraftArmorState"), _base(base), _craft(craft), _savedScrollPosition(0), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL)
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

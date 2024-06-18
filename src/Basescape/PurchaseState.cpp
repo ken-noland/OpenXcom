@@ -75,7 +75,8 @@ inline constexpr auto allOf(Functions... funcs)
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(base), _parent(parent), _sel(0), _total(0), _pQty(0), _iQty(0.0), _ammoColor(0)
+PurchaseState::PurchaseState(Base* base, CannotReequipState* parent) : State("PurchaseState"), 
+	_base(base), _parent(parent), _sel(0), _total(0), _pQty(0), _iQty(0.0), _ammoColor(0)
 {
 	_autoBuyDone = false;
 	if (_parent)

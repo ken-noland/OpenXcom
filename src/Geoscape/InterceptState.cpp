@@ -50,7 +50,7 @@ namespace OpenXcom
  * @param base Pointer to base to show contained crafts (NULL to show all crafts).
  * @param target Pointer to target to intercept (NULL to ask user for target).
  */
-InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Target *target) : _globe(globe), _base(base), _target(target)
+InterceptState::InterceptState(Globe* globe, bool useCustomSound, Base* base, Target* target) : State("InterceptState"), _globe(globe), _base(base), _target(target)
 {
 	const int WIDTH_CRAFT = 72;
 	const int WIDTH_STATUS = 94;

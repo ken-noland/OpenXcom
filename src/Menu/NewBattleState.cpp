@@ -63,8 +63,8 @@ namespace OpenXcom
  * Initializes all the elements in the New Battle window.
  * @param game Pointer to the core game.
  */
-NewBattleState::NewBattleState() :
-	_craft(0), _selectType(NewBattleSelectType::MISSION), _isRightClick(false),
+NewBattleState::NewBattleState()
+	: State("NewBattleState"), _craft(0), _selectType(NewBattleSelectType::MISSION), _isRightClick(false),
 	_depthVisible(false), _globeTextureVisible(false), _selectedGlobeTexture(0)
 {
 	// Create objects

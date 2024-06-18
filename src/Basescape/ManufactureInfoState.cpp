@@ -50,7 +50,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param item The RuleManufacture to produce.
  */
-ManufactureInfoState::ManufactureInfoState (Base *base, RuleManufacture *item) : _base(base), _item(item), _production(0)
+ManufactureInfoState::ManufactureInfoState(Base* base, RuleManufacture* item) : State("ManufactureInfoState"), _base(base), _item(item), _production(0)
 {
 	buildUi();
 }
@@ -61,7 +61,7 @@ ManufactureInfoState::ManufactureInfoState (Base *base, RuleManufacture *item) :
  * @param base Pointer to the base to get info from.
  * @param production The Production to modify.
  */
-ManufactureInfoState::ManufactureInfoState (Base *base, Production *production) : _base(base), _item(0), _production(production)
+ManufactureInfoState::ManufactureInfoState(Base* base, Production* production) : State("ManufactureInfoState"), _base(base), _item(0), _production(production)
 {
 	buildUi();
 }

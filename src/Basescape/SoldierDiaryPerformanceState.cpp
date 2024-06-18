@@ -46,7 +46,7 @@ namespace OpenXcom
  * @param display Type of totals to display.
  */
 SoldierDiaryPerformanceState::SoldierDiaryPerformanceState(Base *base, size_t soldierId, SoldierDiaryOverviewState *soldierDiaryOverviewState, SoldierDiaryDisplay display) :
-	_base(base), _soldierId(soldierId), _soldierDiaryOverviewState(soldierDiaryOverviewState), _display(display), _lastScrollPos(0)
+	State("SoldierDiaryPerformanceState"), _base(base), _soldierId(soldierId), _soldierDiaryOverviewState(soldierDiaryOverviewState), _display(display), _lastScrollPos(0)
 {
 	if (_base == 0)
 	{

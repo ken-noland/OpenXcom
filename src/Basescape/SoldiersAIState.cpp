@@ -45,7 +45,7 @@ namespace OpenXcom
  * @param soldiers Soldiers to manipulate AI control
  */
 SoldiersAIState::SoldiersAIState(std::vector<Soldier*>& soldiers)
-		: _soldiers(soldiers)
+	: State("SoldiersAIState"), _soldiers(soldiers)
 {
 	_commonConstruct();
 }
@@ -55,6 +55,7 @@ SoldiersAIState::SoldiersAIState(std::vector<Soldier*>& soldiers)
  * @param craft Craft whose soldiers to manipulate AI control
  */
 SoldiersAIState::SoldiersAIState(const Craft* craft)
+	: State("SoldiersAIState")
 {
 	for (Soldier* soldier : craft->getBase()->getSoldiers())
 	{
@@ -69,7 +70,7 @@ SoldiersAIState::SoldiersAIState(const Craft* craft)
  * @param soldiers Soldiers to manipulate AI control
  */
 SoldiersAIState::SoldiersAIState(std::vector<BattleUnit*>& units)
-		: _units(units)
+	: State("SoldiersAIState"), _units(units)
 {
 	_commonConstruct();
 }

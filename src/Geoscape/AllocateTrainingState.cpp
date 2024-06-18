@@ -47,7 +47,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to handle.
  */
-AllocateTrainingState::AllocateTrainingState(Base *base) : _sel(0), _base(base), _origSoldierOrder(_base->getSoldiers())
+AllocateTrainingState::AllocateTrainingState(Base* base) : State("AllocateTrainingState"), _sel(0), _base(base), _origSoldierOrder(_base->getSoldiers())
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

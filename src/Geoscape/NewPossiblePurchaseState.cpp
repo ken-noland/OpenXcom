@@ -35,7 +35,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param possibilities List of newly possible items to buy
  */
-NewPossiblePurchaseState::NewPossiblePurchaseState(Base * base, const std::vector<RuleItem *> & possibilities) : _base(base)
+NewPossiblePurchaseState::NewPossiblePurchaseState(Base* base, const std::vector<RuleItem*>& possibilities) : State("NewPossiblePurchaseState"), _base(base)
 {
 	_screen = false;
 

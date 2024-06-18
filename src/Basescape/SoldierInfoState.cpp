@@ -56,7 +56,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from. NULL to use the dead soldiers list.
  * @param soldierId ID of the selected soldier.
  */
-SoldierInfoState::SoldierInfoState(Base *base, size_t soldierId, bool forceLimits) : _base(base), _soldierId(soldierId), _forceLimits(forceLimits), _soldier(0)
+SoldierInfoState::SoldierInfoState(Base* base, size_t soldierId, bool forceLimits) : State("SoldierInfoState"), _base(base), _soldierId(soldierId), _forceLimits(forceLimits), _soldier(0)
 {
 	if (_base == 0)
 	{

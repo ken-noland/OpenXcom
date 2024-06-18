@@ -45,7 +45,7 @@ namespace OpenXcom
 /**
  * Default constructor, used by SkillMenuState.
  */
-ActionMenuState::ActionMenuState(BattleAction *action) : _action(action)
+ActionMenuState::ActionMenuState(BattleAction* action) : State("ActionMenuState"), _action(action)
 {
 }
 
@@ -56,7 +56,7 @@ ActionMenuState::ActionMenuState(BattleAction *action) : _action(action)
  * @param x Position on the x-axis.
  * @param y position on the y-axis.
  */
-ActionMenuState::ActionMenuState(BattleAction *action, int x, int y) : _action(action)
+ActionMenuState::ActionMenuState(BattleAction* action, int x, int y) : State("ActionMenuState"), _action(action)
 {
 	_screen = false;
 

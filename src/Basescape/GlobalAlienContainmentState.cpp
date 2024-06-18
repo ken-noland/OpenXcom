@@ -42,7 +42,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the GlobalAlienContainment screen.
  */
-GlobalAlienContainmentState::GlobalAlienContainmentState(bool openedFromBasescape) : _openedFromBasescape(openedFromBasescape)
+GlobalAlienContainmentState::GlobalAlienContainmentState(bool openedFromBasescape) : State("GlobalAlienContainmentState"), _openedFromBasescape(openedFromBasescape)
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

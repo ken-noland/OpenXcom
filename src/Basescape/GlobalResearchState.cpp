@@ -39,7 +39,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the GlobalResearch screen.
  */
-GlobalResearchState::GlobalResearchState(bool openedFromBasescape) : _openedFromBasescape(openedFromBasescape)
+GlobalResearchState::GlobalResearchState(bool openedFromBasescape) : State("GlobalResearchState"), _openedFromBasescape(openedFromBasescape)
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

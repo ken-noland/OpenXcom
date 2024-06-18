@@ -44,7 +44,7 @@ namespace OpenXcom
  * @param wasLetterBoxed Was the game letterboxed?
  */
 VideoState::VideoState(const std::vector<std::string> *videos, const std::vector<std::string> *tracks, bool useUfoAudioSequence)
-		: _videos(videos), _tracks(tracks), _useUfoAudioSequence(useUfoAudioSequence)
+	: State("VideoState"), _videos(videos), _tracks(tracks), _useUfoAudioSequence(useUfoAudioSequence)
 {
 }
 

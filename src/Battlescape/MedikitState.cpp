@@ -118,7 +118,7 @@ MedikitButton::MedikitButton(int y) : InteractiveSurface(30, 20, 190, y)
  * @param targetUnit The wounded unit.
  * @param action The healing action.
  */
-MedikitState::MedikitState (BattleUnit *targetUnit, BattleAction *action, TileEngine *tile) : _targetUnit(targetUnit), _action(action), _tileEngine(tile)
+MedikitState::MedikitState(BattleUnit* targetUnit, BattleAction* action, TileEngine* tile) : State("MedikitState"), _targetUnit(targetUnit), _action(action), _tileEngine(tile)
 {
 	if (Options::maximizeInfoScreens)
 	{

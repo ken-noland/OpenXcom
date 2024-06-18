@@ -43,7 +43,7 @@ namespace OpenXcom
  * @param battleGame Pointer to the saved game.
  * @param state Pointer to the Battlescape state.
  */
-AbortMissionState::AbortMissionState(SavedBattleGame *battleGame, BattlescapeState *state) : _battleGame(battleGame), _state(state), _inEntrance(0), _inExit(0), _outside(0)
+AbortMissionState::AbortMissionState(SavedBattleGame* battleGame, BattlescapeState* state) : State("AbortMissionState"), _battleGame(battleGame), _state(state), _inEntrance(0), _inExit(0), _outside(0)
 {
 	// Create objects
 	_screen = false;

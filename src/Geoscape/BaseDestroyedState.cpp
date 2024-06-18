@@ -39,8 +39,8 @@
 namespace OpenXcom
 {
 
-BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles, bool partialDestruction) :
-	_base(base), _missiles(missiles), _partialDestruction(partialDestruction)
+BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles, bool partialDestruction)
+	: State("BaseDestroyedState"), _base(base), _missiles(missiles), _partialDestruction(partialDestruction)
 {
 	_screen = false;
 

@@ -85,7 +85,7 @@ struct compareItemSpaceUsed
  * Initializes all the elements in the Stores window.
  * @param base Pointer to the base to get info from.
  */
-StoresState::StoresState(Base *base) : _base(base)
+StoresState::StoresState(Base* base) : State("StoresState"), _base(base)
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

@@ -38,7 +38,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param origin Game section that originated this state.
  */
-AbandonGameState::AbandonGameState(OptionsOrigin origin) : _origin(origin)
+AbandonGameState::AbandonGameState(OptionsOrigin origin) : State("AbandonGameState"), _origin(origin)
 {
 	_screen = false;
 

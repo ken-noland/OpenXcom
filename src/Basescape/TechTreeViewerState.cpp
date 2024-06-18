@@ -49,6 +49,7 @@ namespace OpenXcom
  * Initializes all the elements on the UI.
  */
 TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufacture *m, const RuleBaseFacility *f, const RuleCraft *c)
+	: State("TechTreeViewerState"), _selectedFlag(TTV_NONE)
 {
 	if (r != 0)
 	{

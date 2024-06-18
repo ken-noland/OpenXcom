@@ -95,7 +95,7 @@ inline _Tx VectNormalize(const _Tx& a, _Ts scale = 1)
 	_Ts dot = VectDotProduct(a, a, scale);
 	if (dot > 0)
 	{
-		dot = std::sqrt(dot * scale);
+		dot = (_Ts)std::sqrt(dot * scale);
 		_Tx temp
 		{
 			a.x * scale / dot,
