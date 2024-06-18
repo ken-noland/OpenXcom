@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <ranges>
 #include "../fmath.h"
 #include <SDL_gfxPrimitives.h>
 #include "Map.h"
@@ -3290,6 +3291,7 @@ void BattlescapeState::popup(State *state)
  */
 void BattlescapeState::finishBattle(bool abort, int inExitArea)
 {
+	entt::registry& registry = getGame()->getSavedGame()->getRegistry();
 	bool isPreview = _save->isPreview();
 
 	while (!getGame()->isState(this))
@@ -3337,19 +3339,18 @@ void BattlescapeState::finishBattle(bool abort, int inExitArea)
 	AlienDeployment *ruleDeploy = getGame()->getMod()->getDeployment(_save->getMissionType());
 	if (!ruleDeploy)
 	{
-		for (Ufo* ufo : getGame()->getSavedGame()->getUfos())
+		auto ufoView = registry.view<Ufo>().each();
+		auto ufoInBattlescapeFilter = [](const auto& eachTuple) { return std::get<Ufo>(eachTuple).isInBattlescape(); };
+		if (auto findItterator = std::ranges::find_if(ufoView, ufoInBattlescapeFilter); findItterator != ufoView.end())
 		{
-			if (ufo->isInBattlescape())
+			const Ufo& ufo = std::get<Ufo>(*findItterator);
+			std::string ufoMissionName = ufo.getRules()->getType();
+			if (!_save->getAlienCustomMission().empty())
 			{
-				std::string ufoMissionName = ufo->getRules()->getType();
-				if (!_save->getAlienCustomMission().empty())
-				{
-					// fake underwater UFO
-					ufoMissionName = _save->getAlienCustomMission();
-				}
-				ruleDeploy = getGame()->getMod()->getDeployment(ufoMissionName);
-				break;
+				// fake underwater UFO
+				ufoMissionName = _save->getAlienCustomMission();
 			}
+			ruleDeploy = getGame()->getMod()->getDeployment(ufoMissionName);
 		}
 	}
 	std::string nextStage;

@@ -24,6 +24,7 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
+#include "../Savegame/AreaSystem.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/Region.h"
@@ -125,16 +126,13 @@ BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles
 	if (!am)
 	{
 		// backwards-compatibility
-		RuleRegion* regionRule = getGame()->getSavedGame()->getRegions().front()->getRules(); // wrong, but that's how it is in OXC
-		for (const Region* region : getGame()->getSavedGame()->getRegions())
-		{
-			if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
-			{
-				regionRule = region->getRules();
-				break;
-			}
-		}
-		am = getGame()->getSavedGame()->findAlienMission(regionRule->getType(), OBJECTIVE_RETALIATION);
+		entt::registry& registry = getGame()->getSavedGame()->getRegistry();
+		entt::entity regionId = AreaSystem::locate<Region>(registry, *_base);
+
+		// apparently falling back to first region is wrong, but that's how it is in OXC. Not sure what would be right :P
+		const std::string regionName = regionId != entt::null ? registry.get<Region>(regionId).getRules()->getType()
+			: registry.get<Region>(registry.view<Region>().front()).getRules()->getType();
+		am = getGame()->getSavedGame()->findAlienMission(regionName, OBJECTIVE_RETALIATION);
 	}
 	getGame()->getSavedGame()->deleteRetaliationMission(am, _base);
 }
@@ -166,14 +164,12 @@ void BaseDestroyedState::btnOkClick(Action *)
 		return;
 	}
 
-	for (auto xbaseIt = getGame()->getSavedGame()->getBases().begin(); xbaseIt != getGame()->getSavedGame()->getBases().end(); ++xbaseIt)
+	for (auto&& [id, base] : getGame()->getSavedGame()->getRegistry().view<Base>().each())
 	{
-		Base* xbase = (*xbaseIt);
-		if (xbase == _base)
+		if (&base == _base)
 		{
-			getGame()->getSavedGame()->stopHuntingXcomCrafts(xbase); // destroyed together with the base
-			delete xbase;
-			getGame()->getSavedGame()->getBases().erase(xbaseIt);
+			getGame()->getSavedGame()->stopHuntingXcomCrafts(&base); // destroyed together with the base
+			getGame()->getSavedGame()->getRegistry().destroy(id);
 			break;
 		}
 	}

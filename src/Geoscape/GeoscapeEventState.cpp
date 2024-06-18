@@ -34,6 +34,7 @@
 #include "../Mod/RuleInterface.h"
 #include "../Mod/RuleRegion.h"
 #include "../Mod/RuleSoldier.h"
+#include "../Savegame/AreaSystem.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/ItemContainer.h"
 #include "../Savegame/Region.h"
@@ -177,13 +178,11 @@ void GeoscapeEventState::eventLogic()
 	// 1. give/take score points
 	if (regionRule)
 	{
-		for (Region* region : getGame()->getSavedGame()->getRegions())
+		entt::registry& registry = getGame()->getSavedGame()->getRegistry();
+		entt::entity regionId = AreaSystem::find<Region>(registry, regionRule->getType());
+		if (regionId != entt::null)
 		{
-			if (region->getRules() == regionRule)
-			{
-				region->addActivityXcom(rule.getPoints());
-				break;
-			}
+			registry.get<Region>(regionId).addActivityXcom(rule.getPoints());
 		}
 	}
 	else

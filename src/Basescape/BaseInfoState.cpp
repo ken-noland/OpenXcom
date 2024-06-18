@@ -172,7 +172,7 @@ BaseInfoState::BaseInfoState(Base *base, BasescapeState *state) : _base(base), _
 	{
 		if (getGame()->getSavedGame()->getBases().at(i) == _base)
 		{
-			_mini->setSelectedBase(i);
+			_mini->setSelectedBaseIndex(i);
 			break;
 		}
 	}
@@ -253,13 +253,6 @@ BaseInfoState::BaseInfoState(Base *base, BasescapeState *state) : _base(base), _
 	_barLongRange->setScale(25.0);
 }
 
-/**
- *
- */
-BaseInfoState::~BaseInfoState()
-{
-
-}
 
 /**
  * The player can change the selected base.
@@ -519,10 +512,11 @@ void BaseInfoState::edtBaseChange(Action *)
  */
 void BaseInfoState::miniClick(Action *)
 {
-	size_t base = _mini->getHoveredBase();
+	size_t base = _mini->getHoveredBaseIndex();
+	size_t numBases = getGame()->getSavedGame()->getRegistry().view<Base>().size();
 	if (base < getGame()->getSavedGame()->getBases().size())
 	{
-		_mini->setSelectedBase(base);
+		_mini->setSelectedBaseIndex(base);
 		_base = getGame()->getSavedGame()->getBases().at(base);
 		_state->setBase(_base);
 		init();
@@ -552,7 +546,7 @@ void BaseInfoState::handleKeyPress(Action *action)
 		{
 			if (key == baseKeys[i])
 			{
-				_mini->setSelectedBase(i);
+				_mini->setSelectedBaseIndex(i);
 				_base = getGame()->getSavedGame()->getBases().at(i);
 				_state->setBase(_base);
 				init();

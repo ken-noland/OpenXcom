@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,27 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "PlaceFacilityState.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
 
-class SelectStartFacilityState;
-
-/**
- * Window shown when the player tries to
- * build a facility.
- */
-class PlaceStartFacilityState : public PlaceFacilityState
+namespace RegionSystem
 {
-private:
-	SelectStartFacilityState *_select;
+	[[nodiscard]]
 
-public:
-	/// Creates the Place Facility state.
-	PlaceStartFacilityState(entt::entity baseId, SelectStartFacilityState *select, const RuleBaseFacility *rule);
-	/// Handler for clicking the base view.
-	void viewClick(Action *action);
-};
+	/// finds a region by name
+	[[nodiscard]] entt::entity findRegion(const entt::registry& registry, const std::string& regionName);
+	/// locates a region id by lat/long
+	[[nodiscard]] entt::entity locateRegion(const entt::registry& registry, double lon, double lat);
+	/// locates a region given a locateable object
+	template<typename Locatable>
+	[[nodiscard]] entt::entity locateRegion(const entt::registry& registry, const Locatable& locatable);
+}
 
 }

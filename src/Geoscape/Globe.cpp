@@ -1458,9 +1458,9 @@ void Globe::drawDetail()
 		label->setColor(CITY_LABEL_COLOR);
 
 		Sint16 x, y;
-		for (Region* region : _game->getSavedGame()->getRegions())
+		for (auto&& [id, region] : _game->getSavedGame()->getRegistry().view<Region>().each())
 		{
-			for (City* city : region->getRules()->getCities())
+			for (City* city : region.getRules()->getCities())
 			{
 				drawTarget(city, _countries);
 
@@ -1478,15 +1478,15 @@ void Globe::drawDetail()
 			}
 		}
 		// Draw bases names
-		for (Base* xbase : _game->getSavedGame()->getBases())
+		for (auto&& [id, base] : _game->getSavedGame()->getRegistry().view<Base>().each())
 		{
-			if (xbase->getMarker() == -1 || pointBack(xbase->getLongitude(), xbase->getLatitude()))
+			if (base.getMarker() == -1 || pointBack(base.getLongitude(), base.getLatitude()))
 				continue;
-			polarToCart(xbase->getLongitude(), xbase->getLatitude(), &x, &y);
+			polarToCart(base.getLongitude(), base.getLatitude(), &x, &y);
 			label->setX(x - 50);
 			label->setY(y + 2);
 			label->setColor(BASE_LABEL_COLOR);
-			label->setText(xbase->getName());
+			label->setText(base.getName());
 			label->blit(_countries->getSurface());
 		}
 
@@ -1525,18 +1525,17 @@ void Globe::drawDetail()
 		else if (debugType == 1)
 		{
 			color = 0;
-			for (Region* region : _game->getSavedGame()->getRegions())
+			if (_game->getSavedGame()->debugRegion != entt::null)
 			{
-				if (_game->getSavedGame()->debugRegion && _game->getSavedGame()->debugRegion != region)
-					continue;
+				const Region& region = _game->getSavedGame()->getRegistry().get<Region>(_game->getSavedGame()->debugRegion);
 
 				color += 10;
-				for (size_t k = 0; k != region->getRules()->getLatMax().size(); ++k)
+				for (size_t k = 0; k != region.getRules()->getLatMax().size(); ++k)
 				{
-					double lon2 = region->getRules()->getLonMax().at(k);
-					double lon1 = region->getRules()->getLonMin().at(k);
-					double lat2 = region->getRules()->getLatMax().at(k);
-					double lat1 = region->getRules()->getLatMin().at(k);
+					double lon2 = region.getRules()->getLonMax().at(k);
+					double lon1 = region.getRules()->getLonMin().at(k);
+					double lat2 = region.getRules()->getLatMax().at(k);
+					double lat1 = region.getRules()->getLatMin().at(k);
 
 					drawVHLine(_countries, lon1, lat1, lon2, lat1, color);
 					drawVHLine(_countries, lon1, lat2, lon2, lat2, color);
@@ -1547,14 +1546,13 @@ void Globe::drawDetail()
 		}
 		else if (debugType == 2)
 		{
-			for (Region* region : _game->getSavedGame()->getRegions())
+			if (_game->getSavedGame()->debugRegion != entt::null)
 			{
-				if (_game->getSavedGame()->debugRegion && _game->getSavedGame()->debugRegion != region)
-					continue;
+				const Region& region = _game->getSavedGame()->getRegistry().get<Region>(_game->getSavedGame()->debugRegion);
 
 				color = -1;
 				size_t zoneNumber = 0;
-				for (const auto& missionZone : region->getRules()->getMissionZones())
+				for (const auto& missionZone : region.getRules()->getMissionZones())
 				{
 					++zoneNumber;
 					if (_game->getSavedGame()->debugZone > 0 && _game->getSavedGame()->debugZone != zoneNumber)

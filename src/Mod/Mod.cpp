@@ -17,97 +17,98 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Mod.h"
-#include "ModScript.h"
 #include <algorithm>
+#include <cassert>
+#include <climits>
 #include <functional>
 #include <sstream>
-#include <climits>
-#include <cassert>
-#include "../version.h"
-#include "../Engine/CrossPlatform.h"
-#include "../Engine/FileMap.h"
-#include "../Engine/Palette.h"
-#include "../Engine/Font.h"
-#include "../Engine/Surface.h"
-#include "../Engine/SurfaceSet.h"
-#include "../Engine/Music.h"
-#include "../Engine/GMCat.h"
-#include "../Engine/SoundSet.h"
-#include "../Engine/Sound.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Window.h"
-#include "MapDataSet.h"
-#include "RuleMusic.h"
-#include "../Engine/ShaderDraw.h"
-#include "../Engine/ShaderMove.h"
-#include "../Engine/Exception.h"
-#include "../Engine/Logger.h"
-#include "../Engine/ScriptBind.h"
-#include "../Engine/Collections.h"
-#include "SoundDefinition.h"
-#include "ExtraSprites.h"
-#include "CustomPalettes.h"
-#include "ExtraSounds.h"
-#include "../Engine/AdlibMusic.h"
-#include "../Engine/CatFile.h"
-#include "../fmath.h"
-#include "../Engine/RNG.h"
-#include "../Engine/Options.h"
-#include "../Battlescape/Pathfinding.h"
-#include "RuleCountry.h"
-#include "RuleRegion.h"
-#include "RuleBaseFacility.h"
-#include "RuleCraft.h"
-#include "RuleCraftWeapon.h"
-#include "RuleItemCategory.h"
-#include "RuleItem.h"
-#include "RuleUfo.h"
-#include "RuleTerrain.h"
-#include "MapScript.h"
-#include "RuleSoldier.h"
-#include "RuleSkill.h"
-#include "RuleCommendations.h"
-#include "AlienRace.h"
-#include "RuleEnviroEffects.h"
-#include "RuleStartingCondition.h"
 #include "AlienDeployment.h"
+#include "AlienRace.h"
 #include "Armor.h"
 #include "ArticleDefinition.h"
+#include "CustomPalettes.h"
+#include "ExtraSounds.h"
+#include "ExtraSprites.h"
+#include "ExtraStrings.h"
+#include "MapDataSet.h"
+#include "MapScript.h"
+#include "MCDPatch.h"
+#include "ModScript.h"
+#include "RuleAlienMission.h"
+#include "RuleArcScript.h"
+#include "RuleBaseFacility.h"
+#include "RuleCommendations.h"
+#include "RuleConverter.h"
+#include "RuleCountry.h"
+#include "RuleCraft.h"
+#include "RuleCraftWeapon.h"
+#include "RuleEnviroEffects.h"
+#include "RuleEvent.h"
+#include "RuleEventScript.h"
+#include "RuleGlobe.h"
+#include "RuleInterface.h"
 #include "RuleInventory.h"
-#include "RuleResearch.h"
+#include "RuleItem.h"
+#include "RuleItemCategory.h"
 #include "RuleManufacture.h"
 #include "RuleManufactureShortcut.h"
-#include "ExtraStrings.h"
-#include "RuleInterface.h"
-#include "RuleArcScript.h"
-#include "RuleEventScript.h"
-#include "RuleEvent.h"
 #include "RuleMissionScript.h"
+#include "RuleMusic.h"
+#include "RuleRegion.h"
+#include "RuleResearch.h"
+#include "RuleSkill.h"
+#include "RuleSoldier.h"
+#include "RuleSoldierBonus.h"
+#include "RuleSoldierTransformation.h"
+#include "RuleStartingCondition.h"
+#include "RuleTerrain.h"
+#include "RuleUfo.h"
+#include "RuleVideo.h"
+#include "SoundDefinition.h"
+#include "StatString.h"
+#include "UfoTrajectory.h"
+#include "../Battlescape/Pathfinding.h"
+#include "../Engine/AdlibMusic.h"
+#include "../Engine/CatFile.h"
+#include "../Engine/Collections.h"
+#include "../Engine/CrossPlatform.h"
+#include "../Engine/Exception.h"
+#include "../Engine/FileMap.h"
+#include "../Engine/Font.h"
+#include "../Engine/GMCat.h"
+#include "../Engine/Logger.h"
+#include "../Engine/Music.h"
+#include "../Engine/Options.h"
+#include "../Engine/Palette.h"
+#include "../Engine/RNG.h"
+#include "../Engine/ScriptBind.h"
+#include "../Engine/ShaderDraw.h"
+#include "../Engine/ShaderMove.h"
+#include "../Engine/Sound.h"
+#include "../Engine/SoundSet.h"
+#include "../Engine/Surface.h"
+#include "../Engine/SurfaceSet.h"
+#include "../fmath.h"
 #include "../Geoscape/Globe.h"
-#include "../Savegame/SavedGame.h"
-#include "../Savegame/SavedBattleGame.h"
-#include "../Savegame/Region.h"
+#include "../Interface/TextButton.h"
+#include "../Interface/Window.h"
+#include "../Savegame/AlienStrategy.h"
 #include "../Savegame/Base.h"
-#include "../Savegame/Country.h"
-#include "../Savegame/Soldier.h"
 #include "../Savegame/BattleUnit.h"
+#include "../Savegame/Country.h"
+#include "../Savegame/CountrySystem.h"
 #include "../Savegame/Craft.h"
 #include "../Savegame/CraftWeapon.h"
+#include "../Savegame/GameTime.h"
 #include "../Savegame/ItemContainer.h"
+#include "../Savegame/Region.h"
+#include "../Savegame/SavedBattleGame.h"
+#include "../Savegame/SavedGame.h"
+#include "../Savegame/Soldier.h"
+#include "../Savegame/SoldierDiary.h"
 #include "../Savegame/Transfer.h"
 #include "../Ufopaedia/Ufopaedia.h"
-#include "../Savegame/AlienStrategy.h"
-#include "../Savegame/GameTime.h"
-#include "../Savegame/SoldierDiary.h"
-#include "UfoTrajectory.h"
-#include "RuleAlienMission.h"
-#include "MCDPatch.h"
-#include "StatString.h"
-#include "RuleGlobe.h"
-#include "RuleVideo.h"
-#include "RuleConverter.h"
-#include "RuleSoldierTransformation.h"
-#include "RuleSoldierBonus.h"
+#include "../version.h"
 
 #define ARRAYLEN(x) (std::size(x))
 
@@ -3748,7 +3749,8 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 	}
 	// Adjust funding to total $6M
 	auto countries = save->getRegistry().view<Country>();
-	int missing = ((_initialFunding - save->getCountryFunding()/1000) / (int) countries.size()) * 1000;
+	int64_t totalFunding = CountrySystem::getCountriesMonthlyFundingTotal(save->getRegistry());
+	int missing = ((_initialFunding - totalFunding/1000) / (int) countries.size()) * 1000;
 	for (auto&& [id, country] : countries.each())
 	{
 		int funding = country.getFunding().back() + missing;
@@ -3758,14 +3760,17 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 		}
 		country.setFunding(funding);
 	}
-	save->setFunds(save->getCountryFunding());
+	save->setFunds(CountrySystem::getCountriesMonthlyFundingTotal(save->getRegistry()));
 
 	// Add regions
 	for (const auto& regionName : _regionsIndex)
 	{
-		RuleRegion *regionRule = getRegion(regionName);
+		RuleRegion* regionRule = getRegion(regionName);
 		if (!regionRule->getLonMin().empty())
-			save->getRegions().push_back(new Region(regionRule));
+		{
+			entt::entity regionId = save->getRegistry().create();
+			save->getRegistry().emplace<Region>(regionId, regionRule);
+		}
 	}
 
 	// Set up starting base

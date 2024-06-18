@@ -25,6 +25,7 @@
 #include "../Interface/TextEdit.h"
 #include "../Interface/TextButton.h"
 #include "../Savegame/Base.h"
+#include "../Savegame/SavedGame.h"
 #include "../Basescape/PlaceLiftState.h"
 #include "../Engine/Options.h"
 #include "../Engine/RNG.h"
@@ -40,7 +41,8 @@ namespace OpenXcom
  * @param first Is this the first base in the game?
  * @param fixedLocation Is this the first base in the game on a fixed location?
  */
-BaseNameState::BaseNameState(Base *base, Globe *globe, bool first, bool fixedLocation) : _base(base), _globe(globe), _first(first), _fixedLocation(fixedLocation)
+BaseNameState::BaseNameState(entt::entity newBaseId, Globe *globe, bool first, bool fixedLocation)
+	: _newBaseId(newBaseId), _globe(globe), _first(first), _fixedLocation(fixedLocation)
 {
 	_globe->onMouseOver(0);
 
@@ -102,14 +104,6 @@ BaseNameState::BaseNameState(Base *base, Globe *globe, bool first, bool fixedLoc
 }
 
 /**
- *
- */
-BaseNameState::~BaseNameState()
-{
-
-}
-
-/**
  * Updates the base name and disables the OK button
  * if no name is entered.
  * @param action Pointer to an action.
@@ -138,7 +132,7 @@ void BaseNameState::btnOkClick(Action *)
 {
 	if (!_edtName->getText().empty())
 	{
-		_base->setName(_edtName->getText());
+		getGame()->getSavedGame()->getRegistry().get<Base>(_newBaseId).setName(_edtName->getText());
 		getGame()->popState(); // pop BaseNameState
 
 		if (!_fixedLocation)
@@ -152,7 +146,7 @@ void BaseNameState::btnOkClick(Action *)
 
 		if (!_first || Options::customInitialBase)
 		{
-			getGame()->pushState(new PlaceLiftState(_base, _globe, _first));
+			getGame()->pushState(new PlaceLiftState(_newBaseId, _globe, _first));
 		}
 	}
 }

@@ -17,33 +17,34 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "AlienMission.h"
+#include <algorithm>
+#include <assert.h>
+#include <functional>
 #include "AlienBase.h"
+#include "AreaSystem.h"
 #include "Base.h"
-#include "../fmath.h"
+#include "Country.h"
+#include "Craft.h"
+#include "MissionSite.h"
+#include "Region.h"
+#include "SavedGame.h"
+#include "Ufo.h"
+#include "Waypoint.h"
 #include "../Engine/Exception.h"
 #include "../Engine/Game.h"
 #include "../Engine/Logger.h"
 #include "../Engine/RNG.h"
+#include "../fmath.h"
 #include "../Geoscape/Globe.h"
-#include "../Mod/RuleAlienMission.h"
-#include "../Mod/RuleRegion.h"
-#include "../Mod/RuleCountry.h"
-#include "../Mod/Mod.h"
-#include "../Mod/RuleUfo.h"
-#include "../Mod/UfoTrajectory.h"
-#include "../Mod/RuleGlobe.h"
-#include "../Mod/Texture.h"
-#include "SavedGame.h"
-#include "MissionSite.h"
-#include "Ufo.h"
-#include "Craft.h"
-#include "Region.h"
-#include "Country.h"
-#include "Waypoint.h"
-#include <assert.h>
-#include <algorithm>
-#include <functional>
 #include "../Mod/AlienDeployment.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleAlienMission.h"
+#include "../Mod/RuleCountry.h"
+#include "../Mod/RuleGlobe.h"
+#include "../Mod/RuleRegion.h"
+#include "../Mod/RuleUfo.h"
+#include "../Mod/Texture.h"
+#include "../Mod/UfoTrajectory.h"
 
 namespace OpenXcom
 {
@@ -1140,22 +1141,8 @@ void AlienMission::addScore(double lon, double lat, SavedGame &game) const
 {
 	if (_rule.getObjective() == OBJECTIVE_INFILTRATION)
 		return; // pact score is a special case
-	for (Region* region : game.getRegions())
-	{
-		if (region->getRules()->insideRegion(lon, lat))
-		{
-			region->addActivityAlien(_rule.getPoints());
-			break;
-		}
-	}
-	for (auto&& [id, country] : game.getRegistry().view<Country>().each())
-	{
-		if (country.getRules()->insideCountry(lon, lat))
-		{
-			country.addActivityAlien(_rule.getPoints());
-			break;
-		}
-	}
+
+	AreaSystem::addAlienActivityToCountryAndRegion(game.getRegistry(), _rule.getPoints(), lon, lat);
 }
 
 /**

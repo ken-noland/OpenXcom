@@ -61,8 +61,6 @@ class BaseInfoState : public State
 public:
 	/// Creates the Base Info state.
 	BaseInfoState(Base *base, BasescapeState *state);
-	/// Cleans up the Base Info state.
-	~BaseInfoState();
 	/// Updates the base stats.
 	void init() override;
 	/// Handler for changing the text on the Name edit.

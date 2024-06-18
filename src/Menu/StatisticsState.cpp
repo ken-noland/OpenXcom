@@ -18,6 +18,7 @@
  */
 #include "StatisticsState.h"
 #include <algorithm>
+#include <numeric>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -124,9 +125,9 @@ void StatisticsState::listStats()
 	_txtTitle->setText(ss.str());
 
 	int totalScore = sumVector(save->getResearchScores());
-	for (Region* region : save->getRegions())
+	for (auto&& [id, region] : getGame()->getSavedGame()->getRegistry().view<Region>().each())
 	{
-		totalScore += sumVector(region->getActivityXcom()) - sumVector(region->getActivityAlien());
+		totalScore += sumVector(region.getActivityXcom()) - sumVector(region.getActivityAlien());
 	}
 
 	int monthlyScore = totalScore / (int)save->getResearchScores().size();
@@ -266,20 +267,15 @@ void StatisticsState::listStats()
 
 	int xcomBases = (int)save->getBases().size() + xcomBasesLost;
 	int currentScientists = 0, currentEngineers = 0;
-	for (const Base* xbase : save->getBases())
+	for (const auto&& [id, base] : getGame()->getSavedGame()->getRegistry().view<const Base>().each())
 	{
-		currentScientists += xbase->getTotalScientists();
-		currentEngineers += xbase->getTotalEngineers();
+		currentScientists += base.getTotalScientists();
+		currentEngineers += base.getTotalEngineers();
 	}
 
-	int countriesLost = 0;
-	for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
-	{
-		if (country.getPact())
-		{
-			countriesLost++;
-		}
-	}
+	auto countryView = getGame()->getSavedGame()->getRegistry().view<const Country>().each();
+	auto sumPactCountries = [](int64_t total, const auto& entry) { return total + std::get<const Country&>(entry).getPact() ? 1 : 0; };
+	int countriesLost = std::accumulate(countryView.begin(), countryView.end(), 0, sumPactCountries);
 
 	int researchDone = (int)save->getDiscoveredResearch().size();
 

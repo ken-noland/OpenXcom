@@ -16,22 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "BaseNameState.h"
 #include "ConfirmNewBaseState.h"
 #include "../Engine/Game.h"
-#include "../Mod/Mod.h"
 #include "../Engine/LocalizedText.h"
-#include "../Interface/Window.h"
-#include "../Interface/Text.h"
-#include "../Interface/TextButton.h"
-#include "../Savegame/SavedGame.h"
-#include "../Savegame/Region.h"
-#include "../Mod/RuleRegion.h"
-#include "../Savegame/Base.h"
-#include "BaseNameState.h"
-#include "../Menu/ErrorMessageState.h"
 #include "../Engine/Options.h"
 #include "../Engine/Unicode.h"
+#include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
+#include "../Interface/Window.h"
+#include "../Menu/ErrorMessageState.h"
+#include "../Mod/Mod.h"
 #include "../Mod/RuleInterface.h"
+#include "../Mod/RuleRegion.h"
+#include "../Savegame/AreaSystem.h"
+#include "../Savegame/Base.h"
+#include "../Savegame/Region.h"
+#include "../Savegame/SavedGame.h"
 
 namespace OpenXcom
 {
@@ -42,7 +43,8 @@ namespace OpenXcom
  * @param base Pointer to the base to place.
  * @param globe Pointer to the Geoscape globe.
  */
-ConfirmNewBaseState::ConfirmNewBaseState(Base *base, Globe *globe) : _base(base), _globe(globe), _cost(0)
+ConfirmNewBaseState::ConfirmNewBaseState(entt::entity newBaseId, Globe *globe)
+	: _newBaseId(newBaseId), _globe(globe)
 {
 	_screen = false;
 
@@ -76,14 +78,13 @@ ConfirmNewBaseState::ConfirmNewBaseState(Base *base, Globe *globe) : _base(base)
 	_btnCancel->onKeyboardPress((ActionHandler)&ConfirmNewBaseState::btnCancelClick, Options::keyCancel);
 
 	std::string area;
-	for (const Region* region : getGame()->getSavedGame()->getRegions())
+	entt::registry& registry = getGame()->getSavedGame()->getRegistry();
+	entt::entity regionId = AreaSystem::locate<Region>(registry, registry.get<Base>(_newBaseId));
+	if (regionId != entt::null)
 	{
-		if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
-		{
-			_cost = region->getRules()->getBaseCost();
-			area = tr(region->getRules()->getType());
-			break;
-		}
+		const RuleRegion& ruleRegion = *registry.get<Region>(regionId).getRules();
+		_cost = ruleRegion.getBaseCost();
+		area = tr(ruleRegion.getType());
 	}
 
 	_txtCost->setText(tr("STR_COST_").arg(Unicode::formatFunding(_cost)));
@@ -92,24 +93,15 @@ ConfirmNewBaseState::ConfirmNewBaseState(Base *base, Globe *globe) : _base(base)
 }
 
 /**
- *
- */
-ConfirmNewBaseState::~ConfirmNewBaseState()
-{
-
-}
-
-/**
  * Go to the Place Access Lift screen.
  * @param action Pointer to an action.
  */
-void ConfirmNewBaseState::btnOkClick(Action *)
+void ConfirmNewBaseState::btnOkClick(Action *) const
 {
 	if (getGame()->getSavedGame()->getFunds() >= _cost)
 	{
 		getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() - _cost);
-		getGame()->getSavedGame()->getBases().push_back(_base);
-		getGame()->pushState(new BaseNameState(_base, _globe, false, false));
+		getGame()->pushState(new BaseNameState(_newBaseId, _globe, false, false));
 	}
 	else
 	{

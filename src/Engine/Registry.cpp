@@ -1,6 +1,5 @@
-#pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,27 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "PlaceFacilityState.h"
+#include "Registry.h"
+#include "Game.h"
 
-namespace OpenXcom
+namespace OpenXcom {
+
+static Registry& getRegistry()
 {
-
-class SelectStartFacilityState;
-
-/**
- * Window shown when the player tries to
- * build a facility.
- */
-class PlaceStartFacilityState : public PlaceFacilityState
-{
-private:
-	SelectStartFacilityState *_select;
-
-public:
-	/// Creates the Place Facility state.
-	PlaceStartFacilityState(entt::entity baseId, SelectStartFacilityState *select, const RuleBaseFacility *rule);
-	/// Handler for clicking the base view.
-	void viewClick(Action *action);
-};
+	return getGame()->getRegistry();
+}
 
 }

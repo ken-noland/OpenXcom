@@ -35,11 +35,10 @@ class GeoscapeState;
 class HiddenAlienActivityState : public State
 {
 private:
-
 	GeoscapeState* _state;
 	SavedGame& _save;
 
-	std::map<OpenXcom::Region*, int> _displayHiddenAlienActivityRegions;
+	std::unordered_map<entt::entity, int> _displayHiddenAlienActivityRegions;
 	std::unordered_map<entt::entity, int> _displayHiddenAlienActivityCountries;
 
 	TextButton* _btnOk;
@@ -49,12 +48,9 @@ private:
 	TextList *_lstHiddenAlienActivityRegions, *_lstHiddenAlienActivityCountries;
 
 public:
-
-	HiddenAlienActivityState(GeoscapeState* state, SavedGame& save, std::map<OpenXcom::Region*, int> displayHiddenAlienActivityRegions, std::unordered_map<entt::entity, int> displayHiddenAlienActivityCountries);
-	~HiddenAlienActivityState();
+	HiddenAlienActivityState(GeoscapeState* state, SavedGame& save, std::unordered_map<entt::entity, int> displayHiddenAlienActivityRegions, std::unordered_map<entt::entity, int> displayHiddenAlienActivityCountries);
 	void btnOkClick(Action* action);
 	void btnCancelClick(Action* action);
-
 };
 
 }

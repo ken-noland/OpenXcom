@@ -70,10 +70,11 @@ private:
 	int _slowdownCounter;
 
 	// hidden alien activity accumulators
-	std::map<OpenXcom::Region*, int> _hiddenAlienActivityRegions;
-	std::map<entt::entity, int> _hiddenAlienActivityCountries;
+	std::unordered_map<entt::entity, int> _hiddenAlienActivityRegions;
+	std::unordered_map<entt::entity, int> _hiddenAlienActivityCountries;
 
-	std::unordered_map<int, entt::entity> _debugComboBoxEntityToIndex;
+	std::unordered_map<size_t, entt::entity> _countryDebugComboBoxIndexToEntity;
+	std::unordered_map<size_t, entt::entity> _regionDebugComboBoxIndexToEntity;
 
 	/// Update list of active crafts.
 	const std::vector<Craft*>& updateActiveCrafts();
@@ -119,7 +120,7 @@ public:
 	/// Displays a popup window.
 	void popup(State *state);
 	/// Gets the Geoscape globe.
-	Globe *getGlobe() const;
+	[[nodiscard]] Globe* getGlobe() const { return _globe; }
 	/// Handler for clicking the globe.
 	void globeClick(Action *action);
 	/// Handler for clicking the Intercept button.

@@ -23,6 +23,7 @@
 #include "../Engine/Palette.h"
 #include "../Engine/Surface.h"
 #include "../Engine/InteractiveSurface.h"
+#include "../Savegame/BaseSystem.h"
 #include "../Savegame/Country.h"
 #include "../Savegame/Region.h"
 #include "../Mod/RuleCountry.h"
@@ -97,16 +98,16 @@ GraphsState::GraphsState() : _butRegionsOffset(0), _butCountriesOffset(0), _zoom
 
 	//create buttons (sooooo many buttons)
 	size_t offset = 0;
-	for (Region* region : getGame()->getSavedGame()->getRegions())
+	for (auto&& [id, region] : getGame()->getSavedGame()->getRegistry().view<Region>().each())
 	{
 		// always save in toggles all the region
 		Uint8 color = 13 + 8 * (offset % GRAPH_MAX_BUTTONS);
-		_regionToggles.push_back(new GraphButInfo(tr(region->getRules()->getType()), color));
+		_regionToggles.push_back(new GraphButInfo(tr(region.getRules()->getType()), color));
 		// initially add the GRAPH_MAX_BUTTONS having the first regions information
 		if (offset < GRAPH_MAX_BUTTONS)
 		{
 			_btnRegions.push_back(new ToggleTextButton(88, 11, 0, (int)offset*11));
-			_btnRegions.at(offset)->setText(tr(region->getRules()->getType()));
+			_btnRegions.at(offset)->setText(tr(region.getRules()->getType()));
 			_btnRegions.at(offset)->setInvertColor(color);
 			_btnRegions.at(offset)->onMousePress((ActionHandler)&GraphsState::btnRegionListClick);
 			add(_btnRegions.at(offset), "button", "graphs");
@@ -907,36 +908,42 @@ void GraphsState::drawRegionLines()
 		int total = 0;
 		if (_alien)
 		{
-			for (size_t iter = 0; iter != getGame()->getSavedGame()->getRegions().size(); ++iter)
+			int iter = 0;
+			for (auto&& [id, region] : getGame()->getSavedGame()->getRegistry().view<Region>().each())
 			{
-				total += getGame()->getSavedGame()->getRegions().at(iter)->getActivityAlien().at(entry);
-				if (getGame()->getSavedGame()->getRegions().at(iter)->getActivityAlien().at(entry) > upperLimit && _regionToggles.at(iter)->_pushed)
+				int activity = region.getActivityAlien().at(entry);
+				total += activity;
+				if (activity > upperLimit && _regionToggles.at(iter)->_pushed)
 				{
-					upperLimit = getGame()->getSavedGame()->getRegions().at(iter)->getActivityAlien().at(entry);
+					upperLimit = region.getActivityAlien().at(entry);
 				}
-				if (getGame()->getSavedGame()->getRegions().at(iter)->getActivityAlien().at(entry) < lowerLimit && _regionToggles.at(iter)->_pushed)
+				if (activity < lowerLimit && _regionToggles.at(iter)->_pushed)
 				{
-					lowerLimit = getGame()->getSavedGame()->getRegions().at(iter)->getActivityAlien().at(entry);
+					lowerLimit = region.getActivityAlien().at(entry);
 				}
+				iter++;
 			}
 		}
 		else
 		{
-			for (size_t iter = 0; iter != getGame()->getSavedGame()->getRegions().size(); ++iter)
+			int iter = 0;
+			for (auto&& [id, region] : getGame()->getSavedGame()->getRegistry().view<Region>().each())
 			{
-				total += getGame()->getSavedGame()->getRegions().at(iter)->getActivityXcom().at(entry);
-				if (getGame()->getSavedGame()->getRegions().at(iter)->getActivityXcom().at(entry) > upperLimit && _regionToggles.at(iter)->_pushed)
+				int activity = region.getActivityXcom().at(entry);
+				total += activity;
+				if (activity > upperLimit && _regionToggles.at(iter)->_pushed)
 				{
-					upperLimit = getGame()->getSavedGame()->getRegions().at(iter)->getActivityXcom().at(entry);
+					upperLimit = region.getActivityAlien().at(entry);
 				}
-				if (getGame()->getSavedGame()->getRegions().at(iter)->getActivityXcom().at(entry) < lowerLimit && _regionToggles.at(iter)->_pushed)
+				if (activity < lowerLimit && _regionToggles.at(iter)->_pushed)
 				{
-					lowerLimit = getGame()->getSavedGame()->getRegions().at(iter)->getActivityXcom().at(entry);
+					lowerLimit = region.getActivityXcom().at(entry);
 				}
+				iter++;
 			}
 		}
 		if (_regionToggles.back()->_pushed && total > upperLimit)
-				upperLimit = total;
+			upperLimit = total;
 	}
 
 	//adjust the scale to fit the upward maximum
@@ -969,9 +976,9 @@ void GraphsState::drawRegionLines()
 	double units = range / 126;
 
 	// draw region lines
-	for (size_t entry = 0; entry != getGame()->getSavedGame()->getRegions().size(); ++entry)
+	size_t entry = 0;
+	for (auto&& [id, region] : getGame()->getSavedGame()->getRegistry().view<Region>().each())
 	{
-		Region *region = getGame()->getSavedGame()->getRegions().at(entry);
 		_alienRegionLines.at(entry)->clear();
 		_xcomRegionLines.at(entry)->clear();
 		std::vector<Sint16> newLineVector;
@@ -982,20 +989,20 @@ void GraphsState::drawRegionLines()
 			size_t y = (size_t)(175 - (-lowerLimit / units));
 			if (_alien)
 			{
-				if (iter < region->getActivityAlien().size())
+				if (iter < region.getActivityAlien().size())
 				{
-					reduction = (int)(region->getActivityAlien().at(region->getActivityAlien().size()-(1+iter)) / units);
+					reduction = (int)(region.getActivityAlien().at(region.getActivityAlien().size()-(1+iter)) / units);
 					y -= reduction;
-					totals[iter] += region->getActivityAlien().at(region->getActivityAlien().size()-(1+iter));
+					totals[iter] += region.getActivityAlien().at(region.getActivityAlien().size()-(1+iter));
 				}
 			}
 			else
 			{
-				if (iter < region->getActivityXcom().size())
+				if (iter < region.getActivityXcom().size())
 				{
-					reduction = (int)(region->getActivityXcom().at(region->getActivityXcom().size()-(1+iter)) / units);
+					reduction = (int)(region.getActivityXcom().at(region.getActivityXcom().size()-(1+iter)) / units);
 					y -= reduction;
-					totals[iter] += region->getActivityXcom().at(region->getActivityXcom().size()-(1+iter));
+					totals[iter] += region.getActivityXcom().at(region.getActivityXcom().size()-(1+iter));
 				}
 			}
 
@@ -1067,7 +1074,7 @@ void GraphsState::drawFinanceLines()
 	int64_t expendTotals[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int64_t maintTotals[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int scoreTotals[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	maintTotals[0] = getGame()->getSavedGame()->getBaseMaintenance() / 1000;
+	maintTotals[0] = BaseSystem::getBasesMaintenanceCost(getGame()->getSavedGame()->getRegistry()) / 1000;
 
 	// start filling those arrays with score value
 	// determine which is the highest one being displayed, so we can adjust the scale
@@ -1078,9 +1085,9 @@ void GraphsState::drawFinanceLines()
 		balanceTotals[entry] = getGame()->getSavedGame()->getFundsList().at(invertedEntry) / 1000;
 		scoreTotals[entry] = getGame()->getSavedGame()->getResearchScores().at(invertedEntry);
 
-		for (Region* region : getGame()->getSavedGame()->getRegions())
+		for (auto&& [id, region] : getGame()->getSavedGame()->getRegistry().view<Region>().each())
 		{
-			scoreTotals[entry] += region->getActivityXcom().at(invertedEntry) - region->getActivityAlien().at(invertedEntry);
+			scoreTotals[entry] += region.getActivityXcom().at(invertedEntry) - region.getActivityAlien().at(invertedEntry);
 		}
 
 		if (_financeToggles.at(2))

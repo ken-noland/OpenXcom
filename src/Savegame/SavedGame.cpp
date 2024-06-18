@@ -17,62 +17,63 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "SavedGame.h"
-#include <sstream>
-#include <set>
-#include <iomanip>
 #include <algorithm>
-#include <functional>
 #include <ctime>
+#include <functional>
+#include <iomanip>
 #include <ranges>
+#include <set>
+#include <sstream>
 #include <yaml-cpp/yaml.h>
-#include "../version.h"
-#include "../Engine/Logger.h"
-#include "../Mod/Mod.h"
-#include "../Engine/RNG.h"
-#include "../Engine/Exception.h"
-#include "../Engine/Options.h"
-#include "../Engine/CrossPlatform.h"
-#include "../Engine/ScriptBind.h"
-#include "SavedBattleGame.h"
-#include "SerializationHelper.h"
-#include "GameTime.h"
-#include "Country.h"
+#include "AlienBase.h"
+#include "AlienMission.h"
+#include "AlienStrategy.h"
 #include "Base.h"
+#include "BaseSystem.h"
+#include "BaseFacility.h"
+#include "Country.h"
+#include "CountrySystem.h"
 #include "Craft.h"
 #include "EquipmentLayoutItem.h"
-#include "Region.h"
-#include "Ufo.h"
-#include "Waypoint.h"
-#include "../Mod/RuleResearch.h"
-#include "ResearchProject.h"
-#include "ItemContainer.h"
-#include "Soldier.h"
-#include "Transfer.h"
-#include "../Mod/RuleManufacture.h"
-#include "../Mod/RuleBaseFacility.h"
-#include "../Mod/RuleCraft.h"
-#include "../Mod/RuleSoldierTransformation.h"
-#include "Production.h"
-#include "MissionSite.h"
-#include "AlienBase.h"
-#include "AlienStrategy.h"
-#include "AlienMission.h"
+#include "GameTime.h"
 #include "GeoscapeEvent.h"
-#include "../Mod/RuleCountry.h"
-#include "../Mod/RuleRegion.h"
-#include "../Mod/RuleSoldier.h"
-#include "../Mod/SoldierNamePool.h"
-#include "BaseFacility.h"
+#include "ItemContainer.h"
+#include "MissionSite.h"
 #include "MissionStatistics.h"
+#include "Production.h"
+#include "RankCount.h"
+#include "Region.h"
+#include "ResearchProject.h"
+#include "SavedBattleGame.h"
+#include "SerializationHelper.h"
+#include "Soldier.h"
 #include "SoldierDeath.h"
 #include "SoldierDiary.h"
-#include "../Mod/AlienRace.h"
-#include "RankCount.h"
-
+#include "Transfer.h"
+#include "Ufo.h"
+#include "Waypoint.h"
+#include "../Engine/CrossPlatform.h"
+#include "../Engine/Exception.h"
 #include "../Engine/Game.h"
-#include "../Lua/LuaMod.h"
+#include "../Engine/Logger.h"
+#include "../Engine/Options.h"
+#include "../Engine/Registry.h"
+#include "../Engine/RNG.h"
+#include "../Engine/ScriptBind.h"
 #include "../Lua/GameScript.h"
-
+#include "../Lua/LuaMod.h"
+#include "../Mod/AlienRace.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleBaseFacility.h"
+#include "../Mod/RuleCountry.h"
+#include "../Mod/RuleCraft.h"
+#include "../Mod/RuleManufacture.h"
+#include "../Mod/RuleRegion.h"
+#include "../Mod/RuleResearch.h"
+#include "../Mod/RuleSoldier.h"
+#include "../Mod/RuleSoldierTransformation.h"
+#include "../Mod/SoldierNamePool.h"
+#include "../version.h"
 
 namespace OpenXcom
 {
@@ -116,7 +117,7 @@ SavedGame::SavedGame() :
 	_difficulty(DIFF_BEGINNER), _end(END_NONE), _ironman(false), _globeLon(0.0), _globeLat(0.0), _globeZoom(0),
 	_battleGame(0), _previewBase(nullptr), _debug(false), _warned(false),
 	_togglePersonalLight(true), _toggleNightVision(false), _toggleBrightness(0),
-	_monthsPassed(-1), _selectedBase(0), _visibleBasesIndex(0), _autosales(), _disableSoldierEquipment(false), _alienContainmentChecked(false)
+	_monthsPassed(-1), _selectedBaseIndex(0), _visibleBasesIndexOffset(0), _autosales(), _disableSoldierEquipment(false), _alienContainmentChecked(false)
 {
 	_time = new GameTime(6, 1, 1, 1999, 12, 0, 0);
 	_alienStrategy = new AlienStrategy();
@@ -139,23 +140,7 @@ SavedGame::SavedGame() :
 SavedGame::~SavedGame()
 {
 	delete _time;
-	// for (auto* country : _countries)
-	// {
-	// 	delete country;
-	// }
-	for (auto* region : _regions)
-	{
-		delete region;
-	}
-	for (auto* xbase : _bases)
-	{
-		delete xbase;
-	}
 	delete _previewBase;
-	for (auto* ufo : _ufos)
-	{
-		delete ufo;
-	}
 	for (auto* wp : _waypoints)
 	{
 		delete wp;
@@ -208,14 +193,7 @@ SavedGame::~SavedGame()
 std::string SavedGame::sanitizeModName(const std::string &name)
 {
 	size_t versionInfoBreakPoint = name.find(" ver: ");
-	if (versionInfoBreakPoint == std::string::npos)
-	{
-		return name;
-	}
-	else
-	{
-		return name.substr(0, versionInfoBreakPoint);
-	}
+	return versionInfoBreakPoint == std::string::npos ? name : name.substr(0, versionInfoBreakPoint);
 }
 
 static bool _isCurrentGameType(const SaveInfo &saveInfo, const std::string &curMaster)
@@ -386,14 +364,7 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 	// Get brief save info
 	YAML::Node brief = file[0];
 	_time->load(brief["time"]);
-	if (brief["name"])
-	{
-		_name = brief["name"].as<std::string>();
-	}
-	else
-	{
-		_name = filename;
-	}
+	_name = (brief["name"]) ? _name = brief["name"].as<std::string>() : _name = filename;
 	_ironman = brief["ironman"].as<bool>(_ironman);
 
 	// Get full save data
@@ -427,9 +398,8 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 		std::string type = (*i)["type"].as<std::string>();
 		if (mod->getCountry(type))
 		{
-			entt::entity entity = _registry.create();
-			Country& newCountry = _registry.emplace<Country>(entity, mod->getCountry(type), false);
-			newCountry.load(*i, mod->getScriptGlobal());
+			Country& country = getRegistry().createAndEmplace<Country>(mod->getCountry(type), false);
+			country.load(*i, mod->getScriptGlobal());
 		}
 		else
 		{
@@ -442,9 +412,8 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 		std::string type = (*i)["type"].as<std::string>();
 		if (mod->getRegion(type))
 		{
-			Region *r = new Region(mod->getRegion(type));
-			r->load(*i);
-			_regions.push_back(r);
+			Region& region = getRegistry().createAndEmplace<Region>(mod->getRegion(type));
+			region.load(*i);
 		}
 		else
 		{
@@ -486,14 +455,15 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 		}
 	}
 
+	std::vector<std::pair<const YAML::Node&, Ufo&>> yamlAndUfoReferences;
 	for (YAML::const_iterator i = doc["ufos"].begin(); i != doc["ufos"].end(); ++i)
 	{
 		std::string type = (*i)["type"].as<std::string>();
 		if (mod->getUfo(type))
 		{
-			Ufo *u = new Ufo(mod->getUfo(type), 0);
-			u->load(*i, mod->getScriptGlobal(), *mod, *this);
-			_ufos.push_back(u);
+			Ufo& ufo = getRegistry().createAndEmplace<Ufo>(mod->getUfo(type), 0);
+			ufo.load(*i, mod->getScriptGlobal(), *mod, *this);
+			yamlAndUfoReferences.emplace_back(*i, ufo);
 		}
 		else
 		{
@@ -582,62 +552,26 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 	_hiddenPurchaseItemsMap = doc["hiddenPurchaseItems"].as< std::map<std::string, bool> >(_hiddenPurchaseItemsMap);
 	_customRuleCraftDeployments = doc["customRuleCraftDeployments"].as< std::map<std::string, RuleCraftDeployment > >(_customRuleCraftDeployments);
 
+	std::vector<std::pair<const YAML::Node&, Base&>> yamlAndBaseReferences;
 	for (YAML::const_iterator i = doc["bases"].begin(); i != doc["bases"].end(); ++i)
 	{
-		Base *b = new Base(mod);
-		b->load(*i, this, false);
-		_bases.push_back(b);
+		auto thing = (*i);
+		Base& base = getRegistry().createAndEmplace<Base>(mod);
+		base.load(*i, this, false);
+
+		yamlAndBaseReferences.emplace_back(*i, base);
 	}
 
-	// Finish loading crafts after bases (more specifically after all crafts) are loaded, because of references between crafts (i.e. friendly escorts)
+	// Finish loading crafts after all bases and their craft are loaded, because of references between crafts (i.e. friendly escorts)
+	for (const auto& [yamlNode, base] : yamlAndBaseReferences)
 	{
-		for (YAML::const_iterator i = doc["bases"].begin(); i != doc["bases"].end(); ++i)
-		{
-			// Bases don't have IDs and names are not unique, so need to consider lon/lat too
-			double lon = (*i)["lon"].as<double>(0.0);
-			double lat = (*i)["lat"].as<double>(0.0);
-			std::string baseName = "";
-			if (const YAML::Node &name = (*i)["name"])
-			{
-				baseName = name.as<std::string>();
-			}
-
-			Base *base = 0;
-			for (auto* xbase : _bases)
-			{
-				if (AreSame(lon, xbase->getLongitude()) && AreSame(lat, xbase->getLatitude()) && xbase->getName() == baseName)
-				{
-					base = xbase;
-					break;
-				}
-			}
-			if (base)
-			{
-				base->finishLoading(*i, this);
-			}
-		}
+		base.finishLoadingCrafts(yamlNode, this);
 	}
 
 	// Finish loading UFOs after all craft and all other UFOs are loaded
-	for (YAML::const_iterator i = doc["ufos"].begin(); i != doc["ufos"].end(); ++i)
+	for (const auto& [yamlNode, ufo] : yamlAndUfoReferences)
 	{
-		int uniqueUfoId = (*i)["uniqueId"].as<int>(0);
-		if (uniqueUfoId > 0)
-		{
-			Ufo *ufo = 0;
-			for (auto* u : _ufos)
-			{
-				if (u->getUniqueId() == uniqueUfoId)
-				{
-					ufo = u;
-					break;
-				}
-			}
-			if (ufo)
-			{
-				ufo->finishLoading(*i, *this);
-			}
-		}
+		ufo.finishLoading(yamlNode, *this);
 	}
 
 	const YAML::Node &research = doc["poppedResearch"];
@@ -824,17 +758,17 @@ void SavedGame::save(const std::string &filename, Mod *mod) const
 	node["globeLat"] = serializeDouble(_globeLat);
 	node["globeZoom"] = _globeZoom;
 	node["ids"] = _ids;
-	for (auto&& [id, country] : _registry.view<Country>().each())
+	for (const Country& country : getRegistry().list<const Country>())
 	{
 		node["countries"].push_back(country.save(mod->getScriptGlobal()));
 	}
-	for (const auto* region : _regions)
+	for (const Region& region : getRegistry().list<const Region>())
 	{
-		node["regions"].push_back(region->save());
+		node["regions"].push_back(region.save());
 	}
-	for (const auto* xbase : _bases)
+	for (const Base& base : getRegistry().list<const Base>())
 	{
-		node["bases"].push_back(xbase->save());
+		node["bases"].push_back(base.save());
 	}
 	for (const auto* wp : _waypoints)
 	{
@@ -855,9 +789,9 @@ void SavedGame::save(const std::string &filename, Mod *mod) const
 		node["alienMissions"].push_back(am->save());
 	}
 	// UFOs must be after missions
-	for (const auto* ufo : _ufos)
+	for (const Ufo& ufo : getRegistry().list<const Ufo>())
 	{
-		node["ufos"].push_back(ufo->save(mod->getScriptGlobal(), getMonthsPassed() == -1));
+		node["ufos"].push_back(ufo.save(mod->getScriptGlobal(), getMonthsPassed() == -1));
 	}
 	for (const auto* ge : _geoscapeEvents)
 	{
@@ -962,42 +896,6 @@ void SavedGame::save(const std::string &filename, Mod *mod) const
 }
 
 /**
- * Returns the game's name shown in Save screens.
- * @return Save name.
- */
-std::string SavedGame::getName() const
-{
-	return _name;
-}
-
-/**
- * Changes the game's name shown in Save screens.
- * @param name New name.
- */
-void SavedGame::setName(const std::string &name)
-{
-	_name = name;
-}
-
-/**
- * Returns the game's difficulty level.
- * @return Difficulty level.
- */
-GameDifficulty SavedGame::getDifficulty() const
-{
-	return _difficulty;
-}
-
-/**
- * Changes the game's difficulty to a new level.
- * @param difficulty New difficulty.
- */
-void SavedGame::setDifficulty(GameDifficulty difficulty)
-{
-	_difficulty = difficulty;
-}
-
-/**
  * Returns the game's difficulty coefficient based
  * on the current level.
  * @return Difficulty coefficient.
@@ -1028,62 +926,6 @@ int SavedGame::getBuyPriceCoefficient() const
 }
 
 /**
- * Returns the game's current ending.
- * @return Ending state.
- */
-GameEnding SavedGame::getEnding() const
-{
-	return _end;
-}
-
-/**
- * Changes the game's current ending.
- * @param end New ending.
- */
-void SavedGame::setEnding(GameEnding end)
-{
-	_end = end;
-}
-
-/**
- * Returns if the game is set to ironman mode.
- * Ironman games cannot be manually saved.
- * @return Tony Stark
- */
-bool SavedGame::isIronman() const
-{
-	return _ironman;
-}
-
-/**
- * Changes if the game is set to ironman mode.
- * Ironman games cannot be manually saved.
- * @param ironman Tony Stark
- */
-void SavedGame::setIronman(bool ironman)
-{
-	_ironman = ironman;
-}
-
-/**
- * Returns the player's current funds.
- * @return Current funds.
- */
-int64_t SavedGame::getFunds() const
-{
-	return _funds.back();
-}
-
-/**
- * Returns the player's funds for the last 12 months.
- * @return funds.
- */
-std::vector<int64_t> &SavedGame::getFundsList()
-{
-	return _funds;
-}
-
-/**
  * Changes the player's funds to a new value.
  * @param funds New funds.
  */
@@ -1101,68 +943,15 @@ void SavedGame::setFunds(int64_t funds)
 }
 
 /**
- * Returns the current longitude of the Geoscape globe.
- * @return Longitude.
- */
-double SavedGame::getGlobeLongitude() const
-{
-	return _globeLon;
-}
-
-/**
- * Changes the current longitude of the Geoscape globe.
- * @param lon Longitude.
- */
-void SavedGame::setGlobeLongitude(double lon)
-{
-	_globeLon = lon;
-}
-
-/**
- * Returns the current latitude of the Geoscape globe.
- * @return Latitude.
- */
-double SavedGame::getGlobeLatitude() const
-{
-	return _globeLat;
-}
-
-/**
- * Changes the current latitude of the Geoscape globe.
- * @param lat Latitude.
- */
-void SavedGame::setGlobeLatitude(double lat)
-{
-	_globeLat = lat;
-}
-
-/**
- * Returns the current zoom level of the Geoscape globe.
- * @return Zoom level.
- */
-int SavedGame::getGlobeZoom() const
-{
-	return _globeZoom;
-}
-
-/**
- * Changes the current zoom level of the Geoscape globe.
- * @param zoom Zoom level.
- */
-void SavedGame::setGlobeZoom(int zoom)
-{
-	_globeZoom = zoom;
-}
-
-/**
  * Gives the player his monthly funds, taking in account
  * all maintenance and profit costs.
  */
 void SavedGame::monthlyFunding()
 {
-	auto countryFunding = getCountryFunding();
-	auto baseMaintenance = getBaseMaintenance();
-	_funds.back() += (countryFunding - baseMaintenance);
+	auto getLastMonthFunding = [](const Country& country) { return country.getFunding().back(); };
+	int64_t countryFunding = getRegistry().totalBy<Country, int64_t>(getLastMonthFunding);
+	int64_t baseMaintenance = BaseSystem::getBasesMaintenanceCost();
+	_funds.back() += countryFunding - baseMaintenance;
 	_funds.push_back(_funds.back());
 	_maintenance.back() = baseMaintenance;
 	_maintenance.push_back(0);
@@ -1180,15 +969,6 @@ void SavedGame::monthlyFunding()
 		_funds.erase(_funds.begin());
 	if (_maintenance.size() > 12)
 		_maintenance.erase(_maintenance.begin());
-}
-
-/**
- * Returns the current time of the game.
- * @return Pointer to the game time.
- */
-GameTime *SavedGame::getTime() const
-{
-	return _time;
 }
 
 /**
@@ -1228,14 +1008,7 @@ int SavedGame::getId(const std::string &name)
 int SavedGame::getLastId(const std::string& name)
 {
 	auto i = _ids.find(name);
-	if (i != _ids.end())
-	{
-		return std::max(1, i->second - 1);
-	}
-	else
-	{
-		return 0;
-	}
+	return i != _ids.end() ? std::max(1, i->second - 1) : 0;
 }
 
 /**
@@ -1283,148 +1056,16 @@ void SavedGame::decreaseCustomCounter(const std::string& name)
 }
 
 /**
-* Resets the list of unique object IDs.
-* @param ids New ID list.
-*/
-const std::map<std::string, int> &SavedGame::getAllIds() const
-{
-	return _ids;
-}
-
-/**
- * Resets the list of unique object IDs.
- * @param ids New ID list.
- */
-void SavedGame::setAllIds(const std::map<std::string, int> &ids)
-{
-	_ids = ids;
-}
-
-/**
- * Returns the list of countries in the game world.
- * @return Pointer to country list.
- */
-// std::vector<Country*>& SavedGame::getCountries()
-// {
-// 	return _countries;
-// }
-
-/**
- * Adds up the monthly funding of all the countries.
- * @return Total funding.
- */
-int SavedGame::getCountryFunding() const
-{
-	int total = 0;
-	for (auto&& [id, country] : _registry.view<const Country>().each())
-	{
-		total += country.getFunding().back();
-	}
-	return total;
-}
-
-/**
- * Returns the list of world regions.
- * @return Pointer to region list.
- */
-std::vector<Region*>& SavedGame::getRegions()
-{
-	return _regions;
-}
-
-/**
- * Returns the list of player bases.
- * @return Pointer to base list.
- */
-std::vector<Base*>& SavedGame::getBases()
-{
-	return _bases;
-}
-
-/**
  * Returns the last selected player base.
  * @return Pointer to base.
  */
-Base *SavedGame::getSelectedBase()
-{
-	// in case a base was destroyed or something...
-	if (_selectedBase < _bases.size())
-	{
-		return _bases.at(_selectedBase);
-	}
-	else
-	{
-		return _bases.front();
-	}
-}
-
-/**
- * Returns the last index of Visible Bases.
- * @return index for visible Bases.
- */
-size_t SavedGame::getVisibleBasesIndex()
-{
-	return _visibleBasesIndex;
-}
-
-/**
- * Sets the last selected player base.
- * @param base number of the base.
- */
-void SavedGame::setSelectedBase(size_t base)
-{
-	_selectedBase = base;
-}
-
-/**
- * Sets the last index of visible bases.
- * @param index number for visible bases.
- */
-void SavedGame::setVisibleBasesIndex(size_t lastVisibleBasesIndex)
-{
-	_visibleBasesIndex = lastVisibleBasesIndex;
-}
-
-/**
- * Returns an immutable list of player bases.
- * @return Pointer to base list.
- */
-const std::vector<Base*>& SavedGame::getBases() const
-{
-	return _bases;
-}
-
-/**
- * Adds up the monthly maintenance of all the bases.
- * @return Total maintenance.
- */
-int SavedGame::getBaseMaintenance() const
-{
-	int total = 0;
-	for (const auto* xbase : _bases)
-	{
-		total += xbase->getMonthlyMaintenace();
-	}
-	return total;
-}
-
-/**
- * Returns the list of alien UFOs.
- * @return Pointer to UFO list.
- */
-std::vector<Ufo*>& SavedGame::getUfos()
-{
-	return _ufos;
-}
-
-/**
- * Returns the list of alien UFOs.
- * @return Pointer to UFO list.
- */
-const std::vector<Ufo*>& SavedGame::getUfos() const
-{
-	return _ufos;
-}
+//Base *SavedGame::getSelectedBase()
+//{
+//	auto baseView = _registry.view<Base>();
+//	auto selectedBaseItterator = std::ranges::next(baseView.begin(), _selectedBaseIndex);
+//	return selectedBaseItterator != baseView.end() ? &_registry.get<Base>(*selectedBaseItterator)
+//												   : &_registry.get<Base>(baseView.front());
+//}
 
 /**
  * Returns the list of craft waypoints.
@@ -2244,70 +1885,15 @@ bool SavedGame::isResearched(const std::vector<const RuleResearch *> &research, 
 }
 
 /**
- * Returns if a certain item has been obtained, i.e. is present directly in the base stores.
- * Items in and on craft, in transfer, worn by soldiers, etc. are ignored!!
- * @param itemType Item ID.
- * @return Whether it's obtained or not.
- */
-bool SavedGame::isItemObtained(const std::string &itemType) const
-{
-	for (auto* xbase : _bases)
-	{
-		if (xbase->getStorageItems()->getItem(itemType) > 0)
-			return true;
-	}
-	return false;
-}
-/**
- * Returns if a certain facility has been built in any base.
- * @param facilityType facility ID.
- * @return Whether it's been built or not. If false, the facility has not been built in any base.
- */
-bool SavedGame::isFacilityBuilt(const std::string &facilityType) const
-{
-	for (Base* xbase : _bases)
-	{
-		for (BaseFacility* fac : xbase->getFacilities())
-		{
-			if (fac->getBuildTime() == 0 && fac->getRules()->getType() == facilityType)
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-/**
- * Returns if a certain soldier type has been hired in any base.
- * @param soldierType soldier type ID.
- * @return Whether it's been hired (and arrived already) or not.
- */
-bool SavedGame::isSoldierTypeHired(const std::string& soldierType) const
-{
-	for (Base* xbase : _bases)
-	{
-		for (Soldier* soldier : xbase->getSoldiers())
-		{
-			if (soldier->getRules()->getType() == soldierType)
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-/**
  * Returns pointer to the Soldier given it's unique ID.
  * @param id A soldier's unique id.
  * @return Pointer to Soldier.
  */
 Soldier *SavedGame::getSoldier(int id) const
 {
-	for (Base* xbase : _bases)
+	for (const Base& base : getRegistry().list<const Base>())
 	{
-		for (Soldier* soldier : xbase->getSoldiers())
+		for (Soldier* soldier : base.getSoldiers())
 		{
 			if (soldier->getId() == id)
 			{
@@ -2594,31 +2180,6 @@ void SavedGame::setWarned(bool warned)
 }
 
 /**
- * Find the region containing this location.
- * @param lon The longitude.
- * @param lat The latitude.
- * @return Pointer to the region, or 0.
- */
-Region *SavedGame::locateRegion(double lon, double lat) const
-{
-	Region* found = nullptr;
-	for (auto* region : _regions)
-	{
-		if (region->getRules()->insideRegion(lon, lat))
-		{
-			found = region;
-			break;
-		}
-	}
-	if (found)
-	{
-		return found;
-	}
-	Log(LOG_ERROR) << "Failed to find a region at location [" << lon << ", " << lat << "].";
-	return 0;
-}
-
-/**
  * Find the region containing this target.
  * @param target The target to locate.
  * @return Pointer to the region, or 0.
@@ -2626,24 +2187,6 @@ Region *SavedGame::locateRegion(double lon, double lat) const
 Region *SavedGame::locateRegion(const Target &target) const
 {
 	return locateRegion(target.getLongitude(), target.getLatitude());
-}
-
-/**
- * Find the country containing this location.
- * @param lon The longitude.
- * @param lat The latitude.
- * @return Pointer to the country, or nullptr.
- */
-const Country* SavedGame::locateCountry(double lon, double lat) const
-{
-	for (auto&& [id, country] : _registry.view<Country>().each())
-	{
-		if (country.getRules()->insideCountry(lon, lat))
-		{
-			return &country;
-		}
-	}
-	return nullptr;
 }
 
 /**
@@ -2720,14 +2263,6 @@ int SavedGame::selectSoldierNationalityByLocation(const Mod* mod, const RuleSold
 }
 
 /*
- * @return the month counter.
- */
-int SavedGame::getMonthsPassed() const
-{
-	return _monthsPassed;
-}
-
-/*
  * @return the GraphRegionToggles.
  */
 const std::string &SavedGame::getGraphRegionToggles() const
@@ -2784,7 +2319,6 @@ void SavedGame::setGraphFinanceToggles(const std::string &value)
 void SavedGame::addMonth()
 {
 	++_monthsPassed;
-
 	_monthlyPurchaseLimitLog.clear();
 }
 
@@ -2856,12 +2390,12 @@ std::vector<Soldier*>& SavedGame::getDeadSoldiers()
 std::vector<Soldier*> SavedGame::getAllActiveSoldiers() const
 {
 	std::vector<Soldier*> soldiers;
-	for (auto* xbase : _bases)
+	for (const Base& base : getRegistry().list<const Base>())
 	{
-		std::vector<Soldier*> baseSoldiers = xbase->getSoldiers();
+		std::vector<Soldier*> baseSoldiers = base.getSoldiers();
 		soldiers.insert(soldiers.end(), baseSoldiers.begin(), baseSoldiers.end());
 
-		for (Transfer* transfer : xbase->getTransfers())
+		for (Transfer* transfer : base.getTransfers())
 		{
 			if (transfer->getType() == TRANSFER_SOLDIER)
 			{
@@ -3008,8 +2542,8 @@ std::vector<Soldier*>::iterator SavedGame::killSoldier(bool resetArmor, Soldier 
 	{
 		// OXCE: soldiers are buried in their default armor (...nicer stats in the Memorial GUI; no free armor if resurrected)
 		soldier->setArmor(soldier->getRules()->getDefaultArmor());
-		soldier->setReplacedArmor(0);
-		soldier->setTransformedArmor(0);
+		soldier->setReplacedArmor(nullptr);
+		soldier->setTransformedArmor(nullptr);
 	}
 	else
 	{
@@ -3018,15 +2552,15 @@ std::vector<Soldier*>::iterator SavedGame::killSoldier(bool resetArmor, Soldier 
 	}
 
 	std::vector<Soldier*>::iterator soldierIt;
-	for (Base* xbase : _bases)
+	for (Base& base : getRegistry().list<Base>())
 	{
-		for (soldierIt = xbase->getSoldiers().begin(); soldierIt != xbase->getSoldiers().end(); ++soldierIt)
+		for (soldierIt = base.getSoldiers().begin(); soldierIt != base.getSoldiers().end(); ++soldierIt)
 		{
 			if ((*soldierIt) == soldier)
 			{
 				soldier->die(new SoldierDeath(*_time, cause));
 				_deadSoldiers.push_back(soldier);
-				return xbase->getSoldiers().erase(soldierIt);
+				return base.getSoldiers().erase(soldierIt);
 			}
 		}
 	}
@@ -3064,9 +2598,9 @@ bool SavedGame::getAutosell(const RuleItem *itype) const
  */
 void SavedGame::removeAllSoldiersFromXcomCraft(Craft *craft)
 {
-	for (auto* xbase : _bases)
+	for (const Base& base : getRegistry().list<const Base>())
 	{
-		for (Soldier* soldier : xbase->getSoldiers())
+		for (Soldier* soldier : base.getSoldiers())
 		{
 			if (soldier->getCraft() == craft)
 			{
@@ -3081,9 +2615,9 @@ void SavedGame::removeAllSoldiersFromXcomCraft(Craft *craft)
  */
 void SavedGame::stopHuntingXcomCraft(Craft *target)
 {
-	for (auto* ufo : _ufos)
+	for (Ufo& ufo : getRegistry().list<Ufo>())
 	{
-		ufo->resetOriginalDestination(target);
+		ufo.resetOriginalDestination(target);
 	}
 }
 
@@ -3094,9 +2628,9 @@ void SavedGame::stopHuntingXcomCrafts(Base *base)
 {
 	for (Craft* xcraft : base->getCrafts())
 	{
-		for (Ufo* ufo : _ufos)
+		for (Ufo& ufo : getRegistry().list<Ufo>())
 		{
-			ufo->resetOriginalDestination(xcraft);
+			ufo.resetOriginalDestination(xcraft);
 		}
 	}
 }
@@ -3122,12 +2656,8 @@ void SavedGame::setDisableSoldierEquipment(bool disableSoldierEquipment)
  */
 bool SavedGame::isManaUnlocked(Mod *mod) const
 {
-	auto researchName = mod->getManaUnlockResearch();
-	if (Mod::isEmptyRuleName(researchName) || isResearched(researchName))
-	{
-		return true;
-	}
-	return false;
+	auto& researchName = mod->getManaUnlockResearch();
+	return Mod::isEmptyRuleName(researchName) || isResearched(researchName);
 }
 
 /**
@@ -3135,15 +2665,11 @@ bool SavedGame::isManaUnlocked(Mod *mod) const
  */
 int SavedGame::getCurrentScore(int monthsPassed) const
 {
-	size_t invertedEntry = _funds.size() - 1;
-	int scoreTotal = _researchScores.at(invertedEntry);
-	if (monthsPassed > 1)
-		scoreTotal += 400;
-	for (auto region : _regions)
-	{
-		scoreTotal += region->getActivityXcom().at(invertedEntry) - region->getActivityAlien().at(invertedEntry);
-	}
-	return scoreTotal;
+	// months are stored in inverse order so latest is at the end.
+	int scoreTotal = _researchScores.back();
+	if (monthsPassed > 1) { scoreTotal += 400; }
+	auto getRegionScore = [](const Region& region) { return region.getActivityXcom().back() - region.getActivityAlien().back(); };
+	return scoreTotal + getRegistry().totalBy<Region, int>(getRegionScore);
 }
 
 /**
@@ -3168,13 +2694,9 @@ void SavedGame::clearLinksForAlienBase(AlienBase* alienBase, const Mod* mod)
 	// If there was a pact with this base, cancel it?
 	if (mod->getAllowCountriesToCancelAlienPact() && !alienBase->getPactCountry().empty())
 	{
-		for (auto&& [id, country] : _registry.view<Country>().each())
+		if (Country* country = getRegistry().findValueByName<Country>(alienBase->getPactCountry()))
 		{
-			if (country.getRules()->getType() == alienBase->getPactCountry())
-			{
-				country.setCancelPact();
-				break;
-			}
+			country->setCancelPact();
 		}
 	}
 }
@@ -3184,18 +2706,11 @@ void SavedGame::clearLinksForAlienBase(AlienBase* alienBase, const Mod* mod)
  */
 void SavedGame::deleteRetaliationMission(AlienMission* am, Base* base)
 {
-	for (auto iter = _ufos.begin(); iter != _ufos.end();)
+	entt::registry& registry = getRegistry().raw();
+	auto missionFilter = [am, &registry](entt::entity ufoId) { return registry.get<Ufo>(ufoId).getMission() == am; };
+	if (entt::entity ufoId = getRegistry().find_if<Ufo>(missionFilter); ufoId != entt::null)
 	{
-		Ufo* ufo = (*iter);
-		if (ufo->getMission() == am)
-		{
-			delete ufo;
-			iter = _ufos.erase(iter);
-		}
-		else
-		{
-			++iter;
-		}
+		registry.destroy(ufoId);
 	}
 	for (auto iter = _activeMissions.begin(); iter != _activeMissions.end(); ++iter)
 	{
@@ -3285,29 +2800,30 @@ bool SavedGame::handleResearchUnlockedByMissions(const RuleResearch* research, c
 	{
 		return false;
 	}
-	if (_bases.empty())
+	entt::entity firstBaseId = getRegistry().raw().view<Base>().front();
+	if (firstBaseId == entt::null)
 	{
 		return false; // all bases lost, game over
 	}
-	Base* base = _bases.front();
+	Base& base = getRegistry().raw().get<Base>(firstBaseId);
 
 	std::vector<const RuleResearch*> researchVec;
 	researchVec.push_back(research);
-	addFinishedResearch(research, mod, base, true);
+	addFinishedResearch(research, mod, &base, true);
 	if (!research->getLookup().empty())
 	{
 		researchVec.push_back(mod->getResearch(research->getLookup(), true));
-		addFinishedResearch(researchVec.back(), mod, base, true);
+		addFinishedResearch(researchVec.back(), mod, &base, true);
 	}
 
 	if (auto bonus = selectGetOneFree(research))
 	{
 		researchVec.push_back(bonus);
-		addFinishedResearch(bonus, mod, base, true);
+		addFinishedResearch(bonus, mod, &base, true);
 		if (!bonus->getLookup().empty())
 		{
 			researchVec.push_back(mod->getResearch(bonus->getLookup(), true));
-			addFinishedResearch(researchVec.back(), mod, base, true);
+			addFinishedResearch(researchVec.back(), mod, &base, true);
 		}
 	}
 
@@ -3336,9 +2852,9 @@ void SavedGame::handlePrimaryResearchSideEffects(const std::vector<const RuleRes
 	for (auto* myResearchRule : topicsToCheck)
 	{
 		// 3j. now iterate through all the bases and remove this project from their labs (unless it can still yield more stuff!)
-		for (Base* otherBase : _bases)
+		for (Base& base : getRegistry().list<Base>())
 		{
-			for (ResearchProject* otherProject : otherBase->getResearch())
+			for (ResearchProject* otherProject : base.getResearch())
 			{
 				if (myResearchRule == otherProject->getRules())
 				{
@@ -3353,7 +2869,7 @@ void SavedGame::handlePrimaryResearchSideEffects(const std::vector<const RuleRes
 					else
 					{
 						// This topic can't give you anything else anymore, remove it!
-						otherBase->removeResearch(otherProject);
+						base.removeResearch(otherProject);
 						break;
 					}
 				}

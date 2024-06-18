@@ -16,7 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <climits>
+#include <sstream>
 #include "MonthlyReportState.h"
+#include "Globe.h"
+#include "PsiTrainingState.h"
 #include "../Battlescape/CommendationState.h"
 #include "../Engine/Game.h"
 #include "../Engine/LocalizedText.h"
@@ -32,15 +36,13 @@
 #include "../Mod/RuleInterface.h"
 #include "../Mod/RuleVideo.h"
 #include "../Savegame/Base.h"
+#include "../Savegame/BaseSystem.h"
 #include "../Savegame/Country.h"
+#include "../Savegame/CountrySystem.h"
 #include "../Savegame/GameTime.h"
 #include "../Savegame/Region.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/SoldierDiary.h"
-#include "Globe.h"
-#include "PsiTrainingState.h"
-#include <climits>
-#include <sstream>
 
 namespace OpenXcom
 {
@@ -209,17 +211,22 @@ MonthlyReportState::MonthlyReportState(Globe* globe) : _gameOver(0), _ratingTota
 
 	_txtRating->setText(tr("STR_MONTHLY_RATING").arg(_ratingTotal).arg(rating));
 
-	std::ostringstream ss;
-	ss << tr("STR_INCOME") << "> " << Unicode::TOK_COLOR_FLIP << Unicode::formatFunding(getGame()->getSavedGame()->getCountryFunding());
-	ss << " (";
-	if (_fundingDiff > 0)
-		ss << '+';
-	ss << Unicode::formatFunding(_fundingDiff) << ")";
-	_txtIncome->setText(ss.str());
+	int64_t monthlyFunding = CountrySystem::getCountriesMonthlyFundingTotal();
+	std::string formattedIncome = std::format("{}> {}{} ({}{})",
+		tr("STR_INCOME"),
+		Unicode::TOK_COLOR_FLIP,
+		Unicode::formatFunding(monthlyFunding),
+		_fundingDiff > 0 ? "+" : "",
+		Unicode::formatFunding(_fundingDiff)
+	);
+	_txtIncome->setText(formattedIncome);
 
-	std::ostringstream ss2;
-	ss2 << tr("STR_MAINTENANCE") << "> " << Unicode::TOK_COLOR_FLIP << Unicode::formatFunding(getGame()->getSavedGame()->getBaseMaintenance());
-	_txtMaintenance->setText(ss2.str());
+	int64_t baseMaintiance = BaseSystem::getBasesMaintenanceCost(getGame()->getSavedGame()->getRegistry());
+	std::string formattedMaintanceCost = std::format("{}> {}{}",
+		tr("STR_MAINTENANCE"),
+		Unicode::TOK_COLOR_FLIP,
+		Unicode::formatFunding(baseMaintiance));
+	_txtMaintenance->setText(formattedMaintanceCost);
 
 	int performanceBonus = _ratingTotal * getGame()->getMod()->getPerformanceBonusFactor();
 	if (performanceBonus > 0)
@@ -446,13 +453,13 @@ void MonthlyReportState::calculateChanges()
 		lastMonthOffset += 2;
 	// update activity meters, calculate a total score based on regional activity
 	// and gather last month's score
-	for (Region* region : getGame()->getSavedGame()->getRegions())
+	for (auto&& [id, region] : getGame()->getSavedGame()->getRegistry().view<Region>().each())
 	{
-		region->newMonth();
-		if (region->getActivityXcom().size() > 2)
-			_lastMonthsRating += region->getActivityXcom().at(lastMonthOffset) - region->getActivityAlien().at(lastMonthOffset);
-		xcomSubTotal += region->getActivityXcom().at(monthOffset);
-		alienTotal += region->getActivityAlien().at(monthOffset);
+		region.newMonth();
+		if (region.getActivityXcom().size() > 2)
+			_lastMonthsRating += region.getActivityXcom().at(lastMonthOffset) - region.getActivityAlien().at(lastMonthOffset);
+		xcomSubTotal += region.getActivityXcom().at(monthOffset);
+		alienTotal += region.getActivityAlien().at(monthOffset);
 	}
 	// apply research bonus AFTER calculating our total, because this bonus applies to the council ONLY,
 	// and shouldn't influence each country's decision.
@@ -475,7 +482,8 @@ void MonthlyReportState::calculateChanges()
 		pactScore = infiltration->getPoints();
 	}
 	auto countries = getGame()->getSavedGame()->getRegistry().view<Country>();
-	int averageFunding = (int)(getGame()->getSavedGame()->getCountryFunding() / countries.size() / 1000 * 1000);
+	int64_t averageFunding = CountrySystem::getCountriesMonthlyFundingTotal() / countries.size();
+	averageFunding = (averageFunding / 1000) * 1000; // round to nearest 1000 place.
 	for (auto&& [id, country] : countries.each())
 	{
 		// check pact status before and after, because scripting can arbitrarily form/break pacts

@@ -38,30 +38,28 @@ private:
 
 	std::vector<Base*> *_bases;
 	SurfaceSet *_texture;
-	size_t _base, _hoverBase, _visibleBasesIndex;
+	int _base, _hoveredBaseIndex, _visibleBasesIndexOffset;
 	Uint8 _red, _green, _blue;
 public:
 	static const size_t MAX_VISIBLE_BASES = 8;  
 	/// Creates a new mini base view at the specified position and size.
 	MiniBaseView(int width, int height, int x = 0, int y = 0);
-	/// Cleans up the mini base view.
-	~MiniBaseView();
 	/// Sets the base list to display.
 	void setBases(std::vector<Base*>& bases);
 	/// Sets the texture for the mini base view.
 	void setTexture(SurfaceSet *texture);
 	/// Gets the base the mouse is over.
-	size_t getHoveredBase() const;
+	size_t getHoveredBaseIndex() const;
 	/// Sets the selected base for the mini base view.
-	void setSelectedBase(size_t base);
+	void setSelectedBaseIndex(size_t base);
 	/// Increment index of visible bases for the mini base view (if possible).
 	bool incVisibleBasesIndex();	
 	/// Decrement index of visible bases for the mini base view (if possible).
 	bool decVisibleBasesIndex();	
 	/// Gets the index of visible bases for the mini base view.
-	size_t getVisibleBasesIndex() const;
+	int getVisibleBasesIndexOffset() const { return _visibleBasesIndexOffset; }
 	/// Sets the index of visible bases for the mini base view.
-	void setVisibleBasesIndex(size_t newVisibelBasesIndex);		
+	void setVisibleBasesIndexOffset(int newVisibelBasesIndex);		
 	/// Draws the mini base view.
 	void draw() override;
 	/// Special handling for mouse hovers.

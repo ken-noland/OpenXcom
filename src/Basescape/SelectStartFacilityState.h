@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "BuildFacilitiesState.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
@@ -34,9 +35,7 @@ private:
 	Globe *_globe;
 public:
 	/// Creates the Build Facilities state.
-	SelectStartFacilityState(Base *base, State *state, Globe *globe);
-	/// Cleans up the Build Facilities state.
-	~SelectStartFacilityState();
+	SelectStartFacilityState(entt::entity _newBaseId, State *state, Globe *globe);
 	/// Populates the build option list.
 	virtual void populateBuildList() override;
 	/// Handler for clicking the Reset button.

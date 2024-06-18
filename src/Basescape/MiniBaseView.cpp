@@ -34,14 +34,7 @@ namespace OpenXcom
  * @param x X position in pixels.
  * @param y Y position in pixels.
  */
-MiniBaseView::MiniBaseView(int width, int height, int x, int y) : InteractiveSurface(width, height, x, y), _bases(0), _texture(0), _base(0), _hoverBase(0), _visibleBasesIndex(0), _red(0), _green(0), _blue(0)
-{
-}
-
-/**
- *
- */
-MiniBaseView::~MiniBaseView()
+MiniBaseView::MiniBaseView(int width, int height, int x, int y) : InteractiveSurface(width, height, x, y), _bases(0), _texture(0), _base(0), _hoverBase(0), _visibleBasesIndexOffset(0), _red(0), _green(0), _blue(0)
 {
 }
 
@@ -69,7 +62,7 @@ void MiniBaseView::setTexture(SurfaceSet *texture)
  * Returns the base the mouse cursor is currently over.
  * @return ID of the base.
  */
-size_t MiniBaseView::getHoveredBase() const
+size_t MiniBaseView::getHoveredBaseIndex() const
 {
 	return _hoverBase;
 }
@@ -79,7 +72,7 @@ size_t MiniBaseView::getHoveredBase() const
  * the mini base view.
  * @param base ID of base.
  */
-void MiniBaseView::setSelectedBase(size_t base)
+void MiniBaseView::setSelectedBaseIndex(size_t base)
 {
 	_base = base;
 	_redraw = true;
@@ -92,9 +85,9 @@ void MiniBaseView::setSelectedBase(size_t base)
  */
 bool MiniBaseView::incVisibleBasesIndex()
 {
-	if (_visibleBasesIndex < (_bases->size() - MAX_VISIBLE_BASES))
+	if (_visibleBasesIndexOffset < (_bases->size() - MAX_VISIBLE_BASES))
 	{
-		_visibleBasesIndex++;
+		_visibleBasesIndexOffset++;
 		_redraw = true;
 		return true;
 	}
@@ -108,9 +101,9 @@ bool MiniBaseView::incVisibleBasesIndex()
  */
 bool MiniBaseView::decVisibleBasesIndex()
 {
-	if (_visibleBasesIndex > 0)
+	if (_visibleBasesIndexOffset > 0)
 	{
-		_visibleBasesIndex--;
+		_visibleBasesIndexOffset--;
 		_redraw = true;
 		return true;
 	}
@@ -122,9 +115,9 @@ bool MiniBaseView::decVisibleBasesIndex()
  * of visible bases
  * @return offset index
  */
-size_t MiniBaseView::getVisibleBasesIndex() const
+size_t MiniBaseView::getVisibleBasesIndexOffset() const
 {
-	return _visibleBasesIndex;
+	return _visibleBasesIndexOffset;
 }
 
 /**
@@ -132,9 +125,9 @@ size_t MiniBaseView::getVisibleBasesIndex() const
  * the mini base view.
  * @param newVisibleBasesIndex offset for list of visible bases.
  */
-void MiniBaseView::setVisibleBasesIndex(size_t newVisibleBasesIndex)
+void MiniBaseView::setVisibleBasesIndexOffset(size_t newVisibleBasesIndex)
 {
-	_visibleBasesIndex = newVisibleBasesIndex;
+	_visibleBasesIndexOffset = newVisibleBasesIndex;
 }
 
 /**
@@ -147,7 +140,7 @@ void MiniBaseView::draw()
 	for (Sint16 i = 0; i < (Sint16)MAX_VISIBLE_BASES; ++i)
 	{
 		// Draw base squares
-		if ((i + _visibleBasesIndex) == _base)
+		if ((i + _visibleBasesIndexOffset) == _base)
 		{
 			SDL_Rect r;
 			r.x = i * (MINI_SIZE + 2);
@@ -163,7 +156,7 @@ void MiniBaseView::draw()
 		{
 			SDL_Rect r;
 			lock();
-			for (const BaseFacility* fac : _bases->at(i + _visibleBasesIndex)->getFacilities())
+			for (const BaseFacility* fac : _bases->at(i + _visibleBasesIndexOffset)->getFacilities())
 			{
 				int color;
 				if (fac->getDisabled())
