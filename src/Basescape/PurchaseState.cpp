@@ -200,15 +200,10 @@ PurchaseState::PurchaseState(Base *base, CannotReequipState *parent) : _base(bas
 	};
 	constexpr auto requiredCountryAllied = [](const auto* rule)
 	{
-		if (!rule->getRequiresBuyCountry().empty())
-		{
-			for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
-			{
-				if (country.getPact() && country.getRules()->getType() == rule->getRequiresBuyCountry())
-				{
-					return false;
-				}
-			}
+		if (const std::string& requiredCountry = rule->getRequiresBuyCountry(); !requiredCountry.empty())
+		{	// if this rule is enabled country must exist (obviously) and *not* be in a pact.
+			const Country* country = getRegistry().findValueByName<const Country>(requiredCountry);
+			return country && !country->getPact();
 		}
 		return true;
 	};
@@ -468,7 +463,8 @@ bool PurchaseState::isHidden(int sel) const
 	case TRANSFER_ENGINEER:
 		return false;
 	case TRANSFER_CRAFT:
-		isCraft = true; // fall-through
+		isCraft = true;
+		[[fallthrough]];
 	case TRANSFER_ITEM:
 		if (isCraft)
 		{
@@ -1016,8 +1012,7 @@ void PurchaseState::increaseByValue(int change)
 					errorMessage = tr("STR_MONTHLY_SOLDIER_HIRING_LIMIT_EXCEEDED");
 				}
 			}
-			// fall-through
-		case TRANSFER_SCIENTIST:
+		case TRANSFER_SCIENTIST: [[fallthrough]];
 		case TRANSFER_ENGINEER:
 			if (_pQty + 1 > _base->getAvailableQuarters() - _base->getUsedQuarters())
 			{
@@ -1090,7 +1085,7 @@ void PurchaseState::increaseByValue(int change)
 				}
 			}
 			// fall-through
-		case TRANSFER_SCIENTIST:
+		case TRANSFER_SCIENTIST: [[fallthrough]];
 		case TRANSFER_ENGINEER:
 			{
 				int maxByQuarters = _base->getAvailableQuarters() - _base->getUsedQuarters() - _pQty;

@@ -25,6 +25,7 @@
 #include "AlienMission.h"
 #include "../Engine/Exception.h"
 #include "../Engine/Language.h"
+#include "../Engine/Registry.h"
 #include "../Engine/RNG.h"
 #include "../Engine/ScriptBind.h"
 #include "../Mod/Mod.h"
@@ -195,9 +196,9 @@ void Ufo::finishLoading(const YAML::Node &node, SavedGame &save)
 			std::string type = dest["type"].as<std::string>();
 			int id = dest["id"].as<int>();
 			bool found = false;
-			for (Base* xbase : save.getBases())
+			for (Base& xcomBase : getRegistry().list<Base>())
 			{
-				for (Craft* xcraft : xbase->getCrafts())
+				for (Craft* xcraft : xcomBase.getCrafts())
 				{
 					if (xcraft->getId() == id && xcraft->getRules()->getType() == type)
 					{

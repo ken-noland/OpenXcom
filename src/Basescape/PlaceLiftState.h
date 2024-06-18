@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../Engine/State.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
@@ -38,7 +39,7 @@ class RuleBaseFacility;
 class PlaceLiftState : public State
 {
 private:
-	Base *_base;
+	entt::entity _newBaseId;
 	Globe *_globe;
 	BaseView *_view;
 	Text *_txtTitle;
@@ -51,9 +52,7 @@ private:
 	TextList *_lstAccessLifts;
 public:
 	/// Creates the Place Lift state.
-	PlaceLiftState(Base *base, Globe *globe, bool first);
-	/// Cleans up the Place Lift state.
-	~PlaceLiftState();
+	PlaceLiftState(entt::entity newBaseId, Globe *globe, bool first);
 	/// Handler for clicking the base view.
 	void viewClick(Action *action);
 	/// Handler for clicking the Access Lifts list.

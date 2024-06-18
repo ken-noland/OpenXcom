@@ -146,7 +146,7 @@ int RuleRegion::getBaseCost() const
  * @param ignoreTechnicalRegion If true, empty technical regions (i.e. regions with no areas, just having mission zones) will return true.
  * @return True if it's inside, false if it's outside.
  */
-bool RuleRegion::insideRegion(double lon, double lat, bool ignoreTechnicalRegion) const
+bool RuleRegion::contains(double lon, double lat, bool ignoreTechnicalRegion) const
 {
 	if (ignoreTechnicalRegion && _lonMin.empty())
 		return true;

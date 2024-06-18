@@ -176,7 +176,8 @@ void NewGameState::btnOkClick(Action *)
 	getGame()->setState(gs);
 	gs->init();
 
-	Base* base = getGame()->getSavedGame()->getBases().back();
+	Base* base = getRegistry().backValue<Base>();
+	entt::entity baseId = getRegistry().find(base);
 	if (base->getMarker() != -1)
 	{
 		// location known already
@@ -188,18 +189,18 @@ void NewGameState::btnOkClick(Action *)
 		if (base->getName().empty())
 		{
 			// fixed location, custom name
-			getGame()->pushState(new BaseNameState(base, gs->getGlobe(), true, true));
+			getGame()->pushState(new BaseNameState(baseId, gs->getGlobe(), true, true));
 		}
 		else if (Options::customInitialBase)
 		{
 			// fixed location, fixed name
-			getGame()->pushState(new PlaceLiftState(base, gs->getGlobe(), true));
+			getGame()->pushState(new PlaceLiftState(baseId, gs->getGlobe(), true));
 		}
 	}
 	else
 	{
 		// custom location, custom name
-		getGame()->pushState(new BuildNewBaseState(base, gs->getGlobe(), true));
+		getGame()->pushState(new BuildNewBaseState(baseId, gs->getGlobe(), true));
 	}
 }
 

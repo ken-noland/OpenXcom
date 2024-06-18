@@ -406,8 +406,8 @@ std::string Armor::getSpriteInventory() const
 }
 
 /**
- * Gets the front armor level.
- * @return The front armor level.
+ * Gets the frontValue armor level.
+ * @return The frontValue armor level.
  */
 int Armor::getFrontArmor() const
 {

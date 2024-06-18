@@ -168,11 +168,11 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 	_selCrafts.clear();
 
 	int row = 0;
-	for (Base* xbase : getGame()->getSavedGame()->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
-		if (_base != 0 && xbase != _base)
+		if (_base != 0 && &xcomBase != _base)
 			continue;
-		for (Craft* xcraft : xbase->getCrafts())
+		for (Craft* xcraft : xcomBase.getCrafts())
 		{
 			std::ostringstream ssStatus;
 			std::string status = xcraft->getStatus();
@@ -335,7 +335,7 @@ InterceptState::InterceptState(Globe *globe, bool useCustomSound, Base *base, Ta
 				ss << 0;
 			}
 			_crafts.push_back(xcraft);
-			_lstCrafts->addRow(4, xcraft->getName(getGame()->getLanguage()).c_str(), ssStatus.str().c_str(), xbase->getName().c_str(), ss.str().c_str());
+			_lstCrafts->addRow(4, xcraft->getName(getGame()->getLanguage()).c_str(), ssStatus.str().c_str(), xcomBase.getName().c_str(), ss.str().c_str());
 			if (hasEnoughPilots && status == "STR_READY")
 			{
 				_lstCrafts->setCellColor(row, 1, _lstCrafts->getSecondaryColor());
@@ -369,7 +369,7 @@ void InterceptState::btnCancelClick(Action *)
 void InterceptState::btnGotoBaseClick(Action *)
 {
 	getGame()->popState();
-	getGame()->pushState(new BasescapeState(_base, _globe));
+	getGame()->pushState(new BasescapeState(getRegistry().find(_base), _globe));
 }
 
 /**
@@ -415,7 +415,7 @@ void InterceptState::lstCraftsLeftClick(Action *)
 	{
 		if (allowStart(c))
  		{
-			//remove itself from the vector assuming it is already inside, so it can be put in front of the vector
+			//remove itself from the vector assuming it is already inside, so it can be put in frontValue of the vector
 			auto craftIt = std::find (_selCrafts.begin(), _selCrafts.end(), c);
 			if ( craftIt != _selCrafts.end() )
 			{
@@ -453,15 +453,15 @@ void InterceptState::lstCraftsRightClick(Action *)
 		getGame()->popState();
 
 		bool found = false;
-		for (Base* xbase : getGame()->getSavedGame()->getBases())
+		for (Base& xcomBase : getRegistry().list<Base>())
 		{
-			if (_base != 0 && xbase != _base)
+			if (_base != 0 && &xcomBase != _base)
 				continue;
-			for (size_t ci = 0; ci < xbase->getCrafts().size(); ++ci)
+			for (size_t ci = 0; ci < xcomBase.getCrafts().size(); ++ci)
 			{
-				if (c == xbase->getCrafts().at(ci))
+				if (c == xcomBase.getCrafts().at(ci))
 				{
-					getGame()->pushState(new CraftInfoState(xbase, ci));
+					getGame()->pushState(new CraftInfoState(&xcomBase, ci));
 					found = true;
 					break;
 				}

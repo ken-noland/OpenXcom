@@ -35,7 +35,7 @@ inline uint32_t makePixel(unsigned char a, unsigned char r, unsigned char g, uns
 #define calcColor(colFront, colBack) static_cast<unsigned char>((colFront * weightFront + colBack * weightBack) / weightSum)
 
 template <unsigned int M, unsigned int N> inline
-uint32_t gradientRGB(uint32_t pixFront, uint32_t pixBack) //blend front color with opacity M / N over opaque background: http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
+uint32_t gradientRGB(uint32_t pixFront, uint32_t pixBack) //blend frontValue color with opacity M / N over opaque background: http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
 {
     //static_assert(0 < M && M < N && N <= 1000, "");
 

@@ -17,97 +17,99 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Mod.h"
-#include "ModScript.h"
 #include <algorithm>
+#include <cassert>
+#include <climits>
 #include <functional>
 #include <sstream>
-#include <climits>
-#include <cassert>
-#include "../version.h"
-#include "../Engine/CrossPlatform.h"
-#include "../Engine/FileMap.h"
-#include "../Engine/Palette.h"
-#include "../Engine/Font.h"
-#include "../Engine/Surface.h"
-#include "../Engine/SurfaceSet.h"
-#include "../Engine/Music.h"
-#include "../Engine/GMCat.h"
-#include "../Engine/SoundSet.h"
-#include "../Engine/Sound.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Window.h"
-#include "MapDataSet.h"
-#include "RuleMusic.h"
-#include "../Engine/ShaderDraw.h"
-#include "../Engine/ShaderMove.h"
-#include "../Engine/Exception.h"
-#include "../Engine/Logger.h"
-#include "../Engine/ScriptBind.h"
-#include "../Engine/Collections.h"
-#include "SoundDefinition.h"
-#include "ExtraSprites.h"
-#include "CustomPalettes.h"
-#include "ExtraSounds.h"
-#include "../Engine/AdlibMusic.h"
-#include "../Engine/CatFile.h"
-#include "../fmath.h"
-#include "../Engine/RNG.h"
-#include "../Engine/Options.h"
-#include "../Battlescape/Pathfinding.h"
-#include "RuleCountry.h"
-#include "RuleRegion.h"
-#include "RuleBaseFacility.h"
-#include "RuleCraft.h"
-#include "RuleCraftWeapon.h"
-#include "RuleItemCategory.h"
-#include "RuleItem.h"
-#include "RuleUfo.h"
-#include "RuleTerrain.h"
-#include "MapScript.h"
-#include "RuleSoldier.h"
-#include "RuleSkill.h"
-#include "RuleCommendations.h"
-#include "AlienRace.h"
-#include "RuleEnviroEffects.h"
-#include "RuleStartingCondition.h"
 #include "AlienDeployment.h"
+#include "AlienRace.h"
 #include "Armor.h"
 #include "ArticleDefinition.h"
+#include "CustomPalettes.h"
+#include "ExtraSounds.h"
+#include "ExtraSprites.h"
+#include "ExtraStrings.h"
+#include "MapDataSet.h"
+#include "MapScript.h"
+#include "MCDPatch.h"
+#include "ModScript.h"
+#include "RuleAlienMission.h"
+#include "RuleArcScript.h"
+#include "RuleBaseFacility.h"
+#include "RuleCommendations.h"
+#include "RuleConverter.h"
+#include "RuleCountry.h"
+#include "RuleCraft.h"
+#include "RuleCraftWeapon.h"
+#include "RuleEnviroEffects.h"
+#include "RuleEvent.h"
+#include "RuleEventScript.h"
+#include "RuleGlobe.h"
+#include "RuleInterface.h"
 #include "RuleInventory.h"
-#include "RuleResearch.h"
+#include "RuleItem.h"
+#include "RuleItemCategory.h"
 #include "RuleManufacture.h"
 #include "RuleManufactureShortcut.h"
-#include "ExtraStrings.h"
-#include "RuleInterface.h"
-#include "RuleArcScript.h"
-#include "RuleEventScript.h"
-#include "RuleEvent.h"
 #include "RuleMissionScript.h"
+#include "RuleMusic.h"
+#include "RuleRegion.h"
+#include "RuleResearch.h"
+#include "RuleSkill.h"
+#include "RuleSoldier.h"
+#include "RuleSoldierBonus.h"
+#include "RuleSoldierTransformation.h"
+#include "RuleStartingCondition.h"
+#include "RuleTerrain.h"
+#include "RuleUfo.h"
+#include "RuleVideo.h"
+#include "SoundDefinition.h"
+#include "StatString.h"
+#include "UfoTrajectory.h"
+#include "../Battlescape/Pathfinding.h"
+#include "../Engine/AdlibMusic.h"
+#include "../Engine/CatFile.h"
+#include "../Engine/Collections.h"
+#include "../Engine/CrossPlatform.h"
+#include "../Engine/Exception.h"
+#include "../Engine/FileMap.h"
+#include "../Engine/Font.h"
+#include "../Engine/GMCat.h"
+#include "../Engine/Logger.h"
+#include "../Engine/Music.h"
+#include "../Engine/Options.h"
+#include "../Engine/Palette.h"
+#include "../Engine/Registry.h"
+#include "../Engine/RNG.h"
+#include "../Engine/ScriptBind.h"
+#include "../Engine/ShaderDraw.h"
+#include "../Engine/ShaderMove.h"
+#include "../Engine/Sound.h"
+#include "../Engine/SoundSet.h"
+#include "../Engine/Surface.h"
+#include "../Engine/SurfaceSet.h"
+#include "../fmath.h"
 #include "../Geoscape/Globe.h"
-#include "../Savegame/SavedGame.h"
-#include "../Savegame/SavedBattleGame.h"
-#include "../Savegame/Region.h"
+#include "../Interface/TextButton.h"
+#include "../Interface/Window.h"
+#include "../Savegame/AlienStrategy.h"
 #include "../Savegame/Base.h"
-#include "../Savegame/Country.h"
-#include "../Savegame/Soldier.h"
 #include "../Savegame/BattleUnit.h"
+#include "../Savegame/Country.h"
+#include "../Savegame/CountrySystem.h"
 #include "../Savegame/Craft.h"
 #include "../Savegame/CraftWeapon.h"
+#include "../Savegame/GameTime.h"
 #include "../Savegame/ItemContainer.h"
+#include "../Savegame/Region.h"
+#include "../Savegame/SavedBattleGame.h"
+#include "../Savegame/SavedGame.h"
+#include "../Savegame/Soldier.h"
+#include "../Savegame/SoldierDiary.h"
 #include "../Savegame/Transfer.h"
 #include "../Ufopaedia/Ufopaedia.h"
-#include "../Savegame/AlienStrategy.h"
-#include "../Savegame/GameTime.h"
-#include "../Savegame/SoldierDiary.h"
-#include "UfoTrajectory.h"
-#include "RuleAlienMission.h"
-#include "MCDPatch.h"
-#include "StatString.h"
-#include "RuleGlobe.h"
-#include "RuleVideo.h"
-#include "RuleConverter.h"
-#include "RuleSoldierTransformation.h"
-#include "RuleSoldierBonus.h"
+#include "../version.h"
 
 #define ARRAYLEN(x) (std::size(x))
 
@@ -3742,14 +3744,13 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 		RuleCountry *countryRule = getCountry(countryName);
 		if (!countryRule->getLonMin().empty())
 		{
-			entt::entity countryId = save->getRegistry().create();
-			save->getRegistry().emplace<Country>(countryId, countryRule);
+			getRegistry().createAndEmplace<Country>(countryRule);
 		}
 	}
 	// Adjust funding to total $6M
-	auto countries = save->getRegistry().view<Country>();
-	int missing = ((_initialFunding - save->getCountryFunding()/1000) / (int) countries.size()) * 1000;
-	for (auto&& [id, country] : countries.each())
+	int64_t totalFunding = CountrySystem::getCountriesMonthlyFundingTotal();
+	int missing = ((_initialFunding - totalFunding/1000) / static_cast<int>(getRegistry().size<Country>())) * 1000;
+	for (Country& country : getRegistry().list<Country>())
 	{
 		int funding = country.getFunding().back() + missing;
 		if (funding < 0)
@@ -3758,38 +3759,39 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 		}
 		country.setFunding(funding);
 	}
-	save->setFunds(save->getCountryFunding());
+	save->setFunds(CountrySystem::getCountriesMonthlyFundingTotal());
 
 	// Add regions
 	for (const auto& regionName : _regionsIndex)
 	{
-		RuleRegion *regionRule = getRegion(regionName);
+		RuleRegion* regionRule = getRegion(regionName);
 		if (!regionRule->getLonMin().empty())
-			save->getRegions().push_back(new Region(regionRule));
+		{
+			getRegistry().createAndEmplace<Region>(regionRule);
+		}
 	}
 
 	// Set up starting base
 	const YAML::Node &startingBaseByDiff = getStartingBase(diff);
-	Base *base = new Base(this);
-	base->load(startingBaseByDiff, save, true);
-	save->getBases().push_back(base);
+	Base& newBase = getRegistry().createAndEmplace<Base>(this);
+	newBase.load(startingBaseByDiff, save, true);
 
 	// Correct IDs
-	for (Craft* craft : base->getCrafts())
+	for (Craft* craft : newBase.getCrafts())
 	{
 		save->getId(craft->getRules()->getType());
 	}
 
 	// Remove craft weapons if needed
-	for (Craft* craft : base->getCrafts())
+	for (Craft* craft : newBase.getCrafts())
 	{
 		if (craft->getMaxUnitsRaw() < 0 || craft->getMaxVehiclesAndLargeSoldiersRaw() < 0)
 		{
 			size_t weaponIndex = 0;
 			for (CraftWeapon* current : craft->getWeapons())
 			{
-				base->getStorageItems()->addItem(current->getRules()->getLauncherItem());
-				base->getStorageItems()->addItem(current->getRules()->getClipItem(), current->getClipsLoaded());
+				newBase.getStorageItems()->addItem(current->getRules()->getLauncherItem());
+				newBase.getStorageItems()->addItem(current->getRules()->getClipItem(), current->getClipsLoaded());
 				craft->addCraftStats(-current->getRules()->getBonusStats());
 				craft->setShield(craft->getShield());
 				delete current;
@@ -3851,7 +3853,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			RuleSoldier* ruleSoldier = getSoldier(randomTypes[i], true);
 			int nationality = save->selectSoldierNationalityByLocation(this, ruleSoldier, nullptr); // -1 (unfortunately the first base is not placed yet)
 			Soldier *soldier = genSoldier(save, ruleSoldier, nationality);
-			base->getSoldiers().push_back(soldier);
+			newBase.getSoldiers().push_back(soldier);
 			// Award soldier a special 'original eight' commendation
 			if (_commendations.find("STR_MEDAL_ORIGINAL8_NAME") != _commendations.end())
 			{
@@ -3864,7 +3866,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			}
 		}
 		// Assign pilots to craft (interceptors first, transport last) and non-pilots to transports only
-		for (Soldier* soldier : base->getSoldiers())
+		for (Soldier* soldier : newBase.getSoldiers())
 		{
 			if (soldier->getArmor()->getSize() > 1)
 			{
@@ -3873,7 +3875,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			else if (soldier->getRules()->getAllowPiloting())
 			{
 				Craft *found = 0;
-				for (Craft* craft : base->getCrafts())
+				for (Craft* craft : newBase.getCrafts())
 				{
 					CraftPlacementErrors err = craft->validateAddingSoldier(craft->getSpaceAvailable(), soldier);
 					if (!found && craft->getRules()->getAllowLanding() && err == CPE_None)
@@ -3892,7 +3894,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 			else
 			{
 				Craft *found = 0;
-				for (Craft* craft : base->getCrafts())
+				for (Craft* craft : newBase.getCrafts())
 				{
 					CraftPlacementErrors err = craft->validateAddingSoldier(craft->getSpaceAvailable(), soldier);
 					if (craft->getRules()->getAllowLanding() && err == CPE_None)
@@ -4945,10 +4947,10 @@ Soldier *Mod::genSoldier(SavedGame *save, const RuleSoldier* ruleSoldier, int na
 		delete soldier;
 		soldier = new Soldier(const_cast<RuleSoldier*>(ruleSoldier), ruleSoldier->getDefaultArmor(), nationality, newId);
 		duplicate = false;
-		for (Base* xbase : save->getBases())
+		for (Base& xcomBase : getRegistry().list<Base>())
 		{
 			if (duplicate) break; // loop finished
-			for (Soldier* xsoldier : xbase->getSoldiers())
+			for (Soldier* xsoldier : xcomBase.getSoldiers())
 			{
 				if (duplicate) break; // loop finished
 				if (xsoldier->getName() == soldier->getName())
@@ -4956,7 +4958,7 @@ Soldier *Mod::genSoldier(SavedGame *save, const RuleSoldier* ruleSoldier, int na
 					duplicate = true;
 				}
 			}
-			for (Transfer* transfer : xbase->getTransfers())
+			for (Transfer* transfer : xcomBase.getTransfers())
 			{
 				if (duplicate) break; // loop finished
 				if (transfer->getType() == TRANSFER_SOLDIER && transfer->getSoldier()->getName() == soldier->getName())

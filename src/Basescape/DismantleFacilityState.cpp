@@ -223,15 +223,8 @@ void DismantleFacilityState::btnOkClick(Action *)
 	// Remove whole base if it's the access lift
 	else
 	{
-		for (auto xbaseIt = getGame()->getSavedGame()->getBases().begin(); xbaseIt != getGame()->getSavedGame()->getBases().end(); ++xbaseIt)
-		{
-			if (*xbaseIt == _base)
-			{
-				getGame()->getSavedGame()->getBases().erase(xbaseIt);
-				delete _base;
-				break;
-			}
-		}
+		entt::entity baseId = getRegistry().find(_base);
+		if (baseId != entt::null) { getRegistry().raw().destroy(baseId); }
 	}
 	getGame()->popState();
 }

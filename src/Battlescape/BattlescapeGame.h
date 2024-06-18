@@ -204,7 +204,7 @@ public:
 	bool playableUnitSelected() const;
 	/// Handles states timer.
 	void handleState();
-	/// Pushes a state to the front of the list.
+	/// Pushes a state to the frontValue of the list.
 	void statePushFront(BattleState *bs);
 	/// Pushes a state to second on the list.
 	void statePushNext(BattleState *bs);

@@ -18,16 +18,18 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../Engine/State.h"
+#include <unordered_map>
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
 
-class Ufo;
 class TextButton;
 class Window;
 class Text;
 class TextList;
 class GeoscapeState;
+class SavedGame;
 
 /**
  * Displays hidden alien activity info.
@@ -35,26 +37,24 @@ class GeoscapeState;
 class HiddenAlienActivityState : public State
 {
 private:
-
 	GeoscapeState* _state;
 	SavedGame& _save;
 
-	std::map<OpenXcom::Region*, int> _displayHiddenAlienActivityRegions;
+	std::unordered_map<entt::entity, int> _displayHiddenAlienActivityRegions;
 	std::unordered_map<entt::entity, int> _displayHiddenAlienActivityCountries;
 
 	TextButton* _btnOk;
 	TextButton* _btnCancel;
 	Window *_window;
-	Text *_txtInfo, *_txtHeaderRegions, *_txtSightingsRegions, *_txtHeaderCountries, *_txtSightingsCountries, *_txtRegionHeader, *_txtCountryHeader;
+	Text *_txtInfo, *_txtHeaderRegions, *_txtSightingsRegions, *_txtHeaderCountries, *_txtSightingsCountries;
 	TextList *_lstHiddenAlienActivityRegions, *_lstHiddenAlienActivityCountries;
 
 public:
-
-	HiddenAlienActivityState(GeoscapeState* state, SavedGame& save, std::map<OpenXcom::Region*, int> displayHiddenAlienActivityRegions, std::unordered_map<entt::entity, int> displayHiddenAlienActivityCountries);
-	~HiddenAlienActivityState();
+	HiddenAlienActivityState(GeoscapeState* state, SavedGame& save,
+		std::unordered_map<entt::entity, int> displayHiddenAlienActivityRegions,
+		std::unordered_map<entt::entity, int> displayHiddenAlienActivityCountries);
 	void btnOkClick(Action* action);
 	void btnCancelClick(Action* action);
-
 };
 
 }

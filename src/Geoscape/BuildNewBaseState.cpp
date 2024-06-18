@@ -47,7 +47,8 @@ namespace OpenXcom
  * @param globe Pointer to the Geoscape globe.
  * @param first Is this the first base in the game?
  */
-BuildNewBaseState::BuildNewBaseState(Base *base, Globe *globe, bool first) : _base(base), _globe(globe), _first(first), _oldlat(0), _oldlon(0), _mousex(0), _mousey(0)
+BuildNewBaseState::BuildNewBaseState(entt::entity newBaseId, Globe *globe, bool first)
+	: _newBaseId(newBaseId), _globe(globe), _first(first)
 {
 	int dx = getGame()->getScreen()->getDX();
 	int dy = getGame()->getScreen()->getDY();
@@ -247,22 +248,23 @@ void BuildNewBaseState::globeClick(Action *action)
 			}
 			else
 			{
-				_base->setFakeUnderwater(fakeUnderwaterTexture);
-				_base->setLongitude(lon);
-				_base->setLatitude(lat);
-				_base->calculateServices(getGame()->getSavedGame());
-				for (Craft* craft : _base->getCrafts())
+				Base& base = getRegistry().raw().get<Base>(_newBaseId);
+				base.setFakeUnderwater(fakeUnderwaterTexture);
+				base.setLongitude(lon);
+				base.setLatitude(lat);
+				base.calculateServices(getGame()->getSavedGame());
+				for (Craft* craft : base.getCrafts())
 				{
 					craft->setLongitude(lon);
 					craft->setLatitude(lat);
 				}
 				if (_first)
 				{
-					getGame()->pushState(new BaseNameState(_base, _globe, _first, false));
+					getGame()->pushState(new BaseNameState(_newBaseId, _globe, _first, false));
 				}
 				else
 				{
-					getGame()->pushState(new ConfirmNewBaseState(_base, _globe));
+					getGame()->pushState(new ConfirmNewBaseState(_newBaseId, _globe));
 				}
 			}
 		}
@@ -387,7 +389,7 @@ void BuildNewBaseState::btnZoomOutRightClick(Action *)
  */
 void BuildNewBaseState::btnCancelClick(Action *)
 {
-	delete _base;
+	getRegistry().raw().destroy(_newBaseId);
 	getGame()->popState();
 }
 

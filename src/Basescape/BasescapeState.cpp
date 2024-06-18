@@ -17,47 +17,49 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "BasescapeState.h"
+#include "BaseInfoState.h"
+#include "BaseView.h"
+#include "BuildFacilitiesState.h"
+#include "CraftInfoState.h"
+#include "CraftsState.h"
+#include "DismantleFacilityState.h"
+#include "ManageAlienContainmentState.h"
+#include "ManufactureState.h"
+#include "MiniBaseView.h"
+#include "PlaceFacilityState.h"
+#include "PurchaseState.h"
+#include "ResearchState.h"
+#include "SellState.h"
+#include "SoldiersState.h"
+#include "TransferBaseState.h"
+#include "../Battlescape/BattlescapeGenerator.h"
+#include "../Battlescape/BriefingState.h"
+#include "../Engine/Action.h"
 #include "../Engine/Game.h"
-#include "../Mod/Mod.h"
 #include "../Engine/LocalizedText.h"
 #include "../Engine/Options.h"
 #include "../Engine/Unicode.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Text.h"
-#include "../Interface/TextEdit.h"
-#include "BaseView.h"
-#include "MiniBaseView.h"
-#include "../Savegame/SavedGame.h"
-#include "../Savegame/Base.h"
-#include "../Savegame/BaseFacility.h"
-#include "../Mod/RuleBaseFacility.h"
-#include "../Savegame/Region.h"
-#include "../Mod/RuleRegion.h"
-#include "../Menu/ErrorMessageState.h"
-#include "DismantleFacilityState.h"
-#include "../Geoscape/BuildNewBaseState.h"
-#include "../Engine/Action.h"
-#include "BaseInfoState.h"
-#include "SoldiersState.h"
-#include "CraftsState.h"
-#include "BuildFacilitiesState.h"
-#include "ResearchState.h"
-#include "ManageAlienContainmentState.h"
-#include "ManufactureState.h"
-#include "PurchaseState.h"
-#include "SellState.h"
-#include "TransferBaseState.h"
-#include "CraftInfoState.h"
 #include "../Geoscape/AllocatePsiTrainingState.h"
 #include "../Geoscape/AllocateTrainingState.h"
-#include "../Mod/RuleInterface.h"
-#include "PlaceFacilityState.h"
-#include "../Ufopaedia/Ufopaedia.h"
-#include "../Battlescape/BattlescapeGenerator.h"
-#include "../Battlescape/BriefingState.h"
-#include "../Savegame/SavedBattleGame.h"
+#include "../Geoscape/BuildNewBaseState.h"
 #include "../Geoscape/Globe.h"
+#include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
+#include "../Interface/TextEdit.h"
+#include "../Menu/ErrorMessageState.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleBaseFacility.h"
 #include "../Mod/RuleGlobe.h"
+#include "../Mod/RuleInterface.h"
+#include "../Mod/RuleRegion.h"
+#include "../Savegame/AreaSystem.h"
+#include "../Savegame/Base.h"
+#include "../Savegame/BaseSystem.h"
+#include "../Savegame/BaseFacility.h"
+#include "../Savegame/Region.h"
+#include "../Savegame/SavedBattleGame.h"
+#include "../Savegame/SavedGame.h"
+#include "../Ufopaedia/Ufopaedia.h"
 
 namespace OpenXcom
 {
@@ -68,8 +70,10 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param globe Pointer to the Geoscape globe.
  */
-BasescapeState::BasescapeState(Base *base, Globe *globe) : _base(base), _globe(globe)
+BasescapeState::BasescapeState(entt::entity baseId, Globe *globe) : _baseId(baseId), _globe(globe)
 {
+	_base = &getRegistry().raw().get<Base>(baseId);
+
 	// Create objects
 	_txtFacility = new Text(192, 9, 0, 0);
 	_view = new BaseView(192, 192, 0, 8);
@@ -130,8 +134,7 @@ BasescapeState::BasescapeState(Base *base, Globe *globe) : _base(base), _globe(g
 	_view->onMouseOut((ActionHandler)&BasescapeState::viewMouseOut);
 
 	_mini->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
-	_mini->setBases(getGame()->getSavedGame()->getBases());
-	_mini->setVisibleBasesIndex(getGame()->getSavedGame()->getVisibleBasesIndex());
+	_mini->setVisibleBasesIndexOffset(getGame()->getSavedGame()->getVisibleBasesIndexOffset());
 	_mini->onMouseClick((ActionHandler)&BasescapeState::miniLeftClick, SDL_BUTTON_LEFT);
 	_mini->onMouseClick((ActionHandler)&BasescapeState::miniRightClick, SDL_BUTTON_RIGHT);
 	_mini->onMouseClick((ActionHandler)&BasescapeState::miniMiddleClick, SDL_BUTTON_MIDDLE);
@@ -190,20 +193,22 @@ BasescapeState::BasescapeState(Base *base, Globe *globe) : _base(base), _globe(g
  */
 BasescapeState::~BasescapeState()
 {
+	// We should have no temporary bases.
 	// Clean up any temporary bases
-	bool exists = false;
-	for (const Base* xbase : getGame()->getSavedGame()->getBases())
-	{
-		if (xbase == _base)
-		{
-			exists = true;
-			break;
-		}
-	}
-	if (!exists)
-	{
-		delete _base;
-	}
+	// 
+	// bool exists = false;
+	// for (const Base* xbase : getGame()->getSavedGame()->getBases())
+	// {
+	// 	if (xbase == _base)
+	// 	{
+	// 		exists = true;
+	// 		break;
+	// 	}
+	// }
+	// if (!exists)
+	// {
+	// 	delete _base;
+	// }
 }
 
 /**
@@ -214,24 +219,20 @@ void BasescapeState::init()
 {
 	State::init();
 
-	setBase(_base);
+	setBase(_baseId);
 	_view->setBase(_base);		
 	updateArrows();	
 	_mini->draw();
 	_edtBase->setText(_base->getName());
 
 	// Get area
-	for (const Region* region : getGame()->getSavedGame()->getRegions())
+	if (const Region* region = AreaSystem::locateValue<Region>(*_base))
 	{
-		if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
-		{
-			_txtLocation->setText(tr(region->getRules()->getType()));
-			break;
-		}
+		_txtLocation->setText(tr(region->getRules()->getType()));
 	}
 
 	_txtFunds->setText(tr("STR_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
-	_btnNewBase->setVisible(getGame()->getSavedGame()->getBases().size() < Options::maxNumberOfBases);
+	_btnNewBase->setVisible(getRegistry().raw().view<Base>().size() < Options::maxNumberOfBases);
 
 	if (!getGame()->getMod()->getNewBaseUnlockResearch().empty())
 	{
@@ -247,41 +248,21 @@ void BasescapeState::init()
  * Changes the base currently displayed on screen.
  * @param base Pointer to new base to display.
  */
-void BasescapeState::setBase(Base *base)
+void BasescapeState::setBase(entt::entity baseId)
 {
-	if (!getGame()->getSavedGame()->getBases().empty())
+	int index = 0;
+	for (auto&& [id, base] : getRegistry().raw().view<Base>().each())
 	{
-		// Check if base still exists
-		bool exists = false;
-		for (size_t i = 0; i < getGame()->getSavedGame()->getBases().size(); ++i)
+		if (id == baseId)
 		{
-			if (getGame()->getSavedGame()->getBases().at(i) == base)
-			{
-				_base = base;
-				_mini->setSelectedBase(i);
-				getGame()->getSavedGame()->setSelectedBase(i);
-				exists = true;
-				break;
-			}
+			_base = &base;
+			_mini->setSelectedBaseIndex(index);
+			getGame()->getSavedGame()->setSelectedBaseIndex(index);
+			return;
 		}
-		// If base was removed, select first one and reset index of visible bases
-		if (!exists)
-		{
-			_base = getGame()->getSavedGame()->getBases().front();
-			_mini->setSelectedBase(0);
-			getGame()->getSavedGame()->setSelectedBase(0);
-			_mini->setVisibleBasesIndex(0);
-			getGame()->getSavedGame()->setVisibleBasesIndex(0);
-
-		}
+		++index;
 	}
-	else
-	{
-		// Use a blank base for special case when player has no bases
-		_base = new Base(getGame()->getMod());
-		_mini->setSelectedBase(0);
-		getGame()->getSavedGame()->setSelectedBase(0);
-	}
+	Log(LOG_ERROR) << "Base not found.";
 }
 
 /**
@@ -290,9 +271,11 @@ void BasescapeState::setBase(Base *base)
  */
 void BasescapeState::btnNewBaseClick(Action *)
 {
-	Base *base = new Base(getGame()->getMod());
+	entt::entity baseId = getRegistry().raw().create();
+	getRegistry().raw().emplace<Base>(baseId, getGame()->getMod());
+
 	getGame()->popState();
-	getGame()->pushState(new BuildNewBaseState(base, _globe, false));
+	getGame()->pushState(new BuildNewBaseState(baseId, _globe, false));
 }
 
 /**
@@ -301,7 +284,7 @@ void BasescapeState::btnNewBaseClick(Action *)
  */
 void BasescapeState::btnBaseInfoClick(Action *)
 {
-	getGame()->pushState(new BaseInfoState(_base, this));
+	getGame()->pushState(new BaseInfoState(_baseId, this));
 }
 
 /**
@@ -328,7 +311,7 @@ void BasescapeState::btnCraftsClick(Action *)
  */
 void BasescapeState::btnFacilitiesClick(Action *)
 {
-	getGame()->pushState(new BuildFacilitiesState(_base, this));
+	getGame()->pushState(new BuildFacilitiesState(_baseId, this));
 }
 
 /**
@@ -397,7 +380,7 @@ void BasescapeState::viewLeftClick(Action *)
 		if (getGame()->isCtrlPressed() && Options::isPasswordCorrect())
 		{
 			// Ctrl + left click on a base facility allows moving it
-			getGame()->pushState(new PlaceFacilityState(_base, fac->getRules(), fac));
+			getGame()->pushState(new PlaceFacilityState(_baseId, fac->getRules(), fac));
 		}
 		else
 		{
@@ -484,7 +467,7 @@ void BasescapeState::viewRightClick(Action *)
 	BaseFacility *f = _view->getSelectedFacility();
 	if (f == 0)
 	{
-		getGame()->pushState(new BaseInfoState(_base, this));
+		getGame()->pushState(new BaseInfoState(_baseId, this));
 	}
 	else if (f->getRules()->getRightClickActionType() != 0)
 	{
@@ -614,12 +597,9 @@ void BasescapeState::viewMouseOut(Action *)
  */
 void BasescapeState::miniLeftClick(Action *)
 {
-	size_t base = _mini->getHoveredBase();
-	if (base < getGame()->getSavedGame()->getBases().size())
-	{
-		_base = getGame()->getSavedGame()->getBases().at(base + _mini->getVisibleBasesIndex());
-		init();
-	}
+	int baseIndex = _mini->getHoveredBaseIndex() + _mini->getVisibleBasesIndexOffset();
+	setBase(getRegistry().next<Base>(baseIndex));
+	init();
 }
 
 /**
@@ -629,22 +609,22 @@ void BasescapeState::miniLeftClick(Action *)
  */
 void BasescapeState::miniRightClick(Action*)
 {
-	size_t baseIndex = _mini->getHoveredBase();
-	size_t numBases = getGame()->getSavedGame()->getBases().size();
+	size_t baseIndex = _mini->getHoveredBaseIndex();
+	size_t numBases = getRegistry().size<Base>();
 	if (numBases > MiniBaseView::MAX_VISIBLE_BASES)
 	{ // More bases than MiniBaseView::MAX_VISIBLE_BASES
 		if (baseIndex == MiniBaseView::MAX_VISIBLE_BASES - 1)
 		{ // most-right base
 			if(_mini->incVisibleBasesIndex())
 			{
-				getGame()->getSavedGame()->setVisibleBasesIndex(_mini->getVisibleBasesIndex());
+				getGame()->getSavedGame()->setVisibleBasesIndexOffset(_mini->getVisibleBasesIndexOffset());
 			}
 		}
 		else if (baseIndex == 0)
 		{ // most-left base
 			if(_mini->decVisibleBasesIndex())
 			{
-				getGame()->getSavedGame()->setVisibleBasesIndex(_mini->getVisibleBasesIndex());	
+				getGame()->getSavedGame()->setVisibleBasesIndexOffset(_mini->getVisibleBasesIndexOffset());	
 			}		
 		}
 		updateArrows();
@@ -657,19 +637,21 @@ void BasescapeState::miniRightClick(Action*)
  */
 void BasescapeState::miniMiddleClick(Action *)
 {
-	size_t baseIndex = _mini->getHoveredBase() + _mini->getVisibleBasesIndex();
-
-	if (baseIndex > 0 && baseIndex < getGame()->getSavedGame()->getBases().size())
-	{
-		std::vector<Base*>& bases = getGame()->getSavedGame()->getBases();
-
-		// only able to move the currently selected base
-		if (bases[baseIndex] == _base)
-		{
-			std::swap(bases[baseIndex], bases[baseIndex - 1]);
-			init();
-		}
-	}
+	// We cannot support this yet.
+//	size_t baseIndex = _mini->getHoveredBaseIndex() + _mini->getVisibleBasesIndexOffset();
+//	size_t numBases = getGame()->getSavedGame()->getRegistry().view<Base>().size();
+//
+//	if (baseIndex > 0 && baseIndex < numBases)
+//	{
+//		std::vector<Base*>& bases = getGame()->getSavedGame()->getBases();
+//
+//		// only able to move the currently selected base
+//		if (bases[baseIndex] == _base)
+//		{
+//			std::swap(bases[baseIndex], bases[baseIndex - 1]);
+//			init();
+//		}
+//	}
 }
 
 /**
@@ -678,28 +660,29 @@ void BasescapeState::miniMiddleClick(Action *)
  */
 void BasescapeState::handleKeyPress(Action *action)
 {
-	if (action->getDetails()->type == SDL_KEYDOWN)
+	if (action->getDetails()->type != SDL_KEYDOWN) return;
+
+	SDLKey baseKeys[] = {
+		Options::keyBaseSelect1,
+		Options::keyBaseSelect2,
+		Options::keyBaseSelect3,
+		Options::keyBaseSelect4,
+		Options::keyBaseSelect5,
+		Options::keyBaseSelect6,
+		Options::keyBaseSelect7,
+		Options::keyBaseSelect8
+	};
+
+	// get the index of the key hit
+	int key = action->getDetails()->key.keysym.sym;
+	if (key < baseKeys[0] || key > baseKeys[7]) return;
+	size_t index = static_cast<size_t>(key - baseKeys[0]);
+
+	if (auto bases = getRegistry().raw().view<Base>(); index < bases.size())
 	{
-		SDLKey baseKeys[] = {
-			Options::keyBaseSelect1,
-			Options::keyBaseSelect2,
-			Options::keyBaseSelect3,
-			Options::keyBaseSelect4,
-			Options::keyBaseSelect5,
-			Options::keyBaseSelect6,
-			Options::keyBaseSelect7,
-			Options::keyBaseSelect8
-		};
-		int key = action->getDetails()->key.keysym.sym;
-		for (size_t i = 0; i < getGame()->getSavedGame()->getBases().size(); ++i)
-		{
-			if (key == baseKeys[i])
-			{
-				_base = getGame()->getSavedGame()->getBases().at(i);
-				init();
-				break;
-			}
-		}
+		auto&& [id, xcomBase] = *std::next(bases.each().begin(), index);
+		_base = &xcomBase;
+		init();
 	}
 }
 
@@ -717,8 +700,8 @@ void BasescapeState::edtBaseChange(Action *)
  */
 void BasescapeState::updateArrows()
 {
-	size_t numBases = getGame()->getSavedGame()->getBases().size();
-	if(_mini->getVisibleBasesIndex() > 0)
+	size_t numBases = getRegistry().raw().view<Base>().size();
+	if(_mini->getVisibleBasesIndexOffset() > 0)
 	{
 		_leftArrow->setText("<");	
 	}	
@@ -726,7 +709,7 @@ void BasescapeState::updateArrows()
 		_leftArrow->setText("");
 	}
 	size_t maxIndex = numBases >  MiniBaseView::MAX_VISIBLE_BASES? numBases -  MiniBaseView::MAX_VISIBLE_BASES:0;
-	if(_mini->getVisibleBasesIndex() < maxIndex)
+	if(_mini->getVisibleBasesIndexOffset() < maxIndex)
 	{
 		_rightArrow->setText(">");	
 	}	

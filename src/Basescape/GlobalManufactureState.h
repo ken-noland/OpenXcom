@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../Engine/State.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
@@ -41,7 +42,7 @@ private:
 	Text *_txtTitle, *_txtAvailable, *_txtAllocated, *_txtSpace, *_txtFunds, *_txtItem, *_txtEngineers, *_txtProduced, *_txtCost, *_txtTimeLeft;
 	TextList *_lstManufacture;
 
-	std::vector<Base*> _bases;
+	std::vector<entt::entity> _baseIds;
 	std::vector<const RuleManufacture*> _topics;
 	bool _openedFromBasescape;
 public:

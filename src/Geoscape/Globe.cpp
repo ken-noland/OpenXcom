@@ -443,7 +443,7 @@ void Globe::cartToPolar(Sint16 x, Sint16 y, double *lon, double *lat) const
  * invisible to the player.
  * @param lon Longitude of the point.
  * @param lat Latitude of the point.
- * @return True if it's on the back, False if it's on the front.
+ * @return True if it's on the back, False if it's on the frontValue.
  */
 bool Globe::pointBack(double lon, double lat) const
 {
@@ -752,7 +752,7 @@ void Globe::toggleDetail()
  * @param y Y coordinate of point.
  * @return True if it's near, false otherwise.
  */
-bool Globe::targetNear(Target* target, int x, int y) const
+bool Globe::targetNear(const Target* target, int x, int y) const
 {
 	Sint16 tx, ty;
 	if (pointBack(target->getLongitude(), target->getLatitude()))
@@ -775,28 +775,24 @@ bool Globe::targetNear(Target* target, int x, int y) const
 std::vector<Target*> Globe::getTargets(int x, int y, bool craft, Craft *currentCraft) const
 {
 	std::vector<Target*> v;
+	auto latLongNot0 = [](const Base& base) { return base.getLongitude() != 0.0 && base.getLatitude() != 0.0; };
+	for (Base& xcomBase : getRegistry().list<Base>(latLongNot0))
 	{
-		for (Base* xbase : _game->getSavedGame()->getBases())
+		if (targetNear(&xcomBase, x, y))
 		{
-			if (xbase->getLongitude() == 0.0 && xbase->getLatitude() == 0.0)
+			v.push_back(&xcomBase);
+		}
+
+		for (Craft* xcraft : xcomBase.getCrafts())
+		{
+			if (xcraft == currentCraft)
+				continue;
+			if (xcraft->getLongitude() == xcomBase.getLongitude() && xcraft->getLatitude() == xcomBase.getLatitude() && xcraft->getDestination() == 0)
 				continue;
 
-			if (targetNear(xbase, x, y))
+			if (targetNear(xcraft, x, y))
 			{
-				v.push_back(xbase);
-			}
-
-			for (Craft* xcraft : xbase->getCrafts())
-			{
-				if (xcraft == currentCraft)
-					continue;
-				if (xcraft->getLongitude() == xbase->getLongitude() && xcraft->getLatitude() == xbase->getLatitude() && xcraft->getDestination() == 0)
-					continue;
-
-				if (targetNear(xcraft, x, y))
-				{
-					v.push_back(xcraft);
-				}
+				v.push_back(xcraft);
 			}
 		}
 	}
@@ -1185,10 +1181,10 @@ void Globe::drawRadars()
 	}
 
 	// Draw radars around bases
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (const Base& xcomBase : getRegistry().list<const Base>())
 	{
-		lat = xbase->getLatitude();
-		lon = xbase->getLongitude();
+		lat = xcomBase.getLatitude();
+		lon = xcomBase.getLongitude();
 		// Cheap hack to hide bases when they haven't been placed yet
 		if (( !(AreSame(lon, 0.0) && AreSame(lat, 0.0)) )/* &&
 			!pointBack(xbase->getLongitude(), xbase->getLatitude())*/)
@@ -1200,7 +1196,7 @@ void Globe::drawRadars()
 			else
 			{
 				range = 0;
-				for (BaseFacility* fac : xbase->getFacilities())
+				for (BaseFacility* fac : xcomBase.getFacilities())
 				{
 					if (fac->getBuildTime() == 0)
 					{
@@ -1216,7 +1212,7 @@ void Globe::drawRadars()
 		}
 
 		// Draw radars around player craft
-		for (Craft* xcraft : xbase->getCrafts())
+		for (Craft* xcraft : xcomBase.getCrafts())
 		{
 			if (xcraft->getStatus() != "STR_OUT")
 				continue;
@@ -1391,7 +1387,7 @@ void Globe::drawDetail()
 		label->setAlign(ALIGN_CENTER);
 
 		Sint16 x, y;
-		for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
+		for (const Country& country : getRegistry().list<const Country>())
 		{
 			// Don't draw if label is facing back
 			if (pointBack(country.getRules()->getLabelLongitude(), country.getRules()->getLabelLatitude()))
@@ -1458,9 +1454,9 @@ void Globe::drawDetail()
 		label->setColor(CITY_LABEL_COLOR);
 
 		Sint16 x, y;
-		for (Region* region : _game->getSavedGame()->getRegions())
+		for (const Region& region : getRegistry().list<const Region>())
 		{
-			for (City* city : region->getRules()->getCities())
+			for (City* city : region.getRules()->getCities())
 			{
 				drawTarget(city, _countries);
 
@@ -1478,15 +1474,15 @@ void Globe::drawDetail()
 			}
 		}
 		// Draw bases names
-		for (Base* xbase : _game->getSavedGame()->getBases())
+		for (const Base& xcomBase : getRegistry().list<const Base>())
 		{
-			if (xbase->getMarker() == -1 || pointBack(xbase->getLongitude(), xbase->getLatitude()))
+			if (xcomBase.getMarker() == -1 || pointBack(xcomBase.getLongitude(), xcomBase.getLatitude()))
 				continue;
-			polarToCart(xbase->getLongitude(), xbase->getLatitude(), &x, &y);
+			polarToCart(xcomBase.getLongitude(), xcomBase.getLatitude(), &x, &y);
 			label->setX(x - 50);
 			label->setY(y + 2);
 			label->setColor(BASE_LABEL_COLOR);
-			label->setText(xbase->getName());
+			label->setText(xcomBase.getName());
 			label->blit(_countries->getSurface());
 		}
 
@@ -1502,7 +1498,7 @@ void Globe::drawDetail()
 		if (debugType == 0)
 		{
 			color = 0;
-			for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
+			for (const auto&& [id, country] : getRegistry().raw().view<const Country>().each())
 			{
 				if (_game->getSavedGame()->debugCountry != id)
 					continue;
@@ -1525,18 +1521,17 @@ void Globe::drawDetail()
 		else if (debugType == 1)
 		{
 			color = 0;
-			for (Region* region : _game->getSavedGame()->getRegions())
+			if (_game->getSavedGame()->debugRegion != entt::null)
 			{
-				if (_game->getSavedGame()->debugRegion && _game->getSavedGame()->debugRegion != region)
-					continue;
+				const Region& region = getRegistry().raw().get<Region>(_game->getSavedGame()->debugRegion);
 
 				color += 10;
-				for (size_t k = 0; k != region->getRules()->getLatMax().size(); ++k)
+				for (size_t k = 0; k != region.getRules()->getLatMax().size(); ++k)
 				{
-					double lon2 = region->getRules()->getLonMax().at(k);
-					double lon1 = region->getRules()->getLonMin().at(k);
-					double lat2 = region->getRules()->getLatMax().at(k);
-					double lat1 = region->getRules()->getLatMin().at(k);
+					double lon2 = region.getRules()->getLonMax().at(k);
+					double lon1 = region.getRules()->getLonMin().at(k);
+					double lat2 = region.getRules()->getLatMax().at(k);
+					double lat1 = region.getRules()->getLatMin().at(k);
 
 					drawVHLine(_countries, lon1, lat1, lon2, lat1, color);
 					drawVHLine(_countries, lon1, lat2, lon2, lat2, color);
@@ -1547,14 +1542,13 @@ void Globe::drawDetail()
 		}
 		else if (debugType == 2)
 		{
-			for (Region* region : _game->getSavedGame()->getRegions())
+			if (_game->getSavedGame()->debugRegion != entt::null)
 			{
-				if (_game->getSavedGame()->debugRegion && _game->getSavedGame()->debugRegion != region)
-					continue;
+				const Region& region = getRegistry().raw().get<Region>(_game->getSavedGame()->debugRegion);
 
 				color = -1;
 				size_t zoneNumber = 0;
-				for (const auto& missionZone : region->getRules()->getMissionZones())
+				for (const auto& missionZone : region.getRules()->getMissionZones())
 				{
 					++zoneNumber;
 					if (_game->getSavedGame()->debugZone > 0 && _game->getSavedGame()->debugZone != zoneNumber)
@@ -1645,9 +1639,9 @@ void Globe::drawFlights()
 	_radars->lock();
 
 	// Draw the craft flight paths
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (const Base& xcomBase : getRegistry().list<const Base>())
 	{
-		for (Craft* xcraft : xbase->getCrafts())
+		for (Craft* xcraft : xcomBase.getCrafts())
 		{
 			// Hide crafts docked at base
 			if (xcraft->getStatus() != "STR_OUT" || xcraft->getDestination() == 0 /*|| pointBack(xcraft->getLongitude(), xcraft->getLatitude())*/)
@@ -1697,7 +1691,7 @@ void Globe::drawFlights()
  * Draws the marker for a specified target on the globe.
  * @param target Pointer to globe target.
  */
-void Globe::drawTarget(Target *target, Surface *surface)
+void Globe::drawTarget(const Target *target, Surface *surface)
 {
 	if (target->getMarker() != -1 && !pointBack(target->getLongitude(), target->getLatitude()))
 	{
@@ -1748,9 +1742,9 @@ void Globe::drawMarkers()
 	_markers->clear();
 	_markers->lock();
 	// Draw the base markers
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (const Base& xcomBase : getRegistry().list<const Base>())
 	{
-		drawTarget(xbase, _markers);
+		drawTarget(&xcomBase, _markers);
 	}
 
 	// Draw the waypoint markers
@@ -1778,9 +1772,9 @@ void Globe::drawMarkers()
 	}
 
 	// Draw the craft markers
-	for (Base* xbase : _game->getSavedGame()->getBases())
+	for (const Base& xcomBase : getRegistry().list<const Base>())
 	{
-		for (Craft* xcraft : xbase->getCrafts())
+		for (Craft* xcraft : xcomBase.getCrafts())
 		{
 			drawTarget(xcraft, _markers);
 		}

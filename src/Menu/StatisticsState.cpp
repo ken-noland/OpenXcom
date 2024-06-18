@@ -18,6 +18,7 @@
  */
 #include "StatisticsState.h"
 #include <algorithm>
+#include <numeric>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -83,25 +84,6 @@ StatisticsState::StatisticsState()
 	listStats();
 }
 
-/**
- *
- */
-StatisticsState::~StatisticsState()
-{
-
-}
-
-template <typename T>
-T StatisticsState::sumVector(const std::vector<T> &vec) const
-{
-	T total = 0;
-	for (typename std::vector<T>::const_iterator i = vec.begin(); i != vec.end(); ++i)
-	{
-		total += *i;
-	}
-	return total;
-}
-
 void StatisticsState::listStats()
 {
 	SavedGame *save = getGame()->getSavedGame();
@@ -123,15 +105,17 @@ void StatisticsState::listStats()
 	ss << Unicode::TOK_NL_SMALL << time->getDayString(getGame()->getLanguage()) << " " << tr(time->getMonthString()) << " " << time->getYear();
 	_txtTitle->setText(ss.str());
 
-	int totalScore = sumVector(save->getResearchScores());
-	for (Region* region : save->getRegions())
+	int totalScore = std::accumulate(save->getResearchScores().begin(), save->getResearchScores().end(), 0);
+	auto totalRegionScore = [](const Region region)
 	{
-		totalScore += sumVector(region->getActivityXcom()) - sumVector(region->getActivityAlien());
-	}
+		return std::accumulate(region.getActivityXcom().begin(), region.getActivityXcom().end(), 0)
+			 - std::accumulate(region.getActivityXcom().begin(), region.getActivityXcom().end(), 0);
+	};
+	totalScore += getRegistry().totalBy<Region, int>(totalRegionScore);
 
 	int monthlyScore = totalScore / (int)save->getResearchScores().size();
-	int64_t totalIncome = sumVector(save->getIncomes());
-	int64_t totalExpenses = sumVector(save->getExpenditures());
+	int64_t totalIncome = std::accumulate(save->getIncomes().begin(), save->getIncomes().end(), 0LL);
+	int64_t totalExpenses = std::accumulate(save->getExpenditures().begin(), save->getExpenditures().end(), 0LL);
 
 	int alienBasesDestroyed = 0, xcomBasesLost = 0;
 	int missionsWin = 0, missionsLoss = 0, nightMissions = 0;
@@ -166,9 +150,9 @@ void StatisticsState::listStats()
 	worstScore = (worstScore == 9999) ? 0 : worstScore;
 
 	std::vector<Soldier*> allSoldiers;
-	for (Base* xbase : save->getBases())
+	for (const Base& xcomBase : getRegistry().list<Base>())
 	{
-		allSoldiers.insert(allSoldiers.end(), xbase->getSoldiers().begin(), xbase->getSoldiers().end());
+		allSoldiers.insert(allSoldiers.end(), xcomBase.getSoldiers().begin(), xcomBase.getSoldiers().end());
 	}
 	allSoldiers.insert(allSoldiers.end(), save->getDeadSoldiers().begin(), save->getDeadSoldiers().end());
 	int soldiersRecruited = (int)allSoldiers.size();
@@ -264,22 +248,12 @@ void StatisticsState::listStats()
 		totalCrafts += std::max(0, ids[craftType] - 1);
 	}
 
-	int xcomBases = (int)save->getBases().size() + xcomBasesLost;
-	int currentScientists = 0, currentEngineers = 0;
-	for (const Base* xbase : save->getBases())
-	{
-		currentScientists += xbase->getTotalScientists();
-		currentEngineers += xbase->getTotalEngineers();
-	}
+	int xcomBases = static_cast<int>(getRegistry().size<Base>()) + xcomBasesLost;
+	int currentScientists = getRegistry().totalBy<Base, int>(&Base::getTotalScientists);
+	int currentEngineers = getRegistry().totalBy<Base, int>(&Base::getTotalEngineers);
 
-	int countriesLost = 0;
-	for (const auto&& [id, country] : _game->getSavedGame()->getRegistry().view<const Country>().each())
-	{
-		if (country.getPact())
-		{
-			countriesLost++;
-		}
-	}
+	auto castPacts = [](const Country& country) { return country.getPact() ? 1 : 0; };
+	int countriesLost = getRegistry().totalBy<Country, int>(castPacts);
 
 	int researchDone = (int)save->getDiscoveredResearch().size();
 

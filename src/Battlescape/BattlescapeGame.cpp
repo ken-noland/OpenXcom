@@ -1187,7 +1187,7 @@ bool BattlescapeGame::playableUnitSelected() const
 }
 
 /**
- * Gives time slice to the front state.
+ * Gives time slice to the frontValue state.
  */
 void BattlescapeGame::handleState()
 {
@@ -1209,7 +1209,7 @@ void BattlescapeGame::handleState()
 }
 
 /**
- * Pushes a state to the front of the queue and starts it.
+ * Pushes a state to the frontValue of the queue and starts it.
  * @param bs Battlestate.
  */
 void BattlescapeGame::statePushFront(BattleState *bs)

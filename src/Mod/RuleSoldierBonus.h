@@ -62,7 +62,7 @@ public:
 	const std::string &getName() const { return _name; }
 	/// Gets the bonus to night vision (in tiles).
 	int getVisibilityAtDark() const { return _visibilityAtDark; }
-	/// Gets the bonus to front armor.
+	/// Gets the bonus to frontValue armor.
 	int getFrontArmor() const { return _frontArmor; }
 	/// Gets the bonus to left side armor.
 	int getLeftSideArmor() const { return _sideArmor + _leftArmorDiff; }

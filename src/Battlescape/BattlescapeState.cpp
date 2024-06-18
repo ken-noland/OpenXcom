@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <ranges>
 #include "../fmath.h"
 #include <SDL_gfxPrimitives.h>
 #include "Map.h"
@@ -96,14 +97,7 @@ namespace OpenXcom
  * Initializes all the elements in the Battlescape screen.
  * @param game Pointer to the core game.
  */
-BattlescapeState::BattlescapeState() :
-	_reserve(0), _touchButtonsEnabled(false), _touchButtonsEnabledLastTurn(false), _manaBarVisible(false),
-	_firstInit(true), _paletteResetNeeded(false), _paletteResetRequested(false),
-	_isMouseScrolling(false), _isMouseScrolled(false),
-	_xBeforeMouseScrolling(0), _yBeforeMouseScrolling(0),
-	_totalMouseMoveX(0), _totalMouseMoveY(0), _mouseMovedOverThreshold(0), _mouseOverIcons(false),
-	_autosave(0),
-	_numberOfDirectlyVisibleUnits(0), _numberOfEnemiesTotal(0), _numberOfEnemiesTotalPlusWounded(0)
+BattlescapeState::BattlescapeState()
 {
 	_save = getGame()->getSavedGame()->getSavedBattle();
 
@@ -240,10 +234,7 @@ BattlescapeState::BattlescapeState() :
 	_numMorale = new NumberText(15, 5, x + 154, y + 50);
 	_barMorale = new Bar(102, 3, x + 170, y + 41 + step*3);
 
-	if (_manaBarVisible)
-	{
-		_barMana = new Bar(102, 3, x + 170, y + 41 + step*4);
-	}
+	_barMana = _manaBarVisible ? new Bar(102, 3, x + 170, y + 41 + step * 4) : nullptr;
 
 	_txtDebug = new Text(300, 10, 20, 0);
 	_txtTooltip = new Text(300, 10, x + 2, y - 10);
@@ -3337,19 +3328,14 @@ void BattlescapeState::finishBattle(bool abort, int inExitArea)
 	AlienDeployment *ruleDeploy = getGame()->getMod()->getDeployment(_save->getMissionType());
 	if (!ruleDeploy)
 	{
-		for (Ufo* ufo : getGame()->getSavedGame()->getUfos())
-		{
-			if (ufo->isInBattlescape())
+		if (Ufo* ufo = getRegistry().findValue_if<Ufo>(std::mem_fn(&Ufo::isInBattlescape))) {
+			std::string ufoMissionName = ufo->getRules()->getType();
+			if (!_save->getAlienCustomMission().empty())
 			{
-				std::string ufoMissionName = ufo->getRules()->getType();
-				if (!_save->getAlienCustomMission().empty())
-				{
-					// fake underwater UFO
-					ufoMissionName = _save->getAlienCustomMission();
-				}
-				ruleDeploy = getGame()->getMod()->getDeployment(ufoMissionName);
-				break;
+				// fake underwater UFO
+				ufoMissionName = _save->getAlienCustomMission();
 			}
+			ruleDeploy = getGame()->getMod()->getDeployment(ufoMissionName);
 		}
 	}
 	std::string nextStage;
@@ -3388,10 +3374,10 @@ void BattlescapeState::finishBattle(bool abort, int inExitArea)
 			getGame()->getSavedGame()->setBattleGame(0);
 
 			// unmark all craft and all bases (current craft would be enough, but better safe than sorry)
-			for (Base* xbase : getGame()->getSavedGame()->getBases())
+			for (Base& xcomBase : getRegistry().list<Base>())
 			{
-				xbase->setInBattlescape(false);
-				for (Craft* craft : xbase->getCrafts())
+				xcomBase.setInBattlescape(false);
+				for (Craft* craft : xcomBase.getCrafts())
 				{
 					craft->setInBattlescape(false);
 				}
@@ -3628,7 +3614,7 @@ void BattlescapeState::txtTooltipInExtra(Action *action, bool leftHand, bool spe
 				}
 			}
 
-			// search for target in front of the selected unit
+			// search for target in frontValue of the selected unit
 			if (!targetUnit && weaponRule->getAllowTargetStanding())
 			{
 				Position dest;

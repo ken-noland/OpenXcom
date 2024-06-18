@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2024-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,27 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "PlaceFacilityState.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
 
-class SelectStartFacilityState;
-
-/**
- * Window shown when the player tries to
- * build a facility.
- */
-class PlaceStartFacilityState : public PlaceFacilityState
+namespace BaseSystem
 {
-private:
-	SelectStartFacilityState *_select;
-
-public:
-	/// Creates the Place Facility state.
-	PlaceStartFacilityState(entt::entity baseId, SelectStartFacilityState *select, const RuleBaseFacility *rule);
-	/// Handler for clicking the base view.
-	void viewClick(Action *action);
-};
+	// Gets the total maintiance cost for all bases.
+	[[nodiscard]] int64_t getBasesMaintenanceCost();
+	// Gets if an item is in storage at any base.
+	[[nodiscard]] bool isItemInBaseStores(const entt::registry& registry, const std::string& itemType);
+	// Gets if a facility is built at any base.
+	[[nodiscard]] bool isFacilityBuilt(const entt::registry& registry, const std::string& facilityType);
+	// Gets if a solider types is hired at any base.
+	[[nodiscard]] bool isSoldierTypeHired(const entt::registry& registry, const std::string& soldierType);
+}
 
 }

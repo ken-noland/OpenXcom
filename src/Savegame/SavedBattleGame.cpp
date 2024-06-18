@@ -1450,9 +1450,9 @@ void SavedBattleGame::saveDummyCraftDeployment()
 	auto* save = getGeoscapeSave();
 
 	// don't forget to invalidate custom deployments of all real craft of this type
-	for (Base* xbase : save->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
-		for (Craft* xcraft : xbase->getCrafts())
+		for (Craft* xcraft : xcomBase.getCrafts())
 		{
 			if (xcraft->getRules() == _craftForPreview->getRules())
 			{

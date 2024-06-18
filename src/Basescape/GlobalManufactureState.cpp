@@ -137,9 +137,8 @@ void GlobalManufactureState::btnOkClick(Action *)
  */
 void GlobalManufactureState::onSelectBase(Action *)
 {
-	Base *base = _bases[_lstManufacture->getSelectedRow()];
-
-	if (base)
+	entt::entity baseId = _baseIds[_lstManufacture->getSelectedRow()];
+	if (Base* base = getRegistry().raw().try_get<Base>(baseId))
 	{
 		// close this window
 		getGame()->popState();
@@ -192,7 +191,7 @@ void GlobalManufactureState::init()
  */
 void GlobalManufactureState::fillProductionList()
 {
-	_bases.clear();
+	_baseIds.clear();
 	_topics.clear();
 	_lstManufacture->clearList();
 
@@ -200,66 +199,58 @@ void GlobalManufactureState::fillProductionList()
 	int allocatedEngineers = 0;
 	int freeWorkshops = 0;
 
-	for (Base* xbase : getGame()->getSavedGame()->getBases())
+	for (auto&& [ id, xcomBase ] : getRegistry().raw().view<Base>().each())
 	{
-		auto& baseProductions = xbase->getProductions();
-		if (!baseProductions.empty() || xbase->getEngineers() > 0)
+		auto& baseProductions = xcomBase.getProductions();
+		if (!baseProductions.empty() || xcomBase.getEngineers() > 0)
 		{
-			std::string baseName = xbase->getName(getGame()->getLanguage());
+			std::string baseName = xcomBase.getName(getGame()->getLanguage());
 			_lstManufacture->addRow(3, baseName.c_str(), "", "");
 			_lstManufacture->setRowColor(_lstManufacture->getLastRowIndex(), _lstManufacture->getSecondaryColor());
 
 			// dummy
-			_bases.push_back(0);
+			_baseIds.push_back(entt::null);
 			_topics.push_back(0);
 		}
 		for (const auto* prod : baseProductions)
 		{
-			std::ostringstream s1;
-			s1 << prod->getAssignedEngineers();
-			std::ostringstream s2;
-			s2 << prod->getAmountProduced() << "/";
-			if (prod->getInfiniteAmount()) s2 << "∞";
-			else s2 << prod->getAmountTotal();
-			if (prod->getSellItems()) s2 << " $";
-			std::ostringstream s3;
-			s3 << Unicode::formatFunding(prod->getRules()->getManufactureCost());
-			std::ostringstream s4;
-			if (prod->getInfiniteAmount())
-			{
-				s4 << "∞";
-			}
+			std::string producedOfTotal = std::format("{}/{}{}", prod->getAmountProduced(),
+				prod->getInfiniteAmount() ? "∞" : std::to_string(prod->getAmountTotal()),
+				prod->getSellItems() ? " $" : "");
+
+			std::string timeLeft;
+			if (prod->getInfiniteAmount()) { timeLeft = "∞"; }
 			else if (prod->getAssignedEngineers() > 0)
 			{
-				int timeLeft = prod->getAmountTotal() * prod->getRules()->getManufactureTime() - prod->getTimeSpent();
+				int hoursLeft = prod->getAmountTotal() * prod->getRules()->getManufactureTime() - prod->getTimeSpent();
 				int numEffectiveEngineers = prod->getAssignedEngineers();
 				// ensure we round up since it takes an entire hour to manufacture any part of that hour's capacity
-				int hoursLeft = (timeLeft + numEffectiveEngineers - 1) / numEffectiveEngineers;
+				hoursLeft = (hoursLeft + numEffectiveEngineers - 1) / numEffectiveEngineers;
 				int daysLeft = hoursLeft / 24;
 				int hours = hoursLeft % 24;
-				s4 << daysLeft << "/" << hours;
+				timeLeft = std::format("{}/{}", daysLeft, hours);
 			}
-			else
-			{
+			else { timeLeft = "-"; }
+			_lstManufacture->addRow(5,
+				tr(prod->getRules()->getName()).c_str(),
+				std::to_string(prod->getAssignedEngineers()), producedOfTotal,
+				Unicode::formatFunding(prod->getRules()->getManufactureCost()),
+				timeLeft);
 
-				s4 << "-";
-			}
-			_lstManufacture->addRow(5, tr(prod->getRules()->getName()).c_str(), s1.str().c_str(), s2.str().c_str(), s3.str().c_str(), s4.str().c_str());
-
-			_bases.push_back(xbase);
+			_baseIds.push_back(id);
 			_topics.push_back(prod->getRules());
 		}
-		if (baseProductions.empty() && xbase->getEngineers() > 0)
+		if (baseProductions.empty() && xcomBase.getEngineers() > 0)
 		{
 			_lstManufacture->addRow(5, tr("STR_NONE").c_str(), "", "", "", "");
 
-			_bases.push_back(xbase);
+			_baseIds.push_back(id);
 			_topics.push_back(0);
 		}
 
-		availableEngineers += xbase->getAvailableEngineers();
-		allocatedEngineers += xbase->getAllocatedEngineers();
-		freeWorkshops += xbase->getFreeWorkshops();
+		availableEngineers += xcomBase.getAvailableEngineers();
+		allocatedEngineers += xcomBase.getAllocatedEngineers();
+		freeWorkshops += xcomBase.getFreeWorkshops();
 	}
 
 	_txtAvailable->setText(tr("STR_ENGINEERS_AVAILABLE").arg(availableEngineers));

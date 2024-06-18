@@ -20,6 +20,7 @@
 #include <algorithm>
 #include "../fmath.h"
 #include "../Engine/Language.h"
+#include "../Engine/Registry.h"
 #include "../Engine/RNG.h"
 #include "../Engine/ScriptBind.h"
 #include "../Mod/RuleCraft.h"
@@ -316,17 +317,14 @@ void Craft::finishLoading(const YAML::Node &node, SavedGame *save)
 		std::string type = dest["type"].as<std::string>();
 		int id = dest["id"].as<int>();
 
-		bool found = false;
-		for (Base* xbase : save->getBases())
+		for (Base& xcomBase : getRegistry().list<Base>())
 		{
-			if (found) break; // loop finished
-			for (Craft* xcraft : xbase->getCrafts())
+			for (Craft* xcraft : xcomBase.getCrafts())
 			{
-				if (found) break; // loop finished
 				if (xcraft->getId() == id && xcraft->getRules()->getType() == type)
 				{
 					setDestination(xcraft);
-					found = true;
+					return;
 				}
 			}
 		}

@@ -110,7 +110,7 @@ public:
 	Position getTarget() const;
 	/// Gets the distance that projectile traveled.
 	float getDistance() const;
-	/// Is this projectile being drawn back-to-front or front-to-back?
+	/// Is this projectile being drawn back-to-frontValue or frontValue-to-back?
 	bool isReversed() const;
 	/// adds a cloud of particles at the projectile's location
 	void addVaporCloud();

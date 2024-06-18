@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -18,8 +18,9 @@
  */
 #include "MiniBaseView.h"
 #include <cmath>
-#include "../Engine/SurfaceSet.h"
 #include "../Engine/Action.h"
+#include "../Engine/Registry.h"
+#include "../Engine/SurfaceSet.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/BaseFacility.h"
 #include "../Mod/RuleBaseFacility.h"
@@ -34,44 +35,17 @@ namespace OpenXcom
  * @param x X position in pixels.
  * @param y Y position in pixels.
  */
-MiniBaseView::MiniBaseView(int width, int height, int x, int y) : InteractiveSurface(width, height, x, y), _bases(0), _texture(0), _base(0), _hoverBase(0), _visibleBasesIndex(0), _red(0), _green(0), _blue(0)
+MiniBaseView::MiniBaseView(int width, int height, int x, int y)
+	: InteractiveSurface(width, height, x, y)
 {
+	getRegistry().raw().on_construct<Base>().connect<&MiniBaseView::onBaseSetChange>(this);
+	getRegistry().raw().on_destroy<Base>().connect<&MiniBaseView::onBaseSetChange>(this);
 }
 
-/**
- *
- */
 MiniBaseView::~MiniBaseView()
 {
-}
-
-/**
- * Changes the current list of bases to display.
- * @param bases Pointer to base list to display.
- */
-void MiniBaseView::setBases(std::vector<Base*>& bases)
-{
-	_bases = &bases;
-	_redraw = true;
-}
-
-/**
- * Changes the texture to use for drawing
- * the various base elements.
- * @param texture Pointer to SurfaceSet to use.
- */
-void MiniBaseView::setTexture(SurfaceSet *texture)
-{
-	_texture = texture;
-}
-
-/**
- * Returns the base the mouse cursor is currently over.
- * @return ID of the base.
- */
-size_t MiniBaseView::getHoveredBase() const
-{
-	return _hoverBase;
+	getRegistry().raw().on_construct<Base>().disconnect<&MiniBaseView::onBaseSetChange>(this);
+	getRegistry().raw().on_destroy<Base>().disconnect<&MiniBaseView::onBaseSetChange>(this);
 }
 
 /**
@@ -79,22 +53,22 @@ size_t MiniBaseView::getHoveredBase() const
  * the mini base view.
  * @param base ID of base.
  */
-void MiniBaseView::setSelectedBase(size_t base)
+void MiniBaseView::setSelectedBaseIndex(int selectedBaseIndex)
 {
-	_base = base;
+	_selectedBaseIndex = selectedBaseIndex;
 	_redraw = true;
 }
 
 /**
  * Changes the set of bases that are currently visible on
- * the mini base view (if more than MAX_VISIBLE_BASES)
+ * the mini base view (if more than MAX_VISIBLE_selectedBaseIndex)
  * to show one more up
  */
 bool MiniBaseView::incVisibleBasesIndex()
 {
-	if (_visibleBasesIndex < (_bases->size() - MAX_VISIBLE_BASES))
+	if (_visibleBasesIndexOffset < (_baseIds.size() - MAX_VISIBLE_BASES))
 	{
-		_visibleBasesIndex++;
+		_visibleBasesIndexOffset++;
 		_redraw = true;
 		return true;
 	}
@@ -103,38 +77,18 @@ bool MiniBaseView::incVisibleBasesIndex()
 
 /**
  * Changes the set of bases that are currently visible on
- * the mini base view (if more than MAX_VISIBLE_BASES)
+ * the mini base view (if more than MAX_VISIBLE_selectedBaseIndex)
  * to show one more down
  */
 bool MiniBaseView::decVisibleBasesIndex()
 {
-	if (_visibleBasesIndex > 0)
+	if (_visibleBasesIndexOffset > 0)
 	{
-		_visibleBasesIndex--;
+		_visibleBasesIndexOffset--;
 		_redraw = true;
 		return true;
 	}
 	return false;
-}
-
-/**
- * Returns the index offset for the list
- * of visible bases
- * @return offset index
- */
-size_t MiniBaseView::getVisibleBasesIndex() const
-{
-	return _visibleBasesIndex;
-}
-
-/**
- * Changes the set of base that are currently selected on
- * the mini base view.
- * @param newVisibleBasesIndex offset for list of visible bases.
- */
-void MiniBaseView::setVisibleBasesIndex(size_t newVisibleBasesIndex)
-{
-	_visibleBasesIndex = newVisibleBasesIndex;
 }
 
 /**
@@ -144,26 +98,30 @@ void MiniBaseView::setVisibleBasesIndex(size_t newVisibleBasesIndex)
 void MiniBaseView::draw()
 {
 	Surface::draw();
-	for (Sint16 i = 0; i < (Sint16)MAX_VISIBLE_BASES; ++i)
+
+	auto bases = getRegistry().list<const Base>() | std::views::drop(_visibleBasesIndexOffset);
+	auto baseIterator = bases.begin();
+
+	for (Sint16 index = 0; index < static_cast<Sint16>(MAX_VISIBLE_BASES); ++index)
 	{
 		// Draw base squares
-		if ((i + _visibleBasesIndex) == _base)
+		if (index + _visibleBasesIndexOffset == _selectedBaseIndex)
 		{
 			SDL_Rect r;
-			r.x = i * (MINI_SIZE + 2);
+			r.x = index * (MINI_SIZE + 2);
 			r.y = 0;
 			r.w = MINI_SIZE + 2;
 			r.h = MINI_SIZE + 2;
 			drawRect(&r, 1);
 		}
-		_texture->getFrame(41)->blitNShade(this, i * (MINI_SIZE + 2), 0);
+		_texture->getFrame(41)->blitNShade(this, index * (MINI_SIZE + 2), 0);
 
 		// Draw facilities
-		if (i < _bases->size())
+		if (baseIterator != bases.end())
 		{
 			SDL_Rect r;
 			lock();
-			for (const BaseFacility* fac : _bases->at(i + _visibleBasesIndex)->getFacilities())
+			for (const BaseFacility* fac : (*baseIterator).getFacilities())
 			{
 				int color;
 				if (fac->getDisabled())
@@ -173,7 +131,7 @@ void MiniBaseView::draw()
 				else
 					color = _red;
 
-				r.x = i * (MINI_SIZE + 2) + 2 + fac->getX() * 2;
+				r.x = index * (MINI_SIZE + 2) + 2 + fac->getX() * 2;
 				r.y = 2 + fac->getY() * 2;
 				r.w = fac->getRules()->getSizeX() * 2;
 				r.h = fac->getRules()->getSizeY() * 2;
@@ -207,21 +165,8 @@ void MiniBaseView::draw()
  */
 void MiniBaseView::mouseOver(Action *action, State *state)
 {
-	_hoverBase = (int)floor(action->getRelativeXMouse() / ((MINI_SIZE + 2) * action->getXScale()));
+	_hoveredBaseIndex = static_cast<int>(floor(action->getRelativeXMouse() / ((MINI_SIZE + 2) * action->getXScale())));
 	InteractiveSurface::mouseOver(action, state);
-}
-
-void MiniBaseView::setColor(Uint8 color)
-{
-	_green = color;
-}
-void MiniBaseView::setSecondaryColor(Uint8 color)
-{
-	_red = color;
-}
-void MiniBaseView::setBorderColor(Uint8 color)
-{
-	_blue = color;
 }
 
 }

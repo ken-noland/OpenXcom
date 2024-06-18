@@ -386,9 +386,8 @@ void NewBattleState::load(const std::string &filename)
 				const Mod *mod = getGame()->getMod();
 				SavedGame *save = new SavedGame();
 
-				Base *base = new Base(mod);
-				base->load(doc["base"], save, false);
-				save->getBases().push_back(base);
+				Base& newBase = getRegistry().createAndEmplace<Base>(mod);
+				newBase.load(doc["base"], save, false);
 
 				// Add research
 				for (auto& pair : mod->getResearchMap())
@@ -397,26 +396,26 @@ void NewBattleState::load(const std::string &filename)
 				}
 
 				// Generate items
-				base->getStorageItems()->clear();
+				newBase.getStorageItems()->clear();
 				for (auto& itemType : mod->getItemsList())
 				{
 					RuleItem *rule = getGame()->getMod()->getItem(itemType);
 					if (rule->getBattleType() != BT_CORPSE && rule->isRecoverable())
 					{
-						base->getStorageItems()->addItem(rule, 1);
+						newBase.getStorageItems()->addItem(rule, 1);
 					}
 				}
 
 				// Fix invalid contents
-				if (base->getCrafts().empty())
+				if (newBase.getCrafts().empty())
 				{
 					std::string craftType = _crafts[_cbxCraft->getSelected()];
-					_craft = new Craft(getGame()->getMod()->getCraft(craftType), base, save->getId(craftType));
-					base->getCrafts().push_back(_craft);
+					_craft = new Craft(getGame()->getMod()->getCraft(craftType), &newBase, save->getId(craftType));
+					newBase.getCrafts().push_back(_craft);
 				}
 				else
 				{
-					_craft = base->getCrafts().front();
+					_craft = newBase.getCrafts().front();
 				}
 
 				getGame()->setSavedGame(save);
@@ -450,7 +449,7 @@ void NewBattleState::save(const std::string &filename)
 	node["alienRace"] = _cbxAlienRace->getSelected();
 	node["difficulty"] = _cbxDifficulty->getSelected();
 	node["alienTech"] = _slrAlienTech->getValue();
-	node["base"] = getGame()->getSavedGame()->getBases().front()->save();
+	node["base"] = getRegistry().frontValue<Base>()->save();
 	out << node;
 
 	std::string filepath = Options::getMasterUserFolder() + filename + ".cfg";
@@ -469,26 +468,26 @@ void NewBattleState::initSave()
 {
 	const Mod *mod = getGame()->getMod();
 	SavedGame *save = new SavedGame();
-	Base *base = new Base(mod);
-	const YAML::Node &starter = getGame()->getMod()->getDefaultStartingBase();
-	base->load(starter, save, true, true);
-	save->getBases().push_back(base);
+
+	const YAML::Node& starterBase = getGame()->getMod()->getDefaultStartingBase();
+	Base& newBase = getRegistry().createAndEmplace<Base>(mod);
+	newBase.load(starterBase, save, true, true);
 
 	// Kill everything we don't want in this base
-	for (Soldier* soldier : base->getSoldiers())
+	for (Soldier* soldier : newBase.getSoldiers())
 	{
 		delete soldier;
 	}
-	base->getSoldiers().clear();
-	for (Craft* xcraft : base->getCrafts())
+	newBase.getSoldiers().clear();
+	for (Craft* xcraft : newBase.getCrafts())
 	{
 		delete xcraft;
 	}
-	base->getCrafts().clear();
-	base->getStorageItems()->clear();
+	newBase.getCrafts().clear();
+	newBase.getStorageItems()->clear();
 
-	_craft = new Craft(mod->getCraft(_crafts[_cbxCraft->getSelected()]), base, 1);
-	base->getCrafts().push_back(_craft);
+	_craft = new Craft(mod->getCraft(_crafts[_cbxCraft->getSelected()]), &newBase, 1);
+	newBase.getCrafts().push_back(_craft);
 
 	// Generate soldiers
 	bool psiStrengthEval = (Options::psiStrengthEval && save->isResearched(mod->getPsiRequirements()));
@@ -525,7 +524,7 @@ void NewBattleState::initSave()
 		// update again, could have been changed since soldier creation
 		soldier->calcStatString(mod->getStatStrings(), psiStrengthEval);
 
-		base->getSoldiers().push_back(soldier);
+		newBase.getSoldiers().push_back(soldier);
 
 		int space = _craft->getSpaceAvailable();
 		if (_craft->validateAddingSoldier(space, soldier) == CPE_None)
@@ -541,7 +540,7 @@ void NewBattleState::initSave()
 		if (rule->getBattleType() != BT_CORPSE && rule->isRecoverable())
 		{
 			int howMany = rule->getBattleType() == BT_AMMO ? 2 : 1;
-			base->getStorageItems()->addItem(rule, howMany);
+			newBase.getStorageItems()->addItem(rule, howMany);
 			if (rule->getBattleType() != BT_NONE && rule->isInventoryItem())
 			{
 				_craft->getItems()->addItem(rule, howMany);
@@ -705,7 +704,7 @@ void NewBattleState::btnRandomClick(Action *)
  */
 void NewBattleState::btnEquipClick(Action *)
 {
-	getGame()->pushState(new CraftInfoState(getGame()->getSavedGame()->getBases().front(), 0));
+	getGame()->pushState(new CraftInfoState(getRegistry().frontValue<Base>(), 0));
 }
 
 /**

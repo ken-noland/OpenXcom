@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,40 +17,41 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Base.h"
-#include "../fmath.h"
-#include <stack>
 #include <algorithm>
 #include <functional>
-#include "BaseFacility.h"
-#include "../Mod/RuleBaseFacility.h"
-#include "Craft.h"
-#include "SavedGame.h"
-#include "../Mod/RuleCraft.h"
-#include "../Mod/Mod.h"
-#include "ItemContainer.h"
-#include "Soldier.h"
-#include "../Engine/Language.h"
-#include "../Mod/RuleItem.h"
-#include "../Mod/Armor.h"
-#include "../Mod/RuleManufacture.h"
-#include "../Mod/RuleResearch.h"
-#include "Transfer.h"
-#include "ResearchProject.h"
-#include "Production.h"
-#include "Vehicle.h"
-#include "Target.h"
-#include "Ufo.h"
-#include "../Engine/RNG.h"
-#include "../Engine/Options.h"
-#include "../Mod/RuleSoldier.h"
-#include "../Engine/Logger.h"
-#include "../Engine/Collections.h"
-#include "WeightedOptions.h"
+#include <stack>
 #include "AlienMission.h"
+#include "AreaSystem.h"
+#include "BaseFacility.h"
 #include "Country.h"
-#include "../Mod/RuleCountry.h"
+#include "Craft.h"
+#include "ItemContainer.h"
+#include "Production.h"
 #include "Region.h"
+#include "ResearchProject.h"
+#include "SavedGame.h"
+#include "Soldier.h"
+#include "Target.h"
+#include "Transfer.h"
+#include "Ufo.h"
+#include "Vehicle.h"
+#include "WeightedOptions.h"
+#include "../Engine/Collections.h"
+#include "../Engine/Language.h"
+#include "../Engine/Logger.h"
+#include "../Engine/Options.h"
+#include "../Engine/RNG.h"
+#include "../fmath.h"
+#include "../Mod/Armor.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleBaseFacility.h"
+#include "../Mod/RuleCountry.h"
+#include "../Mod/RuleCraft.h"
+#include "../Mod/RuleItem.h"
+#include "../Mod/RuleManufacture.h"
 #include "../Mod/RuleRegion.h"
+#include "../Mod/RuleResearch.h"
+#include "../Mod/RuleSoldier.h"
 
 namespace OpenXcom
 {
@@ -234,6 +235,8 @@ void Base::load(const YAML::Node &node, SavedGame *save, bool newGame, bool newB
 	_fakeUnderwater = node["fakeUnderwater"].as<bool>(_fakeUnderwater);
 
 	isOverlappingOrOverflowing(); // don't crash, just report in the log file...
+
+	calculateServices(save);
 }
 
 /**
@@ -241,7 +244,7 @@ void Base::load(const YAML::Node &node, SavedGame *save, bool newGame, bool newB
  * @param node YAML node.
  * @param save Pointer to saved game.
  */
-void Base::finishLoading(const YAML::Node &node, SavedGame *save)
+void Base::finishLoadingCrafts(const YAML::Node &node, SavedGame *save)
 {
 	for (YAML::const_iterator i = node["crafts"].begin(); i != node["crafts"].end(); ++i)
 	{
@@ -268,7 +271,6 @@ void Base::finishLoading(const YAML::Node &node, SavedGame *save)
 			Log(LOG_ERROR) << "Failed to load craft " << type;
 		}
 	}
-	calculateServices(save);
 }
 
 /**
@@ -276,23 +278,15 @@ void Base::finishLoading(const YAML::Node &node, SavedGame *save)
  */
 void Base::calculateServices(SavedGame* save)
 {
-	for (const auto&& [id, country] : save->getRegistry().view<const Country>().each())
+	if (Country* country = AreaSystem::locateValue<Country>(_lon, _lat))
 	{
-		if (country.getRules()->insideCountry(_lon, _lat))
-		{
-			_provideBaseFunc |= country.getRules()->getProvidedBaseFunc();
-			_forbiddenBaseFunc |= country.getRules()->getForbiddenBaseFunc();
-			break;
-		}
+		_provideBaseFunc   |= country->getRules()->getProvidedBaseFunc();
+		_forbiddenBaseFunc |= country->getRules()->getForbiddenBaseFunc();
 	}
-	for (const auto* region : save->getRegions())
+	if (Region* region = AreaSystem::locateValue<Region>(_lon, _lat))
 	{
-		if (region->getRules()->insideRegion(_lon, _lat))
-		{
-			_provideBaseFunc |= region->getRules()->getProvidedBaseFunc();
-			_forbiddenBaseFunc |= region->getRules()->getForbiddenBaseFunc();
-			break;
-		}
+		_provideBaseFunc   |= region->getRules()->getProvidedBaseFunc();
+		_forbiddenBaseFunc |= region->getRules()->getForbiddenBaseFunc();
 	}
 }
 
@@ -430,24 +424,6 @@ int Base::getMarker() const
 	if (AreSame(_lon, 0.0) && AreSame(_lat, 0.0))
 		return -1;
 	return 0;
-}
-
-/**
- * Returns the list of facilities in the base.
- * @return Pointer to the facility list.
- */
-std::vector<BaseFacility*>& Base::getFacilities()
-{
-	return _facilities;
-}
-
-/**
- * Returns the list of soldiers in the base.
- * @return Pointer to the soldier list.
- */
-std::vector<Soldier*>& Base::getSoldiers()
-{
-	return _soldiers;
 }
 
 /**
