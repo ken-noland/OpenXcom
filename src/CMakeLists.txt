@@ -518,6 +518,17 @@ add_custom_target(build_lua
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
+# Fetch EnTT
+#  EnTT is used as the Entity Component System library for the game
+FetchContent_Declare(
+  EnTT
+  GIT_REPOSITORY https://github.com/skypjack/entt.git
+  GIT_TAG "origin/master"
+)
+FetchContent_MakeAvailable(EnTT)
+
+
+
 
 set ( data_install_dir bin )
 if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
@@ -687,7 +698,7 @@ if (WIN32)
 endif(WIN32)
 
 target_link_libraries ( openxcom PUBLIC ${system_libs} ${PKG_DEPS_LDFLAGS} ${WIN32_LIBS} yaml-cpp::yaml-cpp lua )
-target_include_directories ( openxcom PUBLIC ${yaml-cpp_SOURCE_DIR}/include ${lua_SOURCE_DIR} )
+target_include_directories ( openxcom PUBLIC ${yaml-cpp_SOURCE_DIR}/include ${lua_SOURCE_DIR} ${EnTT_SOURCE_DIR}/single_include)
 
 # Pack libraries into bundle and link executable appropriately
 if ( APPLE AND CREATE_BUNDLE )
