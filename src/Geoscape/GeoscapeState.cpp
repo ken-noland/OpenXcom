@@ -134,6 +134,8 @@
 #include "../fmath.h"
 #include "../fallthrough.h"
 
+#include "../Entities/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -4637,8 +4639,9 @@ void GeoscapeState::resize(int &dX, int &dY)
 
 	_globe->resize();
 
-	for (auto* surface : _surfaces)
+	for (entt::entity surfaceEnt : _surfaces)
 	{
+		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
 		if (surface != _globe)
 		{
 			surface->setX(surface->getX() + dX);

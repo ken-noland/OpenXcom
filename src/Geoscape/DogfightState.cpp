@@ -54,6 +54,8 @@
 #include "../Mod/RuleInterface.h"
 #include "../Mod/Mod.h"
 
+#include "../Entities/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -2498,8 +2500,10 @@ void DogfightState::moveWindow()
 {
 	int x = _window->getX() - _x;
 	int y = _window->getY() - _y;
-	for (auto* surface : _surfaces)
+	for (entt::entity surfaceEnt : _surfaces)
 	{
+		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+
 		surface->setX(surface->getX() - x);
 		surface->setY(surface->getY() - y);
 	}

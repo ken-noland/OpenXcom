@@ -22,6 +22,8 @@
 #include <SDL.h>
 #include "LocalizedText.h"
 
+#include <entt/entt.hpp>
+
 namespace OpenXcom
 {
 
@@ -51,10 +53,14 @@ class State
 protected:
 	std::string _name;
 
-	std::vector<Surface*> _surfaces;
+// temp for now
+entt::registry _surfaceRegistry;
+
+	std::vector<entt::entity> _surfaces;
 	bool _screen;
 	bool _soundPlayed;
 	InteractiveSurface *_modal;
+
 
 	std::string _interfaceCategory;
 	RuleInterface *_ruleInterface;
@@ -77,7 +83,7 @@ public:
 
 	bool IsScreen() const { return _screen; }
 
-	const std::vector<Surface*>& getSurfaces() const { return _surfaces; }
+//	const std::vector<Surface*>& getSurfaces() const { return _surfaces; }
 
 	/// Set interface rules.
 	void setInterface(const std::string &s, bool alterPal = false, SavedBattleGame *battleGame = 0);

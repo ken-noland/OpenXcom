@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,31 +16,5 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "TextButton.h"
-#include "../Engine/Action.h"
-#include "../Engine/State.h"
 
-namespace OpenXcom
-{
-
-class ToggleTextButton :
-	public TextButton
-{
-private:
-	bool _isPressed;
-	int _originalColor, _invertedColor;
-	TextButton *_fakeGroup;
-
-public:
-	ToggleTextButton(int width, int height, int x, int y);
-	~ToggleTextButton(void);
-
-	void draw() override;
-	void mousePress(Action *action, State *state) override;
-	void setPressed(bool pressed);
-	bool getPressed() const { return _isPressed; }
-	void setColor(Uint8 color) override;
-	void setInvertColor(Uint8 color);
-};
-
-}
+//nothing to see here, move along

@@ -17,31 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "TextButton.h"
-#include "../Engine/Action.h"
-#include "../Engine/State.h"
+
 
 namespace OpenXcom
 {
 
-class ToggleTextButton :
-	public TextButton
+class NamedComponent
 {
-private:
-	bool _isPressed;
-	int _originalColor, _invertedColor;
-	TextButton *_fakeGroup;
+protected:
+	std::string _name;
 
 public:
-	ToggleTextButton(int width, int height, int x, int y);
-	~ToggleTextButton(void);
+	NamedComponent(const std::string& name) : _name(name) {}
+	~NamedComponent() {}
 
-	void draw() override;
-	void mousePress(Action *action, State *state) override;
-	void setPressed(bool pressed);
-	bool getPressed() const { return _isPressed; }
-	void setColor(Uint8 color) override;
-	void setInvertColor(Uint8 color);
+	inline const std::string& getName() const { return _name; }
 };
 
-}
+} // namespace OpenXcom

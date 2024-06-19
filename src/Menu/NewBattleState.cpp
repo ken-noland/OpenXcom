@@ -56,6 +56,8 @@
 #include "../Mod/AlienRace.h"
 #include "../Mod/RuleGlobe.h"
 
+#include "../Entities/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -936,8 +938,9 @@ void NewBattleState::fillList(NewBattleSelectType selectType, bool isRightClick)
 	if (_surfaceBackup.empty())
 	{
 		firstRun = true;
-		for (auto surface : _surfaces)
+		for (entt::entity surfaceEnt : _surfaces)
 		{
+			Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
 			_surfaceBackup[surface] = surface->getVisible();
 			surface->setVisible(false);
 		}

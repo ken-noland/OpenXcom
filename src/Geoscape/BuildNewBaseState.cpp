@@ -37,6 +37,8 @@
 #include "../Menu/ErrorMessageState.h"
 #include "../Mod/RuleInterface.h"
 
+#include "../Entities/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -399,8 +401,10 @@ void BuildNewBaseState::btnCancelClick(Action *)
  */
 void BuildNewBaseState::resize(int &dX, int &dY)
 {
-	for (auto* surface : _surfaces)
+	for (entt::entity surfaceEnt : _surfaces)
 	{
+		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+
 		surface->setX(surface->getX() + dX / 2);
 		if (surface != _window && surface != _btnCancel && surface != _txtTitle)
 		{

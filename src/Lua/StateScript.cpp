@@ -34,7 +34,7 @@ template <>
 void toLua(lua_State* luaState, State* arg)
 {
 	int tableIndex = pushTableWithUserdataAndProperties(luaState, arg, [arg](lua_State* luaState, int tableIndex) {
-		registerContainer<&State::getSurfaces>(luaState, "surfaces", tableIndex, arg);
+//		registerContainer<&State::getSurfaces>(luaState, "surfaces", tableIndex, arg);
 	});
 
 	registerProperty<&State::getName>(luaState, "name", tableIndex, arg);
@@ -60,6 +60,7 @@ void toLua(lua_State* luaState, Surface* arg)
 	registerProperty<&Surface::getY>(luaState, "Y", tableIndex, arg);
 	registerProperty<&Surface::getWidth>(luaState, "Width", tableIndex, arg);
 	registerProperty<&Surface::getHeight>(luaState, "Height", tableIndex, arg);
+
 }
 
 template <>

@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,31 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "TextButton.h"
-#include "../Engine/Action.h"
-#include "../Engine/State.h"
+#include "Surface.h"
+#include "../Common/Named.h"
 
 namespace OpenXcom
 {
 
-class ToggleTextButton :
-	public TextButton
+SurfaceFactory::SurfaceFactory(entt::registry& registry)
+	: _registry(registry)
 {
-private:
-	bool _isPressed;
-	int _originalColor, _invertedColor;
-	TextButton *_fakeGroup;
-
-public:
-	ToggleTextButton(int width, int height, int x, int y);
-	~ToggleTextButton(void);
-
-	void draw() override;
-	void mousePress(Action *action, State *state) override;
-	void setPressed(bool pressed);
-	bool getPressed() const { return _isPressed; }
-	void setColor(Uint8 color) override;
-	void setInvertColor(Uint8 color);
-};
-
 }
+
+SurfaceFactory::~SurfaceFactory()
+{
+}
+
+entt::entity OpenXcom::SurfaceFactory::CreateSurface(const std::string& name, int width, int height, int x, int y)
+{
+	entt::entity entity = _registry.create();
+	_registry.emplace<NamedComponent>(entity, name);
+
+	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
+	_registry.emplace<SurfaceComponent>(entity, std::move(surface));
+
+	return entity;
+}
+
+} // namespace OpenXcom

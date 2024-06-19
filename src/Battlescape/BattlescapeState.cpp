@@ -89,6 +89,8 @@
 #include <algorithm>
 #include "../Basescape/SoldiersAIState.h"
 
+#include "../Entities/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -766,8 +768,9 @@ void BattlescapeState::init()
 
 		resetPalettes();
 		_save->setPaletteByDepth(this);
-		for (Surface* surface : _surfaces)
+		for (entt::entity surfaceEnt : _surfaces)
 		{
+			Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
 			surface->setPalette(_palette);
 		}
 	}
@@ -3831,20 +3834,22 @@ void BattlescapeState::resize(int &dX, int &dY)
 	_map->getCamera()->resize();
 	_map->getCamera()->jumpXY(dX/2, dY/2);
 
-	for (auto* surf : _surfaces)
+	for (entt::entity surfaceEnt : _surfaces)
 	{
-		if (surf == _btnCtrl || surf == _btnAlt || surf == _btnShift || surf == _btnRMB || surf == _btnMMB)
+		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+
+		if (surface == _btnCtrl || surface == _btnAlt || surface == _btnShift || surface == _btnRMB || surface == _btnMMB)
 		{
 			continue;
 		}
-		if (surf != _map && surf != _btnPsi && surf != _btnLaunch && surf != _btnSpecial && surf != _btnSkills && surf != _txtDebug)
+		if (surface != _map && surface != _btnPsi && surface != _btnLaunch && surface != _btnSpecial && surface != _btnSkills && surface != _txtDebug)
 		{
-			surf->setX(surf->getX() + dX / 2);
-			surf->setY(surf->getY() + dY);
+			surface->setX(surface->getX() + dX / 2);
+			surface->setY(surface->getY() + dY);
 		}
-		else if (surf != _map && surf != _txtDebug)
+		else if (surface != _map && surface != _txtDebug)
 		{
-			surf->setX(surf->getX() + dX);
+			surface->setX(surface->getX() + dX);
 		}
 	}
 
