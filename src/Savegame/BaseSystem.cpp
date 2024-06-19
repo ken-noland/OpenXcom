@@ -30,6 +30,19 @@ namespace OpenXcom::BaseSystem
 {
 
 /**
+ * @brief Gets the index of a given base in the registry by its id.
+ * @param registry the global entity registry
+ * @param baseId the base Id to search for
+ * @return the index of the base entity, or -1 if it is not found.
+*/
+static int getBaseIndex(const entt::registry& registry, entt::entity baseId)
+{
+	auto baseView = registry.view<Base>();
+	auto findIterator = std::find(baseView.begin(), baseView.end(), baseId);
+	return findIterator != baseView.end() ? std::distance(baseView.begin(), findIterator) : -1;
+}
+
+/**
  * Adds up the monthly maintenance of all the bases.
  * @return Total maintenance.
  */

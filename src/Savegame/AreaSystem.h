@@ -34,17 +34,17 @@ concept LocatableConcept = requires(T locatable) {
 namespace AreaSystem
 {
 	/// locates the first area entity that contains lat/long
-	template<typename AreaType>
+	template<typename Area>
 	[[nodiscard]] entt::entity locate(double lon, double lat);
 	/// locates the first area entity that contains locatable
-	template<typename AreaType, typename Locatable>
+	template<typename Area, typename Locatable>
 	[[nodiscard]] entt::entity locate(const Locatable& locatable);
 	/// locates the first area entity that contains lat/long
-	template<typename AreaType>
-	[[nodiscard]] AreaType* locateValue(double lon, double lat);
+	template<typename Area>
+	[[nodiscard]] Area* locateValue(double lon, double lat);
 	/// locates the first area entity that contains locatable
-	template<typename AreaType, typename Locatable>
-	[[nodiscard]] AreaType* locateValue(const Locatable& locatable);
+	template<typename Area, typename Locatable>
+	[[nodiscard]] Area* locateValue(const Locatable& locatable);
 
 	bool addAlienActivityToCountryAndRegion(int amount, double lon, double lat);
 
@@ -55,14 +55,14 @@ namespace AreaSystem
 	template<typename Locatable>
 	bool addXcomActivityToCountryAndRegion(int amount, const Locatable& locatable);
 
-	template<typename AreaType>
+	template<typename Area>
 	bool addAlienActivity(int amount, double lon, double lat);
-	template<typename AreaType, typename Locatable>
+	template<typename Area, typename Locatable>
 	bool addAlienActivity(int amount, const Locatable& locatable);
 
-	template<typename AreaType>
+	template<typename Area>
 	bool addXcomActivity(int amount, double lon, double lat);
-	template<typename AreaType, typename Locatable>
+	template<typename Area, typename Locatable>
 	bool addXcomActivity(int amoutn, const Locatable& locatable);
 }
 

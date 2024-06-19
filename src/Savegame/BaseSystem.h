@@ -24,6 +24,11 @@ namespace OpenXcom
 
 namespace BaseSystem
 {
+	// Gets the index of a given base entity.
+	[[nodiscard]] int getBaseIndex(const entt::registry& registry, entt::entity baseId);
+	// Adds up the cost of variable number of member functions for all bases.
+	template<typename... Funcs>
+	[[nodiscard]] static int64_t getBasesTotal(Funcs... funcs);
 	// Gets the total maintiance cost for all bases.
 	[[nodiscard]] int64_t getBasesMaintenanceCost();
 	// Gets if an item is in storage at any base.

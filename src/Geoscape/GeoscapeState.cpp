@@ -2273,7 +2273,7 @@ void GenerateSupplyMission::operator()(AlienBase *base) const
 						regionsWithXcomBases.push_back(region->getRules()->getType());
 					}
 				}
-				size_t randomIndex = RNG::generate(0, regionsWithXcomBases.size() - 1);
+				int randomIndex = RNG::generate(0, static_cast<int>(regionsWithXcomBases.size()) - 1);
 				targetRegion = regionsWithXcomBases[randomIndex];
 			}
 			else if (rule.hasRegionWeights())
