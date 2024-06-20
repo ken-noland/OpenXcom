@@ -435,13 +435,16 @@ set ( entity_common_src
   Entity/Common/Named.cpp
 )
 
-
 set ( entity_engine_src
   Entity/Engine/Surface.cpp
 )
 
 set ( entity_game_src
   Entity/Game/Base.cpp
+  Entity/Game/BaseFactory.cpp
+  Entity/Game/CountryFactory.cpp
+  Entity/Game/RegionFactory.cpp
+  Entity/Game/UfoFactory.cpp
 )
 
 set ( entity_interface_src

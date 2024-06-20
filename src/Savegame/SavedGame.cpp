@@ -75,6 +75,10 @@
 #include "../Mod/RuleSoldierTransformation.h"
 #include "../Mod/SoldierNamePool.h"
 #include "../version.h"
+#include "../Entity/Game/BaseFactory.h"
+#include "../Entity/Game/CountryFactory.h"
+#include "../Entity/Game/RegionFactory.h"
+#include "../Entity/Game/UfoFactory.h"
 
 namespace OpenXcom
 {
@@ -413,7 +417,7 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 		std::string type = (*i)["type"].as<std::string>();
 		if (mod->getRegion(type))
 		{
-			Region& region = getRegistry().createAndEmplace<Region>(mod->getRegion(type));
+			Region& region = entt::locator<RegionFactory>::value().create(*mod->getRegion(type).get<Region>();
 			region.load(*i);
 		}
 		else
@@ -462,7 +466,7 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 		std::string type = (*i)["type"].as<std::string>();
 		if (mod->getUfo(type))
 		{
-			Ufo& ufo = getRegistry().createAndEmplace<Ufo>(mod->getUfo(type), 0);
+			Ufo& ufo = entt::locator<UfoFactory>::value().create(*mod->getUfo(type), 0).get<Ufo>();
 			ufo.load(*i, mod->getScriptGlobal(), *mod, *this);
 			yamlAndUfoReferences.emplace_back(*i, ufo);
 		}
@@ -556,10 +560,8 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 	std::vector<std::pair<const YAML::Node&, Base&>> yamlAndBaseReferences;
 	for (YAML::const_iterator i = doc["bases"].begin(); i != doc["bases"].end(); ++i)
 	{
-		auto thing = (*i);
-		Base& base = getRegistry().createAndEmplace<Base>(mod);
+		Base& base = entt::locator<BaseFactory>::value().create(*mod).get<Base>();
 		base.load(*i, this, false);
-
 		yamlAndBaseReferences.emplace_back(*i, base);
 	}
 

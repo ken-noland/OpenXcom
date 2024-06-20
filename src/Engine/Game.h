@@ -86,7 +86,7 @@ private:
 
 
 	///TEMP!!!
-	entt::registry _registry;
+	entt::registry _tempRegistry;
 	SurfaceFactory _surfaceFactory;
 	InterfaceFactory _interfaceFactory;
 
@@ -208,7 +208,7 @@ public:
 
 
 	///TEMP!!!
-	entt::registry& getRegistry() { return _registry; }
+	entt::registry& getRegistryTemp() { return _tempRegistry; }
 	SurfaceFactory& getSurfaceFactory() { return _surfaceFactory; }
 	InterfaceFactory& getInterfaceFactory() { return _interfaceFactory; }
 };

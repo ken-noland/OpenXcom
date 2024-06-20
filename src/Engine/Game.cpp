@@ -17,37 +17,40 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Game.h"
-#include "../resource.h"
+#include <algorithm>
 #include <algorithm>
 #include <cmath>
-#include <sstream>
 #include <SDL_mixer.h>
-#include "State.h"
-#include "Screen.h"
-#include "Sound.h"
-#include "Music.h"
+#include <sstream>
+#include "Action.h"
+#include "CrossPlatform.h"
+#include "Exception.h"
+#include "FileMap.h"
 #include "Language.h"
 #include "Logger.h"
+#include "Music.h"
+#include "Options.h"
+#include "Screen.h"
+#include "Sound.h"
+#include "State.h"
+#include "Unicode.h"
+#include "../fallthrough.h"
+#include "../Entity/Game/BaseFactory.h"
+#include "../Entity/Game/CountryFactory.h"
+#include "../Entity/Game/RegionFactory.h"
+#include "../Entity/Game/UfoFactory.h"
+#include "../Geoscape/GeoscapeState.h"
 #include "../Interface/Cursor.h"
 #include "../Interface/FpsCounter.h"
-#include "../Mod/Mod.h"
-#include "../Mod/ModFile.h"
-#include "../Savegame/SavedGame.h"
-#include "../Savegame/SavedBattleGame.h"
-#include "Action.h"
-#include "Exception.h"
-#include "Options.h"
-#include "CrossPlatform.h"
-#include "FileMap.h"
-#include "Unicode.h"
-#include "../Ufopaedia/UfopaediaStartState.h"
+#include "../Lua/LuaMod.h"
 #include "../Menu/NotesState.h"
 #include "../Menu/TestState.h"
-#include <algorithm>
-#include "../fallthrough.h"
-#include "../Geoscape/GeoscapeState.h"
-
-#include "../Lua/LuaMod.h"
+#include "../Mod/Mod.h"
+#include "../Mod/ModFile.h"
+#include "../resource.h"
+#include "../Savegame/SavedBattleGame.h"
+#include "../Savegame/SavedGame.h"
+#include "../Ufopaedia/UfopaediaStartState.h"
 
 //temp
 #include "../Lua/UIScript.h"
@@ -85,7 +88,7 @@ Game::Game(const std::string &title)
 	  _ctrl(false), _alt(false), _shift(false), _rmb(false), _mmb(false), _luaMod(nullptr)
 
 	///TEMP
-	, _surfaceFactory(_registry), _interfaceFactory(_registry, _surfaceFactory)
+	, _surfaceFactory(_tempRegistry), _interfaceFactory(_tempRegistry, _surfaceFactory)
 {
 	setThreadLocalGame(this);
 
@@ -135,6 +138,12 @@ Game::Game(const std::string &title)
 	_lang = new Language();
 
 	_timeOfLastFrame = 0;
+
+	// ToDo: move this to seperate method
+	entt::locator<BaseFactory>::emplace<BaseFactory>(_registry.raw());
+	entt::locator<CountryFactory>::emplace<CountryFactory>(_registry.raw());
+	entt::locator<RegionFactory>::emplace<RegionFactory>(_registry.raw());
+	entt::locator<UfoFactory>::emplace<UfoFactory>(_registry.raw());
 }
 
 /**
@@ -162,6 +171,16 @@ Game::~Game()
 	Mix_CloseAudio();
 
 	SDL_Quit();
+}
+
+namespace
+{
+	void registerFactories(entt::registry registry)
+	{
+		registry.emplace<BaseFactory>(registry.create());
+
+	}
+
 }
 
 /**
