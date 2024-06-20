@@ -99,7 +99,7 @@ namespace OpenXcom
  * Initializes all the elements in the Battlescape screen.
  * @param game Pointer to the core game.
  */
-BattlescapeState::BattlescapeState() : State("BattlescapeState"),
+BattlescapeState::BattlescapeState() : State("BattlescapeState")
 {
 	_save = getGame()->getSavedGame()->getSavedBattle();
 

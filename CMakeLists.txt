@@ -235,4 +235,3 @@ endif ()
 
 add_subdirectory ( docs )
 add_subdirectory ( src )
-add_subdirectory ( deps/entt )
