@@ -945,7 +945,7 @@ void GeoscapeState::time5Seconds()
 	}
 
 	// Game over if there are no more bases.
-	if (getRegistry().empty<Base>() == 0)
+	if (getRegistry().empty<Base>())
 	{
 		getGame()->getSavedGame()->setEnding(END_LOSE);
 	}
