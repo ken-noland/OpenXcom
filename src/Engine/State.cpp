@@ -138,7 +138,9 @@ void State::setWindowBackground(entt::entity window, const std::string& s)
 void State::setWindowBackgroundImage(entt::entity window, const std::string& bgImageName)
 {
 	const auto* bgImage = getGame()->getMod()->getSurface(bgImageName);
-	//window->setBackground(bgImage);
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(window);
+	windowComponent.setBackground(bgImage);
 }
 
 /**
