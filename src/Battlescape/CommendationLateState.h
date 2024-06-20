@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class Soldier;
@@ -35,7 +35,7 @@ class CommendationLateState : public State
 {
 private:
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextList *_lstSoldiers;
 	std::vector<std::string> _commendationsNames;

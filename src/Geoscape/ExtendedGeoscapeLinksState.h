@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class GeoscapeState;
 
@@ -36,7 +36,7 @@ private:
 	TextButton *_btnOk;
 	TextButton *_btnFunding, *_btnTechTree, *_btnGlobalResearch, *_btnGlobalProduction, *_btnUfoTracker, *_btnPilotExp, *_btnNotes, *_btnMusic;
 	TextButton *_btnTest;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	GeoscapeState *_parent;
 public:

@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class ComboBox;
@@ -44,7 +44,7 @@ private:
 	static constexpr int noCol = 4;	//Name Rank AI-Control Aggresiveness
 
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtName, *_txtRank;
 	Text *_txtControlled, *_txtAgressiveness;
 	TextList *_lstUnits;

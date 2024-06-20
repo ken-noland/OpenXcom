@@ -35,7 +35,7 @@ namespace OpenXcom
 {
 
 CutsceneState::CutsceneState(const std::string &cutsceneId)
-	: State("CutsceneState"), _cutsceneId(cutsceneId)
+	: State("CutsceneState", true), _cutsceneId(cutsceneId)
 {
 	// empty
 }

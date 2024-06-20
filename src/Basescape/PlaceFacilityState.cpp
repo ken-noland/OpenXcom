@@ -47,13 +47,13 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param rule Pointer to the facility ruleset to build.
  */
-PlaceFacilityState::PlaceFacilityState(Base *base, const RuleBaseFacility *rule, BaseFacility *origFac) : State("PlaceFacilityState"), 
-	_base(base), _rule(rule), _origFac(origFac)
+PlaceFacilityState::PlaceFacilityState(Base *base, const RuleBaseFacility *rule, BaseFacility *origFac)
+	: State("PlaceFacilityState", false), _base(base), _rule(rule), _origFac(origFac)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 128, 160, 192, 40);
+	_window = factory.createWindow("placeFacility", this, 128, 160, 192, 40);
 	_view = new BaseView(192, 192, 0, 8);
 	_btnCancel = new TextButton(112, 16, 200, 176);
 	_txtFacility = new Text(110, 9, 202, 50);

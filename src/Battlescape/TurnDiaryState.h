@@ -22,7 +22,7 @@
 namespace OpenXcom
 {
 
-class Window;
+
 class Text;
 class TextButton;
 class TextList;
@@ -34,7 +34,7 @@ class HitLog;
 class TurnDiaryState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextButton *_btnCancel;
 	TextList *_lstTurnDiary;

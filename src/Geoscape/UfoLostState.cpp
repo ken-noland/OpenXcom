@@ -32,12 +32,13 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param id Name of the UFO.
  */
-UfoLostState::UfoLostState(const std::string& id) : State("UfoLostState"), _id(id)
+UfoLostState::UfoLostState(const std::string& id)
+	: State("UfoLostState", false), _id(id)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 192, 104, 32, 48, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 192, 104, 32, 48, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(60, 12, 98, 112);
 	_txtTitle = new Text(160, 32, 48, 72);
 

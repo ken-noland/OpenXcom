@@ -29,7 +29,7 @@ class Text;
 class TextButton;
 class TextEdit;
 class TextList;
-class Window;
+
 
 /// Transformation sorting modes.
 enum TransformationSort
@@ -59,7 +59,7 @@ private:
 
 	TextButton *_btnCancel;
 	TextEdit *_btnQuickSearch;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtType;
 	TextList *_lstTransformations;
 	ArrowButton *_sortName;

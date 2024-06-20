@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TransferItemsState;
 class Base;
@@ -35,7 +35,7 @@ class TransferConfirmState : public State
 {
 private:
 	TextButton *_btnCancel, *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtCost, *_txtTotal;
 	Base *_base;
 	TransferItemsState *_state;

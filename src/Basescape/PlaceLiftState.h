@@ -27,7 +27,6 @@ class BaseView;
 class MiniBaseView;
 class Text;
 class TextList;
-class Window;
 class Globe;
 class RuleBaseFacility;
 
@@ -46,7 +45,7 @@ private:
 	RuleBaseFacility *_lift;
 
 	std::vector<RuleBaseFacility*> _accessLifts;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtHeader;
 	TextList *_lstAccessLifts;
 public:

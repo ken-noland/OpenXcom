@@ -37,7 +37,7 @@
 #include "ConfirmCydoniaState.h"
 #include "../Engine/Options.h"
 
-#include "../Entities/Engine/Surface.h"
+#include "../Entity/Engine/Surface.h"
 
 namespace OpenXcom
 {
@@ -48,11 +48,11 @@ namespace OpenXcom
  * @param craft Pointer to the craft to target.
  * @param globe Pointer to the Geoscape globe.
  */
-SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe* globe) : State("SelectDestinationState"), _crafts(std::move(crafts)), _globe(globe)
+SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe* globe)
+	: State("SelectDestinationState", false), _crafts(std::move(crafts)), _globe(globe)
 {
 	int dx = getGame()->getScreen()->getDX();
 	int dy = getGame()->getScreen()->getDY();
-	_screen = false;
 
 	// Create objects
 	_btnRotateLeft = new InteractiveSurface(12, 10, 259 + dx * 2, 176 + dy);
@@ -62,9 +62,15 @@ SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe
 	_btnZoomIn = new InteractiveSurface(23, 23, 295 + dx * 2, 156 + dy);
 	_btnZoomOut = new InteractiveSurface(13, 17, 300 + dx * 2, 182 + dy);
 
-	_window = new Window(this, 256, 28, 0, 0);
-	_window->setX(dx);
-	_window->setDY(0);
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
+	_window = factory.createWindow("windowName", this, 256, 28, 0, 0);
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+
+	windowSurface->setX(dx);
+	windowComponent.setDY(0);
 	_btnCancel = new TextButton(60, 12, 110 + dx, 8);
 	_btnCydonia = new TextButton(60, 12, 180 + dx, 8);
 	_txtTitle = new Text(100, 16, 10 + dx, 6);
@@ -369,10 +375,12 @@ void SelectDestinationState::resize(int &dX, int &dY)
 {
 	for (const entt::entity& surfaceEntity : _surfaces)
 	{
-		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEntity).getSurface();
+		if (surfaceEntity == _window) { continue; }
+
+		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEntity).getSurface();
 
 		surface->setX(surface->getX() + dX / 2);
-		if (surface != _window && surface != _btnCancel && surface != _txtTitle && surface != _btnCydonia)
+		if (surface != _btnCancel && surface != _txtTitle && surface != _btnCydonia)
 		{
 			surface->setY(surface->getY() + dY / 2);
 		}

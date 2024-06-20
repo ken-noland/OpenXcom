@@ -36,12 +36,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-TransfersState::TransfersState(Base* base) : State("TransfersState"), _base(base)
+TransfersState::TransfersState(Base* base) : State("TransfersState", true), _base(base)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 320, 184, 0, 8, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 320, 184, 0, 8, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(288, 16, 16, 166);
 	_txtTitle = new Text(278, 17, 21, 18);
 	_txtItem = new Text(114, 9, 16, 34);

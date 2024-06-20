@@ -50,13 +50,13 @@ namespace OpenXcom
  * @param base Pointer to base to show contained crafts (NULL to show all crafts).
  * @param target Pointer to target to intercept (NULL to ask user for target).
  */
-InterceptState::InterceptState(Globe* globe, bool useCustomSound, Base* base, Target* target) : State("InterceptState"), _globe(globe), _base(base), _target(target)
+InterceptState::InterceptState(Globe* globe, bool useCustomSound, Base* base, Target* target)
+	: State("InterceptState", false), _globe(globe), _base(base), _target(target)
 {
 	const int WIDTH_CRAFT = 72;
 	const int WIDTH_STATUS = 94;
 	const int WIDTH_BASE = 74;
 	const int WIDTH_WEAPONS = 48;
-	_screen = false;
 
 	if (useCustomSound)
 	{
@@ -68,10 +68,12 @@ InterceptState::InterceptState(Globe* globe, bool useCustomSound, Base* base, Ta
 		}
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
 	if (Options::oxceInterceptGuiMaintenanceTime > 0)
 	{
-		_window = new Window(this, 320, 140, 0, 30, POPUP_HORIZONTAL);
+		_window = factory.createWindow("windowName", this, 320, 140, 0, 30, WindowPopup::POPUP_HORIZONTAL);
 		_btnCancel = new TextButton(_base ? 142 : 288, 16, 16, 146);
 		_btnGotoBase = new TextButton(142, 16, 162, 146);
 		_txtTitle = new Text(300, 17, 10, 46);
@@ -87,7 +89,7 @@ InterceptState::InterceptState(Globe* globe, bool useCustomSound, Base* base, Ta
 	}
 	else
 	{
-		_window = new Window(this, 320, 140, 0, 30, POPUP_HORIZONTAL);
+		_window = factory.createWindow("windowName", this, 320, 140, 0, 30, WindowPopup::POPUP_HORIZONTAL);
 		_btnCancel = new TextButton(_base ? 142 : 288, 16, 16, 146);
 		_btnGotoBase = new TextButton(142, 16, 162, 146);
 		_txtTitle = new Text(300, 17, 10, 46);

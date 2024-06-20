@@ -38,10 +38,12 @@ namespace OpenXcom
  * Initializes all the elements in the Difficulty window.
  * @param game Pointer to the core game.
  */
-NewGameState::NewGameState() : State("NewGameState")
+NewGameState::NewGameState() : State("NewGameState", true)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 192, 180, 64, 10, POPUP_VERTICAL);
+	_window = factory.createWindow("windowName", this, 192, 180, 64, 10, WindowPopup::POPUP_VERTICAL);
 	_btnBeginner = new TextButton(160, 18, 80, 32);
 	_btnExperienced = new TextButton(160, 18, 80, 52);
 	_btnVeteran = new TextButton(160, 18, 80, 72);

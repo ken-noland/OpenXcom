@@ -24,7 +24,7 @@
 namespace OpenXcom
 {
 
-class Window;
+
 class TextButton;
 class Text;
 class ComboBox;
@@ -55,7 +55,7 @@ struct PaletteTestMetadata {
 class TestState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	TextButton *_btnRun, *_btnCancel;
 	Text *_txtPalette;
 	Text *_txtTitle, *_txtTestCase, *_txtDescription;

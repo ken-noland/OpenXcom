@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class Base;
@@ -40,7 +40,7 @@ class InterceptState : public State
 {
 private:
 	TextButton *_btnCancel, *_btnGotoBase;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtCraft, *_txtStatus, *_txtBase, *_txtWeapons;
 	TextList *_lstCrafts;
 	Globe *_globe;

@@ -50,7 +50,8 @@ namespace OpenXcom
  * @param ufo Pointer to the attacking ufo.
  * @param state Pointer to the Geoscape.
  */
-BaseDefenseState::BaseDefenseState(Base* base, Ufo* ufo, GeoscapeState* state) : State("BaseDefenseState"), _state(state)
+BaseDefenseState::BaseDefenseState(Base* base, Ufo* ufo, GeoscapeState* state)
+	: State("BaseDefenseState", true), _state(state)
 {
 	_base = base;
 	_action = BDA_NONE;
@@ -59,8 +60,11 @@ BaseDefenseState::BaseDefenseState(Base* base, Ufo* ufo, GeoscapeState* state) :
 	_attacks = 0;
 	_thinkcycles = 0;
 	_ufo = ufo;
+
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_txtTitle = new Text(300, 17, 16, 6);
 	_txtInit = new Text(300, 10, 16, 24);
 	_lstDefenses = new TextList(300, 128, 16, 40);

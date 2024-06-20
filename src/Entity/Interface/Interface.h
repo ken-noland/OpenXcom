@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <entt/entt.hpp>
+#include "Window.h"
 #include "../Engine/Surface.h"
 
 //temp includes
@@ -70,7 +71,7 @@ public:
 	entt::entity createTextEdit(const std::string& name, State* state, int width, int height, int x = 0, int y = 0);
 	entt::entity createTextList(const std::string& name, int width, int height, int x = 0, int y = 0);
 	entt::entity createToggleTextButton(const std::string& name, int width, int height, int x, int y);
-	entt::entity createWindow(const std::string& name, State* state, int width, int height, int x = 0, int y = 0, WindowPopup popup = POPUP_NONE);
+	entt::entity createWindow(const std::string& name, State* state, int width, int height, int x = 0, int y = 0, WindowPopup popup = WindowPopup::POPUP_NONE);
 };
 
 } // namespace OpenXcom

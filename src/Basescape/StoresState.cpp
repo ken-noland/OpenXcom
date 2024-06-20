@@ -85,10 +85,12 @@ struct compareItemSpaceUsed
  * Initializes all the elements in the Stores window.
  * @param base Pointer to the base to get info from.
  */
-StoresState::StoresState(Base* base) : State("StoresState"), _base(base)
+StoresState::StoresState(Base* base) : State("StoresState", true), _base(base)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("storesInfo", this, 320, 200, 0, 0);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 10, 20);
 	_btnOk = new TextButton(148, 16, 164, 176);
 	_btnGrandTotal = new ToggleTextButton(148, 16, 8, 176);

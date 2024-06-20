@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Craft;
 class Globe;
@@ -42,7 +42,7 @@ private:
 	Waypoint *_waypoint;
 
 	TextButton *_btnBase, *_btnTarget, *_btnPatrol, *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtStatus, *_txtBase, *_txtSpeed, *_txtMaxSpeed, *_txtAltitude, *_txtFuel;
 	Text *_txtSoldier, *_txtHWP, *_txtShield, *_txtDamage;
 	Text *_txtWeaponName[RuleCraft::WeaponMax], *_txtWeaponAmmo[RuleCraft::WeaponMax];

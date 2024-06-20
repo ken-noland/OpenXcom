@@ -26,7 +26,7 @@ class Base;
 class Globe;
 class InteractiveSurface;
 class Timer;
-class Window;
+
 class Text;
 class TextButton;
 
@@ -40,7 +40,7 @@ private:
 	Base *_base;
 	Globe *_globe;
 	InteractiveSurface *_btnRotateLeft, *_btnRotateRight, *_btnRotateUp, *_btnRotateDown, *_btnZoomIn, *_btnZoomOut;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextButton *_btnCancel;
 	Timer *_hoverTimer;

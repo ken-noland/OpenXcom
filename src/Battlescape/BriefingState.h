@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Craft;
 class Base;
@@ -37,7 +37,7 @@ class BriefingState : public State
 {
 private:
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtTarget, *_txtCraft, *_txtBriefing;
 	std::string _cutsceneId, _musicId;
 	bool _infoOnly;

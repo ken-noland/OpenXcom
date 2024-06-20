@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Craft;
 
@@ -37,7 +37,7 @@ class DogfightErrorState : public State
 private:
 	Craft *_craft;
 	TextButton *_btnIntercept, *_btnBase;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtCraft, *_txtMessage;
 public:
 	/// Creates the Craft Error state.

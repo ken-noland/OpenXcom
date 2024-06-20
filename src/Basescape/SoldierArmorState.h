@@ -31,7 +31,7 @@ enum SoldierArmorOrigin
 
 class Base;
 class TextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class TextList;
@@ -68,7 +68,7 @@ private:
 	SoldierArmorOrigin _origin;
 	TextButton *_btnCancel;
 	TextEdit *_btnQuickSearch;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtType, *_txtQuantity;
 	TextList *_lstArmor;
 	ArrowButton *_sortName;

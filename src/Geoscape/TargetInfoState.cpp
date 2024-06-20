@@ -42,12 +42,13 @@ namespace OpenXcom
  * @param target Pointer to the target to show info from.
  * @param globe Pointer to the Geoscape globe.
  */
-TargetInfoState::TargetInfoState(Target* target, Globe* globe) : State("TargetInfoState"), _target(target), _globe(globe), _deploymentRule(0)
+TargetInfoState::TargetInfoState(Target* target, Globe* globe)
+	: State("TargetInfoState", false), _target(target), _globe(globe), _deploymentRule(0)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 192, 120, 32, 40, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 192, 120, 32, 40, WindowPopup::POPUP_BOTH);
 	_btnIntercept = new TextButton(160, 12, 48, 124);
 	_btnInfo = new TextButton(77, 12, 48, 140);
 	_btnOk = new TextButton(77, 12, 131, 140);

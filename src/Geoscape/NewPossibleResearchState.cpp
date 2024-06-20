@@ -38,12 +38,12 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param possibilities List of newly possible ResearchProject
  */
-NewPossibleResearchState::NewPossibleResearchState(Base* base, const std::vector<RuleResearch*>& possibilities) : State("NewPossibleResearchState"), _base(base)
+NewPossibleResearchState::NewPossibleResearchState(Base* base, const std::vector<RuleResearch*>& possibilities) : State("NewPossibleResearchState", false), _base(base)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 288, 180, 16, 10);
+	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);
 	_btnOk = new TextButton(160, 14, 80, 149);
 	_btnResearch = new TextButton(160, 14, 80, 165);
 	_txtTitle = new Text(288, 40, 16, 20);

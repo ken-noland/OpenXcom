@@ -427,6 +427,24 @@ set ( lua_src
   Lua/UIScript.cpp
 )
 
+set ( entity_common_src
+  Entity/Common/Named.cpp
+)
+
+
+set ( entity_engine_src
+  Entity/Engine/Surface.cpp
+)
+
+set ( entity_game_src
+  Entity/Game/Base.cpp
+)
+
+set ( entity_interface_src
+  Entity/Interface/Interface.cpp
+  Entity/Interface/Window.cpp
+)
+
 set ( cxx_src
     ${root_src}
     ${basescape_src}
@@ -439,6 +457,10 @@ set ( cxx_src
     ${savegame_src}
     ${ufopedia_src}
     ${lua_src}
+    ${entity_common_src}
+    ${entity_engine_src}
+    ${entity_game_src}
+    ${entity_interface_src}
 )
 
 set ( c_src
@@ -742,17 +764,5 @@ endif ()
 
 #Setup source groups for IDE
 if ( MSVC OR "${CMAKE_GENERATOR}" STREQUAL "Xcode" )
-  source_group ( "Basescape" FILES ${basescape_src} )
-  source_group ( "Battlescape" FILES ${battlescape_src} )
-  source_group ( "Engine" FILES ${engine_src} )
-  source_group ( "Geoscape" FILES ${geoscape_src} )
-  source_group ( "Interface" FILES ${interface_src} )
-  source_group ( "Menu" FILES ${menu_src} )
-  source_group ( "Mod" FILES ${mod_src} )
-  source_group ( "Savegame" FILES ${savegame_src} )
-  source_group ( "Ufopedia" FILES ${ufopedia_src} )
-  source_group ( "Lua" FILES ${lua_src} )
-  if ( APPLE )
-    source_group ( "SDL" FILES ${sdl_src} )
-  endif ()
+  source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${cxx_src})
 endif ()

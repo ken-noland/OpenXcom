@@ -52,12 +52,13 @@ struct compareTransformationName
  * @param base Pointer to the base to get info from.
  * @param soldier ID of the selected soldier.
  */
-SoldierTransformState::SoldierTransformState(Base* base, size_t soldier) : State("SoldierTransformState"), _base(base), _soldier(soldier)
+SoldierTransformState::SoldierTransformState(Base* base, size_t soldier)
+	: State("SoldierTransformState", false), _base(base), _soldier(soldier)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 192, 160, 64, 20, POPUP_BOTH);
+	_window = factory.createWindow("soldierTransform", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 80, 43);
 	_btnCancel = new TextButton(140, 16, 90, 156);
 	_txtTitle = new Text(182, 16, 69, 28);
@@ -93,9 +94,9 @@ SoldierTransformState::SoldierTransformState(Base* base, size_t soldier) : State
 
 	_lstTransformations->setColumns(1, 153);
 	_lstTransformations->setSelectable(true);
-	_lstTransformations->setBackground(_window);
 	_lstTransformations->setMargin(8);
-
+	_lstTransformations->setBackground(_window);
+		
 	_sortName->setX(_sortName->getX() + _txtType->getTextWidth() + 4);
 	_sortName->onMouseClick((ActionHandler)&SoldierTransformState::sortNameClick);
 

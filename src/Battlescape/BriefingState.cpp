@@ -53,15 +53,16 @@ namespace OpenXcom
  * @param infoOnly Only show static info, when briefing is re-opened during the battle.
  * @param customBriefing Pointer to a custom briefing (used for Reinforcements notification).
  */
-BriefingState::BriefingState(Craft* craft, Base* base, bool infoOnly, BriefingData* customBriefing) : State("BriefingState"), _infoOnly(infoOnly), _disableCutsceneAndMusic(false)
+BriefingState::BriefingState(Craft* craft, Base* base, bool infoOnly, BriefingData* customBriefing) : State("BriefingState", true), _infoOnly(infoOnly), _disableCutsceneAndMusic(false)
 {
 	Options::baseXResolution = Options::baseXGeoscape;
 	Options::baseYResolution = Options::baseYGeoscape;
 	getGame()->getScreen()->resetDisplay(false);
 
-	_screen = true;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(120, 18, 100, 164);
 	_txtTitle = new Text(300, 32, 16, 24);
 	_txtTarget = new Text(300, 17, 16, 40);
@@ -89,17 +90,19 @@ BriefingState::BriefingState(Craft* craft, Base* base, bool infoOnly, BriefingDa
 
 	std::string title = mission;
 	std::string desc = title + "_BRIEFING";
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
 	if (!deployment && !customBriefing) // none defined - should never happen, but better safe than sorry i guess.
 	{
 		setStandardPalette("PAL_GEOSCAPE", 0);
 		_musicId = "GMDEFEND";
-		_window->setBackground(getGame()->getMod()->getSurface("BACK16.SCR"));
+		windowComponent.setBackground(getGame()->getMod()->getSurface("BACK16.SCR"));
 	}
 	else
 	{
 		BriefingData data = customBriefing ? *customBriefing : deployment->getBriefingData();
 		setStandardPalette("PAL_GEOSCAPE", data.palette);
-		_window->setBackground(getGame()->getMod()->getSurface(data.background));
+		windowComponent.setBackground(getGame()->getMod()->getSurface(data.background));
 		_txtCraft->setY(56 + data.textOffset);
 		_txtBriefing->setY(72 + data.textOffset);
 		_txtTarget->setVisible(data.showTarget);

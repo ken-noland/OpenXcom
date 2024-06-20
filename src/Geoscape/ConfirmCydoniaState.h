@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class Craft;
-class Window;
+
 class Text;
 class TextButton;
 
@@ -34,7 +34,7 @@ class TextButton;
 class ConfirmCydoniaState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Text *_txtMessage;
 	TextButton *_btnNo, *_btnYes;
 	Craft *_craft;

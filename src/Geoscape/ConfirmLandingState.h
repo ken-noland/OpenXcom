@@ -22,7 +22,7 @@
 namespace OpenXcom
 {
 
-class Window;
+
 class Text;
 class TextButton;
 class Craft;
@@ -37,7 +37,7 @@ class ConfirmLandingState : public State
 {
 private:
 	Craft *_craft;
-	Window *_window;
+	entt::entity _window;
 	Texture *_missionTexture, *_globeTexture;
 	int _shade;
 	Text *_txtMessage, *_txtBegin;

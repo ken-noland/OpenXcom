@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 
 /**
@@ -35,7 +35,7 @@ class UfoLostState : public State
 {
 private:
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	std::string _id;
 public:

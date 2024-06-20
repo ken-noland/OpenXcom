@@ -85,8 +85,8 @@ namespace OpenXcom
  * Initializes all the elements in the Debriefing screen.
  * @param game Pointer to the core game.
  */
-DebriefingState::DebriefingState() : State("DebriefingState"),
-	_eventToSpawn(nullptr), _region(0), _country(0),
+DebriefingState::DebriefingState()
+	: State("DebriefingState", true), _eventToSpawn(nullptr), _region(0), _country(0),
 	_positiveScore(true), _destroyBase(false), _promotions(false), _showSellButton(true), _initDone(false),
 	_pageNumber(0)
 {
@@ -100,8 +100,10 @@ DebriefingState::DebriefingState() : State("DebriefingState"),
 	getGame()->getCursor()->setVisible(true);
 	_limitsEnforced = Options::storageLimitsEnforced ? 1 : 0;
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(40, 12, 16, 180);
 	_btnStats = new TextButton(60, 12, 244, 180);
 	_btnSell = new TextButton(60, 12, 176, 180);

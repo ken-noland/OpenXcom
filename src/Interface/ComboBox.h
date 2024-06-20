@@ -26,7 +26,7 @@ namespace OpenXcom
 
 class TextButton;
 class TextList;
-class Window;
+
 class Language;
 
 /**
@@ -44,7 +44,7 @@ private:
 
 	TextButton *_button;
 	Surface *_arrow;
-	Window *_window;
+	entt::entity _window;
 	TextList *_list;
 
 	ActionHandler _change;

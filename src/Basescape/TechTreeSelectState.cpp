@@ -40,11 +40,11 @@ namespace OpenXcom
  * Initializes all the elements on the UI.
  * @param parent Pointer to parent state.
  */
-TechTreeSelectState::TechTreeSelectState(TechTreeViewerState* parent) : State("TechTreeSelectState"), _parent(parent)
+TechTreeSelectState::TechTreeSelectState(TechTreeViewerState* parent) : State("TechTreeSelectState", false), _parent(parent)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
-	_window = new Window(this, 230, 140, 45, 32);
+	_window = factory.createWindow("techTreeSelect", this, 230, 140, 45, 32);
 	_btnQuickSearch = new TextEdit(this, 198, 9, 53, 52);
 	_txtTitle = new Text(182, 9, 53, 42);
 	_lstTopics = new TextList(198, 80, 53, 62);

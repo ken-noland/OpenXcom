@@ -36,12 +36,12 @@ namespace OpenXcom
  * Initializes all the elements in the ExtendedInventoryLinksState screen.
  */
 ExtendedInventoryLinksState::ExtendedInventoryLinksState(InventoryState* parent, SavedBattleGame* save, bool inBase, bool beforeMission)
-	: State("ExtendedInventoryLinksState"), _parent(parent), _save(save)
+	: State("ExtendedInventoryLinksState", false), _parent(parent), _save(save)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, inBase ? 180 : 180-14, 32, inBase ? 10 : 10+14, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, inBase ? 180 : 180 - 14, 32, inBase ? 10 : 10 + 14, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(220, 17, 50, inBase ? 33 : 33+23);
 	if (Options::oxceFatFingerLinks)
 	{

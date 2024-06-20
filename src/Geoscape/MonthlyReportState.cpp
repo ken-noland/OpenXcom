@@ -51,12 +51,15 @@ namespace OpenXcom
  * @param globe Pointer to the globe.
  */
 MonthlyReportState::MonthlyReportState(Globe* globe)
-	: State("MonthlyReportState"), _gameOver(0), _ratingTotal(0), _fundingDiff(0),
+	: State("MonthlyReportState", true), _gameOver(0), _ratingTotal(0), _fundingDiff(0),
 	_lastMonthsRating(0), _happyList(0), _sadList(0), _pactList(0), _cancelPactList(0)
 {
 	_globe = globe;
+
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(50, 12, 135, 180);
 	_btnBigOk = new TextButton(120, 18, 100, 174);
 	_txtTitle = new Text(300, 17, 16, 8);
@@ -412,7 +415,9 @@ void MonthlyReportState::btnOkClick(Action*)
 		}
 		else
 		{
-			_window->setColor(getGame()->getMod()->getInterface("monthlyReport")->getElement("window")->color2);
+			WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+			windowComponent.setColor(getGame()->getMod()->getInterface("monthlyReport")->getElement("window")->color2);
+
 			_txtTitle->setVisible(false);
 			_txtMonth->setVisible(false);
 			_txtRating->setVisible(false);

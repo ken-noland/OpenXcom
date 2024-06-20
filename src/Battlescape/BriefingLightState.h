@@ -24,7 +24,7 @@ namespace OpenXcom
 
 class TextButton;
 class ToggleTextButton;
-class Window;
+
 class Text;
 class TextList;
 class AlienDeployment;
@@ -38,7 +38,7 @@ class BriefingLightState : public State
 private:
 	TextButton *_btnOk;
 	ToggleTextButton *_btnArmors;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtBriefing, *_txtArmors;
 	TextList* _lstArmors;
 	std::vector<std::pair<std::string, std::string> > _armorNameList;

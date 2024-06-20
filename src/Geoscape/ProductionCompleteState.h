@@ -27,7 +27,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class Base;
@@ -47,7 +47,7 @@ private:
 	std::vector<std::string> _index;
 
 	TextButton *_btnOk, *_btnGotoBase, *_btnSummary;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtMessage, *_txtItem, *_txtQuantity;
 	TextList *_lstSummary;
 	productionProgress_e _endType;

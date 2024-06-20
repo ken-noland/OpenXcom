@@ -27,7 +27,6 @@ class Base;
 class RuleItem;
 class TextButton;
 class ToggleTextButton;
-class Window;
 class Text;
 class TextEdit;
 class TextList;
@@ -72,7 +71,7 @@ private:
 	TextButton *_btnOk;
 	TextEdit *_btnQuickSearch;
 	ToggleTextButton *_btnGrandTotal;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtItem, *_txtQuantity, *_txtSize, *_txtSpaceUsed;
 	TextList *_lstStores;
 	ArrowButton *_sortName, *_sortQuantity, *_sortSize, *_sortSpaceUsed;

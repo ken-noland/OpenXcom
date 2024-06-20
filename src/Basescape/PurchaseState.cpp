@@ -75,7 +75,7 @@ inline constexpr auto allOf(Functions... funcs)
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-PurchaseState::PurchaseState(Base* base, CannotReequipState* parent) : State("PurchaseState"), 
+PurchaseState::PurchaseState(Base* base, CannotReequipState* parent) : State("PurchaseState", true), 
 	_base(base), _parent(parent), _sel(0), _total(0), _pQty(0), _iQty(0.0), _ammoColor(0)
 {
 	_autoBuyDone = false;
@@ -94,8 +94,10 @@ PurchaseState::PurchaseState(Base* base, CannotReequipState* parent) : State("Pu
 		}
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("buyMenu", this, 320, 200, 0, 0);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 10, 13);
 	_btnOk = new TextButton(148, 16, 8, 176);
 	_btnCancel = new TextButton(148, 16, 164, 176);
@@ -164,6 +166,7 @@ PurchaseState::PurchaseState(Base* base, CannotReequipState* parent) : State("Pu
 	_lstItems->setAlign(ALIGN_RIGHT, 3);
 	_lstItems->setSelectable(true);
 	_lstItems->setBackground(_window);
+
 	_lstItems->setMargin(2);
 	_lstItems->onLeftArrowPress((ActionHandler)&PurchaseState::lstItemsLeftArrowPress);
 	_lstItems->onLeftArrowRelease((ActionHandler)&PurchaseState::lstItemsLeftArrowRelease);

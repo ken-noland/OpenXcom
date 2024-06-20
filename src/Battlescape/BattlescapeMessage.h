@@ -23,7 +23,7 @@
 namespace OpenXcom
 {
 
-class Window;
+
 class Text;
 class Font;
 class ProgressBar;
@@ -38,7 +38,7 @@ private:
 	static const int HORIZONTAL_OFFSET;
 	static const int VERTICAL_OFFSET;
 
-	Window *_window;
+	entt::entity _window;
 	Text *_text;
 	Text *_txtThinking;
 	ProgressBar *_progressBar;

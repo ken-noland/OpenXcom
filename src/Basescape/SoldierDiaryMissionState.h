@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class Soldier;
@@ -38,7 +38,7 @@ private:
 	Soldier *_soldier;
 
 	TextButton *_btnOk, *_btnPrev, *_btnNext;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtUFO, *_txtScore, *_txtKills, *_txtLocation, *_txtRace, *_txtDaylight, *_txtDaysWounded;
 	Text *_txtNoRecord;
 	TextList *_lstKills;

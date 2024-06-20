@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 	class Game;
 	class Action;
-	class Window;
+	
 	class Text;
 	class TextEdit;
 	class TextButton;
@@ -44,7 +44,7 @@ namespace OpenXcom
 		void init() override;
 	protected:
 		std::string _section;
-		Window *_window;
+		entt::entity _window;
 		TextEdit *_btnQuickSearch;
 		Text *_txtTitle;
 		TextButton *_btnOk;

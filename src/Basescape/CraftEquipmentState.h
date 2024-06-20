@@ -26,7 +26,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class TextList;
@@ -43,7 +43,7 @@ class CraftEquipmentState : public State
 private:
 	TextButton *_btnOk, *_btnClear, *_btnInventory;
 	TextEdit *_btnQuickSearch;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtItem, *_txtStores, *_txtAvailable, *_txtUsed, *_txtCrew;
 	std::vector<std::string> _categoryStrings;
 	std::map<std::string, bool> _usedCategoryStrings;

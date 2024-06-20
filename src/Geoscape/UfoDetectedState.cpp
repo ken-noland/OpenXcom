@@ -47,7 +47,8 @@ namespace OpenXcom
  * @param detected Was the UFO detected?
  * @param hyperwave Was it a hyperwave radar?
  */
-UfoDetectedState::UfoDetectedState(Ufo* ufo, GeoscapeState* state, bool detected, bool hyperwave) : State("UfoDetectedState"), _ufo(ufo), _state(state)
+UfoDetectedState::UfoDetectedState(Ufo* ufo, GeoscapeState* state, bool detected, bool hyperwave)
+	: State("UfoDetectedState", false), _ufo(ufo), _state(state)
 {
 	// Generate UFO ID
 	if (_ufo->getId() == 0)
@@ -66,16 +67,16 @@ UfoDetectedState::UfoDetectedState(Ufo* ufo, GeoscapeState* state, bool detected
 		_ufo->setLandId(getGame()->getSavedGame()->getId("STR_LANDING_SITE"));
 	}
 
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
 	if (hyperwave)
 	{
-		_window = new Window(this, 224, 180, 16, 10, POPUP_BOTH);
+		_window = factory.createWindow("windowName", this, 224, 180, 16, 10, WindowPopup::POPUP_BOTH);
 	}
 	else
 	{
-		_window = new Window(this, 224, 128, 16, 44, POPUP_BOTH);
+		_window = factory.createWindow("windowName", this, 224, 128, 16, 44, WindowPopup::POPUP_BOTH);
 	}
 	_btnIntercept = new TextButton(200, 12, 28, 118);
 	_btnCentre = new TextButton(200, 12, 28, 134);

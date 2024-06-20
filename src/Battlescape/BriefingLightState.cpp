@@ -43,11 +43,12 @@ namespace OpenXcom
  * Initializes all the elements in the BriefingLight screen.
  * @param deployment Pointer to the mission deployment.
  */
-BriefingLightState::BriefingLightState(AlienDeployment* deployment) : State("BriefingLightState")
+BriefingLightState::BriefingLightState(AlienDeployment* deployment) : State("BriefingLightState", true)
 {
-	_screen = true;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(140, 18, 164, 164);
 	_btnArmors = new ToggleTextButton(140, 18, 16, 164);
 	_txtTitle = new Text(300, 32, 16, 24);
@@ -60,7 +61,9 @@ BriefingLightState::BriefingLightState(AlienDeployment* deployment) : State("Bri
 
 	BriefingData data = deployment->getBriefingData();
 	setStandardPalette("PAL_GEOSCAPE", data.palette);
-	_window->setBackground(getGame()->getMod()->getSurface(data.background));
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setBackground(getGame()->getMod()->getSurface(data.background));
 
 	add(_window, "window", "briefing");
 	add(_btnOk, "button", "briefing");

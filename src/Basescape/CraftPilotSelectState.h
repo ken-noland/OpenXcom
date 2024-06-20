@@ -26,7 +26,6 @@ namespace OpenXcom
 class Base;
 class Soldier;
 class TextButton;
-class Window;
 class Text;
 class TextList;
 
@@ -40,7 +39,7 @@ private:
 	size_t _craft;
 
 	TextButton *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtName, *_txtFiringAcc, *_txtReactions, *_txtBravery;
 	TextList *_lstPilot;
 	std::vector<int> _pilot;

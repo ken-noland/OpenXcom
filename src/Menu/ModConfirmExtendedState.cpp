@@ -36,12 +36,12 @@ namespace OpenXcom
  * @param modInfo What exactly mod caused this question?
 **/
 ModConfirmExtendedState::ModConfirmExtendedState(ModListState* state, const ModInfo* modInfo, const ModInfo* masterInfo)
-	: State("ModConfirmExtendedState"), _state(state), _isMaster(modInfo->isMaster())
+	: State("ModConfirmExtendedState", false), _state(state), _isMaster(modInfo->isMaster())
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 100, 32, 50, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, 100, 32, 50, WindowPopup::POPUP_BOTH);
 	_btnYes = new TextButton(60, 18, 60, 122);
 	_btnNo = new TextButton(60, 18, 200, 122);
 	_txtTitle = new Text(246, 50, 37, 64);

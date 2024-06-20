@@ -49,11 +49,11 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-NewManufactureListState::NewManufactureListState(Base* base) : State("NewManufactureListState"), _base(base), _showRequirements(false), _refreshCategories(true), _doInit(true), _lstScroll(0)
+NewManufactureListState::NewManufactureListState(Base* base) : State("NewManufactureListState", false), _base(base), _showRequirements(false), _refreshCategories(true), _doInit(true), _lstScroll(0)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
-	_window = new Window(this, 320, 156, 0, 22, POPUP_BOTH);
+	_window = factory.createWindow("selectNewManufacture", this, 320, 156, 0, 22, WindowPopup::POPUP_BOTH);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 10, 35);
 	_btnOk = new TextButton(148, 16, 164, 154);
 	_btnShowOnlyNew = new ToggleTextButton(148, 16, 8, 154);
@@ -98,6 +98,7 @@ NewManufactureListState::NewManufactureListState(Base* base) : State("NewManufac
 	_lstManufacture->setColumns(3, 156, 120, 10);
 	_lstManufacture->setSelectable(true);
 	_lstManufacture->setBackground(_window);
+
 	_lstManufacture->setMargin(2);
 	_lstManufacture->onMouseClick((ActionHandler)&NewManufactureListState::lstProdClickLeft, SDL_BUTTON_LEFT);
 	_lstManufacture->onMouseClick((ActionHandler)&NewManufactureListState::lstProdClickRight, SDL_BUTTON_RIGHT);

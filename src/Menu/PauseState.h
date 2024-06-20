@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 
 /**
@@ -37,7 +37,7 @@ class PauseState : public State
 private:
 	OptionsOrigin _origin;
 	TextButton *_btnLoad, *_btnSave, *_btnAbandon, *_btnOptions, *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 public:
 	/// Creates the Pause state.

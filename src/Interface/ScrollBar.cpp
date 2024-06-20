@@ -22,6 +22,9 @@
 #include "TextList.h"
 #include "../Engine/Palette.h"
 
+#include "../Engine/Game.h"
+#include "../Entity/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -127,9 +130,19 @@ void ScrollBar::setTextList(TextList *list)
  * Changes the surface used to draw the background of the track.
  * @param bg New background.
  */
-void ScrollBar::setBackground(Surface *bg)
+void ScrollBar::setBackground(Surface* bg)
 {
 	_bg = bg;
+}
+
+/**
+ * Changes the surface used to draw the background of the track.
+ * @param bg New background.
+ */
+void ScrollBar::setBackground(entt::entity& bgEntity)
+{
+	Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(bgEntity).getSurface();
+	_bg = surface;
 }
 
 /**

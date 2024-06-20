@@ -30,7 +30,7 @@ enum class NewBattleSelectType { MISSION = 0, TERRAIN, ALIENRACE, GLOBETEXTURE }
 class TextButton;
 class TextEdit;
 class TextList;
-class Window;
+
 class Text;
 class ComboBox;
 class Slider;
@@ -45,7 +45,7 @@ class Craft;
 class NewBattleState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Frame *_frameLeft, *_frameRight;
 	Text *_txtTitle, *_txtMapOptions, *_txtAlienOptions;
 	Text *_txtMission, *_txtCraft, *_txtDarkness, *_txtTerrain, *_txtDifficulty, *_txtAlienRace, *_txtAlienTech, *_txtDepth;

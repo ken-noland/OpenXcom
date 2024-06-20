@@ -38,12 +38,12 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param soldierId ID of the soldier to sack.
  */
-SackSoldierState::SackSoldierState(Base* base, size_t soldierId) : State("SackSoldierState"), _base(base), _soldierId(soldierId)
+SackSoldierState::SackSoldierState(Base* base, size_t soldierId) : State("SackSoldierState", false), _base(base), _soldierId(soldierId)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 152, 80, 84, 60);
+	_window = factory.createWindow("sackSoldier", this, 152, 80, 84, 60);
 	_btnOk = new TextButton(44, 16, 100, 115);
 	_btnCancel = new TextButton(44, 16, 176, 115);
 	_txtTitle = new Text(142, 9, 89, 75);

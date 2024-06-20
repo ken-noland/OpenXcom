@@ -24,7 +24,6 @@ namespace OpenXcom
 
 class Base;
 class TextButton;
-class Window;
 class Text;
 class TextList;
 
@@ -38,7 +37,7 @@ private:
 	Base *_base;
 
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtCost, *_txtQuantity, *_txtTotal, *_txtRental, *_txtSalaries, *_txtIncome, *_txtMaintenance;
 	TextList *_lstCrafts, *_lstSalaries, *_lstMaintenance, *_lstTotal;
 public:

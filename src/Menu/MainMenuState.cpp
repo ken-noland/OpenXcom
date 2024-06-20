@@ -39,7 +39,8 @@
 namespace OpenXcom
 {
 
-GoToMainMenuState::GoToMainMenuState(bool updateCheck) : State("GoToMainMenuState"), _updateCheck(updateCheck)
+GoToMainMenuState::GoToMainMenuState(bool updateCheck)
+	: State("GoToMainMenuState", true), _updateCheck(updateCheck)
 {
 	// empty
 }
@@ -60,14 +61,15 @@ void GoToMainMenuState::init()
  * Initializes all the elements in the Main Menu window.
  * @param updateCheck Perform update check?
  */
-MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState")
+MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 {
 #ifdef _WIN32
 	_debugInVisualStudio = false;
 #endif
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 160, 32, 20, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);
 	_btnNewGame = new TextButton(92, 20, 64, 90);
 	_btnNewBattle = new TextButton(92, 20, 164, 90);
 	_btnLoad = new TextButton(92, 20, 64, 118);

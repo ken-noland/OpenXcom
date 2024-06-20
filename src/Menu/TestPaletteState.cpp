@@ -30,7 +30,8 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the test palette screen.
  */
-TestPaletteState::TestPaletteState(const std::string &palette, PaletteActionType action) : State("TestPaletteState")
+TestPaletteState::TestPaletteState(const std::string &palette, PaletteActionType action)
+	: State("TestPaletteState", true)
 {
 	// Create objects
 	_bg = new Surface(320, 200, 0, 0);

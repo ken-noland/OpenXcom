@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class Game;
-class Window;
+
 class TextButton;
 class Text;
 class RuleItem;
@@ -34,7 +34,7 @@ class RuleItem;
  */
 class ResearchRequiredState : public State
 {
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextButton *_btnOk;
 public:

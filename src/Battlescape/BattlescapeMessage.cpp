@@ -21,6 +21,8 @@
 #include "../Interface/Text.h"
 #include "../Interface/ProgressBar.h"
 #include "../Engine/Palette.h"
+#include "../Engine/Game.h"
+#include "../Entity/Interface/Window.h"
 
 namespace OpenXcom
 {
@@ -37,9 +39,14 @@ const int BattlescapeMessage::VERTICAL_OFFSET = 20;
  */
 BattlescapeMessage::BattlescapeMessage(int width, int height, int x, int y) : Surface(width, height, x, y)
 {
-	_window = new Window(0, width, height, x, y, POPUP_NONE);
-	_window->setColor(Palette::blockOffset(0)-1);
-	_window->setHighContrast(true);
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
+	_window = factory.createWindow("battlescapeMessage", 0, width, height, x, y, WindowPopup::POPUP_NONE);
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+
+	windowComponent.setColor(Palette::blockOffset(0) - 1);
+	windowComponent.setHighContrast(true);
 
 	_text = new Text(width, height, x, y);
 	_text->setColor(Palette::blockOffset(0)-1);
@@ -60,7 +67,8 @@ BattlescapeMessage::BattlescapeMessage(int width, int height, int x, int y) : Su
  */
 BattlescapeMessage::~BattlescapeMessage()
 {
-	delete _window;
+	getGame()->getRegistry().destroy(_window);
+
 	delete _text;
 	delete _txtThinking;
 	delete _progressBar;
@@ -73,7 +81,10 @@ BattlescapeMessage::~BattlescapeMessage()
 void BattlescapeMessage::setX(int x)
 {
 	Surface::setX(x);
-	_window->setX(x);
+
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	windowSurface->setX(x);
+
 	_text->setX(x);
 	_txtThinking->setX(x + HORIZONTAL_OFFSET);
 	_progressBar->setX(x + HORIZONTAL_OFFSET);
@@ -86,7 +97,10 @@ void BattlescapeMessage::setX(int x)
 void BattlescapeMessage::setY(int y)
 {
 	Surface::setY(y);
-	_window->setY(y);
+
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	windowSurface->setY(y);
+
 	_text->setY(y);
 	_txtThinking->setY(y + VERTICAL_OFFSET - 10);
 	_progressBar->setY(y + VERTICAL_OFFSET);
@@ -98,7 +112,8 @@ void BattlescapeMessage::setY(int y)
  */
 void BattlescapeMessage::setBackground(Surface *background)
 {
-	_window->setBackground(background);
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setBackground(background);
 }
 
 /**
@@ -145,7 +160,10 @@ void BattlescapeMessage::initText(Font *big, Font *small, Language *lang)
 void BattlescapeMessage::setPalette(const SDL_Color *colors, int firstcolor, int ncolors)
 {
 	Surface::setPalette(colors, firstcolor, ncolors);
-	_window->setPalette(colors, firstcolor, ncolors);
+
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	windowSurface->setPalette(colors, firstcolor, ncolors);
+
 	_text->setPalette(colors, firstcolor, ncolors);
 	_txtThinking->setPalette(colors, firstcolor, ncolors);
 	_progressBar->setPalette(colors, firstcolor, ncolors);
@@ -157,7 +175,10 @@ void BattlescapeMessage::setPalette(const SDL_Color *colors, int firstcolor, int
 void BattlescapeMessage::blit(SDL_Surface *surface)
 {
 	Surface::blit(surface);
-	_window->blit(surface);
+
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	windowSurface->blit(surface);
+
 	_text->blit(surface);
 	_txtThinking->blit(surface);
 	_progressBar->blit(surface);
@@ -170,7 +191,10 @@ void BattlescapeMessage::blit(SDL_Surface *surface)
 void BattlescapeMessage::setHeight(int height)
 {
 	Surface::setHeight(height);
-	_window->setHeight(height);
+
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	windowSurface->setHeight(height);
+
 	_text->setHeight(height);
 }
 

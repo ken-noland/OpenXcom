@@ -41,12 +41,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param origin Game section that originated this state.
  */
-PauseState::PauseState(OptionsOrigin origin) : State("PauseState"), _origin(origin)
+PauseState::PauseState(OptionsOrigin origin) : State("PauseState", false), _origin(origin)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	int x;
-	if (_origin == OPT_GEOSCAPE)
+	if (_origin == OPT_GEOSCAPE)	//KN NOTE: Hack?
 	{
 		x = 20;
 	}
@@ -56,7 +56,7 @@ PauseState::PauseState(OptionsOrigin origin) : State("PauseState"), _origin(orig
 	}
 
 	// Create objects
-	_window = new Window(this, 216, 160, x, 20, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 216, 160, x, 20, WindowPopup::POPUP_BOTH);
 	_btnLoad = new TextButton(180, 18, x+18, 52);
 	_btnSave = new TextButton(180, 18, x+18, 74);
 	_btnAbandon = new TextButton(180, 18, x+18, 96);

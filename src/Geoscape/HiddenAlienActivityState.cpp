@@ -55,16 +55,16 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
 	std::map<OpenXcom::Region*, int> displayHiddenAlienActivityRegions,
 	std::map<OpenXcom::Country*, int> displayHiddenAlienActivityCountries)
 	:
-	State("HiddenAlienActivityState"),
+	State("HiddenAlienActivityState", false),
 	_state(state),
 	_displayHiddenAlienActivityRegions(displayHiddenAlienActivityRegions),
 	_displayHiddenAlienActivityCountries(displayHiddenAlienActivityCountries)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 
 	// create objects
-
-	_window = new Window(this, 224, 180, 16, 10, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 224, 180, 16, 10, WindowPopup::POPUP_BOTH);
 	_txtInfo = new Text(200, 16, 28, 20);
 	_txtHeaderRegions = new Text(140, 8, 28, 40);
 	_txtSightingsRegions = new Text(40, 8, 28 + 140, 40);

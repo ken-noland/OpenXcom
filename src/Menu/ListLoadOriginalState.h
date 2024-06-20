@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 
 /**
@@ -36,7 +36,7 @@ class ListLoadOriginalState : public State
 {
 private:
 	TextButton *_btnNew, *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtName, *_txtTime, *_txtDate;
 	TextButton *_btnSlot[SaveConverter::NUM_SAVES];
 	Text *_txtSlotName[SaveConverter::NUM_SAVES];

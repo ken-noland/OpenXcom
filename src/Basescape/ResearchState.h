@@ -23,7 +23,6 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
 class Text;
 class TextList;
 class Base;
@@ -37,7 +36,7 @@ class ResearchState : public State
 private:
 	Base *_base;
 	TextButton *_btnNew, *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtAvailable, *_txtAllocated, *_txtSpace, *_txtProject, *_txtScientists, *_txtProgress;
 	TextList *_lstResearch;
 public:

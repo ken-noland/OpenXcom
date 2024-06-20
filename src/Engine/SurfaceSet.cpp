@@ -67,7 +67,7 @@ void SurfaceSet::loadPck(const std::string &pck, const std::string &tab)
 		offsetFile->read((char*)&off, sizeof(off));
 		offsetFile->seekg(0, std::ios::end);
 		end = offsetFile->tellg();
-		int size = end - begin;
+		int size = (int)(end - begin);
 		// 16-bit offsets
 		if (off != 0)
 		{

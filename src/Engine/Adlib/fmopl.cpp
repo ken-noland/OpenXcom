@@ -413,7 +413,7 @@ INLINE void set_ksl_tl(FM_OPL *OPL,int slot,int v)
 	int ksl = v>>6; /* 0 / 1.5 / 3 / 6 db/OCT */
 
 	SLOT->ksl = ksl ? 3-ksl : 31;
-	SLOT->TL  = (v&0x3f)*(0.75/EG_STEP); /* 0.75db step */
+	SLOT->TL  = (INT32)((v&0x3f)*(0.75/EG_STEP)); /* 0.75db step */
 
 	if( !(OPL->mode&0x80) )
 	{	/* not CSM latch total level */
@@ -504,7 +504,7 @@ INLINE void OPL_CALC_CH( OPL_CH *CH )
 INLINE void OPL_CALC_RH( OPL_CH *CH )
 {
 	UINT32 env_tam,env_sd,env_top,env_hh;
-	int whitenoise = (OpenXcom::RNG::seedless(0, 1))*(WHITE_NOISE_db/EG_STEP);
+	int whitenoise = (int)((OpenXcom::RNG::seedless(0, 1))*(WHITE_NOISE_db/EG_STEP));
 	INT32 tone8;
 
 	OPL_SLOT *SLOT;
@@ -597,8 +597,8 @@ static void init_timetables( FM_OPL *OPL , int ARRATE , int DRRATE )
 		if( i < 60 ) rate *= 1.0+(i&3)*0.25;		/* b0-1 : x1 , x1.25 , x1.5 , x1.75 */
 		rate *= 1<<((i>>2)-1);						/* b2-5 : shift bit */
 		rate *= (double)(EG_ENT<<ENV_BITS);
-		OPL->AR_TABLE[i] = rate / ARRATE;
-		OPL->DR_TABLE[i] = rate / DRRATE;
+		OPL->AR_TABLE[i] = (INT32)(rate / ARRATE);
+		OPL->DR_TABLE[i] = (INT32)(rate / DRRATE);
 	}
 	for (i = 60;i < 75;i++)
 	{
@@ -661,7 +661,7 @@ static int OPLOpenTable( void )
 	for (s = 1;s <= SIN_ENT/4;s++){
 		pom = sin(2*PI*s/SIN_ENT); /* sin     */
 		pom = 20*log10(1/pom);	   /* decibel */
-		j = pom / EG_STEP;         /* TL_TABLE steps */
+		j = (int)(pom / EG_STEP);         /* TL_TABLE steps */
 
         /* degree 0   -  90    , degree 180 -  90 : plus section */
 		SIN_TABLE[          s] = SIN_TABLE[SIN_ENT/2-s] = &TL_TABLE[j];
@@ -692,16 +692,16 @@ static int OPLOpenTable( void )
 	for (i=0; i<AMS_ENT; i++)
 	{
 		pom = (1.0+sin(2*PI*i/AMS_ENT))/2; /* sin */
-		AMS_TABLE[i]         = (1.0/EG_STEP)*pom; /* 1dB   */
-		AMS_TABLE[AMS_ENT+i] = (4.8/EG_STEP)*pom; /* 4.8dB */
+		AMS_TABLE[i]         = (INT32)((1.0/EG_STEP)*pom); /* 1dB   */
+		AMS_TABLE[AMS_ENT+i] = (INT32)((4.8/EG_STEP)*pom); /* 4.8dB */
 	}
 	/* make LFO vibrate table */
 	for (i=0; i<VIB_ENT; i++)
 	{
 		/* 100cent = 1seminote = 6% ?? */
 		pom = (double)VIB_RATE*0.06*sin(2*PI*i/VIB_ENT); /* +-100sect step */
-		VIB_TABLE[i]         = VIB_RATE + (pom*0.07); /* +- 7cent */
-		VIB_TABLE[VIB_ENT+i] = VIB_RATE + (pom*0.14); /* +-14cent */
+		VIB_TABLE[i]         = (INT32)(VIB_RATE + (pom*0.07)); /* +- 7cent */
+		VIB_TABLE[VIB_ENT+i] = (INT32)(VIB_RATE + (pom*0.14)); /* +-14cent */
 		/* LOG(LOG_INF,("vib %d=%d\n",i,VIB_TABLE[VIB_ENT+i])); */
 	}
 	return 1;
@@ -747,11 +747,11 @@ static void OPL_initalize(FM_OPL *OPL)
 	/* make fnumber -> increment counter table */
 	for( fn=0 ; fn < 1024 ; fn++ )
 	{
-		OPL->FN_TABLE[fn] = OPL->freqbase * fn * FREQ_RATE * (1<<7) / 2;
+		OPL->FN_TABLE[fn] = (UINT32)(OPL->freqbase * fn * FREQ_RATE * (1<<7) / 2);
 	}
 	/* LFO freq.table */
-	OPL->amsIncr = OPL->rate ? (double)AMS_ENT*(1<<AMS_SHIFT) / OPL->rate * 3.7 * ((double)OPL->clock/3600000) : 0;
-	OPL->vibIncr = OPL->rate ? (double)VIB_ENT*(1<<VIB_SHIFT) / OPL->rate * 6.4 * ((double)OPL->clock/3600000) : 0;
+	OPL->amsIncr = (INT32)(OPL->rate ? (double)AMS_ENT * (1 << AMS_SHIFT) / OPL->rate * 3.7 * ((double)OPL->clock / 3600000) : 0);
+	OPL->vibIncr = (INT32)(OPL->rate ? (double)VIB_ENT*(1<<VIB_SHIFT) / OPL->rate * 6.4 * ((double)OPL->clock/3600000) : 0);
 }
 
 /* ---------- write a OPL registers ---------- */
@@ -1083,7 +1083,7 @@ void YM3812UpdateOne(FM_OPL *OPL, INT16 *buffer, int length, int stripe, float v
 		/* Rythm part */
 		if(rythm)
 			OPL_CALC_RH(S_CH);
-		outd[0] *= volume;
+		outd[0] = (INT32)(outd[0] * volume);
 		/* limit check */
 		data = Limit( outd[0] , OPL_MAXOUT, OPL_MINOUT );
 		/* store to sound buffer */

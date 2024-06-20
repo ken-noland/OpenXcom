@@ -26,7 +26,7 @@ namespace OpenXcom
 
 class Base;
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class Soldier;
@@ -43,7 +43,7 @@ private:
 	size_t _soldier;
 
 	TextButton *_btnCancel, *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtType;
 	Surface *_soldierSurface;
 	TextList *_lstAvatar;

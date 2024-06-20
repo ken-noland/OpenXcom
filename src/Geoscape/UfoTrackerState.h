@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class Globe;
@@ -39,7 +39,7 @@ class UfoTrackerState : public State
 {
 private:
 	TextButton *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtObject, *_txtSize, *_txtAltitude, *_txtHeading, *_txtSpeed;
 	TextList *_lstObjects;
 	GeoscapeState *_state;

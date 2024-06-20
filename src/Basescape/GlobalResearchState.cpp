@@ -39,10 +39,12 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the GlobalResearch screen.
  */
-GlobalResearchState::GlobalResearchState(bool openedFromBasescape) : State("GlobalResearchState"), _openedFromBasescape(openedFromBasescape)
+GlobalResearchState::GlobalResearchState(bool openedFromBasescape) : State("GlobalResearchState", true), _openedFromBasescape(openedFromBasescape)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("globalResearchMenu", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(304, 16, 8, 176);
 	_txtTitle = new Text(310, 17, 5, 8);
 	_txtAvailable = new Text(150, 9, 10, 24);
@@ -55,6 +57,7 @@ GlobalResearchState::GlobalResearchState(bool openedFromBasescape) : State("Glob
 
 	// Set palette
 	setInterface("globalResearchMenu");
+
 
 	add(_window, "window", "globalResearchMenu");
 	add(_btnOk, "button", "globalResearchMenu");
@@ -93,6 +96,7 @@ GlobalResearchState::GlobalResearchState(bool openedFromBasescape) : State("Glob
 	_lstResearch->setAlign(ALIGN_RIGHT, 1);
 	_lstResearch->setSelectable(true);
 	_lstResearch->setBackground(_window);
+
 	_lstResearch->setMargin(2);
 	_lstResearch->setWordWrap(true);
 	_lstResearch->onMouseClick((ActionHandler)&GlobalResearchState::onSelectBase, SDL_BUTTON_LEFT);

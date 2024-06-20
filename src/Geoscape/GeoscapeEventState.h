@@ -25,7 +25,7 @@ namespace OpenXcom
 class TextButton;
 class TextList;
 class ToggleTextButton;
-class Window;
+
 class Text;
 class RuleEvent;
 
@@ -35,7 +35,7 @@ class RuleEvent;
 class GeoscapeEventState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtMessage;
 	Text *_txtItem, *_txtQuantity;
 	TextButton *_btnOk;

@@ -64,8 +64,8 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param origin Game section that originated this state.
  */
-SellState::SellState(Base* base, DebriefingState* debriefingState, OptionsOrigin origin) :
-	State("SellState"),	_base(base), _debriefingState(debriefingState), _sel(0), _total(0), _spaceChange(0), _origin(origin),
+SellState::SellState(Base* base, DebriefingState* debriefingState, OptionsOrigin origin)
+	: State("SellState", true), _base(base), _debriefingState(debriefingState), _sel(0), _total(0), _spaceChange(0), _origin(origin),
 	_reset(false), _sellAllButOne(false), _delayedInitDone(false), _previousSort(TransferSortDirection::BY_LIST_ORDER), _currentSort(TransferSortDirection::BY_LIST_ORDER)
 {
 	_timerInc = new Timer(250);
@@ -88,8 +88,10 @@ void SellState::delayedInit()
 	bool overfull = _debriefingState == 0 && Options::storageLimitsEnforced && _base->storesOverfull();
 	bool overfullCritical = overfull ? _base->storesOverfullCritical() : false;
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("sellMenu", this, 320, 200, 0, 0);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 10, 13);
 	//_btnOk = new TextButton(overfull? 288:148, 16, overfull? 16:8, 176);
 	_btnOk = new TextButton(148, 16, 8, 176);
@@ -172,6 +174,7 @@ void SellState::delayedInit()
 	_lstItems->setAlign(ALIGN_RIGHT, 3);
 	_lstItems->setSelectable(true);
 	_lstItems->setBackground(_window);
+
 	_lstItems->setMargin(2);
 	_lstItems->onLeftArrowPress((ActionHandler)&SellState::lstItemsLeftArrowPress);
 	_lstItems->onLeftArrowRelease((ActionHandler)&SellState::lstItemsLeftArrowRelease);

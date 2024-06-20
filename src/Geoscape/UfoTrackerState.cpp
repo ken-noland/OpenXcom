@@ -45,17 +45,19 @@ namespace OpenXcom
  * @param state Pointer to the Geoscape.
  * @param globe Pointer to the Geoscape globe.
  */
-UfoTrackerState::UfoTrackerState(GeoscapeState* state, Globe* globe) : State("UfoTrackerState"), _state(state), _globe(globe)
+UfoTrackerState::UfoTrackerState(GeoscapeState* state, Globe* globe)
+	: State("UfoTrackerState", false), _state(state), _globe(globe)
 {
 	const int WIDTH_OBJECT = 88;
 	const int WIDTH_SIZE = 60;
 	const int WIDTH_ALTITUDE = 54;
 	const int WIDTH_HEADING = 54;
 	const int WIDTH_SPEED = 32;
-	_screen = false;
+
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 320, 140, 0, 30, POPUP_HORIZONTAL);
+	_window = factory.createWindow("windowName", this, 320, 140, 0, 30, WindowPopup::POPUP_HORIZONTAL);
 	_btnCancel = new TextButton(288, 16, 16, 146);
 	_txtTitle = new Text(300, 17, 10, 46);
 	int x = 14;

@@ -22,7 +22,6 @@
 namespace OpenXcom
 {
 
-class Window;
 class Text;
 class TextButton;
 class TextList;
@@ -33,7 +32,7 @@ class TextList;
 class ManufactureDependenciesTreeState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextList *_lstTopics;
 	TextButton *_btnOk, *_btnShowAll;

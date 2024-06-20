@@ -47,10 +47,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to handle.
  */
-AllocatePsiTrainingState::AllocatePsiTrainingState(Base* base) : State("AllocatePsiTrainingState"), _sel(0), _base(base), _origSoldierOrder(_base->getSoldiers())
+AllocatePsiTrainingState::AllocatePsiTrainingState(Base* base) : State("AllocatePsiTrainingState", true), _sel(0), _base(base), _origSoldierOrder(_base->getSoldiers())
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_txtTitle = new Text(300, 17, 10, 8);
 	_txtRemaining = new Text(300, 10, 10, 24);
 	_txtName = new Text(64, 10, 10, 40);

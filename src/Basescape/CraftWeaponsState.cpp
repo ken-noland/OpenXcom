@@ -48,12 +48,12 @@ namespace OpenXcom
  * @param craft ID of the selected craft.
  * @param weapon ID of the selected weapon.
  */
-CraftWeaponsState::CraftWeaponsState(Base* base, size_t craft, size_t weapon) : State("CraftWeaponsState"), _base(base), _craft(base->getCrafts().at(craft)), _weapon(weapon)
+CraftWeaponsState::CraftWeaponsState(Base* base, size_t craft, size_t weapon) : State("CraftWeaponsState", false), _base(base), _craft(base->getCrafts().at(craft)), _weapon(weapon)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 220, 160, 50, 20, POPUP_BOTH);
+	_window = factory.createWindow("craftWeapons", this, 220, 160, 50, 20, WindowPopup::POPUP_BOTH);
 	_btnCancel = new TextButton(140, 16, 90, 156);
 	_txtTitle = new Text(208, 17, 56, 28);
 	_txtArmament = new Text(76, 9, 66, 52);
@@ -109,6 +109,7 @@ CraftWeaponsState::CraftWeaponsState(Base* base, size_t craft, size_t weapon) : 
 	_lstWeapons->setColumns(3, 94, 50, 36);
 	_lstWeapons->setSelectable(true);
 	_lstWeapons->setBackground(_window);
+
 	_lstWeapons->setMargin(8);
 
 	_lstWeapons->addRow(1, tr("STR_NONE_UC").c_str());

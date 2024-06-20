@@ -26,7 +26,7 @@
 namespace OpenXcom
 {
 
-class Window;
+
 class Text;
 class TextList;
 class TextButton;
@@ -38,7 +38,7 @@ class ComboBox;
 class ModListState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Text *_txtMaster;
 	ComboBox *_cbxMasters;
 	TextList *_lstMods;

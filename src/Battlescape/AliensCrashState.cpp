@@ -32,10 +32,12 @@ namespace OpenXcom
  * Initializes all the elements in the Aliens Crash screen.
  * @param game Pointer to the core game.
  */
-AliensCrashState::AliensCrashState() : State("AliensCrashState")
+AliensCrashState::AliensCrashState() : State("AliensCrashState", true)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 256, 160, 32, 20);
+	_window = factory.createWindow("windowName", this, 256, 160, 32, 20);
 	_btnOk = new TextButton(120, 18, 100, 154);
 	_txtTitle = new Text(246, 80, 37, 50);
 
@@ -48,9 +50,11 @@ AliensCrashState::AliensCrashState() : State("AliensCrashState")
 
 	centerAllSurfaces();
 
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+
 	// Set up objects
-	_window->setHighContrast(true);
-	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
+	windowComponent.setHighContrast(true);
+	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_btnOk->setHighContrast(true);
 	_btnOk->setText(tr("STR_OK"));

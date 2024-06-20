@@ -46,7 +46,8 @@ namespace OpenXcom
  * @param soldierId ID of the selected soldier.
  * @param soldierInfoState Pointer to the Soldier Info screen.
  */
-SoldierDiaryOverviewState::SoldierDiaryOverviewState(Base* base, size_t soldierId, SoldierInfoState* soldierInfoState) : State("SoldierDiaryOverviewState"), _base(base), _soldierId(soldierId), _soldierInfoState(soldierInfoState)
+SoldierDiaryOverviewState::SoldierDiaryOverviewState(Base* base, size_t soldierId, SoldierInfoState* soldierInfoState)
+	: State("SoldierDiaryOverviewState", true), _base(base), _soldierId(soldierId), _soldierInfoState(soldierInfoState)
 {
 	if (_base == 0)
 	{
@@ -57,8 +58,10 @@ SoldierDiaryOverviewState::SoldierDiaryOverviewState(Base* base, size_t soldierI
 		_list = &_base->getSoldiers();
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("soldierDiary", this, 320, 200, 0, 0);
 	_btnKills = new TextButton(70, 16, 8, 176);
 	_btnMissions = new TextButton(70, 16, 86, 176);
 	_btnCommendations = new TextButton(70, 16, 164, 176);

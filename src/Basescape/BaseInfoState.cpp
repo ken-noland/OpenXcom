@@ -45,8 +45,10 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param state Pointer to the Basescape state.
  */
-BaseInfoState::BaseInfoState(Base* base, BasescapeState* state) : State("BaseInfoState"), _base(base), _state(state)
+BaseInfoState::BaseInfoState(Base* base, BasescapeState* state) : State("BaseInfoState", true), _base(base), _state(state)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
 	_bg = new Surface(320, 200, 0, 0);
 	_mini = new MiniBaseView(128, 16, 182, 8);

@@ -35,12 +35,12 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the Dogfight Experience screen.
  */
-DogfightExperienceState::DogfightExperienceState() : State("DogfightExperienceState")
+DogfightExperienceState::DogfightExperienceState() : State("DogfightExperienceState", false)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 320, 140, 0, 30, POPUP_HORIZONTAL);
+	_window = factory.createWindow("windowName", this, 320, 140, 0, 30, WindowPopup::POPUP_HORIZONTAL);
 	_btnOk = new TextButton(300, 16, 10, 146);
 	_txtTitle = new Text(300, 17, 10, 46);
 	_txtFiringAcc = new Text(108, 9, 74, 70);

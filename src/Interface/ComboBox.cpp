@@ -28,6 +28,9 @@
 #include "../Engine/Options.h"
 #include "../Engine/Screen.h"
 
+#include "../Engine/Game.h"
+#include "../Entity/Interface/Interface.h"
+
 namespace OpenXcom
 {
 
@@ -58,6 +61,8 @@ static int getPopupWindowY(int buttonHeight, int buttonY, int popupHeight, bool 
  */
 ComboBox::ComboBox(State *state, int width, int height, int x, int y, bool popupAboveButton) : InteractiveSurface(width, height, x, y), _change(0), _sel(0), _state(state), _lang(0), _toggled(false), _popupAboveButton(popupAboveButton)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	_button = new TextButton(width, height, x, y);
 	_button->setComboBox(this);
 
@@ -65,8 +70,10 @@ ComboBox::ComboBox(State *state, int width, int height, int x, int y, bool popup
 
 	int popupHeight = MAX_ITEMS * TEXT_HEIGHT + VERTICAL_MARGIN * 2;
 	int popupY = getPopupWindowY(height, y, popupHeight, popupAboveButton);
-	_window = new Window(state, width, popupHeight, x, popupY);
-	_window->setThinBorder();
+	_window = factory.createWindow("windowName", state, width, popupHeight, x, popupY);
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setThinBorder();
 
 	_list = new TextList(width - HORIZONTAL_MARGIN * 2 - BUTTON_WIDTH + 1,
 						popupHeight - (VERTICAL_MARGIN * 2 + 2),
@@ -87,9 +94,10 @@ ComboBox::ComboBox(State *state, int width, int height, int x, int y, bool popup
  */
 ComboBox::~ComboBox()
 {
+	getGame()->getRegistry().destroy(_window);
+
 	delete _button;
 	delete _arrow;
-	delete _window;
 	delete _list;
 }
 
@@ -102,7 +110,10 @@ void ComboBox::setX(int x)
 	Surface::setX(x);
 	_button->setX(x);
 	_arrow->setX(x + getWidth() - BUTTON_WIDTH);
-	_window->setX(x);
+
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	windowSurface->setX(x);
+
 	_list->setX(x + HORIZONTAL_MARGIN);
 }
 
@@ -116,9 +127,13 @@ void ComboBox::setY(int y)
 	_button->setY(y);
 	_arrow->setY(y + 4);
 
-	int popupHeight = _window->getHeight();
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+
+	int popupHeight = windowSurface->getHeight();
 	int popupY = getPopupWindowY(getHeight(), y, popupHeight, _popupAboveButton);
-	_window->setY(popupY);
+
+	windowSurface->setY(popupY);
+
 	_list->setY(popupY + VERTICAL_MARGIN);
 }
 
@@ -134,7 +149,10 @@ void ComboBox::setPalette(const SDL_Color *colors, int firstcolor, int ncolors)
 	Surface::setPalette(colors, firstcolor, ncolors);
 	_button->setPalette(colors, firstcolor, ncolors);
 	_arrow->setPalette(colors, firstcolor, ncolors);
-	_window->setPalette(colors, firstcolor, ncolors);
+
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	windowSurface->setPalette(colors, firstcolor, ncolors);
+
 	_list->setPalette(colors, firstcolor, ncolors);
 }
 
@@ -157,7 +175,8 @@ void ComboBox::initText(Font *big, Font *small, Language *lang)
  */
 void ComboBox::setBackground(Surface *bg)
 {
-	_window->setBackground(bg);
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setBackground(bg);
 }
 
 /**
@@ -169,7 +188,10 @@ void ComboBox::setColor(Uint8 color)
 	_color = color;
 	drawArrow();
 	_button->setColor(_color);
-	_window->setColor(_color);
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setColor(_color);
+
 	_list->setColor(_color);
 }
 
@@ -231,7 +253,10 @@ void ComboBox::drawArrow()
 void ComboBox::setHighContrast(bool contrast)
 {
 	_button->setHighContrast(contrast);
-	_window->setHighContrast(contrast);
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setHighContrast(contrast);
+
 	_list->setHighContrast(contrast);
 }
 
@@ -296,18 +321,20 @@ void ComboBox::setSelected(size_t sel)
  */
 void ComboBox::setDropdown(int options)
 {
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+
 	int items = std::min(options, MAX_ITEMS);
 	int h = _button->getFont()->getHeight() + _button->getFont()->getSpacing();
 	int dy = (Options::baseYResolution - 200) / 2;
-	while (_window->getY() + items * h + VERTICAL_MARGIN * 2 > 200 + dy)
+	while (windowSurface->getY() + items * h + VERTICAL_MARGIN * 2 > 200 + dy)
 	{
 		items--;
 	}
 
 	int popupHeight = items * h + VERTICAL_MARGIN * 2;
 	int popupY = getPopupWindowY(getHeight(), getY(), popupHeight, _popupAboveButton);
-	_window->setY(popupY);
-	_window->setHeight(popupHeight);
+	windowSurface->setY(popupY);
+	windowSurface->setHeight(popupHeight);
 	_list->setY(popupY + VERTICAL_MARGIN);
 	_list->setHeight(items * h);
 }
@@ -343,7 +370,10 @@ void ComboBox::blit(SDL_Surface *surface)
 	{
 		_button->blit(surface);
 		_arrow->blit(surface);
-		_window->blit(surface);
+
+		Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+		windowSurface->blit(surface);
+
 		_list->blit(surface);
 	}
 }
@@ -361,10 +391,13 @@ void ComboBox::handle(Action *action, State *state)
 	_button->handle(action, state);
 	_list->handle(action, state);
 	InteractiveSurface::handle(action, state);
-	int topY = std::min(getY(), _window->getY());
-	if (_window->getVisible() && action->getDetails()->type == SDL_MOUSEBUTTONDOWN &&
+
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	int topY = std::min(getY(), windowSurface->getY());
+
+	if (windowSurface->getVisible() && action->getDetails()->type == SDL_MOUSEBUTTONDOWN &&
 		(action->getAbsoluteXMouse() < getX() || action->getAbsoluteXMouse() >= getX() + getWidth() ||
-		 action->getAbsoluteYMouse() < topY || action->getAbsoluteYMouse() >= topY + getHeight() + _window->getHeight()))
+		 action->getAbsoluteYMouse() < topY || action->getAbsoluteYMouse() >= topY + getHeight() + windowSurface->getHeight()))
 	{
 		toggle(false, false);
 	}
@@ -385,7 +418,10 @@ void ComboBox::think()
 {
 	_button->think();
 	_arrow->think();
-	_window->think();
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.think();
+
 	_list->think();
 	InteractiveSurface::think();
 }
@@ -397,10 +433,12 @@ void ComboBox::think()
  */
 void ComboBox::toggle(bool first, bool listClick)
 {
-	_window->setVisible(!_window->getVisible());
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+
+	windowSurface->setVisible(!windowSurface->getVisible());
 	_list->setVisible(!_list->getVisible());
-	_state->setModal(_window->getVisible() ? this : 0);
-	if (!first && !_window->getVisible())
+	_state->setModal(windowSurface->getVisible() ? this : 0);
+	if (!first && !windowSurface->getVisible())
 	{
 		_toggled = listClick;
 	}

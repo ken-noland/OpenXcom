@@ -24,7 +24,6 @@ namespace OpenXcom
 
 class Base;
 class TextButton;
-class Window;
 class Text;
 class TextList;
 
@@ -38,7 +37,7 @@ private:
 	size_t _craft;
 
 	TextButton *_btnOk, *_btnAdd, *_btnRemoveAll;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtFiringAcc, *_txtReactions, *_txtBravery, *_txtPilots;
 	Text *_txtRequired;
 	TextList *_lstPilots;

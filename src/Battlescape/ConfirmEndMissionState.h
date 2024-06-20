@@ -22,7 +22,7 @@
 namespace OpenXcom
 {
 
-class Window;
+
 class Text;
 class TextButton;
 class SavedBattleGame;
@@ -35,7 +35,7 @@ class BattlescapeGame;
 class ConfirmEndMissionState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtWounded, *_txtConfirm;
 	TextButton *_btnOk, *_btnCancel;
 	SavedBattleGame *_battleGame;

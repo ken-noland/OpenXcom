@@ -48,7 +48,8 @@ std::string StartState::error;
  * Initializes all the elements in the Loading screen.
  * @param game Pointer to the core game.
  */
-StartState::StartState() : State("StartState"), _anim(0)
+StartState::StartState()
+	: State("StartState", true), _anim(0)
 {
 	//updateScale() uses newDisplayWidth/Height and needs to be set ahead of time
 	Options::newDisplayWidth = Options::displayWidth;

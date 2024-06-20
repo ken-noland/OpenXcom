@@ -38,18 +38,18 @@ namespace OpenXcom
  * @param mission Pointer to the respective Mission Site.
  * @param state Pointer to the Geoscape.
  */
-MissionDetectedState::MissionDetectedState(MissionSite* mission, GeoscapeState* state) : State("MissionDetectedState"), _mission(mission), _state(state)
+MissionDetectedState::MissionDetectedState(MissionSite* mission, GeoscapeState* state) : State("MissionDetectedState", false), _mission(mission), _state(state)
 {
-	_screen = false;
-
 	int soundId = mission->getDeployment()->getAlertSound();
 	if (soundId != Mod::NO_SOUND)
 	{
 		_customSound = getGame()->getMod()->getSound("GEO.CAT", soundId);
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 256, 200, 0, 0, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, 200, 0, 0, WindowPopup::POPUP_BOTH);
 	_btnIntercept = new TextButton(200, 16, 28, 130);
 	_btnCenter = new TextButton(200, 16, 28, 150);
 	_btnCancel = new TextButton(200, 16, 28, 170);
@@ -69,7 +69,8 @@ MissionDetectedState::MissionDetectedState(MissionSite* mission, GeoscapeState* 
 	centerAllSurfaces();
 
 	// Set up objects
-	_window->setBackground(getGame()->getMod()->getSurface(mission->getDeployment()->getAlertBackground()));
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setBackground(getGame()->getMod()->getSurface(mission->getDeployment()->getAlertBackground()));
 
 	_btnIntercept->setText(tr("STR_INTERCEPT"));
 	_btnIntercept->onMouseClick((ActionHandler)&MissionDetectedState::btnInterceptClick);

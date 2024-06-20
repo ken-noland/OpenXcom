@@ -38,14 +38,18 @@ namespace OpenXcom
 {
 
 UfopaediaSelectState::UfopaediaSelectState(const std::string &section, int heightOffset, int windowOffset)
-	: State("UfopaediaSelectState"), _section(section), _lstScroll(0)
+	: State("UfopaediaSelectState", false), _section(section), _lstScroll(0)
 {
 	_isCommendationsSection = (_section == UFOPAEDIA_COMMENDATIONS);
-	_screen = false;
+
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// set background window
-	_window = new Window(this, 256, 180 + heightOffset, 32, 10 - windowOffset, POPUP_NONE);
-	_window->setInnerColor(239); // almost black = darkest index from backpals.dat
+	_window = factory.createWindow("windowName", this, 256, 180 + heightOffset, 32, 10 - windowOffset, WindowPopup::POPUP_NONE);
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setInnerColor(239); // almost black = darkest index from backpals.dat
+
 	_btnQuickSearch = new TextEdit(this, 48, 9, 48, 30 - windowOffset);
 
 	// set title

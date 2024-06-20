@@ -39,12 +39,12 @@ namespace OpenXcom
  * @param soldier Pointer to the selected soldier.
  * @param rowEntry number to get mission info from.
  */
-SoldierDiaryMissionState::SoldierDiaryMissionState(Soldier* soldier, int rowEntry) : State("SoldierDiaryMissionState"), _soldier(soldier), _rowEntry(rowEntry)
+SoldierDiaryMissionState::SoldierDiaryMissionState(Soldier* soldier, int rowEntry) : State("SoldierDiaryMissionState", false), _soldier(soldier), _rowEntry(rowEntry)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create object
-	_window = new Window(this, 300, 128, 10, 36, POPUP_HORIZONTAL);
+	_window = factory.createWindow("soldierDiaryMission", this, 300, 128, 10, 36, WindowPopup::POPUP_HORIZONTAL);
 	_btnOk = new TextButton(240, 16, 40, 140);
 	_btnPrev = new TextButton(28, 14, 18, 44);
 	_btnNext = new TextButton(28, 14, 274, 44);

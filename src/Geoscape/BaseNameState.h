@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class Base;
-class Window;
+
 class Text;
 class TextEdit;
 class TextButton;
@@ -40,7 +40,7 @@ class BaseNameState : public State
 private:
 	Base *_base;
 	Globe *_globe;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextEdit *_edtName;
 	TextButton *_btnOk;

@@ -25,7 +25,6 @@ namespace OpenXcom
 
 class Base;
 class TextButton;
-class Window;
 class Text;
 class TextList;
 class RuleBaseFacility;
@@ -43,7 +42,7 @@ protected:
 	size_t _lstScroll;
 
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextList *_lstFacilities;
 public:

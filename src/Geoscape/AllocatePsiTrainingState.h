@@ -25,7 +25,7 @@ namespace OpenXcom
 
 class TextButton;
 class ToggleTextButton;
-class Window;
+
 class Text;
 class Base;
 class TextList;
@@ -42,7 +42,7 @@ class AllocatePsiTrainingState : public State
 private:
 	TextButton *_btnOk;
 	ToggleTextButton *_btnPlus;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtTraining, *_txtName, *_txtRemaining;
 	Text *_txtPsiStrength, *_txtPsiSkill;
 	ComboBox *_cbxSortBy;

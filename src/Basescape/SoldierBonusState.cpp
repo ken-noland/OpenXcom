@@ -42,12 +42,12 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param soldier ID of the selected soldier.
  */
-SoldierBonusState::SoldierBonusState(Base* base, size_t soldier) : State("SoldierBonusState"), _base(base), _soldier(soldier)
+SoldierBonusState::SoldierBonusState(Base* base, size_t soldier) : State("SoldierBonusState", false), _base(base), _soldier(soldier)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 192, 160, 64, 20, POPUP_BOTH);
+	_window = factory.createWindow("soldierBonus", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);
 	_btnSummary = new ToggleTextButton(84, 16, 73, 156);
 	_btnCancel = new TextButton(84, 16, 164, 156);
 	_txtTitle = new Text(182, 16, 69, 28);
@@ -86,8 +86,8 @@ SoldierBonusState::SoldierBonusState(Base* base, size_t soldier) : State("Soldie
 
 	_lstBonuses->setColumns(1, 150);
 	_lstBonuses->setSelectable(true);
-	_lstBonuses->setBackground(_window);
 	_lstBonuses->setMargin(8);
+	_lstBonuses->setBackground(_window);
 
 	_bonuses.clear();
 	_lstBonuses->clearList();
@@ -102,9 +102,10 @@ SoldierBonusState::SoldierBonusState(Base* base, size_t soldier) : State("Soldie
 	_lstSummary->setColumns(2, 122, 20);
 	_lstSummary->setAlign(ALIGN_RIGHT, 1);
 	_lstSummary->setSelectable(true);
-	_lstSummary->setBackground(_window);
 	_lstSummary->setMargin(8);
 	_lstSummary->setVisible(false);
+
+	_lstSummary->setBackground(_window);
 
 	int visibilityAtDark = 0;
 	int frontArmor = 0, leftArmor = 0, rightArmor = 0, rearArmor = 0, underArmor = 0;

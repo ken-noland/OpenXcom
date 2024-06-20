@@ -49,7 +49,7 @@ namespace OpenXcom
  * Initializes all the elements on the UI.
  */
 TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufacture *m, const RuleBaseFacility *f, const RuleCraft *c)
-	: State("TechTreeViewerState"), _selectedFlag(TTV_NONE)
+	: State("TechTreeViewerState", true), _selectedFlag(TTV_NONE)
 {
 	if (r != 0)
 	{
@@ -72,8 +72,10 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 		_selectedFlag = TTV_CRAFTS;
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("techTreeViewer", this, 320, 200, 0, 0);
 	_txtTitle = new Text(304, 17, 8, 7);
 	_txtSelectedTopic = new Text(204, 9, 8, 24);
 	_txtProgress = new Text(100, 9, 212, 24);
@@ -119,6 +121,7 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 	_lstLeft->setColumns(1, 132);
 	_lstLeft->setSelectable(true);
 	_lstLeft->setBackground(_window);
+
 	_lstLeft->setWordWrap(true);
 	_lstLeft->onMouseClick((ActionHandler)&TechTreeViewerState::onSelectLeftTopic);
 

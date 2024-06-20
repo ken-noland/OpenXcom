@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 
 /**
@@ -36,7 +36,7 @@ class AbandonGameState : public State
 private:
 	OptionsOrigin _origin;
 	TextButton *_btnYes, *_btnNo;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 public:
 	/// Creates the Abandon Game state.

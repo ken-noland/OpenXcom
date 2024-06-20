@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class TextList;
@@ -42,7 +42,7 @@ private:
 	Base *_base;
 	Soldier *_sourceSoldier;
 	std::vector<Soldier *> *_filteredListOfSoldiers;
-	Window *_window;
+	entt::entity _window;
 	TextEdit *_edtSoldier;
 	Text *_txtCost, *_txtTransferTime, *_txtRecoveryTime, *_txtRequiredItems, *_txtItemNameColumn, *_txtUnitRequiredColumn, *_txtUnitAvailableColumn;
 	TextList *_lstRequiredItems, *_lstStatChanges;

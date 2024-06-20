@@ -39,11 +39,11 @@ namespace OpenXcom
 /**
  * Initializes all the elements on the UI.
  */
-ManufactureDependenciesTreeState::ManufactureDependenciesTreeState(const std::string& selectedItem) : State("ManufactureDependenciesTreeState"), _selectedItem(selectedItem), _showAll(false)
+ManufactureDependenciesTreeState::ManufactureDependenciesTreeState(const std::string& selectedItem) : State("ManufactureDependenciesTreeState", false), _selectedItem(selectedItem), _showAll(false)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
-	_window = new Window(this, 222, 144, 49, 32);
+	_window = factory.createWindow("dependencyTree", this, 222, 144, 49, 32);
 	_txtTitle = new Text(182, 9, 53, 42);
 	_lstTopics = new TextList(198, 96, 53, 54);
 	_btnShowAll = new TextButton(100, 16, 57, 153);

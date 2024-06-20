@@ -37,12 +37,12 @@ namespace OpenXcom
  * Initializes all the elements in the Notes screen.
  * @param origin Game section that originated this state.
  */
-NotesState::NotesState(OptionsOrigin origin) : State("NotesState"), _origin(origin), _previousSelectedRow(-1), _selectedRow(-1)
+NotesState::NotesState(OptionsOrigin origin) : State("NotesState", false), _origin(origin), _previousSelectedRow(-1), _selectedRow(-1)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0, POPUP_NONE);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0, WindowPopup::POPUP_NONE);
 	_txtTitle = new Text(310, 17, 5, 7);
 	_txtDelete = new Text(310, 9, 5, 23);
 	_lstNotes = new TextList(288, 120, 8, 42);

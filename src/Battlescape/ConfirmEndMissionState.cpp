@@ -36,11 +36,12 @@ namespace OpenXcom
  * @param battleGame Pointer to the saved game.
  */
 ConfirmEndMissionState::ConfirmEndMissionState(SavedBattleGame *battleGame, int wounded, BattlescapeGame *parent)
-	: State("ConfirmEndMissionState"), _battleGame(battleGame), _wounded(wounded), _parent(parent)
+	: State("ConfirmEndMissionState", false), _battleGame(battleGame), _wounded(wounded), _parent(parent)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_screen = false;
-	_window = new Window(this, 320, 144, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 144, 0, 0);
 	_txtTitle = new Text(304, 17, 16, 26);
 	_txtWounded = new Text(304, 17, 16, 54);
 	_txtConfirm = new Text(320, 17, 0, 80);
@@ -58,8 +59,9 @@ ConfirmEndMissionState::ConfirmEndMissionState(SavedBattleGame *battleGame, int 
 	add(_btnCancel, "messageWindowButtons", "battlescape");
 
 	// Set up objects
-	_window->setHighContrast(true);
-	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setHighContrast(true);
+	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtTitle->setBig();
 	_txtTitle->setHighContrast(true);

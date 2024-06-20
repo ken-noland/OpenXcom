@@ -44,10 +44,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-ResearchState::ResearchState(Base* base) : State("ResearchState"), _base(base)
+ResearchState::ResearchState(Base* base) : State("ResearchState", true), _base(base)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("researchMenu", this, 320, 200, 0, 0);
 	_btnNew = new TextButton(148, 16, 8, 176);
 	_btnOk = new TextButton(148, 16, 164, 176);
 	_txtTitle = new Text(310, 17, 5, 8);
@@ -105,6 +107,7 @@ ResearchState::ResearchState(Base* base) : State("ResearchState"), _base(base)
 	_lstResearch->setAlign(ALIGN_RIGHT, 1);
 	_lstResearch->setSelectable(true);
 	_lstResearch->setBackground(_window);
+
 	_lstResearch->setMargin(2);
 	_lstResearch->setWordWrap(true);
 	_lstResearch->onMouseClick((ActionHandler)&ResearchState::onSelectProject, SDL_BUTTON_LEFT);

@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class Target;
@@ -41,7 +41,7 @@ private:
 	Globe *_globe;
 
 	TextButton *_btnIntercept, *_btnOk, *_btnInfo;
-	Window *_window;
+	entt::entity _window;
 	TextEdit *_edtTitle;
 	Text *_txtTargetted, *_txtFollowers, *_txtPenalty;
 	AlienDeployment *_deploymentRule;

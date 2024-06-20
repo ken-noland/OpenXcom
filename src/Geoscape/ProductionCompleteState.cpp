@@ -47,12 +47,12 @@ namespace OpenXcom
  * @param production Pointer to the production details.
  */
 ProductionCompleteState::ProductionCompleteState(Base *base, const std::string &item, GeoscapeState *state, productionProgress_e endType, Production *production)
-	: State("ProductionCompleteState"), _base(base), _state(state), _endType(endType)
+	: State("ProductionCompleteState", false), _base(base), _state(state), _endType(endType)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 160, 32, 20, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(118, 18, 40, 154);
 	_btnGotoBase = new TextButton(118, 18, 162, 154);
 	_btnSummary = new TextButton(118, 18, 162, 154);

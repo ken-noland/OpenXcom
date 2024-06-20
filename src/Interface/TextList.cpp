@@ -29,6 +29,9 @@
 #include "ScrollBar.h"
 #include "../fmath.h"
 
+#include "../Engine/Game.h"
+#include "../Entity/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -738,9 +741,20 @@ unsigned int TextList::getSelectedRow() const
  * Changes the surface used to draw the background of the selector.
  * @param bg New background.
  */
-void TextList::setBackground(Surface *bg)
+void TextList::setBackground(Surface* bg)
 {
 	_bg = bg;
+	_scrollbar->setBackground(_bg);
+}
+
+/**
+ * Changes the surface used to draw the background of the selector.
+ * @param bg New background.
+ */
+void TextList::setBackground(entt::entity& bgEntity)
+{
+	Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(bgEntity).getSurface();
+	_bg = surface;
 	_scrollbar->setBackground(_bg);
 }
 

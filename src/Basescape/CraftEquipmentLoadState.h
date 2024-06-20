@@ -24,7 +24,7 @@ namespace OpenXcom
 
 class TextButton;
 class ToggleTextButton;
-class Window;
+
 class Text;
 class TextList;
 class CraftEquipmentState;
@@ -36,7 +36,7 @@ class CraftEquipmentLoadState : public State
 {
 private:
 	CraftEquipmentState *_parent;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextList *_lstLoadout;
 	ToggleTextButton *_btnOnlyAdd;

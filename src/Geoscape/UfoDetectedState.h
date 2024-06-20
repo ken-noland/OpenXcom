@@ -24,7 +24,7 @@ namespace OpenXcom
 
 class Ufo;
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class GeoscapeState;
@@ -39,7 +39,7 @@ private:
 	GeoscapeState *_state;
 
 	TextButton *_btnIntercept, *_btnCentre, *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtUfo, *_txtDetected, *_txtHyperwave;
 	TextList *_lstInfo, *_lstInfo2;
 public:

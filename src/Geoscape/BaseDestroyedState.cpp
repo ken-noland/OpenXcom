@@ -40,7 +40,7 @@ namespace OpenXcom
 {
 
 BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles, bool partialDestruction)
-	: State("BaseDestroyedState"), _base(base), _missiles(missiles), _partialDestruction(partialDestruction)
+	: State("BaseDestroyedState", false), _base(base), _missiles(missiles), _partialDestruction(partialDestruction)
 {
 	_screen = false;
 
@@ -50,8 +50,10 @@ BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles
 		_customSound = getGame()->getMod()->getSound("GEO.CAT", soundId);
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 256, 160, 32, 20);
+	_window = factory.createWindow("windowName", this, 256, 160, 32, 20);
 	_btnOk = new TextButton(100, 20, 110, 142);
 	_txtMessage = new Text(224, 48, 48, _partialDestruction ? 42 : 76);
 	_lstDestroyedFacilities = new TextList(208, 40, 48, 92);

@@ -25,7 +25,6 @@ namespace OpenXcom
 
 class TextEdit;
 class TextButton;
-class Window;
 class Text;
 class TextList;
 class CraftEquipmentState;
@@ -37,7 +36,7 @@ class CraftEquipmentSaveState : public State
 {
 private:
 	CraftEquipmentState *_parent;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextList *_lstLoadout;
 	TextButton *_btnCancel, *_btnSave;

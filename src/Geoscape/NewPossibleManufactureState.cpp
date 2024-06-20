@@ -36,12 +36,13 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param possibilities List of newly possible ManufactureProject
  */
-NewPossibleManufactureState::NewPossibleManufactureState(Base * base, const std::vector<RuleManufacture *> & possibilities) : State("NewPossibleManufactureState"), _base(base)
+NewPossibleManufactureState::NewPossibleManufactureState(Base * base, const std::vector<RuleManufacture *> & possibilities)
+	: State("NewPossibleManufactureState", false), _base(base)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 288, 180, 16, 10);
+	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);
 	_btnOk = new TextButton(160, 14, 80, 149);
 	_btnManufacture = new TextButton(160, 14, 80, 165);
 	_txtTitle = new Text(288, 40, 16, 20);

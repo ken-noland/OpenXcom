@@ -34,12 +34,13 @@ namespace OpenXcom
  * @param origin Game section that originated this state.
  * @param fileName Name of the save file without extension.
  */
-ConfirmLoadState::ConfirmLoadState(OptionsOrigin origin, const std::string& fileName) : State("ConfirmLoadState"), _origin(origin), _fileName(fileName)
+ConfirmLoadState::ConfirmLoadState(OptionsOrigin origin, const std::string& fileName)
+	: State("ConfirmLoadState", false), _origin(origin), _fileName(fileName)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 216, 100, 52, 50, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 216, 100, 52, 50, WindowPopup::POPUP_BOTH);
 	_btnYes = new TextButton(50, 20, 70, 120);
 	_btnNo = new TextButton(50, 20, 200, 120);
 	_txtText = new Text(204, 58, 58, 60);

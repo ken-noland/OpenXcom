@@ -30,7 +30,7 @@ namespace OpenXcom
 class Game;
 class Surface;
 class InteractiveSurface;
-class Window;
+
 class Action;
 class SavedBattleGame;
 class RuleInterface;
@@ -53,9 +53,6 @@ class State
 protected:
 	std::string _name;
 
-// temp for now
-entt::registry _surfaceRegistry;
-
 	std::vector<entt::entity> _surfaces;
 	bool _screen;
 	bool _soundPlayed;
@@ -71,7 +68,7 @@ entt::registry _surfaceRegistry;
 	Uint8 _cursorColor;
 public:
 	/// Creates a new state linked to a game.
-	State(const std::string& name);
+	State(const std::string& name, bool screen);
 	/// Cleans up the state.
 	virtual ~State();
 
@@ -88,13 +85,17 @@ public:
 	/// Set interface rules.
 	void setInterface(const std::string &s, bool alterPal = false, SavedBattleGame *battleGame = 0);
 	/// Set window background.
-	void setWindowBackground(Window *window, const std::string &s);
+	/*[[deprecated]]*/ void setWindowBackground(entt::entity window, const std::string& s);
 	/// Set window background by image name (instead of by interface name).
-	void setWindowBackgroundImage(Window* window, const std::string& bgImageName);
+	/*[[deprecated]]*/ void setWindowBackgroundImage(entt::entity window, const std::string& bgImageName);
 	/// Adds a child element to the state.
-	void add(Surface *surface);
+	/*[[deprecated]]*/ void add(Surface* surface);
 	/// Adds a child element to the state.
-	void add(Surface *surface, const std::string &id, const std::string &category, Surface *parent = 0);
+	/*[[deprecated]]*/ void add(Surface* surface, const std::string& id, const std::string& category, Surface* parent = 0);
+
+	/// Adds a child entity to the state.
+	void add(entt::entity entity, const std::string& id, const std::string& category, Surface* parent = 0);
+
 	/// Gets whether the state is a full-screen.
 	bool isScreen() const;
 	/// Toggles whether the state is a full-screen.

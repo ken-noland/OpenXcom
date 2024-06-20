@@ -49,10 +49,12 @@ namespace OpenXcom
  * Initializes all the elements in the Statistics window.
  * @param game Pointer to the core game.
  */
-StatisticsState::StatisticsState() : State("StatisticsState")
+StatisticsState::StatisticsState() : State("StatisticsState", true)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(50, 12, 135, 180);
 	_txtTitle = new Text(310, 25, 5, 8);
 	_lstStats = new TextList(280, 136, 12, 36);

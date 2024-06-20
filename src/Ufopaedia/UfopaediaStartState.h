@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 	class Game;
 	class Action;
-	class Window;
+	
 	class Text;
 	class TextButton;
 	class ArrowButton;
@@ -43,7 +43,7 @@ namespace OpenXcom
 		virtual ~UfopaediaStartState();
 
 	protected:
-		Window *_window;
+		entt::entity _window;
 		Text *_txtTitle;
 		TextButton *_btnOk;
 		std::vector<TextButton*> _btnSections;

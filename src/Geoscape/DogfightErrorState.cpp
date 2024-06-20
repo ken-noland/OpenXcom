@@ -34,12 +34,12 @@ namespace OpenXcom
  * @param state Pointer to the Geoscape state.
  * @param msg Error message.
  */
-DogfightErrorState::DogfightErrorState(Craft* craft, const std::string& msg) : State("DogfightErrorState"), _craft(craft)
+DogfightErrorState::DogfightErrorState(Craft* craft, const std::string& msg) : State("DogfightErrorState", false), _craft(craft)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 208, 120, 24, 48, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 208, 120, 24, 48, WindowPopup::POPUP_BOTH);
 	_btnIntercept = new TextButton(180, 12, 38, 128);
 	_btnBase = new TextButton(180, 12, 38, 144);
 	_txtCraft = new Text(198, 16, 29, 63);

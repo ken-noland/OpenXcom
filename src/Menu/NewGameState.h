@@ -24,7 +24,7 @@ namespace OpenXcom
 
 class TextButton;
 class ToggleTextButton;
-class Window;
+
 class Text;
 
 /**
@@ -39,7 +39,7 @@ private:
 	TextButton *_difficulty;
 	ToggleTextButton *_btnIronman;
 	TextButton *_btnOk, *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtIronman;
 public:
 	/// Creates the New Game state.

@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class OptionsVideoState;
@@ -39,7 +39,7 @@ private:
 	OptionsOrigin _origin;
 	OptionsVideoState *_optionsVideoState;
 	TextButton *_btnOk, *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtWindowedModePositionX, *_txtWindowedModePositionY;
 	TextEdit *_edtWindowedModePositionX, *_edtWindowedModePositionY;
 public:

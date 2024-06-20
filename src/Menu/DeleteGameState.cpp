@@ -39,13 +39,14 @@ namespace OpenXcom
  * @param save Name of the save file to delete.
  */
 DeleteGameState::DeleteGameState(OptionsOrigin origin, const std::string &save)
-	: State("DeleteGameState"), _origin(origin)
+	: State("DeleteGameState", false), _origin(origin)
 {
 	_filename = Options::getMasterUserFolder() + save;
-	_screen = false;
+
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 100, 32, 50, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, 100, 32, 50, WindowPopup::POPUP_BOTH);
 	_btnYes = new TextButton(60, 18, 60, 122);
 	_btnNo = new TextButton(60, 18, 200, 122);
 	_txtMessage = new Text(246, 32, 37, 70);

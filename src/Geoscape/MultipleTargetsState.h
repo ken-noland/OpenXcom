@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Craft;
 class Target;
 class GeoscapeState;
@@ -44,7 +44,7 @@ private:
 	GeoscapeState *_state;
 	bool _useCustomSound;
 
-	Window *_window;
+	entt::entity _window;
 	std::vector<TextButton*> _btnTargets;
 public:
 	/// Creates the Multiple Targets state.

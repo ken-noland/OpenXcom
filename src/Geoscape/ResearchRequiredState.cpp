@@ -33,12 +33,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param item Pointer to the researched weapon.
  */
-ResearchRequiredState::ResearchRequiredState(RuleItem *item) : State("ResearchRequiredState")
+ResearchRequiredState::ResearchRequiredState(RuleItem *item) : State("ResearchRequiredState", false)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 288, 180, 16, 10);
+	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);
 	_btnOk = new TextButton(160, 18, 80, 150);
 	_txtTitle = new Text(288, 80, 16, 50);
 

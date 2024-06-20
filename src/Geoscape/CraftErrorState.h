@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class GeoscapeState;
 
@@ -37,7 +37,7 @@ class CraftErrorState : public State
 private:
 	GeoscapeState *_state;
 	TextButton *_btnOk, *_btnOk5Secs;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtMessage;
 public:
 	/// Creates the Craft Error state.

@@ -26,7 +26,7 @@ namespace OpenXcom
 class Base;
 class TextButton;
 class ToggleTextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class TextList;
@@ -44,7 +44,7 @@ private:
 	TextButton *_btnOk;
 	ToggleTextButton *_btnShowOnlyNew;
 	TextEdit *_btnQuickSearch;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtItem, *_txtCategory;
 	TextList *_lstManufacture;
 	size_t _lstScroll;

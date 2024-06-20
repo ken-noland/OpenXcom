@@ -85,17 +85,16 @@ struct compareSaveTimestamp
  * @param autoquick Show auto/quick saved games?
  */
 ListGamesState::ListGamesState(OptionsOrigin origin, int firstValidRow, bool autoquick)
-	: State("ListGamesState"), _origin(origin), _firstValidRow(firstValidRow), _autoquick(autoquick), _sortable(true)
+	: State("ListGamesState", false), _origin(origin), _firstValidRow(firstValidRow), _autoquick(autoquick), _sortable(true)
 {
-	_screen = false;
-
 	bool isMobile = false;
 #ifdef __MOBILE__
 	isMobile = true;
 #endif
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0, WindowPopup::POPUP_BOTH);
 	_btnCancel = new TextButton(80, 16, 120, 172);
 	_txtTitle = new Text(310, 17, 5, 7);
 	_txtDelete = new Text(310, 9, 5, 23);

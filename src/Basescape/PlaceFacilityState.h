@@ -27,7 +27,6 @@ class BaseFacility;
 class RuleBaseFacility;
 class BaseView;
 class TextButton;
-class Window;
 class Text;
 
 /**
@@ -43,7 +42,7 @@ protected:
 
 	BaseView *_view;
 	TextButton *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtFacility, *_txtCost, *_numCost, *_numResources, *_txtTime, *_numTime, *_txtMaintenance, *_numMaintenance;
 public:
 	/// Creates the Place Facility state.

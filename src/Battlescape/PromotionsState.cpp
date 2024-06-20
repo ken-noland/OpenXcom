@@ -37,10 +37,12 @@ namespace OpenXcom
  * Initializes all the elements in the Promotions screen.
  * @param game Pointer to the core game.
  */
-PromotionsState::PromotionsState() : State("PromotionsState")
+PromotionsState::PromotionsState() : State("PromotionsState", true)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create object
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(288, 16, 16, 176);
 	_txtTitle = new Text(300, 17, 10, 8);
 	_txtName = new Text(114, 9, 16, 32);

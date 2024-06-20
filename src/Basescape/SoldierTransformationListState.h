@@ -26,7 +26,7 @@ namespace OpenXcom
 
 class TextButton;
 class ToggleTextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class TextList;
@@ -45,7 +45,7 @@ private:
 	ComboBox* _screenActions;
 	TextButton* _btnOK;
 	ToggleTextButton* _btnOnlyEligible;
-	Window* _window;
+	entt::entity _window;
 	Text* _txtTitle, * _txtProject, * _txtNumber, * _txtSoldierNumber;
 	ComboBox* _cbxSoldierType, * _cbxSoldierStatus;
 	TextEdit* _btnQuickSearch;

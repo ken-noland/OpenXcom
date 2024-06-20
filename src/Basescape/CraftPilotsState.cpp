@@ -40,10 +40,12 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the Craft Pilots screen.
  */
-CraftPilotsState::CraftPilotsState(Base* base, size_t craft) : State("CraftPilotsState"), _base(base), _craft(craft)
+CraftPilotsState::CraftPilotsState(Base* base, size_t craft) : State("CraftPilotsState", true), _base(base), _craft(craft)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("craftPilots", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(300, 20, 10, 170);
 	_txtTitle = new Text(310, 17, 5, 12);
 	_txtFiringAcc = new Text(108, 9, 74, 32);

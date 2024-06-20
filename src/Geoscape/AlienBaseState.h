@@ -24,7 +24,7 @@ namespace OpenXcom
 
 class Region;
 class TextButton;
-class Window;
+
 class Text;
 class GeoscapeState;
 class AlienBase;
@@ -38,7 +38,7 @@ private:
 	GeoscapeState *_state;
 	AlienBase *_base;
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 public:
 	/// Creates the Alien Base Detected state.

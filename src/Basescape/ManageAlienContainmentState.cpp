@@ -53,13 +53,15 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param origin Game section that originated this state.
  */
-ManageAlienContainmentState::ManageAlienContainmentState(Base* base, int prisonType, OptionsOrigin origin) : State("ManageAlienContainmentState"), 
+ManageAlienContainmentState::ManageAlienContainmentState(Base* base, int prisonType, OptionsOrigin origin) : State("ManageAlienContainmentState", true), 
 	_base(base), _prisonType(prisonType), _origin(origin), _sel(0), _aliensSold(0), _total(0), _doNotReset(false), _threeButtons(false)
 {
 	_threeButtons = Options::canSellLiveAliens && Options::retainCorpses;
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("manageContainment", this, 320, 200, 0, 0);
 	if (_threeButtons)
 	{
 		// 3 buttons
@@ -156,6 +158,7 @@ ManageAlienContainmentState::ManageAlienContainmentState(Base* base, int prisonT
 	}
 	_lstAliens->setSelectable(true);
 	_lstAliens->setBackground(_window);
+
 	_lstAliens->setMargin(2);
 	_lstAliens->onLeftArrowPress((ActionHandler)&ManageAlienContainmentState::lstItemsLeftArrowPress);
 	_lstAliens->onLeftArrowRelease((ActionHandler)&ManageAlienContainmentState::lstItemsLeftArrowRelease);

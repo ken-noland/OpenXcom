@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 
 /**
@@ -34,7 +34,7 @@ class AliensCrashState : public State
 {
 private:
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 public:
 	/// Creates the Aliens Crash state.

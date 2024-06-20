@@ -43,11 +43,13 @@ namespace OpenXcom
  * @param battleGame Pointer to the saved game.
  * @param state Pointer to the Battlescape state.
  */
-AbortMissionState::AbortMissionState(SavedBattleGame* battleGame, BattlescapeState* state) : State("AbortMissionState"), _battleGame(battleGame), _state(state), _inEntrance(0), _inExit(0), _outside(0)
+AbortMissionState::AbortMissionState(SavedBattleGame* battleGame, BattlescapeState* state)
+	: State("AbortMissionState", false), _battleGame(battleGame), _state(state), _inEntrance(0), _inExit(0), _outside(0)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_screen = false;
-	_window = new Window(this, 320, 144, 0, 0);
+	_window = factory.createWindow("battlescape", this, 320, 144, 0, 0);
 	_txtInEntrance = new Text(304, 17, 16, 20);
 	_txtInExit = new Text(304, 17, 16, 40);
 	_txtOutside = new Text(304, 17, 16, 60);
@@ -118,8 +120,9 @@ AbortMissionState::AbortMissionState(SavedBattleGame* battleGame, BattlescapeSta
 	}
 
 	// Set up objects
-	_window->setHighContrast(true);
-	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setHighContrast(true);
+	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtInEntrance->setBig();
 	_txtInEntrance->setHighContrast(true);

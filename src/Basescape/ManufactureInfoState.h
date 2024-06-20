@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class Base;
-class Window;
+
 class Text;
 class ArrowButton;
 class TextButton;
@@ -42,7 +42,7 @@ private:
 	Base * _base;
 	RuleManufacture * _item;
 	Production * _production;
-	Window * _window;
+	entt::entity _window;
 	ArrowButton * _btnUnitInfinity, * _btnUnitMinimum;
 	ArrowButton * _btnUnitUp, * _btnUnitDown, * _btnEngineerUp, * _btnEngineerDown;
 	TextButton * _btnStop, * _btnOk;

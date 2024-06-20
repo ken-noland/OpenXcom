@@ -26,7 +26,6 @@ namespace OpenXcom
 class Base;
 class Craft;
 class TextButton;
-class Window;
 class Text;
 class TextList;
 class RuleCraftWeapon;
@@ -43,7 +42,7 @@ private:
 	size_t _weapon;
 
 	TextButton *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtArmament, *_txtQuantity, *_txtAmmunition, *_txtCurrentWeapon;
 	TextList *_lstWeapons;
 	std::vector<RuleCraftWeapon*> _weapons;

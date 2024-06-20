@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Globe;
 class Base;
@@ -39,7 +39,7 @@ class MonthlyReportState : public State
 {
 private:
 	TextButton *_btnOk, *_btnBigOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtMonth, *_txtRating;
 	Text *_txtIncome, *_txtMaintenance, *_txtBalance, *_txtBonus;
 	Text *_txtDesc, *_txtFailure;

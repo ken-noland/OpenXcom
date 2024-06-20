@@ -24,7 +24,7 @@ namespace OpenXcom
 	class ModListState;
 	class ModInfo;
 	class TextButton;
-	class Window;
+	
 	class Text;
 	class ModInfo;
 
@@ -38,7 +38,7 @@ namespace OpenXcom
 		ModListState *_state;
 		bool _isMaster;
 		TextButton *_btnYes, *_btnNo;
-		Window *_window;
+		entt::entity _window;
 		Text *_txtTitle;
 	public:
 		/// Creates the Confirm OXCE state.

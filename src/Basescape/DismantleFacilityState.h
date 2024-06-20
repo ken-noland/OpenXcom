@@ -26,7 +26,6 @@ class Base;
 class BaseView;
 class BaseFacility;
 class TextButton;
-class Window;
 class Text;
 
 /**
@@ -41,7 +40,7 @@ private:
 	BaseFacility *_fac;
 
 	TextButton *_btnOk, *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtFacility, *_txtRefundValue;
 public:
 	/// Creates the Dismantle Facility state.

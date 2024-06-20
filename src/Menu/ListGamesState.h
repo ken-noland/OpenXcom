@@ -27,7 +27,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class ArrowButton;
@@ -41,7 +41,7 @@ class ListGamesState : public State
 {
 protected:
 	TextButton *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	ToggleTextButton* _btnDelete;
 	Text *_txtTitle, *_txtName, *_txtDate, *_txtDelete, *_txtDetails;
 	TextList *_lstSaves;

@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Craft;
 class Globe;
@@ -39,7 +39,7 @@ private:
 	Globe *_globe;
 
 	TextButton *_btnOk, *_btnRedirect;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtDestination, *_txtPatrolling;
 public:
 	/// Creates the Geoscape Craft state.

@@ -22,7 +22,7 @@
 namespace OpenXcom
 {
 
-class Window;
+
 class Text;
 class TextButton;
 class ToggleTextButton;
@@ -38,7 +38,7 @@ class ConfirmDestinationState : public State
 private:
 	std::vector<Craft*> _crafts;
 	Target *_target;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTarget;
 	Text *_txtETA;
 	TextButton *_btnOk, *_btnTransfer, *_btnCancel;

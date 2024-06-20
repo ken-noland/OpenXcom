@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 
 // Utility class for enqueuing a state in the stack that goes to the main menu
@@ -45,7 +45,7 @@ class MainMenuState : public State
 {
 private:
 	TextButton *_btnNewGame, *_btnNewBattle, *_btnLoad, *_btnOptions, *_btnMods, *_btnQuit, *_btnUpdate;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtUpdateInfo;
 #ifdef _WIN32
 	bool _debugInVisualStudio;

@@ -26,7 +26,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class TextList;
@@ -47,7 +47,7 @@ private:
 	DebriefingState *_debriefingState;
 	TextButton *_btnOk, *_btnCancel;
 	TextEdit *_btnQuickSearch;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtQuantity, *_txtAmountTransfer, *_txtAmountDestination;
 	ComboBox *_cbxCategory;
 	TextList *_lstItems;

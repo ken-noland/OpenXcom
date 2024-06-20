@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class TextList;
@@ -37,7 +37,7 @@ class SoldierMemorialState : public State
 private:
 	TextButton *_btnOk, *_btnStatistics;
 	TextEdit *_btnQuickSearch;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtName, *_txtRank, *_txtDate, *_txtRecruited, *_txtLost;
 	TextList *_lstSoldiers;
 	std::vector<int> _indices;

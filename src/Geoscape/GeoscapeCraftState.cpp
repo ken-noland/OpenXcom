@@ -49,10 +49,8 @@ namespace OpenXcom
  * @param globe Pointer to the Geoscape globe.
  * @param waypoint Pointer to the last UFO position (if redirecting the craft).
  */
-GeoscapeCraftState::GeoscapeCraftState(Craft* craft, Globe* globe, Waypoint* waypoint, bool useCustomSound) : State("GeoscapeCraftState"), _craft(craft), _globe(globe), _waypoint(waypoint)
+GeoscapeCraftState::GeoscapeCraftState(Craft* craft, Globe* globe, Waypoint* waypoint, bool useCustomSound) : State("GeoscapeCraftState", false), _craft(craft), _globe(globe), _waypoint(waypoint)
 {
-	_screen = false;
-
 	_weaponNum = _craft->getRules()->getWeapons();
 	if (_weaponNum > RuleCraft::WeaponMax)
 		_weaponNum = RuleCraft::WeaponMax;
@@ -69,8 +67,10 @@ GeoscapeCraftState::GeoscapeCraftState(Craft* craft, Globe* globe, Waypoint* way
 		}
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 240, 192, 4, 4, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 240, 192, 4, 4, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(210, 17, 32, offset_upper + 20);
 	_txtStatus = new Text(210, 17, 32, offset_upper + 36);
 	_txtBase = new Text(210, 9, 32, offset_upper + 52);

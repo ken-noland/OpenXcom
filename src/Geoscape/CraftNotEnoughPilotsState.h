@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Craft;
 
@@ -35,7 +35,7 @@ class CraftNotEnoughPilotsState : public State
 {
 private:
 	TextButton *_btnOk, *_btnAssignPilots;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtMessage;
 	Craft *_craft;
 public:

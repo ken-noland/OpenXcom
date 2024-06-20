@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class Base;
@@ -49,7 +49,7 @@ private:
 	std::vector<Soldier*> *_list;
 
 	TextButton *_btnOk, *_btnPrev, *_btnNext, *_btnKills, *_btnMissions, *_btnCommendations;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtMedalName, *_txtMedalLevel, *_txtMedalInfo;
 	TextList *_lstPerformance, *_lstKillTotals, *_lstMissionTotals, *_lstCommendations;
 	std::vector<std::string> _commendationsListEntry;

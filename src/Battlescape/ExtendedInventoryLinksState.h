@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class InventoryState;
 class SavedBattleGame;
@@ -36,7 +36,7 @@ class ExtendedInventoryLinksState : public State
 private:
 	TextButton *_btnOk;
 	TextButton *_btnArmor, *_btnAvatar, *_btnEquipmentSave, *_btnEquipmentLoad, *_btnPersonalSave, *_btnPersonalLoad, *_btnNotes, *_btnUfopedia, *_btnAutoEquip;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	InventoryState *_parent;
 	SavedBattleGame* _save;

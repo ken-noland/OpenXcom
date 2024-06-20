@@ -42,10 +42,8 @@ namespace OpenXcom
  * @param grenadeInInventory Pointer to associated grenade.
  */
 PrimeGrenadeState::PrimeGrenadeState(BattleAction *action, bool inInventoryView, BattleItem *grenadeInInventory)
-	: State("PrimeGrenadeState"), _action(action), _inInventoryView(inInventoryView), _grenadeInInventory(grenadeInInventory)
+	: State("PrimeGrenadeState", false), _action(action), _inInventoryView(inInventoryView), _grenadeInInventory(grenadeInInventory)
 {
-	_screen = false;
-
 	// Create objects
 	_title = new Text(192, 24, 65, 44);
 	_frame = new Frame(192, 27, 65, 37);

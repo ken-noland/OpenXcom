@@ -46,12 +46,14 @@ namespace OpenXcom
  * @param globe Pointer to the Geoscape globe.
  * @param first Is this a custom starting base?
  */
-PlaceLiftState::PlaceLiftState(Base* base, Globe* globe, bool first) : State("PlaceLiftState"), _base(base), _globe(globe), _first(first)
+PlaceLiftState::PlaceLiftState(Base* base, Globe* globe, bool first) : State("PlaceLiftState", true), _base(base), _globe(globe), _first(first)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
 	_view = new BaseView(192, 192, 0, 8);
 	_txtTitle = new Text(320, 9, 0, 0);
-	_window = new Window(this, 128, 160, 192, 40, POPUP_NONE);
+	_window = factory.createWindow("placeFacility", this, 128, 160, 192, 40, WindowPopup::POPUP_NONE);
 	_txtHeader = new Text(118, 17, 197, 48);
 	_lstAccessLifts = new TextList(104, 104, 200, 64);
 
@@ -98,6 +100,7 @@ PlaceLiftState::PlaceLiftState(Base* base, Globe* globe, bool first) : State("Pl
 	_lstAccessLifts->setColumns(1, 104);
 	_lstAccessLifts->setSelectable(true);
 	_lstAccessLifts->setBackground(_window);
+
 	_lstAccessLifts->setMargin(2);
 	_lstAccessLifts->setWordWrap(true);
 	_lstAccessLifts->setScrolling(true, 0);
@@ -113,7 +116,10 @@ PlaceLiftState::PlaceLiftState(Base* base, Globe* globe, bool first) : State("Pl
 	{
 		_lstAccessLifts->setVisible(false);
 		_txtHeader->setVisible(false);
-		_window->setVisible(false);
+
+		//KN NOTE: Temp using this even though I know we will be moving away from Surface at some point
+		SurfaceComponent& windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window);
+		windowSurface.getSurface()->setVisible(false);
 
 		_view->setSelectable(_lift->getSizeX(), _lift->getSizeY());
 		_view->onMouseClick((ActionHandler)&PlaceLiftState::viewClick);
@@ -190,7 +196,11 @@ void PlaceLiftState::lstAccessLiftsClick(Action *action)
 	{
 		_lstAccessLifts->setVisible(false);
 		_txtHeader->setVisible(false);
-		_window->setVisible(false);
+
+		// KN NOTE: Temp using this even though I know we will be moving away from Surface at some point
+		SurfaceComponent& windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window);
+		windowSurface.getSurface()->setVisible(false);
+
 
 		_view->setSelectable(_lift->getSizeX(), _lift->getSizeY());
 		_view->onMouseClick((ActionHandler)&PlaceLiftState::viewClick);

@@ -26,7 +26,7 @@ class Base;
 class Text;
 class TextButton;
 class TextList;
-class Window;
+
 
 /**
  * Global Alien Containment screen that provides overview
@@ -36,7 +36,7 @@ class GlobalAlienContainmentState : public State
 {
 private:
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtTotalUsed, *_txtTotalInterrogated, *_txtPrisoner, *_txtPrisonerAmount, *_txtPrisonersInterrogated;
 	TextList *_lstPrisoners;
 

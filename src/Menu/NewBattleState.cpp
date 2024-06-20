@@ -56,7 +56,7 @@
 #include "../Mod/AlienRace.h"
 #include "../Mod/RuleGlobe.h"
 
-#include "../Entities/Engine/Surface.h"
+#include "../Entity/Engine/Surface.h"
 
 namespace OpenXcom
 {
@@ -66,11 +66,13 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  */
 NewBattleState::NewBattleState()
-	: State("NewBattleState"), _craft(0), _selectType(NewBattleSelectType::MISSION), _isRightClick(false),
+	: State("NewBattleState", true), _craft(0), _selectType(NewBattleSelectType::MISSION), _isRightClick(false),
 	_depthVisible(false), _globeTextureVisible(false), _selectedGlobeTexture(0)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0, WindowPopup::POPUP_BOTH);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 264, 183);
 	_txtTitle = new Text(320, 17, 0, 9);
 
@@ -940,11 +942,14 @@ void NewBattleState::fillList(NewBattleSelectType selectType, bool isRightClick)
 		firstRun = true;
 		for (entt::entity surfaceEnt : _surfaces)
 		{
-			Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+			Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
 			_surfaceBackup[surface] = surface->getVisible();
 			surface->setVisible(false);
 		}
-		_window->setVisible(true);
+
+		Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+		windowSurface->setVisible(true);
+
 		_txtTitle->setVisible(true);
 		_btnCancel->setVisible(true);
 		_btnRandom->setVisible(false);

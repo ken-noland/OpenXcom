@@ -38,10 +38,9 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param origin Game section that originated this state.
  */
-AbandonGameState::AbandonGameState(OptionsOrigin origin) : State("AbandonGameState"), _origin(origin)
+AbandonGameState::AbandonGameState(OptionsOrigin origin)
+	: State("AbandonGameState", false), _origin(origin)
 {
-	_screen = false;
-
 	int x;
 	if (_origin == OPT_GEOSCAPE)
 	{
@@ -52,8 +51,10 @@ AbandonGameState::AbandonGameState(OptionsOrigin origin) : State("AbandonGameSta
 		x = 52;
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 216, 160, x, 20, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 216, 160, x, 20, WindowPopup::POPUP_BOTH);
 	_btnYes = new TextButton(50, 20, x+18, 140);
 	_btnNo = new TextButton(50, 20, x+148, 140);
 	_txtTitle = new Text(206, 17, x+5, 70);

@@ -38,12 +38,13 @@ namespace OpenXcom
  * @param list List of soldiers who finished their training
  * @param psi Is psi training?
  */
-TrainingFinishedState::TrainingFinishedState(Base* base, const std::vector<Soldier*>& list, bool psi) : State("TrainingFinishedState"), _base(base), _psi(psi)
+TrainingFinishedState::TrainingFinishedState(Base* base, const std::vector<Soldier*>& list, bool psi)
+	: State("TrainingFinishedState", false), _base(base), _psi(psi)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 288, 180, 16, 10);
+	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);
 	_btnOk = new TextButton(160, 14, 80, 149);
 	_btnOpen = new TextButton(160, 14, 80, 165);
 	_txtTitle = new Text(288, 33, 16, 20);

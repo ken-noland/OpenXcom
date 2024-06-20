@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class Game;
-class Window;
+
 class TextButton;
 class Text;
 class Base;
@@ -37,7 +37,7 @@ class Soldier;
 class TrainingFinishedState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextList * _lstPossibilities;
 	TextButton *_btnOpen, *_btnOk;

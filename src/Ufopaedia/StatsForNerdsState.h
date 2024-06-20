@@ -29,7 +29,7 @@
 namespace OpenXcom
 {
 
-class Window;
+
 class Text;
 class ComboBox;
 class TextList;
@@ -46,7 +46,7 @@ template<typename T, typename I> class ScriptValues;
 class StatsForNerdsState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	ComboBox *_cbxRelatedStuff;
 	Text *_txtArticle;

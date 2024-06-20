@@ -37,7 +37,7 @@
 #include "../Menu/ErrorMessageState.h"
 #include "../Mod/RuleInterface.h"
 
-#include "../Entities/Engine/Surface.h"
+#include "../Entity/Engine/Surface.h"
 
 namespace OpenXcom
 {
@@ -50,11 +50,10 @@ namespace OpenXcom
  * @param first Is this the first base in the game?
  */
 BuildNewBaseState::BuildNewBaseState(Base* base, Globe* globe, bool first)
-	: State("BuildNewBaseState"), _base(base), _globe(globe), _first(first), _oldlat(0), _oldlon(0), _mousex(0), _mousey(0)
+	: State("BuildNewBaseState", false), _base(base), _globe(globe), _first(first), _oldlat(0), _oldlon(0), _mousex(0), _mousey(0)
 {
 	int dx = getGame()->getScreen()->getDX();
 	int dy = getGame()->getScreen()->getDY();
-	_screen = false;
 
 	_oldshowradar = Options::globeRadarLines;
 	if (!_oldshowradar)
@@ -67,9 +66,16 @@ BuildNewBaseState::BuildNewBaseState(Base* base, Globe* globe, bool first)
 	_btnZoomIn = new InteractiveSurface(23, 23, 295 + dx * 2, 156 + dy);
 	_btnZoomOut = new InteractiveSurface(13, 17, 300 + dx * 2, 182 + dy);
 
-	_window = new Window(this, 256, 28, 0, 0);
-	_window->setX(dx);
-	_window->setDY(0);
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
+	_window = factory.createWindow("windowName", this, 256, 28, 0, 0);
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+
+	windowSurface->setX(dx);
+	windowComponent.setDY(0);
+
 	_btnCancel = new TextButton(54, 12, 186 + dx, 8);
 	_txtTitle = new Text(180, 16, 8 + dx, 6);
 
@@ -401,12 +407,14 @@ void BuildNewBaseState::btnCancelClick(Action *)
  */
 void BuildNewBaseState::resize(int &dX, int &dY)
 {
-	for (entt::entity surfaceEnt : _surfaces)
+	for (const entt::entity& surfaceEntity : _surfaces)
 	{
-		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+		if (surfaceEntity == _window) { continue; }
+
+		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEntity).getSurface();
 
 		surface->setX(surface->getX() + dX / 2);
-		if (surface != _window && surface != _btnCancel && surface != _txtTitle)
+		if (surface != _btnCancel && surface != _txtTitle)
 		{
 			surface->setY(surface->getY() + dY / 2);
 		}

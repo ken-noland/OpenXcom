@@ -35,12 +35,13 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param possibilities List of newly possible craft to buy/rent
  */
-NewPossibleCraftState::NewPossibleCraftState(Base* base, const std::vector<RuleCraft*>& possibilities) : State("NewPossibleCraftState"), _base(base)
+NewPossibleCraftState::NewPossibleCraftState(Base* base, const std::vector<RuleCraft*>& possibilities)
+	: State("NewPossibleCraftState", false), _base(base)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 288, 180, 16, 10);
+	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);
 	_btnOk = new TextButton(160, 14, 80, 149);
 	_btnPurchase = new TextButton(160, 14, 80, 165);
 	_txtTitle = new Text(288, 40, 16, 20);

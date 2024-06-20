@@ -37,12 +37,12 @@ namespace OpenXcom
  * @param craft Pointer to the craft to display.
  * @param globe Pointer to the Geoscape globe.
  */
-CraftPatrolState::CraftPatrolState(Craft* craft, Globe* globe) : State("CraftPatrolState"), _craft(craft), _globe(globe)
+CraftPatrolState::CraftPatrolState(Craft* craft, Globe* globe) : State("CraftPatrolState", false), _craft(craft), _globe(globe)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 224, 168, 16, 16, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 224, 168, 16, 16, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(140, 12, 58, 144);
 	_btnRedirect = new TextButton(140, 12, 58, 160);
 	_txtDestination = new Text(224, 64, 16, 48);

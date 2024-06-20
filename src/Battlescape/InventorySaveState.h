@@ -25,7 +25,7 @@ namespace OpenXcom
 
 class TextEdit;
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class EquipmentLayoutItem;
@@ -38,7 +38,7 @@ class InventorySaveState : public State
 {
 private:
 	InventoryState *_parent;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextList *_lstLayout;
 	TextButton *_btnCancel, *_btnSave, *_btnSaveWithArmor;

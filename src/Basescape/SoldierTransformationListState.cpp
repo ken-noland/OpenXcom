@@ -49,13 +49,16 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param screenActions Pointer to the list of transformations in the parent SoldiersState.
  */
-SoldierTransformationListState::SoldierTransformationListState(Base* base, ComboBox* screenActions) : State("SoldierTransformationListState"), _base(base), _screenActions(screenActions)
+SoldierTransformationListState::SoldierTransformationListState(Base* base, ComboBox* screenActions)
+	: State("SoldierTransformationListState", true), _base(base), _screenActions(screenActions)
 {
 	// Calculate once
 	getGame()->getSavedGame()->getAvailableTransformations(_availableTransformations, getGame()->getMod(), _base);
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("transformationList", this, 320, 200, 0, 0);
 	_txtTitle = new Text(310, 17, 5, 8);
 	_cbxSoldierType = new ComboBox(this, 148, 16, 8, 30, false);
 	_cbxSoldierStatus = new ComboBox(this, 148, 16, 164, 30, false);

@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Base;
 
@@ -34,7 +34,7 @@ class PsiTrainingState : public State
 {
 private:
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	std::vector<TextButton*> _btnBases;
 	std::vector<Base*> _bases;

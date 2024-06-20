@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Craft;
 class GeoscapeState;
@@ -39,7 +39,7 @@ private:
 	GeoscapeState *_state;
 
 	TextButton *_btnOk, *_btnOk5Secs;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtMessage;
 public:
 	/// Creates the Low Fuel state.

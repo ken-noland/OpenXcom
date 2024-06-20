@@ -89,7 +89,7 @@
 #include <algorithm>
 #include "../Basescape/SoldiersAIState.h"
 
-#include "../Entities/Engine/Surface.h"
+#include "../Entity/Engine/Surface.h"
 
 namespace OpenXcom
 {
@@ -98,7 +98,8 @@ namespace OpenXcom
  * Initializes all the elements in the Battlescape screen.
  * @param game Pointer to the core game.
  */
-BattlescapeState::BattlescapeState() : State("BattlescapeState"), 
+BattlescapeState::BattlescapeState()
+	: State("BattlescapeState", true), 
 	_reserve(0), _touchButtonsEnabled(false), _touchButtonsEnabledLastTurn(false), _manaBarVisible(false),
 	_firstInit(true), _paletteResetNeeded(false), _paletteResetRequested(false),
 	_isMouseScrolling(false), _isMouseScrolled(false),
@@ -770,7 +771,7 @@ void BattlescapeState::init()
 		_save->setPaletteByDepth(this);
 		for (entt::entity surfaceEnt : _surfaces)
 		{
-			Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+			Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
 			surface->setPalette(_palette);
 		}
 	}
@@ -3836,7 +3837,7 @@ void BattlescapeState::resize(int &dX, int &dY)
 
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
 
 		if (surface == _btnCtrl || surface == _btnAlt || surface == _btnShift || surface == _btnRMB || surface == _btnMMB)
 		{

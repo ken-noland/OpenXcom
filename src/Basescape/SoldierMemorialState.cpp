@@ -42,10 +42,12 @@ namespace OpenXcom
  * Initializes all the elements in the Soldier Memorial screen.
  * @param game Pointer to the core game.
  */
-SoldierMemorialState::SoldierMemorialState() : State("SoldierMemorialState")
+SoldierMemorialState::SoldierMemorialState() : State("SoldierMemorialState", true)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("soldierMemorial", this, 320, 200, 0, 0);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 16, 10);
 	_btnOk = new TextButton(148, 16, 164, 176);
 	_btnStatistics = new TextButton(148, 16, 8, 176);
@@ -108,6 +110,7 @@ SoldierMemorialState::SoldierMemorialState() : State("SoldierMemorialState")
 	_lstSoldiers->setColumns(5, 114, 88, 30, 25, 35);
 	_lstSoldiers->setSelectable(true);
 	_lstSoldiers->setBackground(_window);
+
 	_lstSoldiers->setMargin(8);
 	_lstSoldiers->onMouseClick((ActionHandler)&SoldierMemorialState::lstSoldiersClick);
 

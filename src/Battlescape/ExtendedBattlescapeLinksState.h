@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class BattlescapeState;
 class SavedBattleGame;
@@ -37,7 +37,7 @@ private:
 	TextButton *_btnOk;
 	TextButton *_btnTouch, *_btnNightVision, *_btnPersonalLights, *_btnBrightness, *_btnTurnDiary, *_btnBriefing, *_btnNotes, *_btnMusic;
 	TextButton *_btnKillAll;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	BattlescapeState *_parent;
 	SavedBattleGame* _save;

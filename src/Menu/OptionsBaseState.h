@@ -30,7 +30,7 @@ enum OptionsOrigin
 	OPT_BATTLESCAPE
 };
 
-class Window;
+
 class TextButton;
 class Text;
 
@@ -42,7 +42,7 @@ class OptionsBaseState : public State
 {
 protected:
 	OptionsOrigin _origin;
-	Window *_window;
+	entt::entity _window;
 	TextButton *_btnVideo, *_btnAudio, *_btnControls, *_btnGeoscape, *_btnBattlescape, *_btnAdvanced, *_btnFolders;
 	TextButton *_btnOk, *_btnCancel, *_btnDefault;
 	Text *_txtTooltip;

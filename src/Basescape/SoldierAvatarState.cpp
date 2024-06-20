@@ -42,12 +42,12 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param soldier ID of the selected soldier.
  */
-SoldierAvatarState::SoldierAvatarState(Base* base, size_t soldier) : State("SoldierAvatarState"), _base(base), _soldier(soldier)
+SoldierAvatarState::SoldierAvatarState(Base* base, size_t soldier) : State("SoldierAvatarState", false), _base(base), _soldier(soldier)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 240, 160, 40, 24, POPUP_BOTH);
+	_window = factory.createWindow("soldierAvatar", this, 240, 160, 40, 24, WindowPopup::POPUP_BOTH);
 	_soldierSurface = new Surface(320, 200, 0, 0);
 	_btnCancel = new TextButton(100, 16, 55, 160);
 	_btnOk = new TextButton(100, 16, 165, 160);
@@ -91,6 +91,7 @@ SoldierAvatarState::SoldierAvatarState(Base* base, size_t soldier) : State("Sold
 	_lstAvatar->setColumns(1, 125);
 	_lstAvatar->setSelectable(true);
 	_lstAvatar->setBackground(_window);
+
 	_lstAvatar->setMargin(8);
 
 	std::string prefix = "STR_AVATAR_NAME_";

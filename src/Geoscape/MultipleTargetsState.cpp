@@ -45,9 +45,9 @@ namespace OpenXcom
  * @param state Pointer to the Geoscape state.
  */
 MultipleTargetsState::MultipleTargetsState(std::vector<Target*> targets, std::vector<Craft*> crafts, GeoscapeState *state, bool useCustomSound)
-	: State("MultipleTargetsState"), _targets(targets), _crafts(std::move(crafts)), _state(state), _useCustomSound(useCustomSound)
+	: State("MultipleTargetsState", false), _targets(targets), _crafts(std::move(crafts)), _state(state), _useCustomSound(useCustomSound)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	if (_targets.size() > 1)
 	{
@@ -56,7 +56,7 @@ MultipleTargetsState::MultipleTargetsState(std::vector<Target*> targets, std::ve
 		int btnY = winY + MARGIN;
 
 		// Create objects
-		_window = new Window(this, 136, winHeight, 60, winY, POPUP_VERTICAL);
+		_window = factory.createWindow("windowName", this, 136, winHeight, 60, winY, WindowPopup::POPUP_VERTICAL);
 
 		// Set palette
 		setInterface("multipleTargets");

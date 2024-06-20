@@ -40,10 +40,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-MonthlyCostsState::MonthlyCostsState(Base* base) : State("MonthlyCostsState"), _base(base)
+MonthlyCostsState::MonthlyCostsState(Base* base) : State("MonthlyCostsState", true), _base(base)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("costsInfo", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(300, 20, 10, 170);
 	_txtTitle = new Text(310, 17, 5, 12);
 	_txtCost = new Text(80, 9, 115, 32);

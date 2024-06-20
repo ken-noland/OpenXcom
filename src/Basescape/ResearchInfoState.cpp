@@ -44,7 +44,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param rule A RuleResearch which will be used to create a new ResearchProject
  */
-ResearchInfoState::ResearchInfoState(Base* base, RuleResearch* rule) : State("ResearchInfoState"), 
+ResearchInfoState::ResearchInfoState(Base* base, RuleResearch* rule) : State("ResearchInfoState", false), 
 	_base(base), _project(nullptr), _rule(rule)
 {
 	int rng = RNG::generate(50, 150);
@@ -64,7 +64,7 @@ ResearchInfoState::ResearchInfoState(Base* base, RuleResearch* rule) : State("Re
  * @param base Pointer to the base to get info from.
  * @param project A ResearchProject to modify
  */
-ResearchInfoState::ResearchInfoState(Base* base, ResearchProject* project) : State("ResearchInfoState"), _base(base), _project(project), _rule(0)
+ResearchInfoState::ResearchInfoState(Base* base, ResearchProject* project) : State("ResearchInfoState", false), _base(base), _project(project), _rule(0)
 {
 	buildUi();
 }
@@ -74,9 +74,9 @@ ResearchInfoState::ResearchInfoState(Base* base, ResearchProject* project) : Sta
  */
 void ResearchInfoState::buildUi()
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
-	_window = new Window(this, 230, 140, 45, 30);
+	_window = factory.createWindow("allocateResearch", this, 230, 140, 45, 30);
 	_txtTitle = new Text(210, 17, 61, 40);
 
 	_txtAvailableScientist = new Text(210, 9, 61, 60);

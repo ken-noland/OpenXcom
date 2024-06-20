@@ -134,7 +134,7 @@
 #include "../fmath.h"
 #include "../fallthrough.h"
 
-#include "../Entities/Engine/Surface.h"
+#include "../Entity/Engine/Surface.h"
 
 namespace OpenXcom
 {
@@ -144,7 +144,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  */
 GeoscapeState::GeoscapeState()
-	: State("GeoscapeState"), _pause(false), _zoomInEffectDone(false), _zoomOutEffectDone(false), _minimizedDogfights(0), _slowdownCounter(0)
+	: State("GeoscapeState", true), _pause(false), _zoomInEffectDone(false), _zoomOutEffectDone(false), _minimizedDogfights(0), _slowdownCounter(0)
 {
 	int screenWidth = Options::baseXGeoscape;
 	int screenHeight = Options::baseYGeoscape;
@@ -4641,7 +4641,7 @@ void GeoscapeState::resize(int &dX, int &dY)
 
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
 		if (surface != _globe)
 		{
 			surface->setX(surface->getX() + dX);

@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextList;
 class Soldier;
@@ -34,7 +34,7 @@ class Soldier;
 class InventoryPersonalState : public State
 {
 private:
-	Window* _window;
+	entt::entity _window;
 	Text* _txtTitle;
 	TextList* _lstLayout;
 	TextButton* _btnCancel;

@@ -31,6 +31,8 @@
 #include "../Savegame/Soldier.h"
 #include "../Mod/RuleSoldier.h"
 
+#include "../Entity/Interface/Interface.h"
+
 namespace OpenXcom
 {
 
@@ -40,12 +42,13 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param soldier ID of the selected soldier.
  */
-CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft) : State("CraftPilotSelectState"), _base(base), _craft(craft)
+CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft)
+	: State("CraftPilotSelectState", false), _base(base), _craft(craft)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 232, 156, 44, 28, POPUP_BOTH);
+	_window = factory.createWindow("craftPilotsSelect", this, 232, 156, 44, 28, WindowPopup::POPUP_BOTH);
 	_btnCancel = new TextButton(180, 16, 70, 158);
 	_txtTitle = new Text(222, 9, 49, 36);
 	_txtName = new Text(120, 9, 60, 52);
@@ -89,8 +92,8 @@ CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft) : State("
 	_lstPilot->setAlign(ALIGN_RIGHT);
 	_lstPilot->setAlign(ALIGN_LEFT, 0);
 	_lstPilot->setSelectable(true);
-	_lstPilot->setBackground(_window);
 	_lstPilot->setMargin(8);
+	_lstPilot->setBackground(_window);
 
 	for (const Soldier* soldier : _base->getSoldiers())
 	{

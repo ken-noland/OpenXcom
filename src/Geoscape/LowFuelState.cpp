@@ -35,12 +35,12 @@ namespace OpenXcom
  * @param craft Pointer to the craft to display.
  * @param state Pointer to the Geoscape.
  */
-LowFuelState::LowFuelState(Craft* craft, GeoscapeState* state) : State("LowFuelState"), _craft(craft), _state(state)
+LowFuelState::LowFuelState(Craft* craft, GeoscapeState* state) : State("LowFuelState", false), _craft(craft), _state(state)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 224, 120, 16, 40, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 224, 120, 16, 40, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(90, 18, 30, 120);
 	_btnOk5Secs = new TextButton(90, 18, 136, 120);
 	_txtTitle = new Text(214, 17, 21, 60);

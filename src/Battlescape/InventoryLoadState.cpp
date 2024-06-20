@@ -34,12 +34,13 @@ namespace OpenXcom
 /**
 * Initializes all the elements in the Load Inventory window.
 */
-InventoryLoadState::InventoryLoadState(InventoryState* parent) : State("InventoryLoadState"), _parent(parent)
+InventoryLoadState::InventoryLoadState(InventoryState* parent)
+	: State("InventoryLoadState", false), _parent(parent)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 240, 136, 40, 36+1, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 240, 136, 40, 36 + 1, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(230, 16, 45, 44+3);
 	_lstLayout = new TextList(208, 80, 48, 60);
 	_btnCancel = new TextButton(120, 16, 90, 148);
@@ -54,8 +55,9 @@ InventoryLoadState::InventoryLoadState(InventoryState* parent) : State("Inventor
 	centerAllSurfaces();
 
 	// Set up objects
-	_window->setHighContrast(true);
-	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setHighContrast(true);
+	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtTitle->setHighContrast(true);
 	_txtTitle->setAlign(ALIGN_CENTER);

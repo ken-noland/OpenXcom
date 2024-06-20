@@ -38,12 +38,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param origin Game section that originated this state.
  */
-OptionsConfirmState::OptionsConfirmState(OptionsOrigin origin) : State("OptionsConfirmState"), _origin(origin), _countdown(15)
+OptionsConfirmState::OptionsConfirmState(OptionsOrigin origin) : State("OptionsConfirmState", false), _origin(origin), _countdown(15)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 216, 100, 52, 50, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 216, 100, 52, 50, WindowPopup::POPUP_BOTH);
 	_btnYes = new TextButton(50, 20, 70, 120);
 	_btnNo = new TextButton(50, 20, 200, 120);
 	_txtTitle = new Text(206, 20, 57, 70);

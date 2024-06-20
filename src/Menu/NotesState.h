@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class TextEdit;
 class TextList;
@@ -37,7 +37,7 @@ class ToggleTextButton;
 class NotesState : public State
 {
 protected:
-	Window* _window;
+	entt::entity _window;
 	Text* _txtTitle;
 	Text* _txtDelete;
 	TextList* _lstNotes;

@@ -50,7 +50,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param item The RuleManufacture to produce.
  */
-ManufactureInfoState::ManufactureInfoState(Base* base, RuleManufacture* item) : State("ManufactureInfoState"), _base(base), _item(item), _production(0)
+ManufactureInfoState::ManufactureInfoState(Base* base, RuleManufacture* item) : State("ManufactureInfoState", false), _base(base), _item(item), _production(0)
 {
 	buildUi();
 }
@@ -61,7 +61,7 @@ ManufactureInfoState::ManufactureInfoState(Base* base, RuleManufacture* item) : 
  * @param base Pointer to the base to get info from.
  * @param production The Production to modify.
  */
-ManufactureInfoState::ManufactureInfoState(Base* base, Production* production) : State("ManufactureInfoState"), _base(base), _item(0), _production(production)
+ManufactureInfoState::ManufactureInfoState(Base* base, Production* production) : State("ManufactureInfoState", false), _base(base), _item(0), _production(production)
 {
 	buildUi();
 }
@@ -71,9 +71,9 @@ ManufactureInfoState::ManufactureInfoState(Base* base, Production* production) :
  */
 void ManufactureInfoState::buildUi()
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
-	_window = new Window(this, 320, 160, 0, 20, POPUP_BOTH);
+	_window = factory.createWindow("manufactureInfo", this, 320, 160, 0, 20, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(320, 17, 0, 30);
 	_btnOk = new TextButton(136, 16, 168, 155);
 	_btnStop = new TextButton(136, 16, 16, 155);

@@ -42,12 +42,13 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the ExtendedBattlescapeLinksState screen.
  */
-ExtendedBattlescapeLinksState::ExtendedBattlescapeLinksState(BattlescapeState* parent, SavedBattleGame* save) : State("ExtendedBattlescapeLinksState"), _parent(parent), _save(save)
+ExtendedBattlescapeLinksState::ExtendedBattlescapeLinksState(BattlescapeState* parent, SavedBattleGame* save)
+	: State("ExtendedBattlescapeLinksState", false), _parent(parent), _save(save)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 180, 32, 10, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, 180, 32, 10, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(220, 17, 50, 33);
 	if (Options::oxceFatFingerLinks)
 	{

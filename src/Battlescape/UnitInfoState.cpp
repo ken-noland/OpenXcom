@@ -48,7 +48,7 @@ namespace OpenXcom
  * @param mindProbe Is player using a Mind Probe?
  */
 UnitInfoState::UnitInfoState(BattleUnit *unit, BattlescapeState *parent, bool fromInventory, bool mindProbe)
-	: State("UnitInfoState"), _unit(unit), _parent(parent), _fromInventory(fromInventory), _mindProbe(mindProbe)
+	: State("UnitInfoState", true), _unit(unit), _parent(parent), _fromInventory(fromInventory), _mindProbe(mindProbe)
 {
 	if (Options::maximizeInfoScreens)
 	{

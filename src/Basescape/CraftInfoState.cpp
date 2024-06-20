@@ -57,16 +57,18 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param craftId ID of the selected craft.
  */
-CraftInfoState::CraftInfoState(Base* base, size_t craftId) : State("CraftInfoState"), _base(base), _craftId(craftId), _craft(0)
+CraftInfoState::CraftInfoState(Base* base, size_t craftId) : State("CraftInfoState", true), _base(base), _craftId(craftId), _craft(0)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
 	if (getGame()->getSavedGame()->getMonthsPassed() != -1)
 	{
-		_window = new Window(this, 320, 200, 0, 0, POPUP_BOTH);
+		_window = factory.createWindow("craftInfo", this, 320, 200, 0, 0, WindowPopup::POPUP_BOTH);
 	}
 	else
 	{
-		_window = new Window(this, 320, 200, 0, 0, POPUP_NONE);
+		_window = factory.createWindow("craftInfo", this, 320, 200, 0, 0, WindowPopup::POPUP_NONE);
 	}
 
 	_craft = _base->getCrafts().at(_craftId);

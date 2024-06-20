@@ -29,7 +29,7 @@ enum SelectMusicTrackOrigin
 	SMT_BATTLESCAPE
 };
 
-class Window;
+
 class Text;
 class TextButton;
 class TextList;
@@ -43,7 +43,7 @@ class SelectMusicTrackState : public State
 {
 private:
 	SelectMusicTrackOrigin _origin;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextButton *_btnCancel;
 	TextList *_lstTracks;

@@ -27,7 +27,6 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
 class Text;
 class TextList;
 class RuleResearch;
@@ -44,7 +43,7 @@ class TechTreeViewerState : public State
 {
 private:
 	TextButton *_btnOk, *_btnNew;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtSelectedTopic, *_txtProgress, *_txtCostIndicator;
 	TextList *_lstLeft, *_lstRight, *_lstFull;
 	Uint8 _purple, _pink, _blue, _white, _gold, _grey;

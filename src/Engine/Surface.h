@@ -23,6 +23,8 @@
 #include <memory>
 #include <vector>
 #include <assert.h>
+#include <entt/entt.hpp>
+
 #include "GraphSubset.h"
 
 namespace OpenXcom
@@ -195,6 +197,10 @@ public:
 	virtual void setVisible(bool visible);
 	/// Gets the surface's visibility.
 	bool getVisible() const;
+	/// Get the redraw flag which indicates if the surface should be redrawn.
+	bool shouldRedraw() { return _redraw; }
+	/// Set the redraw flag which indicates if the surface should be redrawn.
+	void setRedraw(bool redraw) { _redraw = redraw; }
 	/// Gets the cropping rectangle for the surface.
 	SurfaceCrop getCrop() const;
 	/**

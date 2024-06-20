@@ -40,10 +40,12 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the GlobalManufacture screen.
  */
-GlobalManufactureState::GlobalManufactureState(bool openedFromBasescape) : State("GlobalManufactureState"), _openedFromBasescape(openedFromBasescape)
+GlobalManufactureState::GlobalManufactureState(bool openedFromBasescape) : State("GlobalManufactureState", true), _openedFromBasescape(openedFromBasescape)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("globalManufactureMenu", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(304, 16, 8, 176);
 	_txtTitle = new Text(310, 17, 5, 8);
 	_txtAvailable = new Text(150, 9, 8, 24);
@@ -108,6 +110,7 @@ GlobalManufactureState::GlobalManufactureState(bool openedFromBasescape) : State
 	_lstManufacture->setAlign(ALIGN_LEFT, 0);
 	_lstManufacture->setSelectable(true);
 	_lstManufacture->setBackground(_window);
+
 	_lstManufacture->setMargin(2);
 	_lstManufacture->setWordWrap(true);
 	_lstManufacture->onMouseClick((ActionHandler)&GlobalManufactureState::onSelectBase, SDL_BUTTON_LEFT);

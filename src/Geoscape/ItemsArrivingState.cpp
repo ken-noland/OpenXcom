@@ -42,12 +42,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param state Pointer to the Geoscape state.
  */
-ItemsArrivingState::ItemsArrivingState(GeoscapeState* state) : State("ItemsArrivingState"), _state(state), _base(0)
+ItemsArrivingState::ItemsArrivingState(GeoscapeState* state) : State("ItemsArrivingState", false), _state(state), _base(0)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 320, 184, 0, 8, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 320, 184, 0, 8, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(142, 16, 16, 166);
 	_btnGotoBase = new TextButton(142, 16, 162, 166);
 	_txtTitle = new Text(310, 17, 5, 18);

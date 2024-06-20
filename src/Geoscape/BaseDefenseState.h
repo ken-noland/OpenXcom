@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Base;
 class Ufo;
@@ -41,7 +41,7 @@ class BaseDefenseState : public State
 private:
 	TextButton *_btnOk;
 	TextButton *_btnStart, *_btnAbort;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtInit;
 	TextList *_lstDefenses;
 	Base *_base;

@@ -35,12 +35,13 @@ namespace OpenXcom
  * Initializes all the elements in a Craft Not Enough Pilots window.
  * @param craft Relevant craft.
  */
-CraftNotEnoughPilotsState::CraftNotEnoughPilotsState(Craft* craft) : State("CraftNotEnoughPilotsState"), _craft(craft)
+CraftNotEnoughPilotsState::CraftNotEnoughPilotsState(Craft* craft)
+	: State("CraftNotEnoughPilotsState", false), _craft(craft)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 160, 32, 20, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(108, 18, 48, 150);
 	_btnAssignPilots = new TextButton(108, 18, 164, 150);
 	_txtMessage = new Text(246, 96, 37, 42);

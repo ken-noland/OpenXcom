@@ -261,9 +261,9 @@ void Mod::resetGlobalStatics()
 
 	TextButton::soundPress = 0;
 
-	Window::soundPopup[0] = 0;
-	Window::soundPopup[1] = 0;
-	Window::soundPopup[2] = 0;
+	//Window::soundPopup[0] = 0;
+	//Window::soundPopup[1] = 0;
+	//Window::soundPopup[2] = 0;
 
 	Pathfinding::red = 3;
 	Pathfinding::yellow = 10;
@@ -6044,9 +6044,9 @@ void Mod::loadExtraResources()
 	}
 
 	TextButton::soundPress = getSound("GEO.CAT", Mod::BUTTON_PRESS);
-	Window::soundPopup[0] = getSound("GEO.CAT", Mod::WINDOW_POPUP[0]);
-	Window::soundPopup[1] = getSound("GEO.CAT", Mod::WINDOW_POPUP[1]);
-	Window::soundPopup[2] = getSound("GEO.CAT", Mod::WINDOW_POPUP[2]);
+	//Window::soundPopup[0] = getSound("GEO.CAT", Mod::WINDOW_POPUP[0]);
+	//Window::soundPopup[1] = getSound("GEO.CAT", Mod::WINDOW_POPUP[1]);
+	//Window::soundPopup[2] = getSound("GEO.CAT", Mod::WINDOW_POPUP[2]);
 }
 
 void Mod::loadExtraSprite(ExtraSprites *spritePack)

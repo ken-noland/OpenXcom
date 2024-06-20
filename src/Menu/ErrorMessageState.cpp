@@ -37,7 +37,8 @@ namespace OpenXcom
  * @param bg Background image.
  * @param bgColor Background color (-1 for Battlescape).
  */
-ErrorMessageState::ErrorMessageState(const std::string &msg, SDL_Color *palette, Uint8 color, const std::string &bg, int bgColor) : State("ErrorMessageState")
+ErrorMessageState::ErrorMessageState(const std::string &msg, SDL_Color *palette, Uint8 color, const std::string &bg, int bgColor)
+	: State("ErrorMessageState", true)
 {
 	create(msg, palette, color, bg, bgColor);
 }
@@ -60,10 +61,10 @@ ErrorMessageState::~ErrorMessageState()
  */
 void ErrorMessageState::create(const std::string &str, SDL_Color *palette, Uint8 color, const std::string &bg, int bgColor)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 160, 32, 20, POPUP_BOTH);
+	_window = factory.createWindow("errorMessage", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(120, 18, 100, 154);
 	_txtMessage = new Text(246, 80, 37, 50);
 
@@ -72,15 +73,16 @@ void ErrorMessageState::create(const std::string &str, SDL_Color *palette, Uint8
 	if (bgColor != -1)
 		setStatePalette(getGame()->getMod()->getPalette("BACKPALS.DAT")->getColors(Palette::blockOffset(bgColor)), Palette::backPos, 16);
 
-	add(_window);
+	add(_window, "window", "errorMessage");
 	add(_btnOk);
 	add(_txtMessage);
 
 	centerAllSurfaces();
 
 	// Set up objects
-	_window->setColor(color);
-	_window->setBackground(getGame()->getMod()->getSurface(bg));
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setColor(color);
+	windowComponent.setBackground(getGame()->getMod()->getSurface(bg));
 
 	_btnOk->setColor(color);
 	_btnOk->setText(tr("STR_OK"));
@@ -97,7 +99,7 @@ void ErrorMessageState::create(const std::string &str, SDL_Color *palette, Uint8
 
 	if (bgColor == -1)
 	{
-		_window->setHighContrast(true);
+		windowComponent.setHighContrast(true);
 		_btnOk->setHighContrast(true);
 		_txtMessage->setHighContrast(true);
 	}

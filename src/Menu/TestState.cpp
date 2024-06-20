@@ -77,10 +77,12 @@ static std::map<int, PaletteTestMetadata> _paletteMetadataMap =
 /**
  * Initializes all the elements in the test screen.
  */
-TestState::TestState() : State("TestState")
+TestState::TestState() : State("TestState", true)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_txtTitle = new Text(300, 17, 10, 7);
 	_txtPalette = new Text(66, 9, 10, 30);
 	_cbxPalette = new ComboBox(this, 114, 16, 78, 26);

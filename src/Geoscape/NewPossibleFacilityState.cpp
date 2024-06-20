@@ -36,12 +36,13 @@ namespace OpenXcom
  * @param globe Pointer to the globe.
  * @param possibilities List of newly possible base facilities to build
  */
-NewPossibleFacilityState::NewPossibleFacilityState(Base* base, Globe* globe, const std::vector<RuleBaseFacility*>& possibilities) : State("NewPossibleFacilityState"), _base(base), _globe(globe)
+NewPossibleFacilityState::NewPossibleFacilityState(Base* base, Globe* globe, const std::vector<RuleBaseFacility*>& possibilities)
+	: State("NewPossibleFacilityState", false), _base(base), _globe(globe)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 288, 180, 16, 10);
+	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);
 	_btnOk = new TextButton(160, 14, 80, 149);
 	_btnOpen = new TextButton(160, 14, 80, 165);
 	_txtTitle = new Text(288, 40, 16, 20);

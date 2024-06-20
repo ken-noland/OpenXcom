@@ -59,7 +59,7 @@ namespace OpenXcom
  * @param state Pointer to the Battlescape state.
  */
 NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* state)
-	: State("NextTurnState"), _battleGame(battleGame), _state(state), _timer(0), _currentTurn(0), _showBriefing(false)
+	: State("NextTurnState", true), _battleGame(battleGame), _state(state), _timer(0), _currentTurn(0), _showBriefing(false)
 {
 	if (_battleGame->isPreview())
 	{
@@ -90,7 +90,9 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	// Create objects
 	int y = state->getMap()->getMessageY();
 
-	_window = new Window(this, 320, 200, 0, 0);
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
+	_window = factory.createWindow("nextTurn", this, 320, 200, 0, 0);
 	_txtMessageReinforcements = new Text(320, 33, 0, 8);
 	_btnBriefingReinforcements = new TextButton(120, 16, 100, 45);
 	_txtTitle = new Text(320, 17, 0, 68);
@@ -105,7 +107,7 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	battleGame->setPaletteByDepth(this);
 
 	add(_bg);
-	add(_window);
+	add(_window, "window", "nextTurn");
 	add(_txtMessageReinforcements, "messageWindows", "battlescape");
 	add(_btnBriefingReinforcements, "messageWindowButtons", "battlescape");
 	add(_txtTitle, "messageWindows", "battlescape");
@@ -133,7 +135,8 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	}
 	_bg->drawRect(&rect, Palette::blockOffset(0) + bgColor);
 	// make this screen line up with the hidden movement screen
-	_window->setY(y);
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	windowSurface->setY(y);
 	_txtMessageReinforcements->setY(y + 8);
 	_btnBriefingReinforcements->setY(y + 45);
 	_txtTitle->setY(y + 68);
@@ -144,9 +147,10 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	_txtMessage3->setY(y + 172);
 
 	// Set up objects
-	_window->setColor(Palette::blockOffset(0)-1);
-	_window->setHighContrast(true);
-	_window->setBackground(getGame()->getMod()->getSurface(_battleGame->getHiddenMovementBackground()));
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setColor(Palette::blockOffset(0) - 1);
+	windowComponent.setHighContrast(true);
+	windowComponent.setBackground(getGame()->getMod()->getSurface(_battleGame->getHiddenMovementBackground()));
 
 
 	_txtMessageReinforcements->setBig();

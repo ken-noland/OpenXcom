@@ -35,12 +35,12 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the Turn Diary window.
  */
-TurnDiaryState::TurnDiaryState(const HitLog *hitLog) : State("TurnDiaryState")
+TurnDiaryState::TurnDiaryState(const HitLog *hitLog) : State("TurnDiaryState", false)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 216, 160, 52, 20, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 216, 160, 52, 20, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(206, 17, 57, 32);
 	_btnCancel = new TextButton(140, 16, 90, 156);
 	_lstTurnDiary = new TextList(180, 96, 65, 52);
@@ -56,8 +56,9 @@ TurnDiaryState::TurnDiaryState(const HitLog *hitLog) : State("TurnDiaryState")
 	centerAllSurfaces();
 
 	// Set up objects
-	_window->setHighContrast(true);
-	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setHighContrast(true);
+	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setBig();

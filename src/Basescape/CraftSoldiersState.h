@@ -25,7 +25,6 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
 class Text;
 class TextList;
 class ComboBox;
@@ -42,7 +41,7 @@ class CraftSoldiersState : public State
 private:
 	TextButton *_btnOk;
 	TextButton *_btnPreview;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtName, *_txtRank, *_txtCraft, *_txtAvailable, *_txtUsed;
 	ComboBox *_cbxSortBy;
 	TextList *_lstSoldiers;

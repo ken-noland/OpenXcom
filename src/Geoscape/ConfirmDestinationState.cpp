@@ -56,10 +56,9 @@ namespace OpenXcom
  * @param crafts Vector for the crafts part of a wing to retarget.
  * @param target Pointer to the selected target (NULL if it's just a point on the globe).
  */
-ConfirmDestinationState::ConfirmDestinationState(std::vector<Craft*> crafts, Target* target) : State("ConfirmDestinationState"), _crafts(std::move(crafts)), _target(target)
+ConfirmDestinationState::ConfirmDestinationState(std::vector<Craft*> crafts, Target* target) : State("ConfirmDestinationState", false), _crafts(std::move(crafts)), _target(target)
 {
 	Waypoint *w = dynamic_cast<Waypoint*>(_target);
-	_screen = false;
 
 	Base *base = dynamic_cast<Base*>(_target);
 	bool transferAvailable = false; // no transfer allowed for wings
@@ -72,8 +71,10 @@ ConfirmDestinationState::ConfirmDestinationState(std::vector<Craft*> crafts, Tar
 	int btnOkX = transferAvailable ? 29 : 68;
 	int btnCancelX = transferAvailable ? 177 : 138;
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 244, 72, 6, 64);
+	_window = factory.createWindow("windowName", this, 244, 72, 6, 64);
 	_btnOk = new TextButton(50, 12, btnOkX, 104);
 	_btnTransfer = new TextButton(82, 12, 87, 104);
 	_btnCancel = new TextButton(50, 12, btnCancelX, 104);

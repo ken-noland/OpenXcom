@@ -37,12 +37,12 @@ namespace OpenXcom
  * @param research Pointer to the research project.
  */
 ResearchCompleteState::ResearchCompleteState(const RuleResearch *newResearch, const RuleResearch *bonus, const RuleResearch *research, const Base* base)
-	: State("ResearchRequiredState"), _research(newResearch), _bonus(bonus)
+	: State("ResearchRequiredState", false), _research(newResearch), _bonus(bonus)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 230, 140, 45, 30, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 230, 140, 45, 30, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(80, 16, 64, 146);
 	_btnReport = new TextButton(80, 16, 176, 146);
 	_txtBase = new Text(230, 9, 45, 40);

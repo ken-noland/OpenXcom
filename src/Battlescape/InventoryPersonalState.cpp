@@ -37,12 +37,13 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the InventoryPersonalState.
  */
-InventoryPersonalState::InventoryPersonalState(Soldier* soldier) : State("InventoryPersonalState")
+InventoryPersonalState::InventoryPersonalState(Soldier* soldier)
+	: State("InventoryPersonalState", false)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 196, 160, 64, 20, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 196, 160, 64, 20, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(186, 16, 69, 30);
 	_lstLayout = new TextList(164, 104, 72, 44);
 	_btnCancel = new TextButton(144, 16, 90, 156);
@@ -57,8 +58,9 @@ InventoryPersonalState::InventoryPersonalState(Soldier* soldier) : State("Invent
 	centerAllSurfaces();
 
 	// Set up objects
-	_window->setHighContrast(true);
-	_window->setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setHighContrast(true);
+	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtTitle->setHighContrast(true);
 	_txtTitle->setAlign(ALIGN_CENTER);

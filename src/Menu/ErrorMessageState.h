@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 
 /**
@@ -34,7 +34,7 @@ class ErrorMessageState : public State
 {
 private:
 	TextButton *_btnOk;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtMessage;
 
 	void create(const std::string &str, SDL_Color *palette, Uint8 color, const std::string &bg, int bgColor);

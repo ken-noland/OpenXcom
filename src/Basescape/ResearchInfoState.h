@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Base;
 class RuleResearch;
@@ -42,7 +42,7 @@ private:
 	TextButton *_btnOk;
 	TextButton *_btnCancel;
 	ArrowButton *_btnMore, *_btnLess;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtAvailableScientist, *_txtAvailableSpace, *_txtAllocatedScientist, *_txtMore, *_txtLess;
 	void setAssignedScientist();
 	ResearchProject *_project;

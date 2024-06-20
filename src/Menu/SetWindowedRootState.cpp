@@ -36,12 +36,12 @@ namespace OpenXcom
  * @param OptionsVideoState Options screen that originated this state.
  */
 SetWindowedRootState::SetWindowedRootState(OptionsOrigin origin, OptionsVideoState *optionsVideoState)
-	: State("SetWindowedRootState"), _origin(origin), _optionsVideoState(optionsVideoState)
+	: State("SetWindowedRootState", false), _origin(origin), _optionsVideoState(optionsVideoState)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create object
-	_window = new Window(this, 216, 100, 52, 50, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 216, 100, 52, 50, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(206, 20, 57, 70);
 	_txtWindowedModePositionX = new Text(160, 10, 25, 90);
 	_txtWindowedModePositionY = new Text(160, 10, 25, 100);

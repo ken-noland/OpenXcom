@@ -51,10 +51,12 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param craft ID of the selected craft.
  */
-CraftArmorState::CraftArmorState(Base* base, size_t craft) : State("CraftArmorState"), _base(base), _craft(craft), _savedScrollPosition(0), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL)
+CraftArmorState::CraftArmorState(Base* base, size_t craft) : State("CraftArmorState", true), _base(base), _craft(craft), _savedScrollPosition(0), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("craftArmor", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(148, 16, 164, 176);
 	_txtTitle = new Text(300, 17, 16, 7);
 	_txtName = new Text(114, 9, 16, 32);
@@ -145,6 +147,7 @@ CraftArmorState::CraftArmorState(Base* base, size_t craft) : State("CraftArmorSt
 	_lstSoldiers->setAlign(ALIGN_RIGHT, 3);
 	_lstSoldiers->setSelectable(true);
 	_lstSoldiers->setBackground(_window);
+
 	_lstSoldiers->setMargin(8);
 	_lstSoldiers->onLeftArrowClick((ActionHandler)&CraftArmorState::lstItemsLeftArrowClick);
 	_lstSoldiers->onRightArrowClick((ActionHandler)&CraftArmorState::lstItemsRightArrowClick);

@@ -35,13 +35,11 @@ namespace OpenXcom
 {
 
 UfopaediaStartState::UfopaediaStartState()
-	: State("UfopaediaStartState"), _offset(0), _scroll(0), _maxButtons(0), _heightOffset(0), _windowOffset(0), _cats(getGame()->getMod()->getUfopaediaCategoryList())
+	: State("UfopaediaStartState", false), _offset(0), _scroll(0), _maxButtons(0), _heightOffset(0), _windowOffset(0), _cats(getGame()->getMod()->getUfopaediaCategoryList())
 {
 	const int MAX_VANILLA_BUTTONS = 10;
 	const int SPACE_PER_BUTTON = 13;
 	const int HALF_SPACE_PER_BUTTON = 7;
-
-	_screen = false;
 
 	int extraSpace = (getGame()->getScreen()->getDY() * 2) + 20; // upper extra + lower extra + 20 pixels from the original
 	int maxButtons = (extraSpace / SPACE_PER_BUTTON) + MAX_VANILLA_BUTTONS;
@@ -56,9 +54,13 @@ UfopaediaStartState::UfopaediaStartState()
 		buttonOffset = _windowOffset + SPACE_PER_BUTTON;
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// set background window
-	_window = new Window(this, 256, 180 + _heightOffset, 32, 10 - _windowOffset, POPUP_BOTH);
-	_window->setInnerColor(239); // almost black = darkest index from backpals.dat
+	_window = factory.createWindow("windowName", this, 256, 180 + _heightOffset, 32, 10 - _windowOffset, WindowPopup::POPUP_BOTH);
+
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setInnerColor(239); // almost black = darkest index from backpals.dat
 
 	// set title
 	_txtTitle = new Text(220, 17, 50, 33);
@@ -95,11 +97,14 @@ UfopaediaStartState::UfopaediaStartState()
 	_btnScrollDown = new ArrowButton(ARROW_BIG_DOWN, 13, 14, 270, y - 15);
 	add(_btnScrollDown, "button1", "ufopaedia");
 
+	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+
 	updateButtons();
 	if (!_btnSections.empty())
 	{
 		int titleY = _btnSections.front()->getY() - _txtTitle->getHeight();
-		if (titleY < _window->getY()) titleY = _window->getY();
+		if (titleY < windowSurface->getY())
+			titleY = windowSurface->getY();
 		_txtTitle->setY(titleY);
 	}
 

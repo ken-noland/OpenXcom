@@ -40,14 +40,15 @@ namespace OpenXcom
  * @param first Is this the first base in the game?
  * @param fixedLocation Is this the first base in the game on a fixed location?
  */
-BaseNameState::BaseNameState(Base *base, Globe *globe, bool first, bool fixedLocation) : State("BaseNameState"), _base(base), _globe(globe), _first(first), _fixedLocation(fixedLocation)
+BaseNameState::BaseNameState(Base *base, Globe *globe, bool first, bool fixedLocation)
+	: State("BaseNameState", false), _base(base), _globe(globe), _first(first), _fixedLocation(fixedLocation)
 {
 	_globe->onMouseOver(0);
 
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 192, 80, 32, 60, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 192, 80, 32, 60, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(162, 12, 47, 118);
 	_txtTitle = new Text(182, 17, 37, 70);
 	_edtName = new TextEdit(this, 127, 16, 59, 94);

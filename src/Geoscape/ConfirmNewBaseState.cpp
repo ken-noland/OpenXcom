@@ -42,12 +42,12 @@ namespace OpenXcom
  * @param base Pointer to the base to place.
  * @param globe Pointer to the Geoscape globe.
  */
-ConfirmNewBaseState::ConfirmNewBaseState(Base* base, Globe* globe) : State("ConfirmNewBaseState"), _base(base), _globe(globe), _cost(0)
+ConfirmNewBaseState::ConfirmNewBaseState(Base* base, Globe* globe) : State("ConfirmNewBaseState", false), _base(base), _globe(globe), _cost(0)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 224, 72, 16, 64);
+	_window = factory.createWindow("windowName", this, 224, 72, 16, 64);
 	_btnOk = new TextButton(54, 12, 68, 104);
 	_btnCancel = new TextButton(54, 12, 138, 104);
 	_txtCost = new Text(120, 9, 68, 80);

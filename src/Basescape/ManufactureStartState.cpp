@@ -45,11 +45,12 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param item The RuleManufacture to produce.
  */
-ManufactureStartState::ManufactureStartState(Base* base, RuleManufacture* item) : State("ManufactureStartState"), _base(base), _item(item)
+ManufactureStartState::ManufactureStartState(Base* base, RuleManufacture* item) : State("ManufactureStartState", false), _base(base), _item(item)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
-	_window = new Window(this, 320, 160, 0, 20);
+	_window = factory.createWindow("allocateManufacture", this, 320, 160, 0, 20);
+
 	_btnCancel = new TextButton(136, 16, 16, 155);
 	_txtTitle = new Text(320, 17, 0, 30);
 	_txtManHour = new Text(290, 9, 16, 50);

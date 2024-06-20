@@ -49,12 +49,12 @@ namespace OpenXcom
  * Initializes all the elements in the Geoscape Event window.
  * @param geoEvent Pointer to the event.
  */
-GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : State("GeoscapeEventState"), _eventRule(eventRule)
+GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : State("GeoscapeEventState", false), _eventRule(eventRule)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 176, 32, 12, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, 176, 32, 12, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(236, 32, 42, 23);
 	_txtMessage = new Text(236, 96, 42, 58);
 	_btnOk = new TextButton(108, 18, 48, 158);
@@ -78,7 +78,8 @@ GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : State("Geos
 	centerAllSurfaces();
 
 	// Set up objects
-	_window->setBackground(getGame()->getMod()->getSurface(_eventRule.getBackground()));
+	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	windowComponent.setBackground(getGame()->getMod()->getSurface(_eventRule.getBackground()));
 
 	_txtTitle->setAlign(ALIGN_CENTER);
 	_txtTitle->setBig();

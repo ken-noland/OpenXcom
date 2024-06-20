@@ -24,7 +24,7 @@ namespace OpenXcom
 
 class MissionSite;
 class TextButton;
-class Window;
+
 class Text;
 class GeoscapeState;
 
@@ -38,7 +38,7 @@ private:
 	GeoscapeState *_state;
 
 	TextButton *_btnIntercept, *_btnCenter, *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtCity;
 public:
 	/// Creates the Mission Detected state.

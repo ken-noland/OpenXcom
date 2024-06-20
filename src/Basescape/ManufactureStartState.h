@@ -24,7 +24,6 @@ namespace OpenXcom
 
 class Base;
 class RuleManufacture;
-class Window;
 class TextButton;
 class Text;
 class TextList;
@@ -37,7 +36,7 @@ class ManufactureStartState : public State
 private:
 	Base *_base;
 	RuleManufacture *_item;
-	Window *_window;
+	entt::entity _window;
 	TextButton *_btnCancel, *_btnStart;
 	Text *_txtTitle, *_txtManHour, *_txtCost, *_txtWorkSpace, *_txtRequiredItemsTitle, *_txtItemNameColumn, *_txtUnitRequiredColumn, *_txtUnitAvailableColumn;
 	TextList *_lstRequiredItems;

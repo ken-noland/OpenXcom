@@ -32,7 +32,7 @@ namespace OpenXcom
 {
 
 SlideshowState::SlideshowState(const SlideshowHeader &slideshowHeader, const std::vector<SlideshowSlide> *slideshowSlides)
-	: State("SlideshowState"), _slideshowHeader(slideshowHeader), _slideshowSlides(slideshowSlides), _curScreen(-1)
+	: State("SlideshowState", true), _slideshowHeader(slideshowHeader), _slideshowSlides(slideshowSlides), _curScreen(-1)
 {
 	_wasLetterboxed = CutsceneState::initDisplay();
 

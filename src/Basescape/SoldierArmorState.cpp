@@ -58,12 +58,12 @@ struct compareArmorName
  * @param base Pointer to the base to get info from.
  * @param soldier ID of the selected soldier.
  */
-SoldierArmorState::SoldierArmorState(Base* base, size_t soldier, SoldierArmorOrigin origin) : State("SoldierArmorState"), _base(base), _soldier(soldier), _origin(origin)
+SoldierArmorState::SoldierArmorState(Base* base, size_t soldier, SoldierArmorOrigin origin) : State("SoldierArmorState", false), _base(base), _soldier(soldier), _origin(origin)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 192, 160, 64, 20, POPUP_BOTH);
+	_window = factory.createWindow("soldierArmor", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 80, 43);
 	_btnCancel = new TextButton(140, 16, 90, 156);
 	_txtTitle = new Text(182, 16, 69, 28);
@@ -110,8 +110,9 @@ SoldierArmorState::SoldierArmorState(Base* base, size_t soldier, SoldierArmorOri
 
 	_lstArmor->setColumns(2, 132, 21);
 	_lstArmor->setSelectable(true);
-	_lstArmor->setBackground(_window);
 	_lstArmor->setMargin(8);
+	_lstArmor->setBackground(_window);
+
 
 	_sortName->setX(_sortName->getX() + _txtType->getTextWidth() + 4);
 	_sortName->onMouseClick((ActionHandler)&SoldierArmorState::sortNameClick);

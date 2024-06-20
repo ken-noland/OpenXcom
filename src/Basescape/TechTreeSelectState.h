@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class TechTreeViewerState;
-class Window;
+
 class Text;
 class TextButton;
 class TextEdit;
@@ -38,7 +38,7 @@ private:
 	TechTreeViewerState *_parent;
 	TextButton *_btnOk;
 	TextEdit *_btnQuickSearch;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle;
 	TextList *_lstTopics;
 	std::vector<std::string> _availableTopics;

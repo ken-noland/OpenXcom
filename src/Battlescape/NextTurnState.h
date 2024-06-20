@@ -25,7 +25,7 @@
 namespace OpenXcom
 {
 
-class Window;
+
 class Text;
 class TextButton;
 class SavedBattleGame;
@@ -44,7 +44,7 @@ class NextTurnState : public State
 {
 private:
 	static const int NEXT_TURN_DELAY = 500;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtTurn, *_txtSide, *_txtMessage, *_txtMessage2, *_txtMessage3, *_txtMessageReinforcements;
 	TextButton *_btnBriefingReinforcements;
 	SavedBattleGame *_battleGame;

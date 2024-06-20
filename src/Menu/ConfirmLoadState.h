@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 
 /**
@@ -37,7 +37,7 @@ private:
 	OptionsOrigin _origin;
 	std::string _fileName;
 	TextButton *_btnYes, *_btnNo;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtText;
 public:
 	/// Creates a new confirmation state.

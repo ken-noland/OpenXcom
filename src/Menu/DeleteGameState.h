@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 
 /**
@@ -35,7 +35,7 @@ class DeleteGameState : public State
 {
 private:
 	TextButton *_btnNo, *_btnYes;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtMessage;
 	std::string _filename;
 	OptionsOrigin _origin;

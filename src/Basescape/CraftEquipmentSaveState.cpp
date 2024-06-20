@@ -38,12 +38,12 @@ namespace OpenXcom
 /**
 * Initializes all the elements in the Save Craft Loadout window.
 */
-CraftEquipmentSaveState::CraftEquipmentSaveState(CraftEquipmentState* parent) : State("CraftEquipmentSaveState"), _parent(parent), _previousSelectedRow(-1), _selectedRow(-1)
+CraftEquipmentSaveState::CraftEquipmentSaveState(CraftEquipmentState* parent) : State("CraftEquipmentSaveState", false), _parent(parent), _previousSelectedRow(-1), _selectedRow(-1)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 240, 136, 40, 36 + 1, POPUP_BOTH);
+	_window = factory.createWindow("craftEquipmentSave", this, 240, 136, 40, 36 + 1, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(230, 16, 45, 44 + 3);
 	_lstLoadout = new TextList(208, 80, 48, 60);
 	_btnCancel = new TextButton(80, 16, 165, 148);
@@ -71,6 +71,7 @@ CraftEquipmentSaveState::CraftEquipmentSaveState(CraftEquipmentState* parent) : 
 	_lstLoadout->setColumns(1, 192);
 	_lstLoadout->setSelectable(true);
 	_lstLoadout->setBackground(_window);
+
 	_lstLoadout->setMargin(8);
 	_lstLoadout->onMousePress((ActionHandler)&CraftEquipmentSaveState::lstLoadoutPress);
 

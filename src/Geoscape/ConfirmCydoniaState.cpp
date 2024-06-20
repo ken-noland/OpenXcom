@@ -32,12 +32,13 @@
 namespace OpenXcom
 {
 
-ConfirmCydoniaState::ConfirmCydoniaState(Craft* craft) : State("ConfirmCydoniaState"), _craft(craft)
+ConfirmCydoniaState::ConfirmCydoniaState(Craft* craft)
+	: State("ConfirmCydoniaState", false), _craft(craft)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 160, 32, 20);
+	_window = factory.createWindow("windowName", this, 256, 160, 32, 20);
 	_btnYes = new TextButton(80, 20, 70, 142);
 	_btnNo = new TextButton(80, 20, 170, 142);
 	_txtMessage = new Text(224, 48, 48, 76);

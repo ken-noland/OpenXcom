@@ -38,10 +38,13 @@ namespace OpenXcom
  * @param missingItems List of items still needed for reequip.
  * @param base Relevant xcom base.
  */
-CannotReequipState::CannotReequipState(std::vector<ReequipStat>& missingItems, Base* base) : State("CannotReequipState"), _missingItems(missingItems), _base(base)
+CannotReequipState::CannotReequipState(std::vector<ReequipStat>& missingItems, Base* base)
+	: State("CannotReequipState", true), _missingItems(missingItems), _base(base)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_btnManufacture = new TextButton(128, 14, 10, 178);
 	_btnPurchase = new TextButton(128, 14, 144, 178);
 	_btnOk = new TextButton(34, 14, 278, 178);

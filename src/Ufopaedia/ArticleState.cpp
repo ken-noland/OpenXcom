@@ -121,7 +121,7 @@ namespace OpenXcom
 	 * @param article_id The article id of this article state instance.
 	 */
 	ArticleState::ArticleState(const std::string &article_id, std::shared_ptr<ArticleCommonState> state)
-		: State("ArticleState"), _id(article_id)
+		: State("ArticleState", true), _id(article_id)
 	{
 		// init background and navigation elements
 		_bg = new Surface(320, 200, 0, 0);

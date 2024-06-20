@@ -141,7 +141,7 @@ const std::map<std::string, std::string> StatsForNerdsState::shortTranslationMap
  * Initializes all the elements on the UI.
  */
 StatsForNerdsState::StatsForNerdsState(std::shared_ptr<ArticleCommonState> state, bool debug, bool ids, bool defaults)
-	: State("StatsForNerdsState"), _state{std::move(state)}, _counter(0), _indent(false)
+	: State("StatsForNerdsState", true), _state{std::move(state)}, _counter(0), _indent(false)
 {
 	auto article = _state->getCurrentArticle();
 	_typeId = article->getType();
@@ -155,7 +155,7 @@ StatsForNerdsState::StatsForNerdsState(std::shared_ptr<ArticleCommonState> state
  * Initializes all the elements on the UI.
  */
 StatsForNerdsState::StatsForNerdsState(const UfopaediaTypeId typeId, const std::string topicId, bool debug, bool ids, bool defaults)
-	: State("StatsForNerdsState"), _counter(0), _indent(false)
+	: State("StatsForNerdsState", true), _counter(0), _indent(false)
 {
 	_typeId = typeId;
 	_topicId = topicId;
@@ -169,8 +169,10 @@ StatsForNerdsState::StatsForNerdsState(const UfopaediaTypeId typeId, const std::
  */
 void StatsForNerdsState::buildUI(bool debug, bool ids, bool defaults)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_txtTitle = new Text(304, 17, 8, 7);
 	_cbxRelatedStuff = new ComboBox(this, 148, 16, 164, 7);
 	_txtArticle = new Text(230, 9, 8, 24);

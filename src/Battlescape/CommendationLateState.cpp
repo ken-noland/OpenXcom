@@ -39,10 +39,12 @@ namespace OpenXcom
  * @param soldiersMedalled List of soldiers with medals.
  */
 CommendationLateState::CommendationLateState(std::vector<Soldier*> soldiersMedalled)
-	: State("CommendationLateState")
+	: State("CommendationLateState", true)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create object
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(288, 16, 16, 176);
 	_txtTitle = new Text(300, 16, 10, 8);
 	_lstSoldiers = new TextList(288, 128, 8, 32);

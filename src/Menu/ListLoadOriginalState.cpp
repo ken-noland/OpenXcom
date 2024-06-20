@@ -43,12 +43,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param origin Game section that originated this state.
  */
-ListLoadOriginalState::ListLoadOriginalState(OptionsOrigin origin) : State("ListLoadOriginalState"), _origin(origin)
+ListLoadOriginalState::ListLoadOriginalState(OptionsOrigin origin) : State("ListLoadOriginalState", false), _origin(origin)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_btnNew = new TextButton(80, 16, 60, 172);
 	_btnCancel = new TextButton(80, 16, 180, 172);
 	_txtTitle = new Text(310, 17, 5, 7);

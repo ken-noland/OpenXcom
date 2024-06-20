@@ -40,10 +40,12 @@ namespace OpenXcom
  * Initializes all the elements in the Psi Training screen.
  * @param game Pointer to the core game.
  */
-TrainingState::TrainingState() : State("TrainingState")
+TrainingState::TrainingState() : State("TrainingState", true)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_txtTitle = new Text(300, 17, 10, 16);
 	_btnOk = new TextButton(160, 14, 80, 174);
 

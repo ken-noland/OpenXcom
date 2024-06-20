@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class Base;
-class Window;
+
 class Text;
 class TextButton;
 class Globe;
@@ -38,7 +38,7 @@ class ConfirmNewBaseState : public State
 private:
 	Base *_base;
 	Globe *_globe;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtCost, *_txtArea;
 	TextButton *_btnOk, *_btnCancel;
 	int _cost;

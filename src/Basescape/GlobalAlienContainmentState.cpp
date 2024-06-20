@@ -42,10 +42,12 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the GlobalAlienContainment screen.
  */
-GlobalAlienContainmentState::GlobalAlienContainmentState(bool openedFromBasescape) : State("GlobalAlienContainmentState"), _openedFromBasescape(openedFromBasescape)
+GlobalAlienContainmentState::GlobalAlienContainmentState(bool openedFromBasescape) : State("GlobalAlienContainmentState", true), _openedFromBasescape(openedFromBasescape)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("globalContainmentMenu", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(304, 16, 8, 176);
 	_txtTitle = new Text(310, 17, 5, 8);
 	_txtTotalUsed = new Text(150, 9, 10, 24);
@@ -93,6 +95,7 @@ GlobalAlienContainmentState::GlobalAlienContainmentState(bool openedFromBasescap
 	_lstPrisoners->setColumns(3, 146, 60, 80);
 	_lstPrisoners->setSelectable(true);
 	_lstPrisoners->setBackground(_window);
+
 	_lstPrisoners->setMargin(2);
 	_lstPrisoners->setWordWrap(true);
 	_lstPrisoners->setAlign(ALIGN_CENTER, 1);

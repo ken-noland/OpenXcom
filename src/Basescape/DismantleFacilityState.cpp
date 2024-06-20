@@ -42,12 +42,12 @@ namespace OpenXcom
  * @param view Pointer to the baseview to update.
  * @param fac Pointer to the facility to dismantle.
  */
-DismantleFacilityState::DismantleFacilityState(Base* base, BaseView* view, BaseFacility* fac) : State("DismantleFacilityState"), _base(base), _view(view), _fac(fac)
+DismantleFacilityState::DismantleFacilityState(Base* base, BaseView* view, BaseFacility* fac) : State("DismantleFacilityState", false), _base(base), _view(view), _fac(fac)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 152, 80, 20, 60);
+	_window = factory.createWindow("dismantleFacility", this, 152, 80, 20, 60);
 	_btnOk = new TextButton(44, 16, 36, 115);
 	_btnCancel = new TextButton(44, 16, 112, 115);
 	_txtTitle = new Text(142, 9, 25, 75);

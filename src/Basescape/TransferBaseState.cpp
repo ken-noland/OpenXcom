@@ -42,10 +42,13 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-TransferBaseState::TransferBaseState(Base* base, DebriefingState* debriefingState) : State("TransferBaseState"), _base(base), _debriefingState(debriefingState)
+TransferBaseState::TransferBaseState(Base* base, DebriefingState* debriefingState)
+	: State("TransferBaseState", true), _base(base), _debriefingState(debriefingState)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 280, 140, 20, 30);
+	_window = factory.createWindow("windowName", this, 280, 140, 20, 30);
 	_btnCancel = new TextButton(264, 16, 28, 146);
 	_txtTitle = new Text(270, 17, 25, 38);
 	_txtFunds = new Text(250, 9, 30, 54);

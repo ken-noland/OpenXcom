@@ -24,7 +24,6 @@ namespace OpenXcom
 
 class Base;
 class TextButton;
-class Window;
 class Text;
 
 /**
@@ -38,7 +37,7 @@ private:
 	size_t _soldierId;
 
 	TextButton *_btnOk, *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtSoldier;
 public:
 	/// Creates the Sack Soldier state.

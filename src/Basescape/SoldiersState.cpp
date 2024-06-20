@@ -54,7 +54,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-SoldiersState::SoldiersState(Base* base) : State("SoldiersState"), _base(base), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL), selectedCraftIndex(0)
+SoldiersState::SoldiersState(Base* base) : State("SoldiersState", true), _base(base), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL), selectedCraftIndex(0)
 {
 	bool isPsiBtnVisible = Options::anytimePsiTraining && _base->getAvailablePsiLabs() > 0;
 	bool isTrnBtnVisible = _base->getAvailableTraining() > 0;
@@ -62,10 +62,12 @@ SoldiersState::SoldiersState(Base* base) : State("SoldiersState"), _base(base), 
 	getGame()->getSavedGame()->getAvailableTransformations(availableTransformations, getGame()->getMod(), _base);
 	bool isTransformationAvailable = availableTransformations.size() > 0;
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Always show Combo Box and Three buttons: one button for actions(Memorial, Trainings, Transormations,...)
 	// another button for craft selection; and a 3rd one for "Ok"
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("soldierList", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(64, 16, 248, 176);
 	_cbxScreenActions = new ComboBox(this, 128, 16, 8, 176, true);
 	_cbxFilterByCraft = new ComboBox(this, 96, 16, 144, 176, true);	

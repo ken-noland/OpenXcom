@@ -39,10 +39,12 @@ namespace OpenXcom
  * Initializes all the elements in the Mod Options window.
  * @param game Pointer to the core game.
  */
-ModListState::ModListState() : State("ModListState"), _curMasterIdx(0)
+ModListState::ModListState() : State("ModListState", true), _curMasterIdx(0)
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 
 	_txtMaster = new Text(305, 9, 8, 8);
 	_cbxMasters = new ComboBox(this, 305, 16, 8, 18);

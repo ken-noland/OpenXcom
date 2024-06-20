@@ -37,12 +37,11 @@ namespace OpenXcom
  * Initializes all the elements in the Select Music Track window.
  * @param origin Where is the dialog called from?
  */
-SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin) : State("SelectMusicTrackState"), _origin(origin)
+SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin)
+	: State("SelectMusicTrackState", false), _origin(origin)
 {
-	_screen = false;
-
 	int x;
-	if (_origin == SMT_BATTLESCAPE)
+	if (_origin == SMT_BATTLESCAPE)	//KN NOTE: This feels like a hack!
 	{
 		x = 52;
 	}
@@ -51,8 +50,10 @@ SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin) : St
 		x = 20;
 	}
 
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 216, 160, x, 20, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 216, 160, x, 20, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(206, 17, x + 5, 32);
 	_btnCancel = new TextButton(140, 16, x + 38, 156);
 	_lstTracks = new TextList(180, 96, x + 13, 52);

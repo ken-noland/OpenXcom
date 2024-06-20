@@ -39,12 +39,12 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param soldierId ID of the selected soldier.
  */
-SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : State("SoldierRankState"), _base(base), _soldierId(soldierId)
+SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : State("SoldierRankState", false), _base(base), _soldierId(soldierId)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 192, 160, 64, 20, POPUP_BOTH);
+	_window = factory.createWindow("selectNewManufacture", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);
 	_btnCancel = new TextButton(140, 16, 90, 156);
 	_txtTitle = new Text(182, 17, 69, 28);
 	_txtRank = new Text(90, 9, 80, 52);
@@ -80,8 +80,8 @@ SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : State("Soldie
 
 	_lstRanks->setColumns(2, 132, 21);
 	_lstRanks->setSelectable(true);
-	_lstRanks->setBackground(_window);
 	_lstRanks->setMargin(8);
+	_lstRanks->setBackground(_window);
 
 	PromotionOpenings openings = PromotionOpenings(getGame()->getSavedGame()->getAllActiveSoldiers(), getGame()->getMod());
 

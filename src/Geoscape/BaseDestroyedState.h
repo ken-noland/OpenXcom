@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class Base;
-class Window;
+
 class Text;
 class TextButton;
 class TextList;
@@ -36,7 +36,7 @@ class Ufo;
 class BaseDestroyedState : public State
 {
 private:
-	Window *_window;
+	entt::entity _window;
 	Text *_txtMessage;
 	TextButton *_btnOk;
 	TextList *_lstDestroyedFacilities;

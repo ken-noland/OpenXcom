@@ -39,7 +39,7 @@ class Base;
 class Text;
 class TextButton;
 class TextList;
-class Window;
+
 
 class SoldierRankState : public State
 {
@@ -48,7 +48,7 @@ private:
 	size_t _soldierId;
 
 	TextButton *_btnCancel;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtRank, *_txtOpening;
 	TextList *_lstRanks;
 	std::vector<RankItem> _ranks;

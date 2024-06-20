@@ -42,12 +42,12 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param state Pointer to the base state to refresh.
  */
-BuildFacilitiesState::BuildFacilitiesState(Base* base, State* state) : State("BuildFacilitiesState"), _base(base), _state(state), _lstScroll(0)
+BuildFacilitiesState::BuildFacilitiesState(Base* base, State* state) : State("BuildFacilitiesState", false), _base(base), _state(state), _lstScroll(0)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 128, 160, 192, 40, POPUP_VERTICAL);
+	_window = factory.createWindow("selectFacility", this, 128, 160, 192, 40, WindowPopup::POPUP_VERTICAL);
 	_btnOk = new TextButton(112, 16, 200, 176);
 	_lstFacilities = new TextList(104, 104, 200, 64);
 	_txtTitle = new Text(118, 17, 197, 48);

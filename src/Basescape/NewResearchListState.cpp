@@ -44,16 +44,16 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param sortByCost Should the list be sorted by cost or listOrder?
  */
-NewResearchListState::NewResearchListState(Base* base, bool sortByCost) : State("NewResearchListState"), _base(base), _sortByCost(sortByCost), _lstScroll(0)
+NewResearchListState::NewResearchListState(Base* base, bool sortByCost) : State("NewResearchListState", false), _base(base), _sortByCost(sortByCost), _lstScroll(0)
 {
 	if (Options::isPasswordCorrect())
 	{
 		_sortByCost = !_sortByCost;
 	}
 
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
-	_window = new Window(this, 230, 140, 45, 30, POPUP_BOTH);
+	_window = factory.createWindow("selectNewResearch", this, 230, 140, 45, 30, WindowPopup::POPUP_BOTH);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 53, 38);
 	_btnOK = new TextButton(103, 16, 164, 146);
 	_cbxSort = new ComboBox(this, 103, 16, 53, 146, true);

@@ -8,6 +8,6 @@
 	BreakBeforeBraces: Allman,
 	FixNamespaceComments: false,
 	PointerAlignment: Left,
-	AccessModifierOffset: 0,
+	AccessModifierOffset: -4,
 #	EmptyLineAfterAccessModifier: Never,
 }

@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class TextButton;
-class Window;
+
 class Text;
 class Timer;
 
@@ -37,7 +37,7 @@ class OptionsConfirmState : public State
 private:
 	OptionsOrigin _origin;
 	TextButton *_btnYes, *_btnNo;
-	Window *_window;
+	entt::entity _window;
 	Text *_txtTitle, *_txtTimer;
 	Timer *_timer;
 	int _countdown;

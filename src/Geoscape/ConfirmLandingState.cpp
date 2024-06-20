@@ -54,12 +54,12 @@ namespace OpenXcom
  * @param shade Shade of the landing site.
  */
 ConfirmLandingState::ConfirmLandingState(Craft *craft, Texture *missionTexture, Texture *globeTexture, int shade)
-	: State("ConfirmLandingState"), _craft(craft), _missionTexture(missionTexture), _globeTexture(globeTexture), _shade(shade)
+	: State("ConfirmLandingState", false), _craft(craft), _missionTexture(missionTexture), _globeTexture(globeTexture), _shade(shade)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 216, 160, 20, 20, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 216, 160, 20, 20, WindowPopup::POPUP_BOTH);
 	_btnYes = new TextButton(80, 20, 40, 150);
 	_btnNo = new TextButton(80, 20, 136, 150);
 	_txtMessage = new Text(206, 80, 25, 40);

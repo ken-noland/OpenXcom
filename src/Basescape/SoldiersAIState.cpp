@@ -45,7 +45,7 @@ namespace OpenXcom
  * @param soldiers Soldiers to manipulate AI control
  */
 SoldiersAIState::SoldiersAIState(std::vector<Soldier*>& soldiers)
-	: State("SoldiersAIState"), _soldiers(soldiers)
+	: State("SoldiersAIState", true), _soldiers(soldiers)
 {
 	_commonConstruct();
 }
@@ -55,7 +55,7 @@ SoldiersAIState::SoldiersAIState(std::vector<Soldier*>& soldiers)
  * @param craft Craft whose soldiers to manipulate AI control
  */
 SoldiersAIState::SoldiersAIState(const Craft* craft)
-	: State("SoldiersAIState")
+	: State("SoldiersAIState", true)
 {
 	for (Soldier* soldier : craft->getBase()->getSoldiers())
 	{
@@ -70,7 +70,7 @@ SoldiersAIState::SoldiersAIState(const Craft* craft)
  * @param soldiers Soldiers to manipulate AI control
  */
 SoldiersAIState::SoldiersAIState(std::vector<BattleUnit*>& units)
-	: State("SoldiersAIState"), _units(units)
+	: State("SoldiersAIState", true), _units(units)
 {
 	_commonConstruct();
 }
@@ -80,8 +80,10 @@ SoldiersAIState::SoldiersAIState(std::vector<BattleUnit*>& units)
  */
 void SoldiersAIState::_commonConstruct()
 {
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+
 	// Create objects
-	_window = new Window(this, 320, 200, 0, 0);
+	_window = factory.createWindow("craftSoldiers", this, 320, 200, 0, 0);
 	_btnOk = new TextButton(148, 16, 164, 176);
 	_txtTitle = new Text(300, 17, 16, 7);
 	_lstUnits = new TextList(288, 128, 8, 40);
@@ -133,6 +135,7 @@ void SoldiersAIState::_commonConstruct()
 	_lstUnits->setAlign(ALIGN_RIGHT, 3);
 	_lstUnits->setSelectable(true);
 	_lstUnits->setBackground(_window);
+
 	_lstUnits->setMargin(8);
 	_lstUnits->onMouseClick((ActionHandler)&SoldiersAIState::lstSoldiersClick, 0);
 }

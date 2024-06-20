@@ -37,12 +37,12 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the ExtendedGeoscapeLinksState screen.
  */
-ExtendedGeoscapeLinksState::ExtendedGeoscapeLinksState(GeoscapeState* parent) : State("ExtendedGeoscapeLinksState"), _parent(parent)
+ExtendedGeoscapeLinksState::ExtendedGeoscapeLinksState(GeoscapeState* parent) : State("ExtendedGeoscapeLinksState", false), _parent(parent)
 {
-	_screen = false;
+	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
 	// Create objects
-	_window = new Window(this, 256, 180, 32, 10, POPUP_BOTH);
+	_window = factory.createWindow("windowName", this, 256, 180, 32, 10, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(220, 17, 50, 33);
 	if (Options::oxceFatFingerLinks)
 	{

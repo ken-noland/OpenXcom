@@ -16,28 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Interface.h"
+#include "Surface.h"
+#include "../Common/Named.h"
 
 namespace OpenXcom
 {
 
-InterfaceFactory::InterfaceFactory(entt::registry& registry, SurfaceFactory& sf)
-	: _registry(registry), _surfaceFactory(sf),
+SurfaceFactory::SurfaceFactory(entt::registry& registry)
+	: _registry(registry)
 {
 }
 
-InterfaceFactory::~InterfaceFactory()
+SurfaceFactory::~SurfaceFactory()
 {
 }
 
-
-entt::entity InterfaceFactory::createWindow(const std::string& name, State* state, int width, int height, int x, int y, WindowPopup popup)
+entt::entity SurfaceFactory::createSurface(const std::string& name, int width, int height, int x, int y)
 {
-	entt::entity entity = _surfaceFactory.createSurface(name, state, width, height, x, y);
+	entt::entity entity = _registry.create();
+	_registry.emplace<NamedComponent>(entity, name);
 
-	SurfaceComponent& sufaceComponent = _registry.get<SurfaceComponent>(entity);
-	_registry.emplace<WindowComponent>(entity, sufaceComponent, popup);
+	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
+	_registry.emplace<SurfaceComponent>(entity, std::move(surface));
+
+	return entity;
 }
 
-
-}
+} // namespace OpenXcom
