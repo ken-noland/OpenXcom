@@ -17,28 +17,29 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "BaseDefenseState.h"
-#include "../Engine/Game.h"
-#include "../Mod/Mod.h"
-#include "../Engine/LocalizedText.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Window.h"
-#include "../Interface/Text.h"
-#include "../Savegame/SavedGame.h"
-#include "../Savegame/AlienMission.h"
-#include "../Savegame/Base.h"
-#include "../Savegame/ItemContainer.h"
-#include "../Savegame/Region.h"
-#include "../Mod/RuleRegion.h"
-#include "../Savegame/BaseFacility.h"
-#include "../Mod/RuleBaseFacility.h"
-#include "../Savegame/Ufo.h"
-#include "../Interface/TextList.h"
 #include "GeoscapeState.h"
 #include "../Engine/Action.h"
+#include "../Engine/Game.h"
+#include "../Engine/LocalizedText.h"
+#include "../Engine/Options.h"
 #include "../Engine/RNG.h"
 #include "../Engine/Sound.h"
 #include "../Engine/Timer.h"
-#include "../Engine/Options.h"
+#include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
+#include "../Interface/TextList.h"
+#include "../Interface/Window.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleBaseFacility.h"
+#include "../Mod/RuleRegion.h"
+#include "../Savegame/AlienMission.h"
+#include "../Savegame/AreaSystem.h"
+#include "../Savegame/Base.h"
+#include "../Savegame/BaseFacility.h"
+#include "../Savegame/ItemContainer.h"
+#include "../Savegame/Region.h"
+#include "../Savegame/SavedGame.h"
+#include "../Savegame/Ufo.h"
 
 namespace OpenXcom
 {
@@ -325,16 +326,12 @@ void BaseDefenseState::btnOkClick(Action *)
 			if (!am)
 			{
 				// backwards-compatibility
-				RuleRegion* regionRule = getGame()->getSavedGame()->getRegions().front()->getRules(); // wrong, but that's how it is in OXC
-				for (const Region* region : getGame()->getSavedGame()->getRegions())
-				{
-					if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
-					{
-						regionRule = region->getRules();
-						break;
-					}
-				}
-				am = getGame()->getSavedGame()->findAlienMission(regionRule->getType(), OBJECTIVE_RETALIATION);
+				// apparently falling back to first region is wrong, but that's how it is in OXC. Not sure what would be right :P
+				const Region* region = AreaSystem::locateValue<Region>(*_base);				
+				const std::string regionName = region ? region->getRules()->getType()
+													// fall back to first region. This dies if *no* regions, but thats probably okay
+													  : getRegistry().frontValue<Region>()->getRules()->getType(); 
+				am = getGame()->getSavedGame()->findAlienMission(regionName, OBJECTIVE_RETALIATION);
 			}
 
 			if (am && am->getRules().isMultiUfoRetaliation())

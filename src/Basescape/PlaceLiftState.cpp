@@ -46,7 +46,8 @@ namespace OpenXcom
  * @param globe Pointer to the Geoscape globe.
  * @param first Is this a custom starting base?
  */
-PlaceLiftState::PlaceLiftState(Base* base, Globe* globe, bool first) : State("PlaceLiftState", true), _base(base), _globe(globe), _first(first)
+PlaceLiftState::PlaceLiftState(entt::entity newBaseId, Globe *globe, bool first) 
+	: State("PlaceLiftState", true), _newBaseId(newBaseId), _globe(globe), _first(first)
 {
 	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
@@ -70,6 +71,8 @@ PlaceLiftState::PlaceLiftState(Base* base, Globe* globe, bool first) : State("Pl
 
 	// Set up objects
 	setWindowBackground(_window, "selectFacility");
+	Base& base = getRegistry().raw().get<Base>(_newBaseId);
+
 
 	auto* itf = getGame()->getMod()->getInterface("basescape")->getElement("trafficLights");
 	if (itf)
@@ -77,13 +80,13 @@ PlaceLiftState::PlaceLiftState(Base* base, Globe* globe, bool first) : State("Pl
 		_view->setOtherColors(itf->color, itf->color2, itf->border, !itf->TFTDMode);
 	}
 	_view->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
-	_view->setBase(_base);
+	_view->setBase(&base);
 
 	_lift = nullptr;
 	for (auto& facilityType : getGame()->getMod()->getBaseFacilitiesList())
 	{
 		auto* facilityRule = getGame()->getMod()->getBaseFacility(facilityType);
-		if (facilityRule->isLift() && facilityRule->isAllowedForBaseType(_base->isFakeUnderwater()) && getGame()->getSavedGame()->isResearched(facilityRule->getRequirements()))
+		if (facilityRule->isLift() && facilityRule->isAllowedForBaseType(base.isFakeUnderwater()) && getGame()->getSavedGame()->isResearched(facilityRule->getRequirements()))
 		{
 			_accessLifts.push_back(facilityRule);
 		}
@@ -129,46 +132,28 @@ PlaceLiftState::PlaceLiftState(Base* base, Globe* globe, bool first) : State("Pl
 }
 
 /**
- *
- */
-PlaceLiftState::~PlaceLiftState()
-{
-
-}
-
-/**
  * Processes clicking on facilities.
  * @param action Pointer to an action.
  */
 void PlaceLiftState::viewClick(Action *)
 {
-	BaseFacility *fac = new BaseFacility(_lift, _base);
+	Base& base = getRegistry().raw().get<Base>(_newBaseId);
+	BaseFacility *fac = new BaseFacility(_lift, &base);
 	fac->setX(_view->getGridX());
 	fac->setY(_view->getGridY());
-	_base->getFacilities().push_back(fac);
+	base.getFacilities().push_back(fac);
 	if (fac->getRules()->getPlaceSound() != Mod::NO_SOUND)
 	{
 		getGame()->getMod()->getSound("GEO.CAT", fac->getRules()->getPlaceSound())->play();
 	}
 	getGame()->popState();
 
-	std::size_t visibleBasesIndex;
-	std::size_t numBases = getGame()->getSavedGame()->getBases().size();
-	if (numBases >= MiniBaseView::MAX_VISIBLE_BASES)
-	{
-		visibleBasesIndex = numBases - MiniBaseView::MAX_VISIBLE_BASES;
-	}
-	else
-	{
-		visibleBasesIndex = 0;
-	}
-
-	BasescapeState *bState = new BasescapeState(_base, _globe);
-	getGame()->getSavedGame()->setSelectedBase(numBases - 1);
+	BasescapeState *bState = new BasescapeState(_newBaseId, _globe);
+	getGame()->getSavedGame()->setSelectedBaseIndex(static_cast<int>(getRegistry().size<Base>()) - 1);
 	getGame()->pushState(bState);
 	if (_first)
 	{
-		getGame()->pushState(new SelectStartFacilityState(_base, bState, _globe));
+		getGame()->pushState(new SelectStartFacilityState(_newBaseId, bState, _globe));
 	}
 }
 

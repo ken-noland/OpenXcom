@@ -86,22 +86,28 @@ PromotionsState::PromotionsState() : State("PromotionsState", true)
 	_lstSoldiers->setBackground(_window);
 	_lstSoldiers->setMargin(8);
 
-	for (Base* xbase : getGame()->getSavedGame()->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
-		for (Soldier* soldier : xbase->getSoldiers())
+		for (Soldier* soldier : xcomBase.getSoldiers())
 		{
 			if (soldier->isPromoted())
 			{
-				_lstSoldiers->addRow(3, soldier->getName().c_str(), tr(soldier->getRankString()).c_str(), xbase->getName().c_str());
+				_lstSoldiers->addRow(3,
+					soldier->getName().c_str(),
+					tr(soldier->getRankString()).c_str(),
+					xcomBase.getName().c_str());
 			}
 		}
-		for (Transfer* transfer : xbase->getTransfers())
+		for (Transfer* transfer : xcomBase.getTransfers())
 		{
 			if (transfer->getType() == TRANSFER_SOLDIER)
 			{
 				if (transfer->getSoldier()->isPromoted())
 				{
-					_lstSoldiers->addRow(3, transfer->getSoldier()->getName().c_str(), tr(transfer->getSoldier()->getRankString()).c_str(), xbase->getName().c_str());
+					_lstSoldiers->addRow(3,
+						transfer->getSoldier()->getName().c_str(),
+						tr(transfer->getSoldier()->getRankString()).c_str(),
+						xcomBase.getName().c_str());
 				}
 			}
 		}

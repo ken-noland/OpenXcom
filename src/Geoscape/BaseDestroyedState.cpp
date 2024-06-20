@@ -24,6 +24,7 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
+#include "../Savegame/AreaSystem.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/Region.h"
@@ -127,16 +128,11 @@ BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles
 	if (!am)
 	{
 		// backwards-compatibility
-		RuleRegion* regionRule = getGame()->getSavedGame()->getRegions().front()->getRules(); // wrong, but that's how it is in OXC
-		for (const Region* region : getGame()->getSavedGame()->getRegions())
-		{
-			if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
-			{
-				regionRule = region->getRules();
-				break;
-			}
-		}
-		am = getGame()->getSavedGame()->findAlienMission(regionRule->getType(), OBJECTIVE_RETALIATION);
+		const Region* region = AreaSystem::locateValue<Region>(*_base);
+		const std::string regionName = region ? region->getRules()->getType()
+			// fall back to first region. This dies if *no* regions, but thats probably okay
+			: getRegistry().frontValue<Region>()->getRules()->getType();
+		am = getGame()->getSavedGame()->findAlienMission(regionName, OBJECTIVE_RETALIATION);
 	}
 	getGame()->getSavedGame()->deleteRetaliationMission(am, _base);
 }
@@ -168,17 +164,8 @@ void BaseDestroyedState::btnOkClick(Action *)
 		return;
 	}
 
-	for (auto xbaseIt = getGame()->getSavedGame()->getBases().begin(); xbaseIt != getGame()->getSavedGame()->getBases().end(); ++xbaseIt)
-	{
-		Base* xbase = (*xbaseIt);
-		if (xbase == _base)
-		{
-			getGame()->getSavedGame()->stopHuntingXcomCrafts(xbase); // destroyed together with the base
-			delete xbase;
-			getGame()->getSavedGame()->getBases().erase(xbaseIt);
-			break;
-		}
-	}
+	getRegistry().destroy(_base);
+	getGame()->getSavedGame()->stopHuntingXcomCrafts(_base);
 }
 
 }

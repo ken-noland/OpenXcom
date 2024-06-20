@@ -20,7 +20,6 @@
 #include <functional>
 #include <climits>
 #include "TileEngine.h"
-#include "DebriefingState.h"
 #include "CannotReequipState.h"
 #include "../Geoscape/GeoscapeEventState.h"
 #include "../Geoscape/GeoscapeState.h"
@@ -46,6 +45,7 @@
 #include "../Mod/Armor.h"
 #include "../Savegame/AlienBase.h"
 #include "../Savegame/AlienMission.h"
+#include "../Savegame/AreaSystem.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/BattleItem.h"
 #include "../Savegame/Country.h"
@@ -377,7 +377,7 @@ void DebriefingState::applyVisibility()
 
 	// Set text on toggle button accordingly
 	_btnSell->setVisible(showItems && _showSellButton);
-	_btnTransfer->setVisible(showItems && _showSellButton && getGame()->getSavedGame()->getBases().size() > 1);
+	_btnTransfer->setVisible(showItems && _showSellButton && getRegistry().size<Base>() > 1);
 	if (showScore)
 	{
 		_btnStats->setText(tr("STR_STATS"));
@@ -1027,14 +1027,10 @@ void DebriefingState::prepareDebriefing()
 	// OXCE: Don't forget about UFO landings/crash sites
 	if (!ruleDeploy)
 	{
-		for (Ufo* ufo : save->getUfos())
+		if (Ufo* ufo = getRegistry().findValue_if<Ufo>(std::mem_fn(&Ufo::isInBattlescape)))
 		{
-			if (ufo->isInBattlescape())
-			{
-				// Note: fake underwater UFO deployment was already considered above (via alienCustomMission)
-				ruleDeploy = getGame()->getMod()->getDeployment(ufo->getRules()->getType());
-				break;
-			}
+			// Note: fake underwater UFO deployment was already considered above (via alienCustomMission)
+			ruleDeploy = getGame()->getMod()->getDeployment(ufo->getRules()->getType());
 		}
 	}
 
@@ -1099,34 +1095,22 @@ void DebriefingState::prepareDebriefing()
 	_missionStatistics->type = battle->getMissionType();
 	_stats.push_back(new DebriefingStat(getGame()->getMod()->getAlienFuelName(), true));
 
-	for (Base* xbase : save->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
 		// in case we have a craft - check which craft it is about
-		for (Craft* xcraft : xbase->getCrafts())
+		for (Craft* craft : xcomBase.getCrafts())
 		{
-			if (xcraft->isInBattlescape())
+			if (craft->isInBattlescape())
 			{
-				for (Region* region : save->getRegions())
+				if (Region* region = AreaSystem::locateValue<Region>(craft))
 				{
-					if (region->getRules()->insideRegion(xcraft->getLongitude(), xcraft->getLatitude()))
-					{
-						_region = region;
-						_missionStatistics->region = _region->getRules()->getType();
-						break;
-					}
+					_missionStatistics->region = _region->getRules()->getType();
 				}
-				for (Country* country : save->getCountries())
+				if (Country* country = AreaSystem::locateValue<Country>(craft))
 				{
-					if (country->getRules()->insideCountry(xcraft->getLongitude(), xcraft->getLatitude()))
-					{
-						_country = country;
-						_missionStatistics->country = _country->getRules()->getType();
-						break;
-					}
+					_missionStatistics->country = _country->getRules()->getType();
 				}
-				craft = xcraft;
-				base = xbase;
-				if (craft->getDestination() != 0)
+				if (craft->getDestination())
 				{
 					_missionStatistics->markerName = craft->getDestination()->getMarkerName();
 					_missionStatistics->markerId = craft->getDestination()->getMarkerId();
@@ -1149,65 +1133,52 @@ void DebriefingState::prepareDebriefing()
 					follower->returnToBase();
 				}
 			}
-			else if (xcraft->getDestination() != 0)
+			else if (craft->getDestination() != 0)
 			{
-				Ufo* u = dynamic_cast<Ufo*>(xcraft->getDestination());
+				Ufo* u = dynamic_cast<Ufo*>(craft->getDestination());
 				if (u != 0 && u->isInBattlescape())
 				{
-					xcraft->returnToBase();
+					craft->returnToBase();
 				}
-				MissionSite* ms = dynamic_cast<MissionSite*>(xcraft->getDestination());
+				MissionSite* ms = dynamic_cast<MissionSite*>(craft->getDestination());
 				if (ms != 0 && ms->isInBattlescape())
 				{
-					xcraft->returnToBase();
+					craft->returnToBase();
 				}
 			}
 		}
 		// in case we DON'T have a craft (base defense)
-		if (xbase->isInBattlescape())
+		if (xcomBase.isInBattlescape())
 		{
-			base = xbase;
-			target = base->getType();
-			base->setInBattlescape(false);
-			base->cleanupDefenses(false);
-			for (Region* region : save->getRegions())
+			target = xcomBase.getType();
+			xcomBase.setInBattlescape(false);
+			xcomBase.cleanupDefenses(false);
+			if (Region* region = AreaSystem::locateValue<Region>(xcomBase))
 			{
-				if (region->getRules()->insideRegion(base->getLongitude(), base->getLatitude()))
-				{
-					_region = region;
-					_missionStatistics->region = _region->getRules()->getType();
-					break;
-				}
+				_missionStatistics->region = _region->getRules()->getType();
 			}
-			for (Country* country : save->getCountries())
+			if (Country* country = AreaSystem::locateValue<Country>(xcomBase))
 			{
-				if (country->getRules()->insideCountry(base->getLongitude(), base->getLatitude()))
-				{
-					_country = country;
-					_missionStatistics->country = _country->getRules()->getType();
-					break;
-				}
+				_missionStatistics->country = _country->getRules()->getType();
 			}
 			// Loop through the UFOs and see which one is sitting on top of the base... that is probably the one attacking you.
-			for (Ufo* ufo : save->getUfos())
+			auto ufoOnLocationFilter = [xcomBase](const Ufo& ufo) {
+				return AreSame(ufo.getLongitude(), xcomBase.getLongitude()) && AreSame(ufo.getLatitude(), xcomBase.getLatitude());
+			};
+			if (const Ufo* ufo = getRegistry().findValue_if<const Ufo>(ufoOnLocationFilter))
 			{
-				if (AreSame(ufo->getLongitude(), base->getLongitude()) && AreSame(ufo->getLatitude(), base->getLatitude()))
-				{
-					_missionStatistics->ufo = ufo->getRules()->getType(); // no need to check for fake underwater UFOs here
-					_missionStatistics->alienRace = ufo->getAlienRace();
-					break;
-				}
+				_missionStatistics->ufo = ufo->getRules()->getType(); // no need to check for fake underwater UFOs here
+				_missionStatistics->alienRace = ufo->getAlienRace();
 			}
-			if (aborted)
-			{
+			if (aborted){ 
 				_destroyBase = true;
 			}
 
 			// This is an overkill, since we may not lose any hangar/craft, but doing it properly requires tons of changes
-			save->stopHuntingXcomCrafts(base);
+			save->stopHuntingXcomCrafts(&xcomBase);
 
 			std::vector<BaseFacility*> toBeDamaged;
-			for (BaseFacility* fac : base->getFacilities())
+			for (BaseFacility* fac : xcomBase.getFacilities())
 			{
 				// this facility was demolished
 				if (battle->getModuleMap()[fac->getX()][fac->getY()].second == 0)
@@ -1217,10 +1188,10 @@ void DebriefingState::prepareDebriefing()
 			}
 			for (auto fac : toBeDamaged)
 			{
-				base->damageFacility(fac);
+				xcomBase.damageFacility(fac);
 			}
 			// this may cause the base to become disjointed, destroy the disconnected parts.
-			base->destroyDisconnectedFacilities();
+			xcomBase.destroyDisconnectedFacilities();
 		}
 	}
 
@@ -1327,112 +1298,105 @@ void DebriefingState::prepareDebriefing()
 	}
 
 	// if it's a UFO, let's see what happens to it
-	for (auto ufoIt = save->getUfos().begin(); ufoIt != save->getUfos().end(); ++ufoIt)
+	if (Ufo* ufo = getRegistry().findValue_if<Ufo>(std::mem_fn(&Ufo::isInBattlescape)))
 	{
-		Ufo* ufo = (*ufoIt);
-		if (ufo->isInBattlescape())
+		_missionStatistics->ufo = ufo->getRules()->getType(); // no need to check for fake underwater UFOs here
+		if (save->getMonthsPassed() != -1)
 		{
-			_missionStatistics->ufo = ufo->getRules()->getType(); // no need to check for fake underwater UFOs here
-			if (save->getMonthsPassed() != -1)
+			_missionStatistics->alienRace = ufo->getAlienRace();
+		}
+		_txtRecovery->setText(tr("STR_UFO_RECOVERY"));
+		ufo->setInBattlescape(false);
+		// if XCom failed to secure the landing zone, the UFO
+		// takes off immediately and proceeds according to its mission directive
+		if (ufo->getStatus() == Ufo::LANDED && (aborted || playersSurvived == 0))
+		{
+			 ufo->setSecondsRemaining(5);
+		}
+		// if XCom succeeds, or it's a crash site, the UFO disappears
+		else
+		{
+			// Note: just before removing a landed UFO, check for mission interruption (by setting the UFO damage to max)
+			if (save->getMonthsPassed() > -1 && ufo->getStatus() == Ufo::LANDED)
 			{
-				_missionStatistics->alienRace = ufo->getAlienRace();
-			}
-			_txtRecovery->setText(tr("STR_UFO_RECOVERY"));
-			ufo->setInBattlescape(false);
-			// if XCom failed to secure the landing zone, the UFO
-			// takes off immediately and proceeds according to its mission directive
-			if (ufo->getStatus() == Ufo::LANDED && (aborted || playersSurvived == 0))
-			{
-				 ufo->setSecondsRemaining(5);
-			}
-			// if XCom succeeds, or it's a crash site, the UFO disappears
-			else
-			{
-				// Note: just before removing a landed UFO, check for mission interruption (by setting the UFO damage to max)
-				if (save->getMonthsPassed() > -1)
+				ufo->setDamage(ufo->getCraftStats().damageMax, getGame()->getMod());
+				//Xilmi: Make aliens mad about losing their UFO, same as if it was shot down
+				if (Options::aggressiveRetaliation)
 				{
-					if (ufo->getStatus() == Ufo::LANDED)
+					AlienRace *race = getGame()->getMod()->getAlienRace(ufo->getAlienRace());
+					AlienMission *mission = ufo->getMission();
+					mission->ufoShotDown(*ufo);
+					// Check for retaliation trigger.
+					int retaliationOdds = mission->getRules().getRetaliationOdds();
+					if (retaliationOdds == -1)
 					{
-						//Xilmi: Make aliens mad about losing their UFO, same as if it was shot down
-						if (Options::aggressiveRetaliation)
+						retaliationOdds = 100 - (4 * (24 - getGame()->getSavedGame()->getDifficultyCoefficient()) - race->getRetaliationAggression());
 						{
-							AlienRace *race = getGame()->getMod()->getAlienRace(ufo->getAlienRace());
-							AlienMission *mission = ufo->getMission();
-							mission->ufoShotDown(*ufo);
-							// Check for retaliation trigger.
-							int retaliationOdds = mission->getRules().getRetaliationOdds();
-							if (retaliationOdds == -1)
+							int diff = getGame()->getSavedGame()->getDifficulty();
+							auto &custom = getGame()->getMod()->getRetaliationTriggerOdds();
+							if (custom.size() > (size_t)diff)
 							{
-								retaliationOdds = 100 - (4 * (24 - getGame()->getSavedGame()->getDifficultyCoefficient()) - race->getRetaliationAggression());
-								{
-									int diff = getGame()->getSavedGame()->getDifficulty();
-									auto &custom = getGame()->getMod()->getRetaliationTriggerOdds();
-									if (custom.size() > (size_t)diff)
-									{
-										retaliationOdds = custom[diff] + race->getRetaliationAggression();
-									}
-								}
-							}
-							// Have mercy on beginners
-							if (getGame()->getSavedGame()->getMonthsPassed() < Mod::DIFFICULTY_BASED_RETAL_DELAY[getGame()->getSavedGame()->getDifficulty()])
-							{
-								retaliationOdds = 0;
-							}
-
-							if (RNG::percent(retaliationOdds))
-							{
-								// Spawn retaliation mission.
-								std::string targetRegion;
-								int retaliationUfoMissionRegionOdds = 50 - 6 * getGame()->getSavedGame()->getDifficultyCoefficient();
-								{
-									int diff = getGame()->getSavedGame()->getDifficulty();
-									auto &custom = getGame()->getMod()->getRetaliationBaseRegionOdds();
-									if (custom.size() > (size_t)diff)
-									{
-										retaliationUfoMissionRegionOdds = 100 - custom[diff];
-									}
-								}
-								if (RNG::percent(retaliationUfoMissionRegionOdds) || !craft)
-								{
-									// Attack on UFO's mission region
-									targetRegion = ufo->getMission()->getRegion();
-								}
-								else if (craft)
-								{
-									// Try to find and attack the originating base.
-									targetRegion = getGame()->getSavedGame()->locateRegion(*craft->getBase())->getRules()->getType();
-									// TODO: If the base is removed, the mission is canceled.
-								}
-								// Difference from original: No retaliation until final UFO lands (Original: Is spawned).
-								if (!getGame()->getSavedGame()->findAlienMission(targetRegion, OBJECTIVE_RETALIATION, race))
-								{
-									auto *retalWeights = race->retaliationMissionWeights(getGame()->getSavedGame()->getMonthsPassed());
-									std::string retalMission = retalWeights ? retalWeights->choose() : "";
-									const RuleAlienMission *rule = getGame()->getMod()->getAlienMission(retalMission, false);
-									if (!rule)
-									{
-										rule = getGame()->getMod()->getRandomMission(OBJECTIVE_RETALIATION, getGame()->getSavedGame()->getMonthsPassed());
-									}
-
-									if (rule && getGame()->getGeoscapeState() != NULL)
-									{
-										AlienMission *newMission = new AlienMission(*rule);
-										newMission->setId(getGame()->getSavedGame()->getId("ALIEN_MISSIONS"));
-										newMission->setRegion(targetRegion, *getGame()->getMod());
-										newMission->setRace(ufo->getAlienRace());
-										newMission->start(*getGame(), *getGame()->getGeoscapeState()->getGlobe(), newMission->getRules().getWave(0).spawnTimer); // fixed delay for first scout
-										getGame()->getSavedGame()->getAlienMissions().push_back(newMission);
-									}
-								}
+								retaliationOdds = custom[diff] + race->getRetaliationAggression();
 							}
 						}
-						ufo->setDamage(ufo->getCraftStats().damageMax, getGame()->getMod());
+					}
+					// Have mercy on beginners
+					if (getGame()->getSavedGame()->getMonthsPassed() < Mod::DIFFICULTY_BASED_RETAL_DELAY[getGame()->getSavedGame()->getDifficulty()])
+					{
+						retaliationOdds = 0;
+					}
+
+					if (RNG::percent(retaliationOdds))
+					{
+						// Spawn retaliation mission.
+						std::string targetRegion;
+						int retaliationUfoMissionRegionOdds = 50 - 6 * getGame()->getSavedGame()->getDifficultyCoefficient();
+						{
+							int diff = getGame()->getSavedGame()->getDifficulty();
+							auto &custom = getGame()->getMod()->getRetaliationBaseRegionOdds();
+							if (custom.size() > (size_t)diff)
+							{
+								retaliationUfoMissionRegionOdds = 100 - custom[diff];
+							}
+						}
+						if (RNG::percent(retaliationUfoMissionRegionOdds) || !craft)
+						{
+							// Attack on UFO's mission region
+							targetRegion = ufo->getMission()->getRegion();
+						}
+						else if (craft)
+						{
+							if (Region* region = AreaSystem::locateValue<Region>(*craft))
+							{
+								// TODO: If the base is removed, the mission is canceled.
+								targetRegion = region->getRules()->getType();
+							}
+						}
+						// Difference from original: No retaliation until final UFO lands (Original: Is spawned).
+						if (!getGame()->getSavedGame()->findAlienMission(targetRegion, OBJECTIVE_RETALIATION, race))
+						{
+							auto *retalWeights = race->retaliationMissionWeights(getGame()->getSavedGame()->getMonthsPassed());
+							std::string retalMission = retalWeights ? retalWeights->choose() : "";
+							const RuleAlienMission *rule = getGame()->getMod()->getAlienMission(retalMission, false);
+							if (!rule)
+							{
+								rule = getGame()->getMod()->getRandomMission(OBJECTIVE_RETALIATION, getGame()->getSavedGame()->getMonthsPassed());
+							}
+
+							if (rule && getGame()->getGeoscapeState() != NULL)
+							{
+								AlienMission *newMission = new AlienMission(*rule);
+								newMission->setId(getGame()->getSavedGame()->getId("ALIEN_MISSIONS"));
+								newMission->setRegion(targetRegion, *getGame()->getMod());
+								newMission->setRace(ufo->getAlienRace());
+								newMission->start(*getGame(), *getGame()->getGeoscapeState()->getGlobe(), newMission->getRules().getWave(0).spawnTimer); // fixed delay for first scout
+								getGame()->getSavedGame()->getAlienMissions().push_back(newMission);
+							}
+						}
 					}
 				}
-				delete ufo;
-				save->getUfos().erase(ufoIt);
 			}
-			break;
+			getRegistry().destroy(*ufo);
 		}
 	}
 
@@ -2160,20 +2124,11 @@ void DebriefingState::prepareDebriefing()
 					reequipCraft(base, xcraft, false);
 			}
 		}
-		else if (save->getMonthsPassed() != -1)
+		else if (save->getMonthsPassed() != -1) // destroy the base.
 		{
-			for (auto xbaseIt = save->getBases().begin(); xbaseIt != save->getBases().end(); ++xbaseIt)
-			{
-				Base* xbase = (*xbaseIt);
-				if (xbase == base)
-				{
-					save->stopHuntingXcomCrafts(xbase); // destroyed together with the base
-					delete xbase;
-					base = 0; // To avoid similar (potential) problems as with the deleted craft
-					save->getBases().erase(xbaseIt);
-					break;
-				}
-			}
+			save->stopHuntingXcomCrafts(base); // destroyed together with the base
+			getRegistry().destroy(*base);
+			base = nullptr; // To avoid similar (potential) problems as with the deleted craft
 		}
 	}
 
@@ -2659,13 +2614,12 @@ void DebriefingState::recoverCivilian(BattleUnit *from, Base *base, Craft* craft
 					if (killPrisonersAutomatically)
 					{
 						// check also other bases, maybe we can transfer/redirect prisoners there
-						for (Base* xbase : getGame()->getSavedGame()->getBases())
+						auto hasAvaliableSpace = [&ruleLiveAlienItem](const Base& base) {
+							return base.getAvailableContainment(ruleLiveAlienItem->getPrisonType()) > 0;
+						};
+						if (getRegistry().findValue_if<Base>(hasAvaliableSpace))
 						{
-							if (xbase->getAvailableContainment(ruleLiveAlienItem->getPrisonType()) > 0)
-							{
-								killPrisonersAutomatically = false;
-								break;
-							}
+							killPrisonersAutomatically = false;
 						}
 					}
 					if (killPrisonersAutomatically)
@@ -2735,13 +2689,12 @@ void DebriefingState::recoverAlien(BattleUnit *from, Base *base, Craft* craft)
 	if (killPrisonersAutomatically)
 	{
 		// check also other bases, maybe we can transfer/redirect prisoners there
-		for (Base* xbase : getGame()->getSavedGame()->getBases())
+		auto hasAvaliableSpace = [&ruleLiveAlienItem](const Base& base) {
+			return base.getAvailableContainment(ruleLiveAlienItem->getPrisonType()) > 0;
+			};
+		if (getRegistry().findValue_if<Base>(hasAvaliableSpace))
 		{
-			if (xbase->getAvailableContainment(ruleLiveAlienItem->getPrisonType()) > 0)
-			{
-				killPrisonersAutomatically = false;
-				break;
-			}
+			killPrisonersAutomatically = false;
 		}
 	}
 	if (killPrisonersAutomatically)

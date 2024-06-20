@@ -24,6 +24,7 @@
 #include "../Engine/Game.h"
 #include "../Engine/LocalizedText.h"
 #include "../Engine/Options.h"
+#include "../Engine/Registry.h"
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
@@ -145,7 +146,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
 		}
 	}
 
-	for (Base* xbase : getGame()->getSavedGame()->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
 		bool displayed = false;
 		int totalBaseCapacity = 0;
@@ -154,13 +155,13 @@ void GlobalAlienContainmentState::fillPrisonerList()
 		std::set<int> occupiedPrisonTypes;
 		for(int prisonType : prisonTypes)
 		{
-			totalBaseCapacity += xbase->getAvailableContainment(prisonType);
+			totalBaseCapacity += xcomBase.getAvailableContainment(prisonType);
 
-			for (BaseFacility* baseFacility : xbase->getFacilities())
+			for (BaseFacility* baseFacility : xcomBase.getFacilities())
 			{
 				if(baseFacility->getRules()->getAliens() > 0 && baseFacility->getRules()->getPrisonType() == prisonType)
 				{
-					int usedSpace = xbase->getUsedContainment(prisonType);
+					int usedSpace = xcomBase.getUsedContainment(prisonType);
 					if (usedSpace > 0)
 					{
 						occupiedPrisonTypes.insert(prisonType);
@@ -175,7 +176,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
 		for (int prisonType : occupiedPrisonTypes)
 		{
 			std::vector<std::string> researchList;
-			for (const auto* proj : xbase->getResearch())
+			for (const auto* proj : xcomBase.getResearch())
 			{
 				const RuleResearch* research = proj->getRules();
 				const RuleItem* item = getGame()->getMod()->getItem(research->getName()); // don't use getNeededItem()
@@ -185,7 +186,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
 				}
 			}
 
-			std::string baseNameAndPrisonType = xbase->getName(getGame()->getLanguage());
+			std::string baseNameAndPrisonType = xcomBase.getName(getGame()->getLanguage());
 			if (!noTypes)
 			{
 				baseNameAndPrisonType = baseNameAndPrisonType + " - " + std::string(trAlt("STR_PRISON_TYPE", prisonType));
@@ -200,7 +201,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
 				RuleItem* rule = getGame()->getMod()->getItem(itemType, true);
 				if (rule->isAlien() && rule->getPrisonType() == prisonType)
 				{
-					int qty = xbase->getStorageItems()->getItem(rule);
+					int qty = xcomBase.getStorageItems()->getItem(rule);
 					if (qty > 0)
 					{
 						std::ostringstream ss;
@@ -219,7 +220,7 @@ void GlobalAlienContainmentState::fillPrisonerList()
 						}
 
 						_lstPrisoners->addRow(3, tr(itemType).c_str(), ss.str().c_str(), rqty.c_str());
-						_topics.push_back(std::make_tuple(itemType, xbase, prisonType));
+						_topics.push_back(std::make_tuple(itemType, &xcomBase, prisonType));
 					}
 				}
 			}
@@ -227,19 +228,19 @@ void GlobalAlienContainmentState::fillPrisonerList()
 			for (const auto& researchName : researchList)
 			{
 				_lstPrisoners->addRow(3, tr(researchName).c_str(), "0", "1");
-				_topics.push_back(std::make_tuple(researchName, xbase, prisonType));
+				_topics.push_back(std::make_tuple(researchName, &xcomBase, prisonType));
 				totalInterrogated++;
 			}
 		}
 
 		if (!displayed && totalBaseCapacity > 0)
 		{
-			_lstPrisoners->addRow(3, xbase->getName(getGame()->getLanguage()).c_str(), "", "");
+			_lstPrisoners->addRow(3, xcomBase.getName(getGame()->getLanguage()).c_str(), "", "");
 			_lstPrisoners->setRowColor(_lstPrisoners->getLastRowIndex(), _lstPrisoners->getSecondaryColor());
 			_topics.push_back(std::make_tuple("", nullptr, 0));
 
 			_lstPrisoners->addRow(3, tr("STR_NONE").c_str(), "", "");
-			_topics.push_back(std::make_tuple("", xbase, 0));
+			_topics.push_back(std::make_tuple("", &xcomBase, 0));
 		}
 	}
 

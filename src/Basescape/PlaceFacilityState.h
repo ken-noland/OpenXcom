@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../Engine/State.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
@@ -36,7 +37,7 @@ class Text;
 class PlaceFacilityState : public State
 {
 protected:
-	Base *_base;
+	entt::entity _baseId;
 	const RuleBaseFacility *_rule;
 	BaseFacility *_origFac;
 
@@ -46,9 +47,7 @@ protected:
 	Text *_txtFacility, *_txtCost, *_numCost, *_numResources, *_txtTime, *_numTime, *_txtMaintenance, *_numMaintenance;
 public:
 	/// Creates the Place Facility state.
-	PlaceFacilityState(Base *base, const RuleBaseFacility *rule, BaseFacility *origFac = 0);
-	/// Cleans up the Place Facility state.
-	~PlaceFacilityState();
+	PlaceFacilityState(entt::entity baseId, const RuleBaseFacility *rule, BaseFacility *origFac = 0);
 	/// Handler for clicking the Cancel button.
 	void btnCancelClick(Action *action);
 	/// Handler for clicking the base view.

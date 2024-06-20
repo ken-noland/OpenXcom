@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <entt/entt.hpp>
 #include "../Engine/State.h"
 #include "Globe.h"
 
@@ -38,7 +39,7 @@ class Globe;
 class BaseNameState : public State
 {
 private:
-	Base *_base;
+	entt::entity _newBaseId;
 	Globe *_globe;
 	entt::entity _window;
 	Text *_txtTitle;
@@ -48,9 +49,7 @@ private:
 	bool _fixedLocation;
 public:
 	/// Creates the Base Name state.
-	BaseNameState(Base *base, Globe *globe, bool first, bool fixedLocation);
-	/// Cleans up the Base Name state.
-	~BaseNameState();
+	BaseNameState(entt::entity newBaseId, Globe *globe, bool first, bool fixedLocation);
 	/// Handler for clicking the OK button.
 	void btnOkClick(Action *action);
 	/// Handler for changing text on the Name edit.

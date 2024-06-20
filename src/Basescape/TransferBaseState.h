@@ -47,8 +47,6 @@ private:
 public:
 	/// Creates the Transfer Base state.
 	TransferBaseState(Base *base, DebriefingState *debriefingState);
-	/// Cleans up the Transfer Base state.
-	~TransferBaseState();
 	/// Handler for clicking the Cancel button.
 	void btnCancelClick(Action *action);
 	/// Handler for clicking the Bases list.

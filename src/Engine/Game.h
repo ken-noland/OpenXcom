@@ -21,6 +21,7 @@
 #include <string>
 #include <memory>
 #include <SDL.h>
+#include "Registry.h"
 
 
 ///TEMP
@@ -68,6 +69,9 @@ private:
 
 	/// rules, y-scripts and other data from mods
 	std::unique_ptr<Mod> _mod;
+
+	/// central entity registry
+	Registry _registry{};
 
 	/// Lua mods
 	std::unique_ptr<Lua::LuaMod> _luaMod;
@@ -124,6 +128,10 @@ public:
 	SavedGame *getSavedGame() const { return _save; }
 	/// Sets a new saved game for the game.
 	void setSavedGame(SavedGame *save);
+	/// Gets the registry container
+	const [[nodiscard]] Registry& getRegistry() const { return _registry; }
+	/// Gets the registry container
+	[[nodiscard]] Registry& getRegistry() { return _registry; }
 	/// Gets the currently loaded mod.
 	Mod *getMod() const { return _mod.get(); }
 	/// Gets the currently loaded Lua mod.

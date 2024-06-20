@@ -40,6 +40,7 @@
 #include "../Engine/Sound.h"
 #include "../Mod/RuleInventory.h"
 #include "../Battlescape/AIModule.h"
+#include "../Engine/Registry.h"
 #include "../Engine/RNG.h"
 #include "../Engine/Options.h"
 #include "../Engine/Logger.h"
@@ -1450,9 +1451,9 @@ void SavedBattleGame::saveDummyCraftDeployment()
 	auto* save = getGeoscapeSave();
 
 	// don't forget to invalidate custom deployments of all real craft of this type
-	for (Base* xbase : save->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
-		for (Craft* xcraft : xbase->getCrafts())
+		for (Craft* xcraft : xcomBase.getCrafts())
 		{
 			if (xcraft->getRules() == _craftForPreview->getRules())
 			{

@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../Engine/State.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
@@ -39,7 +40,8 @@ class BaseInfoState : public State
 {
 	static const int MAX_BAR_WIDTH = 140;
 
-	Base *_base;
+	entt::entity _baseId;
+	Base* _base;
 	BasescapeState *_state;
 
 	Surface *_bg;
@@ -60,9 +62,7 @@ class BaseInfoState : public State
 	Bar *_barDefense, *_barShortRange, *_barLongRange;
 public:
 	/// Creates the Base Info state.
-	BaseInfoState(Base *base, BasescapeState *state);
-	/// Cleans up the Base Info state.
-	~BaseInfoState();
+	BaseInfoState(entt::entity baseId, BasescapeState *state);
 	/// Updates the base stats.
 	void init() override;
 	/// Handler for changing the text on the Name edit.

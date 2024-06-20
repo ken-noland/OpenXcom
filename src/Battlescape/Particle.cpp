@@ -92,7 +92,7 @@ Position Particle::updateScreenPosition()
 		_layerZ += tileOffset.z * LayerAccuracy;
 	}
 
-	// voxel closer to front of screen are consider on higher layer
+	// voxel closer to frontValue of screen are consider on higher layer
 	_layerZ &= 0xFE; //cut smallest bit
 	_layerZ |= (_subVoxelPos.x + _subVoxelPos.y > Position::TileXY*SubVoxelAccuracy);
 

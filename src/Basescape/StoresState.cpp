@@ -258,13 +258,13 @@ void StoresState::initList()
 		{
 
 			// items from all bases
-			for (Base* xbase : getGame()->getSavedGame()->getBases())
+			for (Base& xcomBase : getRegistry().list<Base>())
 			{
 				// 1. items in base stores
-				qty += xbase->getStorageItems()->getItem(rule);
+				qty += xcomBase.getStorageItems()->getItem(rule);
 
 				// 1b. items from base defense facilities
-				for (const BaseFacility* facility : xbase->getFacilities())
+				for (const BaseFacility* facility : xcomBase.getFacilities())
 				{
 					if (facility->getRules()->getAmmoMax() > 0 && facility->getRules()->getAmmoItem() == rule)
 					{
@@ -273,13 +273,13 @@ void StoresState::initList()
 				}
 
 				// 2. items from craft
-				for (const Craft* craft : xbase->getCrafts())
+				for (const Craft* craft : xcomBase.getCrafts())
 				{
 					qty += craft->getTotalItemCount(rule);
 				}
 
 				// 3. armor in use (worn by soldiers)
-				for (const Soldier* soldier : xbase->getSoldiers())
+				for (const Soldier* soldier : xcomBase.getSoldiers())
 				{
 					if (soldier->getArmor()->getStoreItem() == rule)
 					{
@@ -288,7 +288,7 @@ void StoresState::initList()
 				}
 
 				// 4. items/aliens in research
-				for (const ResearchProject* research : xbase->getResearch())
+				for (const ResearchProject* research : xcomBase.getResearch())
 				{
 					const RuleResearch* rrule = research->getRules();
 					if (rrule->needItem() && rrule->destroyItem())
@@ -302,7 +302,7 @@ void StoresState::initList()
 				}
 
 				// 5. items in transfer
-				for (Transfer* transfer : xbase->getTransfers())
+				for (Transfer* transfer : xcomBase.getTransfers())
 				{
 					if (transfer->getCraft())
 					{

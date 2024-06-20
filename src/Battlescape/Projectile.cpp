@@ -1026,7 +1026,7 @@ float Projectile::getDistance() const
 }
 
 /**
- * Is this projectile drawn back to front or front to back?
+ * Is this projectile drawn back to frontValue or frontValue to back?
  * @return return if this is to be drawn in reverse order.
  */
 bool Projectile::isReversed() const

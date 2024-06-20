@@ -50,7 +50,7 @@ with the "LODEPNG_COMPILE_" #defines divide this up further in an intermixed way
 -The C++ wrapper around all of the above
 */
 
-/*The malloc, realloc and free functions defined here with "lodepng_" in front
+/*The malloc, realloc and free functions defined here with "lodepng_" in frontValue
 of the name, so that you can easily change them to others related to your
 platform if needed. Everything else in the code calls these. Pass
 -DLODEPNG_NO_COMPILE_ALLOCATORS to the compiler, or comment out

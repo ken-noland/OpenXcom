@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -33,13 +33,6 @@ Region::Region(RuleRegion *rules): _rules(rules)
 }
 
 /**
- *
- */
-Region::~Region()
-{
-}
-
-/**
  * Loads the region from a YAML file.
  * @param node YAML node.
  */
@@ -60,51 +53,6 @@ YAML::Node Region::save() const
 	node["activityXcom"] = _activityXcom;
 	node["activityAlien"] = _activityAlien;
 	return node;
-}
-
-/**
- * Returns the ruleset for the region's type.
- * @return Pointer to ruleset.
- */
-RuleRegion *Region::getRules() const
-{
-	return _rules;
-}
-
-/**
- * Adds to the region's xcom activity level.
- * @param activity Amount to add.
- */
-void Region::addActivityXcom(int activity)
-{
-	_activityXcom.back() += activity;
-}
-
-/**
- * Adds to the region's alien activity level.
- * @param activity Amount to add.
- */
-void Region::addActivityAlien(int activity)
-{
-	_activityAlien.back() += activity;
-}
-
-/**
- * Gets the region's xcom activity level.
- * @return activity level.
- */
-std::vector<int> &Region::getActivityXcom()
-{
-	return _activityXcom;
-}
-
-/**
- * Gets the region's alien activity level.
- * @return activity level.
- */
-std::vector<int> &Region::getActivityAlien()
-{
-	return _activityAlien;
 }
 
 /**

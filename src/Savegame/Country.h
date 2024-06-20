@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -52,45 +52,49 @@ private:
 public:
 	/// Creates a new country of the specified type.
 	Country(RuleCountry *rules, bool gen = true);
-	/// Cleans up the country.
-	~Country();
 	/// Loads the country from YAML.
 	void load(const YAML::Node& node, const ScriptGlobal* shared);
 	/// Saves the country to YAML.
 	YAML::Node save(const ScriptGlobal* shared) const;
 	/// Gets the country's ruleset.
-	const RuleCountry *getRules() const;
+	[[nodiscard]] const RuleCountry* getRules() const { return _rules; }
 	/// Gets the country's funding.
-	std::vector<int> &getFunding();
-	/// Sets the country's funding.
-	void setFunding(int funding);
+	[[nodiscard]] std::vector<int>& getFunding() { return _funding; }
+	/// Gets the country's funding.
+	[[nodiscard]] const std::vector<int>& getFunding() const { return _funding; }
+	/// Changes the countries current funding.
+	void setFunding(int funding) { _funding.back() = funding; }
 
 	/// get the country's satisfaction level
-	Satisfaction getSatisfaction() const;
+	[[nodiscard]] Satisfaction getSatisfaction() const { return _pact ? Satisfaction::ALIEN_PACT : _satisfaction; }
 	/// add xcom activity in this country
-	void addActivityXcom(int activity);
+	void addActivityXcom(int activity) { _activityXcom.back() += activity; }
 	/// add alien activity in this country
-	void addActivityAlien(int activity);
+	void addActivityAlien(int activity) { _activityAlien.back() += activity; }
 	/// get xcom activity to this country
-	std::vector<int> &getActivityXcom();
+	[[nodiscard]] std::vector<int>& getActivityXcom() { return _activityXcom; }
 	/// get xcom activity to this country
-	std::vector<int> &getActivityAlien();
+	[[nodiscard]] const std::vector<int>& getActivityXcom() const { return _activityXcom; }
+	/// get xcom activity to this country
+	[[nodiscard]] std::vector<int>& getActivityAlien() { return _activityAlien; }
+	/// get xcom activity to this country
+	[[nodiscard]] const std::vector<int>& getActivityAlien() const { return _activityAlien; }
 	/// store last month's counters, start new counters, set this month's change.
-	void newMonth(int xcomTotal, int alienTotal, int pactScore, int averageFunding, const SavedGame* save);
+	void newMonth(int xcomTotal, int alienTotal, int pactScore, int64_t averageFunding, const SavedGame* save);
 	/// are we signing a new pact?
-	bool getNewPact() const;
+	[[nodiscard]] bool getNewPact() const { return _newPact; }
 	/// sign a pact at the end of this month.
 	void setNewPact();
 	/// are we cancelling an existing pact?
-	bool getCancelPact() const;
+	[[nodiscard]] bool getCancelPact() const { return _cancelPact; }
 	/// cancel or prevent a pact.
 	void setCancelPact();
-	/// have we signed a pact?
-	bool getPact() const;
+	/// has a new pact been signed?
+	[[nodiscard]] bool getPact() const { return _pact; }
 	/// sign a pact immediately
-	void setPact();
+	void setPact() { _pact = true; }
 	/// can be (re)infiltrated?
-	bool canBeInfiltrated();
+	[[nodiscard]] const bool canBeInfiltrated() const;
 
 private:
 	int getCurrentFunding() const { return _funding.back(); }

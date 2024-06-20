@@ -131,27 +131,19 @@ UfoTrackerState::UfoTrackerState(GeoscapeState* state, Globe* globe)
 		row++;
 	}
 
-	for (Ufo* ufo : getGame()->getSavedGame()->getUfos())
+	for (Ufo& ufo : getRegistry().list<Ufo>(std::mem_fn(&Ufo::getDetected)))
 	{
-		if (!ufo->getDetected())
-			continue;
 
-		std::ostringstream ss1;
-		ss1 << tr(ufo->getRules()->getSize());
+		std::string ufoSize = tr(ufo.getRules()->getSize());
 
-		std::ostringstream ss2;
-		std::string altitude = ufo->getAltitude() == "STR_GROUND" ? "STR_GROUNDED" : ufo->getAltitude();
-		ss2 << tr(altitude);
+		std::string altitude = tr(ufo.getAltitude() == "STR_GROUND" ? "STR_GROUNDED" : ufo.getAltitude());
 
-		std::ostringstream ss3;
-		std::string heading = ufo->getStatus() != Ufo::FLYING ? "STR_NONE_UC" : ufo->getDirection();
-		ss3 << tr(heading);
+		std::string heading = tr(ufo.getStatus() != Ufo::FLYING ? "STR_NONE_UC" : ufo.getDirection());
 
-		std::ostringstream ss4;
-		ss4 << Unicode::formatNumber(ufo->getSpeed());
+		std::string speed = Unicode::formatNumber(ufo.getSpeed());
 
-		_objects.push_back(ufo);
-		_lstObjects->addRow(5, ufo->getName(getGame()->getLanguage()).c_str(), ss1.str().c_str(), ss2.str().c_str(), ss3.str().c_str(), ss4.str().c_str());
+		_objects.push_back(&ufo);
+		_lstObjects->addRow(5, ufo.getName(getGame()->getLanguage()).c_str(), ufoSize.c_str(), altitude.c_str(), heading.c_str(), speed.c_str());
 		if (altitude == "STR_GROUNDED")
 		{
 			_lstObjects->setCellColor(row, 2, _lstObjects->getSecondaryColor());

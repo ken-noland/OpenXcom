@@ -152,6 +152,7 @@ set ( engine_src
   Engine/OptionInfo.cpp
   Engine/Options.cpp
   Engine/Palette.cpp
+  Engine/Registry.cpp
   Engine/RNG.cpp
   Engine/Scalers/hq2x.cpp
   Engine/Scalers/hq3x.cpp
@@ -348,11 +349,14 @@ set ( savegame_src
   Savegame/AlienBase.cpp
   Savegame/AlienMission.cpp
   Savegame/AlienStrategy.cpp
+  Savegame/AreaSystem.cpp
   Savegame/Base.cpp
   Savegame/BaseFacility.cpp
+  Savegame/BaseSystem.cpp
   Savegame/BattleItem.cpp
   Savegame/BattleUnit.cpp
   Savegame/Country.cpp
+  Savegame/CountrySystem.cpp
   Savegame/Craft.cpp
   Savegame/CraftWeapon.cpp
   Savegame/CraftWeaponProjectile.cpp

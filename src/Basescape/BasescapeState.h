@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <entt/entt.hpp>
 #include "../Engine/State.h"
 
 namespace OpenXcom
@@ -37,22 +38,23 @@ class Globe;
 class BasescapeState : public State
 {
 private:
+	entt::entity _baseId;
+	Base* _base;
 	BaseView *_view;
 	MiniBaseView *_mini;
 	Text *_txtFacility, *_txtLocation, *_txtFunds, *_leftArrow, *_rightArrow;
 	TextEdit *_edtBase;
 	TextButton *_btnNewBase, *_btnBaseInfo, *_btnSoldiers, *_btnCrafts, *_btnFacilities, *_btnResearch, *_btnManufacture, *_btnTransfer, *_btnPurchase, *_btnSell, *_btnGeoscape;
-	Base *_base;
 	Globe *_globe;
 public:
 	/// Creates the Basescape state.
-	BasescapeState(Base *base, Globe *globe);
+	BasescapeState(entt::entity baseId, Globe *globe);
 	/// Cleans up the Basescape state.
 	~BasescapeState();
 	/// Updates the base stats.
 	void init() override;
 	/// Sets a new base to display.
-	void setBase(Base *base);
+	void setBase(entt::entity baseId);
 	/// Handler for clicking the Build New Base button.
 	void btnNewBaseClick(Action *action);
 	/// Handler for clicking the Base Information button.

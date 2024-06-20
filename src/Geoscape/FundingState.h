@@ -70,8 +70,6 @@ private:
 public:
 	/// Creates the Funding state.
 	FundingState();
-	/// Cleans up the Funding state.
-	~FundingState();
 	/// Handler for clicking the OK button.
 	void btnOkClick(Action *action);
 	/// Sets up the funding countries list.

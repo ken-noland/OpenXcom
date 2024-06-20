@@ -43,8 +43,6 @@ private:
 public:
 	/// Creates the Alien Base Detected state.
 	AlienBaseState(AlienBase *base, GeoscapeState *state);
-	/// Cleans up the Alien Base Detected state.
-	~AlienBaseState();
 	/// Handler for clicking the OK button.
 	void btnOkClick(Action *action);
 };

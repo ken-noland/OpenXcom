@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http:///www.gnu.org/licenses/>.
  */
 #include "../Engine/State.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
@@ -37,7 +38,7 @@ class TextButton;
 class BuildNewBaseState : public State
 {
 private:
-	Base *_base;
+	entt::entity _newBaseId = entt::null;
 	Globe *_globe;
 	InteractiveSurface *_btnRotateLeft, *_btnRotateRight, *_btnRotateUp, *_btnRotateDown, *_btnZoomIn, *_btnZoomOut;
 	entt::entity _window;
@@ -50,7 +51,7 @@ private:
 	int _mousex, _mousey;
 public:
 	/// Creates the Build New Base state.
-	BuildNewBaseState(Base *base, Globe *globe, bool first);
+	BuildNewBaseState(entt::entity newBaseId, Globe *globe, bool first);
 	/// Cleans up the Build New Base state.
 	~BuildNewBaseState();
 	/// Resets globe.

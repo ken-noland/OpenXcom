@@ -17,21 +17,22 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "AlienBaseState.h"
-#include "../Engine/Game.h"
-#include "../Mod/Mod.h"
-#include "../Engine/LocalizedText.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Window.h"
-#include "../Interface/Text.h"
 #include "GeoscapeState.h"
 #include "Globe.h"
-#include "../Savegame/SavedGame.h"
-#include "../Savegame/Region.h"
-#include "../Savegame/Country.h"
-#include "../Mod/RuleRegion.h"
-#include "../Mod/RuleCountry.h"
-#include "../Savegame/AlienBase.h"
+#include "../Engine/Game.h"
+#include "../Engine/LocalizedText.h"
 #include "../Engine/Options.h"
+#include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
+#include "../Interface/Window.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleCountry.h"
+#include "../Mod/RuleRegion.h"
+#include "../Savegame/AlienBase.h"
+#include "../Savegame/AreaSystem.h"
+#include "../Savegame/Country.h"
+#include "../Savegame/Region.h"
+#include "../Savegame/SavedGame.h"
 
 namespace OpenXcom
 {
@@ -73,45 +74,20 @@ AlienBaseState::AlienBaseState(AlienBase *base, GeoscapeState *state) : State("A
 	_txtTitle->setWordWrap(true);
 
 	// Check location of base
-	std::string regionName, countryName;
-	for (const Country* country : getGame()->getSavedGame()->getCountries())
+	std::string countryName, regionName;
+	if (const Country* country = AreaSystem::locateValue<Country>(*base))
 	{
-		if (country->getRules()->insideCountry(_base->getLongitude(), _base->getLatitude()))
-		{
-			countryName = tr(country->getRules()->getType());
-			break;
-		}
+		countryName = tr(country->getRules()->getType());
 	}
-	for (const Region* region : getGame()->getSavedGame()->getRegions())
+	if (const Region* region = AreaSystem::locateValue<Region>(*base))
 	{
-		if (region->getRules()->insideRegion(_base->getLongitude(), _base->getLatitude()))
-		{
-			regionName = tr(region->getRules()->getType());
-			break;
-		}
+		regionName = tr(region->getRules()->getType());
 	}
-	std::string location;
-	if (!countryName.empty())
-	{
-		location = tr("STR_COUNTRIES_COMMA").arg(countryName).arg(regionName);
-	}
-	else if (!regionName.empty())
-	{
-		location = regionName;
-	}
-	else
-	{
-		location = tr("STR_UNKNOWN");
-	}
+
+	std::string location = !countryName.empty() ? tr("STR_COUNTRIES_COMMA").arg(countryName).arg(regionName)
+						 : regionName.empty()   ? static_cast<LocalizedText>(regionName)
+						 : tr("STR_UNKNOWN");
 	_txtTitle->setText(tr("STR_XCOM_AGENTS_HAVE_LOCATED_AN_ALIEN_BASE_IN_REGION").arg(location));
-}
-
-/**
- *
- */
-AlienBaseState::~AlienBaseState()
-{
-
 }
 
 /**

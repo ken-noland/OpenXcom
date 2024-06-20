@@ -180,12 +180,12 @@ void GlobalResearchState::fillProjectList()
 	int allocatedScientists = 0;
 	int freeLaboratories = 0;
 
-	for (Base *xbase : getGame()->getSavedGame()->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
-		const std::vector<ResearchProject*>& baseProjects = xbase->getResearch();
-		if (!baseProjects.empty() || xbase->getScientists() > 0)
+		const std::vector<ResearchProject*>& baseProjects = xcomBase.getResearch();
+		if (!baseProjects.empty() || xcomBase.getScientists() > 0)
 		{
-			std::string baseName = xbase->getName(getGame()->getLanguage());
+			std::string baseName = xcomBase.getName(getGame()->getLanguage());
 			_lstResearch->addRow(4, baseName.c_str(), "", "", "");
 			_lstResearch->setRowColor(_lstResearch->getLastRowIndex(), _lstResearch->getSecondaryColor());
 
@@ -202,20 +202,20 @@ void GlobalResearchState::fillProjectList()
 			std::string wstr = tr(r->getName());
 			_lstResearch->addRow(4, wstr.c_str(), sstr.str().c_str(), "", tr(proj->getResearchProgress()).c_str());
 
-			_bases.push_back(xbase);
+			_bases.push_back(&xcomBase);
 			_topics.push_back(r);
 		}
-		if (baseProjects.empty() && xbase->getScientists() > 0)
+		if (baseProjects.empty() && xcomBase.getScientists() > 0)
 		{
 			_lstResearch->addRow(3, tr("STR_NONE").c_str(), "", "");
 
-			_bases.push_back(xbase);
+			_bases.push_back(&xcomBase);
 			_topics.push_back(0);
 		}
 
-		availableScientists += xbase->getAvailableScientists();
-		allocatedScientists += xbase->getAllocatedScientists();
-		freeLaboratories += xbase->getFreeLaboratories();
+		availableScientists += xcomBase.getAvailableScientists();
+		allocatedScientists += xcomBase.getAllocatedScientists();
+		freeLaboratories += xcomBase.getFreeLaboratories();
 	}
 
 	_txtAvailable->setText(tr("STR_SCIENTISTS_AVAILABLE").arg(availableScientists));

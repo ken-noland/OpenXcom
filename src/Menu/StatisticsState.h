@@ -38,15 +38,9 @@ private:
 	entt::entity _window;
 	Text *_txtTitle;
 	TextList *_lstStats;
-
-	// Sums a list of numbers.
-	template <typename T>
-	T sumVector(const std::vector<T> &vec) const;
 public:
 	/// Creates the New Game state.
 	StatisticsState();
-	/// Cleans up the New Game state.
-	~StatisticsState();
 	/// Gets the save stats.
 	void listStats();
 	/// Handler for clicking the Ok button.

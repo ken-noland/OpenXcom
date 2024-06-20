@@ -92,9 +92,9 @@ DogfightExperienceState::DogfightExperienceState() : State("DogfightExperienceSt
 	_lstPilots->setDot(true);
 
 	_lstPilots->clearList();
-	for (Base* xbase : getGame()->getSavedGame()->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
-		for (Soldier* soldier : xbase->getSoldiers())
+		for (Soldier* soldier : xcomBase.getSoldiers())
 		{
 			auto* tmp = soldier->getDailyDogfightExperienceCache();
 			if (tmp->firing > 0 || tmp->reactions > 0 || tmp->bravery > 0)

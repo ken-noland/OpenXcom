@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2026 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -38,22 +38,24 @@ private:
 public:
 	/// Creates a new region of the specified type.
 	Region(RuleRegion *rules);
-	/// Cleans up the region.
-	~Region();
 	/// Loads the region from YAML.
 	void load(const YAML::Node& node);
 	/// Saves the region to YAML.
 	YAML::Node save() const;
 	/// Gets the region's ruleset.
-	RuleRegion *getRules() const;
+	RuleRegion* getRules() const { return _rules; }
 	/// add xcom activity in this region
-	void addActivityXcom(int activity);
+	void addActivityXcom(int activity) { _activityXcom.back() += activity; }
 	/// add alien activity in this region
-	void addActivityAlien(int activity);
+	void addActivityAlien(int activity) { _activityAlien.back() += activity; }
 	/// get xcom activity to this region
-	std::vector<int> &getActivityXcom();
+	[[nodiscard]] std::vector<int>& getActivityXcom() { return _activityXcom; }
 	/// get xcom activity to this region
-	std::vector<int> &getActivityAlien();
+	[[nodiscard]] const std::vector<int> &getActivityXcom() const { return _activityXcom; }
+	/// get alien activity to this region
+	[[nodiscard]] std::vector<int>& getActivityAlien() { return _activityAlien; }
+	/// get alien activity to this region
+	[[nodiscard]] const std::vector<int>& getActivityAlien() const { return _activityAlien; }
 	/// start new month of activity
 	void newMonth();
 };

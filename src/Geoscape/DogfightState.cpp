@@ -19,40 +19,41 @@
 #include "DogfightState.h"
 #include <cmath>
 #include <sstream>
+#include "DogfightErrorState.h"
 #include "GeoscapeState.h"
-#include "../Engine/Game.h"
-#include "../Engine/Screen.h"
-#include "../Engine/LocalizedText.h"
-#include "../Engine/SurfaceSet.h"
-#include "../Engine/Surface.h"
+#include "Globe.h"
 #include "../Engine/Action.h"
+#include "../Engine/Collections.h"
+#include "../Engine/Game.h"
+#include "../Engine/LocalizedText.h"
+#include "../Engine/RNG.h"
+#include "../Engine/Screen.h"
+#include "../Engine/Sound.h"
+#include "../Engine/Surface.h"
+#include "../Engine/SurfaceSet.h"
+#include "../Engine/Timer.h"
 #include "../Interface/ImageButton.h"
 #include "../Interface/Text.h"
-#include "../Engine/Timer.h"
-#include "../Engine/Collections.h"
-#include "Globe.h"
+#include "../Mod/AlienRace.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleCountry.h"
+#include "../Mod/RuleCraft.h"
+#include "../Mod/RuleCraftWeapon.h"
+#include "../Mod/RuleInterface.h"
+#include "../Mod/RuleRegion.h"
+#include "../Mod/RuleSoldier.h"
+#include "../Mod/RuleUfo.h"
+#include "../Savegame/AlienMission.h"
+#include "../Savegame/AreaSystem.h"
+#include "../Savegame/Base.h"
+#include "../Savegame/Country.h"
+#include "../Savegame/Craft.h"
+#include "../Savegame/CraftWeapon.h"
+#include "../Savegame/CraftWeaponProjectile.h"
+#include "../Savegame/Region.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Soldier.h"
-#include "../Mod/RuleSoldier.h"
-#include "../Savegame/Craft.h"
-#include "../Mod/RuleCraft.h"
-#include "../Savegame/CraftWeapon.h"
-#include "../Mod/RuleCraftWeapon.h"
 #include "../Savegame/Ufo.h"
-#include "../Mod/RuleUfo.h"
-#include "../Mod/AlienRace.h"
-#include "../Engine/RNG.h"
-#include "../Engine/Sound.h"
-#include "../Savegame/Base.h"
-#include "../Savegame/CraftWeaponProjectile.h"
-#include "../Savegame/Country.h"
-#include "../Mod/RuleCountry.h"
-#include "../Savegame/Region.h"
-#include "../Mod/RuleRegion.h"
-#include "../Savegame/AlienMission.h"
-#include "DogfightErrorState.h"
-#include "../Mod/RuleInterface.h"
-#include "../Mod/Mod.h"
 
 #include "../Entity/Engine/Surface.h"
 
@@ -499,9 +500,9 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 	if (_craft->getInterceptionOrder() == 0)
 	{
 		int maxInterceptionOrder = 0;
-		for (Base* xbase : getGame()->getSavedGame()->getBases())
+		for (const Base& xcomBase : getRegistry().list<Base>())
 		{
-			for (Craft* xcraft : xbase->getCrafts())
+			for (Craft* xcraft : xcomBase.getCrafts())
 			{
 				if (xcraft->getInterceptionOrder() > maxInterceptionOrder)
 				{
@@ -1539,10 +1540,10 @@ void DogfightState::update()
 						// Attack on UFO's mission region
 						targetRegion = _ufo->getMission()->getRegion();
 					}
-					else
+					// Try to find and attack the originating base.
+					else if (Region* region = AreaSystem::locateValue<Region>(_craft->getBase()))
 					{
-						// Try to find and attack the originating base.
-						targetRegion = getGame()->getSavedGame()->locateRegion(*_craft->getBase())->getRules()->getType();
+						targetRegion = region->getRules()->getType();
 						// TODO: If the base is removed, the mission is canceled.
 					}
 					// Difference from original: No retaliation until final UFO lands (Original: Is spawned).
@@ -1573,22 +1574,8 @@ void DogfightState::update()
 			{
 				if (_ufo->getShotDownByCraftId() == _craft->getUniqueId())
 				{
-					for (Country* country : getGame()->getSavedGame()->getCountries())
-					{
-						if (country->getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
-						{
-							country->addActivityXcom(_ufo->getRules()->getScore()*2);
-							break;
-						}
-					}
-					for (Region* region : getGame()->getSavedGame()->getRegions())
-					{
-						if (region->getRules()->insideRegion(_ufo->getLongitude(), _ufo->getLatitude()))
-						{
-							region->addActivityXcom(_ufo->getRules()->getScore()*2);
-							break;
-						}
-					}
+					AreaSystem::addXcomActivityToCountryAndRegion(_ufo->getRules()->getScore() * 2, *_ufo);
+
 					setStatus("STR_UFO_DESTROYED");
 					getGame()->getMod()->getSound("GEO.CAT", Mod::UFO_EXPLODE)->play(); //11
 				}
@@ -1600,22 +1587,7 @@ void DogfightState::update()
 				{
 					setStatus("STR_UFO_CRASH_LANDS");
 					getGame()->getMod()->getSound("GEO.CAT", Mod::UFO_CRASH)->play(); //10
-					for (Country* country : getGame()->getSavedGame()->getCountries())
-					{
-						if (country->getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
-						{
-							country->addActivityXcom(_ufo->getRules()->getScore());
-							break;
-						}
-					}
-					for (Region* region : getGame()->getSavedGame()->getRegions())
-					{
-						if (region->getRules()->insideRegion(_ufo->getLongitude(), _ufo->getLatitude()))
-						{
-							region->addActivityXcom(_ufo->getRules()->getScore());
-							break;
-						}
-					}
+					AreaSystem::addXcomActivityToCountryAndRegion(_ufo->getRules()->getScore(), *_ufo);
 				}
 				bool survived = true;
 				bool fakeUnderwaterTexture = _state->getGlobe()->insideFakeUnderwaterTexture(_ufo->getLongitude(), _ufo->getLatitude());
@@ -1642,7 +1614,7 @@ void DogfightState::update()
 				}
 				else
 				{
-					_ufo->setSecondsRemaining(RNG::generate(24, 96)*3600);
+					_ufo->setSecondsRemaining(static_cast<size_t>(RNG::generate(24, 96)) * 3600);
 					_ufo->setAltitude("STR_GROUND");
 					if (_ufo->getCrashId() == 0)
 					{
@@ -1701,22 +1673,7 @@ void DogfightState::update()
 				_ufo->setSpeed(0);
 				_ufo->setStatus(Ufo::DESTROYED);
 				_destroyUfo = true;
-				for (Country* country : getGame()->getSavedGame()->getCountries())
-				{
-					if (country->getRules()->insideCountry(_ufo->getLongitude(), _ufo->getLatitude()))
-					{
-						country->addActivityXcom(_ufo->getRules()->getScore());
-						break;
-					}
-				}
-				for (Region* region : getGame()->getSavedGame()->getRegions())
-				{
-					if (region->getRules()->insideRegion(_ufo->getLongitude(), _ufo->getLatitude()))
-					{
-						region->addActivityXcom(_ufo->getRules()->getScore());
-						break;
-					}
-				}
+				AreaSystem::addXcomActivityToCountryAndRegion(_ufo->getRules()->getScore(), *_ufo);
 			}
 			else // Brought it down over land (or survived splashdown)
 			{
@@ -2102,7 +2059,7 @@ void DogfightState::btnDisengageSimulateLeftPress(Action *action)
 }
 
 /**
- * Shows a front view of the UFO.
+ * Shows a frontValue view of the UFO.
  * @param action Pointer to an action.
  */
 void DogfightState::btnUfoClick(Action *)
@@ -2123,7 +2080,7 @@ void DogfightState::btnUfoClick(Action *)
 }
 
 /**
- * Hides the front view of the UFO.
+ * Hides the frontValue view of the UFO.
  * @param action Pointer to an action.
  */
 void DogfightState::previewClick(Action *)

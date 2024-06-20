@@ -47,8 +47,8 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param rule Pointer to the facility ruleset to build.
  */
-PlaceFacilityState::PlaceFacilityState(Base *base, const RuleBaseFacility *rule, BaseFacility *origFac)
-	: State("PlaceFacilityState", false), _base(base), _rule(rule), _origFac(origFac)
+PlaceFacilityState::PlaceFacilityState(entt::entity baseId, const RuleBaseFacility *rule, BaseFacility *origFac)
+	: State("PlaceFacilityState", false), _baseId(baseId), _rule(rule), _origFac(origFac)
 {
 	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
@@ -91,8 +91,9 @@ PlaceFacilityState::PlaceFacilityState(Base *base, const RuleBaseFacility *rule,
 	{
 		_view->setOtherColors(itf->color, itf->color2, itf->border, !itf->TFTDMode);
 	}
+	Base& base = getRegistry().raw().get<Base>(_baseId);
 	_view->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
-	_view->setBase(_base);
+	_view->setBase(&base);
 	_view->setSelectable(rule->getSizeX(), rule->getSizeY());
 	_view->onMouseClick((ActionHandler)&PlaceFacilityState::viewClick);
 
@@ -139,14 +140,6 @@ PlaceFacilityState::PlaceFacilityState(Base *base, const RuleBaseFacility *rule,
 
 	_numMaintenance->setBig();
 	_numMaintenance->setText(Unicode::formatFunding(_rule->getMonthlyCost()));
-}
-
-/**
- *
- */
-PlaceFacilityState::~PlaceFacilityState()
-{
-
 }
 
 /**
@@ -264,9 +257,10 @@ void PlaceFacilityState::viewClick(Action *)
 		}
 		else
 		{
+			Base& base = getRegistry().raw().get<Base>(_baseId);
 			for (const auto& item: _rule->getBuildCostItems())
 			{
-				int needed = item.second.first - _base->getStorageItems()->getItem(item.first);
+				int needed = item.second.first - base.getStorageItems()->getItem(item.first);
 				if (needed > 0)
 				{
 					getGame()->popState();
@@ -278,9 +272,9 @@ void PlaceFacilityState::viewClick(Action *)
 			double reducedBuildTime = 0.0;
 			bool buildingOver = false;
 			const BaseAreaSubset areaToBuildOver = BaseAreaSubset(_rule->getSizeX(), _rule->getSizeY()).offset(_view->getGridX(), _view->getGridY());
-			for (std::size_t i = static_cast<int>(_base->getFacilities().size() - 1); i >= 0; --i)
+			for (std::size_t i = static_cast<size_t>(base.getFacilities().size() - 1); i >= 0; --i)
 			{
-				BaseFacility *checkFacility = _base->getFacilities().at(i);
+				BaseFacility *checkFacility = base.getFacilities().at(i);
 				if (BaseAreaSubset::intersection(areaToBuildOver, checkFacility->getPlacement()))
 				{
 					// Get a refund from the facility we're building over
@@ -292,7 +286,7 @@ void PlaceFacilityState::viewClick(Action *)
 						getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() + checkFacility->getRules()->getBuildCost());
 						for (auto& item : itemCost)
 						{
-							_base->getStorageItems()->addItem(getGame()->getMod()->getItem(item.first, true), item.second.first);
+							base.getStorageItems()->addItem(getGame()->getMod()->getItem(item.first, true), item.second.first);
 						}
 					}
 					else
@@ -301,7 +295,7 @@ void PlaceFacilityState::viewClick(Action *)
 						getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() + checkFacility->getRules()->getRefundValue());
 						for (auto& item : itemCost)
 						{
-							_base->getStorageItems()->addItem(getGame()->getMod()->getItem(item.first, true), item.second.second);
+							base.getStorageItems()->addItem(getGame()->getMod()->getItem(item.first, true), item.second.second);
 						}
 
 						// Reduce the build time of the new facility
@@ -316,18 +310,18 @@ void PlaceFacilityState::viewClick(Action *)
 					if (checkFacility->getAmmo() > 0)
 					{
 						// Full refund of loaded ammo
-						_base->getStorageItems()->addItem(checkFacility->getRules()->getAmmoItem(), checkFacility->getAmmo());
+						base.getStorageItems()->addItem(checkFacility->getRules()->getAmmoItem(), checkFacility->getAmmo());
 						checkFacility->setAmmo(0);
 					}
 
 					// Remove the facility from the base
-					_base->getFacilities().erase(_base->getFacilities().begin() + i);
+					base.getFacilities().erase(base.getFacilities().begin() + i);
 					delete checkFacility;
 				}
 
 			}
 
-			BaseFacility *fac = new BaseFacility(_rule, _base);
+			BaseFacility *fac = new BaseFacility(_rule, &base);
 			fac->setX(_view->getGridX());
 			fac->setY(_view->getGridY());
 			fac->setBuildTime(_rule->getBuildTime());
@@ -338,7 +332,7 @@ void PlaceFacilityState::viewClick(Action *)
 				int reducedBuildTimeRounded = (int)std::round(reducedBuildTime);
 				fac->setBuildTime(std::max(1, fac->getBuildTime() - reducedBuildTimeRounded));
 			}
-			_base->getFacilities().push_back(fac);
+			base.getFacilities().push_back(fac);
 			if (fac->getRules()->getPlaceSound() != Mod::NO_SOUND)
 			{
 				getGame()->getMod()->getSound("GEO.CAT", fac->getRules()->getPlaceSound())->play();
@@ -348,11 +342,11 @@ void PlaceFacilityState::viewClick(Action *)
 				if (_view->isQueuedBuilding(_rule)) fac->setBuildTime(INT_MAX);
 				_view->reCalcQueuedBuildings();
 			}
-			_view->setBase(_base);
+			_view->setBase(&base);
 			getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() - _rule->getBuildCost());
 			for (const auto& item: _rule->getBuildCostItems())
 			{
-				_base->getStorageItems()->removeItem(item.first, item.second.first);
+				base.getStorageItems()->removeItem(item.first, item.second.first);
 			}
 			getGame()->popState();
 		}
