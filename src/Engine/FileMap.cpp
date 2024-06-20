@@ -795,7 +795,7 @@ static bool mapExtResources(ModRecord *mrec, const std::string& basename, bool e
 	if (zipname == "common.zip" || zipname == "standard.zip") {
 		embedded_rwops = CrossPlatform::getEmbeddedAsset(zipname);
 	}
-	// first try finding a directory (ass-backwards since we got to push this into front re layers.
+	// first try finding a directory (ass-backwards since we got to push this into frontValue re layers.
 	if (!embedded_rwops || ! embeddedOnly) {
 		std::string fullname = Options::getUserFolder() + basename;
 		if (!CrossPlatform::folderExists(fullname)) {

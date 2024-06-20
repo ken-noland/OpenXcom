@@ -17,22 +17,23 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "TransferBaseState.h"
+#include "TransferItemsState.h"
 #include <sstream>
-#include "../Engine/Game.h"
-#include "../Mod/Mod.h"
+#include "../Battlescape/DebriefingState.h"
 #include "../Engine/LocalizedText.h"
+#include "../Engine/Game.h"
 #include "../Engine/Options.h"
 #include "../Engine/Unicode.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Window.h"
 #include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
+#include "../Interface/Window.h"
+#include "../Savegame/AreaSystem.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/Region.h"
+#include "../Mod/Mod.h"
 #include "../Mod/RuleRegion.h"
-#include "TransferItemsState.h"
-#include "../Battlescape/DebriefingState.h"
 
 namespace OpenXcom
 {
@@ -92,34 +93,23 @@ TransferBaseState::TransferBaseState(Base* base, DebriefingState* debriefingStat
 	_lstBases->onMouseClick((ActionHandler)&TransferBaseState::lstBasesClick);
 
 	int row = 0;
-	for (Base* xbase : getGame()->getSavedGame()->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
-		if (xbase != _base)
+		if (&xcomBase != _base)
 		{
 			// Get area
 			std::string area;
-			for (const Region* region : getGame()->getSavedGame()->getRegions())
+			if (Region* region = AreaSystem::locateValue<Region>(xcomBase))
 			{
-				if (region->getRules()->insideRegion(xbase->getLongitude(), xbase->getLatitude()))
-				{
-					area = tr(region->getRules()->getType());
-					break;
-				}
+				area = tr(region->getRules()->getType());
 			}
-			std::ostringstream ss;
-			ss << Unicode::TOK_COLOR_FLIP << area;
-			_lstBases->addRow(2, xbase->getName().c_str(), ss.str().c_str());
-			_bases.push_back(xbase);
+
+			std::string baseArea = std::format("{}{}", Unicode::TOK_COLOR_FLIP, area);
+			_lstBases->addRow(2, xcomBase.getName().c_str(), baseArea.c_str());
+			_bases.push_back(&xcomBase);
 			row++;
 		}
 	}
-}
-
-/**
- *
- */
-TransferBaseState::~TransferBaseState()
-{
 }
 
 /**

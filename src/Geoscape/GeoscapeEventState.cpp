@@ -34,6 +34,7 @@
 #include "../Mod/RuleInterface.h"
 #include "../Mod/RuleRegion.h"
 #include "../Mod/RuleSoldier.h"
+#include "../Savegame/AreaSystem.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/ItemContainer.h"
 #include "../Savegame/Region.h"
@@ -129,7 +130,7 @@ GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : State("Geos
 void GeoscapeEventState::eventLogic()
 {
 	SavedGame *save = getGame()->getSavedGame();
-	Base *hq = save->getBases().front();
+	Base *hq = getRegistry().frontValue<Base>();
 	const Mod *mod = getGame()->getMod();
 	const RuleEvent &rule = _eventRule;
 
@@ -137,7 +138,7 @@ void GeoscapeEventState::eventLogic()
 	City* city = nullptr;
 	if (!rule.getRegionList().empty())
 	{
-		size_t pickRegion = RNG::generate(0, (int)rule.getRegionList().size() - 1);
+		size_t pickRegion = static_cast<size_t>(RNG::generate(0, static_cast<int>(rule.getRegionList().size() - 1)));
 		std::string regionName = rule.getRegionList().at(pickRegion);
 		regionRule = getGame()->getMod()->getRegion(regionName, true);
 		std::string place = tr(regionName);
@@ -147,7 +148,7 @@ void GeoscapeEventState::eventLogic()
 			size_t cities = regionRule->getCities().size();
 			if (cities > 0)
 			{
-				size_t pickCity = RNG::generate(0, (int)cities - 1);
+				size_t pickCity = static_cast<size_t>(RNG::generate(0, static_cast<int>(cities - 1)));
 				city = regionRule->getCities().at(pickCity);
 				place = city->getName(getGame()->getLanguage());
 			}
@@ -168,7 +169,7 @@ void GeoscapeEventState::eventLogic()
 			size_t cities = regionRule->getCities().size();
 			if (cities > 0)
 			{
-				size_t pickCity = RNG::generate(0, (int)cities - 1);
+				size_t pickCity = static_cast<size_t>(RNG::generate(0, static_cast<int>(cities - 1)));
 				city = regionRule->getCities().at(pickCity);
 			}
 		}
@@ -177,13 +178,9 @@ void GeoscapeEventState::eventLogic()
 	// 1. give/take score points
 	if (regionRule)
 	{
-		for (Region* region : getGame()->getSavedGame()->getRegions())
+		if (Region* region = getRegistry().findValueByName<Region>(regionRule->getType()))
 		{
-			if (region->getRules() == regionRule)
-			{
-				region->addActivityXcom(rule.getPoints());
-				break;
-			}
+			region->addActivityXcom(rule.getPoints());
 		}
 	}
 	else
@@ -425,7 +422,7 @@ void GeoscapeEventState::btnOkClick(Action *)
 {
 	getGame()->popState();
 
-	Base *base = getGame()->getSavedGame()->getBases().front();
+	Base *base = getRegistry().frontValue<Base>();
 	if (getGame()->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && base != 0 && base->storesOverfull())
 	{
 		getGame()->pushState(new SellState(base, 0));

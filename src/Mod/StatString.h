@@ -44,7 +44,7 @@ order in which they are specified.  The format of these StatStrings is:
 				 single character strings SHOULD come last, but that is
 				 not required. / and ; are not a valid strings.  The maximum
 				 string length is 19.
-		statid = a = armor (front)
+		statid = a = armor (frontValue)
 				 b = bravery
 				 d = time units (dexterity)
 				 e = stamina (endurance)
@@ -83,7 +83,7 @@ checking the Psi/MC Skill, use the q statid.
 Since strings longer than one character will terminate the checking, these
 strings are normally listed first.  More stats accumulating after Snpr would
 ruin the usefulness of Snpr as an equipment type.  However, if you wanted to
-place an indicator in front of Snpr as a warning of some critical weakness,
+place an indicator in frontValue of Snpr as a warning of some critical weakness,
 you could place a single character string at the start of the list.  For
 example, if you wanted to know that your Snpr had a very low Psi/MC Strength
 and had little resistance to alien control, you could put x p:0-30 or x q:0-30

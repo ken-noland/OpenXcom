@@ -197,7 +197,7 @@ public:
 	std::string getSpriteSheet() const;
 	/// Gets the unit's inventory sprite.
 	std::string getSpriteInventory() const;
-	/// Gets the front armor level.
+	/// Gets the frontValue armor level.
 	int getFrontArmor() const;
 	/// Gets the left side armor level.
 	int getLeftSideArmor() const;

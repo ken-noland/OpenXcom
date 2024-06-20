@@ -146,7 +146,7 @@ double RuleCountry::getLabelLatitude() const
  * @param lat Latitude in radians.
  * @return True if it's inside, false if it's outside.
  */
-bool RuleCountry::insideCountry(double lon, double lat) const
+bool RuleCountry::contains(double lon, double lat) const
 {
 	for (size_t i = 0; i < _lonMin.size(); ++i)
 	{

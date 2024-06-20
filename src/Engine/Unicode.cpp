@@ -749,7 +749,7 @@ std::string formatNumber(int64_t value, const std::string &currency)
 
 /**
  * Takes an integer value and formats it as currency,
- * spacing the thousands and adding a $ sign to the front.
+ * spacing the thousands and adding a $ sign to the frontValue.
  * @param funds The funding value.
  * @return The formatted string.
  */

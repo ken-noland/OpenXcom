@@ -2173,7 +2173,7 @@ double TileEngine::checkVoxelExposure(Position *originVoxel, Tile *tile, BattleU
 
 	int relX = sliceTargetsX[0];
 	int relY = sliceTargetsY[0];
-	int sliceTargetsTopBottom[] = { relY, -relX, -relY, relX }; // front/back scan points
+	int sliceTargetsTopBottom[] = { relY, -relX, -relY, relX }; // frontValue/back scan points
 
 	std::vector<std::string> scanArray;
 	scanArray.reserve(24);
@@ -2262,11 +2262,11 @@ double TileEngine::checkVoxelExposure(Position *originVoxel, Tile *tile, BattleU
 		bool aimFromBelow = originVoxel->z < targetMinHeight + 1;
 		if (!aimFromAbove && !aimFromBelow) return exposure; // Aiming horizontally, cannot see any additional voxels
 
-		// sliceTargetsTopBottom[] points order: front, back
-		// If aiming from above: check "top back" and "bottom front" points
+		// sliceTargetsTopBottom[] points order: frontValue, back
+		// If aiming from above: check "top back" and "bottom frontValue" points
 		int heights[] = { targetMinHeight+1, targetMaxHeight };
 
-		// If aiming from below: check "bottom back" and "top front" points
+		// If aiming from below: check "bottom back" and "top frontValue" points
 		if (aimFromBelow) std::swap( heights[0], heights[1] );
 
 		for ( int i = 0; i < 2; ++i)
@@ -2361,7 +2361,7 @@ bool TileEngine::canTargetUnit(Position *originVoxel, Tile *tile, Position *scan
 
 	if (isPlayer && !isUnderAIcontrol) // Precise targeting for human player
 	{
-		static int verticalSlices[26] = { 0 }; // Up to 11 frontal section points and 2 for front/back
+		static int verticalSlices[26] = { 0 }; // Up to 11 frontal section points and 2 for frontValue/back
 		bool aimFromAbove = (originVoxel->z > targetMaxHeight ? true : false);
 		bool aimFromBelow = (originVoxel->z < targetMinHeight ? true : false);
 
@@ -2489,7 +2489,7 @@ bool TileEngine::canTargetUnit(Position *originVoxel, Tile *tile, Position *scan
 		int relX = (int)floor(((float)relPos.y) * normal + 0.5);
 		int relY = (int)floor(((float)-relPos.x) * normal + 0.5);
 
-		// Targeting order: center, right, left, front, back
+		// Targeting order: center, right, left, frontValue, back
 		int verticalSlices[] = { 0,0, relX,relY, -relX,-relY, relY,-relX, -relY,relX };
 
 		int horizontalSlices[] = // Targeting order: 3/4 height, 1/4 height, top, bottom
@@ -2508,7 +2508,7 @@ bool TileEngine::canTargetUnit(Position *originVoxel, Tile *tile, Position *scan
 			// Scan ray for every vertical slice in selected horizontal plane
 			for (int vIdx = 0; vIdx < 5; ++vIdx)
 			{
-				// Scan front/back slices only on top/bottom planes
+				// Scan frontValue/back slices only on top/bottom planes
 				if (hIdx < 2 && vIdx > 2) break;
 
 				scanVoxel->x = targetVoxel.x + verticalSlices[ vIdx * 2 ];
@@ -2868,7 +2868,7 @@ std::vector<TileEngine::ReactionScore> TileEngine::getSpottingUnits(BattleUnit* 
 
 				if (!gotHit && Mod::EXTENDED_MELEE_REACTIONS == 2)
 				{
-					// to allow melee reactions when attacked from any side, not just from the front
+					// to allow melee reactions when attacked from any side, not just from the frontValue
 					gotHit = bu->wasMeleeAttackedBy(unit->getId());
 				}
 
@@ -3009,7 +3009,7 @@ TileEngine::ReactionScore TileEngine::determineReactionType(BattleUnit *unit, Ba
 	int tempDirection = unit->getDirection();
 	if (Mod::EXTENDED_MELEE_REACTIONS == 2)
 	{
-		// temporarily face the target to allow melee reactions when attacked from any side, not just from the front
+		// temporarily face the target to allow melee reactions when attacked from any side, not just from the frontValue
 		tempDirection = getDirectionTo(unit->getPosition(), target->getPosition());
 	}
 
@@ -5153,7 +5153,7 @@ bool TileEngine::meleeAttack(BattleActionAttack attack, BattleUnit *victim, int 
 		// hit log - new melee attack
 		_save->appendToHitLog(HITLOG_NEW_SHOT, attack.attacker->getFaction());
 
-		// to allow melee reactions when attacked from any side, not just from the front
+		// to allow melee reactions when attacked from any side, not just from the frontValue
 		if (victim && Mod::EXTENDED_MELEE_REACTIONS == 2)
 		{
 			victim->setMeleeAttackedBy(attack.attacker->getId());
@@ -6192,7 +6192,7 @@ Position TileEngine::getOriginVoxel(BattleAction &action, Tile *tile)
 			{
 			case BattleActionOrigin::CENTRE:
 				originVoxel.x += 8 * unitSize; // Shoot straight from the eye point
-				originVoxel.y += 8 * unitSize; // moving barrel in front of unit breaks LOF near walls with existing LOS above them
+				originVoxel.y += 8 * unitSize; // moving barrel in frontValue of unit breaks LOF near walls with existing LOS above them
 				break;
 
 			case BattleActionOrigin::LEFT:

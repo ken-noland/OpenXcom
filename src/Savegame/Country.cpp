@@ -42,13 +42,6 @@ Country::Country(RuleCountry* rules, bool gen) : _rules(rules), _pact(false), _n
 }
 
 /**
- *
- */
-Country::~Country()
-{
-}
-
-/**
  * Loads the country from a YAML file.
  * @param node YAML node.
  */
@@ -94,78 +87,10 @@ YAML::Node Country::save(const ScriptGlobal* shared) const
 	return node;
 }
 
-/**
- * Returns the ruleset for the country's type.
- * @return Pointer to ruleset.
- */
-const RuleCountry* Country::getRules() const
-{
-	return _rules;
-}
-
-/**
- * Returns the country's current monthly funding.
- * @return Monthly funding.
- */
-std::vector<int>& Country::getFunding()
-{
-	return _funding;
-}
-
-/**
- * Changes the country's current monthly funding.
- * @param funding Monthly funding.
- */
-void Country::setFunding(int funding)
-{
-	_funding.back() = funding;
-}
-
-/*
- * Keith Richards would be so proud
- * @return satisfaction level, 0 = alien pact, 1 = unhappy, 2 = satisfied, 3 = happy.
- */
-Country::Satisfaction Country::getSatisfaction() const
-{
-	if (_pact)
-		return Satisfaction::ALIEN_PACT;
-	return _satisfaction;
-}
-
-/**
- * Adds to the country's xcom activity level.
- * @param activity how many points to add.
- */
-void Country::addActivityXcom(int activity)
-{
-	_activityXcom.back() += activity;
-}
-
-/**
- * Adds to the country's alien activity level.
- * @param activity how many points to add.
- */
-void Country::addActivityAlien(int activity)
-{
-	_activityAlien.back() += activity;
-}
-
-/**
- * Gets the country's xcom activity level.
- * @return activity level.
- */
-std::vector<int>& Country::getActivityXcom()
-{
-	return _activityXcom;
-}
-
-/**
- * Gets the country's alien activity level.
- * @return activity level.
- */
-std::vector<int>& Country::getActivityAlien()
-{
-	return _activityAlien;
+namespace {
+	const int FUNDING_INCREASE = +1;
+	const int FUNDING_DECREASE = -1;
+	const int FUNDING_NO_CHANGE = 0;
 }
 
 /**
@@ -175,73 +100,41 @@ std::vector<int>& Country::getActivityAlien()
  * @param xcomTotal the council's xcom score
  * @param alienTotal the council's alien score
  * @param pactScore the penalty for signing a pact
- * @param averageFunding current average funding across all countries (including withdrawn countries)
+ * @param averageFunding current average funding across all countries (including withdrawn countries) rounded to thousands place
  */
-
-void Country::newMonth(int xcomTotal, int alienTotal, int pactScore, int averageFunding, const SavedGame* save)
-{
-	// Note: this is a TEMPORARY variable! it's not saved in the save file, i.e. we don't know the value from the previous month!
-	_satisfaction = Satisfaction::SATISFIED;
+void Country::newMonth(int xcomTotal, int alienTotal, int pactScore, int64_t averageFunding, const SavedGame* save)
+{	
 	const int funding = getFunding().back();
-	const int good = (xcomTotal / 10) + _activityXcom.back();
-	const int bad = (alienTotal / 20) + _activityAlien.back();
-	const int oldFunding = _funding.back() / 1000;
-	int newFunding = (oldFunding * RNG::generate(5, 20) / 100) * 1000;
-	if (newFunding == 0)
-	{
-		newFunding = 1000; // increase at least by 1000
-	}
+	int randomFunding = std::max(1000, ((funding / 1000) * RNG::generate(5, 20) / 100) * 1000); // change is always at least 1000
 
-	if (bad <= good + 30)
-	{
-		if (good > bad + 30)
-		{
-			if (RNG::generate(0, good) > bad)
-			{
-				// don't go over the cap
-				int cap = getRules()->getFundingCap() * 1000;
-				if (funding + newFunding > cap)
-					newFunding = cap - funding;
-				if (newFunding)
-					_satisfaction = Satisfaction::HAPPY;
-			}
-		}
-	}
-	else
-	{
-		if (RNG::generate(0, bad) > good)
-		{
-			if (newFunding)
-			{
-				newFunding = -newFunding;
-				// don't go below zero
-				if (funding + newFunding < 0)
-					newFunding = 0 - funding;
-				if (newFunding)
-					_satisfaction = Satisfaction::UNHAPPY;
-			}
-		}
-	}
+	const int xcomPoints  = (xcomTotal  / 10) + _activityXcom.back();
+	const int alienPoints = (alienTotal / 20) + _activityAlien.back();
 
-	if (_satisfaction == Satisfaction::SATISFIED)
+	// funding increases if xcom outscores the aliens by 30 and passes the rng check.
+	int fundingDirection = xcomPoints > alienPoints + 30 && RNG::generate(0, xcomPoints) > alienPoints ? FUNDING_INCREASE
+					     : RNG::generate(0, alienPoints) > xcomPoints ? FUNDING_DECREASE
+					     : FUNDING_NO_CHANGE;
+	int fundingChange = fundingDirection * randomFunding;
+
+	// clamp funding change so that change + funding cannot exceed the cap, or go below 0.
+	fundingChange = std::clamp(randomFunding, -funding, (getRules()->getFundingCap() * 1000) - funding);
+
+	_satisfaction = fundingChange > 0 ? Satisfaction::SATISFIED
+				  : fundingChange < 0 ? Satisfaction::UNHAPPY
+		          : Satisfaction::SATISFIED;
+
+	if (_cancelPact && funding <= 0)
 	{
-		newFunding = 0;
-	}
-	if (_cancelPact)
-	{
-		if (oldFunding <= 0)
-		{
-			_satisfaction = Satisfaction::SATISFIED; // satisfied, not happy or unhappy
-			newFunding = averageFunding;
-		}
+		_satisfaction = Satisfaction::SATISFIED; // satisfied, not happy or unhappy
+		fundingChange = averageFunding;
 	}
 
 	// call script which can adjust values.
-	ModScript::NewMonthCountry::Output args{newFunding, static_cast<int>(_satisfaction), _newPact, _cancelPact};
+	ModScript::NewMonthCountry::Output args{fundingChange, static_cast<int>(_satisfaction), _newPact, _cancelPact};
 	ModScript::NewMonthCountry::Worker work{this, save, xcomTotal, alienTotal};
 	work.execute(_rules->getScript<ModScript::NewMonthCountry>(), args);
 
-	newFunding = std::get<0>(args.data);
+	fundingChange = std::get<0>(args.data);
 	_satisfaction = static_cast<Satisfaction>(std::get<1>(args.data));
 	_newPact = static_cast<bool>(std::get<2>(args.data));
 	_cancelPact = static_cast<bool>(std::get<3>(args.data));
@@ -265,7 +158,7 @@ void Country::newMonth(int xcomTotal, int alienTotal, int pactScore, int average
 	if (_pact)
 		_funding.push_back(0); // yes, hardcoded!
 	else
-		_funding.push_back(funding + newFunding);
+		_funding.push_back(funding + fundingChange);
 
 	_activityAlien.push_back(0);
 	_activityXcom.push_back(0);
@@ -278,28 +171,12 @@ void Country::newMonth(int xcomTotal, int alienTotal, int pactScore, int average
 }
 
 /**
- * @return if we will sign a new pact.
- */
-bool Country::getNewPact() const
-{
-	return _newPact;
-}
-
-/**
  * sign a new pact at month's end.
  */
 void Country::setNewPact()
 {
 	_newPact = true;
 	_cancelPact = false;
-}
-
-/**
- * @return if we will cancel a pact at month's end.
- */
-bool Country::getCancelPact() const
-{
-	return _cancelPact;
 }
 
 /**
@@ -322,27 +199,9 @@ void Country::setCancelPact()
 }
 
 /**
- * no setter for this one, as it gets set automatically
- * at month's end if _newPact is set.
- * @return if we have signed a pact.
- */
-bool Country::getPact() const
-{
-	return _pact;
-}
-
-/**
- * sign a new pact.
- */
-void Country::setPact()
-{
-	_pact = true;
-}
-
-/**
  * can be (re)infiltrated?
  */
-bool Country::canBeInfiltrated()
+const bool Country::canBeInfiltrated() const
 {
 	if (!_pact && !_newPact)
 	{

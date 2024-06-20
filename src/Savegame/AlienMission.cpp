@@ -17,33 +17,34 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "AlienMission.h"
+#include <algorithm>
+#include <assert.h>
+#include <functional>
 #include "AlienBase.h"
+#include "AreaSystem.h"
 #include "Base.h"
-#include "../fmath.h"
+#include "Country.h"
+#include "Craft.h"
+#include "MissionSite.h"
+#include "Region.h"
+#include "SavedGame.h"
+#include "Ufo.h"
+#include "Waypoint.h"
 #include "../Engine/Exception.h"
 #include "../Engine/Game.h"
 #include "../Engine/Logger.h"
 #include "../Engine/RNG.h"
+#include "../fmath.h"
 #include "../Geoscape/Globe.h"
-#include "../Mod/RuleAlienMission.h"
-#include "../Mod/RuleRegion.h"
-#include "../Mod/RuleCountry.h"
-#include "../Mod/Mod.h"
-#include "../Mod/RuleUfo.h"
-#include "../Mod/UfoTrajectory.h"
-#include "../Mod/RuleGlobe.h"
-#include "../Mod/Texture.h"
-#include "SavedGame.h"
-#include "MissionSite.h"
-#include "Ufo.h"
-#include "Craft.h"
-#include "Region.h"
-#include "Country.h"
-#include "Waypoint.h"
-#include <assert.h>
-#include <algorithm>
-#include <functional>
 #include "../Mod/AlienDeployment.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleAlienMission.h"
+#include "../Mod/RuleCountry.h"
+#include "../Mod/RuleGlobe.h"
+#include "../Mod/RuleRegion.h"
+#include "../Mod/RuleUfo.h"
+#include "../Mod/Texture.h"
+#include "../Mod/UfoTrajectory.h"
 
 namespace OpenXcom
 {
@@ -208,11 +209,9 @@ void AlienMission::think(Game &engine, const Globe &globe)
 	const MissionWave &wave = _rule.getWave(_nextWave);
 	const UfoTrajectory &trajectory = *mod.getUfoTrajectory(wave.trajectory, true);
 	Ufo *ufo = spawnUfo(game, mod, globe, wave, trajectory);
-	if (ufo)
+	if (ufo) //Some missions may not spawn a UFO!
 	{
-		//Some missions may not spawn a UFO!
-		ufo->setMissionWaveNumber((int)_nextWave);
-		game.getUfos().push_back(ufo);
+		getRegistry().insert<Ufo>(ufo);
 	}
 	else if ((mod.getDeployment(wave.ufoType) && !mod.getUfo(wave.ufoType) && !mod.getDeployment(wave.ufoType)->getMarkerName().empty()) // a mission site that we want to spawn directly
 			|| (_rule.getObjective() == OBJECTIVE_SITE && wave.objective)) // or we want to spawn one at random according to our terrain
@@ -250,10 +249,10 @@ void AlienMission::think(Game &engine, const Globe &globe)
 	}
 	if (_rule.getObjective() == OBJECTIVE_INFILTRATION && _nextWave == _rule.getWaveCount())
 	{
-		for (Country* country : game.getCountries())
+		for (Country& country : getRegistry().list<Country>())
 		{
 			RuleRegion *region = mod.getRegion(_region, true);
-			if (country->canBeInfiltrated() && region->insideRegion(country->getRules()->getLabelLongitude(), country->getRules()->getLabelLatitude()))
+			if (country.canBeInfiltrated() && region->contains(country.getRules()->getLabelLongitude(), country.getRules()->getLabelLatitude()))
 			{
 				std::pair<double, double> pos;
 				int tries = 0;
@@ -281,7 +280,7 @@ void AlienMission::think(Game &engine, const Globe &globe)
 						{
 							found = true; // forced spawn on invalid location
 						}
-						else if (globe.insideLand(pos.first, pos.second) && region->insideRegion(pos.first, pos.second))
+						else if (globe.insideLand(pos.first, pos.second) && region->contains(pos.first, pos.second))
 						{
 							bool isFakeUnderwater = globe.insideFakeUnderwaterTexture(pos.first, pos.second);
 							if (wantsToSpawnFakeUnderwater)
@@ -302,7 +301,7 @@ void AlienMission::think(Game &engine, const Globe &globe)
 					alienBaseType = chooseAlienBaseType(mod, dummyArea);
 					wantsToSpawnFakeUnderwater = RNG::percent(alienBaseType->getFakeUnderwaterSpawnChance());
 
-					const RuleCountry* cRule = country->getRules();
+					const RuleCountry* cRule = country.getRules();
 					int pick = 0;
 					double lonMini, lonMaxi, latMini, latMaxi;
 					while (!found)
@@ -325,7 +324,7 @@ void AlienMission::think(Game &engine, const Globe &globe)
 						{
 							found = true; // forced spawn on invalid location
 						}
-						else if (globe.insideLand(pos.first, pos.second) && cRule->insideCountry(pos.first, pos.second))
+						else if (globe.insideLand(pos.first, pos.second) && cRule->contains(pos.first, pos.second))
 						{
 							bool isFakeUnderwater = globe.insideFakeUnderwaterTexture(pos.first, pos.second);
 							if (wantsToSpawnFakeUnderwater)
@@ -342,9 +341,9 @@ void AlienMission::think(Game &engine, const Globe &globe)
 				if (tries < 100 || mod.getAllowAlienBasesOnWrongTextures())
 				{
 					// only create a pact if the base is going to be spawned too
-					country->setNewPact();
+					country.setNewPact();
 
-					spawnAlienBase(country, engine, pos, alienBaseType);
+					spawnAlienBase(&country, engine, pos, alienBaseType);
 
 					// if the base can't be spawned for this country, try the next country
 					break;
@@ -384,7 +383,7 @@ void AlienMission::think(Game &engine, const Globe &globe)
 			{
 				found = true; // forced spawn on invalid location
 			}
-			else if (globe.insideLand(pos.first, pos.second) && region->insideRegion(pos.first, pos.second, true))
+			else if (globe.insideLand(pos.first, pos.second) && region->contains(pos.first, pos.second, true))
 			{
 				bool isFakeUnderwater = globe.insideFakeUnderwaterTexture(pos.first, pos.second);
 				if (wantsToSpawnFakeUnderwater)
@@ -420,50 +419,28 @@ void AlienMission::think(Game &engine, const Globe &globe)
 /**
  * Selects an xcom base in a given region.
  * @param game The saved game information.
- * @param regionRules The rule for the given region.
+ * @param regionRule The rule for the given region.
  * @return Pointer to the selected xcom base or nullptr.
  */
-Base* AlienMission::selectXcomBase(SavedGame& game, const RuleRegion& regionRules)
+Base* AlienMission::selectXcomBase(SavedGame& game, const RuleRegion& regionRule)
 {
-	std::vector<Base*> validxcombases;
-	for (Base* xb : game.getBases())
+	std::vector<Base*> selectableBases;
+	auto containsBase = [&regionRule](const Base& xcomBase) { return regionRule.contains(xcomBase.getLongitude(), xcomBase.getLatitude()); };
+	for (Base& xcomBase : getRegistry().list<Base>(containsBase))
 	{
-		if (regionRules.insideRegion(xb->getLongitude(), xb->getLatitude()))
+		// only discovered xcom bases!
+		if (_rule.getObjective() == OBJECTIVE_RETALIATION && xcomBase.getRetaliationTarget())
 		{
-			if (_rule.getObjective() == OBJECTIVE_RETALIATION)
-			{
-				// only discovered xcom bases!
-				if (xb->getRetaliationTarget())
-				{
-					validxcombases.push_back(xb);
-					if (_rule.isMultiUfoRetaliation())
-					{
-						continue; // non-vanilla: let's consider all, for fun
-					}
-					break; // vanilla: the first is enough
-				}
-			}
-			else // instant retaliation; or a mission wave with `objectiveOnXcomBase: true`
-			{
-				validxcombases.push_back(xb);
-			}
+			selectableBases.push_back(&xcomBase);
+			if (_rule.isMultiUfoRetaliation()) { continue; } // non-vanilla: let's consider all, for fun
+			break; // vanilla: the first is enough
+		}
+		else // instant retaliation; or a mission wave with `objectiveOnXcomBase: true`
+		{
+			selectableBases.push_back(&xcomBase);
 		}
 	}
-	Base* xcombase = nullptr;
-	if (!validxcombases.empty())
-	{
-		if (validxcombases.size() == 1)
-		{
-			// take the first (don't mess with the RNG seed)
-			xcombase = validxcombases.front();
-		}
-		else
-		{
-			int rngpick = RNG::generate(0, (int)validxcombases.size() - 1);
-			xcombase = validxcombases[rngpick];
-		}
-	}
-	return xcombase;
+	return selectableBases.empty() ? nullptr : selectableBases[RNG::generate(0, static_cast<int>(selectableBases.size()) - 1)];
 }
 
 /**
@@ -518,27 +495,21 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 	}
 	if (_rule.getObjective() == OBJECTIVE_RETALIATION || _rule.getObjective() == OBJECTIVE_INSTANT_RETALIATION)
 	{
-		const RuleRegion &regionRules = *mod.getRegion(_region, true);
-		Base* xcombase = nullptr;
+		const RuleRegion &regionRule = *mod.getRegion(_region, true);
+		Base* xcomBase = nullptr;
 
 		// skip the scouting phase of a retaliation mission
 		if (_rule.skipScoutingPhase() && _rule.getObjective() == OBJECTIVE_RETALIATION)
 		{
-			for (Base* xbase : game.getBases())
-			{
-				if (regionRules.insideRegion(xbase->getLongitude(), xbase->getLatitude()))
-				{
-					xcombase = xbase;
-					break;
-				}
-			}
+			auto containsBase = [&regionRule](const Base& xcomBase) { return regionRule.contains(xcomBase.getLongitude(), xcomBase.getLatitude()); };
+			xcomBase = getRegistry().findValue_if<Base>(containsBase);
 		}
 		else
 		{
-			xcombase = selectXcomBase(game, regionRules);
+			xcomBase = selectXcomBase(game, regionRule);
 		}
 
-		if (xcombase)
+		if (xcomBase)
 		{
 			// Spawn a battleship straight for the XCOM base.
 			const RuleUfo &battleshipRule = _rule.getSpawnUfo().empty() ? *ufoRule : *mod.getUfo(_rule.getSpawnUfo(), true);
@@ -548,8 +519,8 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 			std::pair<double, double> pos;
 			if (_rule.getObjective() == OBJECTIVE_INSTANT_RETALIATION)
 			{
-				pos.first = xcombase->getLongitude();
-				pos.second = xcombase->getLatitude();
+				pos.first = xcomBase->getLongitude();
+				pos.second = xcomBase->getLatitude();
 			}
 			else if (_rule.getOperationType() != AMOT_SPACE && _base)
 			{
@@ -558,19 +529,19 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 			}
 			else if (trajectory.getAltitude(0) == "STR_GROUND")
 			{
-				pos = getLandPoint(globe, regionRules, trajectory.getZone(0), *ufo);
+				pos = getLandPoint(globe, regionRule, trajectory.getZone(0), *ufo);
 			}
 			else
 			{
-				pos = regionRules.getRandomPoint(trajectory.getZone(0));
+				pos = regionRule.getRandomPoint(trajectory.getZone(0));
 			}
 			ufo->setAltitude(assaultTrajectory.getAltitude(0));
 			ufo->setSpeed((int)(assaultTrajectory.getSpeedPercentage(0) * ufo->getCraftStats().speedMax));
 			ufo->setLongitude(pos.first);
 			ufo->setLatitude(pos.second);
 			Waypoint *wp = new Waypoint();
-			wp->setLongitude(xcombase->getLongitude());
-			wp->setLatitude(xcombase->getLatitude());
+			wp->setLongitude(xcomBase->getLongitude());
+			wp->setLatitude(xcomBase->getLatitude());
 			ufo->setDestination(wp);
 			logUfo(ufo, game, this);
 			return ufo;
@@ -647,20 +618,14 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 		{
 			ufo->setEscort(true);
 			// Find a UFO to escort
-			for (Ufo* ufoToBeEscorted : game.getUfos())
+			auto escortUfo = [ufo](const Ufo& escortUfo) {
+				return escortUfo.getMission()->getId() == ufo->getMission()->getId() // From the same mission
+					&& !escortUfo.isHunterKiller(); }; // But not another hunter-killer, we escort only normal UFOs
+			if (Ufo* ufoToBeEscorted = getRegistry().findValue_if<Ufo>(escortUfo))
 			{
-				// From the same mission
-				if (ufoToBeEscorted->getMission()->getId() == ufo->getMission()->getId())
-				{
-					// But not another hunter-killer, we escort only normal UFOs
-					if (!ufoToBeEscorted->isHunterKiller())
-					{
-						ufo->setLongitude(ufoToBeEscorted->getLongitude());
-						ufo->setLatitude(ufoToBeEscorted->getLatitude());
-						ufo->setEscortedUfo(ufoToBeEscorted);
-						break;
-					}
-				}
+				ufo->setLongitude(ufoToBeEscorted->getLongitude());
+				ufo->setLatitude(ufoToBeEscorted->getLatitude());
+				ufo->setEscortedUfo(ufoToBeEscorted);
 			}
 		}
 		logUfo(ufo, game, this);
@@ -708,20 +673,14 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 	{
 		ufo->setEscort(true);
 		// Find a UFO to escort
-		for (Ufo* ufoToBeEscorted : game.getUfos())
+		auto escortUfo = [ufo](const Ufo& escortUfo) {
+			return escortUfo.getMission()->getId() == ufo->getMission()->getId() // From the same mission
+				&& !escortUfo.isHunterKiller(); }; // But not another hunter-killer, we escort only normal UFOs
+		if (Ufo* ufoToBeEscorted = getRegistry().findValue_if<Ufo>(escortUfo))
 		{
-			// From the same mission
-			if (ufoToBeEscorted->getMission()->getId() == ufo->getMission()->getId())
-			{
-				// But not another hunter-killer, we escort only normal UFOs
-				if (!ufoToBeEscorted->isHunterKiller())
-				{
-					ufo->setLongitude(ufoToBeEscorted->getLongitude());
-					ufo->setLatitude(ufoToBeEscorted->getLatitude());
-					ufo->setEscortedUfo(ufoToBeEscorted);
-					break;
-				}
-			}
+			ufo->setLongitude(ufoToBeEscorted->getLongitude());
+			ufo->setLatitude(ufoToBeEscorted->getLatitude());
+			ufo->setEscortedUfo(ufoToBeEscorted);
 		}
 	}
 	logUfo(ufo, game, this);
@@ -762,7 +721,7 @@ void AlienMission::start(Game &engine, const Globe &globe, size_t initialCount)
 				auto missionRegion = mod.getRegion(_region, true);
 				for (AlienBase* ab : game.getAlienBases())
 				{
-					if (missionRegion->insideRegion(ab->getLongitude(), ab->getLatitude()))
+					if (missionRegion->contains(ab->getLongitude(), ab->getLatitude()))
 					{
 						possibilities.push_back(ab);
 					}
@@ -808,7 +767,7 @@ void AlienMission::start(Game &engine, const Globe &globe, size_t initialCount)
 					{
 						found = true; // forced spawn on invalid location
 					}
-					else if (globe.insideLand(pos.first, pos.second) && region->insideRegion(pos.first, pos.second, true))
+					else if (globe.insideLand(pos.first, pos.second) && region->contains(pos.first, pos.second, true))
 					{
 						bool isFakeUnderwater = globe.insideFakeUnderwaterTexture(pos.first, pos.second);
 						if (wantsToSpawnFakeUnderwater)
@@ -877,28 +836,25 @@ void AlienMission::ufoReachedWaypoint(Ufo &ufo, Game &engine, const Globe &globe
 	}
 	ufo.setAltitude(trajectory.getAltitude(nextWaypoint));
 	ufo.setTrajectoryPoint(nextWaypoint);
-	const RuleRegion &regionRules = *mod.getRegion(_region, true);
-	std::pair<double, double> pos = getWaypoint(wave, trajectory, nextWaypoint, globe, regionRules, ufo);
+	const RuleRegion &regionRule = *mod.getRegion(_region, true);
+	std::pair<double, double> pos = getWaypoint(wave, trajectory, nextWaypoint, globe, regionRule, ufo);
 	if (Options::aggressiveRetaliation && _rule.getObjective() == OBJECTIVE_RETALIATION && trajectory.getZone(nextWaypoint) != 5)
 	{
-		for(Base *base : engine.getSavedGame()->getBases())
+		auto containsBase = [&regionRule](const Base& xcomBase) { return regionRule.contains(xcomBase.getLongitude(), xcomBase.getLatitude()); };
+		if(const Base* xcomBase = getRegistry().findValue_if<const Base>(containsBase))
 		{
-			if(regionRules.insideRegion(base->getLongitude(), base->getLatitude()))
-			{
-				double minLon = base->getLongitude() - M_PI_4 / 3.0;
-				double maxLon = base->getLongitude() + M_PI_4 / 3.0;
-				double minLat = base->getLatitude() - M_PI_4 / 3.0;
-				double maxLat = base->getLatitude() + M_PI_4 / 3.0;
-				double lon = RNG::generate(minLon, maxLon);
-				double lat = RNG::generate(minLat, maxLat);
-				pos = std::make_pair(lon, lat);
-				break;
-			}
+			double minLon = xcomBase->getLongitude() - M_PI_4 / 3.0;
+			double maxLon = xcomBase->getLongitude() + M_PI_4 / 3.0;
+			double minLat = xcomBase->getLatitude() - M_PI_4 / 3.0;
+			double maxLat = xcomBase->getLatitude() + M_PI_4 / 3.0;
+			double lon = RNG::generate(minLon, maxLon);
+			double lat = RNG::generate(minLat, maxLat);
+			pos = std::make_pair(lon, lat);
 		}
 	}
 
 	{
-		std::pair<double, double> pos = getWaypoint(wave, trajectory, nextWaypoint, globe, regionRules, ufo);
+		std::pair<double, double> pos = getWaypoint(wave, trajectory, nextWaypoint, globe, regionRule, ufo);
 
 		Waypoint *wp = new Waypoint();
 		wp->setLongitude(pos.first);
@@ -924,7 +880,7 @@ void AlienMission::ufoReachedWaypoint(Ufo &ufo, Game &engine, const Globe &globe
 			addScore(ufo.getLongitude(), ufo.getLatitude(), game);
 			ufo.setStatus(Ufo::DESTROYED);
 
-			MissionArea area = regionRules.getMissionZones().at(trajectory.getZone(curWaypoint)).areas.at(_missionSiteZoneArea);
+			MissionArea area = regionRule.getMissionZones().at(trajectory.getZone(curWaypoint)).areas.at(_missionSiteZoneArea);
 			if (wave.objectiveOnTheLandingSite)
 			{
 				// Note: 'area' is a local variable; we're not changing the ruleset
@@ -950,22 +906,17 @@ void AlienMission::ufoReachedWaypoint(Ufo &ufo, Game &engine, const Globe &globe
 			// Ignore what the trajectory might say, this is a base assault.
 			// Remove UFO, replace with Base defense.
 			ufo.setDetected(false);
-			Base* found = nullptr;
-			for (Base* xbase : game.getBases())
-			{
-				if (AreSame(xbase->getLongitude(), ufo.getLongitude()) && AreSame(xbase->getLatitude(), ufo.getLatitude()))
-				{
-					found = xbase;
-					break;
-				}
-			}
-			if (!found)
+
+			auto containsBase = [&regionRule](const Base& xcomBase) { return regionRule.contains(xcomBase.getLongitude(), xcomBase.getLatitude()); };
+			Base* foundBase = getRegistry().findValue_if<Base>(containsBase);
+			
+			if (!foundBase)
 			{
 				ufo.setStatus(Ufo::DESTROYED);
 				// Only spawn mission if the base is still there.
 				return;
 			}
-			ufo.setDestination(found);
+			ufo.setDestination(foundBase);
 		}
 		else
 		{
@@ -1140,22 +1091,8 @@ void AlienMission::addScore(double lon, double lat, SavedGame &game) const
 {
 	if (_rule.getObjective() == OBJECTIVE_INFILTRATION)
 		return; // pact score is a special case
-	for (Region* region : game.getRegions())
-	{
-		if (region->getRules()->insideRegion(lon, lat))
-		{
-			region->addActivityAlien(_rule.getPoints());
-			break;
-		}
-	}
-	for (Country* country : game.getCountries())
-	{
-		if (country->getRules()->insideCountry(lon, lat))
-		{
-			country->addActivityAlien(_rule.getPoints());
-			break;
-		}
-	}
+
+	AreaSystem::addAlienActivityToCountryAndRegion(_rule.getPoints(), lon, lat);
 }
 
 /**
@@ -1329,7 +1266,7 @@ std::pair<double, double> AlienMission::getLandPoint(const Globe &globe, const R
 			{
 				found = true; // forced decision
 			}
-			else if (globe.insideLand(pos.first, pos.second) && region.insideRegion(pos.first, pos.second))
+			else if (globe.insideLand(pos.first, pos.second) && region.contains(pos.first, pos.second))
 			{
 				bool isFakeWater = globe.insideFakeUnderwaterTexture(pos.first, pos.second);
 				if (wantsToLandOnFakeWater)
@@ -1400,7 +1337,7 @@ std::pair<double, double> AlienMission::getLandPointForMissionSite(const Globe& 
 			{
 				found = true; // forced decision
 			}
-			else if (globe.insideLand(pos.first, pos.second) /* && region.insideRegion(pos.first, pos.second) */) // doesn't need to be inside the region!
+			else if (globe.insideLand(pos.first, pos.second) /* && region.contains(pos.first, pos.second) */) // doesn't need to be inside the region!
 			{
 				bool isFakeWater = globe.insideFakeUnderwaterTexture(pos.first, pos.second);
 				if (wantsToLandOnFakeWater)

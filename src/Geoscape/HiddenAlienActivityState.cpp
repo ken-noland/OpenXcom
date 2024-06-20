@@ -16,6 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "HiddenAlienActivityState.h"
+#include <sstream>
+#include "GeoscapeState.h"
+#include "Globe.h"
+#include "InterceptState.h"
 #include "../Engine/Game.h"
 #include "../Engine/LocalizedText.h"
 #include "../Engine/Options.h"
@@ -34,11 +39,6 @@
 #include "../Savegame/Ufo.h"
 #include "../Savegame/Region.h"
 #include "../Savegame/Country.h"
-#include "GeoscapeState.h"
-#include "Globe.h"
-#include "InterceptState.h"
-#include "HiddenAlienActivityState.h"
-#include <sstream>
 
 namespace OpenXcom
 {
@@ -51,19 +51,16 @@ namespace OpenXcom
  * @param detected Was the UFO detected?
  * @param hyperwave Was it a hyperwave radar?
  */
-HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
-	std::map<OpenXcom::Region*, int> displayHiddenAlienActivityRegions,
-	std::map<OpenXcom::Country*, int> displayHiddenAlienActivityCountries)
-	:
-	State("HiddenAlienActivityState"),
-	_state(state),
+HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state, SavedGame& save,
+	std::unordered_map<entt::entity, int> displayHiddenAlienActivityRegions,
+	std::unordered_map<entt::entity, int> displayHiddenAlienActivityCountries
+) : State("HiddenAlienActivityState"), _state(state), _save(save),
 	_displayHiddenAlienActivityRegions(displayHiddenAlienActivityRegions),
 	_displayHiddenAlienActivityCountries(displayHiddenAlienActivityCountries)
 {
 	_screen = false;
 
 	// create objects
-
 	_window = new Window(this, 224, 180, 16, 10, POPUP_BOTH);
 	_txtInfo = new Text(200, 16, 28, 20);
 	_txtHeaderRegions = new Text(140, 8, 28, 40);
@@ -76,11 +73,9 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
 	_btnCancel = new TextButton(200, 12, 28, 168);
 
 	// set palette
-
 	setInterface("hiddenAlienActivity", false);
 
 	// add elements
-
 	add(_window, "window", "hiddenAlienActivity");
 	add(_txtInfo, "text", "hiddenAlienActivity");
 	add(_txtHeaderRegions, "text", "hiddenAlienActivity");
@@ -93,7 +88,6 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
 	add(_btnCancel, "button", "hiddenAlienActivity");
 
 	// set up objects
-
 	setWindowBackground(_window, "hiddenAlienActivity");
 
 	centerAllSurfaces();
@@ -130,11 +124,9 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
 	}
 
 	// populate alien activity lists
-
-	for (std::pair<Region* const, int> displayHiddenAlienActivityRegionEntry : _displayHiddenAlienActivityRegions)
+	for (auto &&[id, activity] : _displayHiddenAlienActivityRegions)
 	{
-		Region* region = displayHiddenAlienActivityRegionEntry.first;
-		int activity = displayHiddenAlienActivityRegionEntry.second;
+		const Region& region = getRegistry().raw().get<Region>(id);
 
 		std::ostringstream ossName;
 		std::ostringstream ossValue;
@@ -143,7 +135,7 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
 			ossName << Unicode::TOK_COLOR_FLIP;
 			ossValue << Unicode::TOK_COLOR_FLIP;
 		}
-		ossName << tr(region->getRules()->getType());
+		ossName << tr(region.getRules()->getType());
 		ossValue << std::to_string(activity);
 
 		if (Options::displayHiddenAlienActivity == 2)
@@ -154,13 +146,11 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
 		{
 			_lstHiddenAlienActivityRegions->addRow(1, ossName.str().c_str());
 		}
-
 	}
 
-	for (std::pair<Country* const, int> displayHiddenAlienActivitycountryEntry : _displayHiddenAlienActivityCountries)
+	for (auto &&[id, activity] : _displayHiddenAlienActivityCountries)
 	{
-		Country* country = displayHiddenAlienActivitycountryEntry.first;
-		int activity = displayHiddenAlienActivitycountryEntry.second;
+		const Country& country = getRegistry().raw().get<Country>(id);
 
 		std::ostringstream ossName;
 		std::ostringstream ossValue;
@@ -169,7 +159,7 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
 			ossName << Unicode::TOK_COLOR_FLIP;
 			ossValue << Unicode::TOK_COLOR_FLIP;
 		}
-		ossName << tr(country->getRules()->getType());
+		ossName << tr(country.getRules()->getType());
 		ossValue << std::to_string(activity);
 
 		if (Options::displayHiddenAlienActivity == 2)
@@ -180,16 +170,7 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state,
 		{
 			_lstHiddenAlienActivityCountries->addRow(1, ossName.str().c_str());
 		}
-
 	}
-
-}
-
-/**
- *
- */
-HiddenAlienActivityState::~HiddenAlienActivityState()
-{
 }
 
 /**

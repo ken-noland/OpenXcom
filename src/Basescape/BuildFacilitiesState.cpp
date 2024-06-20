@@ -42,7 +42,8 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param state Pointer to the base state to refresh.
  */
-BuildFacilitiesState::BuildFacilitiesState(Base* base, State* state) : State("BuildFacilitiesState"), _base(base), _state(state), _lstScroll(0)
+BuildFacilitiesState::BuildFacilitiesState(entt::entity baseId, State *state) : State("BuildFacilitiesState"),
+	_baseId(baseId), _state(state), _lstScroll(0)
 {
 	_screen = false;
 
@@ -85,14 +86,6 @@ BuildFacilitiesState::BuildFacilitiesState(Base* base, State* state) : State("Bu
 }
 
 /**
- *
- */
-BuildFacilitiesState::~BuildFacilitiesState()
-{
-
-}
-
-/**
  * Populates the build list from the current "available" facilities.
  */
 void BuildFacilitiesState::populateBuildList()
@@ -101,14 +94,16 @@ void BuildFacilitiesState::populateBuildList()
 	_disabledFacilities.clear();
 	_lstFacilities->clearList();
 
-	auto providedBaseFunc = _base->getProvidedBaseFunc({});
-	auto forbiddenBaseFunc = _base->getForbiddenBaseFunc({});
-	auto futureBaseFunc = _base->getFutureBaseFunc({});
+	Base& base = getRegistry().raw().get<Base>(_baseId);
+
+	auto providedBaseFunc = base.getProvidedBaseFunc({});
+	auto forbiddenBaseFunc = base.getForbiddenBaseFunc({});
+	auto futureBaseFunc = base.getFutureBaseFunc({});
 
 	for (auto& facilityType : getGame()->getMod()->getBaseFacilitiesList())
 	{
 		RuleBaseFacility *rule = getGame()->getMod()->getBaseFacility(facilityType);
-		if (!rule->isAllowedForBaseType(_base->isFakeUnderwater()))
+		if (!rule->isAllowedForBaseType(base.isFakeUnderwater()))
 		{
 			continue;
 		}
@@ -116,7 +111,7 @@ void BuildFacilitiesState::populateBuildList()
 		{
 			continue;
 		}
-		if (_base->isMaxAllowedLimitReached(rule))
+		if (base.isMaxAllowedLimitReached(rule))
 		{
 			_disabledFacilities.push_back(rule);
 			continue;
@@ -213,7 +208,7 @@ void BuildFacilitiesState::lstFacilitiesClick(Action *action)
 	{
 		return;
 	}
-	getGame()->pushState(new PlaceFacilityState(_base, _facilities[index]));
+	getGame()->pushState(new PlaceFacilityState(_baseId, _facilities[index]));
 }
 
 }

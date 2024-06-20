@@ -16,7 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <climits>
+#include <sstream>
 #include "MonthlyReportState.h"
+#include "Globe.h"
+#include "PsiTrainingState.h"
 #include "../Battlescape/CommendationState.h"
 #include "../Engine/Game.h"
 #include "../Engine/LocalizedText.h"
@@ -32,15 +36,13 @@
 #include "../Mod/RuleInterface.h"
 #include "../Mod/RuleVideo.h"
 #include "../Savegame/Base.h"
+#include "../Savegame/BaseSystem.h"
 #include "../Savegame/Country.h"
+#include "../Savegame/CountrySystem.h"
 #include "../Savegame/GameTime.h"
 #include "../Savegame/Region.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/SoldierDiary.h"
-#include "Globe.h"
-#include "PsiTrainingState.h"
-#include <climits>
-#include <sstream>
 
 namespace OpenXcom
 {
@@ -211,17 +213,22 @@ MonthlyReportState::MonthlyReportState(Globe* globe)
 
 	_txtRating->setText(tr("STR_MONTHLY_RATING").arg(_ratingTotal).arg(rating));
 
-	std::ostringstream ss;
-	ss << tr("STR_INCOME") << "> " << Unicode::TOK_COLOR_FLIP << Unicode::formatFunding(getGame()->getSavedGame()->getCountryFunding());
-	ss << " (";
-	if (_fundingDiff > 0)
-		ss << '+';
-	ss << Unicode::formatFunding(_fundingDiff) << ")";
-	_txtIncome->setText(ss.str());
+	int64_t monthlyFunding = CountrySystem::getCountriesMonthlyFundingTotal();
+	std::string formattedIncome = std::format("{}> {}{} ({}{})",
+		tr("STR_INCOME").c_str(),
+		Unicode::TOK_COLOR_FLIP,
+		Unicode::formatFunding(monthlyFunding),
+		_fundingDiff > 0 ? "+" : "",
+		Unicode::formatFunding(_fundingDiff)
+	);
+	_txtIncome->setText(formattedIncome);
 
-	std::ostringstream ss2;
-	ss2 << tr("STR_MAINTENANCE") << "> " << Unicode::TOK_COLOR_FLIP << Unicode::formatFunding(getGame()->getSavedGame()->getBaseMaintenance());
-	_txtMaintenance->setText(ss2.str());
+	int64_t baseMaintiance = BaseSystem::getBasesMaintenanceCost();
+	std::string formattedMaintanceCost = std::format("{}> {}{}",
+		tr("STR_MAINTENANCE").c_str(),
+		Unicode::TOK_COLOR_FLIP,
+		Unicode::formatFunding(baseMaintiance));
+	_txtMaintenance->setText(formattedMaintanceCost);
 
 	int performanceBonus = _ratingTotal * getGame()->getMod()->getPerformanceBonusFactor();
 	if (performanceBonus > 0)
@@ -349,10 +356,10 @@ void MonthlyReportState::btnOkClick(Action*)
 		getGame()->popState();
 		// Award medals for service time
 		// Iterate through all your bases
-		for (Base* xbase : getGame()->getSavedGame()->getBases())
+		for (Base& xcomBase : getRegistry().list<Base>())
 		{
 			// Iterate through all your soldiers
-			for (Soldier* soldier : xbase->getSoldiers())
+			for (Soldier* soldier : xcomBase.getSoldiers())
 			{
 				// Award medals to eligible soldiers
 				soldier->getDiary()->addMonthlyService();
@@ -367,12 +374,8 @@ void MonthlyReportState::btnOkClick(Action*)
 			getGame()->pushState(new CommendationState(_soldiersMedalled));
 		}
 
-		bool psi = false;
-		for (Base* xbase : getGame()->getSavedGame()->getBases())
-		{
-			psi = psi || xbase->getAvailablePsiLabs();
-		}
-		if (psi && !Options::anytimePsiTraining)
+		int avaliablePsiLabs = getRegistry().totalBy<Base, int>(&Base::getAvailablePsiLabs);
+		if (avaliablePsiLabs > 0 || Options::anytimePsiTraining)
 		{
 			getGame()->pushState(new PsiTrainingState);
 		}
@@ -448,13 +451,13 @@ void MonthlyReportState::calculateChanges()
 		lastMonthOffset += 2;
 	// update activity meters, calculate a total score based on regional activity
 	// and gather last month's score
-	for (Region* region : getGame()->getSavedGame()->getRegions())
+	for (Region& region : getRegistry().list<Region>())
 	{
-		region->newMonth();
-		if (region->getActivityXcom().size() > 2)
-			_lastMonthsRating += region->getActivityXcom().at(lastMonthOffset) - region->getActivityAlien().at(lastMonthOffset);
-		xcomSubTotal += region->getActivityXcom().at(monthOffset);
-		alienTotal += region->getActivityAlien().at(monthOffset);
+		region.newMonth();
+		if (region.getActivityXcom().size() > 2)
+			_lastMonthsRating += region.getActivityXcom().at(lastMonthOffset) - region.getActivityAlien().at(lastMonthOffset);
+		xcomSubTotal += region.getActivityXcom().at(monthOffset);
+		alienTotal += region.getActivityAlien().at(monthOffset);
 	}
 	// apply research bonus AFTER calculating our total, because this bonus applies to the council ONLY,
 	// and shouldn't influence each country's decision.
@@ -476,36 +479,38 @@ void MonthlyReportState::calculateChanges()
 	{
 		pactScore = infiltration->getPoints();
 	}
-	int averageFunding = (int)(getGame()->getSavedGame()->getCountryFunding() / getGame()->getSavedGame()->getCountries().size() / 1000 * 1000);
-	for (Country* country : getGame()->getSavedGame()->getCountries())
+
+	int64_t averageFunding = CountrySystem::getCountriesMonthlyFundingTotal() / getRegistry().size<Country>();
+	averageFunding = (averageFunding / 1000) * 1000; // round to nearest 1000 place.
+	for (Country& country : getRegistry().list<Country>())
 	{
 		// check pact status before and after, because scripting can arbitrarily form/break pacts
-		bool wasInPact = country->getPact();
+		bool wasInPact = country.getPact();
 
 		// determine satisfaction level, sign pacts, adjust funding
 		// and update activity meters,
-		country->newMonth(xcomTotal, alienTotal, pactScore, averageFunding, getGame()->getSavedGame());
+		country.newMonth(xcomTotal, alienTotal, pactScore, averageFunding, getGame()->getSavedGame());
 		// and after they've made their decisions, calculate the difference, and add
 		// them to the appropriate lists.
-		_fundingDiff += country->getFunding().back() - country->getFunding().at(country->getFunding().size() - 2);
+		_fundingDiff += country.getFunding().back() - country.getFunding().at(country.getFunding().size() - 2);
 
-		bool isInPact = country->getPact();
+		bool isInPact = country.getPact();
 		if (!wasInPact && isInPact) // signed a new pact this month
 		{
-			_pactList.push_back(country->getRules()->getType());
+			_pactList.push_back(country.getRules()->getType());
 		}
 		else if (wasInPact && !isInPact) // renounced a pact this month
 		{
-			_cancelPactList.push_back(country->getRules()->getType());
+			_cancelPactList.push_back(country.getRules()->getType());
 		}
 
-		switch (country->getSatisfaction())
+		switch (country.getSatisfaction())
 		{
 		case Country::Satisfaction::UNHAPPY:
-			_sadList.push_back(country->getRules()->getType());
+			_sadList.push_back(country.getRules()->getType());
 			break;
 		case Country::Satisfaction::HAPPY:
-			_happyList.push_back(country->getRules()->getType());
+			_happyList.push_back(country.getRules()->getType());
 			break;
 		default:
 			break;

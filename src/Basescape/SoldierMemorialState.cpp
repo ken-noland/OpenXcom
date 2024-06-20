@@ -95,14 +95,9 @@ SoldierMemorialState::SoldierMemorialState() : State("SoldierMemorialState")
 	_txtDate->setText(tr("STR_DATE_UC"));
 
 	size_t lost = getGame()->getSavedGame()->getDeadSoldiers().size();
-	size_t recruited = lost;
-	for (const auto* xbase : getGame()->getSavedGame()->getBases())
-	{
-		recruited += xbase->getTotalSoldiers();
-	}
+	size_t recruited = lost += getRegistry().totalBy<Base, size_t>(&Base::getTotalSoldiers);
 
 	_txtRecruited->setText(tr("STR_SOLDIERS_RECRUITED_UC").arg(recruited));
-
 	_txtLost->setText(tr("STR_SOLDIERS_LOST_UC").arg(lost));
 
 	_lstSoldiers->setColumns(5, 114, 88, 30, 25, 35);

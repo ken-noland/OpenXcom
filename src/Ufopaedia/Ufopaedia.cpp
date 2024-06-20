@@ -320,9 +320,9 @@ namespace OpenXcom
 		if (article->section == UFOPAEDIA_COMMENDATIONS)
 		{
 			// 1. check living soldiers
-			for (Base* xbase : save->getBases())
+			for (Base& xcomBase : getRegistry().list<Base>())
 			{
-				for (Soldier* soldier : xbase->getSoldiers())
+				for (Soldier* soldier : xcomBase.getSoldiers())
 				{
 					for (SoldierCommendations* comm : soldier->getDiary()->getSoldierCommendations())
 					{

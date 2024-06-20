@@ -18,19 +18,22 @@
  */
 #include "FundingState.h"
 #include <sstream>
+#include <entt/entt.hpp>
 #include "../Engine/Game.h"
-#include "../Mod/Mod.h"
 #include "../Engine/LocalizedText.h"
+#include "../Engine/Options.h"
 #include "../Engine/Unicode.h"
 #include "../Interface/ArrowButton.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Window.h"
 #include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
-#include "../Savegame/Country.h"
+#include "../Interface/Window.h"
+#include "../Mod/Mod.h"
 #include "../Mod/RuleCountry.h"
+#include "../Savegame/Country.h"
+#include "../Savegame/CountrySystem.h"
 #include "../Savegame/SavedGame.h"
-#include "../Engine/Options.h"
+#include "../Savegame/BaseSystem.h"
 
 namespace OpenXcom
 {
@@ -131,22 +134,14 @@ FundingState::FundingState() : State("FundingState")
 
 	_fundingCountryOrder = FC_NONE;
 
-	for (Country* country : getGame()->getSavedGame()->getCountries())
+	for (const Country& country : getRegistry().list<const Country>())
 	{
 		_fundingCountryList.push_back(FundingCountry(
-			tr(country->getRules()->getType()),
-			country->getFunding().back(),
-			country->getFunding().size() > 1 ? country->getFunding().back() - country->getFunding().at(country->getFunding().size() - 2) : 0)
+			tr(country.getRules()->getType()),
+			country.getFunding().back(),
+			country.getFunding().size() > 1 ? country.getFunding().back() - country.getFunding().at(country.getFunding().size() - 2) : 0)
 		);
 	}
-}
-
-/**
- *
- */
-FundingState::~FundingState()
-{
-
 }
 
 /**
@@ -256,8 +251,9 @@ void FundingState::updateList()
 
 		_lstCountries->addRow(3, country.name.c_str(), ss.str().c_str(), ss2.str().c_str());
 	}
-	_lstCountries->addRow(2, tr("STR_TOTAL_UC").c_str(), Unicode::formatFunding(getGame()->getSavedGame()->getCountryFunding()).c_str());
-	_lstCountries->setRowColor(getGame()->getSavedGame()->getCountries().size(), _txtCountry->getColor());
+	int64_t countryFunding = CountrySystem::getCountriesMonthlyFundingTotal();
+	_lstCountries->addRow(2, tr("STR_TOTAL_UC").c_str(), Unicode::formatFunding(countryFunding).c_str());
+	_lstCountries->setRowColor(getRegistry().size<const Country>(), _txtCountry->getColor());
 }
 
 /**

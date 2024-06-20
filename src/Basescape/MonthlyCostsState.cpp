@@ -28,6 +28,8 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextList.h"
 #include "../Savegame/Base.h"
+#include "../Savegame/BaseSystem.h"
+#include "../Savegame/CountrySystem.h"
 #include "../Savegame/SavedGame.h"
 #include "../Mod/RuleCraft.h"
 #include "../Mod/RuleSoldier.h"
@@ -100,13 +102,11 @@ MonthlyCostsState::MonthlyCostsState(Base* base) : State("MonthlyCostsState"), _
 
 	_txtSalaries->setText(tr("STR_SALARIES"));
 
-	std::ostringstream ss;
-	ss << tr("STR_INCOME") << "=" << Unicode::formatFunding(getGame()->getSavedGame()->getCountryFunding());
-	_txtIncome->setText(ss.str());
+	int64_t countryFunding = CountrySystem::getCountriesMonthlyFundingTotal();
+	_txtIncome->setText(std::format("{}={}", tr("STR_INCOME").c_str(), Unicode::formatFunding(countryFunding)));
 
-	std::ostringstream ss2;
-	ss2 << tr("STR_MAINTENANCE") << "=" << Unicode::formatFunding(getGame()->getSavedGame()->getBaseMaintenance());
-	_txtMaintenance->setText(ss2.str());
+	int64_t baseFunding = BaseSystem::getBasesMaintenanceCost();
+	_txtMaintenance->setText(std::format("{}={}", tr("STR_MAINTENANCE").c_str(), Unicode::formatFunding(baseFunding)));
 
 //	_lstCrafts->setColumns(4, 125, 70, 44, 50);
 	_lstCrafts->setColumns(4, 115, 50, 50, 85);

@@ -131,7 +131,7 @@ bool MapData::isGravLift() const
 }
 
 /**
- * Gets whether this should be drawn behind a unit or in front of a unit (i.e. if it works as a S or E wall).
+ * Gets whether this should be drawn behind a unit or in frontValue of a unit (i.e. if it works as a S or E wall).
  */
 bool MapData::isBackTileObject() const
 {

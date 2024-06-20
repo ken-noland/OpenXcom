@@ -23,6 +23,7 @@
 #include "BaseView.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/BaseFacility.h"
+#include "../Savegame/SavedGame.h"
 #include "../Mod/RuleBaseFacility.h"
 #include "../Menu/ErrorMessageState.h"
 #include "SelectStartFacilityState.h"
@@ -39,19 +40,12 @@ namespace OpenXcom
  * @param select Pointer to the selection state.
  * @param rule Pointer to the facility ruleset to build.
  */
-PlaceStartFacilityState::PlaceStartFacilityState(Base *base, SelectStartFacilityState *select, const RuleBaseFacility *rule) : PlaceFacilityState(base, rule), _select(select)
+PlaceStartFacilityState::PlaceStartFacilityState(entt::entity baseId, SelectStartFacilityState *select, const RuleBaseFacility *rule)
+	: PlaceFacilityState(baseId, rule), _select(select)
 {
 	_view->onMouseClick((ActionHandler)&PlaceStartFacilityState::viewClick);
 	_numCost->setText(tr("STR_NONE"));
 	_numTime->setText(tr("STR_NONE"));
-}
-
-/**
- *
- */
-PlaceStartFacilityState::~PlaceStartFacilityState()
-{
-
 }
 
 /**
@@ -67,10 +61,11 @@ void PlaceStartFacilityState::viewClick(Action *)
 	}
 	else
 	{
-		BaseFacility *fac = new BaseFacility(_rule, _base);
+		Base& base = getRegistry().raw().get<Base>(_baseId);
+		BaseFacility *fac = new BaseFacility(_rule, &base);
 		fac->setX(_view->getGridX());
 		fac->setY(_view->getGridY());
-		_base->getFacilities().push_back(fac);
+		base.getFacilities().push_back(fac);
 		if (fac->getRules()->getPlaceSound() != Mod::NO_SOUND)
 		{
 			getGame()->getMod()->getSound("GEO.CAT", fac->getRules()->getPlaceSound())->play();

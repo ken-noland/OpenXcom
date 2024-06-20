@@ -96,14 +96,14 @@ ItemsArrivingState::ItemsArrivingState(GeoscapeState* state) : State("ItemsArriv
 	_lstTransfers->setBackground(_window);
 	_lstTransfers->setMargin(2);
 
-	for (Base* xbase : getGame()->getSavedGame()->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
-		for (auto transferIt = xbase->getTransfers().begin(); transferIt != xbase->getTransfers().end();)
+		for (auto transferIt = xcomBase.getTransfers().begin(); transferIt != xcomBase.getTransfers().end();)
 		{
 			Transfer *transfer = (*transferIt);
 			if (transfer->getHours() == 0)
 			{
-				_base = xbase;
+				_base = &xcomBase;
 
 				// Check if we have an automated use for an item
 				if (transfer->getType() == TRANSFER_ITEM)
@@ -111,7 +111,7 @@ ItemsArrivingState::ItemsArrivingState(GeoscapeState* state) : State("ItemsArriv
 					const auto* item = transfer->getItems();
 					if (item->getBattleType() == BT_NONE)
 					{
-						for (Craft* xcraft : xbase->getCrafts())
+						for (Craft* xcraft : xcomBase.getCrafts())
 						{
 							xcraft->reuseItem(item);
 						}
@@ -121,9 +121,9 @@ ItemsArrivingState::ItemsArrivingState(GeoscapeState* state) : State("ItemsArriv
 				// Remove transfer
 				std::ostringstream ss;
 				ss << transfer->getQuantity();
-				_lstTransfers->addRow(3, transfer->getName(getGame()->getLanguage()).c_str(), ss.str().c_str(), xbase->getName().c_str());
+				_lstTransfers->addRow(3, transfer->getName(getGame()->getLanguage()).c_str(), ss.str().c_str(), xcomBase.getName().c_str());
 				delete transfer;
-				transferIt = xbase->getTransfers().erase(transferIt);
+				transferIt = xcomBase.getTransfers().erase(transferIt);
 			}
 			else
 			{
@@ -157,7 +157,7 @@ void ItemsArrivingState::btnGotoBaseClick(Action *)
 {
 	_state->timerReset();
 	getGame()->popState();
-	getGame()->pushState(new BasescapeState(_base, _state->getGlobe()));
+	getGame()->pushState(new BasescapeState(getRegistry().find(_base), _state->getGlobe()));
 }
 
 }

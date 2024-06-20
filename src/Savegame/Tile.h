@@ -277,7 +277,7 @@ public:
 	}
 
 	/**
-	 * Check if an object should be drawn behind or in front of a unit.
+	 * Check if an object should be drawn behind or in frontValue of a unit.
 	 * @param tp Part to check
 	 * @return True if its back object.
 	 */

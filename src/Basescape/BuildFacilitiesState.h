@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <vector>
+#include <entt/entt.hpp>
 #include "../Engine/State.h"
 
 namespace OpenXcom
@@ -37,7 +38,7 @@ class RuleBaseFacility;
 class BuildFacilitiesState : public State
 {
 protected:
-	Base *_base;
+	entt::entity _baseId;
 	State *_state;
 	std::vector<RuleBaseFacility*> _facilities, _disabledFacilities;
 	size_t _lstScroll;
@@ -48,9 +49,7 @@ protected:
 	TextList *_lstFacilities;
 public:
 	/// Creates the Build Facilities state.
-	BuildFacilitiesState(Base *base, State *state);
-	/// Cleans up the Build Facilities state.
-	~BuildFacilitiesState();
+	BuildFacilitiesState(entt::entity baseId, State *state);
 	/// Populates the build option list.
 	virtual void populateBuildList();
 	/// Updates the base stats.

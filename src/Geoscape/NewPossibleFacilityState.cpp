@@ -17,16 +17,17 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "NewPossibleFacilityState.h"
+#include "../Basescape/BasescapeState.h"
 #include "../Engine/Game.h"
 #include "../Engine/LocalizedText.h"
-#include "../Mod/Mod.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Window.h"
-#include "../Interface/Text.h"
-#include "../Interface/TextList.h"
-#include "../Mod/RuleBaseFacility.h"
-#include "../Basescape/BasescapeState.h"
 #include "../Engine/Options.h"
+#include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
+#include "../Interface/TextList.h"
+#include "../Interface/Window.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleBaseFacility.h"
+#include "../Savegame/Base.h"
 
 namespace OpenXcom
 {
@@ -122,7 +123,7 @@ void NewPossibleFacilityState::btnOkClick(Action *)
 void NewPossibleFacilityState::btnOpenClick(Action *)
 {
 	getGame()->popState();
-	getGame()->pushState(new BasescapeState(_base, _globe));
+	getGame()->pushState(new BasescapeState(getRegistry().find<Base>(_base), _globe));
 }
 
 }

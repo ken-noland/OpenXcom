@@ -66,22 +66,20 @@ TrainingState::TrainingState() : State("TrainingState")
 	_txtTitle->setText(tr("STR_PHYSICAL_TRAINING"));
 
 	int buttons = 0;
-	for (Base* xbase : getGame()->getSavedGame()->getBases())
+	auto trainingSpaceAvaliable = [](const Base& base) { return base.getAvailableTraining() > 0; };
+	for (Base& xcomBase : getRegistry().list<Base>(trainingSpaceAvaliable))
 	{
-		if (xbase->getAvailableTraining())
+		TextButton *btnBase = new TextButton(160, 14, 80, 40 + 16 * buttons);
+		btnBase->setColor(Palette::blockOffset(15) + 6);
+		btnBase->onMouseClick((ActionHandler)&TrainingState::btnBaseXClick);
+		btnBase->setText(xcomBase.getName());
+		add(btnBase, "button1", "martialTraining");
+		_bases.push_back(&xcomBase);
+		_btnBases.push_back(btnBase);
+		++buttons;
+		if (buttons >= 8)
 		{
-			TextButton *btnBase = new TextButton(160, 14, 80, 40 + 16 * buttons);
-			btnBase->setColor(Palette::blockOffset(15) + 6);
-			btnBase->onMouseClick((ActionHandler)&TrainingState::btnBaseXClick);
-			btnBase->setText(xbase->getName());
-			add(btnBase, "button1", "martialTraining");
-			_bases.push_back(xbase);
-			_btnBases.push_back(btnBase);
-			++buttons;
-			if (buttons >= 8)
-			{
-				break;
-			}
+			break;
 		}
 	}
 

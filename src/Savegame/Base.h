@@ -137,7 +137,8 @@ public:
 	/// Loads the base from YAML.
 	void load(const YAML::Node& node, SavedGame *save, bool newGame, bool newBattleGame = false);
 	/// Finishes loading the base (more specifically all craft in the base) from YAML.
-	void finishLoading(const YAML::Node& node, SavedGame *save);
+	void finishLoadingCrafts(const YAML::Node& node, SavedGame *save);
+	/// Calculates services provided by this base.
 	void calculateServices(SavedGame* save);
 	/// Tests whether the base facilities are within the base boundaries and not overlapping.
 	bool isOverlappingOrOverflowing();
@@ -150,9 +151,13 @@ public:
 	/// Gets the base's marker sprite.
 	int getMarker() const override;
 	/// Gets the base's facilities.
-	std::vector<BaseFacility*>& getFacilities();
+	[[nodiscard]] std::vector<BaseFacility*>& getFacilities() { return _facilities; }
+	/// Gets the base's facilities.
+	[[nodiscard]] const std::vector<BaseFacility*>& getFacilities() const { return _facilities; }
 	/// Gets the base's soldiers.
-	std::vector<Soldier*>& getSoldiers();
+	[[nodiscard]] std::vector<Soldier*>& getSoldiers() { return _soldiers; }
+	/// Gets the base's soldiers.
+	[[nodiscard]] const std::vector<Soldier*>& getSoldiers() const { return _soldiers; }
 	/// Pre-calculates soldier stats with various bonuses.
 	void prepareSoldierStatsWithBonuses();
 	/// Gets the base's crafts.

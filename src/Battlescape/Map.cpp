@@ -1287,7 +1287,7 @@ void Map::drawTerrain(Surface *surface)
 						Surface::blitRaw(surface, tmpSurface, screenPosition.x, screenPosition.y, shade, false, _nvColor);
 					}
 
-					//draw particle clouds on front of solder
+					//draw particle clouds on frontValue of solder
 					for (const Particle& p : getVaporParticle(tile, topLayer ? 3 : 1))
 					{
 						int vaporX = vaporScreenOriginX + p.getOffsetX();
@@ -1341,7 +1341,7 @@ void Map::drawTerrain(Surface *surface)
 							}
 						}
 					}
-					// Draw cursor front
+					// Draw cursor frontValue
 					if (_cursorType != CT_NONE && _selectorX > itX - _cursorSize && _selectorY > itY - _cursorSize && _selectorX < itX+1 && _selectorY < itY+1 && !_save->getBattleState()->getMouseOverIcons())
 					{
 						if (_camera->getViewLevel() == itZ)

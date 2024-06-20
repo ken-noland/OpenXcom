@@ -86,7 +86,7 @@ private:
 	/// Get polygon pointer
 	Polygon* getPolygonFromLonLat(double lon, double lat) const;
 	/// Checks if a target is near a point.
-	bool targetNear(Target* target, int x, int y) const;
+	bool targetNear(const Target* target, int x, int y) const;
 	/// Caches a set of polygons.
 	void cache(std::list<Polygon*> *polygons, std::list<Polygon*> *cache);
 	/// Get position of sun relative to given position in polar cords and date.
@@ -100,7 +100,7 @@ private:
 	/// Draw flight path.
 	void drawPath(Surface *surface, double lon1, double lat1, double lon2, double lat2);
 	/// Draw target marker.
-	void drawTarget(Target *target, Surface *surface);
+	void drawTarget(const Target *target, Surface *surface);
 	/// Set up the radius of earth and stuff.
 	void setupRadii(int width, int height);
 public:

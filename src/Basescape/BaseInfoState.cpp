@@ -45,7 +45,8 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param state Pointer to the Basescape state.
  */
-BaseInfoState::BaseInfoState(Base* base, BasescapeState* state) : State("BaseInfoState"), _base(base), _state(state)
+BaseInfoState::BaseInfoState(entt::entity baseId, BasescapeState *state) : State("BaseInfoState"),
+	_baseId(baseId), _state(state), _base(&getRegistry().raw().get<Base>(baseId))
 {
 	// Create objects
 	_bg = new Surface(320, 200, 0, 0);
@@ -85,6 +86,12 @@ BaseInfoState::BaseInfoState(Base* base, BasescapeState* state) : State("BaseInf
 		_txtContainment = new Text(114, 9, 8, 123);
 		_numContainment = new Text(40, 9, 126, 123);
 		_barContainment = new Bar(150, 5, 166, 125);
+	}
+	else
+	{
+		_txtContainment = nullptr;
+		_numContainment = nullptr;
+		_barContainment = nullptr;
 	}
 	_txtHangars = new Text(114, 9, 8, Options::storageLimitsEnforced ? 133 : 123);
 	_numHangars = new Text(40, 9, 126, Options::storageLimitsEnforced ? 133 : 123);
@@ -167,15 +174,8 @@ BaseInfoState::BaseInfoState(Base* base, BasescapeState* state) : State("BaseInf
 	getGame()->getMod()->getSurface(ss.str())->blitNShade(_bg, 0, 0);
 
 	_mini->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
-	_mini->setBases(getGame()->getSavedGame()->getBases());
-	for (size_t i = 0; i < getGame()->getSavedGame()->getBases().size(); ++i)
-	{
-		if (getGame()->getSavedGame()->getBases().at(i) == _base)
-		{
-			_mini->setSelectedBase(i);
-			break;
-		}
-	}
+	int selectedBaseIndex = getRegistry().index<Base>(baseId);
+	_mini->setSelectedBaseIndex(selectedBaseIndex);
 	_mini->onMouseClick((ActionHandler)&BaseInfoState::miniClick);
 	_mini->onKeyboardPress((ActionHandler)&BaseInfoState::handleKeyPress);
 
@@ -253,12 +253,21 @@ BaseInfoState::BaseInfoState(Base* base, BasescapeState* state) : State("BaseInf
 	_barLongRange->setScale(25.0);
 }
 
-/**
- *
- */
-BaseInfoState::~BaseInfoState()
+static void setBarState(Text& barText, Bar& bar, int count, int max, double maxBarWidth)
 {
+	barText.setText(std::format("{}:{}", count, max));
 
+	if (!Options::oxceBaseInfoScaleEnabled || count * bar.getScale() < maxBarWidth)
+	{
+		bar.setMax(max);
+		bar.setValue(count);
+	}
+	else
+	{
+		bar.setMax(maxBarWidth);
+		bar.setValue(count * maxBarWidth / max);
+		bar.setScale(1.0);
+	}
 }
 
 /**
@@ -269,126 +278,13 @@ void BaseInfoState::init()
 	State::init();
 	_edtBase->setText(_base->getName());
 
-	std::ostringstream ss;
-	ss << _base->getAvailableSoldiers() << ":" << _base->getTotalSoldiers();
-	_numSoldiers->setText(ss.str());
-
-	if (!Options::oxceBaseInfoScaleEnabled || _base->getTotalSoldiers() * _barSoldiers->getScale() < MAX_BAR_WIDTH)
-	{
-		_barSoldiers->setMax(_base->getTotalSoldiers());
-		_barSoldiers->setValue(_base->getAvailableSoldiers());
-	}
-	else
-	{
-		_barSoldiers->setMax(MAX_BAR_WIDTH);
-		_barSoldiers->setValue(_base->getAvailableSoldiers() * MAX_BAR_WIDTH / _base->getTotalSoldiers());
-	}
-
-	std::ostringstream ss2;
-	ss2 << _base->getAvailableEngineers() << ":" << _base->getTotalEngineers();
-	_numEngineers->setText(ss2.str());
-
-	if (!Options::oxceBaseInfoScaleEnabled || _base->getTotalEngineers() * _barEngineers->getScale() < MAX_BAR_WIDTH)
-	{
-		_barEngineers->setMax(_base->getTotalEngineers());
-		_barEngineers->setValue(_base->getAvailableEngineers());
-	}
-	else
-	{
-		_barEngineers->setMax(MAX_BAR_WIDTH);
-		_barEngineers->setValue(_base->getAvailableEngineers() * MAX_BAR_WIDTH / _base->getTotalEngineers());
-	}
-
-	std::ostringstream ss3;
-	ss3 << _base->getAvailableScientists() << ":" << _base->getTotalScientists();
-	_numScientists->setText(ss3.str());
-
-	if (!Options::oxceBaseInfoScaleEnabled || _base->getTotalScientists() * _barScientists->getScale() < MAX_BAR_WIDTH)
-	{
-		_barScientists->setMax(_base->getTotalScientists());
-		_barScientists->setValue(_base->getAvailableScientists());
-	}
-	else
-	{
-		_barScientists->setMax(MAX_BAR_WIDTH);
-		_barScientists->setValue(_base->getAvailableScientists() * MAX_BAR_WIDTH / _base->getTotalScientists());
-	}
-
-	if (_base->getTotalScientists() * _barScientists->getScale() < MAX_BAR_WIDTH)
-	{
-		_barScientists->setMax(_base->getTotalScientists());
-		_barScientists->setValue(_base->getAvailableScientists());
-	}
-	else
-	{
-		_barScientists->setMax(MAX_BAR_WIDTH);
-		_barScientists->setValue(_base->getAvailableScientists() * MAX_BAR_WIDTH / _base->getTotalScientists());
-		_barScientists->setScale(1.0);
-	}
-
-	std::ostringstream ss4;
-	ss4 << _base->getUsedQuarters() << ":" << _base->getAvailableQuarters();
-	_numQuarters->setText(ss4.str());
-
-	if (!Options::oxceBaseInfoScaleEnabled || _base->getAvailableQuarters() * _barQuarters->getScale() < MAX_BAR_WIDTH)
-	{
-		_barQuarters->setMax(_base->getAvailableQuarters());
-		_barQuarters->setValue(_base->getUsedQuarters());
-	}
-	else
-	{
-		_barQuarters->setMax(MAX_BAR_WIDTH);
-		_barQuarters->setValue(_base->getUsedQuarters() * MAX_BAR_WIDTH / _base->getAvailableQuarters());
-		_barQuarters->setScale(1.0);
-	}
-
-	std::ostringstream ss5;
-	ss5 << (int)floor(_base->getUsedStores() + 0.05) << ":" << _base->getAvailableStores();
-	_numStores->setText(ss5.str());
-
-	if (!Options::oxceBaseInfoScaleEnabled || _base->getAvailableStores() * _barStores->getScale() < MAX_BAR_WIDTH)
-	{
-		_barStores->setMax(_base->getAvailableStores());
-		_barStores->setValue((int)floor(_base->getUsedStores() + 0.05));
-	}
-	else
-	{
-		_barStores->setMax(MAX_BAR_WIDTH);
-		_barStores->setValue(((int)floor(_base->getUsedStores() + 0.05)) * MAX_BAR_WIDTH / _base->getAvailableStores());
-		_barStores->setScale(1.0);
-	}
-
-	std::ostringstream ss6;
-	ss6 << _base->getUsedLaboratories() << ":" << _base->getAvailableLaboratories();
-	_numLaboratories->setText(ss6.str());
-
-	if (!Options::oxceBaseInfoScaleEnabled || _base->getAvailableLaboratories() * _barLaboratories->getScale() < MAX_BAR_WIDTH)
-	{
-		_barLaboratories->setMax(_base->getAvailableLaboratories());
-		_barLaboratories->setValue(_base->getUsedLaboratories());
-	}
-	else
-	{
-		_barLaboratories->setMax(MAX_BAR_WIDTH);
-		_barLaboratories->setValue(_base->getUsedLaboratories() * MAX_BAR_WIDTH / _base->getAvailableLaboratories());
-		_barLaboratories->setScale(1.0);
-	}
-
-	std::ostringstream ss7;
-	ss7 << _base->getUsedWorkshops() << ":" << _base->getAvailableWorkshops();
-	_numWorkshops->setText(ss7.str());
-
-	if (!Options::oxceBaseInfoScaleEnabled || _base->getAvailableWorkshops() * _barWorkshops->getScale() < MAX_BAR_WIDTH)
-	{
-		_barWorkshops->setMax(_base->getAvailableWorkshops());
-		_barWorkshops->setValue(_base->getUsedWorkshops());
-	}
-	else
-	{
-		_barWorkshops->setMax(MAX_BAR_WIDTH);
-		_barWorkshops->setValue(_base->getUsedWorkshops() * MAX_BAR_WIDTH / _base->getAvailableWorkshops());
-		_barWorkshops->setScale(1.0);
-	}
+	setBarState(*_numSoldiers, *_barSoldiers, _base->getAvailableSoldiers(), _base->getTotalSoldiers(), MAX_BAR_WIDTH);
+	setBarState(*_numEngineers, *_barEngineers, _base->getAvailableEngineers(), _base->getTotalEngineers(), MAX_BAR_WIDTH);
+	setBarState(*_numScientists, *_barScientists, _base->getAvailableScientists(), _base->getTotalScientists(), MAX_BAR_WIDTH);
+	setBarState(*_numQuarters, *_barQuarters, _base->getUsedQuarters(), _base->getAvailableQuarters(), MAX_BAR_WIDTH);
+	setBarState(*_numStores, *_barStores, static_cast<int>(std::ceil(_base->getUsedStores())), _base->getAvailableStores(), MAX_BAR_WIDTH);
+	setBarState(*_numLaboratories, *_barLaboratories, _base->getUsedLaboratories(), _base->getAvailableLaboratories(), MAX_BAR_WIDTH);
+	setBarState(*_numWorkshops, *_barWorkshops, _base->getUsedWorkshops(), _base->getAvailableWorkshops(), MAX_BAR_WIDTH);
 
 	if (Options::storageLimitsEnforced)
 	{
@@ -501,7 +397,6 @@ void BaseInfoState::init()
 		_barLongRange->setValue(longRangeDetection);
 
 	}
-
 }
 
 /**
@@ -519,12 +414,14 @@ void BaseInfoState::edtBaseChange(Action *)
  */
 void BaseInfoState::miniClick(Action *)
 {
-	size_t base = _mini->getHoveredBase();
-	if (base < getGame()->getSavedGame()->getBases().size())
+	int clickedBaseIndex = _mini->getHoveredBaseIndex();
+	auto bases = getRegistry().raw().view<Base>();
+	if (clickedBaseIndex < bases.size())
 	{
-		_mini->setSelectedBase(base);
-		_base = getGame()->getSavedGame()->getBases().at(base);
-		_state->setBase(_base);
+		_mini->setSelectedBaseIndex(clickedBaseIndex);
+		auto&& [ id, base ]= *std::next(bases.each().begin(), clickedBaseIndex);
+		_base = &base;
+		_state->setBase(id);
 		init();
 	}
 }
@@ -535,30 +432,32 @@ void BaseInfoState::miniClick(Action *)
  */
 void BaseInfoState::handleKeyPress(Action *action)
 {
-	if (action->getDetails()->type == SDL_KEYDOWN)
+	if (action->getDetails()->type != SDL_KEYDOWN) return;
+
+	SDLKey baseKeys[] = {
+		Options::keyBaseSelect1,
+		Options::keyBaseSelect2,
+		Options::keyBaseSelect3,
+		Options::keyBaseSelect4,
+		Options::keyBaseSelect5,
+		Options::keyBaseSelect6,
+		Options::keyBaseSelect7,
+		Options::keyBaseSelect8
+	};
+
+	// get the index of the key hit
+	int key = action->getDetails()->key.keysym.sym;
+	if (key < baseKeys[0] || key > baseKeys[7]) return;
+	int index = key - baseKeys[0];
+
+	if (auto bases = getRegistry().raw().view<Base>(); index < bases.size())
 	{
-		SDLKey baseKeys[] = {
-			Options::keyBaseSelect1,
-			Options::keyBaseSelect2,
-			Options::keyBaseSelect3,
-			Options::keyBaseSelect4,
-			Options::keyBaseSelect5,
-			Options::keyBaseSelect6,
-			Options::keyBaseSelect7,
-			Options::keyBaseSelect8
-		};
-		int key = action->getDetails()->key.keysym.sym;
-		for (size_t i = 0; i < getGame()->getSavedGame()->getBases().size(); ++i)
-		{
-			if (key == baseKeys[i])
-			{
-				_mini->setSelectedBase(i);
-				_base = getGame()->getSavedGame()->getBases().at(i);
-				_state->setBase(_base);
-				init();
-				break;
-			}
-		}
+		auto&& [id, xcomBase] = *std::next(bases.each().begin(), index);
+
+		_mini->setSelectedBaseIndex(index);
+		_base = &xcomBase;
+		_state->setBase(id);
+		init();
 	}
 }
 

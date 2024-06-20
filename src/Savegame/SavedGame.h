@@ -23,6 +23,7 @@
 #include <string>
 #include <time.h>
 #include <stdint.h>
+#include <entt/entt.hpp>
 #include "GameTime.h"
 #include "../Mod/RuleAlienMission.h"
 #include "../Mod/RuleEvent.h"
@@ -88,14 +89,14 @@ struct SaveInfo
 {
 	std::string fileName;
 	std::string displayName;
-	time_t timestamp;
+	time_t timestamp{0};
 	std::string isoDate, isoTime;
 	std::string details;
 
 	using SaveInfoModList = std::vector<std::string>;
 	SaveInfoModList mods;
 
-	bool reserved;
+	bool reserved = false;
 };
 
 /**
@@ -106,8 +107,8 @@ struct SaveInfo
 class SavedGame
 {
 public:
-	Country *debugCountry = nullptr;
-	Region *debugRegion = nullptr;
+	entt::entity debugCountry = entt::null;
+	entt::entity debugRegion = entt::null;
 	int debugType = 0;
 	size_t debugZone = 0;
 	size_t debugArea = 0;
@@ -116,7 +117,6 @@ public:
 	static constexpr const char *ScriptName = "GeoscapeGame";
 	/// Register all useful function used by script.
 	static void ScriptRegister(ScriptParserBase* parser);
-
 
 	static const int MAX_EQUIPMENT_LAYOUT_TEMPLATES = 50;
 	static const int MAX_CRAFT_LOADOUT_TEMPLATES = 10;
@@ -134,10 +134,6 @@ private:
 	double _globeLon, _globeLat;
 	int _globeZoom;
 	std::map<std::string, int> _ids;
-	std::vector<Country*> _countries;
-	std::vector<Region*> _regions;
-	std::vector<Base*> _bases;
-	std::vector<Ufo*> _ufos;
 	std::vector<Waypoint*> _waypoints;
 	std::vector<MissionSite*> _missionSites;
 	std::vector<AlienBase*> _alienBases;
@@ -163,8 +159,8 @@ private:
 	std::string _graphFinanceToggles;
 	std::vector<const RuleResearch*> _poppedResearch;
 	std::vector<Soldier*> _deadSoldiers;
-	size_t _selectedBase;
-	size_t _visibleBasesIndex;
+	int _selectedBaseIndex;
+	int _visibleBasesIndexOffset;
 	std::string _lastselectedArmor; //contains the last selected armor
 	std::string _globalEquipmentLayoutName[MAX_EQUIPMENT_LAYOUT_TEMPLATES];
 	std::string _globalEquipmentLayoutArmor[MAX_EQUIPMENT_LAYOUT_TEMPLATES];
@@ -194,13 +190,13 @@ public:
 	/// Saves a saved game to YAML.
 	void save(const std::string &filename, Mod *mod) const;
 	/// Gets the game name.
-	std::string getName() const;
+	std::string getName() const { return _name; }
 	/// Sets the game name.
-	void setName(const std::string &name);
+	void setName(const std::string& name) { _name = name; }
 	/// Gets the game difficulty.
-	GameDifficulty getDifficulty() const;
+	GameDifficulty getDifficulty() const { return _difficulty; }
 	/// Sets the game difficulty.
-	void setDifficulty(GameDifficulty difficulty);
+	void setDifficulty(GameDifficulty difficulty) { _difficulty = difficulty; }
 	/// Gets the game difficulty coefficient.
 	int getDifficultyCoefficient() const;
 	/// Gets the sell price coefficient.
@@ -208,35 +204,35 @@ public:
 	/// Gets the buy price coefficient.
 	int getBuyPriceCoefficient() const;
 	/// Gets the game ending.
-	GameEnding getEnding() const;
+	GameEnding getEnding() const { return _end; }
 	/// Sets the game ending.
-	void setEnding(GameEnding end);
+	void setEnding(GameEnding end) { _end = end; }
 	/// Gets if the game is in ironman mode.
-	bool isIronman() const;
+	bool isIronman() const { return _ironman; }
 	/// Sets if the game is in ironman mode.
-	void setIronman(bool ironman);
+	void setIronman(bool ironman) { _ironman = ironman; }
 	/// Gets the current funds.
-	int64_t getFunds() const;
-	/// Gets the list of funds from previous months.
-	std::vector<int64_t> &getFundsList();
+	int64_t getFunds() const { return _funds.back(); }
+	/// Gets the list of funds from previous 12 months.
+	std::vector<int64_t>& getFundsList() { return _funds; }
 	/// Sets new funds.
 	void setFunds(int64_t funds);
 	/// Gets the current globe longitude.
-	double getGlobeLongitude() const;
+	double getGlobeLongitude() const { return _globeLon; }
 	/// Sets the new globe longitude.
-	void setGlobeLongitude(double lon);
+	void setGlobeLongitude(double lon) { _globeLon = lon; }
 	/// Gets the current globe latitude.
-	double getGlobeLatitude() const;
+	double getGlobeLatitude() const { return _globeLat; }
 	/// Sets the new globe latitude.
-	void setGlobeLatitude(double lat);
+	void setGlobeLatitude(double lat) { _globeLat = lat; }
 	/// Gets the current globe zoom.
-	int getGlobeZoom() const;
+	int getGlobeZoom() const { return _globeZoom; }
 	/// Sets the new globe zoom.
-	void setGlobeZoom(int zoom);
+	void setGlobeZoom(int zoom) { _globeZoom = zoom; }
 	/// Handles monthly funding.
 	void monthlyFunding();
 	/// Gets the current game time.
-	GameTime *getTime() const;
+	GameTime* getTime() const { return _time; }
 	/// Sets the current game time.
 	void setTime(const GameTime& time);
 	/// Gets the current ID for an object.
@@ -247,32 +243,10 @@ public:
 	void increaseCustomCounter(const std::string& name);
 	/// Decrease a custom counter.
 	void decreaseCustomCounter(const std::string& name);
-	/// Resets the list of object IDs.
-	const std::map<std::string, int> &getAllIds() const;
-	/// Resets the list of object IDs.
-	void setAllIds(const std::map<std::string, int> &ids);
-	/// Gets the list of countries.
-	std::vector<Country*>& getCountries();
-	/// Gets the list of countries.
-	[[nodiscard]] const std::vector<Country*>* getCountries() const { return &_countries; }
-	/// Gets the total country funding.
-	int getCountryFunding() const;
-	/// Gets the list of regions.
-	std::vector<Region*>& getRegions();
-	/// Gets the list of bases.
-	std::vector<Base*>& getBases();
-	/// Gets the list of bases.
-	const std::vector<Base*>& getBases() const;
-	// Gets the index of visible Bases
-	size_t getVisibleBasesIndex();
-	// Sets the index of visible Bases
-	void setVisibleBasesIndex(size_t lastVisibleBasesIndex);	
-	/// Gets the total base maintenance.
-	int getBaseMaintenance() const;
-	/// Gets the list of UFOs.
-	std::vector<Ufo*>& getUfos();
-	/// Gets the list of UFOs.
-	const std::vector<Ufo*>& getUfos() const;
+	/// Gets the list of object IDs.
+	const std::map<std::string, int>& getAllIds() const { return _ids; }
+	/// Sets the list of object IDs.
+	void setAllIds(const std::map<std::string, int>& ids) { _ids = ids; }
 	/// Gets the list of waypoints.
 	std::vector<Waypoint*>& getWaypoints();
 	/// Gets the list of mission sites.
@@ -347,12 +321,6 @@ public:
 	bool isResearched(const std::vector<std::string> &research, bool considerDebugMode = true) const;
 	/// Gets if a certain list of research topics has been completed.
 	bool isResearched(const std::vector<const RuleResearch *> &research, bool considerDebugMode = true, bool skipDisabled = false) const;
-	/// Gets if a certain item has been obtained.
-	bool isItemObtained(const std::string &itemType) const;
-	/// Gets if a certain facility has been built.
-	bool isFacilityBuilt(const std::string &facilityType) const;
-	/// Gets if a certain soldier type has been hired.
-	bool isSoldierTypeHired(const std::string& soldierType) const;
 	/// Gets the soldier matching this ID.
 	Soldier *getSoldier(int id) const;
 	/// Handles the higher promotions.
@@ -366,73 +334,65 @@ public:
 	/// Sets debug mode.
 	void setDebugMode();
 	/// Gets debug mode.
-	bool getDebugMode() const;
+	[[nodiscard]] bool getDebugMode() const { return _debug; }
 	/// return a list of maintenance costs
-	std::vector<int64_t> &getMaintenances();
+	[[nodiscard]] std::vector<int64_t>& getMaintenances() { return _maintenance; }
 	/// sets the research score for the month
-	void addResearchScore(int score);
+	void addResearchScore(int score) { _researchScores.back() += score; }
 	/// gets the list of research scores
-	std::vector<int> &getResearchScores();
+	[[nodiscard]] std::vector<int>& getResearchScores() { return _researchScores; }
 	/// gets the list of incomes.
-	std::vector<int64_t> &getIncomes();
+	[[nodiscard]] std::vector<int64_t>& getIncomes() { return _incomes; }
 	/// gets the list of expenditures.
-	std::vector<int64_t> &getExpenditures();
-	/// gets whether or not the player has been warned
-	bool getWarned() const;
-	/// sets whether or not the player has been warned
-	void setWarned(bool warned);
+	[[nodiscard]] std::vector<int64_t>& getExpenditures() { return _expenditures; }
+	/// gets whether or not the player has been warned for low performance
+	[[nodiscard]] bool getWarned() const { return _warned; }
+	/// sets whether or not the player has been warned for low performance
+	void setWarned(bool warned) { _warned = warned; }
 
 	/// gets personal light toggle
-	bool getTogglePersonalLight() const { return _togglePersonalLight; }
+	[[nodiscard]] bool getTogglePersonalLight() const { return _togglePersonalLight; }
 	/// sets personal light toggle
 	void setTogglePersonalLight(bool togglePersonalLight) { _togglePersonalLight = togglePersonalLight; }
 	/// gets night vision toggle
-	bool getToggleNightVision() const { return _toggleNightVision; }
+	[[nodiscard]] bool getToggleNightVision() const { return _toggleNightVision; }
 	/// sets night vision toggle
 	void setToggleNightVision(bool toggleNightVision) { _toggleNightVision = toggleNightVision; }
 	/// gets brightness toggle
-	int getToggleBrightness() const { return _toggleBrightness; }
+	[[nodiscard]] int getToggleBrightness() const { return _toggleBrightness; }
 	/// sets brightness toggle
 	void setToggleBrightness(int toggleBrightness) { _toggleBrightness = toggleBrightness; }
 
 	/// Full access to the alien strategy data.
-	AlienStrategy &getAlienStrategy() { return *_alienStrategy; }
+	[[nodiscard]] AlienStrategy &getAlienStrategy() { return *_alienStrategy; }
 	/// Read-only access to the alien strategy data.
-	const AlienStrategy &getAlienStrategy() const { return *_alienStrategy; }
+	[[nodiscard]] const AlienStrategy &getAlienStrategy() const { return *_alienStrategy; }
 	/// Full access to the current alien missions.
-	std::vector<AlienMission*> &getAlienMissions() { return _activeMissions; }
+	[[nodiscard]] std::vector<AlienMission*> &getAlienMissions() { return _activeMissions; }
 	/// Read-only access to the current alien missions.
-	const std::vector<AlienMission*> &getAlienMissions() const { return _activeMissions; }
+	[[nodiscard]] const std::vector<AlienMission*> &getAlienMissions() const { return _activeMissions; }
 	/// Finds a mission by region and objective.
 	AlienMission *findAlienMission(const std::string &region, MissionObjective objective, AlienRace* race = nullptr) const;
 	/// Full access to the current geoscape events.
-	std::vector<GeoscapeEvent*> &getGeoscapeEvents() { return _geoscapeEvents; }
+	[[nodiscard]] std::vector<GeoscapeEvent*> &getGeoscapeEvents() { return _geoscapeEvents; }
 	/// Read-only access to the current geoscape events.
-	const std::vector<GeoscapeEvent*> &getGeoscapeEvents() const { return _geoscapeEvents; }
-	/// Locate a region containing a position.
-	Region *locateRegion(double lon, double lat) const;
-	/// Locate a region containing a Target.
-	Region *locateRegion(const Target &target) const;
-	/// Locate a country containing a position.
-	Country* locateCountry(double lon, double lat) const;
-	/// Locate a country containing a Target.
-	Country* locateCountry(const Target& target) const;
+	[[nodiscard]] const std::vector<GeoscapeEvent*> &getGeoscapeEvents() const { return _geoscapeEvents; }
 	/// Select a soldier nationality based on mod rules and location on the globe.
 	int selectSoldierNationalityByLocation(const Mod* mod, const RuleSoldier* rule, const Target* target) const;
 	/// Return the month counter.
-	int getMonthsPassed() const;
+	[[nodiscard]] int getMonthsPassed() const { return _monthsPassed; }
 	/// Return the GraphRegionToggles.
-	const std::string &getGraphRegionToggles() const;
+	[[nodiscard]] const std::string& getGraphRegionToggles() const { return _graphRegionToggles; }
 	/// Return the GraphCountryToggles.
-	const std::string &getGraphCountryToggles() const;
+	[[nodiscard]] const std::string& getGraphCountryToggles() const { return _graphCountryToggles; }
 	/// Return the GraphFinanceToggles.
-	const std::string &getGraphFinanceToggles() const;
+	[[nodiscard]] const std::string& getGraphFinanceToggles() const { return _graphFinanceToggles; }
 	/// Sets the GraphRegionToggles.
-	void setGraphRegionToggles(const std::string &value);
+	void setGraphRegionToggles(const std::string& value) { _graphRegionToggles = value; }
 	/// Sets the GraphCountryToggles.
-	void setGraphCountryToggles(const std::string &value);
+	void setGraphCountryToggles(const std::string& value) { _graphCountryToggles = value; }
 	/// Sets the GraphFinanceToggles.
-	void setGraphFinanceToggles(const std::string &value);
+	void setGraphFinanceToggles(const std::string& value) { _graphFinanceToggles = value; }
 	/// Increment the month counter.
 	void addMonth();
 	/// add a research to the "popped up" array
@@ -450,15 +410,19 @@ public:
 	/// Gets a list of all active soldiers.
 	std::vector<Soldier*> getAllActiveSoldiers() const;
 	/// Gets the last selected player base.
-	Base *getSelectedBase();
-	/// Set the last selected player base.
-	void setSelectedBase(size_t base);
+	[[nodiscard]] entt::entity getSelectedBase() const;
+	/// Set the last selected player base index.
+	void setSelectedBaseIndex(int index) { _selectedBaseIndex = index; }
+	// Gets the index of visible Bases
+	[[nodiscard]] int getVisibleBasesIndexOffset() const { return _visibleBasesIndexOffset; }
+	// Sets the index of visible Bases
+	void setVisibleBasesIndexOffset(int lastVisibleBasesIndex) { _visibleBasesIndexOffset = lastVisibleBasesIndex; }
 	/// Evaluate the score of a soldier based on all of his stats, missions and kills.
 	int getSoldierScore(Soldier *soldier);
 	/// Sets the last selected armor
-	void setLastSelectedArmor(const std::string &value);
+	void setLastSelectedArmor(const std::string& armorName) { _lastselectedArmor = armorName; }
 	/// Gets the last selected armor
-	std::string getLastSelectedArmor() const;
+	std::string getLastSelectedArmor() const { return _lastselectedArmor; }
 	/// Gets the name of a global equipment layout at specified index.
 	const std::string &getGlobalEquipmentLayoutName(int index) const;
 	/// Sets the name of a global equipment layout at specified index.
@@ -476,7 +440,7 @@ public:
 	/// Gets the global craft loadout at specified index.
 	ItemContainer *getGlobalCraftLoadout(int index);
 	/// Gets the list of missions statistics
-	std::vector<MissionStatistics*>& getMissionStatistics();
+	std::vector<MissionStatistics*>& getMissionStatistics() { return _missionStatistics; }
 	/// Adds a UFO to the ignore list.
 	void addUfoToIgnoreList(int ufoId);
 	/// Checks if a UFO is on the ignore list.
@@ -494,9 +458,9 @@ public:
 	/// Stop hunting all xcom craft from a given xcom base.
 	void stopHuntingXcomCrafts(Base *base);
 	/// Should all xcom soldiers have completely empty starting inventory when doing base equipment?
-	bool getDisableSoldierEquipment() const;
+	bool getDisableSoldierEquipment() const { return _disableSoldierEquipment; }
 	/// Sets the corresponding flag.
-	void setDisableSoldierEquipment(bool disableSoldierEquipment);
+	void setDisableSoldierEquipment(bool disableSoldierEquipment) { _disableSoldierEquipment = disableSoldierEquipment; }
 	/// Is alien containment check finished?
 	bool getAlienContainmentChecked() const { return _alienContainmentChecked; }
 	/// Sets the corresponding flag.

@@ -62,15 +62,15 @@ PsiTrainingState::PsiTrainingState() : State("PsiTrainingState")
 	_txtTitle->setText(tr("STR_PSIONIC_TRAINING"));
 
 	int buttons = 0;
-	for (Base* xbase : getGame()->getSavedGame()->getBases())
+	for (Base& xcomBase : getRegistry().list<Base>())
 	{
-		if (xbase->getAvailablePsiLabs())
+		if (xcomBase.getAvailablePsiLabs())
 		{
 			TextButton *btnBase = new TextButton(160, 14, 80, 40 + 16 * buttons);
 			btnBase->onMouseClick((ActionHandler)&PsiTrainingState::btnBaseXClick);
-			btnBase->setText(xbase->getName());
+			btnBase->setText(xcomBase.getName());
 			add(btnBase, "button1", "psiTraining");
-			_bases.push_back(xbase);
+			_bases.push_back(&xcomBase);
 			_btnBases.push_back(btnBase);
 			++buttons;
 			if (buttons >= 8)
