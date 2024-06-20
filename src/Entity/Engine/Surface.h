@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../../Engine/Surface.h"
+#include "Drawable.h"
 #include <entt/entt.hpp>
 
 namespace OpenXcom
@@ -32,11 +33,14 @@ protected:
 	std::unique_ptr<Surface> _surface;
 
 public:
-	SurfaceComponent(std::unique_ptr<Surface> surface) : _surface(std::move(surface)) {}
+	SurfaceComponent(DrawableComponent& drawable, std::unique_ptr<Surface>& surface);
 	~SurfaceComponent() = default;
 
 	// temp
 	Surface* getSurface() { return _surface.get(); }
+
+	void blit();
+
 };
 
 class SurfaceFactory

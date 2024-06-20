@@ -17,15 +17,21 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Window.h"
+#include "../../fmath.h"
 #include "../../Engine/Timer.h"
+#include "../../Engine/RNG.h"
 
 namespace OpenXcom
 {
 
-WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, State* state, WindowPopup popup)
-	: _surfaceComponent(surfaceComponent), _bg(0), _color(0), _popup(popup), _popupStep(0.0),
+const double WindowComponent::POPUP_SPEED = 0.05;
+
+WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, DrawableComponent& drawableComponent, State* state, WindowPopup popup)
+	: _surfaceComponent(surfaceComponent), _drawableComponent(drawableComponent), _bg(0), _color(0), _popup(popup), _popupStep(0.0),
 	_state(state), _contrast(false), _screen(false), _thinBorder(false), _innerColor(0), _mute(false)
 {
+	drawableComponent.addDrawable(std::bind(&WindowComponent::draw, this));
+
 	// the background image is always positioned at 0,0, so this sets the initial position of the background to be cropped
 	_dx = -_surfaceComponent.getSurface()->getX();
 	_dy = -_surfaceComponent.getSurface()->getY();
@@ -33,21 +39,22 @@ WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, State* stat
 	_timer = new Timer(10);
 	_timer->onSurface(std::bind(&WindowComponent::popup, this));
 
-	//if (_popup == WindowPopup::POPUP_NONE)
-	//{
-	//	_popupStep = 1.0;
-	//}
-	//else
-	//{
-	//	setHidden(true);
-	//	_timer->start();
-	//	if (_state != 0)
-	//	{
-	//		_screen = state->isScreen();
-	//		if (_screen)
-	//			_state->toggleScreen();
-	//	}
-	//}
+	if (_popup == WindowPopup::POPUP_NONE)
+	{
+		_popupStep = 1.0;
+	}
+	else
+	{
+		_surfaceComponent.getSurface()->setHidden(true);
+
+		_timer->start();
+		if (_state != 0)
+		{
+			_screen = state->isScreen();
+			if (_screen)
+				_state->toggleScreen();
+		}
+	}
 }
 
 WindowComponent::~WindowComponent()
@@ -106,129 +113,136 @@ void WindowComponent::popup()
 	//		soundPopup[sound]->play(Mix_GroupAvailable(0));
 	//	}
 	//}
-	//if (_popupStep < 1.0)
-	//{
-	//	_popupStep += POPUP_SPEED;
-	//}
-	//else
-	//{
-	//	if (_screen)
-	//	{
-	//		_state->toggleScreen();
-	//	}
-	//	_state->showAll();
-	//	_popupStep = 1.0;
-	//	_timer->stop();
-	//}
-	//_redraw = true;
+	if (_popupStep < 1.0)
+	{
+		_popupStep += POPUP_SPEED;
+	}
+	else
+	{
+		if (_screen)
+		{
+			_state->toggleScreen();
+		}
+		_state->showAll();
+		_popupStep = 1.0;
+		_timer->stop();
+	}
+
+	Surface* windowSurface = _surfaceComponent.getSurface();
+	windowSurface->setRedraw(true);
 }
 
 /// Draws the window.
 void WindowComponent::draw()
 {
-	//Surface::draw();
-	//SDL_Rect square;
+	Surface* windowSurface = _surfaceComponent.getSurface();
+	windowSurface->draw();
 
-	//if (_popup == POPUP_HORIZONTAL || _popup == POPUP_BOTH)
-	//{
-	//	square.x = (int)((getWidth() - getWidth() * _popupStep) / 2);
-	//	square.w = (int)(getWidth() * _popupStep);
-	//}
-	//else
-	//{
-	//	square.x = 0;
-	//	square.w = getWidth();
-	//}
-	//if (_popup == POPUP_VERTICAL || _popup == POPUP_BOTH)
-	//{
-	//	square.y = (int)((getHeight() - getHeight() * _popupStep) / 2);
-	//	square.h = (int)(getHeight() * _popupStep);
-	//}
-	//else
-	//{
-	//	square.y = 0;
-	//	square.h = getHeight();
-	//}
+	SDL_Rect square;
 
-	//int mul = 1;
-	//if (_contrast)
-	//{
-	//	mul = 2;
-	//}
-	//Uint8 color = _color + 3 * mul;
+	Sint16 width = windowSurface->getWidth();
+	Sint16 height = windowSurface->getHeight();
 
-	//if (_thinBorder)
-	//{
-	//	color = _color + 1 * mul;
-	//	for (int i = 0; i < 5; ++i)
-	//	{
-	//		drawRect(&square, color);
+	if (_popup == WindowPopup::POPUP_HORIZONTAL || _popup == WindowPopup::POPUP_BOTH)
+	{
+		square.x = (Sint16)((width - (width * _popupStep)) / 2);
+		square.w = (Sint16)(width * _popupStep);
+	}
+	else
+	{
+		square.x = 0;
+		square.w = width;
+	}
+	if (_popup == WindowPopup::POPUP_VERTICAL || _popup == WindowPopup::POPUP_BOTH)
+	{
+		square.y = (Sint16)((height - (height * _popupStep)) / 2);
+		square.h = (Sint16)(height * _popupStep);
+	}
+	else
+	{
+		square.y = 0;
+		square.h = height;
+	}
 
-	//		if (i % 2 == 0)
-	//		{
-	//			square.x++;
-	//			square.y++;
-	//		}
-	//		square.w--;
-	//		square.h--;
+	int mul = 1;
+	if (_contrast)
+	{
+		mul = 2;
+	}
+	Uint8 color = _color + 3 * mul;
 
-	//		switch (i)
-	//		{
-	//		case 0:
-	//			color = _color + 5 * mul;
-	//			setPixel(square.w, 0, color);
-	//			break;
-	//		case 1:
-	//			color = _color + 2 * mul;
-	//			break;
-	//		case 2:
-	//			color = _color + 4 * mul;
-	//			setPixel(square.w + 1, 1, color);
-	//			break;
-	//		case 3:
-	//			color = _color + 3 * mul;
-	//			break;
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	for (int i = 0; i < 5; ++i)
-	//	{
-	//		drawRect(&square, color);
-	//		if (i < 2)
-	//			color -= 1 * mul;
-	//		else
-	//			color += 1 * mul;
-	//		square.x++;
-	//		square.y++;
-	//		if (square.w >= 2)
-	//			square.w -= 2;
-	//		else
-	//			square.w = 1;
+	if (_thinBorder)
+	{
+		color = _color + 1 * mul;
+		for (int i = 0; i < 5; ++i)
+		{
+			windowSurface->drawRect(&square, color);
 
-	//		if (square.h >= 2)
-	//			square.h -= 2;
-	//		else
-	//			square.h = 1;
-	//	}
-	//	if (_innerColor != 0)
-	//	{
-	//		drawRect(&square, _innerColor);
-	//	}
-	//}
+			if (i % 2 == 0)
+			{
+				square.x++;
+				square.y++;
+			}
+			square.w--;
+			square.h--;
 
-	//if (_bg != 0)
-	//{
-	//	auto crop = _bg->getCrop();
-	//	crop.getCrop()->x = square.x - _dx;
-	//	crop.getCrop()->y = square.y - _dy;
-	//	crop.getCrop()->w = square.w;
-	//	crop.getCrop()->h = square.h;
-	//	crop.setX(square.x);
-	//	crop.setY(square.y);
-	//	crop.blit(this);
-	//}
+			switch (i)
+			{
+			case 0:
+				color = _color + 5 * mul;
+				windowSurface->setPixel(square.w, 0, color);
+				break;
+			case 1:
+				color = _color + 2 * mul;
+				break;
+			case 2:
+				color = _color + 4 * mul;
+				windowSurface->setPixel(square.w + 1, 1, color);
+				break;
+			case 3:
+				color = _color + 3 * mul;
+				break;
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			windowSurface->drawRect(&square, color);
+			if (i < 2)
+				color -= 1 * mul;
+			else
+				color += 1 * mul;
+			square.x++;
+			square.y++;
+			if (square.w >= 2)
+				square.w -= 2;
+			else
+				square.w = 1;
+
+			if (square.h >= 2)
+				square.h -= 2;
+			else
+				square.h = 1;
+		}
+		if (_innerColor != 0)
+		{
+			windowSurface->drawRect(&square, _innerColor);
+		}
+	}
+
+	if (_bg != 0)
+	{
+		auto crop = _bg->getCrop();
+		crop.getCrop()->x = square.x - _dx;
+		crop.getCrop()->y = square.y - _dy;
+		crop.getCrop()->w = square.w;
+		crop.getCrop()->h = square.h;
+		crop.setX(square.x);
+		crop.setY(square.y);
+		crop.blit(windowSurface);
+	}
 }
 
 /// sets the X delta.

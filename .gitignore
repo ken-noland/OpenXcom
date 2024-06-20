@@ -74,7 +74,6 @@ Dependencies/
 translations/
 *.*.user
 !install/win/plugins/**/*.dll
-!deps/entt
 #Ignore Vim swap files
 *.swp
 #Ignore NetBeans project directory

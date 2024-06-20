@@ -45,8 +45,9 @@ class WindowComponent
 {
 protected:
 	SurfaceComponent& _surfaceComponent;
+	DrawableComponent& _drawableComponent;
 
-	static const double POPUP_SPEED;
+	static const double POPUP_SPEED;	//KN NOTE: this should be a data driven parameter, not a static constant.
 	int _dx, _dy;
 	const Surface* _bg;
 	Uint8 _color;
@@ -59,7 +60,7 @@ protected:
 	bool _mute;
 
 public:
-	WindowComponent(SurfaceComponent& surfaceComponent, State* state, WindowPopup popup);
+	WindowComponent(SurfaceComponent& surfaceComponent, DrawableComponent& drawableComponent, State* state, WindowPopup popup);
 	~WindowComponent();
 
 	/// Sets the background surface.

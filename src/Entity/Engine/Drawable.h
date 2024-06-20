@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,32 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Interface.h"
-#include "Window.h"
+#include "Delegate.h"
 
 namespace OpenXcom
 {
 
-InterfaceFactory::InterfaceFactory(entt::registry& registry, SurfaceFactory& sf)
-	: _registry(registry), _surfaceFactory(sf)
+using DrawableCallback = std::function<void()>;
+
+class DrawableComponent
 {
-}
+	MulticastDelegate<void()> _drawables;
 
-InterfaceFactory::~InterfaceFactory()
-{
-}
+public:
+	DrawableComponent();
+	~DrawableComponent();
 
+	/// Adds a drawable to the list.
+	void addDrawable(const DrawableCallback& drawable);
 
-entt::entity InterfaceFactory::createWindow(const std::string& name, State* state, int width, int height, int x, int y, WindowPopup popup)
-{
-	entt::entity entity = _surfaceFactory.createSurface(name, width, height, x, y);
+	/// Draws all drawables.
+	void draw();
+};
 
-	SurfaceComponent& surfaceComponent = _registry.get<SurfaceComponent>(entity);
-	DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
-	_registry.emplace<WindowComponent>(entity, surfaceComponent, drawableComponent, state, popup);
-
-	return entity;
-}
-
-
-}
+} // namespace OpenXcom

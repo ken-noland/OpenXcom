@@ -17,10 +17,24 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Surface.h"
+#include "Drawable.h"
 #include "../Common/Named.h"
+#include "../../Engine/Game.h"
+#include "../../Engine/Screen.h"
 
 namespace OpenXcom
 {
+
+SurfaceComponent::SurfaceComponent(DrawableComponent& drawable, std::unique_ptr<Surface>& surface)
+	: _surface(std::move(surface))
+{
+	drawable.addDrawable(std::bind(&SurfaceComponent::blit, this));
+}
+
+void SurfaceComponent::blit()
+{
+	_surface->blit(getGame()->getScreen()->getSurface());
+}
 
 SurfaceFactory::SurfaceFactory(entt::registry& registry)
 	: _registry(registry)
@@ -36,8 +50,10 @@ entt::entity SurfaceFactory::createSurface(const std::string& name, int width, i
 	entt::entity entity = _registry.create();
 	_registry.emplace<NamedComponent>(entity, name);
 
+	DrawableComponent& drawable = _registry.emplace<DrawableComponent>(entity);
+
 	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
-	_registry.emplace<SurfaceComponent>(entity, std::move(surface));
+	_registry.emplace<SurfaceComponent>(entity, drawable, surface);
 
 	return entity;
 }
