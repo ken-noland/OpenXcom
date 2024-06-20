@@ -71,7 +71,7 @@ ScannerState::ScannerState(BattleAction* action)
 	_bg->onKeyboardPress((ActionHandler)&ScannerState::exitClick, Options::keyCancel);
 
 	_timerAnimate = new Timer(125);
-	_timerAnimate->onTimer((StateHandler)&ScannerState::animate);
+	_timerAnimate->onState(std::bind(&ScannerState::animate, this));
 	_timerAnimate->start();
 
 	update();

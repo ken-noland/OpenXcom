@@ -80,7 +80,7 @@ void ErrorMessageState::create(const std::string &str, SDL_Color *palette, Uint8
 	centerAllSurfaces();
 
 	// Set up objects
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.setColor(color);
 	windowComponent.setBackground(getGame()->getMod()->getSurface(bg));
 

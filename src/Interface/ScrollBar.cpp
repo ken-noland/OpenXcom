@@ -141,7 +141,7 @@ void ScrollBar::setBackground(Surface* bg)
  */
 void ScrollBar::setBackground(entt::entity& bgEntity)
 {
-	Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(bgEntity).getSurface();
+	Surface* surface = getRegistry().raw().get<SurfaceComponent>(bgEntity).getSurface();
 	_bg = surface;
 }
 

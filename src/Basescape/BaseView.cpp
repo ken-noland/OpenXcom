@@ -58,7 +58,8 @@ BaseView::BaseView(int width, int height, int x, int y) : InteractiveSurface(wid
 	}
 
 	_timer = new Timer(100);
-	_timer->onTimer((SurfaceHandler)&BaseView::blink);
+	_timer->onTimer(std::bind(&BaseView::blink, this));
+
 	_timer->start();
 }
 

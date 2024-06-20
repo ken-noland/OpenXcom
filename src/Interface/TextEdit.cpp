@@ -43,7 +43,7 @@ TextEdit::TextEdit(State *state, int width, int height, int x, int y) : Interact
 	_isFocused = false;
 	_text = new Text(width, height, 0, 0);
 	_timer = new Timer(100);
-	_timer->onTimer((SurfaceHandler)&TextEdit::blink);
+	_timer->onTimer(std::bind(&TextEdit::blink, this));
 	_caret = new Text(16, 17, 0, 0);
 	_caret->setText("|");
 }

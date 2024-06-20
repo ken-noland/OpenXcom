@@ -112,7 +112,7 @@ BaseDefenseState::BaseDefenseState(Base* base, Ufo* ufo, GeoscapeState* state)
 	_gravShields = _base->getGravShields();
 	_defenses = (int)_base->getDefenses().size();
 	_timer = new Timer(250);
-	_timer->onTimer((StateHandler)&BaseDefenseState::nextStep);
+	_timer->onState(std::bind(&BaseDefenseState::nextStep, this));
 
 	_explosionCount = 0;
 

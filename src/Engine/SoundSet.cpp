@@ -66,7 +66,7 @@ static const Uint8 header[] = {  'R',  'I',  'F',  'F', 0x00, 0x00, 0x00, 0x00, 
  */
 void SoundSet::writeWAV(SDL_RWops *dest, Uint8 *sound, size_t size, bool resample) const {
 	SDL_RWwrite(dest, header, sizeof(header), 1);
-	int newsize = size;
+	int newsize = (int)size;
 
 	if (resample) {
 		auto newsound = SDL_malloc(2*size);
@@ -74,7 +74,7 @@ void SoundSet::writeWAV(SDL_RWops *dest, Uint8 *sound, size_t size, bool resampl
 		SDL_RWwrite(dest, newsound, newsize, 1);
 		SDL_free(newsound);
 	} else {
-		SDL_RWwrite(dest, sound, size, 1);
+		SDL_RWwrite(dest, sound, newsize, 1);
 	}
 
 	// update the header

@@ -222,9 +222,9 @@ CraftEquipmentState::CraftEquipmentState(Base* base, size_t craft) : State("Craf
 	_btnOk->onKeyboardRelease((ActionHandler)&CraftEquipmentState::btnQuickSearchToggle, Options::keyToggleQuickSearch);
 
 	_timerLeft = new Timer(250);
-	_timerLeft->onTimer((StateHandler)&CraftEquipmentState::moveLeft);
+	_timerLeft->onState(std::bind(&CraftEquipmentState::moveLeft, this));
 	_timerRight = new Timer(250);
-	_timerRight->onTimer((StateHandler)&CraftEquipmentState::moveRight);
+	_timerRight->onState(std::bind(&CraftEquipmentState::moveRight, this));
 }
 
 /**

@@ -91,7 +91,7 @@ BriefingState::BriefingState(Craft* craft, Base* base, bool infoOnly, BriefingDa
 	std::string title = mission;
 	std::string desc = title + "_BRIEFING";
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	if (!deployment && !customBriefing) // none defined - should never happen, but better safe than sorry i guess.
 	{
 		setStandardPalette("PAL_GEOSCAPE", 0);

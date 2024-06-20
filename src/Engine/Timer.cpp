@@ -48,7 +48,7 @@ int Timer::maxFrameSkip = 8; // this is a pretty good default at 60FPS.
  * @param interval Time interval in milliseconds.
  * @param frameSkipping Use frameskipping.
  */
-Timer::Timer(Uint32 interval, bool frameSkipping) : _start(0), _frameSkipStart(0), _interval(interval), _running(false), _frameSkipping(frameSkipping), _state(0), _surface(0)
+Timer::Timer(Uint32 interval, bool frameSkipping) : _start(0), _frameSkipStart(0), _interval(interval), _running(false), _frameSkipping(frameSkipping)
 {
 	Timer::maxFrameSkip = Options::maxFrameSkip;
 }
@@ -117,9 +117,9 @@ void Timer::think(State* state, Surface* surface)
 		{
 			for (int i = 0; i <= maxFrameSkip && isRunning() && (now - _frameSkipStart) >= _interval; ++i)
 			{
-				if (state != 0 && _state != 0)
+				if (state && _stateFunction)
 				{
-					(state->*_state)();
+					_stateFunction();
 				}
 				_frameSkipStart += _interval;
 				// breaking here after one iteration effectively returns this function to its old functionality:
@@ -127,9 +127,9 @@ void Timer::think(State* state, Surface* surface)
 					break; // if game isn't set, we can't verify *state
 			}
 
-			if (_running && surface != 0 && _surface != 0)
+			if (surface && _timerFunction)
 			{
-				(surface->*_surface)();
+				_timerFunction();
 			}
 			_start = slowTick();
 			if (_start > _frameSkipStart) _frameSkipStart = _start; // don't play animations in ffwd to catch up :P
@@ -150,18 +150,18 @@ void Timer::setInterval(Uint32 interval)
  * Sets a state function for the timer to call every interval.
  * @param handler Event handler.
  */
-void Timer::onTimer(StateHandler handler)
+void Timer::onState(StateHandler handler)
 {
-	_state = handler;
+	_stateFunction = handler;
 }
 
 /**
  * Sets a surface function for the timer to call every interval.
  * @param handler Event handler.
  */
-void Timer::onTimer(SurfaceHandler handler)
+void Timer::onTimer(TimerHandler handler)
 {
-	_surface = handler;
+	_timerFunction = handler;
 }
 
 }

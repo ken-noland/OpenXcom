@@ -753,7 +753,7 @@ void TextList::setBackground(Surface* bg)
  */
 void TextList::setBackground(entt::entity& bgEntity)
 {
-	Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(bgEntity).getSurface();
+	Surface* surface = getRegistry().raw().get<SurfaceComponent>(bgEntity).getSurface();
 	_bg = surface;
 	_scrollbar->setBackground(_bg);
 }

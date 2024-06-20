@@ -35,7 +35,7 @@ namespace OpenXcom
 ArrowButton::ArrowButton(ArrowShape shape, int width, int height, int x, int y) : ImageButton(width, height, x, y), _shape(shape), _list(0)
 {
 	_timer = new Timer(50);
-	_timer->onTimer((SurfaceHandler)&ArrowButton::scroll);
+	_timer->onTimer(std::bind(&ArrowButton::scroll, this));
 }
 
 /**

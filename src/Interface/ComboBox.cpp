@@ -72,7 +72,7 @@ ComboBox::ComboBox(State *state, int width, int height, int x, int y, bool popup
 	int popupY = getPopupWindowY(height, y, popupHeight, popupAboveButton);
 	_window = factory.createWindow("windowName", state, width, popupHeight, x, popupY);
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.setThinBorder();
 
 	_list = new TextList(width - HORIZONTAL_MARGIN * 2 - BUTTON_WIDTH + 1,
@@ -94,7 +94,7 @@ ComboBox::ComboBox(State *state, int width, int height, int x, int y, bool popup
  */
 ComboBox::~ComboBox()
 {
-	getGame()->getRegistry().destroy(_window);
+	getRegistry().raw().destroy(_window);
 
 	delete _button;
 	delete _arrow;
@@ -111,7 +111,7 @@ void ComboBox::setX(int x)
 	_button->setX(x);
 	_arrow->setX(x + getWidth() - BUTTON_WIDTH);
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	windowSurface->setX(x);
 
 	_list->setX(x + HORIZONTAL_MARGIN);
@@ -127,7 +127,7 @@ void ComboBox::setY(int y)
 	_button->setY(y);
 	_arrow->setY(y + 4);
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 
 	int popupHeight = windowSurface->getHeight();
 	int popupY = getPopupWindowY(getHeight(), y, popupHeight, _popupAboveButton);
@@ -150,7 +150,7 @@ void ComboBox::setPalette(const SDL_Color *colors, int firstcolor, int ncolors)
 	_button->setPalette(colors, firstcolor, ncolors);
 	_arrow->setPalette(colors, firstcolor, ncolors);
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	windowSurface->setPalette(colors, firstcolor, ncolors);
 
 	_list->setPalette(colors, firstcolor, ncolors);
@@ -175,7 +175,7 @@ void ComboBox::initText(Font *big, Font *small, Language *lang)
  */
 void ComboBox::setBackground(Surface *bg)
 {
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.setBackground(bg);
 }
 
@@ -189,7 +189,7 @@ void ComboBox::setColor(Uint8 color)
 	drawArrow();
 	_button->setColor(_color);
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.setColor(_color);
 
 	_list->setColor(_color);
@@ -254,7 +254,7 @@ void ComboBox::setHighContrast(bool contrast)
 {
 	_button->setHighContrast(contrast);
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.setHighContrast(contrast);
 
 	_list->setHighContrast(contrast);
@@ -321,7 +321,7 @@ void ComboBox::setSelected(size_t sel)
  */
 void ComboBox::setDropdown(int options)
 {
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 
 	int items = std::min(options, MAX_ITEMS);
 	int h = _button->getFont()->getHeight() + _button->getFont()->getSpacing();
@@ -371,7 +371,7 @@ void ComboBox::blit(SDL_Surface *surface)
 		_button->blit(surface);
 		_arrow->blit(surface);
 
-		Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+		Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 		windowSurface->blit(surface);
 
 		_list->blit(surface);
@@ -392,7 +392,7 @@ void ComboBox::handle(Action *action, State *state)
 	_list->handle(action, state);
 	InteractiveSurface::handle(action, state);
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	int topY = std::min(getY(), windowSurface->getY());
 
 	if (windowSurface->getVisible() && action->getDetails()->type == SDL_MOUSEBUTTONDOWN &&
@@ -419,7 +419,7 @@ void ComboBox::think()
 	_button->think();
 	_arrow->think();
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.think();
 
 	_list->think();
@@ -433,7 +433,7 @@ void ComboBox::think()
  */
 void ComboBox::toggle(bool first, bool listClick)
 {
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 
 	windowSurface->setVisible(!windowSurface->getVisible());
 	_list->setVisible(!_list->getVisible());

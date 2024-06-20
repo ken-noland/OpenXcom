@@ -84,7 +84,7 @@ MiniMapState::MiniMapState(Camera* camera, SavedBattleGame* battleGame)
 	_txtLevel->setHighContrast(true);
 	_txtLevel->setText(tr("STR_LEVEL_SHORT").arg(camera->getViewLevel()));
 	_timerAnimate = new Timer(125);
-	_timerAnimate->onTimer((StateHandler)&MiniMapState::animate);
+	_timerAnimate->onState(std::bind(&MiniMapState::animate, this));
 	_timerAnimate->start();
 	_miniMapView->draw();
 }

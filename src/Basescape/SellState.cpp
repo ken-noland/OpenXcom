@@ -69,9 +69,9 @@ SellState::SellState(Base* base, DebriefingState* debriefingState, OptionsOrigin
 	_reset(false), _sellAllButOne(false), _delayedInitDone(false), _previousSort(TransferSortDirection::BY_LIST_ORDER), _currentSort(TransferSortDirection::BY_LIST_ORDER)
 {
 	_timerInc = new Timer(250);
-	_timerInc->onTimer((StateHandler)&SellState::increase);
+	_timerInc->onState(std::bind(&SellState::increase, this));
 	_timerDec = new Timer(250);
-	_timerDec->onTimer((StateHandler)&SellState::decrease);
+	_timerInc->onState(std::bind(&SellState::decrease, this));
 }
 
 /**

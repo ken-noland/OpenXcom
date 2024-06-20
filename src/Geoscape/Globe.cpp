@@ -345,10 +345,10 @@ Globe::Globe(Game* game, int cenX, int cenY, int width, int height, int x, int y
 
 	// Animation timers
 	_blinkTimer = new Timer(100);
-	_blinkTimer->onTimer((SurfaceHandler)&Globe::blink);
+	_blinkTimer->onTimer(std::bind(&Globe::blink, this));
 	_blinkTimer->start();
 	_rotTimer = new Timer(10);
-	_rotTimer->onTimer((SurfaceHandler)&Globe::rotate);
+	_rotTimer->onTimer(std::bind(&Globe::rotate, this));
 
 	_cenLon = _game->getSavedGame()->getGlobeLongitude();
 	_cenLat = _game->getSavedGame()->getGlobeLatitude();

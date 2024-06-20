@@ -50,7 +50,7 @@ AliensCrashState::AliensCrashState() : State("AliensCrashState", true)
 
 	centerAllSurfaces();
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 
 	// Set up objects
 	windowComponent.setHighContrast(true);

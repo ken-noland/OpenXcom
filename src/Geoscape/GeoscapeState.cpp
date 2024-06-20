@@ -429,13 +429,13 @@ GeoscapeState::GeoscapeState()
 		_txtSec->setX(_txtSec->getX()-10);
 	}
 
-	_gameTimer->onTimer((StateHandler)&GeoscapeState::timeAdvance);
+	_gameTimer->onState(std::bind(&GeoscapeState::timeAdvance, this));
 	_gameTimer->start();
 
-	_zoomInEffectTimer->onTimer((StateHandler)&GeoscapeState::zoomInEffect);
-	_zoomOutEffectTimer->onTimer((StateHandler)&GeoscapeState::zoomOutEffect);
-	_dogfightStartTimer->onTimer((StateHandler)&GeoscapeState::startDogfight);
-	_dogfightTimer->onTimer((StateHandler)&GeoscapeState::handleDogfights);
+	_zoomInEffectTimer->onState(std::bind(&GeoscapeState::zoomInEffect, this));
+	_zoomOutEffectTimer->onState(std::bind(&GeoscapeState::zoomOutEffect, this));
+	_dogfightStartTimer->onState(std::bind(&GeoscapeState::startDogfight, this));
+	_dogfightTimer->onState(std::bind(&GeoscapeState::handleDogfights, this));
 
 	// debug helpers
 	{
@@ -4441,7 +4441,7 @@ void GeoscapeState::resize(int &dX, int &dY)
 
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		if (surface != _globe)
 		{
 			surface->setX(surface->getX() + dX);

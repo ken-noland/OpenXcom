@@ -169,9 +169,9 @@ ManageAlienContainmentState::ManageAlienContainmentState(Base* base, int prisonT
 	_lstAliens->onMousePress((ActionHandler)&ManageAlienContainmentState::lstItemsMousePress);
 
 	_timerInc = new Timer(250);
-	_timerInc->onTimer((StateHandler)&ManageAlienContainmentState::increase);
+	_timerInc->onState(std::bind(&ManageAlienContainmentState::increase, this));
 	_timerDec = new Timer(250);
-	_timerDec->onTimer((StateHandler)&ManageAlienContainmentState::decrease);
+	_timerDec->onState(std::bind(&ManageAlienContainmentState::decrease, this));
 }
 
 /**

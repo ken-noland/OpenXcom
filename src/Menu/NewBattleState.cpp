@@ -940,12 +940,12 @@ void NewBattleState::fillList(NewBattleSelectType selectType, bool isRightClick)
 		firstRun = true;
 		for (entt::entity surfaceEnt : _surfaces)
 		{
-			Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+			Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 			_surfaceBackup[surface] = surface->getVisible();
 			surface->setVisible(false);
 		}
 
-		Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+		Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 		windowSurface->setVisible(true);
 
 		_txtTitle->setVisible(true);

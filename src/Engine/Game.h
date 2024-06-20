@@ -84,9 +84,7 @@ private:
 	bool _ctrl, _alt, _shift, _rmb, _mmb;
 	static const double VOLUME_GRADIENT;
 
-
 	///TEMP!!!
-	entt::registry _registry;
 	SurfaceFactory _surfaceFactory;
 	InterfaceFactory _interfaceFactory;
 
@@ -206,9 +204,7 @@ public:
 	/// Gets the geoScapeState
 	GeoscapeState *getGeoscapeState() const;
 
-
 	///TEMP!!!
-	entt::registry& getRegistry() { return _registry; }
 	SurfaceFactory& getSurfaceFactory() { return _surfaceFactory; }
 	InterfaceFactory& getInterfaceFactory() { return _interfaceFactory; }
 };

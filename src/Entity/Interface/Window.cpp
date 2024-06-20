@@ -30,8 +30,8 @@ WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, State* stat
 	_dx = -surfaceComponent.getSurface()->getX();
 	_dy = -surfaceComponent.getSurface()->getY();
 
-	//_timer = new Timer(10);
-	//_timer->onTimer((SurfaceHandler)&WindowComponent::popup);
+	_timer = new Timer(10);
+	_timer->onTimer(std::bind(&WindowComponent::popup, this));
 
 	//if (_popup == WindowPopup::POPUP_NONE)
 	//{
@@ -52,7 +52,7 @@ WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, State* stat
 
 WindowComponent::~WindowComponent()
 {
-	//delete _timer;
+	delete _timer;
 }
 
 /// Sets the background surface.

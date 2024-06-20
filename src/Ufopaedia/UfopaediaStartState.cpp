@@ -59,7 +59,7 @@ UfopaediaStartState::UfopaediaStartState()
 	// set background window
 	_window = factory.createWindow("windowName", this, 256, 180 + _heightOffset, 32, 10 - _windowOffset, WindowPopup::POPUP_BOTH);
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.setInnerColor(239); // almost black = darkest index from backpals.dat
 
 	// set title
@@ -97,7 +97,7 @@ UfopaediaStartState::UfopaediaStartState()
 	_btnScrollDown = new ArrowButton(ARROW_BIG_DOWN, 13, 14, 270, y - 15);
 	add(_btnScrollDown, "button1", "ufopaedia");
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 
 	updateButtons();
 	if (!_btnSections.empty())
@@ -129,7 +129,7 @@ UfopaediaStartState::UfopaediaStartState()
 	_btnScrollDown->onMouseRelease((ActionHandler)&UfopaediaStartState::btnScrollRelease);
 
 	_timerScroll = new Timer(50);
-	_timerScroll->onTimer((StateHandler)&UfopaediaStartState::scroll);
+	_timerScroll->onState(std::bind(&UfopaediaStartState::scroll, this));
 }
 
 /**

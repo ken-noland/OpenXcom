@@ -42,7 +42,7 @@ WarningMessage::WarningMessage(int width, int height, int x, int y) : Surface(wi
 	_text->setWordWrap(true);
 
 	_timer = new Timer(50);
-	_timer->onTimer((SurfaceHandler)&WarningMessage::fade);
+	_timer->onState(std::bind(&WarningMessage::fade, this));
 
 	setVisible(false);
 }

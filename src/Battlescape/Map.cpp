@@ -148,14 +148,17 @@ Map::Map(Game *game, int width, int height, int x, int y, int visibleMapHeight) 
 	_message->setY((visibleMapHeight - _message->getHeight()) / 2);
 	_message->setTextColor(_messageColor);
 	_camera = new Camera(_spriteWidth, _spriteHeight, _save->getMapSizeX(), _save->getMapSizeY(), _save->getMapSizeZ(), this, visibleMapHeight);
+
 	_scrollMouseTimer = new Timer(SCROLL_INTERVAL);
-	_scrollMouseTimer->onTimer((SurfaceHandler)&Map::scrollMouse);
+	_scrollMouseTimer->onTimer(std::bind(&Map::scrollMouse, this));
+
 	_scrollKeyTimer = new Timer(SCROLL_INTERVAL);
-	_scrollKeyTimer->onTimer((SurfaceHandler)&Map::scrollKey);
+	_scrollKeyTimer->onTimer(std::bind(&Map::scrollKey, this));
 	_camera->setScrollTimer(_scrollMouseTimer, _scrollKeyTimer);
+
 	_obstacleTimer = new Timer(2500);
 	_obstacleTimer->stop();
-	_obstacleTimer->onTimer((SurfaceHandler)&Map::disableObstacles);
+	_obstacleTimer->onTimer(std::bind(&Map::disableObstacles, this));
 
 	_txtAccuracy = new Text(44, 18, 0, 0);
 	_txtAccuracy->setSmall();
@@ -196,7 +199,7 @@ Map::Map(Game *game, int width, int height, int x, int y, int visibleMapHeight) 
 	_fadeShade = 16;
 	_nvColor = 0;
 	_fadeTimer = new Timer(FADE_INTERVAL);
-	_fadeTimer->onTimer((SurfaceHandler)&Map::fadeShade);
+	_fadeTimer->onTimer(std::bind(&Map::fadeShade, this));
 	_fadeTimer->start();
 
 	auto enviro = _save->getEnviroEffects();
