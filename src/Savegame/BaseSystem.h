@@ -24,19 +24,14 @@ namespace OpenXcom
 
 namespace BaseSystem
 {
-	// Gets the index of a given base entity.
-	[[nodiscard]] int getBaseIndex(const entt::registry& registry, entt::entity baseId);
-	// Adds up the cost of variable number of member functions for all bases.
-	template<typename... Funcs>
-	[[nodiscard]] static int64_t getBasesTotal(Funcs... funcs);
 	// Gets the total maintiance cost for all bases.
 	[[nodiscard]] int64_t getBasesMaintenanceCost();
 	// Gets if an item is in storage at any base.
-	[[nodiscard]] bool isItemInBaseStores(const entt::registry& registry, const std::string& itemType);
+	[[nodiscard]] bool isItemInBaseStores(const std::string& itemType);
 	// Gets if a facility is built at any base.
-	[[nodiscard]] bool isFacilityBuilt(const entt::registry& registry, const std::string& facilityType);
+	[[nodiscard]] bool isFacilityBuilt(const std::string& facilityType);
 	// Gets if a solider types is hired at any base.
-	[[nodiscard]] bool isSoldierTypeHired(const entt::registry& registry, const std::string& soldierType);
+	[[nodiscard]] bool isSoldierTypeHired(const std::string& soldierType);
 }
 
 }

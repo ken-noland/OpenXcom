@@ -987,7 +987,8 @@ namespace OpenXcom
 						ufo->setSecondsRemaining(0);
 					}
 
-					_save->getUfos().push_back(ufo);
+					
+					getRegistry().insert<Ufo>(ufo);
 				}
 			}
 		}

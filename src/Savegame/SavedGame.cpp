@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -28,6 +28,7 @@
 #include "AlienBase.h"
 #include "AlienMission.h"
 #include "AlienStrategy.h"
+#include "AreaSystem.h"
 #include "Base.h"
 #include "BaseSystem.h"
 #include "BaseFacility.h"
@@ -2064,15 +2065,6 @@ void SavedGame::setDebugMode()
 }
 
 /**
- * Gets the current debug mode.
- * @return Debug mode.
- */
-bool SavedGame::getDebugMode() const
-{
-	return _debug;
-}
-
-/**
  * Find a mission type in the active alien missions.
  * @param region The region string ID.
  * @param objective The active mission objective.
@@ -2116,90 +2108,6 @@ AlienMission *SavedGame::findAlienMission(const std::string &region, MissionObje
 }
 
 /**
- * return the list of monthly maintenance costs
- * @return list of maintenances.
- */
-std::vector<int64_t> &SavedGame::getMaintenances()
-{
-	return _maintenance;
-}
-
-/**
- * adds to this month's research score
- * @param score the amount to add.
- */
-void SavedGame::addResearchScore(int score)
-{
-	_researchScores.back() += score;
-}
-
-/**
- * return the list of research scores
- * @return list of research scores.
- */
-std::vector<int> &SavedGame::getResearchScores()
-{
-	return _researchScores;
-}
-
-/**
- * return the list of income scores
- * @return list of income scores.
- */
-std::vector<int64_t> &SavedGame::getIncomes()
-{
-	return _incomes;
-}
-
-/**
- * return the list of expenditures scores
- * @return list of expenditures scores.
- */
-std::vector<int64_t> &SavedGame::getExpenditures()
-{
-	return _expenditures;
-}
-
-/**
- * return if the player has been
- * warned about poor performance.
- * @return true or false.
- */
-bool SavedGame::getWarned() const
-{
-	return _warned;
-}
-
-/**
- * sets the player's "warned" status.
- * @param warned set "warned" to this.
- */
-void SavedGame::setWarned(bool warned)
-{
-	_warned = warned;
-}
-
-/**
- * Find the region containing this target.
- * @param target The target to locate.
- * @return Pointer to the region, or 0.
- */
-Region *SavedGame::locateRegion(const Target &target) const
-{
-	return locateRegion(target.getLongitude(), target.getLatitude());
-}
-
-/**
- * Find the country containing this target.
- * @param target The target to locate.
- * @return Pointer to the country, or 0.
- */
-const Country* SavedGame::locateCountry(const Target& target) const
-{
-	return locateCountry(target.getLongitude(), target.getLatitude());
-}
-
-/**
  * Select a soldier nationality based on mod rules and location on the globe.
  */
 int SavedGame::selectSoldierNationalityByLocation(const Mod* mod, const RuleSoldier* rule, const Target* target) const
@@ -2211,8 +2119,7 @@ int SavedGame::selectSoldierNationalityByLocation(const Mod* mod, const RuleSold
 
 	if (mod->getHireByCountryOdds() > 0 && RNG::percent(mod->getHireByCountryOdds()))
 	{
-		const Country* country = locateCountry(*target);
-		if (country)
+		if (const Country* country = AreaSystem::locateValue<Country>(*target))
 		{
 			int nationality = 0;
 			for (auto* namepool : rule->getNames())
@@ -2229,8 +2136,7 @@ int SavedGame::selectSoldierNationalityByLocation(const Mod* mod, const RuleSold
 
 	if (mod->getHireByRegionOdds() > 0 && RNG::percent(mod->getHireByRegionOdds()))
 	{
-		Region* region = locateRegion(*target);
-		if (region)
+		if (const Region* region = AreaSystem::locateValue<Region>(*target))
 		{
 			// build a new name pool collection, filtered by the region
 			std::vector<std::pair<SoldierNamePool*, int> > filteredNames;
@@ -2356,23 +2262,10 @@ std::vector<Soldier*> SavedGame::getAllActiveSoldiers() const
 	return soldiers;
 }
 
-/**
- * Sets the last selected armor.
- * @param value The new value for last selected armor - Armor type string.
- */
-
-void SavedGame::setLastSelectedArmor(const std::string &value)
+/// Gets the last selected player base.
+[[nodiscard]] entt::entity SavedGame::getSelectedBase() const
 {
-	_lastselectedArmor = value;
-}
-
-/**
- * Gets the last selected armor
- * @return last used armor type string
- */
-std::string SavedGame::getLastSelectedArmor() const
-{
-	return _lastselectedArmor;
+	return getRegistry().next<Base>(_selectedBaseIndex);
 }
 
 /**
@@ -2448,15 +2341,6 @@ const std::string &SavedGame::getGlobalCraftLoadoutName(int index) const
 void SavedGame::setGlobalCraftLoadoutName(int index, const std::string &name)
 {
 	_globalCraftLoadoutName[index] = name;
-}
-
-/**
- * Returns the list of mission statistics.
- * @return Pointer to statistics list.
- */
-std::vector<MissionStatistics*>& SavedGame::getMissionStatistics()
-{
-	return _missionStatistics;
 }
 
 /**
@@ -2582,22 +2466,6 @@ void SavedGame::stopHuntingXcomCrafts(Base *base)
 			ufo.resetOriginalDestination(xcraft);
 		}
 	}
-}
-
-/**
- * Should all xcom soldiers have completely empty starting inventory when doing base equipment?
- */
-bool SavedGame::getDisableSoldierEquipment() const
-{
-	return _disableSoldierEquipment;
-}
-
-/**
- * Sets the corresponding flag.
- */
-void SavedGame::setDisableSoldierEquipment(bool disableSoldierEquipment)
-{
-	_disableSoldierEquipment = disableSoldierEquipment;
 }
 
 /**

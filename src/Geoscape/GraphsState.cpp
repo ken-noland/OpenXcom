@@ -1067,8 +1067,8 @@ void GraphsState::drawRegionLines()
 void GraphsState::drawFinanceLines()
 {
 	//set up array
-	int upperLimit = 0;
-	int lowerLimit = 0;
+	int64_t upperLimit = 0;
+	int64_t lowerLimit = 0;
 	int64_t incomeTotals[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int64_t balanceTotals[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	int64_t expendTotals[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -1178,19 +1178,19 @@ void GraphsState::drawFinanceLines()
 			switch(button)
 			{
 			case 0:
-				reduction = incomeTotals[iter] / units;
+				reduction = static_cast<int>(incomeTotals[iter] / units);
 				break;
 			case 1:
-				reduction = expendTotals[iter] / units;
+				reduction = static_cast<int>(expendTotals[iter] / units);
 				break;
 			case 2:
-				reduction = maintTotals[iter] / units;
+				reduction = static_cast<int>(maintTotals[iter] / units);
 				break;
 			case 3:
-				reduction = balanceTotals[iter] / units;
+				reduction = static_cast<int>(balanceTotals[iter] / units);
 				break;
 			case 4:
-				reduction = scoreTotals[iter] / units;
+				reduction = static_cast<int>(scoreTotals[iter] / units);
 				break;
 			}
 			y -= reduction;

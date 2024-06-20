@@ -30,23 +30,10 @@ namespace OpenXcom::BaseSystem
 {
 
 /**
- * @brief Gets the index of a given base in the registry by its id.
- * @param registry the global entity registry
- * @param baseId the base Id to search for
- * @return the index of the base entity, or -1 if it is not found.
-*/
-static int getBaseIndex(const entt::registry& registry, entt::entity baseId)
-{
-	auto baseView = registry.view<Base>();
-	auto findIterator = std::find(baseView.begin(), baseView.end(), baseId);
-	return findIterator != baseView.end() ? std::distance(baseView.begin(), findIterator) : -1;
-}
-
-/**
  * Adds up the monthly maintenance of all the bases.
  * @return Total maintenance.
  */
-static int64_t getBasesMaintenanceCost()
+int64_t getBasesMaintenanceCost()
 {
 	return getRegistry().totalBy<Base, int64_t>(&Base::getCraftMaintenance, &Base::getFacilityMaintenance, &Base::getPersonnelMaintenance);
 }
@@ -57,12 +44,11 @@ static int64_t getBasesMaintenanceCost()
  * @param itemType Item ID.
  * @return Whether it's obtained or not.
  */
-static bool isItemInBaseStores(const entt::registry& registry, const std::string& itemType)
+bool isItemInBaseStores(const std::string& itemType)
 {
-	for (const auto&& [id, base] : registry.view<Base>().each())
+	for (const Base& xcomBase : getRegistry().list<const Base>())
 	{
-		if (base.getStorageItems()->getItem(itemType) > 0)
-			return true;
+		if (xcomBase.getStorageItems()->getItem(itemType) > 0) { return true; }
 	}
 	return false;
 }
@@ -72,11 +58,11 @@ static bool isItemInBaseStores(const entt::registry& registry, const std::string
  * @param facilityType facility ID.
  * @return Whether it's been built or not. If false, the facility has not been built in any base.
  */
-static bool BaseSystem::isFacilityBuilt(const entt::registry& registry, const std::string& facilityType)
+bool BaseSystem::isFacilityBuilt(const std::string& facilityType)
 {
-	for (const auto&& [id, base] : registry.view<const Base>().each())
+	for (const Base& xcomBase : getRegistry().list<const Base>())
 	{
-		for (BaseFacility* fac : base.getFacilities())
+		for (BaseFacility* fac : xcomBase.getFacilities())
 		{
 			if (fac->getBuildTime() == 0 && fac->getRules()->getType() == facilityType)
 			{
@@ -92,11 +78,11 @@ static bool BaseSystem::isFacilityBuilt(const entt::registry& registry, const st
  * @param soldierType soldier type ID.
  * @return Whether it's been hired (and arrived already) or not.
  */
-static bool isSoldierTypeHired(const entt::registry& registry, const std::string& soldierType)
+bool isSoldierTypeHired(const std::string& soldierType)
 {
-	for (const auto&& [id, base] : registry.view<const Base>().each())
+	for (const Base& xcomBase : getRegistry().list<const Base>())
 	{
-		for (Soldier* soldier : base.getSoldiers())
+		for (Soldier* soldier : xcomBase.getSoldiers())
 		{
 			if (soldier->getRules()->getType() == soldierType)
 			{

@@ -25,11 +25,6 @@ namespace OpenXcom
 
 namespace CountrySystem
 {
-	/// finds a country by lat/long
-	[[nodiscard]] entt::entity locateCountry(const entt::registry& registry, double lon, double lat);
-	/// finds a country containing a locatable
-	template<typename Locatable>
-	[[nodiscard]] entt::entity locateCountry(const entt::registry& registry, const Locatable& locatable);
 	/// gets the total funding of all countries
 	[[nodiscard]] int64_t getCountriesMonthlyFundingTotal();
 }

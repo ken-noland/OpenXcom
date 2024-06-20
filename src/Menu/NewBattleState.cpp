@@ -610,22 +610,21 @@ void NewBattleState::btnOkClick(Action *)
 	// ufo assault
 	else if (_craft && getGame()->getMod()->getUfo(_missionTypes[_cbxMission->getSelected()]))
 	{
-		Ufo *u = new Ufo(getGame()->getMod()->getUfo(_missionTypes[_cbxMission->getSelected()]), 1);
-		u->setId(1);
-		_craft->setDestination(u);
-		bgen.setUfo(u);
+		Ufo& newUfo = getRegistry().createAndEmplace<Ufo>(getGame()->getMod()->getUfo(_missionTypes[_cbxMission->getSelected()]), 1);
+		newUfo.setId(1);
+		_craft->setDestination(&newUfo);
+		bgen.setUfo(&newUfo);
 		// either ground assault or ufo crash
 		if (RNG::generate(0,1) == 1)
 		{
-			u->setStatus(Ufo::LANDED);
+			newUfo.setStatus(Ufo::LANDED);
 			bgame->setMissionType("STR_UFO_GROUND_ASSAULT");
 		}
 		else
 		{
-			u->setStatus(Ufo::CRASHED);
+			newUfo.setStatus(Ufo::CRASHED);
 			bgame->setMissionType("STR_UFO_CRASH_RECOVERY");
 		}
-		getGame()->getSavedGame()->getUfos().push_back(u);
 	}
 	// mission site
 	else

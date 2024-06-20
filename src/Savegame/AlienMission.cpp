@@ -209,11 +209,9 @@ void AlienMission::think(Game &engine, const Globe &globe)
 	const MissionWave &wave = _rule.getWave(_nextWave);
 	const UfoTrajectory &trajectory = *mod.getUfoTrajectory(wave.trajectory, true);
 	Ufo *ufo = spawnUfo(game, mod, globe, wave, trajectory);
-	if (ufo)
+	if (ufo) //Some missions may not spawn a UFO!
 	{
-		//Some missions may not spawn a UFO!
-		ufo->setMissionWaveNumber((int)_nextWave);
-		game.getUfos().push_back(ufo);
+		getRegistry().insert<Ufo>(ufo);
 	}
 	else if ((mod.getDeployment(wave.ufoType) && !mod.getUfo(wave.ufoType) && !mod.getDeployment(wave.ufoType)->getMarkerName().empty()) // a mission site that we want to spawn directly
 			|| (_rule.getObjective() == OBJECTIVE_SITE && wave.objective)) // or we want to spawn one at random according to our terrain
@@ -620,20 +618,14 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 		{
 			ufo->setEscort(true);
 			// Find a UFO to escort
-			for (Ufo* ufoToBeEscorted : game.getUfos())
+			auto escortUfo = [ufo](const Ufo& escortUfo) {
+				return escortUfo.getMission()->getId() == ufo->getMission()->getId() // From the same mission
+					&& !escortUfo.isHunterKiller(); }; // But not another hunter-killer, we escort only normal UFOs
+			if (Ufo* ufoToBeEscorted = getRegistry().findValue_if<Ufo>(escortUfo))
 			{
-				// From the same mission
-				if (ufoToBeEscorted->getMission()->getId() == ufo->getMission()->getId())
-				{
-					// But not another hunter-killer, we escort only normal UFOs
-					if (!ufoToBeEscorted->isHunterKiller())
-					{
-						ufo->setLongitude(ufoToBeEscorted->getLongitude());
-						ufo->setLatitude(ufoToBeEscorted->getLatitude());
-						ufo->setEscortedUfo(ufoToBeEscorted);
-						break;
-					}
-				}
+				ufo->setLongitude(ufoToBeEscorted->getLongitude());
+				ufo->setLatitude(ufoToBeEscorted->getLatitude());
+				ufo->setEscortedUfo(ufoToBeEscorted);
 			}
 		}
 		logUfo(ufo, game, this);
@@ -681,20 +673,14 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 	{
 		ufo->setEscort(true);
 		// Find a UFO to escort
-		for (Ufo* ufoToBeEscorted : game.getUfos())
+		auto escortUfo = [ufo](const Ufo& escortUfo) {
+			return escortUfo.getMission()->getId() == ufo->getMission()->getId() // From the same mission
+				&& !escortUfo.isHunterKiller(); }; // But not another hunter-killer, we escort only normal UFOs
+		if (Ufo* ufoToBeEscorted = getRegistry().findValue_if<Ufo>(escortUfo))
 		{
-			// From the same mission
-			if (ufoToBeEscorted->getMission()->getId() == ufo->getMission()->getId())
-			{
-				// But not another hunter-killer, we escort only normal UFOs
-				if (!ufoToBeEscorted->isHunterKiller())
-				{
-					ufo->setLongitude(ufoToBeEscorted->getLongitude());
-					ufo->setLatitude(ufoToBeEscorted->getLatitude());
-					ufo->setEscortedUfo(ufoToBeEscorted);
-					break;
-				}
-			}
+			ufo->setLongitude(ufoToBeEscorted->getLongitude());
+			ufo->setLatitude(ufoToBeEscorted->getLatitude());
+			ufo->setEscortedUfo(ufoToBeEscorted);
 		}
 	}
 	logUfo(ufo, game, this);
