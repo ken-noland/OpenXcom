@@ -942,7 +942,7 @@ void GeoscapeState::time5Seconds()
 	}
 
 	// Game over if there are no more bases.
-	if (getRegistry().raw().storage<Base>().empty())
+	if (getRegistry().empty<Base>() == 0)
 	{
 		getGame()->getSavedGame()->setEnding(END_LOSE);
 	}
@@ -1655,7 +1655,7 @@ void GeoscapeState::baseHunting()
 								// Spawn hunt mission for this base.
 								const RuleAlienMission &rule = *getGame()->getMod()->getAlienMission(huntMission);
 								AlienMission *mission = new AlienMission(rule);
-								mission->setRegion(getGame()->getSavedGame()->locateRegion(*ab)->getRules()->getType(), *getGame()->getMod());
+								mission->setRegion(AreaSystem::locateValue<Region>(*ab)->getRules()->getType(), *getGame()->getMod());
 								mission->setId(getGame()->getSavedGame()->getId("ALIEN_MISSIONS"));
 								if (!ab->getDeployment()->isHuntMissionRaceFromAlienBase() && rule.hasRaceWeights())
 								{
@@ -1809,18 +1809,16 @@ void GeoscapeState::time30Minutes()
 	);
 
 	// Handle crashed UFOs expiration
-	for (Ufo* ufo : getGame()->getSavedGame()->getUfos())
+	auto crashedStatus = [](const Ufo& ufo) { return ufo.getStatus() == Ufo::CRASHED; };
+	for (Ufo& ufo : getRegistry().list<Ufo>(crashedStatus))
 	{
-		if (ufo->getStatus() == Ufo::CRASHED)
+		if (ufo.getSecondsRemaining() >= 30 * 60)
 		{
-			if (ufo->getSecondsRemaining() >= 30 * 60)
-			{
-				ufo->setSecondsRemaining(ufo->getSecondsRemaining() - 30 * 60);
-				continue;
-			}
-			// Marked expired UFOs for removal.
-			ufo->setStatus(Ufo::DESTROYED);
+			ufo.setSecondsRemaining(ufo.getSecondsRemaining() - 30 * 60);
+			continue;
 		}
+		// Marked expired UFOs for removal.
+		ufo.setStatus(Ufo::DESTROYED);
 	}
 
 	// Handle craft maintenance and alien base detection
@@ -1881,16 +1879,12 @@ void GeoscapeState::time30Minutes()
 	std::unordered_map<entt::entity, int> hiddenUfoCountries;
 
 	// Handle UFO detection and give aliens points
-	for (Ufo* ufo : getGame()->getSavedGame()->getUfos())
+	auto ignoreInstantRetaliation = [](const Ufo& ufo) { // instant retaliation missions are ignored (UFOs shouldn't be detected)
+		return ufo.getMission()->getRules().getObjective() != OBJECTIVE_INSTANT_RETALIATION; };
+	for (Ufo& ufo : getRegistry().list<Ufo>(ignoreInstantRetaliation))
 	{
-		// instant retaliation missions are ignored (UFOs shouldn't be detected)
-		if (ufo->getMission()->getRules().getObjective() == OBJECTIVE_INSTANT_RETALIATION)
-		{
-			continue;
-		}
-
-		int points = ufo->getRules()->getMissionScore(); //one point per UFO in-flight per half hour
-		switch (ufo->getStatus())
+		int points = ufo.getRules()->getMissionScore(); //one point per UFO in-flight per half hour
+		switch (ufo.getStatus())
 		{
 		case Ufo::LANDED:
 			points *= 2;
@@ -1898,13 +1892,13 @@ void GeoscapeState::time30Minutes()
 		case Ufo::FLYING:
 			ufoRegion = entt::null;
 
-			AreaSystem::addAlienActivityToCountryAndRegion(points, *ufo);
+			AreaSystem::addAlienActivityToCountryAndRegion(points, ufo);
 
 			// detection ufo state
-			ufoDetection(ufo, activeCrafts);
+			ufoDetection(&ufo, activeCrafts);
 
 			// accumulate hidden ufos
-			if (!ufo->getDetected())
+			if (!ufo.getDetected())
 			{
 				if (ufoRegion != entt::null)
 				{
@@ -2284,7 +2278,7 @@ void GenerateSupplyMission::operator()(AlienBase *base) const
 			else
 			{
 				// 3. target the region of the alien base (vanilla default)
-				targetRegion = _save.locateRegion(*base)->getRules()->getType();
+				targetRegion = AreaSystem::locateValue<Region>(*base)->getRules()->getType();
 			}
 			mission->setRegion(targetRegion, _mod);
 			mission->setId(_save.getId("ALIEN_MISSIONS"));
@@ -3484,7 +3478,7 @@ void GeoscapeState::determineAlienMissions()
 					// item requirements
 					for (auto &triggerItem : arcScript->getItemTriggers())
 					{
-						triggerHappy = (save->isItemObtained(triggerItem.first) == triggerItem.second);
+						triggerHappy = BaseSystem::isItemInBaseStores(triggerItem.first) == triggerItem.second;
 						if (!triggerHappy)
 							break;
 					}
@@ -3494,7 +3488,7 @@ void GeoscapeState::determineAlienMissions()
 					// facility requirements
 					for (auto &triggerFacility : arcScript->getFacilityTriggers())
 					{
-						triggerHappy = (save->isFacilityBuilt(triggerFacility.first) == triggerFacility.second);
+						triggerHappy = (BaseSystem::isFacilityBuilt(triggerFacility.first) == triggerFacility.second);
 						if (!triggerHappy)
 							break;
 					}
@@ -3659,7 +3653,7 @@ void GeoscapeState::determineAlienMissions()
 				// item requirements
 				for (auto &triggerItem : command->getItemTriggers())
 				{
-					triggerHappy = (save->isItemObtained(triggerItem.first) == triggerItem.second);
+					triggerHappy = BaseSystem::isItemInBaseStores(triggerItem.first) == triggerItem.second;
 					if (!triggerHappy)
 						break;
 				}
@@ -3669,7 +3663,7 @@ void GeoscapeState::determineAlienMissions()
 				// facility requirements
 				for (auto &triggerFacility : command->getFacilityTriggers())
 				{
-					triggerHappy = (save->isFacilityBuilt(triggerFacility.first) == triggerFacility.second);
+					triggerHappy = BaseSystem::isFacilityBuilt(triggerFacility.first) == triggerFacility.second;
 					if (!triggerHappy)
 						break;
 				}
@@ -3825,7 +3819,7 @@ void GeoscapeState::determineAlienMissions()
 					// item requirements
 					for (auto &triggerItem : eventScript->getItemTriggers())
 					{
-						triggerHappy = (save->isItemObtained(triggerItem.first) == triggerItem.second);
+						triggerHappy = BaseSystem::isItemInBaseStores(triggerItem.first) == triggerItem.second;
 						if (!triggerHappy)
 							break;
 					}
@@ -3835,7 +3829,7 @@ void GeoscapeState::determineAlienMissions()
 					// facility requirements
 					for (auto &triggerFacility : eventScript->getFacilityTriggers())
 					{
-						triggerHappy = (save->isFacilityBuilt(triggerFacility.first) == triggerFacility.second);
+						triggerHappy = BaseSystem::isFacilityBuilt(triggerFacility.first) == triggerFacility.second;
 						if (!triggerHappy)
 							break;
 					}
@@ -3845,7 +3839,7 @@ void GeoscapeState::determineAlienMissions()
 					// soldier type requirements
 					for (auto& triggerSoldierType : eventScript->getSoldierTypeTriggers())
 					{
-						triggerHappy = (save->isSoldierTypeHired(triggerSoldierType.first) == triggerSoldierType.second);
+						triggerHappy = BaseSystem::isSoldierTypeHired(triggerSoldierType.first) == triggerSoldierType.second;
 						if (!triggerHappy)
 							break;
 					}

@@ -227,19 +227,16 @@ void Ufo::finishLoading(const YAML::Node &node, SavedGame &save)
 				int uniqueUfoId = dest["uniqueId"].as<int>(0);
 				if (uniqueUfoId > 0)
 				{
-					for (Ufo* ufo : save.getUfos())
+					auto mathchesId = [uniqueUfoId](const Ufo& ufo) { return ufo.getUniqueId() == uniqueUfoId; };
+					if(Ufo* ufo = getRegistry().findValue_if<Ufo>(mathchesId))
 					{
-						if (ufo->getUniqueId() == uniqueUfoId)
+						if (_dest)
 						{
-							if (_dest)
-							{
-								// this is just a dummy waypoint created during normal loading, not a UFO... yet
-								delete _dest;
-								_dest = 0;
-							}
-							setDestination(ufo);
-							break;
+							// this is just a dummy waypoint created during normal loading, not a UFO... yet
+							delete _dest;
+							_dest = 0;
 						}
+						setDestination(ufo);
 					}
 				}
 			}

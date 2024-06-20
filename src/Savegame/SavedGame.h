@@ -89,14 +89,14 @@ struct SaveInfo
 {
 	std::string fileName;
 	std::string displayName;
-	time_t timestamp;
+	time_t timestamp{0};
 	std::string isoDate, isoTime;
 	std::string details;
 
 	using SaveInfoModList = std::vector<std::string>;
 	SaveInfoModList mods;
 
-	bool reserved;
+	bool reserved = false;
 };
 
 /**
@@ -247,10 +247,6 @@ public:
 	const std::map<std::string, int>& getAllIds() const { return _ids; }
 	/// Sets the list of object IDs.
 	void setAllIds(const std::map<std::string, int>& ids) { _ids = ids; }
-	/// Gets the list of UFOs.
-	std::vector<Ufo*>& getUfos();
-	/// Gets the list of UFOs.
-	const std::vector<Ufo*>& getUfos() const;
 	/// Gets the list of waypoints.
 	std::vector<Waypoint*>& getWaypoints();
 	/// Gets the list of mission sites.
@@ -325,12 +321,6 @@ public:
 	bool isResearched(const std::vector<std::string> &research, bool considerDebugMode = true) const;
 	/// Gets if a certain list of research topics has been completed.
 	bool isResearched(const std::vector<const RuleResearch *> &research, bool considerDebugMode = true, bool skipDisabled = false) const;
-	/// Gets if a certain item has been obtained.
-	bool isItemObtained(const std::string &itemType) const;
-	/// Gets if a certain facility has been built.
-	bool isFacilityBuilt(const std::string &facilityType) const;
-	/// Gets if a certain soldier type has been hired.
-	bool isSoldierTypeHired(const std::string& soldierType) const;
 	/// Gets the soldier matching this ID.
 	Soldier *getSoldier(int id) const;
 	/// Handles the higher promotions.
@@ -344,57 +334,49 @@ public:
 	/// Sets debug mode.
 	void setDebugMode();
 	/// Gets debug mode.
-	bool getDebugMode() const;
+	[[nodiscard]] bool getDebugMode() const { return _debug; }
 	/// return a list of maintenance costs
-	std::vector<int64_t> &getMaintenances();
+	[[nodiscard]] std::vector<int64_t>& getMaintenances() { return _maintenance; }
 	/// sets the research score for the month
-	void addResearchScore(int score);
+	void addResearchScore(int score) { _researchScores.back() += score; }
 	/// gets the list of research scores
-	std::vector<int> &getResearchScores();
+	[[nodiscard]] std::vector<int>& getResearchScores() { return _researchScores; }
 	/// gets the list of incomes.
-	std::vector<int64_t> &getIncomes();
+	[[nodiscard]] std::vector<int64_t>& getIncomes() { return _incomes; }
 	/// gets the list of expenditures.
-	std::vector<int64_t> &getExpenditures();
-	/// gets whether or not the player has been warned
-	bool getWarned() const;
-	/// sets whether or not the player has been warned
-	void setWarned(bool warned);
+	[[nodiscard]] std::vector<int64_t>& getExpenditures() { return _expenditures; }
+	/// gets whether or not the player has been warned for low performance
+	[[nodiscard]] bool getWarned() const { return _warned; }
+	/// sets whether or not the player has been warned for low performance
+	void setWarned(bool warned) { _warned = warned; }
 
 	/// gets personal light toggle
-	bool getTogglePersonalLight() const { return _togglePersonalLight; }
+	[[nodiscard]] bool getTogglePersonalLight() const { return _togglePersonalLight; }
 	/// sets personal light toggle
 	void setTogglePersonalLight(bool togglePersonalLight) { _togglePersonalLight = togglePersonalLight; }
 	/// gets night vision toggle
-	bool getToggleNightVision() const { return _toggleNightVision; }
+	[[nodiscard]] bool getToggleNightVision() const { return _toggleNightVision; }
 	/// sets night vision toggle
 	void setToggleNightVision(bool toggleNightVision) { _toggleNightVision = toggleNightVision; }
 	/// gets brightness toggle
-	int getToggleBrightness() const { return _toggleBrightness; }
+	[[nodiscard]] int getToggleBrightness() const { return _toggleBrightness; }
 	/// sets brightness toggle
 	void setToggleBrightness(int toggleBrightness) { _toggleBrightness = toggleBrightness; }
 
 	/// Full access to the alien strategy data.
-	AlienStrategy &getAlienStrategy() { return *_alienStrategy; }
+	[[nodiscard]] AlienStrategy &getAlienStrategy() { return *_alienStrategy; }
 	/// Read-only access to the alien strategy data.
-	const AlienStrategy &getAlienStrategy() const { return *_alienStrategy; }
+	[[nodiscard]] const AlienStrategy &getAlienStrategy() const { return *_alienStrategy; }
 	/// Full access to the current alien missions.
-	std::vector<AlienMission*> &getAlienMissions() { return _activeMissions; }
+	[[nodiscard]] std::vector<AlienMission*> &getAlienMissions() { return _activeMissions; }
 	/// Read-only access to the current alien missions.
-	const std::vector<AlienMission*> &getAlienMissions() const { return _activeMissions; }
+	[[nodiscard]] const std::vector<AlienMission*> &getAlienMissions() const { return _activeMissions; }
 	/// Finds a mission by region and objective.
 	AlienMission *findAlienMission(const std::string &region, MissionObjective objective, AlienRace* race = nullptr) const;
 	/// Full access to the current geoscape events.
-	std::vector<GeoscapeEvent*> &getGeoscapeEvents() { return _geoscapeEvents; }
+	[[nodiscard]] std::vector<GeoscapeEvent*> &getGeoscapeEvents() { return _geoscapeEvents; }
 	/// Read-only access to the current geoscape events.
-	const std::vector<GeoscapeEvent*> &getGeoscapeEvents() const { return _geoscapeEvents; }
-	/// Locate a region containing a position.
-	Region *locateRegion(double lon, double lat) const;
-	/// Locate a region containing a Target.
-	Region *locateRegion(const Target &target) const;
-	/// Locate a country containing a position.
-	const Country* locateCountry(double lon, double lat) const;
-	/// Locate a country containing a Target.
-	const Country* locateCountry(const Target& target) const;
+	[[nodiscard]] const std::vector<GeoscapeEvent*> &getGeoscapeEvents() const { return _geoscapeEvents; }
 	/// Select a soldier nationality based on mod rules and location on the globe.
 	int selectSoldierNationalityByLocation(const Mod* mod, const RuleSoldier* rule, const Target* target) const;
 	/// Return the month counter.
@@ -438,9 +420,9 @@ public:
 	/// Evaluate the score of a soldier based on all of his stats, missions and kills.
 	int getSoldierScore(Soldier *soldier);
 	/// Sets the last selected armor
-	void setLastSelectedArmor(const std::string &value);
+	void setLastSelectedArmor(const std::string& armorName) { _lastselectedArmor = armorName; }
 	/// Gets the last selected armor
-	std::string getLastSelectedArmor() const;
+	std::string getLastSelectedArmor() const { return _lastselectedArmor; }
 	/// Gets the name of a global equipment layout at specified index.
 	const std::string &getGlobalEquipmentLayoutName(int index) const;
 	/// Sets the name of a global equipment layout at specified index.
@@ -458,7 +440,7 @@ public:
 	/// Gets the global craft loadout at specified index.
 	ItemContainer *getGlobalCraftLoadout(int index);
 	/// Gets the list of missions statistics
-	std::vector<MissionStatistics*>& getMissionStatistics();
+	std::vector<MissionStatistics*>& getMissionStatistics() { return _missionStatistics; }
 	/// Adds a UFO to the ignore list.
 	void addUfoToIgnoreList(int ufoId);
 	/// Checks if a UFO is on the ignore list.
@@ -476,9 +458,9 @@ public:
 	/// Stop hunting all xcom craft from a given xcom base.
 	void stopHuntingXcomCrafts(Base *base);
 	/// Should all xcom soldiers have completely empty starting inventory when doing base equipment?
-	bool getDisableSoldierEquipment() const;
+	bool getDisableSoldierEquipment() const { return _disableSoldierEquipment; }
 	/// Sets the corresponding flag.
-	void setDisableSoldierEquipment(bool disableSoldierEquipment);
+	void setDisableSoldierEquipment(bool disableSoldierEquipment) { _disableSoldierEquipment = disableSoldierEquipment; }
 	/// Is alien containment check finished?
 	bool getAlienContainmentChecked() const { return _alienContainmentChecked; }
 	/// Sets the corresponding flag.

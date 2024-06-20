@@ -232,14 +232,8 @@ void Craft::load(const YAML::Node &node, const ScriptGlobal *shared, const Mod *
 		}
 		else if (type == "STR_UFO")
 		{
-			for (Ufo* ufo : save->getUfos())
-			{
-				if (ufo->getId() == id)
-				{
-					setDestination(ufo);
-					break;
-				}
-			}
+			auto matchingId = [id](const Ufo& ufo) { return ufo.getId() == id; };
+			if (Ufo* ufo = getRegistry().findValue_if<Ufo>(matchingId)) { setDestination(ufo); }
 		}
 		else if (type == "STR_WAY_POINT")
 		{

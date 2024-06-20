@@ -87,6 +87,12 @@ BaseInfoState::BaseInfoState(entt::entity baseId, BasescapeState *state)
 		_numContainment = new Text(40, 9, 126, 123);
 		_barContainment = new Bar(150, 5, 166, 125);
 	}
+	else
+	{
+		_txtContainment = nullptr;
+		_numContainment = nullptr;
+		_barContainment = nullptr;
+	}
 	_txtHangars = new Text(114, 9, 8, Options::storageLimitsEnforced ? 133 : 123);
 	_numHangars = new Text(40, 9, 126, Options::storageLimitsEnforced ? 133 : 123);
 	_barHangars = new Bar(150, 5, 166, Options::storageLimitsEnforced ? 135 : 125);
@@ -442,7 +448,7 @@ void BaseInfoState::handleKeyPress(Action *action)
 	// get the index of the key hit
 	int key = action->getDetails()->key.keysym.sym;
 	if (key < baseKeys[0] || key > baseKeys[7]) return;
-	size_t index = static_cast<size_t>(key - baseKeys[0]);
+	int index = key - baseKeys[0];
 
 	if (auto bases = getRegistry().raw().view<Base>(); index < bases.size())
 	{

@@ -796,14 +796,11 @@ std::vector<Target*> Globe::getTargets(int x, int y, bool craft, Craft *currentC
 			}
 		}
 	}
-	for (Ufo* ufo : _game->getSavedGame()->getUfos())
+	for (Ufo& ufo : getRegistry().list<Ufo>(std::mem_fn(&Ufo::getDetected)))
 	{
-		if (!ufo->getDetected())
-			continue;
-
-		if (targetNear(ufo, x, y))
+		if (targetNear(&ufo, x, y))
 		{
-			v.push_back(ufo);
+			v.push_back(&ufo);
 		}
 	}
 	for (Waypoint* wp : _game->getSavedGame()->getWaypoints())
@@ -1227,20 +1224,15 @@ void Globe::drawRadars()
 	if (_game->getMod()->getDrawEnemyRadarCircles() > 0)
 	{
 		// Draw radars around UFO hunter-killers
-		for (Ufo* ufo : _game->getSavedGame()->getUfos())
+		auto shouldDrawRadar = [](const Ufo& ufo) { return ufo.isHunterKiller() && ufo.getDetected()
+			&& !(getGame()->getMod()->getDrawEnemyRadarCircles() == 1 && !ufo.getHyperDetected()); };
+		for (Ufo& ufo : getRegistry().list<Ufo>(shouldDrawRadar))
 		{
-			if (ufo->isHunterKiller() && ufo->getDetected())
-			{
-				if (_game->getMod()->getDrawEnemyRadarCircles() == 1 && !ufo->getHyperDetected())
-				{
-					continue;
-				}
-				lat = ufo->getLatitude();
-				lon = ufo->getLongitude();
-				range = Nautical(ufo->getCraftStats().radarRange);
+			lat = ufo.getLatitude();
+			lon = ufo.getLongitude();
+			range = Nautical(ufo.getCraftStats().radarRange);
 
-				if (range > 0) drawGlobeCircle(lat, lon, range, 24);
-			}
+			if (range > 0) drawGlobeCircle(lat, lon, range, 24);
 		}
 
 		// Draw radars around alien bases
@@ -1670,17 +1662,15 @@ void Globe::drawFlights()
 	}
 
 	// Draw the hunting UFO flight paths
-	for (Ufo* ufo : _game->getSavedGame()->getUfos())
+	auto detectedAndHunting = [](const Ufo& ufo) { return ufo.isHunting() && ufo.getDetected(); };
+	for (const Ufo& ufo : getRegistry().list<const Ufo>(detectedAndHunting))
 	{
-		if (ufo->isHunting() && ufo->getDetected())
-		{
-			double lon1 = ufo->getLongitude();
-			double lon2 = ufo->getDestination()->getLongitude();
-			double lat1 = ufo->getLatitude();
-			double lat2 = ufo->getDestination()->getLatitude();
+		double lon1 = ufo.getLongitude();
+		double lon2 = ufo.getDestination()->getLongitude();
+		double lat1 = ufo.getLatitude();
+		double lat2 = ufo.getDestination()->getLatitude();
 
-			drawPath(_radars, lon1, lat1, lon2, lat2);
-		}
+		drawPath(_radars, lon1, lat1, lon2, lat2);
 	}
 
 	// Unlock the surface
@@ -1766,9 +1756,9 @@ void Globe::drawMarkers()
 	}
 
 	// Draw the UFO markers
-	for (Ufo* ufo : _game->getSavedGame()->getUfos())
+	for (Ufo& ufo : getRegistry().list<Ufo>())
 	{
-		drawTarget(ufo, _markers);
+		drawTarget(&ufo, _markers);
 	}
 
 	// Draw the craft markers
