@@ -84,7 +84,7 @@ OptionsConfirmState::OptionsConfirmState(OptionsOrigin origin) : State("OptionsC
 		applyBattlescapeTheme("optionsMenu");
 	}
 
-	_timer->onTimer((StateHandler)&OptionsConfirmState::countdown);
+	_timer->onState(std::bind(&OptionsConfirmState::countdown, this));
 	_timer->start();
 }
 
@@ -103,7 +103,7 @@ void OptionsConfirmState::think()
 {
 	State::think();
 
-	_timer->think(this, 0);
+	_timer->think(true, false);
 }
 
 /**

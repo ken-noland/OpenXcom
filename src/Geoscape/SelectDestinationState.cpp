@@ -66,8 +66,8 @@ SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe
 
 	_window = factory.createWindow("windowName", this, 256, 28, 0, 0);
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 
 	windowSurface->setX(dx);
 	windowComponent.setDY(0);
@@ -377,7 +377,7 @@ void SelectDestinationState::resize(int &dX, int &dY)
 	{
 		if (surfaceEntity == _window) { continue; }
 
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEntity).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEntity).getSurface();
 
 		surface->setX(surface->getX() + dX / 2);
 		if (surface != _btnCancel && surface != _txtTitle && surface != _btnCydonia)

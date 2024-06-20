@@ -70,8 +70,8 @@ BuildNewBaseState::BuildNewBaseState(entt::entity newBaseId, Globe *globe, bool 
 
 	_window = factory.createWindow("windowName", this, 256, 28, 0, 0);
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 
 	windowSurface->setX(dx);
 	windowComponent.setDY(0);
@@ -80,7 +80,7 @@ BuildNewBaseState::BuildNewBaseState(entt::entity newBaseId, Globe *globe, bool 
 	_txtTitle = new Text(180, 16, 8 + dx, 6);
 
 	_hoverTimer = new Timer(50);
-	_hoverTimer->onTimer((StateHandler)&BuildNewBaseState::hoverRedraw);
+	_hoverTimer->onState(std::bind(&BuildNewBaseState::hoverRedraw, this));
 	_hoverTimer->start();
 
 	// Set palette
@@ -180,7 +180,7 @@ void BuildNewBaseState::think()
 {
 	State::think();
 	_globe->think();
-	_hoverTimer->think(this, 0);
+	_hoverTimer->think(true, false);
 }
 
 /**
@@ -412,7 +412,7 @@ void BuildNewBaseState::resize(int &dX, int &dY)
 	{
 		if (surfaceEntity == _window) { continue; }
 
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEntity).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEntity).getSurface();
 
 		surface->setX(surface->getX() + dX / 2);
 		if (surface != _btnCancel && surface != _txtTitle)

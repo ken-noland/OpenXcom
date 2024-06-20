@@ -121,7 +121,7 @@ PlaceLiftState::PlaceLiftState(entt::entity newBaseId, Globe *globe, bool first)
 		_txtHeader->setVisible(false);
 
 		//KN NOTE: Temp using this even though I know we will be moving away from Surface at some point
-		SurfaceComponent& windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window);
+		SurfaceComponent& windowSurface = getRegistry().raw().get<SurfaceComponent>(_window);
 		windowSurface.getSurface()->setVisible(false);
 
 		_view->setSelectable(_lift->getSizeX(), _lift->getSizeY());
@@ -183,7 +183,7 @@ void PlaceLiftState::lstAccessLiftsClick(Action *action)
 		_txtHeader->setVisible(false);
 
 		// KN NOTE: Temp using this even though I know we will be moving away from Surface at some point
-		SurfaceComponent& windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window);
+		SurfaceComponent& windowSurface = getRegistry().raw().get<SurfaceComponent>(_window);
 		windowSurface.getSurface()->setVisible(false);
 
 

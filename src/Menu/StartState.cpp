@@ -88,7 +88,7 @@ StartState::StartState()
 	_cursor->setColor(0);
 	_cursor->setText("_");
 
-	_timer->onTimer((StateHandler)&StartState::animate);
+	_timer->onState(std::bind(&StartState::animate, this));
 	_timer->start();
 
 	// Hide UI
@@ -157,7 +157,7 @@ void StartState::init()
 void StartState::think()
 {
 	State::think();
-	_timer->think(this, 0);
+	_timer->think(true, false);
 
 	switch (loading)
 	{

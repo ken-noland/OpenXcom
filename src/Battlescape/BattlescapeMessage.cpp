@@ -43,7 +43,7 @@ BattlescapeMessage::BattlescapeMessage(int width, int height, int x, int y) : Su
 
 	_window = factory.createWindow("battlescapeMessage", 0, width, height, x, y, WindowPopup::POPUP_NONE);
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 
 	windowComponent.setColor(Palette::blockOffset(0) - 1);
 	windowComponent.setHighContrast(true);
@@ -67,7 +67,7 @@ BattlescapeMessage::BattlescapeMessage(int width, int height, int x, int y) : Su
  */
 BattlescapeMessage::~BattlescapeMessage()
 {
-	getGame()->getRegistry().destroy(_window);
+	getRegistry().raw().destroy(_window);
 
 	delete _text;
 	delete _txtThinking;
@@ -82,7 +82,7 @@ void BattlescapeMessage::setX(int x)
 {
 	Surface::setX(x);
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	windowSurface->setX(x);
 
 	_text->setX(x);
@@ -98,7 +98,7 @@ void BattlescapeMessage::setY(int y)
 {
 	Surface::setY(y);
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	windowSurface->setY(y);
 
 	_text->setY(y);
@@ -112,7 +112,7 @@ void BattlescapeMessage::setY(int y)
  */
 void BattlescapeMessage::setBackground(Surface *background)
 {
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.setBackground(background);
 }
 
@@ -161,7 +161,7 @@ void BattlescapeMessage::setPalette(const SDL_Color *colors, int firstcolor, int
 {
 	Surface::setPalette(colors, firstcolor, ncolors);
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	windowSurface->setPalette(colors, firstcolor, ncolors);
 
 	_text->setPalette(colors, firstcolor, ncolors);
@@ -176,7 +176,7 @@ void BattlescapeMessage::blit(SDL_Surface *surface)
 {
 	Surface::blit(surface);
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	windowSurface->blit(surface);
 
 	_text->blit(surface);
@@ -192,7 +192,7 @@ void BattlescapeMessage::setHeight(int height)
 {
 	Surface::setHeight(height);
 
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	windowSurface->setHeight(height);
 
 	_text->setHeight(height);

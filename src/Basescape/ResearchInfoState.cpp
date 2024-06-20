@@ -143,9 +143,9 @@ void ResearchInfoState::buildUi()
 	_btnLess->onMouseClick((ActionHandler)&ResearchInfoState::lessClick, 0);
 
 	_timerMore = new Timer(250);
-	_timerMore->onTimer((StateHandler)&ResearchInfoState::more);
+	_timerMore->onState(std::bind(&ResearchInfoState::more, this));
 	_timerLess = new Timer(250);
-	_timerLess->onTimer((StateHandler)&ResearchInfoState::less);
+	_timerLess->onState(std::bind(&ResearchInfoState::less, this));
 
 	_btnOk->onMouseClick((ActionHandler)&ResearchInfoState::btnOkClick);
 	_btnOk->onKeyboardPress((ActionHandler)&ResearchInfoState::btnOkClick, Options::keyOk);

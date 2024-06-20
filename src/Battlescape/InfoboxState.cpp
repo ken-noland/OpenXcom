@@ -66,7 +66,7 @@ InfoboxState::InfoboxState(const std::string& msg) : State("InfoboxState", false
 	}
 
 	_timer = new Timer(delay);
-	_timer->onTimer((StateHandler)&InfoboxState::close);
+	_timer->onState(std::bind(&InfoboxState::close, this));
 	_timer->start();
 }
 
@@ -97,7 +97,7 @@ void InfoboxState::handle(Action *action)
  */
 void InfoboxState::think()
 {
-	_timer->think(this, 0);
+	_timer->think(true, false);
 }
 
 /**

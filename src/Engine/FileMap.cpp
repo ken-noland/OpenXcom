@@ -321,7 +321,7 @@ static bool sanitizeZipEntryName(std::string& zefname) {
 static std::string hexDumpBogusData(const std::string& bogus) {
 	std::vector<char> buf(bogus.size()*3 + 1, 0);
 	char *p = buf.data();
-	for (auto c : bogus) { p += sprintf(p, "%02hhx ", c); }
+	for (auto c : bogus) { p += sprintf_s(p, buf.size(), "%02hhx ", c); }
 	return std::string(buf.data());
 }
 /* recursively list a directory */

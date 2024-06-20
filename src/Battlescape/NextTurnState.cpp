@@ -135,7 +135,7 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	}
 	_bg->drawRect(&rect, Palette::blockOffset(0) + bgColor);
 	// make this screen line up with the hidden movement screen
-	Surface* windowSurface = getGame()->getRegistry().get<SurfaceComponent>(_window).getSurface();
+	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	windowSurface->setY(y);
 	_txtMessageReinforcements->setY(y + 8);
 	_btnBriefingReinforcements->setY(y + 45);
@@ -147,7 +147,7 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	_txtMessage3->setY(y + 172);
 
 	// Set up objects
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(_window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.setColor(Palette::blockOffset(0) - 1);
 	windowComponent.setHighContrast(true);
 	windowComponent.setBackground(getGame()->getMod()->getSurface(_battleGame->getHiddenMovementBackground()));
@@ -305,7 +305,7 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	if (Options::skipNextTurnScreen && message.empty() && messageReinforcements.empty())
 	{
 		_timer = new Timer(NEXT_TURN_DELAY);
-		_timer->onTimer((StateHandler)&NextTurnState::close);
+		_timer->onState(std::bind(&NextTurnState::close, this));
 		_timer->start();
 	}
 }
@@ -505,7 +505,7 @@ void NextTurnState::think()
 {
 	if (_timer)
 	{
-		_timer->think(this, 0);
+		_timer->think(true, false);
 	}
 }
 

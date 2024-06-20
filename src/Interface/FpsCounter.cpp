@@ -39,7 +39,7 @@ FpsCounter::FpsCounter(int width, int height, int x, int y) : Surface(width, hei
 	_visible = Options::fpsCounter;
 
 	_timer = new Timer(1000);
-	_timer->onTimer((SurfaceHandler)&FpsCounter::update);
+	_timer->onSurface(std::bind(&FpsCounter::update, this));
 	_timer->start();
 
 	_text = new NumberText(width, height, x, y);
@@ -93,7 +93,7 @@ void FpsCounter::handle(Action *action)
  */
 void FpsCounter::think()
 {
-	_timer->think(0, this);
+	_timer->think(false, true);
 }
 
 /**

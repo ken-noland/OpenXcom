@@ -69,7 +69,7 @@ SlideshowState::SlideshowState(const SlideshowHeader &slideshowHeader, const std
 	if (_slideshowSlides->front().transitionSeconds > 0)
 		transitionSeconds = _slideshowSlides->front().transitionSeconds;
 	_transitionTimer = new Timer(transitionSeconds * 1000);
-	_transitionTimer->onTimer((StateHandler)&SlideshowState::screenTimer);
+	_transitionTimer->onState(std::bind(&SlideshowState::screenTimer, this));
 
 	getGame()->getMod()->playMusic(_slideshowHeader.musicId);
 	getGame()->getCursor()->setVisible(false);
@@ -94,7 +94,7 @@ void SlideshowState::screenTimer()
  */
 void SlideshowState::think()
 {
-	_transitionTimer->think(this, 0);
+	_transitionTimer->think(true, false);
 }
 
 /**

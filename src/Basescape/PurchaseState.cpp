@@ -363,9 +363,9 @@ PurchaseState::PurchaseState(Base* base, CannotReequipState* parent) : State("Pu
 	}
 
 	_timerInc = new Timer(250);
-	_timerInc->onTimer((StateHandler)&PurchaseState::increase);
+	_timerInc->onState(std::bind(&PurchaseState::increase, this));
 	_timerDec = new Timer(250);
-	_timerDec->onTimer((StateHandler)&PurchaseState::decrease);
+	_timerDec->onState(std::bind(&PurchaseState::decrease, this));
 }
 
 /**
@@ -384,8 +384,8 @@ void PurchaseState::think()
 {
 	State::think();
 
-	_timerInc->think(this, 0);
-	_timerDec->think(this, 0);
+	_timerInc->think(true, false);
+	_timerDec->think(true, false);
 }
 
 /**

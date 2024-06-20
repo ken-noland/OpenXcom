@@ -58,7 +58,8 @@ BaseView::BaseView(int width, int height, int x, int y) : InteractiveSurface(wid
 	}
 
 	_timer = new Timer(100);
-	_timer->onTimer((SurfaceHandler)&BaseView::blink);
+	_timer->onSurface(std::bind(&BaseView::blink, this));
+
 	_timer->start();
 }
 
@@ -436,7 +437,7 @@ void BaseView::updateNeighborFacilityBuildTime(BaseFacility* facility, BaseFacil
  */
 void BaseView::think()
 {
-	_timer->think(0, this);
+	_timer->think(false, true);
 }
 
 /**

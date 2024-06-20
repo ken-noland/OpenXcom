@@ -623,7 +623,7 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 	frame = set->getFrame(_craft->getSkinSprite() + 11);
 	frame->blitNShade(_craftSprite, 0, 0);
 
-	_craftDamageAnimTimer->onTimer((StateHandler)&DogfightState::animateCraftDamage);
+	_craftDamageAnimTimer->onState(std::bind(&DogfightState::animateCraftDamage, this));
 
 	// don't set these variables if the ufo is already engaged in a dogfight
 	if (!_ufo->getEscapeCountdown())
@@ -757,7 +757,7 @@ void DogfightState::think()
 	if (!_endDogfight)
 	{
 		update();
-		_craftDamageAnimTimer->think(this, 0);
+		_craftDamageAnimTimer->think(true, false);
 	}
 	if (!_ufoIsAttacking || _ufo->getStatus() == Ufo::LANDED)
 	{
@@ -2458,7 +2458,7 @@ void DogfightState::moveWindow()
 	int y = _window->getY() - _y;
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 
 		surface->setX(surface->getX() - x);
 		surface->setY(surface->getY() - y);

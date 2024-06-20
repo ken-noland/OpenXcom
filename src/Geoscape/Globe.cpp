@@ -345,10 +345,10 @@ Globe::Globe(Game* game, int cenX, int cenY, int width, int height, int x, int y
 
 	// Animation timers
 	_blinkTimer = new Timer(100);
-	_blinkTimer->onTimer((SurfaceHandler)&Globe::blink);
+	_blinkTimer->onSurface(std::bind(&Globe::blink, this));
 	_blinkTimer->start();
 	_rotTimer = new Timer(10);
-	_rotTimer->onTimer((SurfaceHandler)&Globe::rotate);
+	_rotTimer->onSurface(std::bind(&Globe::rotate, this));
 
 	_cenLon = _game->getSavedGame()->getGlobeLongitude();
 	_cenLat = _game->getSavedGame()->getGlobeLatitude();
@@ -910,8 +910,8 @@ void Globe::setPalette(const SDL_Color *colors, int firstcolor, int ncolors)
  */
 void Globe::think()
 {
-	_blinkTimer->think(0, this);
-	_rotTimer->think(0, this);
+	_blinkTimer->think(false, true);
+	_rotTimer->think(false, true);
 }
 
 /**

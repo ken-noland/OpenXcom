@@ -42,7 +42,7 @@ WarningMessage::WarningMessage(int width, int height, int x, int y) : Surface(wi
 	_text->setWordWrap(true);
 
 	_timer = new Timer(50);
-	_timer->onTimer((SurfaceHandler)&WarningMessage::fade);
+	_timer->onState(std::bind(&WarningMessage::fade, this));
 
 	setVisible(false);
 }
@@ -119,7 +119,7 @@ void WarningMessage::showMessage(const std::string &msg, int time)
  */
 void WarningMessage::think()
 {
-	_timer->think(0, this);
+	_timer->think(false, true);
 }
 
 /**

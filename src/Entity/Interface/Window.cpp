@@ -27,11 +27,11 @@ WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, State* stat
 	_state(state), _contrast(false), _screen(false), _thinBorder(false), _innerColor(0), _mute(false)
 {
 	// the background image is always positioned at 0,0, so this sets the initial position of the background to be cropped
-	_dx = -surfaceComponent.getSurface()->getX();
-	_dy = -surfaceComponent.getSurface()->getY();
+	_dx = -_surfaceComponent.getSurface()->getX();
+	_dy = -_surfaceComponent.getSurface()->getY();
 
-	//_timer = new Timer(10);
-	//_timer->onTimer((SurfaceHandler)&WindowComponent::popup);
+	_timer = new Timer(10);
+	_timer->onSurface(std::bind(&WindowComponent::popup, this));
 
 	//if (_popup == WindowPopup::POPUP_NONE)
 	//{
@@ -52,7 +52,7 @@ WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, State* stat
 
 WindowComponent::~WindowComponent()
 {
-	//delete _timer;
+	delete _timer;
 }
 
 /// Sets the background surface.
@@ -85,13 +85,14 @@ void WindowComponent::setHighContrast(bool contrast)
 /// Handles the timers.
 void WindowComponent::think()
 {
-	//if (_hidden && _popupStep < 1.0)
-	//{
-	//	_state->hideAll();
-	//	_surfaceComponent.getSurface()->setHidden(false);
-	//}
+	Surface* windowSurface = _surfaceComponent.getSurface();
+	if (windowSurface->isHidden() && _popupStep < 1.0)
+	{
+		_state->hideAll();
+		_surfaceComponent.getSurface()->setHidden(false);
+	}
 
-	//_timer->think(0, this);
+	_timer->think(false, true);
 }
 
 /// Popups the window.

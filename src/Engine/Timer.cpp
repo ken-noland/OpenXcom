@@ -48,7 +48,7 @@ int Timer::maxFrameSkip = 8; // this is a pretty good default at 60FPS.
  * @param interval Time interval in milliseconds.
  * @param frameSkipping Use frameskipping.
  */
-Timer::Timer(Uint32 interval, bool frameSkipping) : _start(0), _frameSkipStart(0), _interval(interval), _running(false), _frameSkipping(frameSkipping), _state(0), _surface(0)
+Timer::Timer(Uint32 interval, bool frameSkipping) : _start(0), _frameSkipStart(0), _interval(interval), _running(false), _frameSkipping(frameSkipping)
 {
 	Timer::maxFrameSkip = Options::maxFrameSkip;
 }
@@ -106,7 +106,7 @@ bool Timer::isRunning() const
  * @param state State that the action handler belongs to.
  * @param surface Surface that the action handler belongs to.
  */
-void Timer::think(State* state, Surface* surface)
+void Timer::think(bool state, bool surface)
 {
 	Sint64 now = slowTick(); // must be signed to permit negative numbers
 	//assert(!game || game->isState(state));
@@ -117,19 +117,19 @@ void Timer::think(State* state, Surface* surface)
 		{
 			for (int i = 0; i <= maxFrameSkip && isRunning() && (now - _frameSkipStart) >= _interval; ++i)
 			{
-				if (state != 0 && _state != 0)
+				if (state && _stateFunction)
 				{
-					(state->*_state)();
+					_stateFunction();
 				}
 				_frameSkipStart += _interval;
 				// breaking here after one iteration effectively returns this function to its old functionality:
-				if (!state || !_frameSkipping || !getGame()->isState(state))
+				if (!state || !_frameSkipping)
 					break; // if game isn't set, we can't verify *state
 			}
 
-			if (_running && surface != 0 && _surface != 0)
+			if (surface && _surfaceFunction)
 			{
-				(surface->*_surface)();
+				_surfaceFunction();
 			}
 			_start = slowTick();
 			if (_start > _frameSkipStart) _frameSkipStart = _start; // don't play animations in ffwd to catch up :P
@@ -150,18 +150,18 @@ void Timer::setInterval(Uint32 interval)
  * Sets a state function for the timer to call every interval.
  * @param handler Event handler.
  */
-void Timer::onTimer(StateHandler handler)
+void Timer::onState(StateHandler handler)
 {
-	_state = handler;
+	_stateFunction = handler;
 }
 
 /**
  * Sets a surface function for the timer to call every interval.
  * @param handler Event handler.
  */
-void Timer::onTimer(SurfaceHandler handler)
+void Timer::onSurface(SurfaceHandler handler)
 {
-	_surface = handler;
+	_surfaceFunction = handler;
 }
 
 }

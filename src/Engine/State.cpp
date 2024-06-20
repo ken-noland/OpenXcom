@@ -62,7 +62,7 @@ State::~State()
 {
 	for(entt::entity surfaceEnt : _surfaces)
 	{
-		getGame()->getRegistry().destroy(surfaceEnt);
+		getRegistry().raw().destroy(surfaceEnt);
 	}
 }
 
@@ -139,7 +139,7 @@ void State::setWindowBackgroundImage(entt::entity window, const std::string& bgI
 {
 	const auto* bgImage = getGame()->getMod()->getSurface(bgImageName);
 
-	WindowComponent& windowComponent = getGame()->getRegistry().get<WindowComponent>(window);
+	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(window);
 	windowComponent.setBackground(bgImage);
 }
 
@@ -162,7 +162,7 @@ void State::add(Surface *surface)
 	if (getGame()->getLanguage() && getGame()->getMod())
 		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
 
-	entt::registry& registry = getGame()->getRegistry();
+	entt::registry& registry = getRegistry().raw();
 	entt::entity surfaceEnt = registry.create();
 	registry.emplace<SurfaceComponent>(surfaceEnt, std::unique_ptr<Surface>{surface});
 
@@ -236,7 +236,7 @@ void State::add(Surface *surface, const std::string &id, const std::string &cate
 	if (getGame()->getLanguage() && getGame()->getMod())
 		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
 
-	entt::registry& registry = getGame()->getRegistry();
+	entt::registry& registry = getRegistry().raw();
 	entt::entity surfaceEnt = registry.create();
 	registry.emplace<SurfaceComponent>(surfaceEnt, std::unique_ptr<Surface>{surface});
 
@@ -311,7 +311,7 @@ void State::init()
 
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		//Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		//Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 
 		//Window* window = dynamic_cast<Window*>(surface);
 		//if (window)
@@ -337,7 +337,7 @@ void State::think()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		surface->think();
 	}
 }
@@ -353,7 +353,7 @@ void State::handle(Action *action)
 	{
 		for (std::vector<entt::entity>::reverse_iterator i = _surfaces.rbegin(); i != _surfaces.rend(); ++i)
 		{
-			Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(*i).getSurface();
+			Surface* surface = getRegistry().raw().get<SurfaceComponent>(*i).getSurface();
 			InteractiveSurface* j = dynamic_cast<InteractiveSurface*>(surface);
 			if (j != 0)
 				j->handle(action, this);
@@ -373,7 +373,7 @@ void State::blit()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		surface->blit(getGame()->getScreen()->getSurface());
 	}
 }
@@ -385,7 +385,7 @@ void State::hideAll()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		surface->setHidden(true);
 	}
 }
@@ -397,7 +397,7 @@ void State::showAll()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		surface->setHidden(false);
 	}
 }
@@ -410,7 +410,7 @@ void State::resetAll()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		InteractiveSurface* s = dynamic_cast<InteractiveSurface*>(surface);
 		if (s != 0)
 		{
@@ -481,7 +481,7 @@ void State::centerAllSurfaces()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		surface->setX(surface->getX() + getGame()->getScreen()->getDX());
 		surface->setY(surface->getY() + getGame()->getScreen()->getDY());
 	}
@@ -494,7 +494,7 @@ void State::lowerAllSurfaces()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		surface->setY(surface->getY() + getGame()->getScreen()->getDY() / 2);
 	}
 }
@@ -512,7 +512,7 @@ void State::applyBattlescapeTheme(const std::string& category)
 	}
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		surface->setColor(element->color);
 		surface->setHighContrast(true);
 
@@ -541,7 +541,7 @@ void State::redrawText()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		Text* text = dynamic_cast<Text*>(surface);
 		TextButton* button = dynamic_cast<TextButton*>(surface);
 		TextEdit* edit = dynamic_cast<TextEdit*>(surface);
@@ -666,7 +666,7 @@ void State::recenter(int dX, int dY)
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 		surface->setX(surface->getX() + dX / 2);
 		surface->setY(surface->getY() + dY / 2);
 	}

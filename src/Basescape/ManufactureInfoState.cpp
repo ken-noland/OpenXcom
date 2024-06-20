@@ -237,10 +237,10 @@ void ManufactureInfoState::buildUi()
 	_timerLessEngineer = new Timer(250);
 	_timerMoreUnit = new Timer(250);
 	_timerLessUnit = new Timer(250);
-	_timerMoreEngineer->onTimer((StateHandler)&ManufactureInfoState::onMoreEngineer);
-	_timerLessEngineer->onTimer((StateHandler)&ManufactureInfoState::onLessEngineer);
-	_timerMoreUnit->onTimer((StateHandler)&ManufactureInfoState::onMoreUnit);
-	_timerLessUnit->onTimer((StateHandler)&ManufactureInfoState::onLessUnit);
+	_timerMoreEngineer->onState(std::bind(&ManufactureInfoState::onMoreEngineer, this));
+	_timerLessEngineer->onState(std::bind(&ManufactureInfoState::onLessEngineer, this));
+	_timerMoreUnit->onState(std::bind(&ManufactureInfoState::onMoreUnit, this));
+	_timerLessUnit->onState(std::bind(&ManufactureInfoState::onLessUnit, this));
 }
 
 void ManufactureInfoState::initProfitInfo ()
@@ -736,10 +736,10 @@ void ManufactureInfoState::handleWheelUnit(Action *action)
 void ManufactureInfoState::think()
 {
 	State::think();
-	_timerMoreEngineer->think(this, 0);
-	_timerLessEngineer->think(this, 0);
-	_timerMoreUnit->think(this, 0);
-	_timerLessUnit->think(this, 0);
+	_timerMoreEngineer->think(true, false);
+	_timerLessEngineer->think(true, false);
+	_timerMoreUnit->think(true, false);
+	_timerLessUnit->think(true, false);
 }
 
 }

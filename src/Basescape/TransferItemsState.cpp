@@ -268,9 +268,9 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	updateList();
 
 	_timerInc = new Timer(250);
-	_timerInc->onTimer((StateHandler)&TransferItemsState::increase);
+	_timerInc->onState(std::bind(&TransferItemsState::increase, this));
 	_timerDec = new Timer(250);
-	_timerDec->onTimer((StateHandler)&TransferItemsState::decrease);
+	_timerDec->onState(std::bind(&TransferItemsState::decrease, this));
 }
 
 /**
@@ -289,8 +289,8 @@ void TransferItemsState::think()
 {
 	State::think();
 
-	_timerInc->think(this, 0);
-	_timerDec->think(this, 0);
+	_timerInc->think(true, false);
+	_timerDec->think(true, false);
 }
 
 /**

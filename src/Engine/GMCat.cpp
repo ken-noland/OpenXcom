@@ -349,10 +349,10 @@ static int gmext_write_midi (const struct gmstream *stream,
 		// rewrite track length
 		unsigned char *p = &midi[loffset];
 		size_t length = midi.size() - loffset - 4;
-		p[0] = length >> 24;
-		p[1] = length >> 16;
-		p[2] = length >> 8;
-		p[3] = length;
+		p[0] = (unsigned char)(length >> 24);
+		p[1] = (unsigned char)(length >> 16);
+		p[2] = (unsigned char)(length >> 8);
+		p[3] = (unsigned char)(length);
 	}
 
 	return 0;
@@ -377,7 +377,7 @@ Music *GMCatFile::loadMIDI(unsigned int i)
 	auto nameskip = SDL_ReadU8(cat_rwops) + 1;
 	SDL_RWseek(cat_rwops, RW_SEEK_SET, 0);
 	auto data = (unsigned char *)SDL_LoadFile_RW(cat_rwops, &size, SDL_TRUE);
-	if (gmext_read_stream(&stream, size - nameskip, data + nameskip) == -1) {
+	if (gmext_read_stream(&stream, (unsigned int)(size - nameskip), data + nameskip) == -1) {
 		Log(LOG_ERROR) << "GMCatFile::loadMIDI("<<fileName()<<", "<<i<<"): Error reading MIDI stream";
 		return music;
 	}
@@ -388,7 +388,7 @@ Music *GMCatFile::loadMIDI(unsigned int i)
 	if (gmext_write_midi(&stream, midi) == -1) {
 		Log(LOG_ERROR) << "GMCatFile::loadMIDI("<<fileName()<<", "<<i<<"): Error writing MIDI stream";
 	} else {
-		music->load(SDL_RWFromConstMem(midi.data(), midi.size()));
+		music->load(SDL_RWFromConstMem(midi.data(), (int)midi.size()));
 	}
 	Log(LOG_VERBOSE) << "GMCatFile::loadMIDI("<<fileName()<<", "<<i<<"): loaded ok.";
 	SDL_free(data);

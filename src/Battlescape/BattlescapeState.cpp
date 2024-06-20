@@ -702,10 +702,10 @@ BattlescapeState::BattlescapeState()
 	}
 
 	_animTimer = new Timer(DEFAULT_ANIM_SPEED, true);
-	_animTimer->onTimer((StateHandler)&BattlescapeState::animate);
+	_animTimer->onState(std::bind(&BattlescapeState::animate, this));
 
 	_gameTimer = new Timer(DEFAULT_ANIM_SPEED, true);
-	_gameTimer->onTimer((StateHandler)&BattlescapeState::handleState);
+	_gameTimer->onState(std::bind(&BattlescapeState::handleState, this));
 
 	_battleGame = new BattlescapeGame(_save, this);
 
@@ -769,7 +769,7 @@ void BattlescapeState::init()
 		_save->setPaletteByDepth(this);
 		for (entt::entity surfaceEnt : _surfaces)
 		{
-			Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+			Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 			surface->setPalette(_palette);
 		}
 	}
@@ -868,8 +868,8 @@ void BattlescapeState::think()
 			{
 				_map->refreshAIProgress(100 - ret); // progress = 100 - ret;
 			}
-			_animTimer->think(this, 0);
-			_gameTimer->think(this, 0);
+			_animTimer->think(true, false);
+			_gameTimer->think(true, false);
 			if (popped)
 			{
 				_battleGame->handleNonTargetAction();
@@ -3830,7 +3830,7 @@ void BattlescapeState::resize(int &dX, int &dY)
 
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getGame()->getRegistry().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
 
 		if (surface == _btnCtrl || surface == _btnAlt || surface == _btnShift || surface == _btnRMB || surface == _btnMMB)
 		{

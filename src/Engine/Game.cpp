@@ -88,7 +88,7 @@ Game::Game(const std::string &title)
 	  _ctrl(false), _alt(false), _shift(false), _rmb(false), _mmb(false), _luaMod(nullptr)
 
 	///TEMP
-	, _surfaceFactory(_tempRegistry), _interfaceFactory(_tempRegistry, _surfaceFactory)
+	  , _surfaceFactory(_registry.raw()), _interfaceFactory(_registry.raw(), _surfaceFactory)
 {
 	setThreadLocalGame(this);
 
