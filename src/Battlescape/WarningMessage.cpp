@@ -119,7 +119,7 @@ void WarningMessage::showMessage(const std::string &msg, int time)
  */
 void WarningMessage::think()
 {
-	_timer->think(0, this);
+	_timer->think(false, true);
 }
 
 /**

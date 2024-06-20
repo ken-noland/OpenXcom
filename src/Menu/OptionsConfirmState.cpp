@@ -103,7 +103,7 @@ void OptionsConfirmState::think()
 {
 	State::think();
 
-	_timer->think(this, 0);
+	_timer->think(true, false);
 }
 
 /**

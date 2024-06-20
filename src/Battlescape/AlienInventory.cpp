@@ -50,7 +50,7 @@ AlienInventory::AlienInventory(Game *game, int width, int height, int x, int y) 
 	_items = new Surface(width, height, 0, 0);
 
 	_animTimer = new Timer(100);
-	_animTimer->onTimer(std::bind(&AlienInventory::animate, this));
+	_animTimer->onSurface(std::bind(&AlienInventory::animate, this));
 	_animTimer->start();
 }
 
@@ -271,7 +271,7 @@ void AlienInventory::mouseClick(Action *action, State *state)
  */
 void AlienInventory::think()
 {
-	_animTimer->think(0, this);
+	_animTimer->think(false, true);
 }
 
 /**

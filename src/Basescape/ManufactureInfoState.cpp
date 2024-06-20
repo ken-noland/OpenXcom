@@ -736,10 +736,10 @@ void ManufactureInfoState::handleWheelUnit(Action *action)
 void ManufactureInfoState::think()
 {
 	State::think();
-	_timerMoreEngineer->think(this, 0);
-	_timerLessEngineer->think(this, 0);
-	_timerMoreUnit->think(this, 0);
-	_timerLessUnit->think(this, 0);
+	_timerMoreEngineer->think(true, false);
+	_timerLessEngineer->think(true, false);
+	_timerMoreUnit->think(true, false);
+	_timerLessUnit->think(true, false);
 }
 
 }

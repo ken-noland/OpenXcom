@@ -505,7 +505,7 @@ void NextTurnState::think()
 {
 	if (_timer)
 	{
-		_timer->think(this, 0);
+		_timer->think(true, false);
 	}
 }
 

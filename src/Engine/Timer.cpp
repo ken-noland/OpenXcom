@@ -106,7 +106,7 @@ bool Timer::isRunning() const
  * @param state State that the action handler belongs to.
  * @param surface Surface that the action handler belongs to.
  */
-void Timer::think(State* state, Surface* surface)
+void Timer::think(bool state, bool surface)
 {
 	Sint64 now = slowTick(); // must be signed to permit negative numbers
 	//assert(!game || game->isState(state));
@@ -123,13 +123,13 @@ void Timer::think(State* state, Surface* surface)
 				}
 				_frameSkipStart += _interval;
 				// breaking here after one iteration effectively returns this function to its old functionality:
-				if (!state || !_frameSkipping || !getGame()->isState(state))
+				if (!state || !_frameSkipping)
 					break; // if game isn't set, we can't verify *state
 			}
 
-			if (surface && _timerFunction)
+			if (surface && _surfaceFunction)
 			{
-				_timerFunction();
+				_surfaceFunction();
 			}
 			_start = slowTick();
 			if (_start > _frameSkipStart) _frameSkipStart = _start; // don't play animations in ffwd to catch up :P
@@ -159,9 +159,9 @@ void Timer::onState(StateHandler handler)
  * Sets a surface function for the timer to call every interval.
  * @param handler Event handler.
  */
-void Timer::onTimer(TimerHandler handler)
+void Timer::onSurface(SurfaceHandler handler)
 {
-	_timerFunction = handler;
+	_surfaceFunction = handler;
 }
 
 }

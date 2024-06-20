@@ -150,15 +150,15 @@ Map::Map(Game *game, int width, int height, int x, int y, int visibleMapHeight) 
 	_camera = new Camera(_spriteWidth, _spriteHeight, _save->getMapSizeX(), _save->getMapSizeY(), _save->getMapSizeZ(), this, visibleMapHeight);
 
 	_scrollMouseTimer = new Timer(SCROLL_INTERVAL);
-	_scrollMouseTimer->onTimer(std::bind(&Map::scrollMouse, this));
+	_scrollMouseTimer->onSurface(std::bind(&Map::scrollMouse, this));
 
 	_scrollKeyTimer = new Timer(SCROLL_INTERVAL);
-	_scrollKeyTimer->onTimer(std::bind(&Map::scrollKey, this));
+	_scrollKeyTimer->onSurface(std::bind(&Map::scrollKey, this));
 	_camera->setScrollTimer(_scrollMouseTimer, _scrollKeyTimer);
 
 	_obstacleTimer = new Timer(2500);
 	_obstacleTimer->stop();
-	_obstacleTimer->onTimer(std::bind(&Map::disableObstacles, this));
+	_obstacleTimer->onSurface(std::bind(&Map::disableObstacles, this));
 
 	_txtAccuracy = new Text(44, 18, 0, 0);
 	_txtAccuracy->setSmall();
@@ -199,7 +199,7 @@ Map::Map(Game *game, int width, int height, int x, int y, int visibleMapHeight) 
 	_fadeShade = 16;
 	_nvColor = 0;
 	_fadeTimer = new Timer(FADE_INTERVAL);
-	_fadeTimer->onTimer(std::bind(&Map::fadeShade, this));
+	_fadeTimer->onSurface(std::bind(&Map::fadeShade, this));
 	_fadeTimer->start();
 
 	auto enviro = _save->getEnviroEffects();
@@ -283,10 +283,10 @@ void Map::init()
  */
 void Map::think()
 {
-	_scrollMouseTimer->think(0, this);
-	_scrollKeyTimer->think(0, this);
-	_fadeTimer->think(0, this);
-	_obstacleTimer->think(0, this);
+	_scrollMouseTimer->think(false, true);
+	_scrollKeyTimer->think(false, true);
+	_fadeTimer->think(false, true);
+	_obstacleTimer->think(false, true);
 }
 
 /**

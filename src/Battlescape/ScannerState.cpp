@@ -117,7 +117,7 @@ void ScannerState::animate()
 void ScannerState::think()
 {
 	State::think();
-	_timerAnimate->think(this, 0);
+	_timerAnimate->think(true, false);
 }
 
 /**

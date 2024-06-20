@@ -180,7 +180,7 @@ void BuildNewBaseState::think()
 {
 	State::think();
 	_globe->think();
-	_hoverTimer->think(this, 0);
+	_hoverTimer->think(true, false);
 }
 
 /**

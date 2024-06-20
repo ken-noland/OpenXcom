@@ -157,7 +157,7 @@ void StartState::init()
 void StartState::think()
 {
 	State::think();
-	_timer->think(this, 0);
+	_timer->think(true, false);
 
 	switch (loading)
 	{

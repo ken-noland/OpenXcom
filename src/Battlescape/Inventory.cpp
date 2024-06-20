@@ -81,7 +81,7 @@ Inventory::Inventory(Game *game, int width, int height, int x, int y, bool base)
 	_warning->setTextColor(_game->getMod()->getInterface("battlescape")->getElement("warning")->color);
 
 	_animTimer = new Timer(100);
-	_animTimer->onTimer(std::bind(&Inventory::animate, this));
+	_animTimer->onSurface(std::bind(&Inventory::animate, this));
 	_animTimer->start();
 
 	_stunIndicator = _game->getMod()->getSurface("BigStunIndicator", false);

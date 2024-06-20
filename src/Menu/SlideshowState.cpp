@@ -94,7 +94,7 @@ void SlideshowState::screenTimer()
  */
 void SlideshowState::think()
 {
-	_transitionTimer->think(this, 0);
+	_transitionTimer->think(true, false);
 }
 
 /**

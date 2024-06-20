@@ -289,8 +289,8 @@ void TransferItemsState::think()
 {
 	State::think();
 
-	_timerInc->think(this, 0);
-	_timerDec->think(this, 0);
+	_timerInc->think(true, false);
+	_timerDec->think(true, false);
 }
 
 /**

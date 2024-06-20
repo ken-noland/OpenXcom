@@ -44,7 +44,7 @@ namespace OpenXcom
 //	_dx(-x), _dy(-y), _bg(0), _color(0), _popup(popup), _popupStep(0.0), _state(state), _contrast(false), _screen(false), _thinBorder(false), _innerColor(0), _mute(false)
 //{
 //	_timer = new Timer(10);
-//	_timer->onTimer((SurfaceHandler)&Window::popup);
+//	_timer->onSurface((SurfaceHandler)&Window::popup);
 //
 //	if (_popup == POPUP_NONE)
 //	{
@@ -122,7 +122,7 @@ namespace OpenXcom
 //		setHidden(false);
 //	}
 //
-//	_timer->think(0, this);
+//	_timer->think(false, true);
 //}
 //
 ///**

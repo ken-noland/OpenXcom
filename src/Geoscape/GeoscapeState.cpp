@@ -754,14 +754,14 @@ void GeoscapeState::think()
 {
 	State::think();
 
-	_zoomInEffectTimer->think(this, 0);
-	_zoomOutEffectTimer->think(this, 0);
-	_dogfightStartTimer->think(this, 0);
+	_zoomInEffectTimer->think(true, false);
+	_zoomOutEffectTimer->think(true, false);
+	_dogfightStartTimer->think(true, false);
 
 	if (_popups.empty() && _dogfights.empty() && (!_zoomInEffectTimer->isRunning() || _zoomInEffectDone) && (!_zoomOutEffectTimer->isRunning() || _zoomOutEffectDone))
 	{
 		// Handle timers
-		_gameTimer->think(this, 0);
+		_gameTimer->think(true, false);
 	}
 	else
 	{
@@ -771,9 +771,9 @@ void GeoscapeState::think()
 			if (_dogfights.size() == _minimizedDogfights)
 			{
 				_pause = false;
-				_gameTimer->think(this, 0);
+				_gameTimer->think(true, false);
 			}
-			_dogfightTimer->think(this, 0);
+			_dogfightTimer->think(true, false);
 		}
 		if (!_popups.empty())
 		{

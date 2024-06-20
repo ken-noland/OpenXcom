@@ -146,7 +146,7 @@ UfopaediaStartState::~UfopaediaStartState()
 void UfopaediaStartState::think()
 {
 	State::think();
-	_timerScroll->think(this, 0);
+	_timerScroll->think(true, false);
 }
 
 /**

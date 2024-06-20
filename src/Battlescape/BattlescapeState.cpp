@@ -868,8 +868,8 @@ void BattlescapeState::think()
 			{
 				_map->refreshAIProgress(100 - ret); // progress = 100 - ret;
 			}
-			_animTimer->think(this, 0);
-			_gameTimer->think(this, 0);
+			_animTimer->think(true, false);
+			_gameTimer->think(true, false);
 			if (popped)
 			{
 				_battleGame->handleNonTargetAction();

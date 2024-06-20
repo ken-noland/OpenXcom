@@ -25,14 +25,14 @@ namespace OpenXcom
 {
 
 using StateHandler = std::function<void()>;
-using TimerHandler = std::function<void()>;
+using SurfaceHandler = std::function<void()>;
 
 /**
  * Timer used to run code in fixed intervals.
  * Used for code that should run at the same fixed interval
  * in various machines, based on milliseconds instead of CPU cycles.
  */
-class Timer
+class Timer	//KN NOTE: this should be split into two timers. One for state and one for surface.
 {
 public:
 	static int maxFrameSkip;
@@ -45,7 +45,7 @@ private:
 	bool _running;
 	bool _frameSkipping;
 	StateHandler _stateFunction;
-	TimerHandler _timerFunction;
+	SurfaceHandler _surfaceFunction;
 
 public:
 	/// Creates a stopped timer.
@@ -61,13 +61,13 @@ public:
 	/// Gets if the timer's running.
 	bool isRunning() const;
 	/// Advances the timer.
-	void think(State* state, Surface* surface);
+	void think(bool state, bool surface);
 	/// Sets the timer's interval.
 	void setInterval(Uint32 interval);
 	/// Hooks a state action handler to the timer interval.
 	void onState(StateHandler handler);
 	/// Hooks a surface action handler to the timer interval.
-	void onTimer(TimerHandler handler);
+	void onSurface(SurfaceHandler handler);
 };
 
 }

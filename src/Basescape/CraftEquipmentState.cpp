@@ -516,8 +516,8 @@ void CraftEquipmentState::think()
 {
 	State::think();
 
-	_timerLeft->think(this, 0);
-	_timerRight->think(this, 0);
+	_timerLeft->think(true, false);
+	_timerRight->think(true, false);
 }
 
 
