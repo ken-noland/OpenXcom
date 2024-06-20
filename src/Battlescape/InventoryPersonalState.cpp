@@ -37,7 +37,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the InventoryPersonalState.
  */
-InventoryPersonalState::InventoryPersonalState(Soldier* soldier)
+InventoryPersonalState::InventoryPersonalState(Soldier* soldier) : State("InventoryPersonalState")
 {
 	_screen = false;
 

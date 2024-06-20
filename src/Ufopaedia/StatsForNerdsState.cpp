@@ -140,7 +140,8 @@ const std::map<std::string, std::string> StatsForNerdsState::shortTranslationMap
 /**
  * Initializes all the elements on the UI.
  */
-StatsForNerdsState::StatsForNerdsState(std::shared_ptr<ArticleCommonState> state, bool debug, bool ids, bool defaults) : _state{ std::move(state) }, _counter(0), _indent(false)
+StatsForNerdsState::StatsForNerdsState(std::shared_ptr<ArticleCommonState> state, bool debug, bool ids, bool defaults)
+	: State("StatsForNerdsState"), _state{std::move(state)}, _counter(0), _indent(false)
 {
 	auto article = _state->getCurrentArticle();
 	_typeId = article->getType();
@@ -153,7 +154,8 @@ StatsForNerdsState::StatsForNerdsState(std::shared_ptr<ArticleCommonState> state
 /**
  * Initializes all the elements on the UI.
  */
-StatsForNerdsState::StatsForNerdsState(const UfopaediaTypeId typeId, const std::string topicId, bool debug, bool ids, bool defaults) : _counter(0), _indent(false)
+StatsForNerdsState::StatsForNerdsState(const UfopaediaTypeId typeId, const std::string topicId, bool debug, bool ids, bool defaults)
+	: State("StatsForNerdsState"), _counter(0), _indent(false)
 {
 	_typeId = typeId;
 	_topicId = topicId;

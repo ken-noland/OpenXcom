@@ -49,7 +49,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-NewManufactureListState::NewManufactureListState(Base *base) : _base(base), _showRequirements(false), _refreshCategories(true), _doInit(true), _lstScroll(0)
+NewManufactureListState::NewManufactureListState(Base* base) : State("NewManufactureListState"), _base(base), _showRequirements(false), _refreshCategories(true), _doInit(true), _lstScroll(0)
 {
 	_screen = false;
 

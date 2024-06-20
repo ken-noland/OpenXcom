@@ -37,7 +37,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the ExtendedGeoscapeLinksState screen.
  */
-ExtendedGeoscapeLinksState::ExtendedGeoscapeLinksState(GeoscapeState* parent) : _parent(parent)
+ExtendedGeoscapeLinksState::ExtendedGeoscapeLinksState(GeoscapeState* parent) : State("ExtendedGeoscapeLinksState"), _parent(parent)
 {
 	_screen = false;
 

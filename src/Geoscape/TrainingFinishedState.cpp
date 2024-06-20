@@ -38,7 +38,7 @@ namespace OpenXcom
  * @param list List of soldiers who finished their training
  * @param psi Is psi training?
  */
-TrainingFinishedState::TrainingFinishedState(Base *base, const std::vector<Soldier *> & list, bool psi) : _base(base), _psi(psi)
+TrainingFinishedState::TrainingFinishedState(Base* base, const std::vector<Soldier*>& list, bool psi) : State("TrainingFinishedState"), _base(base), _psi(psi)
 {
 	_screen = false;
 

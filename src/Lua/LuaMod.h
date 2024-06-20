@@ -30,6 +30,7 @@ namespace Lua
 {
 
 class GameScript;
+class UIScript;
 
 /// 
 class LuaMod
@@ -42,6 +43,7 @@ private:
 	LuaMods _luaMods;
 
 	std::unique_ptr<GameScript> _luaGameScript;
+	std::unique_ptr<UIScript> _luaUIScript;
 
 public:
 	LuaMod(Game& game, const ModFile& modFiles);
@@ -50,6 +52,7 @@ public:
 	bool loadAll();
 
 	inline GameScript& getGameScript() const { return *_luaGameScript; }
+	inline UIScript& getUIScript() const { return *_luaUIScript; }
 
 };
 

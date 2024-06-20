@@ -45,7 +45,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param state Pointer to the Basescape state.
  */
-BaseInfoState::BaseInfoState(entt::entity baseId, BasescapeState *state)
+BaseInfoState::BaseInfoState(entt::entity baseId, BasescapeState *state) : State("BaseInfoState")
 	: _baseId(baseId), _state(state), _base(&getRegistry().raw().get<Base>(baseId))
 {
 	// Create objects

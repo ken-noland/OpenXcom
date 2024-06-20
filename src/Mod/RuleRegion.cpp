@@ -223,7 +223,7 @@ std::pair<double, double> RuleRegion::getRandomPoint(size_t zone, int area) cons
 {
 	if (zone < _missionZones.size())
 	{
-		size_t a = area != -1 ? area : RNG::generate(0, _missionZones[zone].areas.size() - 1);
+		size_t a = area != -1 ? area : RNG::generate(0, (int)_missionZones[zone].areas.size() - 1);
 		double lonMin = _missionZones[zone].areas[a].lonMin;
 		double lonMax = _missionZones[zone].areas[a].lonMax;
 		double latMin = _missionZones[zone].areas[a].latMin;

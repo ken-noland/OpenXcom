@@ -22,6 +22,8 @@
 #include <SDL.h>
 #include "LocalizedText.h"
 
+#include <entt/entt.hpp>
+
 namespace OpenXcom
 {
 
@@ -49,10 +51,18 @@ class State
 	friend class Timer;
 
 protected:
-	std::vector<Surface*> _surfaces;
+	std::string _name;
+
+// temp for now
+entt::registry _surfaceRegistry;
+
+	std::vector<entt::entity> _surfaces;
 	bool _screen;
 	bool _soundPlayed;
 	InteractiveSurface *_modal;
+
+
+	std::string _interfaceCategory;
 	RuleInterface *_ruleInterface;
 	RuleInterface *_ruleInterfaceParent;
 	const Sound* _customSound;
@@ -61,9 +71,20 @@ protected:
 	Uint8 _cursorColor;
 public:
 	/// Creates a new state linked to a game.
-	State();
+	State(const std::string& name);
 	/// Cleans up the state.
 	virtual ~State();
+
+	const std::string& getName() const { return _name; }
+
+	const std::string& getInterfaceCategory() const { return _interfaceCategory; }
+
+	bool IsSoundPlayed() const { return _soundPlayed; }
+
+	bool IsScreen() const { return _screen; }
+
+//	const std::vector<Surface*>& getSurfaces() const { return _surfaces; }
+
 	/// Set interface rules.
 	void setInterface(const std::string &s, bool alterPal = false, SavedBattleGame *battleGame = 0);
 	/// Set window background.

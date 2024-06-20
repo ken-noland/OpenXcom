@@ -49,6 +49,9 @@
 
 #include "../Lua/LuaMod.h"
 
+//temp
+#include "../Lua/UIScript.h"
+
 namespace OpenXcom
 {
 
@@ -339,6 +342,12 @@ void Game::run()
 								_states.back()->redrawText();
 							}
 						}
+
+						//temp hack to force lua bound event
+						if (action.getDetails()->key.keysym.sym == SDLK_l && isCtrlPressed())
+						{
+							getLuaMod().getUIScript().getOnTestEvent().dispatchCallback();
+						}
 					}
 					_states.back()->handle(&action);
 					break;
@@ -507,6 +516,16 @@ void Game::popState()
 	_deleted.push_back(_states.back());
 	_states.pop_back();
 	_init = false;
+}
+
+State* Game::getState()
+{
+	return _states.back();
+}
+
+const std::list<State*>& Game::getStates() const
+{
+	return _states;
 }
 
 /**

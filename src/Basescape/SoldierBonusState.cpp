@@ -42,7 +42,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param soldier ID of the selected soldier.
  */
-SoldierBonusState::SoldierBonusState(Base *base, size_t soldier) : _base(base), _soldier(soldier)
+SoldierBonusState::SoldierBonusState(Base* base, size_t soldier) : State("SoldierBonusState"), _base(base), _soldier(soldier)
 {
 	_screen = false;
 

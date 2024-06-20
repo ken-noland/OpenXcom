@@ -39,7 +39,7 @@ namespace OpenXcom
  * Initializes all the elements in the Mod Options window.
  * @param game Pointer to the core game.
  */
-ModListState::ModListState() : _curMasterIdx(0)
+ModListState::ModListState() : State("ModListState"), _curMasterIdx(0)
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);
@@ -340,7 +340,7 @@ void ModListState::moveModUp(Action *action, unsigned int row, bool max)
 	else
 	{
 		// calculate target scroll pos
-		int curScrollPos = _lstMods->getScroll();
+		int curScrollPos = (int)_lstMods->getScroll();
 		int targetScrollPos = 0;
 		for (size_t i = 0; i < row - 1; ++i)
 		{

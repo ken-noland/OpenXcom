@@ -59,7 +59,7 @@ namespace OpenXcom
  * @param baseFrom Pointer to the source base.
  * @param baseTo Pointer to the destination base.
  */
-TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingState *debriefingState) :
+TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingState *debriefingState) : State("TransferItemsState"), 
 	_baseFrom(baseFrom), _baseTo(baseTo), _debriefingState(debriefingState),
 	_sel(0), _total(0), _pQty(0), _aQty(0), _iQty(0.0), _distance(0.0), _ammoColor(0),
 	_previousSort(TransferSortDirection::BY_LIST_ORDER), _currentSort(TransferSortDirection::BY_LIST_ORDER), _errorShown(false)

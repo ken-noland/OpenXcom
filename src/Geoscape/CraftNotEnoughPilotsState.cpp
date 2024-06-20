@@ -35,7 +35,7 @@ namespace OpenXcom
  * Initializes all the elements in a Craft Not Enough Pilots window.
  * @param craft Relevant craft.
  */
-CraftNotEnoughPilotsState::CraftNotEnoughPilotsState(Craft *craft) : _craft(craft)
+CraftNotEnoughPilotsState::CraftNotEnoughPilotsState(Craft* craft) : State("CraftNotEnoughPilotsState"), _craft(craft)
 {
 	_screen = false;
 

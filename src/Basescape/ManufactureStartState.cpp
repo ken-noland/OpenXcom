@@ -45,7 +45,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param item The RuleManufacture to produce.
  */
-ManufactureStartState::ManufactureStartState(Base *base, RuleManufacture *item) :  _base(base), _item(item)
+ManufactureStartState::ManufactureStartState(Base* base, RuleManufacture* item) : State("ManufactureStartState"), _base(base), _item(item)
 {
 	_screen = false;
 

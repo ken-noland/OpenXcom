@@ -99,7 +99,7 @@ constexpr bool isKnowNamePrefix(ScriptRef name)
 //						proc definition
 ////////////////////////////////////////////////////////////
 FORCE_INLINE
-static inline void addShade_h(int& reg, const int& var)
+static void addShade_h(int& reg, const int& var)
 {
 	const int newShade = (reg & 0xF) + var;
 	if (newShade > 0xF)
@@ -120,7 +120,7 @@ static inline void addShade_h(int& reg, const int& var)
 }
 
 FORCE_INLINE
-static inline RetEnum mulAddMod_h(int& reg, const int& mul, const int& add, const int& mod)
+static RetEnum mulAddMod_h(int& reg, const int& mul, const int& add, const int& mod)
 {
 	const int64_t a = ((int64_t)reg) * mul + add;
 	if (mod)
@@ -132,7 +132,7 @@ static inline RetEnum mulAddMod_h(int& reg, const int& mul, const int& add, cons
 }
 
 FORCE_INLINE
-static inline RetEnum mulDiv_h(int& reg, const int& mul, const int& div)
+static RetEnum mulDiv_h(int& reg, const int& mul, const int& div)
 {
 	if (div)
 	{
@@ -143,7 +143,7 @@ static inline RetEnum mulDiv_h(int& reg, const int& mul, const int& div)
 }
 
 FORCE_INLINE
-static inline RetEnum wavegen_rect_h(int& reg, const int& period, const int& size, const int& max)
+static RetEnum wavegen_rect_h(int& reg, const int& period, const int& size, const int& max)
 {
 	if (period <= 0)
 		return RetError;
@@ -158,7 +158,7 @@ static inline RetEnum wavegen_rect_h(int& reg, const int& period, const int& siz
 }
 
 FORCE_INLINE
-static inline RetEnum wavegen_saw_h(int& reg, const int& period, const int& size, const int& max)
+static RetEnum wavegen_saw_h(int& reg, const int& period, const int& size, const int& max)
 {
 	if (period <= 0)
 		return RetError;
@@ -173,7 +173,7 @@ static inline RetEnum wavegen_saw_h(int& reg, const int& period, const int& size
 }
 
 FORCE_INLINE
-static inline RetEnum wavegen_tri_h(int& reg, const int& period, const int& size, const int& max)
+static RetEnum wavegen_tri_h(int& reg, const int& period, const int& size, const int& max)
 {
 	if (period <= 0)
 		return RetError;
@@ -193,25 +193,25 @@ static inline RetEnum wavegen_tri_h(int& reg, const int& period, const int& size
 }
 
 FORCE_INLINE
-static inline RetEnum wavegen_sin_h(int& reg, const int& period, const int& size)
+static RetEnum wavegen_sin_h(int& reg, const int& period, const int& size)
 {
 	if (period <= 0)
 		return RetError;
-	reg = size * std::sin(2.0 * M_PI *  reg / period);
+	reg = (int)(size * std::sin(2.0 * M_PI *  reg / period));
 	return RetContinue;
 }
 
 FORCE_INLINE
-static inline RetEnum wavegen_cos_h(int& reg, const int& period, const int& size)
+static RetEnum wavegen_cos_h(int& reg, const int& period, const int& size)
 {
 	if (period <= 0)
 		return RetError;
-	reg = size * std::cos(2.0 * M_PI *  reg  / period);
+	reg = (int)(size * std::cos(2.0 * M_PI *  reg  / period));
 	return RetContinue;
 }
 
 FORCE_INLINE
-static inline RetEnum call_func_h(ScriptWorkerBase& c, ScriptFunc func, const Uint8* d, ProgPos& p)
+static RetEnum call_func_h(ScriptWorkerBase& c, ScriptFunc func, const Uint8* d, ProgPos& p)
 {
 	auto t = p;
 	auto r = func(c, d, t);
@@ -220,13 +220,13 @@ static inline RetEnum call_func_h(ScriptWorkerBase& c, ScriptFunc func, const Ui
 }
 
 FORCE_INLINE
-static inline RetEnum bit_popcount_h(int& reg)
+static RetEnum bit_popcount_h(int& reg)
 {
 	constexpr size_t minBitsetSize = 8*sizeof(std::bitset<1>);
 	constexpr size_t minRequiredSize = 8*sizeof(int);
 	constexpr size_t optimalSize = minRequiredSize < minBitsetSize ? minRequiredSize : minBitsetSize;
 	std::bitset<optimalSize> set = reg; //bitset with optimal size and without overhead
-	reg = set.count();
+	reg = (int)set.count();
 	return RetContinue;
 }
 
@@ -300,6 +300,13 @@ static inline RetEnum bit_popcount_h(int& reg)
 namespace
 {
 
+#if defined(_MSC_VER)
+#define GNU_ALWAYS_INLINE
+#else
+#define GNU_ALWAYS_INLINE [[gnu::always_inline]]
+#endif
+
+
 /**
  * Macro returning name of function
  */
@@ -311,7 +318,7 @@ namespace
 #define MACRO_CREATE_FUNC(NAME, Impl, Args, ...) \
 	struct MACRO_FUNC_ID(NAME) \
 	{ \
-		[[gnu::always_inline]] \
+		GNU_ALWAYS_INLINE \
 		static RetEnum func Args \
 			Impl \
 	};
@@ -320,10 +327,9 @@ MACRO_PROC_DEFINITION(MACRO_CREATE_FUNC)
 
 #undef MACRO_CREATE_FUNC
 
-
 struct Func_test_eq_null
 {
-	[[gnu::always_inline]]
+	GNU_ALWAYS_INLINE
 	static RetEnum func (ProgPos& Prog, std::nullptr_t, std::nullptr_t, ProgPos LabelTrue, ProgPos)
 	{
 		Prog = LabelTrue;
@@ -333,7 +339,7 @@ struct Func_test_eq_null
 
 struct Func_debug_impl_int
 {
-	[[gnu::always_inline]]
+	GNU_ALWAYS_INLINE
 	static RetEnum func (ScriptWorkerBase& c, int i)
 	{
 		auto f = [&]{ return std::to_string(i); };
@@ -344,7 +350,7 @@ struct Func_debug_impl_int
 
 struct Func_debug_impl_text
 {
-	[[gnu::always_inline]]
+	GNU_ALWAYS_INLINE
 	static RetEnum func (ScriptWorkerBase& c, ScriptText p)
 	{
 		auto f = [&]{ return std::string(p); };
@@ -355,7 +361,7 @@ struct Func_debug_impl_text
 
 struct Func_debug_flush
 {
-	[[gnu::always_inline]]
+	GNU_ALWAYS_INLINE
 	static RetEnum func (ScriptWorkerBase& c, ProgPos& p)
 	{
 		c.log_buffer_flush(p);
@@ -365,7 +371,7 @@ struct Func_debug_flush
 
 struct Func_set_text
 {
-	[[gnu::always_inline]]
+	GNU_ALWAYS_INLINE
 	static RetEnum func (ScriptWorkerBase& c, ScriptText& a, ScriptText b)
 	{
 		a = b;
@@ -375,7 +381,7 @@ struct Func_set_text
 
 struct Func_clear_text
 {
-	[[gnu::always_inline]]
+	GNU_ALWAYS_INLINE
 	static RetEnum func (ScriptWorkerBase& c, ScriptText& a)
 	{
 		a = ScriptText::empty;
@@ -385,7 +391,7 @@ struct Func_clear_text
 
 struct Func_test_eq_text
 {
-	[[gnu::always_inline]]
+	GNU_ALWAYS_INLINE
 	static RetEnum func (ProgPos& prog, ScriptText a, ScriptText b, ProgPos labelTrue, ProgPos labelFalse)
 	{
 		if (a.ptr == nullptr && b.ptr == nullptr)
@@ -1391,7 +1397,7 @@ int overloadCustomProc(const ScriptProcData& spd, const ScriptRefData* begin, co
 	{
 		return 0;
 	}
-	return tempSorce;
+	return (int)tempSorce;
 }
 
 /**
@@ -2024,7 +2030,7 @@ bool parseLoop(const ScriptProcData& spd, ParserWriter& ph, const ScriptRefData*
 				return {};
 			}
 
-			return std::make_tuple(bestOverload, getOverloadArgTypeTail(*bestOverload, org));
+			return std::make_tuple(bestOverload, getOverloadArgTypeTail(*bestOverload, (int)org));
 		};
 
 		auto parseReg = [&](ScriptRef name, ScriptRange<ArgEnum> types) -> ScriptRefData

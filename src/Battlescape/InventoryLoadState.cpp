@@ -34,7 +34,7 @@ namespace OpenXcom
 /**
 * Initializes all the elements in the Load Inventory window.
 */
-InventoryLoadState::InventoryLoadState(InventoryState *parent) : _parent(parent)
+InventoryLoadState::InventoryLoadState(InventoryState* parent) : State("InventoryLoadState"), _parent(parent)
 {
 	_screen = false;
 

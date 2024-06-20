@@ -66,7 +66,7 @@ struct compareFundingCountryChange
  * Initializes all the elements in the Funding screen.
  * @param game Pointer to the core game.
  */
-FundingState::FundingState()
+FundingState::FundingState() : State("FundingState")
 {
 	_screen = false;
 

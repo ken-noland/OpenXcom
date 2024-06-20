@@ -36,7 +36,8 @@ namespace OpenXcom
  * @param bonus Pointer to bonus unlocked research.
  * @param research Pointer to the research project.
  */
-ResearchCompleteState::ResearchCompleteState(const RuleResearch *newResearch, const RuleResearch *bonus, const RuleResearch *research, const Base* base) : _research(newResearch), _bonus(bonus)
+ResearchCompleteState::ResearchCompleteState(const RuleResearch *newResearch, const RuleResearch *bonus, const RuleResearch *research, const Base* base)
+	: State("ResearchRequiredState"), _research(newResearch), _bonus(bonus)
 {
 	_screen = false;
 

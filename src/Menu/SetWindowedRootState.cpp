@@ -35,7 +35,8 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param OptionsVideoState Options screen that originated this state.
  */
-SetWindowedRootState::SetWindowedRootState(OptionsOrigin origin, OptionsVideoState *optionsVideoState) : _origin(origin), _optionsVideoState(optionsVideoState)
+SetWindowedRootState::SetWindowedRootState(OptionsOrigin origin, OptionsVideoState *optionsVideoState)
+	: State("SetWindowedRootState"), _origin(origin), _optionsVideoState(optionsVideoState)
 {
 	_screen = false;
 

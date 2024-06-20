@@ -58,7 +58,8 @@ namespace OpenXcom
  * @param battleGame Pointer to the saved game.
  * @param state Pointer to the Battlescape state.
  */
-NextTurnState::NextTurnState(SavedBattleGame *battleGame, BattlescapeState *state) : _battleGame(battleGame), _state(state), _timer(0), _currentTurn(0), _showBriefing(false)
+NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* state)
+	: State("NextTurnState"), _battleGame(battleGame), _state(state), _timer(0), _currentTurn(0), _showBriefing(false)
 {
 	if (_battleGame->isPreview())
 	{
@@ -1111,7 +1112,7 @@ bool NextTurnState::placeReinforcementNearFriend(BattleUnit *unit)
 		bool largeUnit = false;
 		while (entryPoint == TileEngine::invalid && tries)
 		{
-			BattleUnit* k = _battleGame->getUnits().at(RNG::generate(0, _battleGame->getUnits().size() - 1));
+			BattleUnit* k = _battleGame->getUnits().at(RNG::generate(0, (int)_battleGame->getUnits().size() - 1));
 			if (k->getFaction() == unit->getFaction() && k->getPosition() != TileEngine::invalid && k->getArmor()->getSize() >= unit->getArmor()->getSize())
 			{
 				entryPoint = k->getPosition();

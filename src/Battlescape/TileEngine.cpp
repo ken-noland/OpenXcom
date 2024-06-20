@@ -6468,7 +6468,7 @@ std::set<Tile*> TileEngine::visibleTilesFrom(BattleUnit* unit, Position pos, int
 	bool swap = (direction == 0 || direction == 4);
 	const int signX[8] = {+1, +1, +1, +1, -1, -1, -1, -1};
 	const int signY[8] = {-1, -1, -1, +1, +1, +1, -1, -1};
-	int y1, y2;
+	int y1;
 	Position posTest;
 
 	if ((unit->getHeight() + unit->getFloatHeight() + -_save->getTile(pos)->getTerrainLevel()) >= 24 + 4)

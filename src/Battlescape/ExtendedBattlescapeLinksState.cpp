@@ -42,7 +42,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements in the ExtendedBattlescapeLinksState screen.
  */
-ExtendedBattlescapeLinksState::ExtendedBattlescapeLinksState(BattlescapeState* parent, SavedBattleGame* save) : _parent(parent), _save(save)
+ExtendedBattlescapeLinksState::ExtendedBattlescapeLinksState(BattlescapeState* parent, SavedBattleGame* save) : State("ExtendedBattlescapeLinksState"), _parent(parent), _save(save)
 {
 	_screen = false;
 

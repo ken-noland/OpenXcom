@@ -54,7 +54,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param base Pointer to the base to get info from.
  */
-SoldiersState::SoldiersState(Base *base) : _base(base), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL), selectedCraftIndex(0)
+SoldiersState::SoldiersState(Base* base) : State("SoldiersState"), _base(base), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL), selectedCraftIndex(0)
 {
 	bool isPsiBtnVisible = Options::anytimePsiTraining && _base->getAvailablePsiLabs() > 0;
 	bool isTrnBtnVisible = _base->getAvailableTraining() > 0;

@@ -38,7 +38,7 @@ namespace OpenXcom
 /**
 * Initializes all the elements in the Save Craft Loadout window.
 */
-CraftEquipmentSaveState::CraftEquipmentSaveState(CraftEquipmentState *parent) : _parent(parent), _previousSelectedRow(-1), _selectedRow(-1)
+CraftEquipmentSaveState::CraftEquipmentSaveState(CraftEquipmentState* parent) : State("CraftEquipmentSaveState"), _parent(parent), _previousSelectedRow(-1), _selectedRow(-1)
 {
 	_screen = false;
 

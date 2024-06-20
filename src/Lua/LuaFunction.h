@@ -17,6 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <tuple>
+#include <string>
+
+extern "C"
+{
+#include <lauxlib.h>
+#include <lua.h>
+#include <lualib.h>
+}
 
 namespace OpenXcom
 {
@@ -64,7 +73,7 @@ struct FunctionTraits<_ReturnType (_ClassType::*)(_Args...) const>
 	using ArgsTuple = std::tuple<_Args...>;
 	using FunctionType = ReturnType (*)(_Args...);
 
-	using ClassMemberFunction = std::false_type;
+	using ClassMemberFunction = std::true_type;
 };
 
 template <typename Ret, typename... Args>
@@ -165,6 +174,35 @@ void registerFunction(lua_State* luaState, const std::string& functionName)
 
 	// tableName[functionName] = function
 	lua_setfield(luaState, -2, functionName.c_str());
+}
+
+
+
+
+/// Static function to act as a trampoline for member functions
+template <typename Owner, int (Owner::*func)(lua_State*)>
+int memberLuaFunctionWrapper(lua_State* luaState)
+{
+	// Get the object instance from the table's metatable
+	lua_getmetatable(luaState, 1);
+	lua_getfield(luaState, -1, "__userdata");
+	void* userdata = lua_touserdata(luaState, -1);
+	lua_pop(luaState, 2);
+
+	// Call the member function
+	Owner* obj = static_cast<Owner*>(userdata);
+	return (obj->*func)(luaState);
+}
+
+/// Helper function to create a class function in the table.
+template <typename Owner, int (Owner::*func)(lua_State*)>
+inline void registerClassLuaFunction(lua_State* luaState, const std::string functionName, int tableIndex) // KN NOTE: Maybe move this to LuaFunction.h? I'm not sure it's used anywhere anymore.
+{
+	// Push the function
+	lua_pushcfunction(luaState, reinterpret_cast<lua_CFunction>(memberLuaFunctionWrapper<Owner, func>)); // Push the function
+
+	// tableName[functionName] = function
+	lua_setfield(luaState, tableIndex, functionName.c_str()); // tableName[functionName] = function
 }
 
 

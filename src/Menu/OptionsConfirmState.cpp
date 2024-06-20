@@ -38,7 +38,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param origin Game section that originated this state.
  */
-OptionsConfirmState::OptionsConfirmState(OptionsOrigin origin) : _origin(origin), _countdown(15)
+OptionsConfirmState::OptionsConfirmState(OptionsOrigin origin) : State("OptionsConfirmState"), _origin(origin), _countdown(15)
 {
 	_screen = false;
 

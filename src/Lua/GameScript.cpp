@@ -43,18 +43,20 @@ GameScript::~GameScript()
 
 void GameScript::onRegisterApi(lua_State* luaState, int parentTableIndex)
 {
-	_geoscapeScript.registerApi(luaState, parentTableIndex);
+	// Stack now: [..., table]
+
+	//_geoscapeScript.registerApi(luaState, parentTableIndex);
 
 	_onLoadGame.registerApi(luaState, parentTableIndex);
 	_onSaveGame.registerApi(luaState, parentTableIndex);
 
-	//using lambdas to register functions for the game table.
-	registerFunction<[]() -> int { return 2; }>(luaState, "test_ret_2");
+	////using lambdas to register functions for the game table.
+	//registerFunction<[]() -> int { return 2; }>(luaState, "test_ret_2");
 
-	registerContainer<
-		[]() -> const std::vector<Base*>& { return std::vector<Base*>{}; }, // ! Wasn't sure how you wanted to handle this so just bypassed for now
-		[]() -> bool { return getGame()->getSavedGame() != nullptr; }
-	>(luaState, "bases", parentTableIndex);
+	//registerContainer<
+	//	[]() -> const std::vector<Base*>& { return getGame()->getSavedGame()->getBases(); },
+	//	[]() -> bool { return getGame()->getSavedGame() != nullptr; }
+	//>(luaState, "bases", parentTableIndex, nullptr);
 }
 
 	

@@ -40,7 +40,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param soldier ID of the selected soldier.
  */
-CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft) : _base(base), _craft(craft)
+CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft) : State("CraftPilotSelectState"), _base(base), _craft(craft)
 {
 	_screen = false;
 

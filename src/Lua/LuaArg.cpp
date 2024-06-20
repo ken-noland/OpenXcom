@@ -74,6 +74,12 @@ void toLua(lua_State* L, __int64 arg)
 }
 
 template <>
+void toLua(lua_State* L, bool arg)
+{
+	lua_pushboolean(L, arg);
+}
+
+template <>
 int fromLua(lua_State* luaState, int index)
 {
 	return static_cast<int>(lua_tointeger(luaState, index));
@@ -109,17 +115,22 @@ const char* fromLua(lua_State* luaState, int index)
 }
 
 template <>
-const size_t fromLua(lua_State* luaState, int index)
+size_t fromLua(lua_State* luaState, int index)
 {
 	return (size_t)lua_tointeger(luaState, index);
 }
 
 template <>
-const __int64 fromLua(lua_State* luaState, int index)
+__int64 fromLua(lua_State* luaState, int index)
 {
 	return (__int64)lua_tointeger(luaState, index);
 }
 
+template <>
+bool fromLua(lua_State* luaState, int index)
+{
+	return lua_toboolean(luaState, index) != 0;
+}
 
 } // namespace Lua
 

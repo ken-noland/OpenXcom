@@ -38,7 +38,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param action Pointer to an action.
  */
-ScannerState::ScannerState (BattleAction *action) : _action(action)
+ScannerState::ScannerState(BattleAction* action) : State("ScannerState"), _action(action)
 {
 	if (Options::maximizeInfoScreens)
 	{

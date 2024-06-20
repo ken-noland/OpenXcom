@@ -52,7 +52,9 @@ namespace OpenXcom
  * @param psi Show psi training afterwards?
  * @param globe Pointer to the globe.
  */
-MonthlyReportState::MonthlyReportState(Globe* globe) : _gameOver(0), _ratingTotal(0), _fundingDiff(0), _lastMonthsRating(0), _happyList(0), _sadList(0), _pactList(0), _cancelPactList(0)
+MonthlyReportState::MonthlyReportState(Globe* globe)
+	: State("MonthlyReportState"), _gameOver(0), _ratingTotal(0), _fundingDiff(0),
+	_lastMonthsRating(0), _happyList(0), _sadList(0), _pactList(0), _cancelPactList(0)
 {
 	_globe = globe;
 	// Create objects

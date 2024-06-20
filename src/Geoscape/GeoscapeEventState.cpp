@@ -50,7 +50,7 @@ namespace OpenXcom
  * Initializes all the elements in the Geoscape Event window.
  * @param geoEvent Pointer to the event.
  */
-GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : _eventRule(eventRule)
+GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : State("GeoscapeEventState"), _eventRule(eventRule)
 {
 	_screen = false;
 

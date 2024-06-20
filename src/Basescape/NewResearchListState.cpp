@@ -44,7 +44,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param sortByCost Should the list be sorted by cost or listOrder?
  */
-NewResearchListState::NewResearchListState(Base *base, bool sortByCost) : _base(base), _sortByCost(sortByCost), _lstScroll(0)
+NewResearchListState::NewResearchListState(Base* base, bool sortByCost) : State("NewResearchListState"), _base(base), _sortByCost(sortByCost), _lstScroll(0)
 {
 	if (Options::isPasswordCorrect())
 	{

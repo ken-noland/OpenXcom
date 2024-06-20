@@ -37,6 +37,8 @@
 #include "ConfirmCydoniaState.h"
 #include "../Engine/Options.h"
 
+#include "../Entities/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -46,7 +48,7 @@ namespace OpenXcom
  * @param craft Pointer to the craft to target.
  * @param globe Pointer to the Geoscape globe.
  */
-SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe *globe) : _crafts(std::move(crafts)), _globe(globe)
+SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe* globe) : State("SelectDestinationState"), _crafts(std::move(crafts)), _globe(globe)
 {
 	int dx = getGame()->getScreen()->getDX();
 	int dy = getGame()->getScreen()->getDY();
@@ -365,8 +367,10 @@ void SelectDestinationState::btnCydoniaClick(Action *)
  */
 void SelectDestinationState::resize(int &dX, int &dY)
 {
-	for (auto* surface : _surfaces)
+	for (const entt::entity& surfaceEntity : _surfaces)
 	{
+		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEntity).getSurface();
+
 		surface->setX(surface->getX() + dX / 2);
 		if (surface != _window && surface != _btnCancel && surface != _txtTitle && surface != _btnCydonia)
 		{

@@ -54,7 +54,7 @@ struct GraphButInfo
  * Initializes all the elements in the Graphs screen.
  * @param game Pointer to the core game.
  */
-GraphsState::GraphsState() : _butRegionsOffset(0), _butCountriesOffset(0), _zoom(100)
+GraphsState::GraphsState() : State("GraphsState"), _butRegionsOffset(0), _butCountriesOffset(0), _zoom(100)
 {
 	// Create object
 	_bg = new InteractiveSurface(320, 200, 0, 0);
@@ -1033,10 +1033,10 @@ void GraphsState::drawRegionLines()
 	for (int iter = 0; iter != 12; ++iter)
 	{
 		int x = 312 - (iter*17);
-		int y = 175 - (-lowerLimit / units);
+		int y = (int)(175 - (-lowerLimit / units));
 		if (totals[iter] > 0)
 		{
-			int reduction = totals[iter] / units;
+			int reduction = (int)(totals[iter] / units);
 			y -= reduction;
 		}
 
@@ -1138,7 +1138,7 @@ void GraphsState::drawFinanceLines()
 		}
 	}
 
-	double range = upperLimit - lowerLimit;
+	double range = (double)(upperLimit - lowerLimit);
 	double low = lowerLimit;
 	int check = 250;
 	int grids = 9; // cells in grid

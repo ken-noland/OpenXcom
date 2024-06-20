@@ -44,8 +44,8 @@ namespace OpenXcom
  * @param craft Pointer to craft to retarget (NULL if none).
  * @param state Pointer to the Geoscape state.
  */
-MultipleTargetsState::MultipleTargetsState(std::vector<Target*> targets, std::vector<Craft*> crafts, GeoscapeState *state, bool useCustomSound) :
-	_targets(targets), _crafts(std::move(crafts)), _state(state), _useCustomSound(useCustomSound)
+MultipleTargetsState::MultipleTargetsState(std::vector<Target*> targets, std::vector<Craft*> crafts, GeoscapeState *state, bool useCustomSound)
+	: State("MultipleTargetsState"), _targets(targets), _crafts(std::move(crafts)), _state(state), _useCustomSound(useCustomSound)
 {
 	_screen = false;
 

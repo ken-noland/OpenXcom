@@ -49,8 +49,8 @@ namespace OpenXcom
  * @param sourceSoldier Pointer to the selected soldier
  * @param filteredListOfSoldiers Pointer to the list of available soldiers
  */
-SoldierTransformationState::SoldierTransformationState(RuleSoldierTransformation *transformationRule, Base *base, Soldier *sourceSoldier, std::vector<Soldier *> *filteredListOfSoldiers) :
-	_transformationRule(transformationRule), _base(base), _sourceSoldier(sourceSoldier), _filteredListOfSoldiers(filteredListOfSoldiers)
+SoldierTransformationState::SoldierTransformationState(RuleSoldierTransformation *transformationRule, Base *base, Soldier *sourceSoldier, std::vector<Soldier *> *filteredListOfSoldiers)
+	: State("SoldierTransformationState"), _transformationRule(transformationRule), _base(base), _sourceSoldier(sourceSoldier), _filteredListOfSoldiers(filteredListOfSoldiers)
 {
 	_window = new Window(this, 320, 200, 0, 0);
 	_btnCancel = new TextButton(148, 16, 8, 176);

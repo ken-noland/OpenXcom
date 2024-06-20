@@ -39,7 +39,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param soldierId ID of the selected soldier.
  */
-SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : _base(base), _soldierId(soldierId)
+SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : State("SoldierRankState"), _base(base), _soldierId(soldierId)
 {
 	_screen = false;
 

@@ -36,7 +36,7 @@ namespace OpenXcom
  * Initializes all the elements in the Psi Training screen.
  * @param game Pointer to the core game.
  */
-PsiTrainingState::PsiTrainingState()
+PsiTrainingState::PsiTrainingState() : State("PsiTrainingState")
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0);

@@ -37,7 +37,7 @@ namespace OpenXcom
  * Initializes all the elements in the Notes screen.
  * @param origin Game section that originated this state.
  */
-NotesState::NotesState(OptionsOrigin origin) : _origin(origin), _previousSelectedRow(-1), _selectedRow(-1)
+NotesState::NotesState(OptionsOrigin origin) : State("NotesState"), _origin(origin), _previousSelectedRow(-1), _selectedRow(-1)
 {
 	_screen = false;
 

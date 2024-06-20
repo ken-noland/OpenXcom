@@ -43,7 +43,7 @@ namespace OpenXcom
  * Initializes all the elements in the BriefingLight screen.
  * @param deployment Pointer to the mission deployment.
  */
-BriefingLightState::BriefingLightState(AlienDeployment *deployment)
+BriefingLightState::BriefingLightState(AlienDeployment* deployment) : State("BriefingLightState")
 {
 	_screen = true;
 	// Create objects

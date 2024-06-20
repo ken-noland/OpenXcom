@@ -49,7 +49,7 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param screenActions Pointer to the list of transformations in the parent SoldiersState.
  */
-SoldierTransformationListState::SoldierTransformationListState(Base *base, ComboBox *screenActions) : _base(base), _screenActions(screenActions)
+SoldierTransformationListState::SoldierTransformationListState(Base* base, ComboBox* screenActions) : State("SoldierTransformationListState"), _base(base), _screenActions(screenActions)
 {
 	// Calculate once
 	getGame()->getSavedGame()->getAvailableTransformations(_availableTransformations, getGame()->getMod(), _base);

@@ -55,6 +55,8 @@
 #include "../Savegame/Soldier.h"
 #include "../Savegame/Ufo.h"
 
+#include "../Entities/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -239,8 +241,8 @@ const int DogfightState::_projectileBlobs[4][6][3] =
  * @param ufo Pointer to the UFO being intercepted.
  * @param ufoIsAttacking Is UFO the aggressor?
  */
-DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool ufoIsAttacking) :
-	_state(state), _craft(craft), _ufo(ufo),
+DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool ufoIsAttacking)
+	: State("DogfightState"), _state(state), _craft(craft), _ufo(ufo),
 	_ufoIsAttacking(ufoIsAttacking), _disableDisengage(false), _disableCautious(false), _craftIsDefenseless(false), _selfDestructPressed(false),
 	_timeout(50), _currentDist(640), _targetDist(560),
 	_end(false), _endUfoHandled(false), _endCraftHandled(false), _ufoBreakingOff(false), _destroyUfo(false), _destroyCraft(false),
@@ -2455,8 +2457,10 @@ void DogfightState::moveWindow()
 {
 	int x = _window->getX() - _x;
 	int y = _window->getY() - _y;
-	for (auto* surface : _surfaces)
+	for (entt::entity surfaceEnt : _surfaces)
 	{
+		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+
 		surface->setX(surface->getX() - x);
 		surface->setY(surface->getY() - y);
 	}

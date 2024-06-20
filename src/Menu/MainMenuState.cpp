@@ -39,7 +39,7 @@
 namespace OpenXcom
 {
 
-GoToMainMenuState::GoToMainMenuState(bool updateCheck) : _updateCheck(updateCheck)
+GoToMainMenuState::GoToMainMenuState(bool updateCheck) : State("GoToMainMenuState"), _updateCheck(updateCheck)
 {
 	// empty
 }
@@ -60,7 +60,7 @@ void GoToMainMenuState::init()
  * Initializes all the elements in the Main Menu window.
  * @param updateCheck Perform update check?
  */
-MainMenuState::MainMenuState(bool updateCheck)
+MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState")
 {
 #ifdef _WIN32
 	_debugInVisualStudio = false;

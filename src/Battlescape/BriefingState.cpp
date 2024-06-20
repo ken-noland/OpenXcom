@@ -53,7 +53,7 @@ namespace OpenXcom
  * @param infoOnly Only show static info, when briefing is re-opened during the battle.
  * @param customBriefing Pointer to a custom briefing (used for Reinforcements notification).
  */
-BriefingState::BriefingState(Craft *craft, Base *base, bool infoOnly, BriefingData *customBriefing) : _infoOnly(infoOnly), _disableCutsceneAndMusic(false)
+BriefingState::BriefingState(Craft* craft, Base* base, bool infoOnly, BriefingData* customBriefing) : State("BriefingState"), _infoOnly(infoOnly), _disableCutsceneAndMusic(false)
 {
 	Options::baseXResolution = Options::baseXGeoscape;
 	Options::baseYResolution = Options::baseYGeoscape;

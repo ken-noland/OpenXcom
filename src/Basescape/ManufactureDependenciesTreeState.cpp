@@ -39,7 +39,7 @@ namespace OpenXcom
 /**
  * Initializes all the elements on the UI.
  */
-ManufactureDependenciesTreeState::ManufactureDependenciesTreeState(const std::string &selectedItem) : _selectedItem(selectedItem), _showAll(false)
+ManufactureDependenciesTreeState::ManufactureDependenciesTreeState(const std::string& selectedItem) : State("ManufactureDependenciesTreeState"), _selectedItem(selectedItem), _showAll(false)
 {
 	_screen = false;
 

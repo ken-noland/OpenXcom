@@ -253,7 +253,7 @@ void Transpose(int reg, int val, int*val2, int *reg3, int*val3)
 			iValue = (iValue & ~0x1F) | (iNewBlock << 2) | ((iNewFNum >> 8) & 0x03);
 
 			iCurrentTweakedBlock[iChannel] = iNewBlock; // save it so we don't have to update register 0xB0 later on
-			iCurrentFNum[iChannel] = iNewFNum;
+			iCurrentFNum[iChannel] = (UINT8)iNewFNum;
 
 			if (iTweakedFMReg[0xA0 + iChannel] != (iNewFNum & 0xFF)) {
 				// Need to write out low bits
@@ -660,7 +660,7 @@ int decode_op(int instrument, bool* another_loop)
 				arg2 = *(music_ptr++);
 					//printf("Opcode [%d] CONTROLLER: %02Xh, %d\n", instrument, arg1, arg2);
 				if (arg1 == 0 && arg2 != 0) //tempo change
-					adl_gv_tempo = arg2 * 0.8;
+					adl_gv_tempo = (int)(arg2 * 0.8);
 				else if (arg1 == 7) //channel volume change
 				{
 					instr1->volume = arg2;
@@ -834,7 +834,7 @@ void func_setup_music(unsigned char* music_ptr, int length)
 	init_music();
 	adlib_init();
 	adlib_reset_channels();
-	adl_gv_tempo *= 0.4;
+	adl_gv_tempo = (int)(adl_gv_tempo * 0.4);
 	adl_gv_tempo_run = adl_gv_tempo;
 	adl_gv_music_playing = true;
 }

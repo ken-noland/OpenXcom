@@ -138,6 +138,8 @@
 #include "../Savegame/Waypoint.h"
 #include "../Ufopaedia/Ufopaedia.h"
 
+#include "../Entities/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -145,7 +147,8 @@ namespace OpenXcom
  * Initializes all the elements in the Geoscape screen.
  * @param game Pointer to the core game.
  */
-GeoscapeState::GeoscapeState() : _pause(false), _zoomInEffectDone(false), _zoomOutEffectDone(false), _minimizedDogfights(0), _slowdownCounter(0)
+GeoscapeState::GeoscapeState()
+	: State("GeoscapeState"), _pause(false), _zoomInEffectDone(false), _zoomOutEffectDone(false), _minimizedDogfights(0), _slowdownCounter(0)
 {
 	int screenWidth = Options::baseXGeoscape;
 	int screenHeight = Options::baseYGeoscape;
@@ -4436,8 +4439,9 @@ void GeoscapeState::resize(int &dX, int &dY)
 
 	_globe->resize();
 
-	for (auto* surface : _surfaces)
+	for (entt::entity surfaceEnt : _surfaces)
 	{
+		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
 		if (surface != _globe)
 		{
 			surface->setX(surface->getX() + dX);

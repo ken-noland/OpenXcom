@@ -42,8 +42,8 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param state Pointer to the base state to refresh.
  */
-BuildFacilitiesState::BuildFacilitiesState(entt::entity baseId, State *state)
-	: _baseId(baseId), _state(state), _lstScroll(0)
+BuildFacilitiesState::BuildFacilitiesState(entt::entity baseId, State *state) : State("BuildFacilitiesState"),
+	_baseId(baseId), _state(state), _lstScroll(0)
 {
 	_screen = false;
 

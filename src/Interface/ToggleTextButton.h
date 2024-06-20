@@ -33,6 +33,8 @@ private:
 	TextButton *_fakeGroup;
 
 public:
+	ToggleTextButton(int width, int height, int x, int y);
+	~ToggleTextButton(void);
 
 	void draw() override;
 	void mousePress(Action *action, State *state) override;
@@ -40,8 +42,6 @@ public:
 	bool getPressed() const { return _isPressed; }
 	void setColor(Uint8 color) override;
 	void setInvertColor(Uint8 color);
-	ToggleTextButton(int width, int height, int x, int y);
-	~ToggleTextButton(void);
 };
 
 }

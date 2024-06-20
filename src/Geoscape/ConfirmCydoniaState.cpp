@@ -32,7 +32,7 @@
 namespace OpenXcom
 {
 
-ConfirmCydoniaState::ConfirmCydoniaState(Craft *craft) : _craft(craft)
+ConfirmCydoniaState::ConfirmCydoniaState(Craft* craft) : State("ConfirmCydoniaState"), _craft(craft)
 {
 	_screen = false;
 

@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "LuaArg.h"
+#include <functional>
 
 namespace OpenXcom
 {
@@ -192,11 +193,12 @@ inline int pushTableWithUserdataAndProperties(lua_State* luaState, void* userdat
 	lua_newtable(luaState); // Create the new table
 	int tableIndex = lua_gettop(luaState);
 
-	if (initializer)
-	{
-		initializer(luaState, tableIndex);
-	}
+//	Log(LOG_WARNING) << "pushTableWithUserdataAndProperties: " << tableIndex;
 
+	// --
+	// phase 1: setup the metatable and properties table
+
+	// setup the tables we will need to store the properties and userdata
 	lua_newtable(luaState); // Create the metatable
 
 	// Store the userdata in the metatable
@@ -205,9 +207,20 @@ inline int pushTableWithUserdataAndProperties(lua_State* luaState, void* userdat
 
 	// Create the __properties table in the metatable
 	lua_newtable(luaState);                     // Create the __properties table
-	lua_pushvalue(luaState, -1);                // Duplicate the __properties table
-	lua_setfield(luaState, -3, "__properties"); // Set the __properties field in the metatable
-	lua_pop(luaState, 1);                       // Pop the __properties table
+	lua_setfield(luaState, -2, "__properties"); // Set the __properties field in the metatable
+
+	lua_setmetatable(luaState, tableIndex);     // Set the metatable for the new table
+
+	// --
+	// phase 2: call the initializer
+	if (initializer)
+	{
+		initializer(luaState, tableIndex);
+	}
+
+	// --
+	// phase 3: set the metafunctions in the metatable
+	lua_getmetatable(luaState, tableIndex);
 
 	// Set the __index metamethod
 	lua_pushcfunction(luaState, propertiesTableIndex);
@@ -221,9 +234,10 @@ inline int pushTableWithUserdataAndProperties(lua_State* luaState, void* userdat
 	lua_pushcfunction(luaState, propertiesTablePairs);
 	lua_setfield(luaState, -2, "__pairs");
 
-	lua_setmetatable(luaState, -2); // Set the metatable for the new table
+	lua_pop(luaState, 1); // Pop the metatable table
 
-	return tableIndex;
+
+	return tableIndex;	//Stack now: [..., table]
 }
 
 
@@ -231,14 +245,15 @@ template <auto GetterFunction>
 inline int callGetter(lua_State* luaState, void* userdata)
 {
 	using GetterType = decltype(GetterFunction);
-	using ReturnType = typename FunctionTraits<GetterType>::ReturnType;
-	using ArgsTuple = typename FunctionTraits<GetterType>::ArgsTuple;
+	using Traits = FunctionTraits<GetterType>;
+	using ReturnType = typename Traits::ReturnType;
+	using ArgsTuple = typename Traits::ArgsTuple;
 
 	// Call the getter function and push the result to the Lua stack
 	if constexpr (std::is_member_function_pointer_v<GetterType>)
 	{
 		// Member function pointer
-		auto object = static_cast<std::remove_pointer_t<std::tuple_element_t<0, ArgsTuple> >*>(userdata);
+		auto object = static_cast<std::remove_pointer_t<typename Traits::ClassType>*>(userdata);
 		ReturnType result = (object->*GetterFunction)();
 		toLua(luaState, result);
 	}

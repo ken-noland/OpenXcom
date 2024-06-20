@@ -522,7 +522,7 @@ std::string AlienDeployment::getRace() const
 {
 	if (!_randomRaces.empty())
 	{
-		return _randomRaces[RNG::generate(0, _randomRaces.size() - 1)];
+		return _randomRaces[RNG::generate(0, (int)_randomRaces.size() - 1)];
 	}
 	return _race;
 }
@@ -535,7 +535,7 @@ const std::string& AlienDeployment::getRandomMapScript() const
 {
 	if (!_mapScripts.empty())
 	{
-		size_t pick = RNG::generate(0, _mapScripts.size() - 1);
+		size_t pick = RNG::generate(0, (int)_mapScripts.size() - 1);
 		return _mapScripts[pick];
 	}
 	return _mapScript;

@@ -34,7 +34,7 @@ namespace OpenXcom
  * @param origin Game section that originated this state.
  * @param fileName Name of the save file without extension.
  */
-ConfirmLoadState::ConfirmLoadState(OptionsOrigin origin, const std::string &fileName) : _origin(origin), _fileName(fileName)
+ConfirmLoadState::ConfirmLoadState(OptionsOrigin origin, const std::string& fileName) : State("ConfirmLoadState"), _origin(origin), _fileName(fileName)
 {
 	_screen = false;
 

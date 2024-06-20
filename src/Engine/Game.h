@@ -98,12 +98,19 @@ public:
 	Cursor *getCursor() const { return _cursor; }
 	/// Gets the FpsCounter.
 	FpsCounter *getFpsCounter() const { return _fpsCounter; }
+
 	/// Resets the state stack to a new state.
 	void setState(State *state);
 	/// Pushes a new state into the state stack.
 	void pushState(State *state);
 	/// Pops the last state from the state stack.
 	void popState();
+	/// Gets the last state from the state stack
+	State* getState();
+	/// Gets the state stack
+	const std::list<State*>& getStates() const;
+
+
 	/// Gets the currently loaded language.
 	Language *getLanguage() const { return _lang; }
 	/// Gets the currently loaded saved game.

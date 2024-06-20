@@ -48,7 +48,7 @@ namespace OpenXcom
  * @param rule Pointer to the facility ruleset to build.
  */
 PlaceFacilityState::PlaceFacilityState(entt::entity baseId, const RuleBaseFacility *rule, BaseFacility *origFac)
-	: _baseId(baseId), _rule(rule), _origFac(origFac)
+	: State("PlaceFacilityState"), _baseId(baseId), _rule(rule), _origFac(origFac)
 {
 	_screen = false;
 

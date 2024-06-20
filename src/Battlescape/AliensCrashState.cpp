@@ -32,7 +32,7 @@ namespace OpenXcom
  * Initializes all the elements in the Aliens Crash screen.
  * @param game Pointer to the core game.
  */
-AliensCrashState::AliensCrashState()
+AliensCrashState::AliensCrashState() : State("AliensCrashState")
 {
 	// Create objects
 	_window = new Window(this, 256, 160, 32, 20);

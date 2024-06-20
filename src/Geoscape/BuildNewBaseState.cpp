@@ -37,6 +37,8 @@
 #include "../Menu/ErrorMessageState.h"
 #include "../Mod/RuleInterface.h"
 
+#include "../Entities/Engine/Surface.h"
+
 namespace OpenXcom
 {
 
@@ -47,8 +49,8 @@ namespace OpenXcom
  * @param globe Pointer to the Geoscape globe.
  * @param first Is this the first base in the game?
  */
-BuildNewBaseState::BuildNewBaseState(entt::entity newBaseId, Globe *globe, bool first)
-	: _newBaseId(newBaseId), _globe(globe), _first(first)
+BuildNewBaseState::BuildNewBaseState(entt::entity newBaseId, Globe *globe, bool first) : State("BuildNewBaseState"),
+	_newBaseId(newBaseId), _globe(globe), _first(first)
 {
 	int dx = getGame()->getScreen()->getDX();
 	int dy = getGame()->getScreen()->getDY();
@@ -400,8 +402,10 @@ void BuildNewBaseState::btnCancelClick(Action *)
  */
 void BuildNewBaseState::resize(int &dX, int &dY)
 {
-	for (auto* surface : _surfaces)
+	for (entt::entity surfaceEnt : _surfaces)
 	{
+		Surface* surface = _surfaceRegistry.get<SurfaceComponent>(surfaceEnt).getSurface();
+
 		surface->setX(surface->getX() + dX / 2);
 		if (surface != _window && surface != _btnCancel && surface != _txtTitle)
 		{

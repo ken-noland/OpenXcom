@@ -43,7 +43,8 @@ namespace OpenXcom
  * @param filename Name of the save file without extension.
  * @param palette Parent state palette.
  */
-SaveGameState::SaveGameState(OptionsOrigin origin, const std::string &filename, SDL_Color *palette) : _firstRun(0), _origin(origin), _filename(filename), _type(SAVE_DEFAULT)
+SaveGameState::SaveGameState(OptionsOrigin origin, const std::string &filename, SDL_Color *palette)
+	: State("SaveGameState"), _firstRun(0), _origin(origin), _filename(filename), _type(SAVE_DEFAULT)
 {
 	buildUi(palette);
 }
@@ -55,7 +56,8 @@ SaveGameState::SaveGameState(OptionsOrigin origin, const std::string &filename, 
  * @param type Type of auto-save being used.
  * @param palette Parent state palette.
  */
-SaveGameState::SaveGameState(OptionsOrigin origin, SaveType type, SDL_Color *palette, int currentTurn) : _firstRun(0), _origin(origin), _type(type)
+SaveGameState::SaveGameState(OptionsOrigin origin, SaveType type, SDL_Color *palette, int currentTurn)
+	: State("SaveGameState"), _firstRun(0), _origin(origin), _type(type)
 {
 	switch (type)
 	{

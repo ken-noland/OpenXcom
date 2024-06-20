@@ -43,7 +43,7 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  * @param origin Game section that originated this state.
  */
-ListLoadOriginalState::ListLoadOriginalState(OptionsOrigin origin) : _origin(origin)
+ListLoadOriginalState::ListLoadOriginalState(OptionsOrigin origin) : State("ListLoadOriginalState"), _origin(origin)
 {
 	_screen = false;
 

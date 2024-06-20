@@ -43,8 +43,8 @@ namespace OpenXcom
  * @param base Pointer to the base to place.
  * @param globe Pointer to the Geoscape globe.
  */
-ConfirmNewBaseState::ConfirmNewBaseState(entt::entity newBaseId, Globe *globe)
-	: _newBaseId(newBaseId), _globe(globe)
+ConfirmNewBaseState::ConfirmNewBaseState(entt::entity newBaseId, Globe *globe) : State("ConfirmNewBaseState"),
+	_newBaseId(newBaseId), _globe(globe)
 {
 	_screen = false;
 

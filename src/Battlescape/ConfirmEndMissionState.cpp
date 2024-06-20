@@ -35,7 +35,8 @@ namespace OpenXcom
  * Initializes all the elements in the ConfirmEndMission window.
  * @param battleGame Pointer to the saved game.
  */
-ConfirmEndMissionState::ConfirmEndMissionState(SavedBattleGame *battleGame, int wounded, BattlescapeGame *parent) : _battleGame(battleGame), _wounded(wounded), _parent(parent)
+ConfirmEndMissionState::ConfirmEndMissionState(SavedBattleGame *battleGame, int wounded, BattlescapeGame *parent)
+	: State("ConfirmEndMissionState"), _battleGame(battleGame), _wounded(wounded), _parent(parent)
 {
 	// Create objects
 	_screen = false;

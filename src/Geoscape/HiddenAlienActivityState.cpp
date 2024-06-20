@@ -54,7 +54,7 @@ namespace OpenXcom
 HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state, SavedGame& save,
 	std::unordered_map<entt::entity, int> displayHiddenAlienActivityRegions,
 	std::unordered_map<entt::entity, int> displayHiddenAlienActivityCountries
-) : _state(state), _save(save),
+) : State("HiddenAlienActivityState"), _state(state), _save(save),
 	_displayHiddenAlienActivityRegions(displayHiddenAlienActivityRegions),
 	_displayHiddenAlienActivityCountries(displayHiddenAlienActivityCountries)
 {

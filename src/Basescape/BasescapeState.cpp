@@ -70,7 +70,8 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param globe Pointer to the Geoscape globe.
  */
-BasescapeState::BasescapeState(entt::entity baseId, Globe *globe) : _baseId(baseId), _globe(globe)
+BasescapeState::BasescapeState(entt::entity baseId, Globe *globe) : State("BasescapeState"), 
+	_baseId(baseId), _globe(globe)
 {
 	_base = &getRegistry().raw().get<Base>(baseId);
 

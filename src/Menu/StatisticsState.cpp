@@ -50,7 +50,7 @@ namespace OpenXcom
  * Initializes all the elements in the Statistics window.
  * @param game Pointer to the core game.
  */
-StatisticsState::StatisticsState()
+StatisticsState::StatisticsState() : State("StatisticsState")
 {
 	// Create objects
 	_window = new Window(this, 320, 200, 0, 0, POPUP_BOTH);

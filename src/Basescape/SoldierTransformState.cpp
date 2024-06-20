@@ -52,7 +52,7 @@ struct compareTransformationName
  * @param base Pointer to the base to get info from.
  * @param soldier ID of the selected soldier.
  */
-SoldierTransformState::SoldierTransformState(Base* base, size_t soldier) : _base(base), _soldier(soldier)
+SoldierTransformState::SoldierTransformState(Base* base, size_t soldier) : State("SoldierTransformState"), _base(base), _soldier(soldier)
 {
 	_screen = false;
 

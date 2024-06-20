@@ -46,7 +46,8 @@ namespace OpenXcom
  * @param endType What ended the production.
  * @param production Pointer to the production details.
  */
-ProductionCompleteState::ProductionCompleteState(Base *base, const std::string &item, GeoscapeState *state, productionProgress_e endType, Production *production) : _base(base), _state(state), _endType(endType)
+ProductionCompleteState::ProductionCompleteState(Base *base, const std::string &item, GeoscapeState *state, productionProgress_e endType, Production *production)
+	: State("ProductionCompleteState"), _base(base), _state(state), _endType(endType)
 {
 	_screen = false;
 

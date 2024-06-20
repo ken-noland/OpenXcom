@@ -55,7 +55,7 @@ namespace OpenXcom
  * @param craft ID of the selected craft.
  */
 CraftSoldiersState::CraftSoldiersState(Base *base, size_t craft)
-		:  _base(base), _craft(craft), _otherCraftColor(0), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL)
+	: State("CraftSoldiersState"), _base(base), _craft(craft), _otherCraftColor(0), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL)
 {
 	bool hidePreview = getGame()->getSavedGame()->getMonthsPassed() == -1;
 	Craft *c = _base->getCrafts().at(_craft);
