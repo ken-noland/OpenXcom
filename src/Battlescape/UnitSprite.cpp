@@ -669,7 +669,7 @@ void UnitSprite::drawRoutine1()
 	// when walking, torso(fixed sprite) has to be animated up/down
 	if (_unit->getStatus() == STATUS_WALKING)
 	{
-		selectUnit(torso, walk, (5 * unitDir) + (walkPhase / 1.6)); // floater only has 5 walk animations instead of 8
+		selectUnit(torso, walk, (int)((5 * unitDir) + (walkPhase / 1.6))); // floater only has 5 walk animations instead of 8
 		torso.offY = (yoffWalk[walkPhase]);
 	}
 	else

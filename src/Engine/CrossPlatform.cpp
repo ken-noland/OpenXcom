@@ -822,7 +822,7 @@ bool compareExt(const std::string &filename, const std::string &extension)
 {
 	if (extension.empty())
 		return true;
-	int j = filename.length() - extension.length();
+	int j = (int)(filename.length() - extension.length());
 	if (j <= 0)
 		return false;
 	if (filename[j - 1] != '.')
@@ -1031,7 +1031,7 @@ bool writeFile(const std::string& filename, const std::string& data) {
 		Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
 		return false;
 	}
-	if (1 != SDL_RWwrite(rwops, data.c_str(), data.size(), 1)) {
+	if (1 != SDL_RWwrite(rwops, data.c_str(), (int)data.size(), 1)) {
 		Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
 		SDL_RWclose(rwops);
 		return false;
@@ -1053,7 +1053,7 @@ bool writeFile(const std::string& filename, const std::vector<unsigned char>& da
 		Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
 		return false;
 	}
-	if (1 != SDL_RWwrite(rwops, data.data(), data.size(), 1)) {
+	if (1 != SDL_RWwrite(rwops, data.data(), (int)data.size(), 1)) {
 		Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
 		SDL_RWclose(rwops);
 		return false;
@@ -1531,7 +1531,7 @@ static bool logToFile(const std::string& filename, const std::string& data) {
 	// Even SDL1 file IO accepts UTF-8 file names on windows.
 	SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "a+");
 	if (rwops) {
-		auto rv = SDL_RWwrite(rwops, data.c_str(), data.size(), 1);
+		auto rv = SDL_RWwrite(rwops, data.c_str(), (int)data.size(), 1);
 		SDL_RWclose(rwops);
 		return rv == 1;
 	}

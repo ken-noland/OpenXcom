@@ -61,7 +61,7 @@ public:
 	/// Sets the scrollbar's list.
 	void setTextList(TextList *list);
 	/// Sets the background for the track.
-	[[deprecated]] void setBackground(Surface* bg);
+	/*[[deprecated]]*/ void setBackground(Surface* bg);
 	/// Sets the background for the track.
 	void setBackground(entt::entity& bgEntity);
 	/// Sets the scrollbar's palette.

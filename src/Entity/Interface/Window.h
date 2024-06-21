@@ -64,7 +64,7 @@ public:
 	~WindowComponent();
 
 	/// Sets the background surface.
-	[[deprecated]] void setBackground(const Surface* bg);
+	/*[[deprecated]]*/ void setBackground(const Surface* bg);
 	/// Sets the border color.
 	void setColor(Uint8 color);
 	/// Gets the border color.

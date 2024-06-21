@@ -18,9 +18,7 @@
  */
 #include "Game.h"
 #include "../resource.h"
-#include <algorithm>
 #include <cmath>
-#include <sstream>
 #include <SDL_mixer.h>
 #include "State.h"
 #include "Screen.h"
@@ -43,10 +41,8 @@
 #include "../Ufopaedia/UfopaediaStartState.h"
 #include "../Menu/NotesState.h"
 #include "../Menu/TestState.h"
-#include <algorithm>
 #include "../fallthrough.h"
 #include "../Geoscape/GeoscapeState.h"
-
 #include "../Lua/LuaMod.h"
 
 //temp
@@ -85,7 +81,7 @@ Game::Game(const std::string &title)
 	  _ctrl(false), _alt(false), _shift(false), _rmb(false), _mmb(false), _luaMod(nullptr)
 
 	///TEMP
-	  , _surfaceFactory(_registry.raw()), _interfaceFactory(_registry.raw(), _surfaceFactory)
+	  , _surfaceFactory(getECS().getRegistry().raw()), _interfaceFactory(getECS().getRegistry().raw(), _surfaceFactory)
 {
 	setThreadLocalGame(this);
 

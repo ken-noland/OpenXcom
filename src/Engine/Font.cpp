@@ -84,7 +84,7 @@ void Font::loadTerminal()
 	SDL_RWops *rw = SDL_RWFromConstMem(dosFont, DOSFONT_SIZE);
 	SDL_Surface *s = SDL_LoadBMP_RW(rw, SDL_TRUE);
 	image.surface = new Surface(s->w, s->h);
-	image.surface->setPalette(TerminalColors, 0, std::size(TerminalColors));
+	image.surface->setPalette(TerminalColors, 0, (int)std::size(TerminalColors));
 	SDL_BlitSurface(s, 0, image.surface->getSurface(), 0);
 	SDL_FreeSurface(s);
 	_images.push_back(image);
@@ -115,8 +115,8 @@ void Font::init(size_t index, const UString &str)
 		for (size_t i = 0; i < str.length(); ++i)
 		{
 			SDL_Rect rect;
-			int startX = i % length * image->width;
-			int startY = i / length * image->height;
+			int startX = (int)(i % length * image->width);
+			int startY = (int)(i / length * image->height);
 			rect.x = startX;
 			rect.y = startY;
 			rect.w = image->width;

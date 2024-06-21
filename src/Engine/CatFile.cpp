@@ -89,11 +89,11 @@ CatFile::CatFile(const std::string& filename) : _data(0), _items()
 		}
 		_items.push_back(std::make_tuple(_data + offset, offset));
 	}
-	Uint32 last_offset = filesize;
+	Uint32 last_offset = (Uint32)filesize;
 	for ( auto it = _items.rbegin(); it != _items.rend(); ++it) {
 		auto this_offset = std::get<1>(*it);
 		std::get<1>(*it) = last_offset - this_offset;
-		last_offset = this_offset;
+		last_offset = (Uint32)this_offset;
 	}
 	SDL_RWclose(rwops);
 }
@@ -117,7 +117,7 @@ SDL_RWops *CatFile::getRWops(Uint32 i) {
 		Log(LOG_ERROR) << "Catfile<" << _filename << ">::getRWops("<<i<<"): >= size " << _items.size();
 		return NULL;
 	}
-	return SDL_RWFromConstMem(std::get<0>(_items[i]), std::get<1>(_items[i]));
+	return SDL_RWFromConstMem(std::get<0>(_items[i]), (int)std::get<1>(_items[i]));
 }
 
 }

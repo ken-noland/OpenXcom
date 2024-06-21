@@ -20,8 +20,8 @@
 #include <list>
 #include <string>
 #include <memory>
-#include <SDL.h>
-#include "Registry.h"
+#include <SDL_events.h>
+#include "../Entity/Engine/ECS.h"
 
 
 ///TEMP
@@ -70,8 +70,8 @@ private:
 	/// rules, y-scripts and other data from mods
 	std::unique_ptr<Mod> _mod;
 
-	/// central entity registry
-	Registry _registry{};
+	/// central entity component system
+	ECS _ecs;
 
 	/// Lua mods
 	std::unique_ptr<Lua::LuaMod> _luaMod;
@@ -122,14 +122,17 @@ public:
 
 	/// Gets the currently loaded language.
 	Language *getLanguage() const { return _lang; }
+
 	/// Gets the currently loaded saved game.
 	SavedGame *getSavedGame() const { return _save; }
 	/// Sets a new saved game for the game.
 	void setSavedGame(SavedGame *save);
+
 	/// Gets the registry container
-	const [[nodiscard]] Registry& getRegistry() const { return _registry; }
+	const [[nodiscard]] ECS& getECS() const { return _ecs; }
 	/// Gets the registry container
-	[[nodiscard]] Registry& getRegistry() { return _registry; }
+	[[nodiscard]] ECS& getECS() { return _ecs; }
+
 	/// Gets the currently loaded mod.
 	Mod *getMod() const { return _mod.get(); }
 	/// Gets the currently loaded Lua mod.

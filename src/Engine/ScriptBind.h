@@ -1338,7 +1338,7 @@ struct BindListInitImpl<bool (*)(T*, V* v, Args...), Func, X...>
 		if (t)
 		{
 			curr = 0;
-			limit = BindMemberInvoke<X...>::f(t).size();
+			limit = (int)BindMemberInvoke<X...>::f(t).size();
 			for (auto* u : BindMemberInvoke<X...>::f(t))
 			{
 				if (Func(t, u, std::forward<Args>(args)...))

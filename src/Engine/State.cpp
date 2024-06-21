@@ -429,22 +429,10 @@ void State::handle(Action *action)
  */
 void State::blit()
 {
-	//KN NOTE: A bit of a hack for now until we have more of the surface stuff
-	// moved over to ECS. Some are using the old draw method(blitting) whereas
-	// others are using the new DrawableComponent
-
-	for (entt::entity surfaceEnt : _surfaces)
+	DrawableSystem& drawable = getSystem<DrawableSystem>();
+	for (entt::entity& surfaceEnt : _surfaces)
 	{
-		if (getRegistry().raw().any_of<WindowComponent>(surfaceEnt))
-		{
-			DrawableComponent& drawableComponent = getRegistry().raw().get<DrawableComponent>(surfaceEnt);
-			drawableComponent.draw();
-		}
-		else
-		{
-			Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
-			surface->blit(getGame()->getScreen()->getSurface());
-		}
+		drawable.draw(surfaceEnt);
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2024 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,15 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Registry.h"
-#include "Game.h"
+#include "ECS.h"
+
+//temp includes until I figure out where I want to populate the factory and system registries
+#include "Drawable.h"
+#include "Surface.h"
+#include "../Interface/Window.h"
 
 namespace OpenXcom
 {
 
-Registry& getRegistry()
+ECS::ECS()
 {
-	return getGame()->getECS().getRegistry();
+	//temporarily putting System and Factory registration here
+	registerSystem<DrawableSystem>();
 }
 
+ECS::~ECS()
+{
 }
+
+} // namespace OpenXcom

@@ -437,8 +437,9 @@ set ( entity_common_src
 
 
 set ( entity_engine_src
-  Entity/Engine/Surface.cpp
   Entity/Engine/Drawable.cpp
+  Entity/Engine/ECS.cpp
+  Entity/Engine/Surface.cpp
 )
 
 set ( entity_game_src

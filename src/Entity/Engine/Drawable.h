@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Delegate.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
@@ -37,6 +38,15 @@ public:
 
 	/// Draws all drawables.
 	void draw();
+};
+
+class DrawableSystem
+{
+public:
+	DrawableSystem();
+	~DrawableSystem();
+
+	void draw(entt::entity& entity);
 };
 
 } // namespace OpenXcom

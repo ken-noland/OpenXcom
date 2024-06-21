@@ -311,7 +311,7 @@ struct CreateShadow
 
 struct CreateShadowWithoutCache
 {
-	static inline void func(Uint8& dest, const helper::Offset& offset, const Cord& sun, const Sint16& noise, const int& radius)
+	static inline void func(Uint8& dest, const helper::Offset& offset, const Cord& sun, const Sint16& noise, const double& radius)
 	{
 		Cord earth = static_data.circle_norm(0., 0., radius, offset.x, offset.y);
 		CreateShadow::func(dest, earth, sun, noise);
@@ -1133,7 +1133,7 @@ void Globe::XuLine(Surface* surface, Surface* src, double x1, double y1, double 
 			{
 				tcol = CreateShadow::getLandShadow((Uint8)tcol, (Uint8)(shade * 3));
 			}
-			surface->setPixel((int)x0,(int)y0,tcol);
+			surface->setPixel((int)x0,(int)y0,(Uint8)tcol);
 		}
 		x0+=SX;
 		y0+=SY;
@@ -1596,7 +1596,7 @@ void Globe::drawPath(Surface *surface, double lon1, double lat1, double lon2, do
 	//longer path have more parts
 	length = b.norm();
 	length *= length*15;
-	count = length + 1;
+	count = (Sint16)(length + 1);
 	b /= count;
 	p1 = CordPolar(a);
 	polarToCart(p1.lon, p1.lat, &x1, &y1);
