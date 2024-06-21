@@ -32,6 +32,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/SavedBattleGame.h"
 #include "../Battlescape/BattlescapeGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -43,7 +44,7 @@ namespace OpenXcom
  */
 PauseState::PauseState(OptionsOrigin origin) : State("PauseState", false), _origin(origin)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	int x;
 	if (_origin == OPT_GEOSCAPE)	//KN NOTE: Hack?

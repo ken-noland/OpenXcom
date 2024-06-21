@@ -28,7 +28,6 @@
 #include "../Interface/TextButton.h"
 #include "../Interface/TextEdit.h"
 #include "../Interface/TextList.h"
-#include "../Interface/Window.h"
 #include "../Mod/Mod.h"
 #include "../Mod/RuleSoldier.h"
 #include "../Mod/RuleSoldierBonus.h"
@@ -38,6 +37,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Soldier.h"
 #include "../Savegame/Transfer.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -52,7 +52,7 @@ namespace OpenXcom
 SoldierTransformationState::SoldierTransformationState(RuleSoldierTransformation *transformationRule, Base *base, Soldier *sourceSoldier, std::vector<Soldier *> *filteredListOfSoldiers)
 	: State("SoldierTransformationState", true), _transformationRule(transformationRule), _base(base), _sourceSoldier(sourceSoldier), _filteredListOfSoldiers(filteredListOfSoldiers)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
 	_btnCancel = new TextButton(148, 16, 8, 176);

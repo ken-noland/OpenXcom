@@ -33,6 +33,7 @@
 #include "../Interface/ArrowButton.h"
 #include "../Engine/Timer.h"
 #include "../Engine/RNG.h"
+#include "../Entity/Interface/Interface.h"
 #include <climits>
 
 namespace OpenXcom
@@ -74,7 +75,7 @@ ResearchInfoState::ResearchInfoState(Base* base, ResearchProject* project) : Sta
  */
 void ResearchInfoState::buildUi()
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("allocateResearch", this, 230, 140, 45, 30);
 	_txtTitle = new Text(210, 17, 61, 40);

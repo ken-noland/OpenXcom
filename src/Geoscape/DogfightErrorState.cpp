@@ -24,6 +24,7 @@
 #include "../Interface/Text.h"
 #include "../Engine/Options.h"
 #include "../Savegame/Craft.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -36,7 +37,7 @@ namespace OpenXcom
  */
 DogfightErrorState::DogfightErrorState(Craft* craft, const std::string& msg) : State("DogfightErrorState", false), _craft(craft)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 208, 120, 24, 48, WindowPopup::POPUP_BOTH);

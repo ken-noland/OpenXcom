@@ -47,6 +47,7 @@
 #include "CraftPilotsState.h"
 #include "../Ufopaedia/Ufopaedia.h"
 #include "SoldiersAIState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -59,7 +60,7 @@ namespace OpenXcom
  */
 CraftInfoState::CraftInfoState(Base* base, size_t craftId) : State("CraftInfoState", true), _base(base), _craftId(craftId), _craft(0)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	if (getGame()->getSavedGame()->getMonthsPassed() != -1)

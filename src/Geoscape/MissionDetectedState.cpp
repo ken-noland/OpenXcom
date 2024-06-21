@@ -28,6 +28,7 @@
 #include "../Engine/Options.h"
 #include "InterceptState.h"
 #include "../Mod/AlienDeployment.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -46,7 +47,7 @@ MissionDetectedState::MissionDetectedState(MissionSite* mission, GeoscapeState* 
 		_customSound = getGame()->getMod()->getSound("GEO.CAT", soundId);
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 200, 0, 0, WindowPopup::POPUP_BOTH);

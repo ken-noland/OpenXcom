@@ -24,6 +24,7 @@
 #include "../Interface/Text.h"
 #include "GeoscapeState.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -37,7 +38,7 @@ namespace OpenXcom
 CraftErrorState::CraftErrorState(GeoscapeState* state, const std::string& msg, bool enableHotkeys)
 	: State("CraftErrorState", false), _state(state)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);

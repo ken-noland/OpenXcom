@@ -29,6 +29,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/SavedBattleGame.h"
 #include "SaveGameState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -51,7 +52,7 @@ AbandonGameState::AbandonGameState(OptionsOrigin origin)
 		x = 52;
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 216, 160, x, 20, WindowPopup::POPUP_BOTH);

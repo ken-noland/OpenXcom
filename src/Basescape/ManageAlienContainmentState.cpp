@@ -43,6 +43,7 @@
 #include "../Mod/RuleInterface.h"
 #include "TechTreeViewerState.h"
 #include "TransferBaseState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -58,7 +59,7 @@ ManageAlienContainmentState::ManageAlienContainmentState(Base* base, int prisonT
 {
 	_threeButtons = Options::canSellLiveAliens && Options::retainCorpses;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("manageContainment", this, 320, 200, 0, 0);

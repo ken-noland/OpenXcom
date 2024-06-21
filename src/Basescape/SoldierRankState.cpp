@@ -22,7 +22,6 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
-#include "../Interface/Window.h"
 #include "../Mod/Mod.h"
 #include "../Mod/RuleSoldier.h"
 #include "../Savegame/Base.h"
@@ -30,6 +29,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Soldier.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -41,7 +41,7 @@ namespace OpenXcom
  */
 SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : State("SoldierRankState", false), _base(base), _soldierId(soldierId)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("selectNewManufacture", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);

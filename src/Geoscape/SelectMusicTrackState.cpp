@@ -29,6 +29,7 @@
 #include "../Interface/TextList.h"
 #include "../Mod/RuleInterface.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -50,7 +51,7 @@ SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin)
 		x = 20;
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 216, 160, x, 20, WindowPopup::POPUP_BOTH);

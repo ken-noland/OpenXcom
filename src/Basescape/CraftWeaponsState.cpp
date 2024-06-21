@@ -37,6 +37,7 @@
 #include "../Savegame/Base.h"
 #include "../Savegame/SavedGame.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -50,7 +51,7 @@ namespace OpenXcom
  */
 CraftWeaponsState::CraftWeaponsState(Base* base, size_t craft, size_t weapon) : State("CraftWeaponsState", false), _base(base), _craft(base->getCrafts().at(craft)), _weapon(weapon)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("craftWeapons", this, 220, 160, 50, 20, WindowPopup::POPUP_BOTH);

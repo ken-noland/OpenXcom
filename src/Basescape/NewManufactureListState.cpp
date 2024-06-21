@@ -40,6 +40,7 @@
 #include "ManufactureStartState.h"
 #include "TechTreeViewerState.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -51,7 +52,7 @@ namespace OpenXcom
  */
 NewManufactureListState::NewManufactureListState(Base* base) : State("NewManufactureListState", false), _base(base), _showRequirements(false), _refreshCategories(true), _doInit(true), _lstScroll(0)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("selectNewManufacture", this, 320, 156, 0, 22, WindowPopup::POPUP_BOTH);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 10, 35);

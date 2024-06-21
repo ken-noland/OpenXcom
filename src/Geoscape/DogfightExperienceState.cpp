@@ -28,6 +28,7 @@
 #include "../Savegame/Base.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Soldier.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -37,7 +38,7 @@ namespace OpenXcom
  */
 DogfightExperienceState::DogfightExperienceState() : State("DogfightExperienceState", false)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 140, 0, 30, WindowPopup::POPUP_HORIZONTAL);

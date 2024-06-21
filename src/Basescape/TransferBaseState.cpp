@@ -32,8 +32,8 @@
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/Region.h"
-#include "../Mod/Mod.h"
 #include "../Mod/RuleRegion.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -46,7 +46,7 @@ namespace OpenXcom
 TransferBaseState::TransferBaseState(Base* base, DebriefingState* debriefingState)
 	: State("TransferBaseState", true), _base(base), _debriefingState(debriefingState)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 280, 140, 20, 30);

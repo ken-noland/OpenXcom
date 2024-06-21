@@ -26,6 +26,7 @@
 #include "../Ufopaedia/Ufopaedia.h"
 #include "../Engine/Options.h"
 #include "../Savegame/Base.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -39,7 +40,7 @@ namespace OpenXcom
 ResearchCompleteState::ResearchCompleteState(const RuleResearch *newResearch, const RuleResearch *bonus, const RuleResearch *research, const Base* base)
 	: State("ResearchRequiredState", false), _research(newResearch), _bonus(bonus)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 230, 140, 45, 30, WindowPopup::POPUP_BOTH);

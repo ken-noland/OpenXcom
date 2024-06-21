@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,29 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "ECS.h"
-
-//temp includes until I figure out where I want to populate the factory and system registries
-#include "Drawable.h"
-#include "Tickable.h"
-#include "Surface.h"
-#include "../Interface/Interface.h"
+#include "../Engine/Surface.h"
 
 namespace OpenXcom
 {
 
-ECS::ECS()
+class ArrowButtonComponent
 {
-	//temporarily putting System and Factory registration here
-	registerSystem<TickableSystem>();
-	registerSystem<DrawableSystem>();
+public:
 
-	registerFactory<SurfaceFactory>(_registry.raw());
-	registerFactory<InterfaceFactory>(_registry.raw(), getFactory<SurfaceFactory>());
-}
-
-ECS::~ECS()
-{
-}
+};
 
 } // namespace OpenXcom

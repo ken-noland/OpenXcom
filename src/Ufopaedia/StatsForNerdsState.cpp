@@ -50,6 +50,7 @@
 #include "../Savegame/SavedBattleGame.h"
 #include "../Savegame/SavedGame.h"
 #include "../fmath.h"
+#include "../Entity/Interface/Interface.h"
 #include <algorithm>
 
 namespace OpenXcom
@@ -169,7 +170,7 @@ StatsForNerdsState::StatsForNerdsState(const UfopaediaTypeId typeId, const std::
  */
 void StatsForNerdsState::buildUI(bool debug, bool ids, bool defaults)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

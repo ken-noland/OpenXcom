@@ -27,6 +27,7 @@
 #include "../Savegame/Target.h"
 #include "GeoscapeCraftState.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -39,7 +40,7 @@ namespace OpenXcom
  */
 CraftPatrolState::CraftPatrolState(Craft* craft, Globe* globe) : State("CraftPatrolState", false), _craft(craft), _globe(globe)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 224, 168, 16, 16, WindowPopup::POPUP_BOTH);

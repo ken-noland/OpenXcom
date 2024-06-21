@@ -28,6 +28,7 @@
 #include "../Interface/Text.h"
 #include "../Savegame/Base.h"
 #include "TransferItemsState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -41,7 +42,7 @@ namespace OpenXcom
 TransferConfirmState::TransferConfirmState(Base* base, TransferItemsState* state)
 	: State("TransferConfirmState", false), _base(base), _state(state)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 80, 0, 60);

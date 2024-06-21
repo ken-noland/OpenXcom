@@ -27,6 +27,7 @@
 #include "../Mod/RuleManufacture.h"
 #include "../Basescape/ManufactureState.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -39,7 +40,7 @@ namespace OpenXcom
 NewPossibleManufactureState::NewPossibleManufactureState(Base * base, const std::vector<RuleManufacture *> & possibilities)
 	: State("NewPossibleManufactureState", false), _base(base)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);

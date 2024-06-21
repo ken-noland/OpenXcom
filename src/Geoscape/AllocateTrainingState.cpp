@@ -38,6 +38,7 @@
 #include "../Basescape/SoldierSortUtil.h"
 #include <algorithm>
 #include "../Engine/Unicode.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -49,7 +50,7 @@ namespace OpenXcom
  */
 AllocateTrainingState::AllocateTrainingState(Base* base) : State("AllocateTrainingState", true), _sel(0), _base(base), _origSoldierOrder(_base->getSoldiers())
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

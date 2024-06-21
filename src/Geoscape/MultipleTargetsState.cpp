@@ -33,6 +33,7 @@
 #include "TargetInfoState.h"
 #include "../Engine/Options.h"
 #include "../Engine/Action.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -47,7 +48,7 @@ namespace OpenXcom
 MultipleTargetsState::MultipleTargetsState(std::vector<Target*> targets, std::vector<Craft*> crafts, GeoscapeState *state, bool useCustomSound)
 	: State("MultipleTargetsState", false), _targets(targets), _crafts(std::move(crafts)), _state(state), _useCustomSound(useCustomSound)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	if (_targets.size() > 1)
 	{

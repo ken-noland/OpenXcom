@@ -27,6 +27,7 @@
 #include "BattlescapeState.h"
 #include "BattlescapeGame.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -38,7 +39,7 @@ namespace OpenXcom
 ConfirmEndMissionState::ConfirmEndMissionState(SavedBattleGame *battleGame, int wounded, BattlescapeGame *parent)
 	: State("ConfirmEndMissionState", false), _battleGame(battleGame), _wounded(wounded), _parent(parent)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 144, 0, 0);

@@ -30,6 +30,7 @@
 #include "../Interface/TextButton.h"
 #include "../Menu/NotesState.h"
 #include "../Menu/TestState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -39,7 +40,7 @@ namespace OpenXcom
  */
 ExtendedGeoscapeLinksState::ExtendedGeoscapeLinksState(GeoscapeState* parent) : State("ExtendedGeoscapeLinksState", false), _parent(parent)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 180, 32, 10, WindowPopup::POPUP_BOTH);

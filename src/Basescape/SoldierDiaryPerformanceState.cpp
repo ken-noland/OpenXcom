@@ -34,6 +34,7 @@
 #include "../Mod/RuleCommendations.h"
 #include "../Engine/Action.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -57,7 +58,7 @@ SoldierDiaryPerformanceState::SoldierDiaryPerformanceState(Base *base, size_t so
 		_list = &_base->getSoldiers();
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("soldierDiaryPerformance", this, 320, 200, 0, 0);

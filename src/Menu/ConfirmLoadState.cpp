@@ -24,6 +24,7 @@
 #include "../Interface/Text.h"
 #include "../Engine/Options.h"
 #include "LoadGameState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -37,7 +38,7 @@ namespace OpenXcom
 ConfirmLoadState::ConfirmLoadState(OptionsOrigin origin, const std::string& fileName)
 	: State("ConfirmLoadState", false), _origin(origin), _fileName(fileName)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 216, 100, 52, 50, WindowPopup::POPUP_BOTH);

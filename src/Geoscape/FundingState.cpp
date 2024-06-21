@@ -34,6 +34,7 @@
 #include "../Savegame/CountrySystem.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/BaseSystem.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -68,7 +69,7 @@ struct compareFundingCountryChange
  */
 FundingState::FundingState() : State("FundingState", false)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0, WindowPopup::POPUP_BOTH);

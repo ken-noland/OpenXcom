@@ -17,7 +17,10 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Interface.h"
+
 #include "Window.h"
+#include "ArrowButton.h"
+
 #include "../Engine/Tickable.h"
 #include "../Engine/Drawable.h"
 
@@ -33,6 +36,22 @@ InterfaceFactory::~InterfaceFactory()
 {
 }
 
+entt::entity InterfaceFactory::createArrowButton(const std::string& name, ArrowShape shape, int width, int height, int x, int y)
+{
+	entt::entity entity = _surfaceFactory.createSurface(name, width, height, x, y);
+
+	SurfaceComponent& surfaceComponent = _registry.get<SurfaceComponent>(entity);
+	DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
+	TickableComponent& tickableComponent = _registry.emplace<TickableComponent>(entity);
+	_registry.emplace<ArrowButtonComponent>(entity, surfaceComponent, tickableComponent, drawableComponent, shape);
+
+	return entity;
+}
+
+entt::entity InterfaceFactory::createTextButton(const std::string& name, int width, int height, int x, int y)
+{
+	return entt::entity();
+}
 
 entt::entity InterfaceFactory::createWindow(const std::string& name, State* state, int width, int height, int x, int y, WindowPopup popup)
 {
@@ -45,6 +64,7 @@ entt::entity InterfaceFactory::createWindow(const std::string& name, State* stat
 
 	return entity;
 }
+
 
 
 }

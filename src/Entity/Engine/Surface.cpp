@@ -59,4 +59,11 @@ entt::entity SurfaceFactory::createSurface(const std::string& name, int width, i
 	return entity;
 }
 
+entt::entity SurfaceFactory::createInteractiveSurface(const std::string& name, int width, int height, int x, int y)
+{
+	entt::entity entity = createSurface(name, width, height, x, y);
+
+	return entity;
+}
+
 } // namespace OpenXcom

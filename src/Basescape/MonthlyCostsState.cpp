@@ -33,6 +33,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Mod/RuleCraft.h"
 #include "../Mod/RuleSoldier.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -44,7 +45,7 @@ namespace OpenXcom
  */
 MonthlyCostsState::MonthlyCostsState(Base* base) : State("MonthlyCostsState", true), _base(base)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("costsInfo", this, 320, 200, 0, 0);

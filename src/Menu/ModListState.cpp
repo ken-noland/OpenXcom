@@ -31,6 +31,7 @@
 #include "../Engine/Options.h"
 #include "../Engine/Action.h"
 #include "StartState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -41,7 +42,7 @@ namespace OpenXcom
  */
 ModListState::ModListState() : State("ModListState", true), _curMasterIdx(0)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

@@ -43,7 +43,7 @@ public:
 	void draw();
 
 	/// Temp hack until we get the flags we need moved over to here
-	/*[[deprecated]]*/ void setSurfaceComponent(SurfaceComponent* surfaceComponent) { _surfaceComponent = surfaceComponent; }
+	[[deprecated]] void setSurfaceComponent(SurfaceComponent* surfaceComponent) { _surfaceComponent = surfaceComponent; }
 };
 
 class DrawableSystem

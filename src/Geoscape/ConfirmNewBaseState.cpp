@@ -33,6 +33,7 @@
 #include "../Savegame/Base.h"
 #include "../Savegame/Region.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -46,7 +47,7 @@ namespace OpenXcom
 ConfirmNewBaseState::ConfirmNewBaseState(entt::entity newBaseId, Globe *globe) 
 	: State("ConfirmNewBaseState", false),	_newBaseId(newBaseId), _globe(globe)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 224, 72, 16, 64);

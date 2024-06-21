@@ -40,6 +40,7 @@
 #include "../Savegame/Region.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Ufo.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -62,7 +63,7 @@ BaseDefenseState::BaseDefenseState(Base* base, Ufo* ufo, GeoscapeState* state)
 	_thinkcycles = 0;
 	_ufo = ufo;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

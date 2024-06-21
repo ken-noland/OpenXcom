@@ -32,6 +32,7 @@
 #include "../Savegame/Base.h"
 #include "../Mod/Armor.h"
 #include "../Mod/RuleSoldier.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -44,7 +45,7 @@ namespace OpenXcom
  */
 SoldierAvatarState::SoldierAvatarState(Base* base, size_t soldier) : State("SoldierAvatarState", false), _base(base), _soldier(soldier)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("soldierAvatar", this, 240, 160, 40, 24, WindowPopup::POPUP_BOTH);

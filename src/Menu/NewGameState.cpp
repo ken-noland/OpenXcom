@@ -30,6 +30,7 @@
 #include "../Engine/Options.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Base.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -40,7 +41,7 @@ namespace OpenXcom
  */
 NewGameState::NewGameState() : State("NewGameState", true)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 192, 180, 64, 10, WindowPopup::POPUP_VERTICAL);

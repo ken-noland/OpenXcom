@@ -45,6 +45,7 @@
 #include <algorithm>
 #include "../Engine/Unicode.h"
 #include "SoldiersAIState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -62,7 +63,7 @@ SoldiersState::SoldiersState(Base* base) : State("SoldiersState", true), _base(b
 	getGame()->getSavedGame()->getAvailableTransformations(availableTransformations, getGame()->getMod(), _base);
 	bool isTransformationAvailable = availableTransformations.size() > 0;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Always show Combo Box and Three buttons: one button for actions(Memorial, Trainings, Transormations,...)
 	// another button for craft selection; and a 3rd one for "Ok"

@@ -33,6 +33,7 @@
 #include "../Mod/RuleCraft.h"
 #include "../Savegame/Craft.h"
 #include "../Savegame/Tile.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -46,7 +47,7 @@ namespace OpenXcom
 AbortMissionState::AbortMissionState(SavedBattleGame* battleGame, BattlescapeState* state)
 	: State("AbortMissionState", false), _battleGame(battleGame), _state(state), _inEntrance(0), _inExit(0), _outside(0)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("battlescape", this, 320, 144, 0, 0);

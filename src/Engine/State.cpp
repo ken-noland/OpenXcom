@@ -41,6 +41,7 @@
 #include "../Entity/Engine/Surface.h"
 #include "../Entity/Engine/Tickable.h"
 #include "../Entity/Engine/Drawable.h"
+#include "../Entity/Interface/Window.h"
 
 namespace OpenXcom
 {

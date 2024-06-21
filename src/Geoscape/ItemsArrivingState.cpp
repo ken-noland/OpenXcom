@@ -31,6 +31,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Transfer.h"
 #include "GeoscapeState.h"
+#include "../Entity/Interface/Interface.h"
 #include <algorithm>
 #include <sstream>
 
@@ -44,7 +45,7 @@ namespace OpenXcom
  */
 ItemsArrivingState::ItemsArrivingState(GeoscapeState* state) : State("ItemsArrivingState", false), _state(state), _base(0)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 184, 0, 8, WindowPopup::POPUP_BOTH);

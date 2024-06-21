@@ -28,6 +28,7 @@
 #include "../Mod/Mod.h"
 #include "../Mod/RuleBaseFacility.h"
 #include "../Savegame/Base.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -40,7 +41,7 @@ namespace OpenXcom
 NewPossibleFacilityState::NewPossibleFacilityState(Base* base, Globe* globe, const std::vector<RuleBaseFacility*>& possibilities)
 	: State("NewPossibleFacilityState", false), _base(base), _globe(globe)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);

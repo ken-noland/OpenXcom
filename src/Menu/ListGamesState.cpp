@@ -35,6 +35,7 @@
 #include "../Interface/ToggleTextButton.h"
 #include "../Interface/ArrowButton.h"
 #include "DeleteGameState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -91,7 +92,7 @@ ListGamesState::ListGamesState(OptionsOrigin origin, int firstValidRow, bool aut
 #ifdef __MOBILE__
 	isMobile = true;
 #endif
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0, WindowPopup::POPUP_BOTH);

@@ -44,6 +44,7 @@
 #include "../Battlescape/BriefingState.h"
 #include "../Savegame/SavedBattleGame.h"
 #include "SoldiersAIState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -65,7 +66,7 @@ CraftSoldiersState::CraftSoldiersState(Base *base, size_t craft)
 		hidePreview = true;
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("craftSoldiers", this, 320, 200, 0, 0);

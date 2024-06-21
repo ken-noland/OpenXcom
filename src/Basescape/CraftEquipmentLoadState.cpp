@@ -29,6 +29,7 @@
 #include "../Interface/TextList.h"
 #include "../Savegame/ItemContainer.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -39,7 +40,7 @@ namespace OpenXcom
 CraftEquipmentLoadState::CraftEquipmentLoadState(CraftEquipmentState* parent)
 	: State("CraftEquipmentLoadState", false), _parent(parent)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("craftEquipmentLoad", this, 240, 136, 40, 36 + 1, WindowPopup::POPUP_BOTH);

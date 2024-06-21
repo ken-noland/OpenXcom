@@ -36,6 +36,7 @@
 #include "UfoDetectedState.h"
 #include "TargetInfoState.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -54,7 +55,7 @@ UfoTrackerState::UfoTrackerState(GeoscapeState* state, Globe* globe)
 	const int WIDTH_HEADING = 54;
 	const int WIDTH_SPEED = 32;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 140, 0, 30, WindowPopup::POPUP_HORIZONTAL);

@@ -32,6 +32,7 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextEdit.h"
 #include "../Interface/TextList.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -42,7 +43,7 @@ namespace OpenXcom
  */
 TechTreeSelectState::TechTreeSelectState(TechTreeViewerState* parent) : State("TechTreeSelectState", false), _parent(parent)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("techTreeSelect", this, 230, 140, 45, 32);
 	_btnQuickSearch = new TextEdit(this, 198, 9, 53, 52);

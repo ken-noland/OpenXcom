@@ -42,7 +42,7 @@ protected:
 	bool isButtonHandled(Uint8 button = 0) override;
 public:
 	/// Creates a new arrow button with the specified size and position.
-	ArrowButton(ArrowShape shape, int width, int height, int x = 0, int y = 0);
+	[[deprecated("Use InterfaceFactory::createArrowButton(...)")]] ArrowButton(ArrowShape shape, int width, int height, int x = 0, int y = 0);
 	/// Cleans up the arrow button.
 	~ArrowButton();
 	/// Sets the arrow button's color.

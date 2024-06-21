@@ -30,7 +30,6 @@
 #include "../Savegame/Craft.h"
 #include "../Savegame/Soldier.h"
 #include "../Mod/RuleSoldier.h"
-
 #include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
@@ -45,7 +44,7 @@ namespace OpenXcom
 CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft)
 	: State("CraftPilotSelectState", false), _base(base), _craft(craft)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("craftPilotsSelect", this, 232, 156, 44, 28, WindowPopup::POPUP_BOTH);

@@ -50,7 +50,7 @@ protected:
 public:
 	static Sound *soundPress;
 	/// Creates a new text button with the specified size and position.
-	TextButton(int width, int height, int x = 0, int y = 0);
+	[[deprecated]] TextButton(int width, int height, int x = 0, int y = 0);
 	/// Cleans up the text button.
 	~TextButton();
 	/// Sets the text button's color.
@@ -74,7 +74,7 @@ public:
 	/// Gets the text button's text.
 	std::string getText() const;
 	/// Sets the text button's group.
-	void setGroup(TextButton **group);
+	[[deprecated]] void setGroup(TextButton **group);
 	/// Sets the text button's palette.
 	void setPalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256) override;
 	/// Draws the text button.

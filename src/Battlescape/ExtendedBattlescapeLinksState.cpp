@@ -35,6 +35,7 @@
 #include "../Mod/Mod.h"
 #include "../Savegame/HitLog.h"
 #include "../Savegame/SavedBattleGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -45,7 +46,7 @@ namespace OpenXcom
 ExtendedBattlescapeLinksState::ExtendedBattlescapeLinksState(BattlescapeState* parent, SavedBattleGame* save)
 	: State("ExtendedBattlescapeLinksState", false), _parent(parent), _save(save)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 180, 32, 10, WindowPopup::POPUP_BOTH);

@@ -32,6 +32,7 @@
 #include "InterceptState.h"
 #include "../Engine/Action.h"
 #include "../Battlescape/BriefingLightState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -45,7 +46,7 @@ namespace OpenXcom
 TargetInfoState::TargetInfoState(Target* target, Globe* globe)
 	: State("TargetInfoState", false), _target(target), _globe(globe), _deploymentRule(0)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 192, 120, 32, 40, WindowPopup::POPUP_BOTH);

@@ -41,6 +41,7 @@
 #include "../Menu/CutsceneState.h"
 #include "../Savegame/AlienMission.h"
 #include "../Mod/RuleAlienMission.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -59,7 +60,7 @@ BriefingState::BriefingState(Craft* craft, Base* base, bool infoOnly, BriefingDa
 	Options::baseYResolution = Options::baseYGeoscape;
 	getGame()->getScreen()->resetDisplay(false);
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

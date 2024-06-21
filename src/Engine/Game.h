@@ -23,11 +23,6 @@
 #include <SDL_events.h>
 #include "../Entity/Engine/ECS.h"
 
-
-///TEMP
-#include "../Entity/Engine/Surface.h"
-#include "../Entity/Interface/Interface.h"
-
 namespace OpenXcom
 {
 
@@ -83,10 +78,6 @@ private:
 	int _timeUntilNextFrame;
 	bool _ctrl, _alt, _shift, _rmb, _mmb;
 	static const double VOLUME_GRADIENT;
-
-	///TEMP!!!
-	SurfaceFactory _surfaceFactory;
-	InterfaceFactory _interfaceFactory;
 
 public:
 	/// Creates a new game and initializes SDL.
@@ -206,10 +197,6 @@ public:
 
 	/// Gets the geoScapeState
 	GeoscapeState *getGeoscapeState() const;
-
-	///TEMP!!!
-	SurfaceFactory& getSurfaceFactory() { return _surfaceFactory; }
-	InterfaceFactory& getInterfaceFactory() { return _interfaceFactory; }
 };
 
 /// Global function that retrieve a thread local Game object.

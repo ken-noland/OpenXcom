@@ -28,6 +28,7 @@
 #include "../Interface/TextButton.h"
 #include "../Menu/NotesState.h"
 #include "../Savegame/SavedBattleGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -38,7 +39,7 @@ namespace OpenXcom
 ExtendedInventoryLinksState::ExtendedInventoryLinksState(InventoryState* parent, SavedBattleGame* save, bool inBase, bool beforeMission)
 	: State("ExtendedInventoryLinksState", false), _parent(parent), _save(save)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, inBase ? 180 : 180 - 14, 32, inBase ? 10 : 10 + 14, WindowPopup::POPUP_BOTH);

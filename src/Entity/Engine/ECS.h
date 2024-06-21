@@ -63,10 +63,16 @@ protected:
 	// it is worth it.
 
 	using SystemRegistryContainer = std::unordered_map<std::type_index, TypeErasedPtr>;
-	SystemRegistryContainer systemRegistry;
+	SystemRegistryContainer _systemRegistry;
 
 	template <typename SystemType, typename... Args>
 	inline void registerSystem(Args&&... args);
+
+	using FactoryRegistryContainer = std::unordered_map<std::type_index, TypeErasedPtr>;
+	FactoryRegistryContainer _factoryRegistry;
+
+	template <typename FactoryType, typename... Args>
+	inline void registerFactory(Args&&... args);
 
 public:
 	ECS();
@@ -78,27 +84,52 @@ public:
 	/// Return a system
 	template <typename SystemType>
 	inline SystemType& getSystem();
+
+	/// Return a factory
+	template <typename FactoryType>
+	inline FactoryType& getFactory();
 };
 
 /// Register a system
 template <typename SystemType, typename... Args>
 inline void ECS::registerSystem(Args&&... args)
 {
-	systemRegistry.emplace(
+	_systemRegistry.emplace(
 		std::type_index(typeid(SystemType)),
 		std::make_unique<SystemType>(std::forward<Args>(args)...));
+}
+
+/// Register a factory
+template <typename FactoryType, typename... Args>
+inline void ECS::registerFactory(Args&&... args)
+{
+	_factoryRegistry.emplace(
+		std::type_index(typeid(FactoryType)),
+		std::make_unique<FactoryType>(std::forward<Args>(args)...));
 }
 
 /// Return a system
 template <typename SystemType>
 SystemType& ECS::getSystem()
 {
-	SystemRegistryContainer::iterator it = systemRegistry.find(typeid(SystemType));
-	if (it == systemRegistry.end())
+	SystemRegistryContainer::iterator it = _systemRegistry.find(typeid(SystemType));
+	if (it == _systemRegistry.end())
 	{
 		throw std::runtime_error("System not found");
 	}
 	return it->second.get<SystemType>();
+}
+
+/// Return a factory
+template <typename FactoryType>
+inline FactoryType& ECS::getFactory()
+{
+	FactoryRegistryContainer::iterator it = _factoryRegistry.find(typeid(FactoryType));
+	if (it == _factoryRegistry.end())
+	{
+		throw std::runtime_error("System not found");
+	}
+	return it->second.get<FactoryType>();
 }
 
 

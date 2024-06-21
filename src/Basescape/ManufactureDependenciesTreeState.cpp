@@ -30,6 +30,7 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextList.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 #include <unordered_map>
 #include <unordered_set>
 
@@ -41,7 +42,7 @@ namespace OpenXcom
  */
 ManufactureDependenciesTreeState::ManufactureDependenciesTreeState(const std::string& selectedItem) : State("ManufactureDependenciesTreeState", false), _selectedItem(selectedItem), _showAll(false)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("dependencyTree", this, 222, 144, 49, 32);
 	_txtTitle = new Text(182, 9, 53, 42);

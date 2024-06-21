@@ -16,40 +16,37 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "PurchaseState.h"
-#include <sstream>
-#include <climits>
-#include <iomanip>
-#include <algorithm>
-#include <locale>
-#include "../fmath.h"
-#include "../Engine/Game.h"
-#include "../Mod/Mod.h"
-#include "../Engine/LocalizedText.h"
-#include "../Engine/Timer.h"
-#include "../Engine/Options.h"
-#include "../Engine/Unicode.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Window.h"
-#include "../Interface/Text.h"
-#include "../Interface/TextEdit.h"
-#include "../Interface/ComboBox.h"
-#include "../Interface/TextList.h"
-#include "../Savegame/SavedGame.h"
-#include "../Mod/RuleCraft.h"
-#include "../Mod/RuleItem.h"
-#include "../Savegame/Base.h"
+#include "../Battlescape/CannotReequipState.h"
 #include "../Engine/Action.h"
+#include "../Engine/Game.h"
+#include "../Engine/LocalizedText.h"
+#include "../Engine/Options.h"
+#include "../Engine/Timer.h"
+#include "../Engine/Unicode.h"
+#include "../Entity/Interface/Interface.h"
+#include "../fmath.h"
+#include "../Interface/ComboBox.h"
+#include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
+#include "../Interface/TextEdit.h"
+#include "../Interface/TextList.h"
+#include "../Menu/ErrorMessageState.h"
+#include "../Mod/Mod.h"
+#include "../Mod/RuleCraft.h"
+#include "../Mod/RuleCountry.h"
+#include "../Mod/RuleInterface.h"
+#include "../Mod/RuleItem.h"
+#include "../Mod/RuleSoldier.h"
+#include "../Savegame/Base.h"
+#include "../Savegame/Country.h"
 #include "../Savegame/Craft.h"
 #include "../Savegame/ItemContainer.h"
-#include "../Menu/ErrorMessageState.h"
-#include "../Mod/RuleInterface.h"
-#include "../Mod/RuleSoldier.h"
-#include "../Mod/Armor.h"
+#include "../Savegame/SavedGame.h"
 #include "../Ufopaedia/Ufopaedia.h"
-#include "../Battlescape/CannotReequipState.h"
-#include "../Savegame/Country.h"
-#include "../Mod/RuleCountry.h"
+#include "PurchaseState.h"
+#include <climits>
+#include <iomanip>
+#include <sstream>
 
 namespace OpenXcom
 {
@@ -94,7 +91,7 @@ PurchaseState::PurchaseState(Base* base, CannotReequipState* parent) : State("Pu
 		}
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("buyMenu", this, 320, 200, 0, 0);

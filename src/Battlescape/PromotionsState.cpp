@@ -29,6 +29,7 @@
 #include "../Savegame/Soldier.h"
 #include "../Savegame/Transfer.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -39,7 +40,7 @@ namespace OpenXcom
  */
 PromotionsState::PromotionsState() : State("PromotionsState", true)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create object
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

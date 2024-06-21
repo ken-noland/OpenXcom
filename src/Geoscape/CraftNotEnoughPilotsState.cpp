@@ -27,6 +27,7 @@
 #include "../Savegame/Base.h"
 #include "../Savegame/Craft.h"
 #include "../Basescape/CraftInfoState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -38,7 +39,7 @@ namespace OpenXcom
 CraftNotEnoughPilotsState::CraftNotEnoughPilotsState(Craft* craft)
 	: State("CraftNotEnoughPilotsState", false), _craft(craft)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);

@@ -35,6 +35,7 @@
 #include "TransfersState.h"
 #include "StoresState.h"
 #include "BasescapeState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -48,7 +49,7 @@ namespace OpenXcom
 BaseInfoState::BaseInfoState(entt::entity baseId, BasescapeState *state) 
 	: State("BaseInfoState", true),	_baseId(baseId), _state(state), _base(&getRegistry().raw().get<Base>(baseId))
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_bg = new Surface(320, 200, 0, 0);

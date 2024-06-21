@@ -27,6 +27,7 @@
 #include "../Mod/RuleCraft.h"
 #include "../Basescape/PurchaseState.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -38,7 +39,7 @@ namespace OpenXcom
 NewPossibleCraftState::NewPossibleCraftState(Base* base, const std::vector<RuleCraft*>& possibilities)
 	: State("NewPossibleCraftState", false), _base(base)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);

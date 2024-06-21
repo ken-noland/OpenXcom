@@ -40,6 +40,7 @@
 #include "../Savegame/ItemContainer.h"
 #include "../Mod/RuleSoldier.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -60,7 +61,7 @@ struct compareArmorName
  */
 SoldierArmorState::SoldierArmorState(Base* base, size_t soldier, SoldierArmorOrigin origin) : State("SoldierArmorState", false), _base(base), _soldier(soldier), _origin(origin)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("soldierArmor", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);

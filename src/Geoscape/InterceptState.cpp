@@ -39,6 +39,7 @@
 #include "../Basescape/BasescapeState.h"
 #include "../Basescape/CraftInfoState.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -68,7 +69,7 @@ InterceptState::InterceptState(Globe* globe, bool useCustomSound, Base* base, Ta
 		}
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	if (Options::oxceInterceptGuiMaintenanceTime > 0)

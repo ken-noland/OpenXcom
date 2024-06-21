@@ -31,6 +31,7 @@
 #include "../Interface/TextList.h"
 #include "../Savegame/ItemContainer.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -40,7 +41,7 @@ namespace OpenXcom
 */
 CraftEquipmentSaveState::CraftEquipmentSaveState(CraftEquipmentState* parent) : State("CraftEquipmentSaveState", false), _parent(parent), _previousSelectedRow(-1), _selectedRow(-1)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("craftEquipmentSave", this, 240, 136, 40, 36 + 1, WindowPopup::POPUP_BOTH);

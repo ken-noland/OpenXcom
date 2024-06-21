@@ -34,6 +34,7 @@
 #include "../Savegame/GameTime.h"
 #include "SoldierInfoState.h"
 #include "../Menu/StatisticsState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -44,7 +45,7 @@ namespace OpenXcom
  */
 SoldierMemorialState::SoldierMemorialState() : State("SoldierMemorialState", true)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("soldierMemorial", this, 320, 200, 0, 0);

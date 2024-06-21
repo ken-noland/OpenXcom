@@ -33,6 +33,7 @@
 #include "ManufactureState.h"
 #include "TechTreeViewerState.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -42,7 +43,7 @@ namespace OpenXcom
  */
 GlobalManufactureState::GlobalManufactureState(bool openedFromBasescape) : State("GlobalManufactureState", true), _openedFromBasescape(openedFromBasescape)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("globalManufactureMenu", this, 320, 200, 0, 0);

@@ -39,6 +39,7 @@
 #include "../Engine/Timer.h"
 #include "../Menu/ErrorMessageState.h"
 #include "../Mod/RuleInterface.h"
+#include "../Entity/Interface/Interface.h"
 #include <climits>
 
 namespace OpenXcom
@@ -71,7 +72,7 @@ ManufactureInfoState::ManufactureInfoState(Base* base, Production* production) :
  */
 void ManufactureInfoState::buildUi()
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("manufactureInfo", this, 320, 160, 0, 20, WindowPopup::POPUP_BOTH);
 	_txtTitle = new Text(320, 17, 0, 30);

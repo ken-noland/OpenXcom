@@ -48,11 +48,13 @@ class SurfaceFactory
 {
 protected:
 	entt::registry& _registry;
+
 public:
 	SurfaceFactory(entt::registry& registry); // KN NOTE: I do plan on passing the renderer here so that Surface is abstracted.
 	~SurfaceFactory();
 
 	entt::entity createSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
+	entt::entity createInteractiveSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
 };
 
 } // namespace OpenXcom

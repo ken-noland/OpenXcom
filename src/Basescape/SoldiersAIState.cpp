@@ -29,13 +29,11 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
-#include "../Interface/Window.h"
-#include "../Menu/ErrorMessageState.h"
-#include "../Mod/RuleInterface.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/BattleUnit.h"
 #include "../Savegame/Craft.h"
 #include "../Savegame/Soldier.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -80,7 +78,7 @@ SoldiersAIState::SoldiersAIState(std::vector<BattleUnit*>& units)
  */
 void SoldiersAIState::_commonConstruct()
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("craftSoldiers", this, 320, 200, 0, 0);

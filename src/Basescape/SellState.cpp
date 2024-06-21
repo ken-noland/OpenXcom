@@ -54,6 +54,7 @@
 #include "TransferBaseState.h"
 #include "TechTreeViewerState.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -88,7 +89,7 @@ void SellState::delayedInit()
 	bool overfull = _debriefingState == 0 && Options::storageLimitsEnforced && _base->storesOverfull();
 	bool overfullCritical = overfull ? _base->storesOverfullCritical() : false;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("sellMenu", this, 320, 200, 0, 0);

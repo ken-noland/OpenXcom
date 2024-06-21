@@ -23,6 +23,7 @@
 #include "../Engine/Palette.h"
 #include "../Engine/Game.h"
 #include "../Entity/Interface/Window.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -39,7 +40,7 @@ const int BattlescapeMessage::VERTICAL_OFFSET = 20;
  */
 BattlescapeMessage::BattlescapeMessage(int width, int height, int x, int y) : Surface(width, height, x, y)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("battlescapeMessage", 0, width, height, x, y, WindowPopup::POPUP_NONE);
 

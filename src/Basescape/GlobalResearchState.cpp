@@ -32,6 +32,7 @@
 #include "../Savegame/ResearchProject.h"
 #include "../Mod/RuleResearch.h"
 #include "TechTreeViewerState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -41,7 +42,7 @@ namespace OpenXcom
  */
 GlobalResearchState::GlobalResearchState(bool openedFromBasescape) : State("GlobalResearchState", true), _openedFromBasescape(openedFromBasescape)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("globalResearchMenu", this, 320, 200, 0, 0);

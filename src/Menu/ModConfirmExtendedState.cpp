@@ -26,6 +26,7 @@
 #include "../Mod/Mod.h"
 #include "../version.h"
 #include "ModListState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -38,7 +39,7 @@ namespace OpenXcom
 ModConfirmExtendedState::ModConfirmExtendedState(ModListState* state, const ModInfo* modInfo, const ModInfo* masterInfo)
 	: State("ModConfirmExtendedState", false), _state(state), _isMaster(modInfo->isMaster())
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 100, 32, 50, WindowPopup::POPUP_BOTH);
