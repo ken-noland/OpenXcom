@@ -108,7 +108,7 @@ const std::string &AlienRace::getMember(int id) const
 		{
 			throw Exception("Race " + _id + " does not have a random member at position/rank " + std::to_string(id));
 		}
-		int rng = RNG::generate(0, _membersRandom[id].size() - 1);
+		int rng = RNG::generate(0, (int)_membersRandom[id].size() - 1);
 		return _membersRandom[id][rng];
 	}
 
@@ -127,10 +127,10 @@ int AlienRace::getMembers() const
 {
 	if (!_membersRandom.empty())
 	{
-		return _membersRandom.size();
+		return (int)_membersRandom.size();
 	}
 
-	return _members.size();
+	return (int)_members.size();
 }
 
 /**

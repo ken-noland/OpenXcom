@@ -23,11 +23,14 @@
 namespace OpenXcom
 {
 
+class SurfaceComponent;//TEMP
+
 using DrawableCallback = std::function<void()>;
 
 class DrawableComponent
 {
 	MulticastDelegate<void()> _drawables;
+	SurfaceComponent* _surfaceComponent;
 
 public:
 	DrawableComponent();
@@ -38,6 +41,9 @@ public:
 
 	/// Draws all drawables.
 	void draw();
+
+	/// Temp hack until we get the flags we need moved over to here
+	[[deprecated]] void setSurfaceComponent(SurfaceComponent* surfaceComponent) { _surfaceComponent = surfaceComponent; }
 };
 
 class DrawableSystem

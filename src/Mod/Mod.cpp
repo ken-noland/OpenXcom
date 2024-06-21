@@ -3749,7 +3749,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 	}
 	// Adjust funding to total $6M
 	int64_t totalFunding = CountrySystem::getCountriesMonthlyFundingTotal();
-	int missing = ((_initialFunding - totalFunding/1000) / static_cast<int>(getRegistry().size<Country>())) * 1000;
+	int missing = (int)(((_initialFunding - totalFunding/1000) / static_cast<int>(getRegistry().size<Country>())) * 1000);
 	for (Country& country : getRegistry().list<Country>())
 	{
 		int funding = country.getFunding().back() + missing;

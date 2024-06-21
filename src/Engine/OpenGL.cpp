@@ -210,12 +210,12 @@ void OpenGL::refresh(bool smooth, unsigned inwidth, unsigned inheight, unsigned 
 		int u1 = 0;
 		int u2 = outwidth * 2;
 		int v1 = outheight;
-		int v2 = - outheight;
+		int v2 = -(int)outheight;
 
 		glBegin(GL_TRIANGLES);
 		glTexCoord2f(0, 0); glVertex3i(u1, v1, 0);
-		glTexCoord2f(w, 0); glVertex3i(u2, v1, 0);
-		glTexCoord2f(0, h); glVertex3i(u1, v2, 0);
+		glTexCoord2f((GLfloat)w, 0); glVertex3i(u2, v1, 0);
+		glTexCoord2f(0, (GLfloat)h); glVertex3i(u1, v2, 0);
 		glEnd();
 	}
 	else
@@ -229,9 +229,9 @@ void OpenGL::refresh(bool smooth, unsigned inwidth, unsigned inheight, unsigned 
 
 		glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f(0, 0); glVertex3i(u1, v1, 0);
-		glTexCoord2f(w, 0); glVertex3i(u2, v1, 0);
-		glTexCoord2f(0, h); glVertex3i(u1, v2, 0);
-		glTexCoord2f(w, h); glVertex3i(u2, v2, 0);
+		glTexCoord2f((GLfloat)w, 0); glVertex3i(u2, v1, 0);
+		glTexCoord2f(0, (GLfloat)h); glVertex3i(u1, v2, 0);
+		glTexCoord2f((GLfloat)w, (GLfloat)h); glVertex3i(u2, v2, 0);
 		glEnd();
 	}
 	glErrorCheck();

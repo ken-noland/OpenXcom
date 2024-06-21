@@ -166,7 +166,8 @@ void State::add(Surface *surface)
 	entt::entity surfaceEnt = registry.create();
 	DrawableComponent& drawableComponent = registry.emplace<DrawableComponent>(surfaceEnt);
 	std::unique_ptr<Surface> surfacePtr(surface);
-	registry.emplace<SurfaceComponent>(surfaceEnt, drawableComponent, surfacePtr);
+	SurfaceComponent& surfaceComponent = registry.emplace<SurfaceComponent>(surfaceEnt, drawableComponent, surfacePtr);
+	drawableComponent.setSurfaceComponent(&surfaceComponent);
 
 	_surfaces.push_back(surfaceEnt);
 }
@@ -242,7 +243,8 @@ void State::add(Surface *surface, const std::string &id, const std::string &cate
 	entt::entity surfaceEnt = registry.create();
 	DrawableComponent& drawableComponent = registry.emplace<DrawableComponent>(surfaceEnt);
 	std::unique_ptr<Surface> surfacePtr(surface);
-	registry.emplace<SurfaceComponent>(surfaceEnt, drawableComponent, surfacePtr);
+	SurfaceComponent& surfaceComponent = registry.emplace<SurfaceComponent>(surfaceEnt, drawableComponent, surfacePtr);
+	drawableComponent.setSurfaceComponent(&surfaceComponent);
 
 	_surfaces.push_back(surfaceEnt);
 }

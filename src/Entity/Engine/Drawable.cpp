@@ -41,7 +41,20 @@ void DrawableComponent::addDrawable(const DrawableCallback& drawable)
 
 void DrawableComponent::draw()
 {
-	_drawables.rcall();
+	Surface* surface = _surfaceComponent->getSurface();
+
+//	if (surface->getVisible() && !surface->isHidden())
+	{
+		if (surface->getRedraw())
+		{
+			_drawables.call();
+		}
+
+		SDL_Rect target{};
+		target.x = surface->getX();
+		target.y = surface->getY();
+		SDL_BlitSurface(surface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
+	}	
 }
 
 DrawableSystem::DrawableSystem()
@@ -62,6 +75,10 @@ void DrawableSystem::draw(entt::entity& entity)
 
 	if (getRegistry().raw().any_of<WindowComponent>(entity))
 	{
+		//hack for now just to get the window to tick(to verify that the tick is the issue)
+		WindowComponent& windowComp = getRegistry().raw().get<WindowComponent>(entity);
+		windowComp.think();
+
 		DrawableComponent& drawableComponent = getRegistry().raw().get<DrawableComponent>(entity);
 		drawableComponent.draw();
 	}

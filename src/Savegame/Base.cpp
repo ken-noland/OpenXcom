@@ -2114,7 +2114,7 @@ void Base::destroyFacility(BASEFACILITIESITERATOR facility)
 		}
 		else  // No crafts in hangar, but it's possible we have to eliminate crafts in transfer/production to this hangar
 		{
-			int remove = -(getAvailableHangars((*facility)->getRules()->getHangarType()) - getUsedHangars((*facility)->getRules()->getHangarType()) - (*facility)->getRules()->getCrafts());
+			size_t remove = -(getAvailableHangars((*facility)->getRules()->getHangarType()) - getUsedHangars((*facility)->getRules()->getHangarType()) - (*facility)->getRules()->getCrafts());
 			remove = Collections::deleteIf(_productions, remove,
 				[&](Production* i)
 				{

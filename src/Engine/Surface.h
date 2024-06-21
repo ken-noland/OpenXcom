@@ -201,6 +201,8 @@ public:
 	bool shouldRedraw() { return _redraw; }
 	/// Set the redraw flag which indicates if the surface should be redrawn.
 	void setRedraw(bool redraw) { _redraw = redraw; }
+	/// Gets the redraw flag which indicates if the surface should be redrawn.
+	bool getRedraw() const { return _redraw; }
 	/// Gets the cropping rectangle for the surface.
 	SurfaceCrop getCrop() const;
 	/**
@@ -338,6 +340,8 @@ public:
 	virtual void setBorderColor(Uint8 /*color*/) { /* empty by design */ };
 	/// Sets the high contrast color setting of the surface.
 	virtual void setHighContrast(bool /*contrast*/) { /* empty by design */ };
+
+	SDL_Surface* getSDLSurface() { return _surface.get(); }
 };
 
 /**

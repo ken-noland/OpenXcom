@@ -95,7 +95,7 @@ void SoundSet::writeWAV(SDL_RWops *dest, Uint8 *sound, size_t size, bool resampl
  */
 void SoundSet::loadCat(CatFile &catFile)
 {
-	for (size_t i = 0; i < catFile.size(); ++i) { loadCatByIndex(catFile, i); }
+	for (size_t i = 0; i < catFile.size(); ++i) { loadCatByIndex(catFile, (int)i); }
 }
 
 /**
@@ -170,7 +170,7 @@ size_t SoundSet::getTotalSounds() const
  */
 void SoundSet::loadCatByIndex(CatFile &catFile, int index, bool tftd)
 {
-	int set_index = tftd ? getTotalSounds() : index;
+	int set_index = tftd ? (int)getTotalSounds() : index;
 	_sounds[set_index] = Sound(); // in case everything else fails, an empty Sound.
 	auto rwops = catFile.getRWops(index);
 	if (!rwops) {
@@ -233,12 +233,12 @@ void SoundSet::loadCatByIndex(CatFile &catFile, int index, bool tftd)
 	}
 	size_t dest_size = 44 + 2 * size; // worst-case estimation
 	auto dest_mem = SDL_malloc(dest_size);
-	auto dest_rwops = SDL_RWFromMem(dest_mem, dest_size);
+	auto dest_rwops = SDL_RWFromMem(dest_mem, (int)dest_size);
 
 	if (do_resample) {
 		writeWAV(dest_rwops, samples, samplecount, !tftd);
 	} else { // nothing to do.
-		SDL_RWwrite(dest_rwops, sound, size, 1);
+		SDL_RWwrite(dest_rwops, sound, (int)size, 1);
 	}
 	SDL_RWseek(dest_rwops, 0, RW_SEEK_SET);
 	_sounds[set_index].load(dest_rwops);  // this frees the dest_rwops

@@ -50,10 +50,11 @@ entt::entity SurfaceFactory::createSurface(const std::string& name, int width, i
 	entt::entity entity = _registry.create();
 	_registry.emplace<NamedComponent>(entity, name);
 
-	DrawableComponent& drawable = _registry.emplace<DrawableComponent>(entity);
+	DrawableComponent& drawableComponent = _registry.emplace<DrawableComponent>(entity);
 
 	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
-	_registry.emplace<SurfaceComponent>(entity, drawable, surface);
+	SurfaceComponent& surfaceComponent = _registry.emplace<SurfaceComponent>(entity, drawableComponent, surface);
+	drawableComponent.setSurfaceComponent(&surfaceComponent);
 
 	return entity;
 }

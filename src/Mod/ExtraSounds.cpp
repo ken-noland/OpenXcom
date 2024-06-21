@@ -133,7 +133,7 @@ void ExtraSounds::loadSound(SoundSet *set, int index, const std::string &fileNam
 			err << "ExtraSounds '" << _type << "' sound '" << indexWithOffset << "' exceeds mod '"<< _current->getName() <<"' size limit " << _current->getSize();
 			throw Exception(err.str());
 		}
-		indexWithOffset += _current->getOffset();
+		indexWithOffset += (int)_current->getOffset();
 	}
 
 	Sound *sound = set->getSound(indexWithOffset);

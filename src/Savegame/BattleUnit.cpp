@@ -6791,7 +6791,7 @@ void getListSizeHackScript(BattleUnit* bu, int& i)
 	{
 		auto& ptr = (bu->*Member);
 		//count number of elements until null, and interpret this as size of array
-		i = std::distance(
+		i = (int)std::distance(
 			std::begin(ptr),
 			std::find(std::begin(ptr), std::end(ptr), nullptr)
 		);

@@ -768,7 +768,7 @@ void setup(const std::vector<const ModInfo* >& active, bool embeddedOnly)
 	}
 }
 
-#ifndef MSVC_VER
+#if !defined(_MSC_VER)
 [[gnu::unused]]
 #endif
 static void dump_mods_layers(std::ostream &out, const std::string& prefix, bool verbose) {

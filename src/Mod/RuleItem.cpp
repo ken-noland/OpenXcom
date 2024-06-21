@@ -165,7 +165,7 @@ RuleItem::RuleItem(const std::string &type, int listOrder) :
 	_isExplodingInHands(false), _specialUseEmptyHand(false), _specialUseEmptyHandShow(false),
 	_defaultInvSlotX(0), _defaultInvSlotY(0), _waypoints(0), _invWidth(1), _invHeight(1),
 	_painKiller(0), _heal(0), _stimulant(0), _medikitType(BMT_NORMAL), _medikitTargetSelf(false), _medikitTargetImmune(false), _medikitTargetMatrix(63),
-	_woundRecovery(0), _healthRecovery(0), _stunRecovery(0), _energyRecovery(0), _manaRecovery(0), _moraleRecovery(0), _painKillerRecovery(1.0f),
+	_woundRecovery(0), _healthRecovery(0), _stunRecovery(0), _energyRecovery(0), _manaRecovery(0), _moraleRecovery(0), _painKillerRecovery(1.f),
 	_recoveryPoints(0), _armor(20), _turretType(-1),
 	_aiUseDelay(-1), _aiMeleeHitCount(25),
 	_recover(true), _recoverCorpse(true), _ignoreInBaseDefense(false), _ignoreInCraftEquip(true), _liveAlien(false),
@@ -1120,7 +1120,7 @@ int RuleItem::getRandomSound(const std::vector<int> &vector, int defaultValue) c
 {
 	if (!vector.empty())
 	{
-		return vector[RNG::generate(0, vector.size() - 1)];
+		return vector[RNG::generate(0, (int)vector.size() - 1)];
 	}
 	return defaultValue;
 }
@@ -1952,7 +1952,7 @@ int RuleItem::getExplosionRadius(BattleActionAttack::ReadOnly attack) const
 
 	if (_damageType.FixRadius == -1)
 	{
-		radius = getPowerBonus(attack) * _damageType.RadiusEffectiveness;
+		radius = (int)(getPowerBonus(attack) * _damageType.RadiusEffectiveness);
 		if (_damageType.FireBlastCalc)
 		{
 			radius += 1;
@@ -2749,13 +2749,13 @@ void getRandomTypeScript(const RuleDamageType* rdt, int &ret)
 
 void getArmorEffectivenessScript(const RuleDamageType* rdt, int& ret)
 {
-	ret = rdt ? round(rdt->ArmorEffectiveness * 100) : 0;
+	ret = (int)(rdt ? round(rdt->ArmorEffectiveness * 100) : 0);
 }
 
 template<float RuleDamageType::* Ptr>
 void getDamageToScript(const RuleDamageType* rdt, int &ret, int value)
 {
-	ret = rdt ? (rdt->* Ptr) * value : 0;
+	ret = (int)(rdt ? (rdt->* Ptr) * value : 0);
 }
 
 void getRandomDamageScript(const RuleDamageType* rdt, int &ret, int value, RNG::RandomState* rng)

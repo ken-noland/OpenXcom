@@ -130,8 +130,8 @@ void Font::init(size_t index, const UString &str)
 		{
 			SDL_Rect rect;
 			int left = -1, right = -1;
-			int startX = i % length * image->width;
-			int startY = i / length * image->height;
+			int startX = (int)(i % length * image->width);
+			int startY = (int)(i / length * image->height);
 			for (int x = startX; x < startX + image->width; ++x)
 			{
 				for (int y = startY; y < startY + image->height && left == -1; ++y)
