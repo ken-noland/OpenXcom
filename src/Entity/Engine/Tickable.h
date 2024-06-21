@@ -17,37 +17,39 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <vector>
-#include <functional>
+#include "Delegate.h"
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
 
-template <typename FunctionSignature>
-class MulticastDelegate : public std::vector<std::function<FunctionSignature>>
+class SurfaceComponent; // TEMP
+
+using TickableCallback = std::function<void()>;
+
+class TickableComponent
+{
+	MulticastDelegate<void()> _tickables;
+	SurfaceComponent* _surfaceComponent;
+
+public:
+	TickableComponent();
+	~TickableComponent();
+
+	/// Adds a tickable to the list.
+	void addTickable(const TickableCallback& Tickable);
+
+	/// Ticks all tickables.
+	void tick();
+};
+
+class TickableSystem
 {
 public:
-	using Function = std::function<FunctionSignature>;
+	TickableSystem();
+	~TickableSystem();
 
-	/// Call all functions in the delegate.
-	template <typename... Args>
-	void call(Args&&... args)
-	{
-		for (Function& function : *this)
-		{
-			function(std::forward<Args>(args)...);
-		}
-	}
-
-	/// Call all functions in reverse order.
-	template <typename... Args>
-	void rcall(Args&&... args)
-	{
-		for (auto it = this->rbegin(); it != this->rend(); ++it)
-		{
-			(*it)(std::forward<Args>(args)...);
-		}
-	}
+	void tick(entt::entity& entity);
 };
 
 } // namespace OpenXcom

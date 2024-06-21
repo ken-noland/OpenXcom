@@ -126,7 +126,7 @@ void Country::newMonth(int xcomTotal, int alienTotal, int pactScore, int64_t ave
 	if (_cancelPact && funding <= 0)
 	{
 		_satisfaction = Satisfaction::SATISFIED; // satisfied, not happy or unhappy
-		fundingChange = averageFunding;
+		fundingChange = (int)averageFunding;
 	}
 
 	// call script which can adjust values.

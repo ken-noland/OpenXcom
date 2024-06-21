@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <entt/entt.hpp>
 #include "../Engine/Surface.h"
 
 namespace OpenXcom
@@ -25,6 +24,7 @@ namespace OpenXcom
 
 class State;
 class Timer;
+class TickableComponent;
 
 /**
  * Enumeration for the type of animation when a window pops up.
@@ -45,7 +45,6 @@ class WindowComponent
 {
 protected:
 	SurfaceComponent& _surfaceComponent;
-	DrawableComponent& _drawableComponent;
 
 	static const double POPUP_SPEED;	//KN NOTE: this should be a data driven parameter, not a static constant.
 	int _dx, _dy;
@@ -60,7 +59,7 @@ protected:
 	bool _mute;
 
 public:
-	WindowComponent(SurfaceComponent& surfaceComponent, DrawableComponent& drawableComponent, State* state, WindowPopup popup);
+	WindowComponent(SurfaceComponent& surfaceComponent, TickableComponent& tickableComponent, DrawableComponent& drawableComponent, State* state, WindowPopup popup);
 	~WindowComponent();
 
 	/// Sets the background surface.
@@ -72,7 +71,7 @@ public:
 	/// Sets the high contrast color setting.
 	void setHighContrast(bool contrast);
 	/// Handles the timers.
-	void think();
+	void tick();
 	/// Popups the window.
 	void popup();
 	/// Draws the window.

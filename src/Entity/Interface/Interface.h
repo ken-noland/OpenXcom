@@ -39,7 +39,6 @@
 #include "../../Interface/TextEdit.h"
 #include "../../Interface/TextList.h"
 #include "../../Interface/ToggleTextButton.h"
-#include "../../Interface/Window.h"
 
 namespace OpenXcom
 {

@@ -20,8 +20,7 @@
 
 //temp includes until I figure out where I want to populate the factory and system registries
 #include "Drawable.h"
-#include "Surface.h"
-#include "../Interface/Window.h"
+#include "Tickable.h"
 
 namespace OpenXcom
 {
@@ -29,6 +28,7 @@ namespace OpenXcom
 ECS::ECS()
 {
 	//temporarily putting System and Factory registration here
+	registerSystem<TickableSystem>();
 	registerSystem<DrawableSystem>();
 }
 

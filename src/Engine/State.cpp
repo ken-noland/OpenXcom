@@ -39,6 +39,8 @@
 #include "../Mod/RuleInterface.h"
 
 #include "../Entity/Engine/Surface.h"
+#include "../Entity/Engine/Tickable.h"
+#include "../Entity/Engine/Drawable.h"
 
 namespace OpenXcom
 {
@@ -397,8 +399,10 @@ void State::think()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
-		surface->think();
+		TickableSystem& tickable = getSystem<TickableSystem>();
+		tickable.tick(surfaceEnt);
+		//Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+		//surface->think();
 	}
 }
 

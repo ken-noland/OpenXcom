@@ -1718,7 +1718,7 @@ void StatsForNerdsState::addSpriteResourcePath(std::ostringstream &ss, Mod *mod,
 			size_t originalSpriteId = resourceId - (extraSprite->getModOwner()->getOffset());
 
 			auto mapOfSprites = extraSprite->getSprites();
-			auto individualSprite = mapOfSprites->find(originalSpriteId);
+			auto individualSprite = mapOfSprites->find((int)originalSpriteId);
 			if (individualSprite != mapOfSprites->end())
 			{
 				std::ostringstream numbers;
@@ -1756,7 +1756,7 @@ void StatsForNerdsState::addSoundVectorResourcePaths(std::ostringstream &ss, Mod
 			for (auto resourceId : resourceIds)
 			{
 				// strip mod offset from the in-game ID
-				int originalSoundId = resourceId - (resourceSet.second->getModOwner()->getOffset());
+				int originalSoundId = (int)(resourceId - (resourceSet.second->getModOwner()->getOffset()));
 
 				auto mapOfSounds = resourceSet.second->getSounds();
 				auto individualSound = mapOfSounds->find(originalSoundId);

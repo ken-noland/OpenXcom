@@ -419,8 +419,9 @@ void ComboBox::think()
 	_button->think();
 	_arrow->think();
 
+	// TEMP! This should be done in the TickableComponent
 	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.think();
+	windowComponent.tick();
 
 	_list->think();
 	InteractiveSurface::think();

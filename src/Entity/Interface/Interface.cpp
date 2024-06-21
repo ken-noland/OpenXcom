@@ -18,6 +18,8 @@
  */
 #include "Interface.h"
 #include "Window.h"
+#include "../Engine/Tickable.h"
+#include "../Engine/Drawable.h"
 
 namespace OpenXcom
 {
@@ -38,7 +40,8 @@ entt::entity InterfaceFactory::createWindow(const std::string& name, State* stat
 
 	SurfaceComponent& surfaceComponent = _registry.get<SurfaceComponent>(entity);
 	DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
-	_registry.emplace<WindowComponent>(entity, surfaceComponent, drawableComponent, state, popup);
+	TickableComponent& tickableComponent = _registry.emplace<TickableComponent>(entity);
+	_registry.emplace<WindowComponent>(entity, surfaceComponent, tickableComponent, drawableComponent, state, popup);
 
 	return entity;
 }

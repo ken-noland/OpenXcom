@@ -75,10 +75,6 @@ void DrawableSystem::draw(entt::entity& entity)
 
 	if (getRegistry().raw().any_of<WindowComponent>(entity))
 	{
-		//hack for now just to get the window to tick(to verify that the tick is the issue)
-		WindowComponent& windowComp = getRegistry().raw().get<WindowComponent>(entity);
-		windowComp.think();
-
 		DrawableComponent& drawableComponent = getRegistry().raw().get<DrawableComponent>(entity);
 		drawableComponent.draw();
 	}
