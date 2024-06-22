@@ -19,7 +19,8 @@
  */
 #include "UfoFactory.h"
 #include <entt/entt.hpp>
-#include "../Common/GeoComponents.h"
+#include "../Common/GeoPosition.h"
+#include "../Common/GeoVelocity.h"
 #include "../Common/Name.h"
 #include "../Common/Type.h"
 #include "../../Mod/RuleUfo.h"

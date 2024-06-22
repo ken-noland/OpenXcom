@@ -28,7 +28,7 @@
 #include "../Geoscape/BaseNameState.h"
 #include "../Basescape/PlaceLiftState.h"
 #include "../Engine/Options.h"
-#include "../Entity/Common/GeoComponents.h"
+#include "../Entity/Common/GeoPosition.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Base.h"
 #include "../Entity/Interface/Interface.h"
@@ -172,7 +172,7 @@ void NewGameState::btnOkClick(Action *)
 	getGame()->setState(gs);
 	gs->init();
 
-	entt::handle newBaseHandle = getRegistry().front<Base, GeoPosition>(); // a base *should* be created in newSave
+	entt::handle newBaseHandle = getRegistry().front<Base, GeoPosition>(); // a base is created in newSave
 	if (newBaseHandle.get<Base>().getMarker() != -1)
 	{
 		// location known already

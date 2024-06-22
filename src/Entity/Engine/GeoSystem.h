@@ -18,46 +18,13 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <entt/entt.hpp>
+#include "../Common/GeoPosition.h"
 #include "../../Mod/RuleCountry.h"
 #include "../../Mod/RuleRegion.h"
 #include "../../Savegame/Country.h"
 #include "../../Savegame/Region.h"
 
-namespace OpenXcom
-{
-
-/**
- * @brief object with a location on the geoscape. Like UFO or bases. In radians.
- */
-struct GeoPosition
-{
-	double latitude = 0.0;
-	double longitude = 0.0;
-
-	// doesn't matter now but probably want some way to throttle these updates
-	// double distanceMovedSinceLastUpdate; 
-	Region* region = nullptr;
-	Country* country = nullptr;
-
-	GeoPosition operator+(const GeoPosition& other) const
-	{
-		return GeoPosition{
-			.latitude  = this->latitude  + other.latitude,
-			.longitude = this->longitude + other.longitude,
-		};
-	}
-
-	static constexpr std::string_view NODE_NAME = "name";
-};
-
-/**
- * @brief entity with a velocity on the geoscape
- */
-struct GeoVelocity
-{
-	double bearing; // Bearing in degrees from north
-	double speed;   // Speed in nm/???
-};
+namespace OpenXcom {
 
 class GeoSystem
 {
@@ -73,7 +40,7 @@ public:
 	 * @return the first area with a matching point, or nullptr if not found
 	 */
 	template<typename Area>
-	Area* locate(const GeoPosition& position)
+	entt::handle locate(const GeoPosition& position)
 	{
 		auto areaView = _registry.view<Area>().each();
 
@@ -82,51 +49,30 @@ public:
 			};
 
 		auto findResult = std::ranges::find_if(areaView, containsPoint);
-		return findResult != areaView.end() ? &std::get<1>(*findResult) : nullptr;
+		return findResult != areaView.end() ? entt::handle(_registry, std::get<0>(*findResult)) : entt::handle();
 	}
 
+	/**
+	 * @brief Updates the current region and country value for all geopositions.
+	 */
 	void updateAllRegionsAndCountries()
 	{
 		for (auto&& [entity, geoPosition] : _registry.view<GeoPosition>().each())
 		{
-			Country* currentCountry = geoPosition.country;
-			Region* currentRegion = geoPosition.region;
+			entt::handle currentCountry = geoPosition.country;
+			entt::handle currentRegion  = geoPosition.region;
 
-			Country* newCountry = locate<Country>(geoPosition);
-			Region* newRegion = locate<Region>(geoPosition);
+			entt::handle newCountry = locate<Country>(geoPosition);
+			entt::handle newRegion  = locate<Region>(geoPosition);
 
-			if ((currentCountry != newCountry) || (currentRegion != newRegion))
+			if ((currentCountry.entity() != newCountry.entity()) || (currentRegion.entity() != newRegion.entity()))
 			{
 				geoPosition.country = newCountry;
-				geoPosition.region = newRegion;
+				geoPosition.region  = newRegion;
 				_registry.replace<GeoPosition>(entity, geoPosition);
 			}
 		}
 	}
 };
 
-}
-
-namespace YAML
-{
-
-	template<>
-	struct convert<OpenXcom::GeoPosition> {
-		static Node encode(const OpenXcom::GeoPosition& geoPosition) {
-			Node node;
-			node[OpenXcom::GeoPosition::NODE_NAME.data()]["latitude"] = geoPosition.latitude;
-			node[OpenXcom::GeoPosition::NODE_NAME.data()]["longitude"] = geoPosition.longitude;
-			return node;
-		}
-
-		static bool decode(const Node& node, OpenXcom::GeoPosition& geoPosition) {
-			if (!node.IsMap() || node.size() != 2) {
-				return false;
-			}
-
-			geoPosition.latitude  = node["latitude"].as<double>();
-			geoPosition.longitude = node["longitude"].as<double>();
-			return true;
-		}
-	};
 }

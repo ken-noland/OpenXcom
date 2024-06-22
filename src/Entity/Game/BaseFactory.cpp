@@ -17,9 +17,9 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "BaseFactory.h"
-#include <yaml-cpp/yaml.h>
 #include "../Common/Index.h"
-#include "../Common/GeoComponents.h"
+#include "../Common/GeoPosition.h"
+#include "../Common/GeoVelocity.h"
 #include "../Common/Name.h"
 #include "../../Savegame/Base.h"
 #include "../../Mod/Mod.h"

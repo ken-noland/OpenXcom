@@ -34,7 +34,7 @@
 #include "State.h"
 #include "Unicode.h"
 #include "../fallthrough.h"
-#include "../Entity/Common/GeoComponents.h"
+#include "../Entity/Engine/GeoSystem.h"
 #include "../Entity/Game/BaseFactory.h"
 #include "../Entity/Game/BasescapeData.h"
 #include "../Entity/Game/CountryFactory.h"

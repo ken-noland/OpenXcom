@@ -39,7 +39,7 @@
 #include "../Engine/LocalizedText.h"
 #include "../Engine/Options.h"
 #include "../Engine/Unicode.h"
-#include "../Entity/Common/Index.h"
+#include "../Entity/Common/GeoPosition.h"
 #include "../Entity/Game/BaseFactory.h"
 #include "../Geoscape/AllocatePsiTrainingState.h"
 #include "../Geoscape/AllocateTrainingState.h"
@@ -223,9 +223,9 @@ void BasescapeState::init()
 	_mini->draw();
 	_edtBase->setText(selectedBase.get<Base>().getName());
 
-	if (const Region* region = selectedBase.try_get<Region>())
+	if (const GeoPosition* position = selectedBase.try_get<GeoPosition>(); position->region)
 	{
-		_txtLocation->setText(tr(region->getRules()->getType()));
+		_txtLocation->setText(tr(position->region.get<Region>().getRules()->getType()));
 	}
 
 	_txtFunds->setText(tr("STR_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));

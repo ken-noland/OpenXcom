@@ -61,7 +61,7 @@
 #include "../Engine/Registry.h"
 #include "../Engine/RNG.h"
 #include "../Engine/ScriptBind.h"
-#include "../Entity/Common/GeoComponents.h"
+#include "../Entity/Engine/GeoSystem.h"
 #include "../Entity/Game/BasescapeData.h"
 #include "../Lua/GameScript.h"
 #include "../Lua/LuaMod.h"

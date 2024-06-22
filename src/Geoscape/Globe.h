@@ -21,7 +21,7 @@
 #include <list>
 #include "../Engine/InteractiveSurface.h"
 #include "../Engine/FastLineClip.h"
-#include "../Entity/Common/GeoComponents.h"
+#include "../Entity/Common/GeoPosition.h"
 #include "Cord.h"
 
 namespace OpenXcom

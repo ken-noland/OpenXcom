@@ -81,7 +81,7 @@
 #include "../Engine/Surface.h"
 #include "../Engine/Timer.h"
 #include "../Engine/Unicode.h"
-#include "../Entity/Common/GeoComponents.h"
+#include "../Entity/Engine/GeoSystem.h"
 #include "../fallthrough.h"
 #include "../fmath.h"
 #include "../Interface/ComboBox.h"
@@ -1776,6 +1776,8 @@ bool GeoscapeState::processMissionSite(MissionSite *site)
  */
 void GeoscapeState::time30Minutes()
 {
+	getRegistry().getService<GeoSystem>().updateAllRegionsAndCountries();
+
 	// Decrease mission countdowns
 	for (auto am : getGame()->getSavedGame()->getAlienMissions())
 	{
