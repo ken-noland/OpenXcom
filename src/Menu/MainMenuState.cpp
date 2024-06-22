@@ -36,6 +36,7 @@
 #include "../Engine/SDL2Helpers.h"
 #include "../Entity/Interface/Interface.h"
 #include <fstream>
+#include <functional>
 
 namespace OpenXcom
 {
@@ -70,14 +71,14 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
-	_window = factory.createWindow("windowName", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);
-	_btnNewGame = new TextButton(92, 20, 64, 90);
-	_btnNewBattle = new TextButton(92, 20, 164, 90);
-	_btnLoad = new TextButton(92, 20, 64, 118);
-	_btnOptions = new TextButton(92, 20, 164, 118);
-	_btnMods = new TextButton(92, 20, 64, 146);
-	_btnQuit = new TextButton(92, 20, 164, 146);
-	_btnUpdate = new TextButton(72, 16, 209, 27);
+	_window = factory.createWindow("mainMenu", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);
+	_btnNewGame = factory.createTextButton("btnNewGame", tr("STR_NEW_GAME"), 92, 20, 64, 90, [](Action*) { getGame()->pushState(new NewGameState); });
+	_btnNewBattle = factory.createTextButton("btnNewBattle", tr("STR_NEW_BATTLE"), 92, 20, 164, 90, [](Action*) { getGame()->pushState(new NewBattleState); });
+	_btnLoad = factory.createTextButton("btnLoad", tr("STR_LOAD_SAVED_GAME"), 92, 20, 64, 118, [](Action*) { getGame()->pushState(new ListLoadState(OPT_MENU)); });
+	_btnOptions = factory.createTextButton("btnOptions", tr("STR_OPTIONS"), 92, 20, 164, 118, [](Action*) { getGame()->pushState(new OptionsVideoState(OPT_MENU)); });
+	_btnMods = factory.createTextButton("btnMods", tr("STR_MODS"), 92, 20, 64, 146, [](Action*) { getGame()->pushState(new ModListState); });
+	_btnQuit = factory.createTextButton("btnQuit", tr("STR_QUIT"), 92, 20, 164, 146, [](Action*) { getGame()->quit(); });
+	_btnUpdate = factory.createTextButton("btnUpdate", tr("STR_UPDATE"), 72, 16, 209, 27, [this](Action* action) { btnUpdateClick(action); });
 	_txtUpdateInfo = new Text(320, 17, 0, 11);
 	_txtTitle = new Text(256, 30, 32, 45);
 
@@ -100,27 +101,27 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	// Set up objects
 	setWindowBackground(_window, "mainMenu");
 
-	_btnNewGame->setText(tr("STR_NEW_GAME"));
-	_btnNewGame->onMouseClick((ActionHandler)&MainMenuState::btnNewGameClick);
+	//_btnNewGame->setText(tr("STR_NEW_GAME"));
+	//_btnNewGame->onMouseClick((ActionHandler)&MainMenuState::btnNewGameClick);
 
-	_btnNewBattle->setText(tr("STR_NEW_BATTLE"));
-	_btnNewBattle->onMouseClick((ActionHandler)&MainMenuState::btnNewBattleClick);
+	//_btnNewBattle->setText(tr("STR_NEW_BATTLE"));
+	//_btnNewBattle->onMouseClick((ActionHandler)&MainMenuState::btnNewBattleClick);
 
-	_btnLoad->setText(tr("STR_LOAD_SAVED_GAME"));
-	_btnLoad->onMouseClick((ActionHandler)&MainMenuState::btnLoadClick);
+	//_btnLoad->setText(tr("STR_LOAD_SAVED_GAME"));
+	//_btnLoad->onMouseClick((ActionHandler)&MainMenuState::btnLoadClick);
 
-	_btnOptions->setText(tr("STR_OPTIONS"));
-	_btnOptions->onMouseClick((ActionHandler)&MainMenuState::btnOptionsClick);
+	//_btnOptions->setText(tr("STR_OPTIONS"));
+	//_btnOptions->onMouseClick((ActionHandler)&MainMenuState::btnOptionsClick);
 
-	_btnMods->setText(tr("STR_MODS"));
-	_btnMods->onMouseClick((ActionHandler)&MainMenuState::btnModsClick);
+	//_btnMods->setText(tr("STR_MODS"));
+	//_btnMods->onMouseClick((ActionHandler)&MainMenuState::btnModsClick);
 
-	_btnQuit->setText(tr("STR_QUIT"));
-	_btnQuit->onMouseClick((ActionHandler)&MainMenuState::btnQuitClick);
+	//_btnQuit->setText(tr("STR_QUIT"));
+	//_btnQuit->onMouseClick((ActionHandler)&MainMenuState::btnQuitClick);
 
-	_btnUpdate->setText(tr("STR_UPDATE"));
-	_btnUpdate->onMouseClick((ActionHandler)& MainMenuState::btnUpdateClick);
-	_btnUpdate->setVisible(false);
+	//_btnUpdate->setText(tr("STR_UPDATE"));
+	//_btnUpdate->onMouseClick((ActionHandler)& MainMenuState::btnUpdateClick);
+	//_btnUpdate->setVisible(false);
 
 	_txtUpdateInfo->setAlign(ALIGN_CENTER);
 	_txtUpdateInfo->setWordWrap(true);
@@ -171,10 +172,10 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 							{
 								checkProgress = 7;
 								_newVersion = doc["newVersion"].as<std::string>();
-								if (CrossPlatform::isHigherThanCurrentVersion(_newVersion))
-									_btnUpdate->setVisible(true);
-								else
-									_txtUpdateInfo->setVisible(true);
+//								if (CrossPlatform::isHigherThanCurrentVersion(_newVersion))
+//									_btnUpdate->setVisible(true);
+//								else
+//									_txtUpdateInfo->setVisible(true);
 							}
 							CrossPlatform::deleteFile(updateMetadataFilename);
 						}
@@ -222,7 +223,7 @@ MainMenuState::~MainMenuState()
  */
 void MainMenuState::btnNewGameClick(Action *)
 {
-	getGame()->pushState(new NewGameState);
+	
 }
 
 /**

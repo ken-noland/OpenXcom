@@ -20,6 +20,7 @@
 
 #include "Window.h"
 #include "ArrowButton.h"
+#include "TextButton.h"
 
 #include "../Engine/Tickable.h"
 #include "../Engine/Drawable.h"
@@ -48,9 +49,13 @@ entt::entity InterfaceFactory::createArrowButton(const std::string& name, ArrowS
 	return entity;
 }
 
-entt::entity InterfaceFactory::createTextButton(const std::string& name, int width, int height, int x, int y)
+entt::entity InterfaceFactory::createTextButton(const std::string& name, const std::string& text, int width, int height, int x, int y, std::function<void(Action*)> onClickCallback)
 {
-	return entt::entity();
+	entt::entity entity = _surfaceFactory.createSurface(name, width, height, x, y);
+
+	_registry.emplace<TextButtonComponent>(entity);
+
+	return entity;
 }
 
 entt::entity InterfaceFactory::createWindow(const std::string& name, State* state, int width, int height, int x, int y, WindowPopup popup)

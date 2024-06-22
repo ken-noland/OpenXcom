@@ -66,7 +66,7 @@ public:
 	entt::entity createScrollBar(const std::string& name, int width, int height, int x = 0, int y = 0);
 	entt::entity createSlider(const std::string& name, int width, int height, int x = 0, int y = 0);
 	entt::entity createText(const std::string& name, int width, int height, int x = 0, int y = 0);
-	entt::entity createTextButton(const std::string& name, int width, int height, int x = 0, int y = 0);
+	entt::entity createTextButton(const std::string& name, const std::string& text, int width, int height, int x, int y, std::function<void(Action*)> onClickCallback);
 	entt::entity createTextEdit(const std::string& name, State* state, int width, int height, int x = 0, int y = 0);
 	entt::entity createTextList(const std::string& name, int width, int height, int x = 0, int y = 0);
 	entt::entity createToggleTextButton(const std::string& name, int width, int height, int x, int y);

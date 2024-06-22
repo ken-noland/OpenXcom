@@ -448,7 +448,9 @@ set ( entity_game_src
 )
 
 set ( entity_interface_src
+  Entity/Interface/ArrowButton.cpp
   Entity/Interface/Interface.cpp
+  Entity/Interface/TextButton.cpp
   Entity/Interface/Window.cpp
 )
 

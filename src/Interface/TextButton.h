@@ -50,7 +50,7 @@ protected:
 public:
 	static Sound *soundPress;
 	/// Creates a new text button with the specified size and position.
-	[[deprecated]] TextButton(int width, int height, int x = 0, int y = 0);
+	[[deprecated("Use InterfaceFactory::createTextButton(...)")]] TextButton(int width, int height, int x = 0, int y = 0);
 	/// Cleans up the text button.
 	~TextButton();
 	/// Sets the text button's color.

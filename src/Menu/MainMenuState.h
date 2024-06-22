@@ -44,7 +44,7 @@ public:
 class MainMenuState : public State
 {
 private:
-	TextButton *_btnNewGame, *_btnNewBattle, *_btnLoad, *_btnOptions, *_btnMods, *_btnQuit, *_btnUpdate;
+	entt::entity _btnNewGame, _btnNewBattle, _btnLoad, _btnOptions, _btnMods, _btnQuit, _btnUpdate;
 	entt::entity _window;
 	Text *_txtTitle, *_txtUpdateInfo;
 #ifdef _WIN32
