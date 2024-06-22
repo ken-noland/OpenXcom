@@ -43,8 +43,8 @@ namespace OpenXcom
  * @param base Pointer to the base to place.
  * @param globe Pointer to the Geoscape globe.
  */
-ConfirmNewBaseState::ConfirmNewBaseState(entt::entity newBaseId, Globe *globe) 
-	: State("ConfirmNewBaseState", false),	_newBaseId(newBaseId), _globe(globe)
+ConfirmNewBaseState::ConfirmNewBaseState(entt::handle newBaseHandle, Globe *globe)
+	: State("ConfirmNewBaseState", false),	_newBaseHandle(newBaseHandle), _globe(globe)
 {
 	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
@@ -78,7 +78,7 @@ ConfirmNewBaseState::ConfirmNewBaseState(entt::entity newBaseId, Globe *globe)
 	_btnCancel->onKeyboardPress((ActionHandler)&ConfirmNewBaseState::btnCancelClick, Options::keyCancel);
 
 	std::string area;
-	const Base& base = getRegistry().raw().get<Base>(_newBaseId);
+	const Base& base = getRegistry().raw().get<Base>(_newBaseHandle);
 	if (const Region* region = AreaSystem::locateValue<Region>(base))
 	{
 		_cost = region->getRules()->getBaseCost();
@@ -99,7 +99,7 @@ void ConfirmNewBaseState::btnOkClick(Action*)
 	if (getGame()->getSavedGame()->getFunds() >= _cost)
 	{
 		getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() - _cost);
-		getGame()->pushState(new BaseNameState(_newBaseId, _globe, false, false));
+		getGame()->pushState(new BaseNameState(_newBaseHandle, _globe, false, false));
 	}
 	else
 	{

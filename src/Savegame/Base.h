@@ -145,7 +145,7 @@ public:
 	/// Saves the base to YAML.
 	YAML::Node save() const override;
 	/// Gets the base's type.
-	std::string getType() const override;
+	std::string getType() const override { return "STR_BASE"; }
 	/// Gets the base's name.
 	std::string getName(Language *lang = 0) const override;
 	/// Gets the base's marker sprite.

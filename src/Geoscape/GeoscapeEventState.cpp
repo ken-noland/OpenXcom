@@ -131,7 +131,7 @@ GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : State("Geos
 void GeoscapeEventState::eventLogic()
 {
 	SavedGame *save = getGame()->getSavedGame();
-	Base *hq = getRegistry().frontValue<Base>();
+	Base* hq = getRegistry().front<Base>().try_get<Base>();
 	const Mod *mod = getGame()->getMod();
 	const RuleEvent &rule = _eventRule;
 
@@ -216,7 +216,7 @@ void GeoscapeEventState::eventLogic()
 				for (int i = 0; i < rule.getSpawnedPersons(); ++i)
 				{
 					Transfer* t = new Transfer(24);
-					int nationality = getGame()->getSavedGame()->selectSoldierNationalityByLocation(getGame()->getMod(), ruleSoldier, city);
+					int nationality = getGame()->getSavedGame()->selectSoldierNationalityByLocation(*getGame()->getMod(), ruleSoldier, city);
 					Soldier* s = mod->genSoldier(save, ruleSoldier, nationality);
 					s->load(rule.getSpawnedSoldierTemplate(), mod, save, mod->getScriptGlobal(), true); // load from soldier template
 					if (!rule.getSpawnedPersonName().empty())
@@ -423,11 +423,13 @@ void GeoscapeEventState::btnOkClick(Action *)
 {
 	getGame()->popState();
 
-	Base *base = getRegistry().frontValue<Base>();
-	if (getGame()->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && base != 0 && base->storesOverfull())
+	if (entt::handle baseHandle = getRegistry().front<Base>();
+		getGame()->getSavedGame()->getMonthsPassed() > -1 && Options::storageLimitsEnforced && baseHandle.get<Base>().storesOverfull())
 	{
-		getGame()->pushState(new SellState(base, 0));
-		getGame()->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(base->getName()), _palette, getGame()->getMod()->getInterface("debriefing")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("debriefing")->getElement("errorPalette")->color));
+		getGame()->pushState(new SellState(&baseHandle.get<Base>(), nullptr));
+		getGame()->pushState(new ErrorMessageState(tr("STR_STORAGE_EXCEEDED").arg(baseHandle.get<Base>().getName()), _palette,
+			getGame()->getMod()->getInterface("debriefing")->getElement("errorMessage")->color, "BACK01.SCR",
+			getGame()->getMod()->getInterface("debriefing")->getElement("errorPalette")->color));
 	}
 
 	if (!_bonusResearchName.empty())

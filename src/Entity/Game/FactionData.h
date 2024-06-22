@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2024-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,17 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <entt/entt.hpp>
+#include "../../Savegame/Country.h"
+#include "../../Savegame/Region.h"
 
 namespace OpenXcom
 {
 
 /**
- * @brief entity with a velocity on the geoscape
- */
-struct GeoVelocity
+  * @brief Holds a history of faction finances
+  */
+struct FinanceData
 {
-	double bearing; // Bearing in degrees from north
-	double speed;   // Speed in nm/???
+	std::vector<int64_t> funds;
+	std::vector<int64_t> maintenance;
+	std::vector<int64_t> income;
+	std::vector<int64_t> expenditures;
 };
-
-}

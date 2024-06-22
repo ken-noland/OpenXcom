@@ -42,8 +42,8 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param state Pointer to the base state to refresh.
  */
-BuildFacilitiesState::BuildFacilitiesState(entt::entity baseId, State *state) 
-	: State("BuildFacilitiesState", false), _baseId(baseId), _state(state), _lstScroll(0)
+BuildFacilitiesState::BuildFacilitiesState(entt::handle baseId, State *state) 
+	: State("BuildFacilitiesState", false), _baseHandle(baseId), _state(state), _lstScroll(0)
 {
 	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
@@ -94,7 +94,7 @@ void BuildFacilitiesState::populateBuildList()
 	_disabledFacilities.clear();
 	_lstFacilities->clearList();
 
-	Base& base = getRegistry().raw().get<Base>(_baseId);
+	Base& base = _baseHandle.get<Base>();
 
 	auto providedBaseFunc = base.getProvidedBaseFunc({});
 	auto forbiddenBaseFunc = base.getForbiddenBaseFunc({});
@@ -208,7 +208,7 @@ void BuildFacilitiesState::lstFacilitiesClick(Action *action)
 	{
 		return;
 	}
-	getGame()->pushState(new PlaceFacilityState(_baseId, _facilities[index]));
+	getGame()->pushState(new PlaceFacilityState(_baseHandle, _facilities[index]));
 }
 
 }

@@ -19,10 +19,10 @@
  */
 #include <entt/entt.hpp>
 
-class Mod;
-
 namespace OpenXcom
 {
+
+class RuleUfo;
 
 /**
  * @brief Factory for creating ufos
@@ -35,7 +35,7 @@ protected:
 public:
 	UfoFactory(entt::registry& registry) : _registry(registry) { }
 
-	entt::handle create(RuleUfo& ruleUfo, int uniqueId, int hunterKillerPercentage = 0, int huntMode = 0, int huntBehavior = 0);
+	entt::handle create(const RuleUfo& ruleUfo, int uniqueId, int hunterKillerPercentage = 0, int huntMode = 0, int huntBehavior = 0);
 };
 
 }

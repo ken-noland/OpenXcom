@@ -37,7 +37,7 @@ public:
 	CountryFactory(entt::registry& registry) : _registry(registry) { }
 
 	// creates a new Country entity in the registry.
-	entt::handle create(const RuleCountry& ruleCountry, bool generateNewFunding = true);
+	entt::handle create(RuleCountry& ruleCountry, bool generateNewFunding = true);
 };
 
 }

@@ -18,20 +18,23 @@
  */
 #include "RegionFactory.h"
 #include <entt/entt.hpp>
+#include "../Common/Type.h"
+#include "../../Mod/RuleRegion.h"
+#include "../../Savegame/Region.h"
 
 namespace OpenXcom {
-
-class Region;
 
 /**
  * @brief Creates a new region entity
  * @param ruleRegion the type of this country
  * @return a handle to the new entity
  */
-entt::handle RegionFactory::create(const RuleRegion& ruleRegion)
+entt::handle RegionFactory::create(RuleRegion& ruleRegion)
 {
 	entt::entity regionId = _registry.create();
-	_registry.emplace<Region>(regionId);
+	_registry.emplace<Region>(regionId, &ruleRegion);
+
+	_registry.emplace<Type>(regionId, ruleRegion.getType());
 
 	return entt::handle(_registry, regionId);
 }

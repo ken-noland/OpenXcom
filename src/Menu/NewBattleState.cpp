@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <yaml-cpp/yaml.h>
 #include "../Engine/Game.h"
+#include "../Entity/Game/BaseFactory.h"
+#include "../Entity/Game/UfoFactory.h"
 #include "../Mod/Mod.h"
 #include "../Mod/RuleItem.h"
 #include "../Engine/LocalizedText.h"
@@ -390,8 +392,7 @@ void NewBattleState::load(const std::string &filename)
 				const Mod *mod = getGame()->getMod();
 				SavedGame *save = new SavedGame();
 
-				Base& newBase = getRegistry().createAndEmplace<Base>(mod);
-				newBase.load(doc["base"], save, false);
+				Base& newBase = getRegistry().getService<BaseFactory>().create(*mod, doc["base"], save, false).get<Base>();
 
 				// Add research
 				for (auto& pair : mod->getResearchMap())
@@ -453,7 +454,7 @@ void NewBattleState::save(const std::string &filename)
 	node["alienRace"] = _cbxAlienRace->getSelected();
 	node["difficulty"] = _cbxDifficulty->getSelected();
 	node["alienTech"] = _slrAlienTech->getValue();
-	node["base"] = getRegistry().frontValue<Base>()->save();
+	node["base"] = getRegistry().front<Base>().try_get<Base>()->save();
 	out << node;
 
 	std::string filepath = Options::getMasterUserFolder() + filename + ".cfg";
@@ -470,11 +471,11 @@ void NewBattleState::save(const std::string &filename)
  */
 void NewBattleState::initSave()
 {
-	const Mod *mod = getGame()->getMod();
+	const Mod& mod = *getGame()->getMod();
 	SavedGame *save = new SavedGame();
 
 	const YAML::Node& starterBase = getGame()->getMod()->getDefaultStartingBase();
-	Base& newBase = getRegistry().createAndEmplace<Base>(mod);
+	Base& newBase = getRegistry().getService<BaseFactory>().create(mod).get<Base>();
 	newBase.load(starterBase, save, true, true);
 
 	// Kill everything we don't want in this base
@@ -490,17 +491,17 @@ void NewBattleState::initSave()
 	newBase.getCrafts().clear();
 	newBase.getStorageItems()->clear();
 
-	_craft = new Craft(mod->getCraft(_crafts[_cbxCraft->getSelected()]), &newBase, 1);
+	_craft = new Craft(mod.getCraft(_crafts[_cbxCraft->getSelected()]), &newBase, 1);
 	newBase.getCrafts().push_back(_craft);
 
 	// Generate soldiers
-	bool psiStrengthEval = (Options::psiStrengthEval && save->isResearched(mod->getPsiRequirements()));
+	bool psiStrengthEval = (Options::psiStrengthEval && save->isResearched(mod.getPsiRequirements()));
 	for (int i = 0; i < 30; ++i)
 	{
-		int randomType = RNG::generate(0, (int)mod->getSoldiersList().size() - 1);
-		RuleSoldier* ruleSoldier = mod->getSoldier(mod->getSoldiersList().at(randomType), true);
+		int randomType = RNG::generate(0, (int)mod.getSoldiersList().size() - 1);
+		RuleSoldier* ruleSoldier = mod.getSoldier(mod.getSoldiersList().at(randomType), true);
 		int nationality = save->selectSoldierNationalityByLocation(mod, ruleSoldier, nullptr); // -1
-		Soldier *soldier = mod->genSoldier(save, ruleSoldier, nationality);
+		Soldier *soldier = mod.genSoldier(save, ruleSoldier, nationality);
 
 		for (int n = 0; n < 5; ++n)
 		{
@@ -526,7 +527,7 @@ void NewBattleState::initSave()
 		stats->bravery = (int)ceil(stats->bravery / 10.0) * 10; // keep it a multiple of 10
 
 		// update again, could have been changed since soldier creation
-		soldier->calcStatString(mod->getStatStrings(), psiStrengthEval);
+		soldier->calcStatString(mod.getStatStrings(), psiStrengthEval);
 
 		newBase.getSoldiers().push_back(soldier);
 
@@ -538,7 +539,7 @@ void NewBattleState::initSave()
 	}
 
 	// Generate items
-	for (auto& itemType : mod->getItemsList())
+	for (auto& itemType : mod.getItemsList())
 	{
 		const RuleItem *rule = getGame()->getMod()->getItem(itemType);
 		if (rule->getBattleType() != BT_CORPSE && rule->isRecoverable())
@@ -553,7 +554,7 @@ void NewBattleState::initSave()
 	}
 
 	// Add research
-	for (auto& pair : mod->getResearchMap())
+	for (auto& pair : mod.getResearchMap())
 	{
 		save->addFinishedResearchSimple(pair.second);
 	}
@@ -612,10 +613,10 @@ void NewBattleState::btnOkClick(Action *)
 		getGame()->getSavedGame()->getAlienBases().push_back(b);
 	}
 	// ufo assault
-	else if (_craft && getGame()->getMod()->getUfo(_missionTypes[_cbxMission->getSelected()]))
+	else if (RuleUfo* ruleUfo = getGame()->getMod()->getUfo(_missionTypes[_cbxMission->getSelected()]); _craft)
 	{
-		Ufo& newUfo = getRegistry().createAndEmplace<Ufo>(getGame()->getMod()->getUfo(_missionTypes[_cbxMission->getSelected()]), 1);
-		newUfo.setId(1);
+		Ufo& newUfo = getRegistry().getService<UfoFactory>().create(*ruleUfo, 1).get<Ufo>();
+
 		_craft->setDestination(&newUfo);
 		bgen.setUfo(&newUfo);
 		// either ground assault or ufo crash
@@ -707,7 +708,7 @@ void NewBattleState::btnRandomClick(Action *)
  */
 void NewBattleState::btnEquipClick(Action *)
 {
-	getGame()->pushState(new CraftInfoState(getRegistry().frontValue<Base>(), 0));
+	getGame()->pushState(new CraftInfoState(getRegistry().front<Base>().try_get<Base>(), 0));
 }
 
 /**

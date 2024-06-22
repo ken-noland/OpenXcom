@@ -35,7 +35,7 @@ private:
 	Globe *_globe;
 public:
 	/// Creates the Build Facilities state.
-	SelectStartFacilityState(entt::entity _newBaseId, State *state, Globe *globe);
+	SelectStartFacilityState(entt::handle _newBaseHandle, State *state, Globe *globe);
 	/// Populates the build option list.
 	virtual void populateBuildList() override;
 	/// Handler for clicking the Reset button.

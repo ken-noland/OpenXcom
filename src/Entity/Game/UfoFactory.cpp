@@ -19,33 +19,38 @@
  */
 #include "UfoFactory.h"
 #include <entt/entt.hpp>
-#include "../Common/GeoPosition.h"
-#include "../Common/GeoVelocity.h"
-#include "../../Savegame/Ufo.h"
+#include "../Common/GeoComponents.h"
+#include "../Common/Name.h"
+#include "../Common/Type.h"
 #include "../../Mod/RuleUfo.h"
+#include "../../Savegame/Ufo.h"
 
 namespace OpenXcom
 {
 
 /**
  * @brief Creates a new ufo
- * @param ruleUfo the ruleset this UFO should use
+ * @param ruleUfo the type of UFO
  * @param uniqueId id unique to this ufo, set to 0 to disable
  * @param hunterKillerPercentage percentage chance this ufo should be a hunter killer
  * @param huntMode determines target preference
  * @param huntBehavior determines fleet/fight behavior in dogfight
  * @return a handle wrapping the registry and the Ufo entity
  */
-entt::handle UfoFactory::create(RuleUfo& ruleUfo, int uniqueId, int hunterKillerPercentage = 0, int huntMode = 0, int huntBehavior = 0)
+entt::handle UfoFactory::create(const RuleUfo& ruleUfo, int uniqueId, int hunterKillerPercentage, int huntMode, int huntBehavior)
 {
 	entt::entity ufoId = _registry.create();
 	_registry.emplace<Ufo>(ufoId, ruleUfo, uniqueId, hunterKillerPercentage, huntMode, huntBehavior);
 
+	_registry.emplace<Name>(ufoId, "");
+
+	_registry.emplace<Type>(ufoId, ruleUfo.getType());
+
 	_registry.emplace<GeoPosition>(ufoId, 0.0, 0.0);
 
-	_registry.emplace<GeoVelocity>(baseId, 0.0, 0.0);
+	_registry.emplace<GeoVelocity>(ufoId, 0.0, 0.0);
 
 	return entt::handle(_registry, ufoId);
-};
+}
 
 }

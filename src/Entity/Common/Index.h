@@ -18,14 +18,30 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace OpenXcom
-{
+namespace OpenXcom {
 
 /**
  * @brief compont that holds an entities position within a "virtual" index.
  */
-struct IndexPosition {
+struct Index {
 	size_t index;
+};
+
+class IndexPositionSystem
+{
+	entt::registry& _registry;
+
+public:
+	IndexPositionSystem(entt::registry& registry) : _registry(registry) { }
+
+	template<typename... Components>
+	entt::handle findByIndex(size_t index)
+	{
+		std::ranges::range auto view = _registry.view<Index, Components>().each();
+		auto matchingIndex = [index](const auto& each) { return std::get<1>(each).index == index; };
+		auto findResult = std::ranges::find_if(view, matchingIndex);
+		return findResult != view.end() ? entt::handle(_registry, std::get<0>(*findResult)) : entt::handle();
+	}
 };
 
 }

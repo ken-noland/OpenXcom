@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Surface.h"
-#include "../Common/Named.h"
+#include "../Common/Name.h"
 
 namespace OpenXcom
 {
@@ -34,7 +34,7 @@ SurfaceFactory::~SurfaceFactory()
 entt::entity SurfaceFactory::createSurface(const std::string& name, int width, int height, int x, int y)
 {
 	entt::entity entity = _registry.create();
-	_registry.emplace<NamedComponent>(entity, name);
+	_registry.emplace<Name>(entity, name);
 
 	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
 	_registry.emplace<SurfaceComponent>(entity, std::move(surface));

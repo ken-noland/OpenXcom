@@ -41,8 +41,8 @@ namespace OpenXcom
  * @param first Is this the first base in the game?
  * @param fixedLocation Is this the first base in the game on a fixed location?
  */
-BaseNameState::BaseNameState(entt::entity newBaseId, Globe *globe, bool first, bool fixedLocation) 
-	: State("BaseNameState", false), _newBaseId(newBaseId), _globe(globe), _first(first), _fixedLocation(fixedLocation)
+BaseNameState::BaseNameState(entt::handle newBaseHandle, Globe *globe, bool first, bool fixedLocation)
+	: State("BaseNameState", false), _newBaseHandle(newBaseHandle), _globe(globe), _first(first), _fixedLocation(fixedLocation)
 {
 	_globe->onMouseOver(0);
 
@@ -132,7 +132,7 @@ void BaseNameState::btnOkClick(Action *)
 {
 	if (!_edtName->getText().empty())
 	{
-		getRegistry().raw().get<Base>(_newBaseId).setName(_edtName->getText());
+		_newBaseHandle.get<Base>().setName(_edtName->getText());
 		getGame()->popState(); // pop BaseNameState
 
 		if (!_fixedLocation)
@@ -146,7 +146,7 @@ void BaseNameState::btnOkClick(Action *)
 
 		if (!_first || Options::customInitialBase)
 		{
-			getGame()->pushState(new PlaceLiftState(_newBaseId, _globe, _first));
+			getGame()->pushState(new PlaceLiftState(_newBaseHandle, _globe, _first));
 		}
 	}
 }

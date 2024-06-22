@@ -35,7 +35,9 @@
 #include "State.h"
 #include "Unicode.h"
 #include "../fallthrough.h"
+#include "../Entity/Common/GeoComponents.h"
 #include "../Entity/Game/BaseFactory.h"
+#include "../Entity/Game/BasescapeData.h"
 #include "../Entity/Game/CountryFactory.h"
 #include "../Entity/Game/RegionFactory.h"
 #include "../Entity/Game/UfoFactory.h"
@@ -138,12 +140,6 @@ Game::Game(const std::string &title)
 	_lang = new Language();
 
 	_timeOfLastFrame = 0;
-
-	// ToDo: move this to seperate method
-	entt::locator<BaseFactory>::emplace<BaseFactory>(_registry.raw());
-	entt::locator<CountryFactory>::emplace<CountryFactory>(_registry.raw());
-	entt::locator<RegionFactory>::emplace<RegionFactory>(_registry.raw());
-	entt::locator<UfoFactory>::emplace<UfoFactory>(_registry.raw());
 }
 
 /**
@@ -171,16 +167,6 @@ Game::~Game()
 	Mix_CloseAudio();
 
 	SDL_Quit();
-}
-
-namespace
-{
-	void registerFactories(entt::registry registry)
-	{
-		registry.emplace<BaseFactory>(registry.create());
-
-	}
-
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -26,8 +26,7 @@
 #include "../Engine/Registry.h"
 #include "../Mod/RuleSoldier.h"
 
-namespace OpenXcom::BaseSystem
-{
+namespace OpenXcom::BaseSystem {
 
 /**
  * Adds up the monthly maintenance of all the bases.
@@ -91,6 +90,11 @@ bool isSoldierTypeHired(const std::string& soldierType)
 		}
 	}
 	return false;
+}
+
+void onLocationChange(entt::registry& registry, entt::entity baseId)
+{
+	
 }
 
 }

@@ -18,9 +18,11 @@
  */
 #include "MiniBaseView.h"
 #include <cmath>
+#include <ranges>
 #include "../Engine/Action.h"
-#include "../Engine/Registry.h"
+#include "../Engine/Options.h"
 #include "../Engine/SurfaceSet.h"
+#include "../Entity/Game/BasescapeData.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/BaseFacility.h"
 #include "../Mod/RuleBaseFacility.h"
@@ -35,60 +37,26 @@ namespace OpenXcom
  * @param x X position in pixels.
  * @param y Y position in pixels.
  */
-MiniBaseView::MiniBaseView(int width, int height, int x, int y)
-	: InteractiveSurface(width, height, x, y)
+MiniBaseView::MiniBaseView(BasescapeSystem& basescapeSystem, int width, int height, int x, int y)
+	: InteractiveSurface(width, height, x, y), _basescapeSystem(basescapeSystem)
 {
-	getRegistry().raw().on_construct<Base>().connect<&MiniBaseView::onBaseSetChange>(this);
-	getRegistry().raw().on_destroy<Base>().connect<&MiniBaseView::onBaseSetChange>(this);
+	_unsubscribeId = _basescapeSystem.connectListener(std::bind_front(&MiniBaseView::draw, this));
+
+	_baseKeys = {
+		Options::keyBaseSelect1,
+		Options::keyBaseSelect2,
+		Options::keyBaseSelect3,
+		Options::keyBaseSelect4,
+		Options::keyBaseSelect5,
+		Options::keyBaseSelect6,
+		Options::keyBaseSelect7,
+		Options::keyBaseSelect8
+	};
 }
 
 MiniBaseView::~MiniBaseView()
 {
-	getRegistry().raw().on_construct<Base>().disconnect<&MiniBaseView::onBaseSetChange>(this);
-	getRegistry().raw().on_destroy<Base>().disconnect<&MiniBaseView::onBaseSetChange>(this);
-}
-
-/**
- * Changes the base that is currently selected on
- * the mini base view.
- * @param base ID of base.
- */
-void MiniBaseView::setSelectedBaseIndex(int selectedBaseIndex)
-{
-	_selectedBaseIndex = selectedBaseIndex;
-	_redraw = true;
-}
-
-/**
- * Changes the set of bases that are currently visible on
- * the mini base view (if more than MAX_VISIBLE_selectedBaseIndex)
- * to show one more up
- */
-bool MiniBaseView::incVisibleBasesIndex()
-{
-	if (_visibleBasesIndexOffset < (_baseIds.size() - MAX_VISIBLE_BASES))
-	{
-		_visibleBasesIndexOffset++;
-		_redraw = true;
-		return true;
-	}
-	return false;
-}
-
-/**
- * Changes the set of bases that are currently visible on
- * the mini base view (if more than MAX_VISIBLE_selectedBaseIndex)
- * to show one more down
- */
-bool MiniBaseView::decVisibleBasesIndex()
-{
-	if (_visibleBasesIndexOffset > 0)
-	{
-		_visibleBasesIndexOffset--;
-		_redraw = true;
-		return true;
-	}
-	return false;
+	_basescapeSystem.disconnectListener(_unsubscribeId);
 }
 
 /**
@@ -99,13 +67,12 @@ void MiniBaseView::draw()
 {
 	Surface::draw();
 
-	auto bases = getRegistry().list<const Base>() | std::views::drop(_visibleBasesIndexOffset);
-	auto baseIterator = bases.begin();
-
-	for (Sint16 index = 0; index < static_cast<Sint16>(MAX_VISIBLE_BASES); ++index)
+	size_t selectedBaseIndex = _basescapeSystem.getBasescapeData().getSelectedBaseVisibleIndex();
+	Sint16 index = 0;
+	for (entt::handle baseHandle : _basescapeSystem.getVisibleBases())
 	{
 		// Draw base squares
-		if (index + _visibleBasesIndexOffset == _selectedBaseIndex)
+		if (index == selectedBaseIndex)
 		{
 			SDL_Rect r;
 			r.x = index * (MINI_SIZE + 2);
@@ -117,56 +84,79 @@ void MiniBaseView::draw()
 		_texture->getFrame(41)->blitNShade(this, index * (MINI_SIZE + 2), 0);
 
 		// Draw facilities
-		if (baseIterator != bases.end())
+		SDL_Rect r;
+		lock();
+		for (const BaseFacility* fac : baseHandle.get<Base>().getFacilities())
 		{
-			SDL_Rect r;
-			lock();
-			for (const BaseFacility* fac : (*baseIterator).getFacilities())
-			{
-				int color;
-				if (fac->getDisabled())
-					color = _blue;
-				else if (fac->getBuildTime() == 0)
-					color = _green;
-				else
-					color = _red;
+			int color;
+			if (fac->getDisabled())
+				color = _blue;
+			else if (fac->getBuildTime() == 0)
+				color = _green;
+			else
+				color = _red;
 
-				r.x = index * (MINI_SIZE + 2) + 2 + fac->getX() * 2;
-				r.y = 2 + fac->getY() * 2;
-				r.w = fac->getRules()->getSizeX() * 2;
-				r.h = fac->getRules()->getSizeY() * 2;
-				drawRect(&r, color+3);
-				r.x++;
-				r.y++;
-				r.w--;
-				r.h--;
-				drawRect(&r, color+5);
-				r.x--;
-				r.y--;
-				drawRect(&r, color+2);
-				r.x++;
-				r.y++;
-				r.w--;
-				r.h--;
-				drawRect(&r, color+3);
-				r.x--;
-				r.y--;
-				setPixel(r.x, r.y, color+1);
-			}
-			unlock();
+			r.x = index * (MINI_SIZE + 2) + 2 + fac->getX() * 2;
+			r.y = 2 + fac->getY() * 2;
+			r.w = fac->getRules()->getSizeX() * 2;
+			r.h = fac->getRules()->getSizeY() * 2;
+			drawRect(&r, color+3);
+			r.x++;
+			r.y++;
+			r.w--;
+			r.h--;
+			drawRect(&r, color+5);
+			r.x--;
+			r.y--;
+			drawRect(&r, color+2);
+			r.x++;
+			r.y++;
+			r.w--;
+			r.h--;
+			drawRect(&r, color+3);
+			r.x--;
+			r.y--;
+			setPixel(r.x, r.y, color+1);
 		}
+		unlock();
+		++index;
 	}
 }
 
-/**
- * Selects the base the mouse is over.
- * @param action Pointer to an action.
- * @param state State that the action handlers belong to.
- */
-void MiniBaseView::mouseOver(Action *action, State *state)
+void MiniBaseView::mouseClick(Action* action, State* state)
 {
-	_hoveredBaseIndex = static_cast<int>(floor(action->getRelativeXMouse() / ((MINI_SIZE + 2) * action->getXScale())));
-	InteractiveSurface::mouseOver(action, state);
+	size_t mouseIndex = static_cast<size_t>(floor(action->getRelativeXMouse() / ((MINI_SIZE + 2) * action->getXScale())));
+	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	{
+		if (_basescapeSystem.trySetSelectedBaseByVisbleIndex(mouseIndex)) { _redraw = true; }
+	}
+	else if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
+	{
+		if (mouseIndex == BasescapeData::MAX_VISIBLE_BASES - 1) { _basescapeSystem.tryIncrementVisibleBaseOffset(); }
+		else if (mouseIndex == 0) { _basescapeSystem.tryDecrementVisibleBaseOffset(); }
+	}
+	else if (action->getDetails()->button.button == SDL_BUTTON_MIDDLE)
+	{
+		// TODO: Implement the swapping behavior
+	}
+	InteractiveSurface::mouseClick(action, state);
 }
+
+void MiniBaseView::keyboardPress(Action* action, State* state)
+{
+	if (action->getDetails()->type == SDL_KEYDOWN)
+	{
+		SDLKey pressedKey = action->getDetails()->key.keysym.sym;
+
+		auto findResult = std::ranges::find(_baseKeys, pressedKey);
+		if (findResult != _baseKeys.end())
+		{
+			size_t index = std::distance(_baseKeys.begin(), findResult);
+			if (_basescapeSystem.trySetSelectedBaseByVisbleIndex(index)) { _redraw = true; }
+		}
+	}
+	InteractiveSurface::keyboardPress(action, state);
+}
+
 
 }

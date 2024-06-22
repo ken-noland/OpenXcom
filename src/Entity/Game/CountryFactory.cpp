@@ -18,11 +18,12 @@
  */
 #include "CountryFactory.h"
 #include <entt/entt.hpp>
+#include "../Common/Type.h"
+#include "../../Savegame/Country.h"
+#include "../../Mod/RuleCountry.h"
 
 namespace OpenXcom
 {
-
-class Country;
 
 /**
  * @brief Creates a new Country
@@ -30,10 +31,12 @@ class Country;
  * @param generateNewFunding indicates if default funding should be generated for this country.
  * @return a new Country entity
  */
-entt::handle CountryFactory::create(const RuleCountry& ruleCountry, bool generateNewFunding)
+entt::handle CountryFactory::create(RuleCountry& ruleCountry, bool generateNewFunding)
 {
 	entt::entity countryId = _registry.create();
 	_registry.emplace<Country>(countryId, &ruleCountry, generateNewFunding);
+
+	_registry.emplace<Type>(countryId, ruleCountry.getType());
 
 	return entt::handle(_registry, countryId);
 };

@@ -157,7 +157,7 @@ void ItemsArrivingState::btnGotoBaseClick(Action *)
 {
 	_state->timerReset();
 	getGame()->popState();
-	getGame()->pushState(new BasescapeState(getRegistry().find(_base), _state->getGlobe()));
+	getGame()->pushState(new BasescapeState(getRegistry().getService<BasescapeSystem>(), _state->getGlobe()));
 }
 
 }

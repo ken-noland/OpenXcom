@@ -89,6 +89,9 @@
 #include "../Engine/SoundSet.h"
 #include "../Engine/Surface.h"
 #include "../Engine/SurfaceSet.h"
+#include "../Entity/Game/BaseFactory.h"
+#include "../Entity/Game/CountryFactory.h"
+#include "../Entity/Game/RegionFactory.h"
 #include "../fmath.h"
 #include "../Geoscape/Globe.h"
 #include "../Interface/TextButton.h"
@@ -3741,10 +3744,13 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 	// Add countries
 	for (const auto& countryName : _countriesIndex)
 	{
-		RuleCountry *countryRule = getCountry(countryName);
-		if (!countryRule->getLonMin().empty())
+		if (RuleCountry* countryRule = getCountry(countryName); !countryRule->getLonMin().empty())
 		{
-			getRegistry().createAndEmplace<Country>(countryRule);
+			getRegistry().getService<CountryFactory>().create(*countryRule);
+		}
+		else
+		{
+			Log(LOG_ERROR) << "Failed to load country " << countryName;
 		}
 	}
 	// Adjust funding to total $6M
@@ -3764,17 +3770,20 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 	// Add regions
 	for (const auto& regionName : _regionsIndex)
 	{
-		RuleRegion* regionRule = getRegion(regionName);
-		if (!regionRule->getLonMin().empty())
+		
+		if (RuleRegion* regionRule = getRegion(regionName); !regionRule->getLonMin().empty())
 		{
-			getRegistry().createAndEmplace<Region>(regionRule);
+			getRegistry().getService<RegionFactory>().create(*regionRule);
+		}
+		else
+		{
+			Log(LOG_ERROR) << "Failed to load region " << regionName;
 		}
 	}
 
 	// Set up starting base
 	const YAML::Node &startingBaseByDiff = getStartingBase(diff);
-	Base& newBase = getRegistry().createAndEmplace<Base>(this);
-	newBase.load(startingBaseByDiff, save, true);
+	Base& newBase = getRegistry().getService<BaseFactory>().create(*this, startingBaseByDiff, save, true).get<Base>();
 
 	// Correct IDs
 	for (Craft* craft : newBase.getCrafts())
@@ -3851,7 +3860,7 @@ SavedGame *Mod::newSave(GameDifficulty diff) const
 		for (size_t i = 0; i < randomTypes.size(); ++i)
 		{
 			RuleSoldier* ruleSoldier = getSoldier(randomTypes[i], true);
-			int nationality = save->selectSoldierNationalityByLocation(this, ruleSoldier, nullptr); // -1 (unfortunately the first base is not placed yet)
+			int nationality = save->selectSoldierNationalityByLocation(*this, ruleSoldier, nullptr); // -1 (unfortunately the first base is not placed yet)
 			Soldier *soldier = genSoldier(save, ruleSoldier, nationality);
 			newBase.getSoldiers().push_back(soldier);
 			// Award soldier a special 'original eight' commendation

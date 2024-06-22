@@ -32,6 +32,8 @@ namespace BaseSystem
 	[[nodiscard]] bool isFacilityBuilt(const std::string& facilityType);
 	// Gets if a solider types is hired at any base.
 	[[nodiscard]] bool isSoldierTypeHired(const std::string& soldierType);
+
+	void onLocationChange(entt::registry& registry, entt::entity baseId);
 }
 
 }

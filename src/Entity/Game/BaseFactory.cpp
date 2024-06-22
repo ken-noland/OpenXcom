@@ -17,10 +17,11 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "BaseFactory.h"
-#include <entt/entt.hpp>
-#include "../Common/IndexPosition.h"
-#include "../Common/GeoPosition.h"
-#include "../Common/GeoVelocity.h"
+#include <yaml-cpp/yaml.h>
+#include "../Common/Index.h"
+#include "../Common/GeoComponents.h"
+#include "../Common/Name.h"
+#include "../../Savegame/Base.h"
 #include "../../Mod/Mod.h"
 
 namespace OpenXcom
@@ -31,10 +32,12 @@ namespace OpenXcom
  * @param global mod reference
  * @return a new base
  */
-entt::handle BaseFactory::create(Mod& mod)
+entt::handle BaseFactory::create(const Mod& mod)
 {
 	entt::entity baseId = _registry.create();
-	Base& base = _registry.emplace<Base>(baseId, mod);
+	Base& base = _registry.emplace<Base>(baseId, &mod);
+
+	_registry.emplace<Name>(baseId, "");
 
 	_registry.emplace<GeoPosition>(baseId, 0.0, 0.0);
 
@@ -43,9 +46,36 @@ entt::handle BaseFactory::create(Mod& mod)
 
 	// size points to one past the last index naturally.
 	size_t index = _registry.storage<Base>().size();
-	IndexPosition& position = _registry.emplace<IndexPosition>(baseId, index);
+	Index& position = _registry.emplace<Index>(baseId, index);
 
-	return entt::handle(registry, baseId);
-};
+	return entt::handle(_registry, baseId);
+}
+
+entt::handle BaseFactory::create(const Mod& mod, const YAML::Node& node, SavedGame* save, bool newGame, bool newBattleGame)
+{
+	entt::entity baseId = _registry.create();
+	Base& base = _registry.emplace<Base>(baseId, &mod);
+
+	base.load(node, save, newGame, newBattleGame);
+
+	GeoPosition position{
+		.latitude  = node["lat"].as<double>(),
+		.longitude = node["lon"].as<double>(),
+	};
+
+	_registry.emplace<GeoPosition>(baseId, position);
+
+	_registry.emplace<Name>(baseId, node["name"].as<std::string>());
+
+	// velocity!? Well, why not. Costs little if it does not move, and if we want to let them move later, we can!
+	_registry.emplace<GeoVelocity>(baseId, 0.0, 0.0);
+
+	// size points to one past the last index naturally.
+	size_t index = _registry.storage<Base>().size();
+	_registry.emplace<Index>(baseId, index);
+
+	return entt::handle(_registry, baseId);
+}
+;
 
 }

@@ -16,25 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "BaseInfoState.h"
-#include <sstream>
 #include <cmath>
-#include "../Engine/Game.h"
-#include "../Engine/Action.h"
-#include "../Mod/Mod.h"
-#include "../Engine/Options.h"
-#include "../Interface/Bar.h"
-#include "../Interface/TextButton.h"
-#include "../Interface/Text.h"
-#include "../Interface/TextEdit.h"
-#include "../Engine/Surface.h"
-#include "MiniBaseView.h"
-#include "../Savegame/SavedGame.h"
-#include "../Savegame/Base.h"
-#include "MonthlyCostsState.h"
-#include "TransfersState.h"
-#include "StoresState.h"
+#include <sstream>
+#include "BaseInfoState.h"
 #include "BasescapeState.h"
+#include "MiniBaseView.h"
+#include "MonthlyCostsState.h"
+#include "StoresState.h"
+#include "TransfersState.h"
+#include "../Engine/Action.h"
+#include "../Engine/Game.h"
+#include "../Engine/Surface.h"
+#include "../Entity/Game/BasescapeData.h"
+#include "../Interface/Bar.h"
+#include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
+#include "../Interface/TextEdit.h"
+#include "../Mod/Mod.h"
+#include "../Savegame/Base.h"
 
 namespace OpenXcom
 {
@@ -45,14 +44,15 @@ namespace OpenXcom
  * @param base Pointer to the base to get info from.
  * @param state Pointer to the Basescape state.
  */
-BaseInfoState::BaseInfoState(entt::entity baseId, BasescapeState *state) 
-	: State("BaseInfoState", true),	_baseId(baseId), _state(state), _base(&getRegistry().raw().get<Base>(baseId))
+BaseInfoState::BaseInfoState(BasescapeSystem& basescapeSystem)
+	: State("BaseInfoState", true), _basescapeSystem(basescapeSystem)
 {
 	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	_unsubscribeId = _basescapeSystem.connectListener(std::bind(&BaseInfoState::init, this));
 
 	// Create objects
 	_bg = new Surface(320, 200, 0, 0);
-	_mini = new MiniBaseView(128, 16, 182, 8);
+	_mini = new MiniBaseView(_basescapeSystem, 128, 16, 182, 8);
 	_btnOk = new TextButton(30, 14, 10, 180);
 	_btnTransfers = new TextButton(80, 14, 46, 180);
 	_btnStores = new TextButton(80, 14, 132, 180);
@@ -176,10 +176,6 @@ BaseInfoState::BaseInfoState(entt::entity baseId, BasescapeState *state)
 	getGame()->getMod()->getSurface(ss.str())->blitNShade(_bg, 0, 0);
 
 	_mini->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
-	int selectedBaseIndex = getRegistry().index<Base>(baseId);
-	_mini->setSelectedBaseIndex(selectedBaseIndex);
-	_mini->onMouseClick((ActionHandler)&BaseInfoState::miniClick);
-	_mini->onKeyboardPress((ActionHandler)&BaseInfoState::handleKeyPress);
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&BaseInfoState::btnOkClick);
@@ -255,6 +251,11 @@ BaseInfoState::BaseInfoState(entt::entity baseId, BasescapeState *state)
 	_barLongRange->setScale(25.0);
 }
 
+BaseInfoState::~BaseInfoState()
+{
+	_basescapeSystem.disconnectListener(_unsubscribeId);
+}
+
 static void setBarState(Text& barText, Bar& bar, int count, int max, double maxBarWidth)
 {
 	barText.setText(std::format("{}:{}", count, max));
@@ -278,50 +279,51 @@ static void setBarState(Text& barText, Bar& bar, int count, int max, double maxB
 void BaseInfoState::init()
 {
 	State::init();
-	_edtBase->setText(_base->getName());
+	Base& base = _basescapeSystem.getSelectedBase().get<Base>();
+	_edtBase->setText(base.getName());
 
-	setBarState(*_numSoldiers, *_barSoldiers, _base->getAvailableSoldiers(), _base->getTotalSoldiers(), MAX_BAR_WIDTH);
-	setBarState(*_numEngineers, *_barEngineers, _base->getAvailableEngineers(), _base->getTotalEngineers(), MAX_BAR_WIDTH);
-	setBarState(*_numScientists, *_barScientists, _base->getAvailableScientists(), _base->getTotalScientists(), MAX_BAR_WIDTH);
-	setBarState(*_numQuarters, *_barQuarters, _base->getUsedQuarters(), _base->getAvailableQuarters(), MAX_BAR_WIDTH);
-	setBarState(*_numStores, *_barStores, static_cast<int>(std::ceil(_base->getUsedStores())), _base->getAvailableStores(), MAX_BAR_WIDTH);
-	setBarState(*_numLaboratories, *_barLaboratories, _base->getUsedLaboratories(), _base->getAvailableLaboratories(), MAX_BAR_WIDTH);
-	setBarState(*_numWorkshops, *_barWorkshops, _base->getUsedWorkshops(), _base->getAvailableWorkshops(), MAX_BAR_WIDTH);
+	setBarState(*_numSoldiers, *_barSoldiers, base.getAvailableSoldiers(), base.getTotalSoldiers(), MAX_BAR_WIDTH);
+	setBarState(*_numEngineers, *_barEngineers, base.getAvailableEngineers(), base.getTotalEngineers(), MAX_BAR_WIDTH);
+	setBarState(*_numScientists, *_barScientists, base.getAvailableScientists(), base.getTotalScientists(), MAX_BAR_WIDTH);
+	setBarState(*_numQuarters, *_barQuarters, base.getUsedQuarters(), base.getAvailableQuarters(), MAX_BAR_WIDTH);
+	setBarState(*_numStores, *_barStores, static_cast<int>(std::ceil(base.getUsedStores())), base.getAvailableStores(), MAX_BAR_WIDTH);
+	setBarState(*_numLaboratories, *_barLaboratories, base.getUsedLaboratories(), base.getAvailableLaboratories(), MAX_BAR_WIDTH);
+	setBarState(*_numWorkshops, *_barWorkshops, base.getUsedWorkshops(), base.getAvailableWorkshops(), MAX_BAR_WIDTH);
 
 	if (Options::storageLimitsEnforced)
 	{
 		std::ostringstream ss72;
-		ss72 << _base->getUsedContainment(0) << ":" << _base->getAvailableContainment(0);
+		ss72 << base.getUsedContainment(0) << ":" << base.getAvailableContainment(0);
 		_numContainment->setText(ss72.str());
 
-		_barContainment->setMax(_base->getAvailableContainment(0));
-		_barContainment->setValue(_base->getUsedContainment(0));
+		_barContainment->setMax(base.getAvailableContainment(0));
+		_barContainment->setValue(base.getUsedContainment(0));
 	}
 
 	std::ostringstream ss8;
-	ss8 << _base->getUsedHangars() << ":" << _base->getAvailableHangars();
+	ss8 << base.getUsedHangars() << ":" << base.getAvailableHangars();
 	_numHangars->setText(ss8.str());
 
 	// bar dynamic scale
 
-	if (_base->getAvailableHangars() * _barHangars->getScale() < MAX_BAR_WIDTH)
+	if (base.getAvailableHangars() * _barHangars->getScale() < MAX_BAR_WIDTH)
 	{
-		_barHangars->setMax(_base->getAvailableHangars());
-		_barHangars->setValue(_base->getUsedHangars());
+		_barHangars->setMax(base.getAvailableHangars());
+		_barHangars->setValue(base.getUsedHangars());
 	}
 	else
 	{
 		_barHangars->setMax(MAX_BAR_WIDTH);
-		_barHangars->setValue(_base->getUsedHangars() * MAX_BAR_WIDTH / _base->getAvailableHangars());
+		_barHangars->setValue(base.getUsedHangars() * MAX_BAR_WIDTH / base.getAvailableHangars());
 		_barHangars->setScale(1.0);
 	}
 
 	if (Options::baseDefenseProbability)
 	{
 		// display base defense percentage
-		int defenseProbabilityPercentage = _base->getDefenseProbabilityPercentage();
-		_barDefense->setMax(_base->getDefenseValue());
-		_barDefense->setValue(_base->getDefenseValue());
+		int defenseProbabilityPercentage = base.getDefenseProbabilityPercentage();
+		_barDefense->setMax(base.getDefenseValue());
+		_barDefense->setValue(base.getDefenseValue());
 		if (Options::oxceBaseInfoDefenseScaleMultiplier != 100)
 		{
 			_barDefense->setScale(0.125 * Options::oxceBaseInfoDefenseScaleMultiplier / 100.0);
@@ -343,11 +345,11 @@ void BaseInfoState::init()
 		// display base defense strength (vanilla)
 
 		std::ostringstream ss9;
-		ss9 << _base->getDefenseValue();
+		ss9 << base.getDefenseValue();
 		_numDefense->setText(ss9.str());
 
-		_barDefense->setMax(_base->getDefenseValue());
-		_barDefense->setValue(_base->getDefenseValue());
+		_barDefense->setMax(base.getDefenseValue());
+		_barDefense->setValue(base.getDefenseValue());
 
 	}
 
@@ -356,7 +358,7 @@ void BaseInfoState::init()
 		// display base detection probability percentage
 
 		std::ostringstream ss10;
-		int shortRangeDetectionProbabilityPercentage = _base->getShortRangeDetectionProbabilityPercentage();
+		int shortRangeDetectionProbabilityPercentage = base.getShortRangeDetectionProbabilityPercentage();
 		ss10 << shortRangeDetectionProbabilityPercentage;
 		ss10 << " %";
 		_numShortRange->setText(ss10.str());
@@ -367,7 +369,7 @@ void BaseInfoState::init()
 		_barShortRange->setValue(shortRangeDetectionProbabilityPercentage);
 
 		std::ostringstream ss11;
-		int longRangeDetectionProbabilityPercentage = _base->getLongRangeDetectionProbabilityPercentage();
+		int longRangeDetectionProbabilityPercentage = base.getLongRangeDetectionProbabilityPercentage();
 		ss11 << longRangeDetectionProbabilityPercentage;
 		ss11 << " %";
 		_numLongRange->setText(ss11.str());
@@ -383,7 +385,7 @@ void BaseInfoState::init()
 		// display base detection count (vanilla)
 
 		std::ostringstream ss10;
-		int shortRangeDetection = _base->getShortRangeDetection();
+		int shortRangeDetection = base.getShortRangeDetection();
 		ss10 << shortRangeDetection;
 		_numShortRange->setText(ss10.str());
 
@@ -391,7 +393,7 @@ void BaseInfoState::init()
 		_barShortRange->setValue(shortRangeDetection);
 
 		std::ostringstream ss11;
-		int longRangeDetection = _base->getLongRangeDetection();
+		int longRangeDetection = base.getLongRangeDetection();
 		ss11 << longRangeDetection;
 		_numLongRange->setText(ss11.str());
 
@@ -407,60 +409,7 @@ void BaseInfoState::init()
  */
 void BaseInfoState::edtBaseChange(Action *)
 {
-	_base->setName(_edtBase->getText());
-}
-
-/**
- * Selects a new base to display.
- * @param action Pointer to an action.
- */
-void BaseInfoState::miniClick(Action *)
-{
-	int clickedBaseIndex = _mini->getHoveredBaseIndex();
-	auto bases = getRegistry().raw().view<Base>();
-	if (clickedBaseIndex < bases.size())
-	{
-		_mini->setSelectedBaseIndex(clickedBaseIndex);
-		auto&& [ id, base ]= *std::next(bases.each().begin(), clickedBaseIndex);
-		_base = &base;
-		_state->setBase(id);
-		init();
-	}
-}
-
-/**
- * Selects a new base to display.
- * @param action Pointer to an action.
- */
-void BaseInfoState::handleKeyPress(Action *action)
-{
-	if (action->getDetails()->type != SDL_KEYDOWN) return;
-
-	SDLKey baseKeys[] = {
-		Options::keyBaseSelect1,
-		Options::keyBaseSelect2,
-		Options::keyBaseSelect3,
-		Options::keyBaseSelect4,
-		Options::keyBaseSelect5,
-		Options::keyBaseSelect6,
-		Options::keyBaseSelect7,
-		Options::keyBaseSelect8
-	};
-
-	// get the index of the key hit
-	int key = action->getDetails()->key.keysym.sym;
-	if (key < baseKeys[0] || key > baseKeys[7]) return;
-	int index = key - baseKeys[0];
-
-	if (auto bases = getRegistry().raw().view<Base>(); index < bases.size())
-	{
-		auto&& [id, xcomBase] = *std::next(bases.each().begin(), index);
-
-		_mini->setSelectedBaseIndex(index);
-		_base = &xcomBase;
-		_state->setBase(id);
-		init();
-	}
+	_basescapeSystem.getSelectedBase().get<Base>().setName(_edtBase->getText());
 }
 
 /**
@@ -478,7 +427,7 @@ void BaseInfoState::btnOkClick(Action *)
  */
 void BaseInfoState::btnTransfersClick(Action *)
 {
-	getGame()->pushState(new TransfersState(_base));
+	getGame()->pushState(new TransfersState(&_basescapeSystem.getSelectedBase().get<Base>()));
 }
 
 /**
@@ -487,7 +436,7 @@ void BaseInfoState::btnTransfersClick(Action *)
  */
 void BaseInfoState::btnStoresClick(Action *)
 {
-	getGame()->pushState(new StoresState(_base));
+	getGame()->pushState(new StoresState(&_basescapeSystem.getSelectedBase().get<Base>()));
 }
 
 /**
@@ -496,7 +445,7 @@ void BaseInfoState::btnStoresClick(Action *)
  */
 void BaseInfoState::btnMonthlyCostsClick(Action *)
 {
-	getGame()->pushState(new MonthlyCostsState(_base));
+	getGame()->pushState(new MonthlyCostsState(&_basescapeSystem.getSelectedBase().get<Base>()));
 }
 
 }

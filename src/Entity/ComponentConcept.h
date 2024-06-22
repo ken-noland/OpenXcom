@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2024-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,5 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <string_view>
+#include <type_traits>
 
-//nothing to see here, move along
+template<typename T>
+concept HasNodeName = requires {
+    { T::NODE_NAME } -> std::convertible_to<std::string_view>;
+};

@@ -52,8 +52,8 @@ const char *Ufo::ALTITUDE_STRING[] = {
  * @param rules Pointer to ruleset.
  * @param uniqueId unique ID to assign to the UFO (0 to not assign).
  */
-Ufo::Ufo(const RuleUfo *rules, int uniqueId, int hunterKillerPercentage, int huntMode, int huntBehavior) : MovingTarget(),
-	_rules(rules), _missionWaveNumber(-1), _crashId(0), _landId(0), _damage(0), _direction("STR_NORTH"),
+Ufo::Ufo(const RuleUfo& rules, int uniqueId, int hunterKillerPercentage, int huntMode, int huntBehavior) : MovingTarget(),
+	_rules(&rules), _missionWaveNumber(-1), _crashId(0), _landId(0), _damage(0), _direction("STR_NORTH"),
 	_altitude("STR_HIGH_UC"), _status(FLYING), _secondsRemaining(0),
 	_inBattlescape(false), _mission(0), _trajectory(0),
 	_trajectoryPoint(0), _detected(false), _hyperDetected(false), _processedIntercept(false),
@@ -61,7 +61,7 @@ Ufo::Ufo(const RuleUfo *rules, int uniqueId, int hunterKillerPercentage, int hun
 	_tractorBeamSlowdown(0), _isHunterKiller(false), _isEscort(false), _huntMode(0), _huntBehavior(0),
 	_isHunting(false), _isEscorting(false), _softlockShotCounter(0), _origWaypoint(0)
 {
-	_stats = rules->getStats();
+	_stats = rules.getStats();
 	if (uniqueId != 0)
 	{
 		_uniqueId = uniqueId;

@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2024-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,16 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <string>
 
-namespace OpenXcom
-{
+namespace OpenXcom {
 
-/**
- * @brief object with a location on the geoscape. Like UFO or bases.
- */
-struct GeoPosition {
-	double latitude;
-	double longitude;
-};
+	/**
+	 * @brief Type Component for an internal type. Subject to translation before display
+	 * Should be unique within a given entity class.
+	 */
+	struct Type
+	{
+		std::string type;
 
-}
+		static constexpr std::string_view NODE_NAME = "type";
+	};
+
+} // namespace OpenXcom

@@ -61,6 +61,8 @@
 #include "../Engine/Registry.h"
 #include "../Engine/RNG.h"
 #include "../Engine/ScriptBind.h"
+#include "../Entity/Common/GeoComponents.h"
+#include "../Entity/Game/BasescapeData.h"
 #include "../Lua/GameScript.h"
 #include "../Lua/LuaMod.h"
 #include "../Mod/AlienRace.h"
@@ -137,6 +139,17 @@ SavedGame::SavedGame() :
 	{
 		_globalCraftLoadout[j] = new ItemContainer();
 	}
+
+	Registry& registry = getRegistry();
+	_gameHandle = registry.createHandle();
+	// ToDo: move this to seperate method
+	registry.emplaceService<BaseFactory>(registry);
+	registry.emplaceService<CountryFactory>(registry);
+	registry.emplaceService<RegionFactory>(registry);
+	registry.emplaceService<UfoFactory>(registry);
+
+	registry.emplaceService<BasescapeSystem>(registry, _gameHandle);
+	registry.emplaceService<GeoSystem>(registry);
 }
 
 /**
@@ -379,6 +392,10 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 	if (doc["rng"] && (_ironman || !Options::newSeedOnLoad))
 		RNG::setSeed(doc["rng"].as<uint64_t>());
 	_monthsPassed = doc["monthsPassed"].as<int>(_monthsPassed);
+
+	BasescapeData basescapeData = doc["basescapeData"].as<BasescapeData>(BasescapeData());
+	_gameHandle.emplace<BasescapeData>(basescapeData);
+
 	_graphRegionToggles = doc["graphRegionToggles"].as<std::string>(_graphRegionToggles);
 	_graphCountryToggles = doc["graphCountryToggles"].as<std::string>(_graphCountryToggles);
 	_graphFinanceToggles = doc["graphFinanceToggles"].as<std::string>(_graphFinanceToggles);
@@ -403,8 +420,8 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 		std::string type = (*i)["type"].as<std::string>();
 		if (mod->getCountry(type))
 		{
-			Country& country = getRegistry().createAndEmplace<Country>(mod->getCountry(type), false);
-			country.load(*i, mod->getScriptGlobal());
+			getRegistry().getService<CountryFactory>().create(*mod->getCountry(type), false)
+						 .get<Country>().load(*i, mod->getScriptGlobal());
 		}
 		else
 		{
@@ -417,8 +434,7 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 		std::string type = (*i)["type"].as<std::string>();
 		if (mod->getRegion(type))
 		{
-			Region& region = entt::locator<RegionFactory>::value().create(*mod->getRegion(type).get<Region>();
-			region.load(*i);
+			getRegistry().getService<RegionFactory>().create(*mod->getRegion(type)).get<Region>().load(*i);
 		}
 		else
 		{
@@ -466,7 +482,7 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 		std::string type = (*i)["type"].as<std::string>();
 		if (mod->getUfo(type))
 		{
-			Ufo& ufo = entt::locator<UfoFactory>::value().create(*mod->getUfo(type), 0).get<Ufo>();
+			Ufo& ufo = getRegistry().getService<UfoFactory>().create(*mod->getUfo(type), 0).get<Ufo>();
 			ufo.load(*i, mod->getScriptGlobal(), *mod, *this);
 			yamlAndUfoReferences.emplace_back(*i, ufo);
 		}
@@ -560,8 +576,7 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 	std::vector<std::pair<const YAML::Node&, Base&>> yamlAndBaseReferences;
 	for (YAML::const_iterator i = doc["bases"].begin(); i != doc["bases"].end(); ++i)
 	{
-		Base& base = entt::locator<BaseFactory>::value().create(*mod).get<Base>();
-		base.load(*i, this, false);
+		Base& base = getRegistry().getService<BaseFactory>().create(*mod, *i, this, false).get<Base>();
 		yamlAndBaseReferences.emplace_back(*i, base);
 	}
 
@@ -729,6 +744,9 @@ void SavedGame::save(const std::string &filename, Mod *mod) const
 	node["difficulty"] = (int)_difficulty;
 	node["end"] = (int)_end;
 	node["monthsPassed"] = _monthsPassed;
+
+	node["basescapeData"].push_back(getRegistry().getService<BasescapeSystem>().getBasescapeData());
+
 	node["graphRegionToggles"] = _graphRegionToggles;
 	node["graphCountryToggles"] = _graphCountryToggles;
 	node["graphFinanceToggles"] = _graphFinanceToggles;
@@ -1056,45 +1074,6 @@ void SavedGame::decreaseCustomCounter(const std::string& name)
 			_ids[name] = 1; // not a typo
 		}
 	}
-}
-
-/**
- * Returns the last selected player base.
- * @return Pointer to base.
- */
-//Base *SavedGame::getSelectedBase()
-//{
-//	auto baseView = _registry.view<Base>();
-//	auto selectedBaseItterator = std::ranges::next(baseView.begin(), _selectedBaseIndex);
-//	return selectedBaseItterator != baseView.end() ? &_registry.get<Base>(*selectedBaseItterator)
-//												   : &_registry.get<Base>(baseView.frontValue());
-//}
-
-/**
- * Returns the list of craft waypoints.
- * @return Pointer to waypoint list.
- */
-std::vector<Waypoint*>& SavedGame::getWaypoints()
-{
-	return _waypoints;
-}
-
-/**
- * Returns the list of mission sites.
- * @return Pointer to mission site list.
- */
-std::vector<MissionSite*>& SavedGame::getMissionSites()
-{
-	return _missionSites;
-}
-
-/**
- * Get pointer to the battleGame object.
- * @return Pointer to the battleGame object.
- */
-SavedBattleGame *SavedGame::getSavedBattle()
-{
-	return _battleGame;
 }
 
 /**
@@ -2112,14 +2091,14 @@ AlienMission *SavedGame::findAlienMission(const std::string &region, MissionObje
 /**
  * Select a soldier nationality based on mod rules and location on the globe.
  */
-int SavedGame::selectSoldierNationalityByLocation(const Mod* mod, const RuleSoldier* rule, const Target* target) const
+int SavedGame::selectSoldierNationalityByLocation(const Mod& mod, const RuleSoldier* rule, const Target* target) const
 {
 	if (!target)
 	{
 		return -1;
 	}
 
-	if (mod->getHireByCountryOdds() > 0 && RNG::percent(mod->getHireByCountryOdds()))
+	if (mod.getHireByCountryOdds() > 0 && RNG::percent(mod.getHireByCountryOdds()))
 	{
 		if (const Country* country = AreaSystem::locateValue<Country>(*target))
 		{
@@ -2136,7 +2115,7 @@ int SavedGame::selectSoldierNationalityByLocation(const Mod* mod, const RuleSold
 		}
 	}
 
-	if (mod->getHireByRegionOdds() > 0 && RNG::percent(mod->getHireByRegionOdds()))
+	if (mod.getHireByRegionOdds() > 0 && RNG::percent(mod.getHireByRegionOdds()))
 	{
 		if (const Region* region = AreaSystem::locateValue<Region>(*target))
 		{
@@ -2262,12 +2241,6 @@ std::vector<Soldier*> SavedGame::getAllActiveSoldiers() const
 	}
 
 	return soldiers;
-}
-
-/// Gets the last selected player base.
-[[nodiscard]] entt::entity SavedGame::getSelectedBase() const
-{
-	return getRegistry().next<Base>(_selectedBaseIndex);
 }
 
 /**
@@ -2527,9 +2500,9 @@ void SavedGame::deleteRetaliationMission(AlienMission* am, Base* base)
 {
 	entt::registry& registry = getRegistry().raw();
 	auto missionFilter = [am, &registry](entt::entity ufoId) { return registry.get<Ufo>(ufoId).getMission() == am; };
-	if (entt::entity ufoId = getRegistry().find_if<Ufo>(missionFilter); ufoId != entt::null)
+	if (entt::handle ufoHandle = getRegistry().find_if<Ufo>(missionFilter))
 	{
-		registry.destroy(ufoId);
+		ufoHandle.destroy();
 	}
 	for (auto iter = _activeMissions.begin(); iter != _activeMissions.end(); ++iter)
 	{

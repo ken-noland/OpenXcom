@@ -48,7 +48,7 @@ namespace OpenXcom
  * @param rule Pointer to the facility ruleset to build.
  */
 PlaceFacilityState::PlaceFacilityState(entt::entity baseId, const RuleBaseFacility *rule, BaseFacility *origFac)
-	: State("PlaceFacilityState", false), _baseId(baseId), _rule(rule), _origFac(origFac)
+	: State("PlaceFacilityState", false), _baseHandle(baseId), _rule(rule), _origFac(origFac)
 {
 	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
@@ -91,7 +91,7 @@ PlaceFacilityState::PlaceFacilityState(entt::entity baseId, const RuleBaseFacili
 	{
 		_view->setOtherColors(itf->color, itf->color2, itf->border, !itf->TFTDMode);
 	}
-	Base& base = getRegistry().raw().get<Base>(_baseId);
+	Base& base = getRegistry().raw().get<Base>(_baseHandle);
 	_view->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
 	_view->setBase(&base);
 	_view->setSelectable(rule->getSizeX(), rule->getSizeY());
@@ -257,7 +257,7 @@ void PlaceFacilityState::viewClick(Action *)
 		}
 		else
 		{
-			Base& base = getRegistry().raw().get<Base>(_baseId);
+			Base& base = getRegistry().raw().get<Base>(_baseHandle);
 			for (const auto& item: _rule->getBuildCostItems())
 			{
 				int needed = item.second.first - base.getStorageItems()->getItem(item.first);

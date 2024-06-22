@@ -46,8 +46,8 @@ namespace OpenXcom
  * @param globe Pointer to the Geoscape globe.
  * @param first Is this a custom starting base?
  */
-PlaceLiftState::PlaceLiftState(entt::entity newBaseId, Globe *globe, bool first) 
-	: State("PlaceLiftState", true), _newBaseId(newBaseId), _globe(globe), _first(first)
+PlaceLiftState::PlaceLiftState(entt::handle newBaseHandle, Globe *globe, bool first)
+	: State("PlaceLiftState", true), _newBaseHandle(newBaseHandle), _globe(globe), _first(first)
 {
 	InterfaceFactory& factory = getGame()->getInterfaceFactory();
 
@@ -71,7 +71,7 @@ PlaceLiftState::PlaceLiftState(entt::entity newBaseId, Globe *globe, bool first)
 
 	// Set up objects
 	setWindowBackground(_window, "selectFacility");
-	Base& base = getRegistry().raw().get<Base>(_newBaseId);
+	Base& base = getRegistry().raw().get<Base>(_newBaseHandle);
 
 
 	auto* itf = getGame()->getMod()->getInterface("basescape")->getElement("trafficLights");
@@ -137,7 +137,7 @@ PlaceLiftState::PlaceLiftState(entt::entity newBaseId, Globe *globe, bool first)
  */
 void PlaceLiftState::viewClick(Action *)
 {
-	Base& base = getRegistry().raw().get<Base>(_newBaseId);
+	Base& base = getRegistry().raw().get<Base>(_newBaseHandle);
 	BaseFacility *fac = new BaseFacility(_lift, &base);
 	fac->setX(_view->getGridX());
 	fac->setY(_view->getGridY());
@@ -148,12 +148,12 @@ void PlaceLiftState::viewClick(Action *)
 	}
 	getGame()->popState();
 
-	BasescapeState *bState = new BasescapeState(_newBaseId, _globe);
+	BasescapeState *bState = new BasescapeState(getRegistry().getService<BasescapeSystem>(), _globe);
 	getGame()->getSavedGame()->setSelectedBaseIndex(static_cast<int>(getRegistry().size<Base>()) - 1);
 	getGame()->pushState(bState);
 	if (_first)
 	{
-		getGame()->pushState(new SelectStartFacilityState(_newBaseId, bState, _globe));
+		getGame()->pushState(new SelectStartFacilityState(_newBaseHandle, bState, _globe));
 	}
 }
 

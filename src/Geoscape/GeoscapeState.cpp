@@ -81,6 +81,7 @@
 #include "../Engine/Surface.h"
 #include "../Engine/Timer.h"
 #include "../Engine/Unicode.h"
+#include "../Entity/Common/GeoComponents.h"
 #include "../fallthrough.h"
 #include "../fmath.h"
 #include "../Interface/ComboBox.h"
@@ -486,6 +487,8 @@ GeoscapeState::GeoscapeState()
 		_cbxCountry->setVisible(false);
 		_cbxCountry->onChange((ActionHandler)&GeoscapeState::cbxCountryChange);
 	}
+
+	getRegistry().getService<GeoSystem>().updateAllRegionsAndCountries();
 
 	timeDisplay();
 }
@@ -2945,7 +2948,7 @@ void GeoscapeState::btnBasesClick(Action *)
 	if (buttonsDisabled()) { return; }
 
 	timerReset();
-	getGame()->pushState(new BasescapeState(getGame()->getSavedGame()->getSelectedBase(), _globe));
+	getGame()->pushState(new BasescapeState(getRegistry().getService<BasescapeSystem>(), _globe));
 }
 
 /**
@@ -3555,7 +3558,7 @@ void GeoscapeState::determineAlienMissions()
 				}
 			}
 			
-			Base* hq = getRegistry().frontValue<Base>();
+			Base* hq = getRegistry().front<Base>().try_get<Base>();
 			bool canAddOneMore = arcCommand->getMaxArcs() == -1 || arcCommand->getMaxArcs() > arcsEnabled;
 			if (canAddOneMore && !disabledSeqArcs.empty())
 			{

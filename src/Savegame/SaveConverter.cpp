@@ -52,6 +52,8 @@
 #include "../Engine/Options.h"
 #include "../Engine/Registry.h"
 #include "../Engine/RNG.h"
+#include "../Entity/Game/CountryFactory.h"
+#include "../Entity/Game/RegionFactory.h"
 #include "../fmath.h"
 #include "../Mod/ArticleDefinition.h"
 #include "../Mod/Mod.h"
@@ -159,14 +161,14 @@ namespace OpenXcom
 		_save->getIncomes().clear();
 		for (const std::string& countryName : _rules->getCountries())
 		{
-			Country& country = getRegistry().createAndEmplace<Country>(_mod->getCountry(countryName, true));
+			Country& country = getRegistry().getService<CountryFactory>().create(*_mod->getCountry(countryName, true)).get<Country>();
 			country.getActivityAlien().clear();
 			country.getActivityXcom().clear();
 			country.getFunding().clear();
 		}
 		for (const std::string& regionName : _rules->getRegions())
 		{
-			Region& region = getRegistry().createAndEmplace<Region>(_mod->getRegion(regionName, true));
+			Region& region = getRegistry().getService<RegionFactory>().create(*_mod->getRegion(regionName, true)).get<Region>();
 			region.getActivityAlien().clear();
 			region.getActivityXcom().clear();
 		}
@@ -623,7 +625,7 @@ namespace OpenXcom
 			case TARGET_UFO:
 			case TARGET_CRASH:
 			case TARGET_LANDED: {
-				Ufo* ufo = new Ufo(_mod->getUfo(_rules->getUfos()[0], true), 0);
+				Ufo* ufo = new Ufo(*_mod->getUfo(_rules->getUfos()[0], true), 0);
 				ufo->setId(id);
 				ufo->setCrashId(id);
 				ufo->setLandId(id);
@@ -929,8 +931,8 @@ namespace OpenXcom
 						b->getCrafts().push_back(craft);
 					}
 				}
-				Ufo *ufo = dynamic_cast<Ufo*>(_targets[i]);
-				if (ufo != 0)
+
+				if (Ufo* ufo = dynamic_cast<Ufo*>(_targets[i]))
 				{
 					ufo->changeRules(_mod->getUfo(_rules->getUfos()[type - 5], true));
 					node["damage"] = (int)load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_DAMAGE"));
@@ -988,7 +990,7 @@ namespace OpenXcom
 					}
 
 					
-					getRegistry().insert<Ufo>(ufo);
+					getRegistry().insert<Ufo>(*ufo);
 				}
 			}
 		}

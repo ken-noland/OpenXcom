@@ -19,10 +19,13 @@
  */
 #include <entt/entt.hpp>
 
-class Mod;
+namespace YAML { class Node; }
 
 namespace OpenXcom
 {
+
+class Mod;
+class SavedGame;
 
 /**
  * @brief Factory for creating bases
@@ -37,7 +40,9 @@ public:
 	BaseFactory(entt::registry& registry) : _registry(registry) { }
 
 	// creates a new Base entity in the registry.
-	entt::handle create(Mod& mod);
+	entt::handle create(const Mod& mod);
+	// creates a new Base loaded from YAML data.
+	entt::handle create(const Mod& mod, const YAML::Node& node, SavedGame* save, bool newGame, bool newBattleGame = false);
 };
 
 }

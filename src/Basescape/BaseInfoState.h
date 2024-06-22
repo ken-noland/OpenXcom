@@ -18,12 +18,12 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../Engine/State.h"
-#include <entt/entt.hpp>
 
 namespace OpenXcom
 {
 
 class BasescapeState;
+class BasescapeSystem;
 class Base;
 class Surface;
 class MiniBaseView;
@@ -40,9 +40,8 @@ class BaseInfoState : public State
 {
 	static const int MAX_BAR_WIDTH = 140;
 
-	entt::entity _baseId;
-	Base* _base;
-	BasescapeState *_state;
+	BasescapeSystem& _basescapeSystem;
+	size_t _unsubscribeId; // used to unsubscribe the listener.
 
 	Surface *_bg;
 	MiniBaseView *_mini;
@@ -62,15 +61,13 @@ class BaseInfoState : public State
 	Bar *_barDefense, *_barShortRange, *_barLongRange;
 public:
 	/// Creates the Base Info state.
-	BaseInfoState(entt::entity baseId, BasescapeState *state);
+	BaseInfoState(BasescapeSystem& basescapeSystem);
+	/// Unsubscribes the listener.
+	~BaseInfoState();
 	/// Updates the base stats.
 	void init() override;
 	/// Handler for changing the text on the Name edit.
 	void edtBaseChange(Action *action);
-	/// Handler for clicking the mini base view.
-	void miniClick(Action *action);
-	/// Handler for selecting bases.
-	void handleKeyPress(Action *action);
 	/// Handler for clicking the OK button.
 	void btnOkClick(Action *action);
 	/// Handler for clicking the Transfers button.

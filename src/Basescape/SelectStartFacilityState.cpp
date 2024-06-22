@@ -40,8 +40,8 @@ namespace OpenXcom
  * @param state Pointer to the base state to refresh.
  * @param globe Pointer to the globe to refresh.
  */
-SelectStartFacilityState::SelectStartFacilityState(entt::entity newBaseId, State *state, Globe *globe)
-	: BuildFacilitiesState(newBaseId, state), _globe(globe)
+SelectStartFacilityState::SelectStartFacilityState(entt::handle newBaseHandle, State *state, Globe *globe)
+	: BuildFacilitiesState(newBaseHandle, state), _globe(globe)
 {
 	_facilities = getGame()->getMod()->getCustomBaseFacilities(getGame()->getSavedGame()->getDifficulty());
 
@@ -70,7 +70,8 @@ void SelectStartFacilityState::populateBuildList()
  */
 void SelectStartFacilityState::btnOkClick(Action *)
 {
-	Base& base = getRegistry().raw().get<Base>(_baseId);
+
+	Base& base = getRegistry().raw().get<Base>(_baseHandle);
 	for (BaseFacility* fac : base.getFacilities())
 	{
 		delete fac;
@@ -78,7 +79,7 @@ void SelectStartFacilityState::btnOkClick(Action *)
 	base.getFacilities().clear();
 	getGame()->popState();
 	getGame()->popState();
-	getGame()->pushState(new PlaceLiftState(_baseId, _globe, true));
+	getGame()->pushState(new PlaceLiftState(_baseHandle, _globe, true));
 }
 
 /**
@@ -87,7 +88,7 @@ void SelectStartFacilityState::btnOkClick(Action *)
  */
 void SelectStartFacilityState::lstFacilitiesClick(Action *)
 {
-	getGame()->pushState(new PlaceStartFacilityState(_baseId, this, _facilities[_lstFacilities->getSelectedRow()]));
+	getGame()->pushState(new PlaceStartFacilityState(_baseHandle, this, _facilities[_lstFacilities->getSelectedRow()]));
 }
 
 /**

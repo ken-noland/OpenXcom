@@ -39,7 +39,7 @@ class Globe;
 class BaseNameState : public State
 {
 private:
-	entt::entity _newBaseId;
+	entt::handle _newBaseHandle;
 	Globe *_globe;
 	entt::entity _window;
 	Text *_txtTitle;
@@ -49,7 +49,7 @@ private:
 	bool _fixedLocation;
 public:
 	/// Creates the Base Name state.
-	BaseNameState(entt::entity newBaseId, Globe *globe, bool first, bool fixedLocation);
+	BaseNameState(entt::handle newBaseHandle, Globe *globe, bool first, bool fixedLocation);
 	/// Handler for clicking the OK button.
 	void btnOkClick(Action *action);
 	/// Handler for changing text on the Name edit.

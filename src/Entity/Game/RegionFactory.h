@@ -37,7 +37,7 @@ public:
 	RegionFactory(entt::registry& registry) : _registry(registry) { }
 
 	// creates a new region
-	entt::handle create(const RuleRegion& ruleRegion);
+	entt::handle create(RuleRegion& ruleRegion);
 };
 
 }

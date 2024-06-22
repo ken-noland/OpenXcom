@@ -37,7 +37,7 @@ class Text;
 class PlaceFacilityState : public State
 {
 protected:
-	entt::entity _baseId;
+	entt::entity _baseHandle;
 	const RuleBaseFacility *_rule;
 	BaseFacility *_origFac;
 

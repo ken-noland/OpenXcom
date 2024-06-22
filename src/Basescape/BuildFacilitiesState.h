@@ -37,7 +37,7 @@ class RuleBaseFacility;
 class BuildFacilitiesState : public State
 {
 protected:
-	entt::entity _baseId;
+	entt::handle _baseHandle;
 	State *_state;
 	std::vector<RuleBaseFacility*> _facilities, _disabledFacilities;
 	size_t _lstScroll;
@@ -48,7 +48,7 @@ protected:
 	TextList *_lstFacilities;
 public:
 	/// Creates the Build Facilities state.
-	BuildFacilitiesState(entt::entity baseId, State *state);
+	BuildFacilitiesState(entt::handle baseHandle, State *state);
 	/// Populates the build option list.
 	virtual void populateBuildList();
 	/// Updates the base stats.
