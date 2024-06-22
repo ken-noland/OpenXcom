@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2010-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -21,12 +21,13 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <yaml-cpp/yaml.h>
 #include "../Mod/RuleBaseFacilityFunctions.h"
 
 #ifndef BASEFACILITIESITERATOR
 #define BASEFACILITIESITERATOR std::vector<BaseFacility*>::iterator
 #endif
+
+namespace YAML { class Node; }
 
 namespace OpenXcom
 {
@@ -129,9 +130,10 @@ private:
 	RuleBaseFacilityFunctions _forbiddenBaseFunc = 0;
 
 	using Target::load;
+
 public:
 	/// Creates a new base.
-	Base(const Mod *mod);
+	Base(const Mod* mod);
 	/// Cleans up the base.
 	~Base();
 	/// Loads the base from YAML.
@@ -145,7 +147,7 @@ public:
 	/// Saves the base to YAML.
 	YAML::Node save() const override;
 	/// Gets the base's type.
-	std::string getType() const override;
+	std::string getType() const override { return "STR_BASE"; }
 	/// Gets the base's name.
 	std::string getName(Language *lang = 0) const override;
 	/// Gets the base's marker sprite.

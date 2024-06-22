@@ -38,7 +38,7 @@ class RuleBaseFacility;
 class PlaceLiftState : public State
 {
 private:
-	entt::entity _newBaseId;
+	entt::handle _newBaseHandle;
 	Globe *_globe;
 	BaseView *_view;
 	Text *_txtTitle;
@@ -51,7 +51,7 @@ private:
 	TextList *_lstAccessLifts;
 public:
 	/// Creates the Place Lift state.
-	PlaceLiftState(entt::entity newBaseId, Globe *globe, bool first);
+	PlaceLiftState(entt::handle newBaseId, Globe *globe, bool first);
 	/// Handler for clicking the base view.
 	void viewClick(Action *action);
 	/// Handler for clicking the Access Lifts list.

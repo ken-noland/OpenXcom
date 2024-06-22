@@ -331,7 +331,7 @@ void BaseDefenseState::btnOkClick(Action *)
 				const Region* region = AreaSystem::locateValue<Region>(*_base);				
 				const std::string regionName = region ? region->getRules()->getType()
 													// fall back to first region. This dies if *no* regions, but thats probably okay
-													  : getRegistry().frontValue<Region>()->getRules()->getType(); 
+													  : getRegistry().front<Region>().get<Region>().getRules()->getType();
 				am = getGame()->getSavedGame()->findAlienMission(regionName, OBJECTIVE_RETALIATION);
 			}
 

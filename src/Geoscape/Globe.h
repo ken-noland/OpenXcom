@@ -21,6 +21,7 @@
 #include <list>
 #include "../Engine/InteractiveSurface.h"
 #include "../Engine/FastLineClip.h"
+#include "../Entity/Common/GeoPosition.h"
 #include "Cord.h"
 
 namespace OpenXcom
@@ -55,7 +56,8 @@ private:
 
 	RuleGlobe *_rules;
 	Sint16 _cenX, _cenY;
-	double _cenLon, _cenLat, _rotLon, _rotLat, _hoverLon, _hoverLat;
+	GeoPosition _cenPosition;
+	double _rotLon, _rotLat, _hoverLon, _hoverLat;
 	double _craftLon, _craftLat, _craftRange;
 	size_t _zoom, _zoomOld, _zoomTexture;
 	SurfaceSet *_texture, *_markerSet;
@@ -152,7 +154,9 @@ public:
 	/// Gets the current zoom.
 	size_t getZoom() const;
 	/// Centers the globe on a point.
-	void center(double lon, double lat);
+	[[deprecated("Move to position based")]] void center(double lon, double lat);
+	/// Centers the globe on a point.
+	void center(GeoPosition position);
 	/// Checks if a point is inside land.
 	bool insideLand(double lon, double lat) const;
 	/// Checks if a point is inside fakeUnderwater texture.

@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2024-2024 OpenXcom Developers.
  *
@@ -17,23 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "RegionFactory.h"
 #include <entt/entt.hpp>
+#include "../Common/Type.h"
+#include "../../Mod/RuleRegion.h"
+#include "../../Savegame/Region.h"
 
-namespace OpenXcom
+namespace OpenXcom {
+
+/**
+ * @brief Creates a new region entity
+ * @param ruleRegion the type of this country
+ * @return a handle to the new entity
+ */
+entt::handle RegionFactory::create(RuleRegion& ruleRegion)
 {
+	entt::entity regionId = _registry.create();
+	_registry.emplace<Region>(regionId, &ruleRegion);
 
-namespace BaseSystem
-{
-	// Gets the total maintiance cost for all bases.
-	[[nodiscard]] int64_t getBasesMaintenanceCost();
-	// Gets if an item is in storage at any base.
-	[[nodiscard]] bool isItemInBaseStores(const std::string& itemType);
-	// Gets if a facility is built at any base.
-	[[nodiscard]] bool isFacilityBuilt(const std::string& facilityType);
-	// Gets if a solider types is hired at any base.
-	[[nodiscard]] bool isSoldierTypeHired(const std::string& soldierType);
+	_registry.emplace<Type>(regionId, ruleRegion.getType());
 
-	void onLocationChange(entt::registry& registry, entt::entity baseId);
+	return entt::handle(_registry, regionId);
 }
 
 }

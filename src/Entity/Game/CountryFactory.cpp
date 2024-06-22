@@ -1,6 +1,5 @@
-#pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2024-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,33 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "BuildFacilitiesState.h"
+#include "CountryFactory.h"
 #include <entt/entt.hpp>
+#include "../Common/Type.h"
+#include "../../Savegame/Country.h"
+#include "../../Mod/RuleCountry.h"
 
 namespace OpenXcom
 {
 
-class Globe;
-
 /**
- * Window shown with all the facilities
- * available to build.
+ * @brief Creates a new Country
+ * @param ruleCountry type of this country
+ * @param generateNewFunding indicates if default funding should be generated for this country.
+ * @return a new Country entity
  */
-class SelectStartFacilityState : public BuildFacilitiesState
+entt::handle CountryFactory::create(RuleCountry& ruleCountry, bool generateNewFunding)
 {
-private:
-	Globe *_globe;
-public:
-	/// Creates the Build Facilities state.
-	SelectStartFacilityState(entt::handle _newBaseHandle, State *state, Globe *globe);
-	/// Populates the build option list.
-	virtual void populateBuildList() override;
-	/// Handler for clicking the Reset button.
-	void btnOkClick(Action *action);
-	/// Handler for clicking the Facilities list.
-	void lstFacilitiesClick(Action *action) override;
-	/// Handler for when the facility is actually built.
-	void facilityBuilt();
+	entt::entity countryId = _registry.create();
+	_registry.emplace<Country>(countryId, &ruleCountry, generateNewFunding);
+
+	_registry.emplace<Type>(countryId, ruleCountry.getType());
+
+	return entt::handle(_registry, countryId);
 };
 
 }

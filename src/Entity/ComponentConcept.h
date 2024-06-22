@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2024-2024 OpenXcom Developers.
  *
@@ -17,23 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <entt/entt.hpp>
+#include <string_view>
+#include <type_traits>
 
-namespace OpenXcom
-{
-
-namespace BaseSystem
-{
-	// Gets the total maintiance cost for all bases.
-	[[nodiscard]] int64_t getBasesMaintenanceCost();
-	// Gets if an item is in storage at any base.
-	[[nodiscard]] bool isItemInBaseStores(const std::string& itemType);
-	// Gets if a facility is built at any base.
-	[[nodiscard]] bool isFacilityBuilt(const std::string& facilityType);
-	// Gets if a solider types is hired at any base.
-	[[nodiscard]] bool isSoldierTypeHired(const std::string& soldierType);
-
-	void onLocationChange(entt::registry& registry, entt::entity baseId);
-}
-
-}
+template<typename T>
+concept HasNodeName = requires {
+    { T::NODE_NAME } -> std::convertible_to<std::string_view>;
+};

@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2024-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,33 +17,36 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "BuildFacilitiesState.h"
 #include <entt/entt.hpp>
+
+namespace YAML { class Node; }
 
 namespace OpenXcom
 {
 
-class Globe;
+class Mod;
+class SavedGame;
 
 /**
- * Window shown with all the facilities
- * available to build.
+ * @brief Factory for creating bases
  */
-class SelectStartFacilityState : public BuildFacilitiesState
+class BaseFactory
 {
-private:
-	Globe *_globe;
+protected:
+	entt::registry& _registry;
+	size_t _nextBaseIndex = 0;
+
+	// sorts bases by index
+	void sortBases();
+
 public:
-	/// Creates the Build Facilities state.
-	SelectStartFacilityState(entt::handle _newBaseHandle, State *state, Globe *globe);
-	/// Populates the build option list.
-	virtual void populateBuildList() override;
-	/// Handler for clicking the Reset button.
-	void btnOkClick(Action *action);
-	/// Handler for clicking the Facilities list.
-	void lstFacilitiesClick(Action *action) override;
-	/// Handler for when the facility is actually built.
-	void facilityBuilt();
+	// creates a new base factory
+	BaseFactory(entt::registry& registry) : _registry(registry) { }
+
+	// creates a new Base entity in the registry.
+	entt::handle create(const Mod& mod);
+	// creates a new Base loaded from YAML data.
+	entt::handle create(const Mod& mod, const YAML::Node& node, SavedGame* save, bool newGame, bool newBattleGame = false);
 };
 
 }

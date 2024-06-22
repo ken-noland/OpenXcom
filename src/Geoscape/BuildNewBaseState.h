@@ -38,7 +38,7 @@ class TextButton;
 class BuildNewBaseState : public State
 {
 private:
-	entt::entity _newBaseId = entt::null;
+	entt::handle _newBaseHandle;
 	Globe *_globe;
 	InteractiveSurface *_btnRotateLeft, *_btnRotateRight, *_btnRotateUp, *_btnRotateDown, *_btnZoomIn, *_btnZoomOut;
 	entt::entity _window;
@@ -51,7 +51,7 @@ private:
 	int _mousex, _mousey;
 public:
 	/// Creates the Build New Base state.
-	BuildNewBaseState(entt::entity newBaseId, Globe *globe, bool first);
+	BuildNewBaseState(entt::handle newBaseHandle, Globe *globe, bool first);
 	/// Cleans up the Build New Base state.
 	~BuildNewBaseState();
 	/// Resets globe.

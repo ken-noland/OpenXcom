@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2024-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,5 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <entt/entt.hpp>
 
-//nothing to see here, move along
+namespace OpenXcom
+{
+
+class RuleRegion;
+
+/**
+ * @brief Factory for creating game entities
+ */
+class RegionFactory
+{
+protected:
+	entt::registry& _registry;
+
+public:
+	// creates a new base factory
+	RegionFactory(entt::registry& registry) : _registry(registry) { }
+
+	// creates a new region
+	entt::handle create(RuleRegion& ruleRegion);
+};
+
+}

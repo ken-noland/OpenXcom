@@ -28,6 +28,7 @@
 #include "../Geoscape/BaseNameState.h"
 #include "../Basescape/PlaceLiftState.h"
 #include "../Engine/Options.h"
+#include "../Entity/Common/GeoPosition.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Base.h"
 #include "../Entity/Interface/Interface.h"
@@ -132,14 +133,6 @@ NewGameState::NewGameState() : State("NewGameState", true)
 }
 
 /**
- *
- */
-NewGameState::~NewGameState()
-{
-
-}
-
-/**
  * Returns to the previous screen.
  * @param action Pointer to an action.
  */
@@ -179,31 +172,30 @@ void NewGameState::btnOkClick(Action *)
 	getGame()->setState(gs);
 	gs->init();
 
-	Base* base = getRegistry().backValue<Base>();
-	entt::entity baseId = getRegistry().find(base);
-	if (base->getMarker() != -1)
+	entt::handle newBaseHandle = getRegistry().front<Base, GeoPosition>(); // a base is created in newSave
+	if (newBaseHandle.get<Base>().getMarker() != -1)
 	{
 		// location known already
-		base->calculateServices(save);
+		newBaseHandle.get<Base>().calculateServices(save);
 
 		// center and rotate 35 degrees down (to see the base location while typoing its name)
-		gs->getGlobe()->center(base->getLongitude(), base->getLatitude() + 0.61);
+		gs->getGlobe()->center(newBaseHandle.get<GeoPosition>() + GeoPosition{0, 0.61});
 
-		if (base->getName().empty())
+		if (newBaseHandle.get<Base>().getName().empty())
 		{
 			// fixed location, custom name
-			getGame()->pushState(new BaseNameState(baseId, gs->getGlobe(), true, true));
+			getGame()->pushState(new BaseNameState(newBaseHandle, gs->getGlobe(), true, true));
 		}
 		else if (Options::customInitialBase)
 		{
 			// fixed location, fixed name
-			getGame()->pushState(new PlaceLiftState(baseId, gs->getGlobe(), true));
+			getGame()->pushState(new PlaceLiftState(newBaseHandle, gs->getGlobe(), true));
 		}
 	}
 	else
 	{
 		// custom location, custom name
-		getGame()->pushState(new BuildNewBaseState(baseId, gs->getGlobe(), true));
+		getGame()->pushState(new BuildNewBaseState(newBaseHandle, gs->getGlobe(), true));
 	}
 }
 

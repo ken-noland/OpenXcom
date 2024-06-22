@@ -186,7 +186,7 @@ void ProductionCompleteState::btnGotoBaseClick(Action *)
 	}
 	else
 	{
-		getGame()->pushState(new BasescapeState(getRegistry().find(_base), _state->getGlobe()));
+		getGame()->pushState(new BasescapeState(getRegistry().getService<BasescapeSystem>(), _state->getGlobe()));
 	}
 }
 

@@ -44,8 +44,6 @@ private:
 public:
 	/// Creates the New Game state.
 	NewGameState();
-	/// Cleans up the New Game state.
-	~NewGameState();
 	/// Handler for clicking the Ok button.
 	void btnOkClick(Action *action);
 	/// Handler for clicking the Cancel button.

@@ -35,6 +35,14 @@ public:
 	// Gets access to the underlying registry.
 	[[nodiscard]] const entt::registry& raw() const { return _registry; }
 
+	// implicitly convert Registry to entt::registry&
+	operator entt::registry& () { return _registry; }
+	// implicitly convert const Registry to const entt::registry&
+	operator const entt::registry& () const { return _registry; }
+
+	// creates a new entity handle
+	[[nodiscard]] inline entt::handle createHandle() { return entt::handle(_registry, _registry.create()); }
+
 	/**
 	 * @brief Lists all Components in the registry in a const context
 	 * @tparam Component the type of componet to list.
@@ -90,104 +98,27 @@ public:
 	[[nodiscard]] bool empty() const { return _registry.view<Components...>().empty(); }
 
 	/**
-     * @brief Gets the first Component in the registry, if any, in a const context.
-     * @tparam Component the type of component to retrieve
-     * @return a const pointer to the first Component in the registry, or nullptr if none.
+     * @brief Gets a hanlde to the first entity in the components pool, if any, in a const context.
+     * @tparam ...Components the type of component pool to retrieve
+     * @return a handle to first entity i the ...Components pool, or an invalid handle if none.
      */
-	template<typename Component>
-	inline const Component* frontValue() const
-	{
-		auto components = list<const Component>();
-		return !components.empty() ? &components.front() : nullptr;
-	}
-
-	/**
-	 * @brief Gets the first Component in the registry, if any, in a mutable context.
-	 * @tparam Component the type of component to retrieve
-	 * @return a pointer to the first Component in the registry, or nullptr if none.
-	 */
-	template<typename Component>
-	inline Component* frontValue()
-	{
-		auto components = list<Component>();
-		return !components.empty() ? &components.front() : nullptr;
-	}
-
-	/**
-	 * @brief Gets the last Component in the registry, if any, in a const context.
-	 * @tparam Component the type of component to retrieve
-	 * @return a const pointer to the last Component in the registry, or nullptr if none.
-	 */
-	template<typename Component>
-	inline const Component* backValue() const
-	{
-		auto components = list<const Component>();
-		return !components.empty() ? &components.back() : nullptr;
-	}
-
-	/**
-	 * @brief Gets the last Component in the registry, if any, in a mutable context.
-	 * @tparam Component the type of component to retrieve
-	 * @return a pointer to the last Component in the registry, or nullptr if none.
-	 */
-	template<typename Component>
-	inline Component* backValue()
-	{
-		entt::entity lastEntity = _registry.view<Component>().back();
-		return lastEntity != entt::null ? &_registry.get<Component>(lastEntity) : nullptr;
-	}
-
-	/**
-	 * @brief Gets the index of id, based on its positioin in Components... registry.
-	 * @tparam ...Components the set of Components to find ids position within
-	 * @param id the entity id to find the index of
-	 * @return the index of the entity, or -1 if it is not found.
-	 */
 	template<typename... Components>
-	inline int index(entt::entity id) const
-	{
-		auto view = _registry.view<const Components...>();
-		auto findIterator = std::find(view.begin(), view.end(), id);
-		return findIterator != view.end() ? static_cast<int>(std::distance(view.begin(), findIterator)) : -1;
-	}
-
-	/**
-	 * @brief Gets the entity in offset position from the front in the Components storage
-	 * @tparam ...Components the type of components the entity should own
-	 * @param offset the number of positions from the front of the registry to offset
-	 * @return the entity in offset position, or entt::null if out of bounds
-	*/
-	template<typename... Components>
-	inline entt::entity next(int offset) const
+	inline entt::handle front()
 	{
 		auto components = _registry.view<Components...>();
-		return components.size() < offset && offset > 0 ? *std::next(components.begin(), offset) : entt::null;
+		return entt::handle(_registry, components.front());
 	}
 
 	/**
-	 * @brief Gets the component in offset position from the front in the Components storage in a const context
-	 * @tparam Component the type of components to retrieve
-	 * @param offset the number of positions from the front of the registry to offset
-	 * @return a const pointer to the  Component in offset position, or nullptr if out of bounds
-	*/
-	template<typename Component>
-	inline const Component* nextValue(int offset) const
+	 * @brief Gets a handle to the last entity in the ...Components pool, if any.
+	 * @tparam ...Components the component pool to retrieve from
+	 * @return a handle to the last entity in the ...Components pool, or an invalid handle if none.
+	 */
+	template<typename... Components>
+	inline entt::handle back()
 	{
-		auto components = list<const Component>();
-		return components.size() < offset && offset > 0 ? std::next(components.front(), offset) : nullptr;
-	}
-
-	/**
-	 * @brief Gets the component in offset position from the front in the Components storage in a mutable context
-	 * @tparam Component the type of components to retrieve
-	 * @param offset the number of positions from the front of the registry to offset
-	 * @return a pointer to the  Component in offset position, or nullptr if out of bounds
-	*/
-	template<typename Component>
-	inline Component* nextValue(int offset)
-	{
-		auto components = list<Component>();
-		return components.size() < offset && offset > 0 ? std::next(components.front(), offset) : nullptr;
+		auto components = _registry.view<Components...>();
+		return entt::handle(_registry, components.back());
 	}
 
 	/**
@@ -204,14 +135,11 @@ public:
 	}
 
 	template<typename Component>
-	inline entt::entity insert(Component* component)
+	inline entt::handle insert(Component& component)
 	{
-		// there has got to be a better way to do this.
-		std::vector<entt::entity> componentId(1);
-		std::vector<Component*> components = { component };
-		_registry.create(componentId.begin(), componentId.end());
-		_registry.insert(componentId.begin(), componentId.end(), components);
-		return componentId.front();
+		entt::entity id = _registry.create();
+		_registry.emplace<Component>(id, component);
+		return entt::handle(_registry, id);
 	}
 
 	/**
@@ -230,31 +158,65 @@ public:
 	}
 
 	/**
+	 * @brief Emplaces a service within the Registry repository
+	 * @tparam Service the type of service to emplace
+	 * @tparam ...ConstructorArgs the type of arguments to pass to the Service constructor
+	 * @param ...args the arguments to be forward to the Service constructor
+	 * @return A reference to the newly created Service
+	*/
+	template<typename Service, typename... ConstructorArgs>
+	inline Service& emplaceService(ConstructorArgs&&... args)
+	{
+		return _registry.ctx().emplace<Service>(std::forward<ConstructorArgs>(args)...);
+	}
+
+	/**
+	 * @brief Retrieves a service from the registry
+	 * @tparam Service the type of service to retrieve
+	 * @return A reference to the Service
+	*/
+	template<typename Service>
+	inline Service& getService()
+	{
+		return _registry.ctx().get<Service>();
+	}
+
+	/**
+	 * @brief Wraps a given entity in a handle
+	 * @param id the entity to wrap
+	 * @return a handle wrapping the entity
+	 */
+	inline entt::handle makeHandle(entt::entity id)
+	{
+		return entt::handle(_registry, id);
+	}
+
+	/**
 	 * @brief Gets the id of the entity that component points to.
 	 * @tparam Component The type of the component the entity should have
 	 * @param component a pointer to the component
 	 * @return the entity that component points to, or entt::null if not found.
 	 */
 	template<typename Component>
-	entt::entity find(Component* component) const {
+	inline entt::handle find(Component* component) {
 		auto viewEach = _registry.view<const Component>().each();
 		auto matching = [component](const auto each) { return &std::get<1>(each) == component; };
 		auto findResult = std::find_if(viewEach.begin(), viewEach.end(), matching);
-		return findResult != viewEach.end() ? std::get<0>(*findResult) : entt::null;
+		return findResult != viewEach.end() ? entt::handle(_registry, std::get<0>(*findResult)) : entt::handle();
 	}
 
 	/**
 	 * @brief Finds the first entity that meets predicate
 	 * @tparam ...Components the set of components the entity must contain
 	 * @param predicate The predicate used to find the entity
-	 * @return the first entity that meets the critieria, or entt::null if no matching enttity found.
+	 * @return handle to the first entity that meets the critieria, or an invalid handle if no matching enttity found.
 	 */
-	template<typename... Components>
-	inline entt::entity find_if(std::predicate<entt::entity> auto predicate) const
+	template<typename Component>
+	inline entt::handle find_if(std::predicate<entt::entity> auto predicate)
 	{
-		auto view = _registry.view<Components...>();
-		auto findIterator = std::ranges::find_if(view.begin(), view.end(), predicate);
-		return findIterator != view.end() ? *findIterator : entt::null;
+		auto view = _registry.view<Component>();
+		auto findIterator = std::ranges::find_if(view, predicate);
+		return findIterator != view.end() ? entt::handle(_registry, *findIterator) : entt::handle();
 	}
 
 	/**

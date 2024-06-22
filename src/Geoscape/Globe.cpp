@@ -350,8 +350,8 @@ Globe::Globe(Game* game, int cenX, int cenY, int width, int height, int x, int y
 	_rotTimer = new Timer(10);
 	_rotTimer->onSurface(std::bind(&Globe::rotate, this));
 
-	_cenLon = _game->getSavedGame()->getGlobeLongitude();
-	_cenLat = _game->getSavedGame()->getGlobeLatitude();
+	_cenPosition.longitude = _game->getSavedGame()->getGlobeLongitude();
+	_cenPosition.latitude = _game->getSavedGame()->getGlobeLatitude();
 	_zoom = _game->getSavedGame()->getGlobeZoom();
 	_zoomOld = _zoom;
 
@@ -391,15 +391,15 @@ Globe::~Globe()
 void Globe::polarToCart(double lon, double lat, Sint16 *x, Sint16 *y) const
 {
 	// Orthographic projection
-	*x = _cenX + (Sint16)floor(_radius * cos(lat) * sin(lon - _cenLon));
-	*y = _cenY + (Sint16)floor(_radius * (cos(_cenLat) * sin(lat) - sin(_cenLat) * cos(lat) * cos(lon - _cenLon)));
+	*x = _cenX + (Sint16)floor(_radius * cos(lat) * sin(lon - _cenPosition.longitude));
+	*y = _cenY + (Sint16)floor(_radius * (cos(_cenPosition.latitude) * sin(lat) - sin(_cenPosition.latitude) * cos(lat) * cos(lon - _cenPosition.longitude)));
 }
 
 void Globe::polarToCart(double lon, double lat, double *x, double *y) const
 {
 	// Orthographic projection
-	*x = _cenX + _radius * cos(lat) * sin(lon - _cenLon);
-	*y = _cenY + _radius * (cos(_cenLat) * sin(lat) - sin(_cenLat) * cos(lat) * cos(lon - _cenLon));
+	*x = _cenX + _radius * cos(lat) * sin(lon - _cenPosition.longitude);
+	*y = _cenY + _radius * (cos(_cenPosition.latitude) * sin(lat) - sin(_cenPosition.latitude) * cos(lat) * cos(lon - _cenPosition.longitude));
 }
 
 
@@ -421,14 +421,14 @@ void Globe::cartToPolar(Sint16 x, Sint16 y, double *lon, double *lat) const
 	double c = asin(rho / _radius);
 	if ( AreSame(rho, 0.0) )
 	{
-		*lat = _cenLat;
-		*lon = _cenLon;
+		*lat = _cenPosition.latitude;
+		*lon = _cenPosition.longitude;
 
 	}
 	else
 	{
-		*lat = asin((y * sin(c) * cos(_cenLat)) / rho + cos(c) * sin(_cenLat));
-		*lon = atan2(x * sin(c),(rho * cos(_cenLat) * cos(c) - y * sin(_cenLat) * sin(c))) + _cenLon;
+		*lat = asin((y * sin(c) * cos(_cenPosition.latitude)) / rho + cos(c) * sin(_cenPosition.latitude));
+		*lon = atan2(x * sin(c),(rho * cos(_cenPosition.latitude) * cos(c) - y * sin(_cenPosition.latitude) * sin(c))) + _cenPosition.longitude;
 	}
 
 	// Keep between 0 and 2xPI
@@ -447,9 +447,7 @@ void Globe::cartToPolar(Sint16 x, Sint16 y, double *lon, double *lat) const
  */
 bool Globe::pointBack(double lon, double lat) const
 {
-	double c = cos(_cenLat) * cos(lat) * cos(lon - _cenLon) + sin(_cenLat) * sin(lat);
-
-	return c < 0.0;
+	return cos(_cenPosition.latitude) * cos(lat) * cos(lon - _cenPosition.longitude) + sin(_cenPosition.latitude) * sin(lat) < 0.0;
 }
 
 Polygon* Globe::getPolygonFromLonLat(double lon, double lat) const
@@ -573,13 +571,13 @@ void Globe::rotateStopLat()
 void Globe::setZoom(size_t zoom)
 {
 	_zoom = Clamp(zoom, (size_t)0u, _zoomRadius.size() - 1);
-	_zoomTexture = (2 - (int)floor(_zoom / 2.0)) * (_texture->getTotalFrames() / 3);
+	_zoomTexture = (2LL - (int)floor(_zoom / 2.0)) * (_texture->getTotalFrames() / 3);
 	_radius = _zoomRadius[_zoom];
 	_game->getSavedGame()->setGlobeZoom((int)_zoom);
 	if (_isMouseScrolling)
 	{
-		_lonBeforeMouseScrolling = _cenLon;
-		_latBeforeMouseScrolling = _cenLat;
+		_lonBeforeMouseScrolling = _cenPosition.longitude;
+		_latBeforeMouseScrolling = _cenPosition.latitude;
 		_totalMouseMoveX = 0; _totalMouseMoveY = 0;
 	}
 	invalidate();
@@ -693,12 +691,27 @@ bool Globe::zoomDogfightOut()
  * @param lon Longitude of the point.
  * @param lat Latitude of the point.
  */
-void Globe::center(double lon, double lat)
+[[obsolete]] void Globe::center(double lon, double lat)
 {
-	_cenLon = lon;
-	_cenLat = lat;
-	_game->getSavedGame()->setGlobeLongitude(_cenLon);
-	_game->getSavedGame()->setGlobeLatitude(_cenLat);
+	_cenPosition.longitude = lon;
+	_cenPosition.latitude = lat;
+	_game->getSavedGame()->setGlobeLongitude(_cenPosition.longitude);
+	_game->getSavedGame()->setGlobeLatitude(_cenPosition.latitude);
+	invalidate();
+}
+
+/**
+ * Rotates the globe to center on a certain
+ * polar point on the world map.
+ * @param lon Longitude of the point.
+ * @param lat Latitude of the point.
+ */
+void Globe::center(GeoPosition position)
+{
+	_cenPosition.longitude = position.longitude;
+	_cenPosition.latitude = position.latitude;
+	_game->getSavedGame()->setGlobeLongitude(_cenPosition.longitude);
+	_game->getSavedGame()->setGlobeLatitude(_cenPosition.latitude);
 	invalidate();
 }
 
@@ -864,7 +877,7 @@ void Globe::cache(std::list<Polygon*> *polygons, std::list<Polygon*> *cache)
 		double furthest = 0.0;
 		for (int j = 0; j < polygon->getPoints(); ++j)
 		{
-			z = cos(_cenLat) * cos(polygon->getLatitude(j)) * cos(polygon->getLongitude(j) - _cenLon) + sin(_cenLat) * sin(polygon->getLatitude(j));
+			z = cos(_cenPosition.latitude) * cos(polygon->getLatitude(j)) * cos(polygon->getLongitude(j) - _cenPosition.longitude) + sin(_cenPosition.latitude) * sin(polygon->getLatitude(j));
 			if (z > closest)
 				closest = z;
 			else if (z < furthest)
@@ -931,10 +944,10 @@ void Globe::blink()
  */
 void Globe::rotate()
 {
-	_cenLon += _rotLon * ((110 - Options::geoScrollSpeed) / 100.0) / (_zoom+1);
-	_cenLat += _rotLat * ((110 - Options::geoScrollSpeed) / 100.0) / (_zoom+1);
-	_game->getSavedGame()->setGlobeLongitude(_cenLon);
-	_game->getSavedGame()->setGlobeLatitude(_cenLat);
+	_cenPosition.longitude += _rotLon * ((110 - Options::geoScrollSpeed) / 100.0) / (_zoom+1);
+	_cenPosition.latitude += _rotLat * ((110 - Options::geoScrollSpeed) / 100.0) / (_zoom+1);
+	_game->getSavedGame()->setGlobeLongitude(_cenPosition.longitude);
+	_game->getSavedGame()->setGlobeLatitude(_cenPosition.latitude);
 	invalidate();
 }
 
@@ -1060,7 +1073,7 @@ void Globe::drawShadow()
 		earth.setMove(_cenX-getWidth()/2, _cenY-getHeight()/2);
 
 		lock();
-		ShaderDraw<CreateShadow>(ShaderSurface(this), earth, ShaderScalar(getSunDirection(_cenLon, _cenLat)), noise);
+		ShaderDraw<CreateShadow>(ShaderSurface(this), earth, ShaderScalar(getSunDirection(_cenPosition.longitude, _cenPosition.latitude)), noise);
 		unlock();
 	}
 	else
@@ -1068,7 +1081,7 @@ void Globe::drawShadow()
 		ShaderRepeat<Sint16> noise = ShaderRepeat<Sint16>(SurfaceRaw<Sint16>(static_data.random_noise, static_data.random_surf_size, static_data.random_surf_size));
 
 		lock();
-		ShaderDraw<CreateShadowWithoutCache>(ShaderSurface(this), helper::Offset(_cenX, _cenY), ShaderScalar(getSunDirection(_cenLon, _cenLat)), noise, ShaderScalar(_zoomRadius[_zoom]));
+		ShaderDraw<CreateShadowWithoutCache>(ShaderSurface(this), helper::Offset(_cenX, _cenY), ShaderScalar(getSunDirection(_cenPosition.longitude, _cenPosition.latitude)), noise, ShaderScalar(_zoomRadius[_zoom]));
 		unlock();
 	}
 
@@ -1840,7 +1853,7 @@ void Globe::mouseOver(Action *action, State *state)
 		{
 			double newLon = -action->getDetails()->motion.xrel * ROTATE_LONGITUDE/(_zoom+1)/2;
 			double newLat = -action->getDetails()->motion.yrel * ROTATE_LATITUDE/(_zoom+1)/2;
-			center(_cenLon + newLon / (Options::geoScrollSpeed / 10), _cenLat + newLat / (Options::geoScrollSpeed / 10));
+			center(_cenPosition.longitude + newLon / (Options::geoScrollSpeed / 10), _cenPosition.latitude + newLat / (Options::geoScrollSpeed / 10));
 		}
 
 		if (Options::touchEnabled == false)
@@ -1883,8 +1896,8 @@ void Globe::mousePress(Action *action, State *state)
 		_isMouseScrolling = true;
 		_isMouseScrolled = false;
 		SDL_GetMouseState(&_xBeforeMouseScrolling, &_yBeforeMouseScrolling);
-		_lonBeforeMouseScrolling = _cenLon;
-		_latBeforeMouseScrolling = _cenLat;
+		_lonBeforeMouseScrolling = _cenPosition.longitude;
+		_latBeforeMouseScrolling = _cenPosition.latitude;
 		_totalMouseMoveX = 0; _totalMouseMoveY = 0;
 		_mouseMovedOverThreshold = false;
 		_mouseScrollingStartTime = SDL_GetTicks();

@@ -61,7 +61,7 @@ void PlaceStartFacilityState::viewClick(Action *)
 	}
 	else
 	{
-		Base& base = getRegistry().raw().get<Base>(_baseId);
+		Base& base = getRegistry().raw().get<Base>(_baseHandle);
 		BaseFacility *fac = new BaseFacility(_rule, &base);
 		fac->setX(_view->getGridX());
 		fac->setY(_view->getGridY());

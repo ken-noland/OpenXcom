@@ -90,7 +90,7 @@ private:
 	void backupOriginalDestination();
 public:
 	/// Creates a UFO of the specified type.
-	Ufo(const RuleUfo *rules, int uniqueId, int hunterKillerPercentage = 0, int huntMode = 0, int huntBehavior = 0);
+	Ufo(const RuleUfo &rules, int uniqueId, int hunterKillerPercentage = 0, int huntMode = 0, int huntBehavior = 0);
 	/// Cleans up the UFO.
 	~Ufo();
 	/// Loads the UFO from YAML.

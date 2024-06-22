@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2010-2016 OpenXcom Developers.
+ * Copyright 2024-2024 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,33 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "BuildFacilitiesState.h"
 #include <entt/entt.hpp>
 
 namespace OpenXcom
 {
 
-class Globe;
+class RuleUfo;
 
 /**
- * Window shown with all the facilities
- * available to build.
+ * @brief Factory for creating ufos
  */
-class SelectStartFacilityState : public BuildFacilitiesState
+class UfoFactory
 {
-private:
-	Globe *_globe;
+protected:
+	entt::registry& _registry;
+
 public:
-	/// Creates the Build Facilities state.
-	SelectStartFacilityState(entt::handle _newBaseHandle, State *state, Globe *globe);
-	/// Populates the build option list.
-	virtual void populateBuildList() override;
-	/// Handler for clicking the Reset button.
-	void btnOkClick(Action *action);
-	/// Handler for clicking the Facilities list.
-	void lstFacilitiesClick(Action *action) override;
-	/// Handler for when the facility is actually built.
-	void facilityBuilt();
+	UfoFactory(entt::registry& registry) : _registry(registry) { }
+
+	entt::handle create(const RuleUfo& ruleUfo, int uniqueId, int hunterKillerPercentage = 0, int huntMode = 0, int huntBehavior = 0);
 };
 
 }

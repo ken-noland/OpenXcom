@@ -125,7 +125,7 @@ void NewPossibleFacilityState::btnOkClick(Action *)
 void NewPossibleFacilityState::btnOpenClick(Action *)
 {
 	getGame()->popState();
-	getGame()->pushState(new BasescapeState(getRegistry().find<Base>(_base), _globe));
+	getGame()->pushState(new BasescapeState(getRegistry().getService<BasescapeSystem>(), _globe));
 }
 
 }

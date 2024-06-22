@@ -46,6 +46,7 @@ class Waypoint;
 class SavedBattleGame;
 class TextList;
 class Language;
+class Registry;
 class RuleResearch;
 class ResearchProject;
 class Soldier;
@@ -122,6 +123,9 @@ public:
 	static const int MAX_CRAFT_LOADOUT_TEMPLATES = 10;
 
 private:
+	// handle to data that is related to game state, like gui configs.
+	entt::handle _gameHandle;
+
 	std::string _name;
 	GameDifficulty _difficulty;
 	GameEnding _end;
@@ -248,11 +252,11 @@ public:
 	/// Sets the list of object IDs.
 	void setAllIds(const std::map<std::string, int>& ids) { _ids = ids; }
 	/// Gets the list of waypoints.
-	std::vector<Waypoint*>& getWaypoints();
+	std::vector<Waypoint*>& getWaypoints() { return _waypoints; }
 	/// Gets the list of mission sites.
-	std::vector<MissionSite*>& getMissionSites();
+	std::vector<MissionSite*>& getMissionSites() { return _missionSites; }
 	/// Gets the current battle game.
-	SavedBattleGame *getSavedBattle();
+	SavedBattleGame* getSavedBattle() { return _battleGame; }
 	/// Sets the current battle game.
 	void setBattleGame(SavedBattleGame *battleGame);
 	/// Sets the status of a ufopedia rule
@@ -378,7 +382,7 @@ public:
 	/// Read-only access to the current geoscape events.
 	[[nodiscard]] const std::vector<GeoscapeEvent*> &getGeoscapeEvents() const { return _geoscapeEvents; }
 	/// Select a soldier nationality based on mod rules and location on the globe.
-	int selectSoldierNationalityByLocation(const Mod* mod, const RuleSoldier* rule, const Target* target) const;
+	int selectSoldierNationalityByLocation(const Mod& mod, const RuleSoldier* rule, const Target* target) const;
 	/// Return the month counter.
 	[[nodiscard]] int getMonthsPassed() const { return _monthsPassed; }
 	/// Return the GraphRegionToggles.

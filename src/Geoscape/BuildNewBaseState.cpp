@@ -50,8 +50,8 @@ namespace OpenXcom
  * @param globe Pointer to the Geoscape globe.
  * @param first Is this the first base in the game?
  */
-BuildNewBaseState::BuildNewBaseState(entt::entity newBaseId, Globe *globe, bool first) 
-	: State("BuildNewBaseState", false), _newBaseId(newBaseId), _globe(globe), _first(first)
+BuildNewBaseState::BuildNewBaseState(entt::handle newBaseHandle, Globe *globe, bool first) 
+	: State("BuildNewBaseState", false), _newBaseHandle(newBaseHandle), _globe(globe), _first(first)
 {
 	int dx = getGame()->getScreen()->getDX();
 	int dy = getGame()->getScreen()->getDY();
@@ -232,6 +232,7 @@ void BuildNewBaseState::globeClick(Action *action)
 	double lon, lat;
 	int mouseX = (int)floor(action->getAbsoluteXMouse()), mouseY = (int)floor(action->getAbsoluteYMouse());
 	_globe->cartToPolar(mouseX, mouseY, &lon, &lat);
+	GeoPosition geoPosition{ .latitude = lat, .longitude = lon };
 
 	// Ignore window clicks
 	if (mouseY < 28)
@@ -257,10 +258,13 @@ void BuildNewBaseState::globeClick(Action *action)
 			}
 			else
 			{
-				Base& base = getRegistry().raw().get<Base>(_newBaseId);
+				Base& base = _newBaseHandle.get<Base>();
 				base.setFakeUnderwater(fakeUnderwaterTexture);
 				base.setLongitude(lon);
 				base.setLatitude(lat);
+
+				_newBaseHandle.emplace_or_replace<GeoPosition>(geoPosition);
+
 				base.calculateServices(getGame()->getSavedGame());
 				for (Craft* craft : base.getCrafts())
 				{
@@ -269,11 +273,11 @@ void BuildNewBaseState::globeClick(Action *action)
 				}
 				if (_first)
 				{
-					getGame()->pushState(new BaseNameState(_newBaseId, _globe, _first, false));
+					getGame()->pushState(new BaseNameState(_newBaseHandle, _globe, _first, false));
 				}
 				else
 				{
-					getGame()->pushState(new ConfirmNewBaseState(_newBaseId, _globe));
+					getGame()->pushState(new ConfirmNewBaseState(_newBaseHandle, _globe));
 				}
 			}
 		}
@@ -398,7 +402,7 @@ void BuildNewBaseState::btnZoomOutRightClick(Action *)
  */
 void BuildNewBaseState::btnCancelClick(Action *)
 {
-	getRegistry().raw().destroy(_newBaseId);
+	getRegistry().raw().destroy(_newBaseHandle);
 	getGame()->popState();
 }
 

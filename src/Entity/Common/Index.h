@@ -17,23 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <entt/entt.hpp>
 
-namespace OpenXcom
+namespace OpenXcom {
+
+/**
+ * @brief compont that holds an entities position within a "virtual" index.
+ */
+struct Index {
+	size_t index;
+};
+
+class IndexPositionSystem
 {
+	entt::registry& _registry;
 
-namespace BaseSystem
-{
-	// Gets the total maintiance cost for all bases.
-	[[nodiscard]] int64_t getBasesMaintenanceCost();
-	// Gets if an item is in storage at any base.
-	[[nodiscard]] bool isItemInBaseStores(const std::string& itemType);
-	// Gets if a facility is built at any base.
-	[[nodiscard]] bool isFacilityBuilt(const std::string& facilityType);
-	// Gets if a solider types is hired at any base.
-	[[nodiscard]] bool isSoldierTypeHired(const std::string& soldierType);
+public:
+	IndexPositionSystem(entt::registry& registry) : _registry(registry) { }
 
-	void onLocationChange(entt::registry& registry, entt::entity baseId);
-}
+	template<typename... Components>
+	entt::handle findByIndex(size_t index)
+	{
+		std::ranges::range auto view = _registry.view<Index, Components>().each();
+		auto matchingIndex = [index](const auto& each) { return std::get<1>(each).index == index; };
+		auto findResult = std::ranges::find_if(view, matchingIndex);
+		return findResult != view.end() ? entt::handle(_registry, std::get<0>(*findResult)) : entt::handle();
+	}
+};
 
 }

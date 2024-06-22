@@ -2585,7 +2585,7 @@ void DebriefingState::recoverCivilian(BattleUnit *from, Base *base, Craft* craft
 			{
 				target = base;
 			}
-			int nationality = getGame()->getSavedGame()->selectSoldierNationalityByLocation(getGame()->getMod(), ruleSoldier, target);
+			int nationality = getGame()->getSavedGame()->selectSoldierNationalityByLocation(*getGame()->getMod(), ruleSoldier, target);
 			Soldier *s = getGame()->getMod()->genSoldier(getGame()->getSavedGame(), ruleSoldier, nationality);
 			s->load(from->getUnitRules()->getSpawnedSoldierTemplate(), getGame()->getMod(), getGame()->getSavedGame(), getGame()->getMod()->getScriptGlobal(), true); // load from soldier template
 			if (!from->getUnitRules()->getSpawnedPersonName().empty())

@@ -395,16 +395,6 @@ YAML::Node Base::save() const
 }
 
 /**
- * Returns the base's unique type used for
- * savegame purposes.
- * @return ID.
- */
-std::string Base::getType() const
-{
-	return "STR_BASE";
-}
-
-/**
  * Returns the custom name for the base.
  * @param lang Language to get strings from (unused).
  * @return Name.

@@ -47,7 +47,7 @@ namespace OpenXcom
  * @param rule Pointer to the facility ruleset to build.
  */
 PlaceFacilityState::PlaceFacilityState(entt::entity baseId, const RuleBaseFacility *rule, BaseFacility *origFac)
-	: State("PlaceFacilityState", false), _baseId(baseId), _rule(rule), _origFac(origFac)
+	: State("PlaceFacilityState", false), _baseHandle(baseId), _rule(rule), _origFac(origFac)
 {
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
@@ -90,7 +90,7 @@ PlaceFacilityState::PlaceFacilityState(entt::entity baseId, const RuleBaseFacili
 	{
 		_view->setOtherColors(itf->color, itf->color2, itf->border, !itf->TFTDMode);
 	}
-	Base& base = getRegistry().raw().get<Base>(_baseId);
+	Base& base = getRegistry().raw().get<Base>(_baseHandle);
 	_view->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
 	_view->setBase(&base);
 	_view->setSelectable(rule->getSizeX(), rule->getSizeY());
@@ -256,7 +256,7 @@ void PlaceFacilityState::viewClick(Action *)
 		}
 		else
 		{
-			Base& base = getRegistry().raw().get<Base>(_baseId);
+			Base& base = getRegistry().raw().get<Base>(_baseHandle);
 			for (const auto& item: _rule->getBuildCostItems())
 			{
 				int needed = item.second.first - base.getStorageItems()->getItem(item.first);
@@ -271,9 +271,8 @@ void PlaceFacilityState::viewClick(Action *)
 			double reducedBuildTime = 0.0;
 			bool buildingOver = false;
 			const BaseAreaSubset areaToBuildOver = BaseAreaSubset(_rule->getSizeX(), _rule->getSizeY()).offset(_view->getGridX(), _view->getGridY());
-			for (std::size_t i = static_cast<size_t>(base.getFacilities().size() - 1); i >= 0; --i)
+			for (BaseFacility* checkFacility : base.getFacilities() | std::views::reverse)
 			{
-				BaseFacility *checkFacility = base.getFacilities().at(i);
 				if (BaseAreaSubset::intersection(areaToBuildOver, checkFacility->getPlacement()))
 				{
 					// Get a refund from the facility we're building over
@@ -314,7 +313,11 @@ void PlaceFacilityState::viewClick(Action *)
 					}
 
 					// Remove the facility from the base
-					base.getFacilities().erase(base.getFacilities().begin() + i);
+					auto it = std::ranges::find(base.getFacilities(), checkFacility);
+					if (it != base.getFacilities().end())
+					{
+						base.getFacilities().erase(it);
+					}
 					delete checkFacility;
 				}
 

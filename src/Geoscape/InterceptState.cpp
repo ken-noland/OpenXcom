@@ -372,7 +372,7 @@ void InterceptState::btnCancelClick(Action *)
 void InterceptState::btnGotoBaseClick(Action *)
 {
 	getGame()->popState();
-	getGame()->pushState(new BasescapeState(getRegistry().find(_base), _globe));
+	getGame()->pushState(new BasescapeState(getRegistry().getService<BasescapeSystem>(), _globe));
 }
 
 /**

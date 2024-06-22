@@ -36,7 +36,7 @@ class Globe;
 class ConfirmNewBaseState : public State
 {
 private:
-	entt::entity _newBaseId;
+	entt::handle _newBaseHandle;
 	Globe *_globe;
 	entt::entity _window;
 	Text *_txtCost, *_txtArea;
@@ -44,7 +44,7 @@ private:
 	int _cost = 0;
 public:
 	/// Creates the Confirm New Base state.
-	ConfirmNewBaseState(entt::entity baseId, Globe *globe);
+	ConfirmNewBaseState(entt::handle baseId, Globe *globe);
 	/// Handler for clicking the OK button.
 	void btnOkClick(Action* action);
 	/// Handler for clicking the Cancel button.

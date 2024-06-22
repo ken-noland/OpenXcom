@@ -17,23 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <entt/entt.hpp>
+#include <string>
 
-namespace OpenXcom
+namespace OpenXcom {
+
+/**
+ * @brief Name Component for a display name. Usually comes from user input.
+ * Not guranteed to be unique.
+ */
+struct Name
 {
+	std::string name;
 
-namespace BaseSystem
-{
-	// Gets the total maintiance cost for all bases.
-	[[nodiscard]] int64_t getBasesMaintenanceCost();
-	// Gets if an item is in storage at any base.
-	[[nodiscard]] bool isItemInBaseStores(const std::string& itemType);
-	// Gets if a facility is built at any base.
-	[[nodiscard]] bool isFacilityBuilt(const std::string& facilityType);
-	// Gets if a solider types is hired at any base.
-	[[nodiscard]] bool isSoldierTypeHired(const std::string& soldierType);
+	static constexpr std::string_view NODE_NAME = "name";
+};
 
-	void onLocationChange(entt::registry& registry, entt::entity baseId);
-}
-
-}
+} // namespace OpenXcom

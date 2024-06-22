@@ -734,7 +734,7 @@ void PurchaseState::btnOkClick(Action *)
 					if (time == 0)
 						time = getGame()->getMod()->getPersonnelTime();
 					t = new Transfer(time);
-					int nationality = getGame()->getSavedGame()->selectSoldierNationalityByLocation(getGame()->getMod(), rule, _base);
+					int nationality = getGame()->getSavedGame()->selectSoldierNationalityByLocation(*getGame()->getMod(), rule, _base);
 					t->setSoldier(getGame()->getMod()->genSoldier(getGame()->getSavedGame(), rule, nationality));
 					_base->getTransfers().push_back(t);
 				}
