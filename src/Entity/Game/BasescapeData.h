@@ -91,8 +91,8 @@ template<>
 struct convert<OpenXcom::BasescapeData> {
 	static Node encode(const OpenXcom::BasescapeData& basescapeData) {
 		Node node;
-		node["selectedBaseIndex"] = basescapeData.selectedBaseIndex;
-		node["visibleBasesOffset"] = basescapeData.visibleBasesOffset;
+		node[OpenXcom::BasescapeData::NODE_NAME.data()]["selectedBaseIndex"] = basescapeData.selectedBaseIndex;
+		node[OpenXcom::BasescapeData::NODE_NAME.data()]["visibleBasesOffset"] = basescapeData.visibleBasesOffset;
 		return node;
 	}
 

@@ -35,7 +35,7 @@ class SurfaceSet;
 class MiniBaseView : public InteractiveSurface
 {
 private:
-	static const int MINI_SIZE = 14;
+	static const Sint16 MINI_SIZE = 14;
 
 	BasescapeSystem& _basescapeSystem;
 	size_t _unsubscribeId;

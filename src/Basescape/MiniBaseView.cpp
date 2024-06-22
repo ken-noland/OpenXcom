@@ -68,58 +68,66 @@ void MiniBaseView::draw()
 	Surface::draw();
 
 	size_t selectedBaseIndex = _basescapeSystem.getBasescapeData().getSelectedBaseVisibleIndex();
-	Sint16 index = 0;
-	for (entt::handle baseHandle : _basescapeSystem.getVisibleBases())
+	auto visibleBases = _basescapeSystem.getVisibleBases() | std::views::reverse;
+	auto baseIterator = visibleBases.begin();
+	for (Sint16 index = 0; index < BasescapeData::MAX_VISIBLE_BASES; ++index)
 	{
 		// Draw base squares
 		if (index == selectedBaseIndex)
 		{
-			SDL_Rect r;
-			r.x = index * (MINI_SIZE + 2);
-			r.y = 0;
-			r.w = MINI_SIZE + 2;
-			r.h = MINI_SIZE + 2;
+			SDL_Rect r{
+				.x = index * (MINI_SIZE + 2),
+				.y = 0,
+				.w = MINI_SIZE + 2,
+				.h = MINI_SIZE + 2,
+			};
 			drawRect(&r, 1);
 		}
+
 		_texture->getFrame(41)->blitNShade(this, index * (MINI_SIZE + 2), 0);
 
 		// Draw facilities
-		SDL_Rect r;
-		lock();
-		for (const BaseFacility* fac : baseHandle.get<Base>().getFacilities())
+		if (baseIterator != visibleBases.end())
 		{
-			int color;
-			if (fac->getDisabled())
-				color = _blue;
-			else if (fac->getBuildTime() == 0)
-				color = _green;
-			else
-				color = _red;
+			lock();
+			for (const BaseFacility* fac : (*baseIterator).get<Base>().getFacilities())
+			{
+				int color;
+				if (fac->getDisabled())
+					color = _blue;
+				else if (fac->getBuildTime() == 0)
+					color = _green;
+				else
+					color = _red;
 
-			r.x = index * (MINI_SIZE + 2) + 2 + fac->getX() * 2;
-			r.y = 2 + fac->getY() * 2;
-			r.w = fac->getRules()->getSizeX() * 2;
-			r.h = fac->getRules()->getSizeY() * 2;
-			drawRect(&r, color+3);
-			r.x++;
-			r.y++;
-			r.w--;
-			r.h--;
-			drawRect(&r, color+5);
-			r.x--;
-			r.y--;
-			drawRect(&r, color+2);
-			r.x++;
-			r.y++;
-			r.w--;
-			r.h--;
-			drawRect(&r, color+3);
-			r.x--;
-			r.y--;
-			setPixel(r.x, r.y, color+1);
+				SDL_Rect r{
+					.x = static_cast<Sint16>(index * (MINI_SIZE + 2) + 2 + fac->getX() * 2),
+					.y = static_cast<Sint16>(2 + fac->getY() * 2),
+					.w = static_cast<Uint16>(fac->getRules()->getSizeX() * 2),
+					.h = static_cast<Uint16>(fac->getRules()->getSizeY() * 2),
+				};
+
+				drawRect(&r, color + 3);
+				r.x++;
+				r.y++;
+				r.w--;
+				r.h--;
+				drawRect(&r, color + 5);
+				r.x--;
+				r.y--;
+				drawRect(&r, color + 2);
+				r.x++;
+				r.y++;
+				r.w--;
+				r.h--;
+				drawRect(&r, color + 3);
+				r.x--;
+				r.y--;
+				setPixel(r.x, r.y, color + 1);
+			}
+			unlock();
+			++baseIterator;
 		}
-		unlock();
-		++index;
 	}
 }
 

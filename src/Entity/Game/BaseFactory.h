@@ -34,6 +34,10 @@ class BaseFactory
 {
 protected:
 	entt::registry& _registry;
+	size_t _nextBaseIndex = 0;
+
+	// sorts bases by index
+	void sortBases();
 
 public:
 	// creates a new base factory

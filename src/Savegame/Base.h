@@ -21,12 +21,13 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <yaml-cpp/yaml.h>
 #include "../Mod/RuleBaseFacilityFunctions.h"
 
 #ifndef BASEFACILITIESITERATOR
 #define BASEFACILITIESITERATOR std::vector<BaseFacility*>::iterator
 #endif
+
+namespace YAML { class Node; }
 
 namespace OpenXcom
 {
@@ -129,9 +130,10 @@ private:
 	RuleBaseFacilityFunctions _forbiddenBaseFunc = 0;
 
 	using Target::load;
+
 public:
 	/// Creates a new base.
-	Base(const Mod *mod);
+	Base(const Mod* mod);
 	/// Cleans up the base.
 	~Base();
 	/// Loads the base from YAML.

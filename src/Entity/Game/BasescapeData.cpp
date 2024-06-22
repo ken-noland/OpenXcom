@@ -44,7 +44,7 @@ size_t BasescapeSystem::connectListener(std::function<void()> listener)
  */
 entt::handle BasescapeSystem::getSelectedBase()
 {
-	size_t index = _gameHandle.get<BasescapeData>().selectedBaseIndex; // copy
+	size_t index = _gameHandle.get<BasescapeData>().selectedBaseIndex;
 	std::ranges::range auto view = _registry.view<Index, Base>().each();
 	auto matchingIndex = [index](const auto& each) { return std::get<1>(each).index == index; };
 	auto findResult = std::ranges::find_if(view, matchingIndex); ;
@@ -59,8 +59,8 @@ entt::handle BasescapeSystem::getSelectedBase()
 bool BasescapeSystem::trySetSelectedBaseByVisbleIndex(size_t index)
 {
 	BasescapeData basescapeData = _gameHandle.get<BasescapeData>(); // copy
-	basescapeData.visibleBasesOffset += index;
-	if (index < _registry.storage<Base>().size())
+	basescapeData.selectedBaseIndex = basescapeData.visibleBasesOffset + index;
+	if (basescapeData.selectedBaseIndex < _registry.storage<Base>().size())
 	{
 		_gameHandle.replace<BasescapeData>(basescapeData);
 		updateListeners();

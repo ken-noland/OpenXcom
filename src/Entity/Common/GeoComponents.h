@@ -27,7 +27,7 @@ namespace OpenXcom
 {
 
 /**
- * @brief object with a location on the geoscape. Like UFO or bases.
+ * @brief object with a location on the geoscape. Like UFO or bases. In radians.
  */
 struct GeoPosition
 {
@@ -105,4 +105,28 @@ public:
 	}
 };
 
+}
+
+namespace YAML
+{
+
+	template<>
+	struct convert<OpenXcom::GeoPosition> {
+		static Node encode(const OpenXcom::GeoPosition& geoPosition) {
+			Node node;
+			node[OpenXcom::GeoPosition::NODE_NAME.data()]["latitude"] = geoPosition.latitude;
+			node[OpenXcom::GeoPosition::NODE_NAME.data()]["longitude"] = geoPosition.longitude;
+			return node;
+		}
+
+		static bool decode(const Node& node, OpenXcom::GeoPosition& geoPosition) {
+			if (!node.IsMap() || node.size() != 2) {
+				return false;
+			}
+
+			geoPosition.latitude  = node["latitude"].as<double>();
+			geoPosition.longitude = node["longitude"].as<double>();
+			return true;
+		}
+	};
 }

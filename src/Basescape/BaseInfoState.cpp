@@ -28,6 +28,7 @@
 #include "../Engine/Game.h"
 #include "../Engine/Surface.h"
 #include "../Entity/Game/BasescapeData.h"
+#include "../Entity/Interface/Interface.h"
 #include "../Interface/Bar.h"
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"

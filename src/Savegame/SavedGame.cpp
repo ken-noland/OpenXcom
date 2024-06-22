@@ -142,6 +142,9 @@ SavedGame::SavedGame() :
 
 	Registry& registry = getRegistry();
 	_gameHandle = registry.createHandle();
+
+	_gameHandle.emplace<BasescapeData>();
+
 	// ToDo: move this to seperate method
 	registry.emplaceService<BaseFactory>(registry);
 	registry.emplaceService<CountryFactory>(registry);
@@ -394,7 +397,7 @@ void SavedGame::load(const std::string &filename, Mod *mod, Language *lang, YAML
 	_monthsPassed = doc["monthsPassed"].as<int>(_monthsPassed);
 
 	BasescapeData basescapeData = doc["basescapeData"].as<BasescapeData>(BasescapeData());
-	_gameHandle.emplace<BasescapeData>(basescapeData);
+	_gameHandle.emplace_or_replace<BasescapeData>(basescapeData);
 
 	_graphRegionToggles = doc["graphRegionToggles"].as<std::string>(_graphRegionToggles);
 	_graphCountryToggles = doc["graphCountryToggles"].as<std::string>(_graphCountryToggles);
