@@ -46,6 +46,7 @@
 #include "../Engine/Options.h"
 #include "../Engine/Sound.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -71,7 +72,7 @@ ConfirmDestinationState::ConfirmDestinationState(std::vector<Craft*> crafts, Tar
 	int btnOkX = transferAvailable ? 29 : 68;
 	int btnCancelX = transferAvailable ? 177 : 138;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 244, 72, 6, 64);

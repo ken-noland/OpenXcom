@@ -34,6 +34,7 @@
 #include "../Battlescape/BattlescapeState.h"
 #include "ErrorMessageState.h"
 #include "../Mod/RuleInterface.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -45,7 +46,7 @@ namespace OpenXcom
  */
 ListLoadOriginalState::ListLoadOriginalState(OptionsOrigin origin) : State("ListLoadOriginalState", false), _origin(origin)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

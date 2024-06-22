@@ -375,7 +375,7 @@ static struct AudioSequence
 					if (s)
 					{
 						s->play(channel);
-						Mix_Volume(channel, sf->volume * ratio);
+						Mix_Volume(channel, (int)(sf->volume * ratio));
 						break;
 					}
 					else Log(LOG_DEBUG) << "Couldn't play " << sf->catFile << ":" << sf->sound;

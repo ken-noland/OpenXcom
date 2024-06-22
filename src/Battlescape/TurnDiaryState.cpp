@@ -28,6 +28,7 @@
 #include "../Savegame/HitLog.h"
 #include "../Savegame/SavedBattleGame.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -37,7 +38,7 @@ namespace OpenXcom
  */
 TurnDiaryState::TurnDiaryState(const HitLog *hitLog) : State("TurnDiaryState", false)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 216, 160, 52, 20, WindowPopup::POPUP_BOTH);

@@ -28,6 +28,7 @@
 #include "../Savegame/ItemContainer.h"
 #include "../Savegame/Soldier.h"
 #include "../Mod/Armor.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -40,7 +41,7 @@ namespace OpenXcom
  */
 SackSoldierState::SackSoldierState(Base* base, size_t soldierId) : State("SackSoldierState", false), _base(base), _soldierId(soldierId)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("sackSoldier", this, 152, 80, 84, 60);

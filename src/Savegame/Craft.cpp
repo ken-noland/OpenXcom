@@ -2113,7 +2113,7 @@ int Craft::getNumTotalSoldiers() const
  */
 int Craft::getNumTotalVehicles() const
 {
-	return _vehicles.size();
+	return (int)_vehicles.size();
 }
 
 /**

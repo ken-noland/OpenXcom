@@ -35,6 +35,7 @@
 #include "../Engine/Screen.h"
 #include "../Engine/Unicode.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -45,7 +46,7 @@ namespace OpenXcom
  */
 BriefingLightState::BriefingLightState(AlienDeployment* deployment) : State("BriefingLightState", true)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

@@ -476,7 +476,7 @@ void Ufo::setDamage(int damage, const Mod *mod)
 		const UfoTrajectory *assaultTrajectory = mod->getUfoTrajectory(UfoTrajectory::RETALIATION_ASSAULT_RUN, true);
 		if (_rules == battleshipRule && _trajectory == assaultTrajectory)
 		{
-			waveNumber = _mission->getRules().getWaveCount() - 1; // last wave
+			waveNumber = (int)_mission->getRules().getWaveCount() - 1; // last wave
 		}
 
 		// backwards save compatibility
@@ -573,7 +573,7 @@ int Ufo::getAltitudeInt() const
 	{
 		if (ALTITUDE_STRING[i] == _altitude)
 		{
-			return i;
+			return (int)i;
 		}
 	}
 	return -1;

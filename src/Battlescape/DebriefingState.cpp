@@ -77,6 +77,7 @@
 #include "../Savegame/MissionStatistics.h"
 #include "../Savegame/BattleUnitStatistics.h"
 #include "../fallthrough.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -100,7 +101,7 @@ DebriefingState::DebriefingState()
 	getGame()->getCursor()->setVisible(true);
 	_limitsEnforced = Options::storageLimitsEnforced ? 1 : 0;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

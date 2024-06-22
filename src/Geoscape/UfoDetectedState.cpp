@@ -35,6 +35,7 @@
 #include "../Savegame/AlienMission.h"
 #include "InterceptState.h"
 #include "../Mod/RuleCraft.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -67,7 +68,7 @@ UfoDetectedState::UfoDetectedState(Ufo* ufo, GeoscapeState* state, bool detected
 		_ufo->setLandId(getGame()->getSavedGame()->getId("STR_LANDING_SITE"));
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	if (hyperwave)

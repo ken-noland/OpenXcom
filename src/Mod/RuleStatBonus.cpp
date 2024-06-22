@@ -58,7 +58,7 @@ template<UnitStats::Ptr fieldA, UnitStats::Ptr fieldB>
 float stat2(const BattleUnit *unit)
 {
 	const UnitStats *stat = unit->getBaseStats();
-	return (stat->*fieldA) * (stat->*fieldB);
+	return (float)((stat->*fieldA) * (stat->*fieldB));
 }
 
 float currentFatalWounds(const BattleUnit *unit)
@@ -141,11 +141,11 @@ float basicEnergyRegeneration(const BattleUnit *unit)
 	Soldier *solder = unit->getGeoscapeSoldier();
 	if (solder != 0)
 	{
-		return solder->getInitStats()->tu / 3;
+		return solder->getInitStats()->tu / 3.f;
 	}
 	else
 	{
-		return unit->getUnitRules()->getEnergyRecovery();
+		return (float)unit->getUnitRules()->getEnergyRecovery();
 	}
 }
 
@@ -166,7 +166,7 @@ struct getBonusStatsScript
 			bonus += pow3; bonus *= stat;
 			bonus += pow2; bonus *= stat;
 			bonus += pow1; bonus *= stat;
-			ret += bonus / statMultiper;
+			ret += (int)(bonus / statMultiper);
 		}
 		return RetContinue;
 	}

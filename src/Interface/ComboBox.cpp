@@ -61,7 +61,7 @@ static int getPopupWindowY(int buttonHeight, int buttonY, int popupHeight, bool 
  */
 ComboBox::ComboBox(State *state, int width, int height, int x, int y, bool popupAboveButton) : InteractiveSurface(width, height, x, y), _change(0), _sel(0), _state(state), _lang(0), _toggled(false), _popupAboveButton(popupAboveButton)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_button = new TextButton(width, height, x, y);
 	_button->setComboBox(this);
@@ -419,8 +419,9 @@ void ComboBox::think()
 	_button->think();
 	_arrow->think();
 
+	// TEMP! This should be done in the TickableComponent
 	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.think();
+	windowComponent.tick();
 
 	_list->think();
 	InteractiveSurface::think();

@@ -26,6 +26,7 @@
 #include "../Interface/Text.h"
 #include "OptionsVideoState.h"
 #include "../Interface/TextEdit.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -38,7 +39,7 @@ namespace OpenXcom
 SetWindowedRootState::SetWindowedRootState(OptionsOrigin origin, OptionsVideoState *optionsVideoState)
 	: State("SetWindowedRootState", false), _origin(origin), _optionsVideoState(optionsVideoState)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create object
 	_window = factory.createWindow("windowName", this, 216, 100, 52, 50, WindowPopup::POPUP_BOTH);

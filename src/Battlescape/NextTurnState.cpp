@@ -48,6 +48,7 @@
 #include "Map.h"
 #include "TileEngine.h"
 #include "Pathfinding.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -90,7 +91,7 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	// Create objects
 	int y = state->getMap()->getMessageY();
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("nextTurn", this, 320, 200, 0, 0);
 	_txtMessageReinforcements = new Text(320, 33, 0, 8);

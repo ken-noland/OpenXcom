@@ -25,6 +25,7 @@
 #include "../Savegame/Craft.h"
 #include "GeoscapeState.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -37,7 +38,7 @@ namespace OpenXcom
  */
 LowFuelState::LowFuelState(Craft* craft, GeoscapeState* state) : State("LowFuelState", false), _craft(craft), _state(state)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 224, 120, 16, 40, WindowPopup::POPUP_BOTH);

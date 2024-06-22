@@ -29,6 +29,7 @@
 #include "../Basescape/PlaceLiftState.h"
 #include "../Engine/Options.h"
 #include "../Engine/RNG.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -46,7 +47,7 @@ BaseNameState::BaseNameState(entt::handle newBaseHandle, Globe *globe, bool firs
 {
 	_globe->onMouseOver(0);
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 192, 80, 32, 60, WindowPopup::POPUP_BOTH);

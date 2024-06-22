@@ -17,8 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Game.h"
-#include <algorithm>
-#include <algorithm>
+#include "../resource.h"
 #include <cmath>
 #include <SDL_mixer.h>
 #include <sstream>
@@ -53,6 +52,13 @@
 #include "../Savegame/SavedBattleGame.h"
 #include "../Savegame/SavedGame.h"
 #include "../Ufopaedia/UfopaediaStartState.h"
+#include "../Menu/NotesState.h"
+#include "../Menu/TestState.h"
+#include <algorithm>
+#include "../fallthrough.h"
+#include "../Geoscape/GeoscapeState.h"
+
+#include "../Lua/LuaMod.h"
 
 //temp
 #include "../Lua/UIScript.h"
@@ -88,9 +94,6 @@ Game* getGame()
 Game::Game(const std::string &title)
 	: _screen(0), _cursor(0), _lang(0), _save(0), _quit(false), _init(false), _update(false),  _mouseActive(true), _timeUntilNextFrame(0),
 	  _ctrl(false), _alt(false), _shift(false), _rmb(false), _mmb(false), _luaMod(nullptr)
-
-	///TEMP
-	  , _surfaceFactory(_registry.raw()), _interfaceFactory(_registry.raw(), _surfaceFactory)
 {
 	setThreadLocalGame(this);
 

@@ -42,6 +42,7 @@
 #include "../Savegame/Country.h"
 #include "../Savegame/Region.h"
 #include "../Savegame/AlienBase.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -52,7 +53,7 @@ namespace OpenXcom
  */
 StatisticsState::StatisticsState() : State("StatisticsState", true)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0, WindowPopup::POPUP_BOTH);

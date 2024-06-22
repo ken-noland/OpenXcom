@@ -41,6 +41,7 @@
 #include "../Ufopaedia/Ufopaedia.h"
 #include <algorithm>
 #include "../Engine/Unicode.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -53,7 +54,7 @@ namespace OpenXcom
  */
 CraftArmorState::CraftArmorState(Base* base, size_t craft) : State("CraftArmorState", true), _base(base), _craft(craft), _savedScrollPosition(0), _origSoldierOrder(_base->getSoldiers()), _dynGetter(NULL)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("craftArmor", this, 320, 200, 0, 0);

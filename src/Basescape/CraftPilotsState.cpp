@@ -33,6 +33,7 @@
 #include "../Mod/RuleCraft.h"
 #include "../Savegame/Soldier.h"
 #include "../Mod/RuleSoldier.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -42,7 +43,7 @@ namespace OpenXcom
  */
 CraftPilotsState::CraftPilotsState(Base* base, size_t craft) : State("CraftPilotsState", true), _base(base), _craft(craft)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("craftPilots", this, 320, 200, 0, 0);

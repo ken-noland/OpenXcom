@@ -55,6 +55,7 @@
 #include "../Savegame/SavedBattleGame.h"
 #include "../Mod/RuleInterface.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -73,7 +74,7 @@ CraftEquipmentState::CraftEquipmentState(Base* base, size_t craft) : State("Craf
 	bool craftHasACrew = c->getNumTotalSoldiers() > 0;
 	_isNewBattle = getGame()->getSavedGame()->getMonthsPassed() == -1;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("craftEquipment", this, 320, 200, 0, 0);

@@ -28,7 +28,6 @@
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
-#include "../Interface/Window.h"
 #include "../Mod/Mod.h"
 #include "../Mod/RuleResearch.h"
 #include "../Savegame/Base.h"
@@ -36,6 +35,7 @@
 #include "../Savegame/ItemContainer.h"
 #include "../Savegame/ResearchProject.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -45,7 +45,7 @@ namespace OpenXcom
  */
 GlobalAlienContainmentState::GlobalAlienContainmentState(bool openedFromBasescape) : State("GlobalAlienContainmentState", true), _openedFromBasescape(openedFromBasescape)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("globalContainmentMenu", this, 320, 200, 0, 0);

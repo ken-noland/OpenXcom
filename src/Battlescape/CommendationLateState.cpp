@@ -30,6 +30,7 @@
 #include "../Engine/Options.h"
 #include "../Mod/RuleCommendations.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -41,7 +42,7 @@ namespace OpenXcom
 CommendationLateState::CommendationLateState(std::vector<Soldier*> soldiersMedalled)
 	: State("CommendationLateState", true)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create object
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

@@ -34,6 +34,7 @@
 #include "../Mod/RuleResearch.h"
 #include "ResearchInfoState.h"
 #include "TechTreeViewerState.h"
+#include "../Entity/Interface/Interface.h"
 #include <algorithm>
 
 namespace OpenXcom
@@ -46,7 +47,7 @@ namespace OpenXcom
  */
 ResearchState::ResearchState(Base* base) : State("ResearchState", true), _base(base)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("researchMenu", this, 320, 200, 0, 0);

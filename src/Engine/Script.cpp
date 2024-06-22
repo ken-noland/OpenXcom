@@ -264,16 +264,16 @@ static RetEnum bit_popcount_h(int& reg)
 	IMPL(shl,		MACRO_QUOTE({ Reg0 <<= Data1;									return RetContinue; }),		(int& Reg0, int Data1),		"Left bit shift of arg1 by arg2") \
 	IMPL(shr,		MACRO_QUOTE({ Reg0 >>= Data1;									return RetContinue; }),		(int& Reg0, int Data1),		"Right bit shift of arg1 by arg2") \
 	\
-	IMPL(bit_and,		MACRO_QUOTE({ Reg0 = Reg0 & Data1;								return RetContinue; }),		(int& Reg0, int Data1),		"Bit And of arg1 and arg2") \
-	IMPL(bit_or,		MACRO_QUOTE({ Reg0 = Reg0 | Data1;								return RetContinue; }),		(int& Reg0, int Data1),		"Bit Or of arg1 and arg2") \
-	IMPL(bit_xor,		MACRO_QUOTE({ Reg0 = Reg0 ^ Data1;								return RetContinue; }),		(int& Reg0, int Data1),		"Bit Xor of arg1 and arg2") \
-	IMPL(bit_not,		MACRO_QUOTE({ Reg0 = ~Reg0;										return RetContinue; }),		(int& Reg0),				"Bit Not of arg1") \
-	IMPL(bit_count,		MACRO_QUOTE({ return bit_popcount_h(Reg0);											 }),	(int& Reg0),				"Count number of set bits of arg1") \
+	IMPL(bit_and,		MACRO_QUOTE({ Reg0 = Reg0 & Data1;								return RetContinue; }),		(int& Reg0, int Data1),				"Bit And of arg1 and arg2") \
+	IMPL(bit_or,		MACRO_QUOTE({ Reg0 = Reg0 | Data1;								return RetContinue; }),		(int& Reg0, int Data1),				"Bit Or of arg1 and arg2") \
+	IMPL(bit_xor,		MACRO_QUOTE({ Reg0 = Reg0 ^ Data1;								return RetContinue; }),		(int& Reg0, int Data1),				"Bit Xor of arg1 and arg2") \
+	IMPL(bit_not,		MACRO_QUOTE({ Reg0 = ~Reg0;										return RetContinue; }),		(int& Reg0),						"Bit Not of arg1") \
+	IMPL(bit_count,		MACRO_QUOTE({ return bit_popcount_h(Reg0);											 }),	(int& Reg0),						"Count number of set bits of arg1") \
 	\
-	IMPL(pow,			MACRO_QUOTE({ Reg0 = std::pow(Reg0, std::max(0, Data1));		return RetContinue; }),		(int& Reg0, int Data1),		"Power of arg1 to arg2") \
-	IMPL(sqrt,			MACRO_QUOTE({ Reg0 = Reg0 > 0 ? std::sqrt(Reg0) : 0;			return RetContinue; }),		(int& Reg0),				"Square root of arg1") \
+	IMPL(pow,			MACRO_QUOTE({ Reg0 = (int)std::pow(Reg0, std::max(0, Data1));	return RetContinue; }),		(int& Reg0, int Data1),				"Power of arg1 to arg2") \
+	IMPL(sqrt,			MACRO_QUOTE({ Reg0 = Reg0 > 0 ? (int)std::sqrt(Reg0) : 0;		return RetContinue; }),		(int& Reg0),						"Square root of arg1") \
 	\
-	IMPL(abs,			MACRO_QUOTE({ Reg0 = std::abs(Reg0);							return RetContinue; }),		(int& Reg0),						"Absolute value of arg1") \
+	IMPL(abs,			MACRO_QUOTE({ Reg0 = (int)std::abs(Reg0);						return RetContinue; }),		(int& Reg0),						"Absolute value of arg1") \
 	IMPL(limit,			MACRO_QUOTE({ Reg0 = std::max(std::min(Reg0, Data2), Data1);	return RetContinue; }),		(int& Reg0, int Data1, int Data2),	"Correct value in arg1 that is always between arg2 and arg3") \
 	IMPL(limit_upper,	MACRO_QUOTE({ Reg0 = std::min(Reg0, Data1);						return RetContinue; }),		(int& Reg0, int Data1),				"Correct value in arg1 that is always lesser than arg2") \
 	IMPL(limit_lower,	MACRO_QUOTE({ Reg0 = std::max(Reg0, Data1);						return RetContinue; }),		(int& Reg0, int Data1),				"Correct value in arg1 that is always greater than arg2") \
@@ -2805,7 +2805,7 @@ void ParserWriter::relese()
 	refTexts.forEachPosition(
 		[&](auto pos, ScriptRef value)
 		{
-			textTotalSize += value.size() + 1;
+			textTotalSize += (int)value.size() + 1;
 		}
 	);
 	auto charPtr = [&](ProgPos pos)
@@ -4016,7 +4016,7 @@ void ScriptParserEventsBase::load(const YAML::Node& scripts)
 				ScriptContainerBase scp;
 
 
-				offset = i["offset"].as<double>(0) * OffsetScale;
+				offset = (int)(i["offset"].as<double>(0) * OffsetScale);
 				if (offset == 0 || offset >= (int)OffsetMax || offset <= -(int)OffsetMax)
 				{
 					//TODO: make it a exception

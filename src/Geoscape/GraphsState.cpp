@@ -1140,7 +1140,7 @@ void GraphsState::drawFinanceLines()
 	}
 
 	double range = (double)(upperLimit - lowerLimit);
-	double low = lowerLimit;
+	double low = (double)lowerLimit;
 	int check = 250;
 	int grids = 9; // cells in grid
 	while (range > check * grids)
@@ -1165,7 +1165,7 @@ void GraphsState::drawFinanceLines()
 		_financeLines.at(button)->setVisible(_financeToggles.at(button));
 		_financeLines.at(button)->clear();
 	}
-	range = upperLimit - lowerLimit;
+	range = (double)(upperLimit - lowerLimit);
 	//figure out how many units to the pixel, then plot the points for the graph and connect the dots.
 	double units = range / 126;
 	for (int button = 0; button != 5; ++button)
@@ -1174,7 +1174,7 @@ void GraphsState::drawFinanceLines()
 		for (int iter = 0; iter != 12; ++iter)
 		{
 			int x = 312 - (iter*17);
-			int y = 175 - (-lowerLimit / units);
+			int y = (int)(175 - (-lowerLimit / units));
 			int reduction = 0;
 			switch(button)
 			{
@@ -1201,7 +1201,7 @@ void GraphsState::drawFinanceLines()
 				_financeLines.at(button)->drawLine(x, y, x+17, newLineVector.at(newLineVector.size()-2), Palette::blockOffset((button/2)+1)+offset);
 		}
 	}
-	updateScale(lowerLimit, upperLimit);
+	updateScale((double)lowerLimit, (double)upperLimit);
 	_txtFactor->setVisible(true);
 }
 

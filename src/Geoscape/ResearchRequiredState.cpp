@@ -25,6 +25,7 @@
 #include "../Interface/Text.h"
 #include "../Mod/RuleItem.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -35,7 +36,7 @@ namespace OpenXcom
  */
 ResearchRequiredState::ResearchRequiredState(RuleItem *item) : State("ResearchRequiredState", false)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);

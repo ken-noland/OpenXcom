@@ -36,6 +36,7 @@
 #include "../Basescape/SellState.h"
 #include "../Menu/ErrorMessageState.h"
 #include "../Mod/RuleInterface.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -51,7 +52,7 @@ BaseDestroyedState::BaseDestroyedState(Base *base, const Ufo* ufo, bool missiles
 		_customSound = getGame()->getMod()->getSound("GEO.CAT", soundId);
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 160, 32, 20);

@@ -36,6 +36,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/MissionStatistics.h"
 #include "../Savegame/BattleUnitStatistics.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -58,7 +59,7 @@ SoldierDiaryOverviewState::SoldierDiaryOverviewState(Base* base, size_t soldierI
 		_list = &_base->getSoldiers();
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("soldierDiary", this, 320, 200, 0, 0);

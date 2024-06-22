@@ -29,6 +29,7 @@
 #include "AllocateTrainingState.h"
 #include "AllocatePsiTrainingState.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -41,7 +42,7 @@ namespace OpenXcom
 TrainingFinishedState::TrainingFinishedState(Base* base, const std::vector<Soldier*>& list, bool psi)
 	: State("TrainingFinishedState", false), _base(base), _psi(psi)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 288, 180, 16, 10);

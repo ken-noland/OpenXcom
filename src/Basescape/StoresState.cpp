@@ -42,6 +42,7 @@
 #include "../Mod/RuleItem.h"
 #include "../Mod/RuleResearch.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 #include <algorithm>
 #include <locale>
 
@@ -87,7 +88,7 @@ struct compareItemSpaceUsed
  */
 StoresState::StoresState(Base* base) : State("StoresState", true), _base(base)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("storesInfo", this, 320, 200, 0, 0);

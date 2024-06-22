@@ -42,6 +42,7 @@
 #include "../Savegame/Soldier.h"
 #include "../Savegame/Transfer.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -52,7 +53,7 @@ namespace OpenXcom
  */
 GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : State("GeoscapeEventState", false), _eventRule(eventRule)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 176, 32, 12, WindowPopup::POPUP_BOTH);

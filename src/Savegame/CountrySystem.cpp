@@ -34,8 +34,8 @@ namespace OpenXcom::CountrySystem
 int64_t getCountriesMonthlyFundingTotal()
 {
 	auto countryView = getRegistry().list<Country>();
-	auto sumByLambda = [](int64_t total, const Country& country) { return total + country.getFunding().back(); };
-	return std::accumulate(countryView.begin(), countryView.end(), 0, sumByLambda);
+	auto sumByLambda = [](int64_t total, const Country& country) -> int64_t	{ return total + (int64_t)country.getFunding().back(); };
+	return std::accumulate(countryView.begin(), countryView.end(), (int64_t)0, sumByLambda);
 }
 
 }

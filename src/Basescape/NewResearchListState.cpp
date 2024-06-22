@@ -35,6 +35,7 @@
 #include "../Mod/RuleResearch.h"
 #include "ResearchInfoState.h"
 #include "TechTreeViewerState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -51,7 +52,7 @@ NewResearchListState::NewResearchListState(Base* base, bool sortByCost) : State(
 		_sortByCost = !_sortByCost;
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("selectNewResearch", this, 230, 140, 45, 30, WindowPopup::POPUP_BOTH);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 53, 38);

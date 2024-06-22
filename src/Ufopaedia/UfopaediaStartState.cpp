@@ -30,6 +30,7 @@
 #include "../Engine/Timer.h"
 #include "../fmath.h"
 #include "../Engine/Screen.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -54,7 +55,7 @@ UfopaediaStartState::UfopaediaStartState()
 		buttonOffset = _windowOffset + SPACE_PER_BUTTON;
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// set background window
 	_window = factory.createWindow("windowName", this, 256, 180 + _heightOffset, 32, 10 - _windowOffset, WindowPopup::POPUP_BOTH);

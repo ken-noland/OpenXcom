@@ -50,6 +50,7 @@
 #include "../Savegame/SavedBattleGame.h"
 #include "../Savegame/SavedGame.h"
 #include "../fmath.h"
+#include "../Entity/Interface/Interface.h"
 #include <algorithm>
 
 namespace OpenXcom
@@ -169,7 +170,7 @@ StatsForNerdsState::StatsForNerdsState(const UfopaediaTypeId typeId, const std::
  */
 void StatsForNerdsState::buildUI(bool debug, bool ids, bool defaults)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
@@ -1718,7 +1719,7 @@ void StatsForNerdsState::addSpriteResourcePath(std::ostringstream &ss, Mod *mod,
 			size_t originalSpriteId = resourceId - (extraSprite->getModOwner()->getOffset());
 
 			auto mapOfSprites = extraSprite->getSprites();
-			auto individualSprite = mapOfSprites->find(originalSpriteId);
+			auto individualSprite = mapOfSprites->find((int)originalSpriteId);
 			if (individualSprite != mapOfSprites->end())
 			{
 				std::ostringstream numbers;
@@ -1756,7 +1757,7 @@ void StatsForNerdsState::addSoundVectorResourcePaths(std::ostringstream &ss, Mod
 			for (auto resourceId : resourceIds)
 			{
 				// strip mod offset from the in-game ID
-				int originalSoundId = resourceId - (resourceSet.second->getModOwner()->getOffset());
+				int originalSoundId = (int)(resourceId - (resourceSet.second->getModOwner()->getOffset()));
 
 				auto mapOfSounds = resourceSet.second->getSounds();
 				auto individualSound = mapOfSounds->find(originalSoundId);

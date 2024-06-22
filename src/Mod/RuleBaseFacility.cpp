@@ -270,7 +270,7 @@ void RuleBaseFacility::afterLoad(const Mod* mod)
 
 	if (_crafts == 1 && _craftSlots.size() > 1)
 	{
-		_crafts = _craftSlots.size();
+		_crafts = (int)_craftSlots.size();
 		Log(LOG_WARNING) << _type << " had more craft-slots than craft-capacity. Increased craft-capacity to match craft-slots.";
 	}
 

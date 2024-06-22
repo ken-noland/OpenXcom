@@ -34,9 +34,8 @@
 #include "../Engine/Options.h"
 #include "../Engine/Unicode.h"
 #include "../Mod/RuleInterface.h"
-#include <algorithm>
+#include "../Entity/Interface/Interface.h"
 #include <climits>
-#include <cmath>
 
 namespace OpenXcom
 {
@@ -50,7 +49,7 @@ namespace OpenXcom
 PlaceFacilityState::PlaceFacilityState(entt::entity baseId, const RuleBaseFacility *rule, BaseFacility *origFac)
 	: State("PlaceFacilityState", false), _baseHandle(baseId), _rule(rule), _origFac(origFac)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("placeFacility", this, 128, 160, 192, 40);

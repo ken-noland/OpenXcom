@@ -32,6 +32,7 @@
 #include "AllocateTrainingState.h"
 #include "../Engine/Options.h"
 #include "../Mod/Mod.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -42,7 +43,7 @@ namespace OpenXcom
  */
 TrainingState::TrainingState() : State("TrainingState", true)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

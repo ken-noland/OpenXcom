@@ -171,7 +171,7 @@ void RuleCraft::load(const YAML::Node &node, Mod *mod, const ModScript &parsers)
 			{
 				for (int j = 0; (size_t)j < t.size() && j < WeaponTypeMax; ++j)
 					_weaponTypes[i][j] = t[j].as<int>();
-				for (int j = t.size(); j < WeaponTypeMax; ++j)
+				for (int j = (int)t.size(); j < WeaponTypeMax; ++j)
 					_weaponTypes[i][j] = _weaponTypes[i][0];
 			}
 			else
@@ -764,7 +764,7 @@ int RuleCraft::getRandomSound(const std::vector<int>& vector, int defaultValue) 
 {
 	if (!vector.empty())
 	{
-		return vector[RNG::generate(0, vector.size() - 1)];
+		return vector[RNG::generate(0, (int)vector.size() - 1)];
 	}
 	return defaultValue;
 }

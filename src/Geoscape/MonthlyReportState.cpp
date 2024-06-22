@@ -43,6 +43,7 @@
 #include "../Savegame/Region.h"
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/SoldierDiary.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -58,7 +59,7 @@ MonthlyReportState::MonthlyReportState(Globe* globe)
 {
 	_globe = globe;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

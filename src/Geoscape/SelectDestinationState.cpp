@@ -38,6 +38,7 @@
 #include "../Engine/Options.h"
 
 #include "../Entity/Engine/Surface.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -62,7 +63,7 @@ SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe
 	_btnZoomIn = new InteractiveSurface(23, 23, 295 + dx * 2, 156 + dy);
 	_btnZoomOut = new InteractiveSurface(13, 17, 300 + dx * 2, 182 + dy);
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("windowName", this, 256, 28, 0, 0);
 

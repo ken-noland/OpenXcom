@@ -34,6 +34,7 @@
 #include "../Savegame/Base.h"
 #include "../Savegame/SavedGame.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -55,7 +56,7 @@ struct compareTransformationName
 SoldierTransformState::SoldierTransformState(Base* base, size_t soldier)
 	: State("SoldierTransformState", false), _base(base), _soldier(soldier)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("soldierTransform", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);

@@ -33,6 +33,7 @@
 #include "../Mod/Mod.h"
 #include "../Mod/RuleInterface.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -42,7 +43,7 @@ UfopaediaSelectState::UfopaediaSelectState(const std::string &section, int heigh
 {
 	_isCommendationsSection = (_section == UFOPAEDIA_COMMENDATIONS);
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// set background window
 	_window = factory.createWindow("windowName", this, 256, 180 + heightOffset, 32, 10 - windowOffset, WindowPopup::POPUP_NONE);

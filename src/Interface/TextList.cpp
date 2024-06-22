@@ -263,7 +263,7 @@ size_t TextList::getRowsDoNotUse() const
  */
 int TextList::getLastRowIndex() const
 {
-	return _texts.size() - 1;
+	return (int)_texts.size() - 1;
 }
 
 /**
@@ -313,7 +313,7 @@ void TextList::addRow(int cols, ...)
 		}
 		else
 		{
-			width = _columns[i];
+			width = (int)_columns[i];
 		}
 		Text* txt = new Text(width, _font->getHeight(), _margin + rowX, rowY);
 		txt->setPalette(this->getPalette());
@@ -376,7 +376,7 @@ void TextList::addRow(int cols, ...)
 		}
 		else
 		{
-			rowX += _columns[i];
+			rowX += (int)_columns[i];
 		}
 	}
 
@@ -639,7 +639,7 @@ void TextList::setAlign(TextHAlign align, int col)
 {
 	if (col == -1)
 	{
-		for (size_t i = 0; i < _columns.size(); ++i)
+		for (int i = 0; i < (int)_columns.size(); ++i)
 		{
 			_align[i] = align;
 		}
@@ -733,7 +733,7 @@ unsigned int TextList::getSelectedRow() const
 	}
 	else
 	{
-		return _rows[_selRow];
+		return (unsigned int)_rows[_selRow];
 	}
 }
 
@@ -1043,7 +1043,7 @@ void TextList::draw()
 	{
 		// for wrapped items, offset the draw height above the visible surface
 		// so that the correct row appears at the top
-		for (int row = _scroll; row > 0 && _rows[row] == _rows[row - 1]; --row)
+		for (size_t row = _scroll; row > 0 && _rows[row] == _rows[row - 1]; --row)
 		{
 			y -= _font->getHeight() + _font->getSpacing();
 		}
@@ -1082,7 +1082,7 @@ void TextList::blit(SDL_Surface *surface)
 		if (_arrowPos != -1 && !_rows.empty())
 		{
 			int y = getY();
-			for (int row = _scroll; row > 0 && _rows[row] == _rows[row - 1]; --row)
+			for (size_t row = _scroll; row > 0 && _rows[row] == _rows[row - 1]; --row)
 			{
 				y -= _font->getHeight() + _font->getSpacing();
 			}
@@ -1182,7 +1182,7 @@ void TextList::mousePress(Action *action, State *state)
 	{
 		allowScroll = (action->getAbsoluteXMouse() < _arrowsLeftEdge || action->getAbsoluteXMouse() > _arrowsRightEdge);
 	}
-	if (isInsideNoScrollArea(action->getAbsoluteXMouse()))
+	if (isInsideNoScrollArea((int)action->getAbsoluteXMouse()))
 	{
 		allowScroll = false;
 	}

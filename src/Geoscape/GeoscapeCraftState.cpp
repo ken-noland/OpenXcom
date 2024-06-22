@@ -38,6 +38,7 @@
 #include "../Engine/Options.h"
 #include "../Engine/Unicode.h"
 #include "Globe.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -67,7 +68,7 @@ GeoscapeCraftState::GeoscapeCraftState(Craft* craft, Globe* globe, Waypoint* way
 		}
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 240, 192, 4, 4, WindowPopup::POPUP_BOTH);

@@ -42,6 +42,7 @@
 #include "../Mod/AlienRace.h"
 #include "../Mod/Mod.h"
 #include "../Mod/Texture.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -56,7 +57,7 @@ namespace OpenXcom
 ConfirmLandingState::ConfirmLandingState(Craft *craft, Texture *missionTexture, Texture *globeTexture, int shade)
 	: State("ConfirmLandingState", false), _craft(craft), _missionTexture(missionTexture), _globeTexture(globeTexture), _shade(shade)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 216, 160, 20, 20, WindowPopup::POPUP_BOTH);

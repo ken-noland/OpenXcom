@@ -24,6 +24,7 @@
 #include "../Interface/Text.h"
 #include "../Engine/Options.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -37,7 +38,7 @@ namespace OpenXcom
 OptionsDefaultsState::OptionsDefaultsState(OptionsOrigin origin, OptionsBaseState *state)
 	: State("OptionsDefaultsState", false), _origin(origin), _state(state)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 100, 32, 50, WindowPopup::POPUP_BOTH);

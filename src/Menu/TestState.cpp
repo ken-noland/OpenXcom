@@ -41,6 +41,7 @@
 #include "../Mod/Texture.h"
 #include "../Mod/MapScript.h"
 #include "../Mod/AlienDeployment.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -79,7 +80,7 @@ static std::map<int, PaletteTestMetadata> _paletteMetadataMap =
  */
 TestState::TestState() : State("TestState", true)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

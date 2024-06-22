@@ -56,7 +56,7 @@ protected:
 	void setButtonPressed(Uint8 button, bool pressed);
 public:
 	/// Creates a new interactive surface with the specified size and position.
-	InteractiveSurface(int width, int height, int x = 0, int y = 0);
+	[[deprecated]] InteractiveSurface(int width, int height, int x = 0, int y = 0);
 	/// Cleans up the interactive surface.
 	virtual ~InteractiveSurface();
 	/// Sets the surface's visibility.

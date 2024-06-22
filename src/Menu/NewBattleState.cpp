@@ -59,6 +59,7 @@
 #include "../Mod/RuleGlobe.h"
 
 #include "../Entity/Engine/Surface.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -71,7 +72,7 @@ NewBattleState::NewBattleState()
 	: State("NewBattleState", true), _craft(0), _selectType(NewBattleSelectType::MISSION), _isRightClick(false),
 	_depthVisible(false), _globeTextureVisible(false), _selectedGlobeTexture(0)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0, WindowPopup::POPUP_BOTH);

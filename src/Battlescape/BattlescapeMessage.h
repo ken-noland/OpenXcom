@@ -17,8 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <string>
 #include "../Engine/Surface.h"
+
+#include <string>
+#include <entt/entt.hpp>
 
 namespace OpenXcom
 {

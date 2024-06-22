@@ -35,6 +35,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Ufopaedia/Ufopaedia.h"
 #include "../Mod/RuleInterface.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -49,7 +50,7 @@ namespace OpenXcom
 PlaceLiftState::PlaceLiftState(entt::handle newBaseHandle, Globe *globe, bool first)
 	: State("PlaceLiftState", true), _newBaseHandle(newBaseHandle), _globe(globe), _first(first)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_view = new BaseView(192, 192, 0, 8);

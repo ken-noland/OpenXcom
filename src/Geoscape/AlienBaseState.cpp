@@ -33,6 +33,7 @@
 #include "../Savegame/Country.h"
 #include "../Savegame/Region.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -45,7 +46,7 @@ namespace OpenXcom
  */
 AlienBaseState::AlienBaseState(AlienBase *base, GeoscapeState *state) : State("AlienBaseState", true), _state(state), _base(base)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

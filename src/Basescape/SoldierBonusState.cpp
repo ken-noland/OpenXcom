@@ -33,6 +33,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Soldier.h"
 #include "../Ufopaedia/StatsForNerdsState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -44,7 +45,7 @@ namespace OpenXcom
  */
 SoldierBonusState::SoldierBonusState(Base* base, size_t soldier) : State("SoldierBonusState", false), _base(base), _soldier(soldier)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("soldierBonus", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);

@@ -32,6 +32,7 @@
 #include "../Savegame/Base.h"
 #include "PlaceFacilityState.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -45,7 +46,7 @@ namespace OpenXcom
 BuildFacilitiesState::BuildFacilitiesState(entt::handle baseId, State *state) 
 	: State("BuildFacilitiesState", false), _baseHandle(baseId), _state(state), _lstScroll(0)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("selectFacility", this, 128, 160, 192, 40, WindowPopup::POPUP_VERTICAL);

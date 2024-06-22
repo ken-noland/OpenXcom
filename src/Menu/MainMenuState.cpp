@@ -34,6 +34,7 @@
 #include "../Engine/Options.h"
 #include "../Engine/FileMap.h"
 #include "../Engine/SDL2Helpers.h"
+#include "../Entity/Interface/Interface.h"
 #include <fstream>
 
 namespace OpenXcom
@@ -66,7 +67,7 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 #ifdef _WIN32
 	_debugInVisualStudio = false;
 #endif
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);

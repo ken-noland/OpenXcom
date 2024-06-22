@@ -31,6 +31,7 @@
 #include "BaseView.h"
 #include "../Mod/RuleBaseFacility.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -44,7 +45,7 @@ namespace OpenXcom
  */
 DismantleFacilityState::DismantleFacilityState(Base* base, BaseView* view, BaseFacility* fac) : State("DismantleFacilityState", false), _base(base), _view(view), _fac(fac)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("dismantleFacility", this, 152, 80, 20, 60);

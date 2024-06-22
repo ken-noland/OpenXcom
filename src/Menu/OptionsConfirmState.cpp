@@ -29,6 +29,7 @@
 #include "../Engine/Timer.h"
 #include "../Engine/Screen.h"
 #include "../Savegame/SavedGame.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -40,7 +41,7 @@ namespace OpenXcom
  */
 OptionsConfirmState::OptionsConfirmState(OptionsOrigin origin) : State("OptionsConfirmState", false), _origin(origin), _countdown(15)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 216, 100, 52, 50, WindowPopup::POPUP_BOTH);

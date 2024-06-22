@@ -437,7 +437,7 @@ bool SoldierDiary::manageCommendations(Mod *mod, std::vector<MissionStatistics*>
 					int referenceTotalCounters = 0;
 					for (auto andCriteria2 = orCriteria->begin(); andCriteria2 != orCriteria->end(); ++andCriteria2)
 					{
-						int index = andCriteria2 - orCriteria->begin();
+						int index = (int)(andCriteria2 - orCriteria->begin());
 						referenceBlockCounters[index] = (*andCriteria2).first;
 						referenceTotalCounters += (*andCriteria2).first;
 					}
@@ -543,7 +543,7 @@ bool SoldierDiary::manageCommendations(Mod *mod, std::vector<MissionStatistics*>
 
 							if (foundMatch)
 							{
-								int index = andCriteria - orCriteria->begin();
+								int index = (int)(andCriteria - orCriteria->begin());
 								// some current block counters might go into negatives, this is used to tally career kills correctly
 								// currentTotalCounters will always ensure we're counting in proper batches
 								if (currentBlockCounters[index]-- > 0 && --currentTotalCounters <= 0)
@@ -820,7 +820,7 @@ int SoldierDiary::getKillTotal() const
  */
 int SoldierDiary::getMissionTotal() const
 {
-	return _missionIdList.size();
+	return (int)_missionIdList.size();
 }
 
 /**

@@ -34,12 +34,12 @@
 #include "../Engine/LocalizedText.h"
 #include "../Engine/Options.h"
 #include "../Engine/Unicode.h"
-#include "../Interface/Window.h"
+#include "../Engine/Surface.h"
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
 #include "../Savegame/SavedGame.h"
-#include <algorithm>
+#include "../Entity/Interface/Interface.h"
 #include <unordered_set>
 
 namespace OpenXcom
@@ -72,7 +72,7 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 		_selectedFlag = TTV_CRAFTS;
 	}
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("techTreeViewer", this, 320, 200, 0, 0);

@@ -39,6 +39,7 @@
 #include "../Savegame/Ufo.h"
 #include "../Savegame/Region.h"
 #include "../Savegame/Country.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -58,7 +59,7 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state, SavedGa
 	_displayHiddenAlienActivityRegions(displayHiddenAlienActivityRegions),
 	_displayHiddenAlienActivityCountries(displayHiddenAlienActivityCountries)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 
 	// create objects

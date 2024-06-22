@@ -40,6 +40,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Savegame/Soldier.h"
 #include "../Ufopaedia/Ufopaedia.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -55,7 +56,7 @@ SoldierTransformationListState::SoldierTransformationListState(Base* base, Combo
 	// Calculate once
 	getGame()->getSavedGame()->getAvailableTransformations(_availableTransformations, getGame()->getMod(), _base);
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("transformationList", this, 320, 200, 0, 0);

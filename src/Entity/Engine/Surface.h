@@ -23,6 +23,8 @@
 namespace OpenXcom
 {
 
+class DrawableComponent;
+
 /// The SurfaceComponent class will eventually be the raw data model, but for now I am
 /// using it as a temporary placeholder for the Surface class.
 class SurfaceComponent
@@ -32,22 +34,27 @@ protected:
 	std::unique_ptr<Surface> _surface;
 
 public:
-	SurfaceComponent(std::unique_ptr<Surface> surface) : _surface(std::move(surface)) {}
+	SurfaceComponent(DrawableComponent& drawable, std::unique_ptr<Surface>& surface);
 	~SurfaceComponent() = default;
 
 	// temp
 	Surface* getSurface() { return _surface.get(); }
+
+	void blit();
+
 };
 
 class SurfaceFactory
 {
 protected:
 	entt::registry& _registry;
+
 public:
 	SurfaceFactory(entt::registry& registry); // KN NOTE: I do plan on passing the renderer here so that Surface is abstracted.
 	~SurfaceFactory();
 
 	entt::entity createSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
+	entt::entity createInteractiveSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
 };
 
 } // namespace OpenXcom

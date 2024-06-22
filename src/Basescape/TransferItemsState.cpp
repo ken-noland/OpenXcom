@@ -49,6 +49,7 @@
 #include "TechTreeViewerState.h"
 #include "../Ufopaedia/Ufopaedia.h"
 #include "../Battlescape/DebriefingState.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -64,7 +65,7 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	_sel(0), _total(0), _pQty(0), _aQty(0), _iQty(0.0), _distance(0.0), _ammoColor(0),
 	_previousSort(TransferSortDirection::BY_LIST_ORDER), _currentSort(TransferSortDirection::BY_LIST_ORDER), _errorShown(false)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);

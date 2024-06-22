@@ -35,6 +35,7 @@
 #include "ManufactureInfoState.h"
 #include "../Savegame/SavedGame.h"
 #include "../Mod/RuleInterface.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -47,7 +48,7 @@ namespace OpenXcom
  */
 ManufactureStartState::ManufactureStartState(Base* base, RuleManufacture* item) : State("ManufactureStartState", false), _base(base), _item(item)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	_window = factory.createWindow("allocateManufacture", this, 320, 160, 0, 20);
 

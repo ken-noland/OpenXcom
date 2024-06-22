@@ -436,7 +436,10 @@ set ( entity_common_src
 )
 
 set ( entity_engine_src
+  Entity/Engine/Drawable.cpp
+  Entity/Engine/ECS.cpp
   Entity/Engine/Surface.cpp
+  Entity/Engine/Tickable.cpp
 )
 
 set ( entity_game_src

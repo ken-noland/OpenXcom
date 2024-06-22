@@ -47,7 +47,7 @@ namespace OpenXcom
 BaseInfoState::BaseInfoState(BasescapeSystem& basescapeSystem)
 	: State("BaseInfoState", true), _basescapeSystem(basescapeSystem)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 	_unsubscribeId = _basescapeSystem.connectListener(std::bind(&BaseInfoState::init, this));
 
 	// Create objects

@@ -28,6 +28,7 @@
 #include "../Savegame/SavedGame.h"
 #include "../Mod/AlienDeployment.h"
 #include "../Engine/Options.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -35,7 +36,7 @@ namespace OpenXcom
 ConfirmCydoniaState::ConfirmCydoniaState(Craft* craft)
 	: State("ConfirmCydoniaState", false), _craft(craft)
 {
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 160, 32, 20);

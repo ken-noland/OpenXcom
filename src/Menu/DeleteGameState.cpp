@@ -28,6 +28,7 @@
 #include "ErrorMessageState.h"
 #include "../Savegame/SavedGame.h"
 #include "../Mod/RuleInterface.h"
+#include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
 {
@@ -43,7 +44,7 @@ DeleteGameState::DeleteGameState(OptionsOrigin origin, const std::string &save)
 {
 	_filename = Options::getMasterUserFolder() + save;
 
-	InterfaceFactory& factory = getGame()->getInterfaceFactory();
+	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
 	_window = factory.createWindow("windowName", this, 256, 100, 32, 50, WindowPopup::POPUP_BOTH);

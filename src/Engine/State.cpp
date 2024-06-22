@@ -39,6 +39,9 @@
 #include "../Mod/RuleInterface.h"
 
 #include "../Entity/Engine/Surface.h"
+#include "../Entity/Engine/Tickable.h"
+#include "../Entity/Engine/Drawable.h"
+#include "../Entity/Interface/Window.h"
 
 namespace OpenXcom
 {
@@ -164,7 +167,10 @@ void State::add(Surface *surface)
 
 	entt::registry& registry = getRegistry().raw();
 	entt::entity surfaceEnt = registry.create();
-	registry.emplace<SurfaceComponent>(surfaceEnt, std::unique_ptr<Surface>{surface});
+	DrawableComponent& drawableComponent = registry.emplace<DrawableComponent>(surfaceEnt);
+	std::unique_ptr<Surface> surfacePtr(surface);
+	SurfaceComponent& surfaceComponent = registry.emplace<SurfaceComponent>(surfaceEnt, drawableComponent, surfacePtr);
+	drawableComponent.setSurfaceComponent(&surfaceComponent);
 
 	_surfaces.push_back(surfaceEnt);
 }
@@ -238,14 +244,72 @@ void State::add(Surface *surface, const std::string &id, const std::string &cate
 
 	entt::registry& registry = getRegistry().raw();
 	entt::entity surfaceEnt = registry.create();
-	registry.emplace<SurfaceComponent>(surfaceEnt, std::unique_ptr<Surface>{surface});
+	DrawableComponent& drawableComponent = registry.emplace<DrawableComponent>(surfaceEnt);
+	std::unique_ptr<Surface> surfacePtr(surface);
+	SurfaceComponent& surfaceComponent = registry.emplace<SurfaceComponent>(surfaceEnt, drawableComponent, surfacePtr);
+	drawableComponent.setSurfaceComponent(&surfaceComponent);
 
 	_surfaces.push_back(surfaceEnt);
 }
 
 void State::add(entt::entity entity, const std::string& id, const std::string& category, Surface* parent)
 {
-	//TODO: implement id, category, and parent
+	Surface* surface = getRegistry().raw().get<SurfaceComponent>(entity).getSurface();
+
+	// Set palette
+	surface->setPalette(_palette);
+
+	// this only works if we're dealing with a battlescape button
+	BattlescapeButton* bsbtn = dynamic_cast<BattlescapeButton*>(surface);
+
+	if (getGame()->getMod()->getInterface(category))
+	{
+		Element* element = getGame()->getMod()->getInterface(category)->getElement(id);
+		if (element)
+		{
+			if (parent && element->w != INT_MAX && element->h != INT_MAX)
+			{
+				surface->setWidth(element->w);
+				surface->setHeight(element->h);
+			}
+
+			if (parent && element->x != INT_MAX && element->y != INT_MAX)
+			{
+				surface->setX(parent->getX() + element->x);
+				surface->setY(parent->getY() + element->y);
+			}
+
+			auto inter = dynamic_cast<InteractiveSurface*>(surface);
+			if (inter)
+			{
+				inter->setTFTDMode(element->TFTDMode);
+			}
+
+			if (element->color != INT_MAX)
+			{
+				surface->setColor(element->color);
+			}
+			if (element->color2 != INT_MAX)
+			{
+				surface->setSecondaryColor(element->color2);
+			}
+			if (element->border != INT_MAX)
+			{
+				surface->setBorderColor(element->border);
+			}
+		}
+	}
+
+	if (bsbtn)
+	{
+		// this will initialize the graphics and settings of the battlescape button.
+		bsbtn->copy(parent);
+		bsbtn->initSurfaces();
+	}
+
+	// Set default text resources
+	if (getGame()->getLanguage() && getGame()->getMod())
+		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
 
 	_surfaces.push_back(entity);
 }
@@ -311,17 +375,16 @@ void State::init()
 
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		//Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
-
-		//Window* window = dynamic_cast<Window*>(surface);
-		//if (window)
-		//{
-		//	if (muteWindowPopupSound)
-		//	{
-		//		window->mute();
-		//	}
-		//	window->invalidate();
-		//}
+		if (getRegistry().raw().all_of<WindowComponent, SurfaceComponent>(surfaceEnt))
+		{
+			WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(surfaceEnt);
+			SurfaceComponent& surfaceComponent = getRegistry().raw().get<SurfaceComponent>(surfaceEnt);
+			if (muteWindowPopupSound)
+			{
+				windowComponent.mute();
+			}
+			surfaceComponent.getSurface()->invalidate();
+		}
 	}
 	if (_ruleInterface != 0 && !_ruleInterface->getMusic().empty())
 	{
@@ -337,8 +400,10 @@ void State::think()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
-		surface->think();
+		TickableSystem& tickable = getSystem<TickableSystem>();
+		tickable.tick(surfaceEnt);
+		//Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+		//surface->think();
 	}
 }
 
@@ -371,10 +436,10 @@ void State::handle(Action *action)
  */
 void State::blit()
 {
-	for (entt::entity surfaceEnt : _surfaces)
+	DrawableSystem& drawable = getSystem<DrawableSystem>();
+	for (entt::entity& surfaceEnt : _surfaces)
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
-		surface->blit(getGame()->getScreen()->getSurface());
+		drawable.draw(surfaceEnt);
 	}
 }
 
@@ -516,21 +581,22 @@ void State::applyBattlescapeTheme(const std::string& category)
 		surface->setColor(element->color);
 		surface->setHighContrast(true);
 
-		//Window* window = dynamic_cast<Window*>(surface);
-		//if (window)
-		//{
-		//	window->setBackground(getGame()->getMod()->getSurface(altBg));
-		//}
-		//TextList* list = dynamic_cast<TextList*>(surface);
-		//if (list)
-		//{
-		//	list->setArrowColor(element->border);
-		//}
-		//ComboBox *combo = dynamic_cast<ComboBox*>(surface);
-		//if (combo)
-		//{
-		//	combo->setArrowColor(element->border);
-		//}
+
+		if(getRegistry().raw().all_of<WindowComponent, SurfaceComponent>(surfaceEnt))
+		{
+			WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(surfaceEnt);
+			windowComponent.setBackground(getGame()->getMod()->getSurface(altBg));
+		}
+		TextList* list = dynamic_cast<TextList*>(surface);
+		if (list)
+		{
+			list->setArrowColor(element->border);
+		}
+		ComboBox *combo = dynamic_cast<ComboBox*>(surface);
+		if (combo)
+		{
+			combo->setArrowColor(element->border);
+		}
 	}
 }
 

@@ -779,9 +779,9 @@ int Zoom::_zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst, int flipx, int fli
 	if (Options::useScaleFilter)
 	{
 		// check the resolution to see which of scale2x, scale3x, etc. we need
-		for (size_t factor = 2; factor <= 4; factor++)
+		for (int factor = 2; factor <= 4; factor++)
 		{
-			if (dst->w == src->w * (int)factor && dst->h == src->h * (int)factor && !scale_precondition(factor, src->format->BytesPerPixel, src->w, src->h))
+			if (dst->w == src->w * (int)factor && dst->h == src->h * factor && !scale_precondition(factor, src->format->BytesPerPixel, src->w, src->h))
 			{
 				scale(factor, dst->pixels, dst->pitch, src->pixels, src->pitch, src->format->BytesPerPixel, src->w, src->h);
 				return 0;
