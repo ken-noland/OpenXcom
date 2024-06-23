@@ -93,10 +93,10 @@ Ufo::~Ufo()
 	if (_dest)
 	{
 		Waypoint *wp = dynamic_cast<Waypoint*>(_dest);
-		if (wp != 0)
+		if (wp)
 		{
 			delete _dest;
-			_dest = 0;
+			_dest = nullptr;
 		}
 	}
 }

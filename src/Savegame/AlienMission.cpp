@@ -33,7 +33,9 @@
 #include "../Engine/Exception.h"
 #include "../Engine/Game.h"
 #include "../Engine/Logger.h"
+#include "../Engine/Registry.h"
 #include "../Engine/RNG.h"
+#include "../Entity/Game/UfoFactory.h"
 #include "../fmath.h"
 #include "../Geoscape/Globe.h"
 #include "../Mod/AlienDeployment.h"
@@ -514,8 +516,9 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 			// Spawn a battleship straight for the XCOM base.
 			const RuleUfo& battleshipRule = _rule.getSpawnUfo().empty() ? *ufoRule : *mod.getUfo(_rule.getSpawnUfo(), true);
 			const UfoTrajectory &assaultTrajectory = *mod.getUfoTrajectory(UfoTrajectory::RETALIATION_ASSAULT_RUN, true);
-			Ufo *ufo = new Ufo(battleshipRule, game.getId("STR_UFO_UNIQUE"));
-			ufo->setMissionInfo(this, &assaultTrajectory);
+			Ufo& ufo = getRegistry().getService<UfoFactory>().create(battleshipRule, game.getId("STR_UFO_UNIQUE")).get<Ufo>();
+
+			ufo.setMissionInfo(this, &assaultTrajectory);
 			std::pair<double, double> pos;
 			if (_rule.getObjective() == OBJECTIVE_INSTANT_RETALIATION)
 			{
@@ -524,27 +527,27 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 			}
 			else if (_rule.getOperationType() != AMOT_SPACE && _base)
 			{
-				pos.first = _base->getLongitude();
+				pos.first  = _base->getLongitude();
 				pos.second = _base->getLatitude();
 			}
 			else if (trajectory.getAltitude(0) == "STR_GROUND")
 			{
-				pos = getLandPoint(globe, regionRule, trajectory.getZone(0), *ufo);
+				pos = getLandPoint(globe, regionRule, trajectory.getZone(0), ufo);
 			}
 			else
 			{
 				pos = regionRule.getRandomPoint(trajectory.getZone(0));
 			}
-			ufo->setAltitude(assaultTrajectory.getAltitude(0));
-			ufo->setSpeed((int)(assaultTrajectory.getSpeedPercentage(0) * ufo->getCraftStats().speedMax));
-			ufo->setLongitude(pos.first);
-			ufo->setLatitude(pos.second);
+			ufo.setAltitude(assaultTrajectory.getAltitude(0));
+			ufo.setSpeed((int)(assaultTrajectory.getSpeedPercentage(0) * ufo.getCraftStats().speedMax));
+			ufo.setLongitude(pos.first);
+			ufo.setLatitude(pos.second);
 			Waypoint *wp = new Waypoint();
 			wp->setLongitude(xcomBase->getLongitude());
 			wp->setLatitude(xcomBase->getLatitude());
-			ufo->setDestination(wp);
-			logUfo(ufo, game, this);
-			return ufo;
+			ufo.setDestination(wp);
+			logUfo(&ufo, game, this);
+			return &ufo;
 		}
 		else if (_rule.getObjective() == OBJECTIVE_INSTANT_RETALIATION)
 		{
@@ -564,11 +567,12 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 		Ufo *ufo = 0;
 		if (wave.objective)
 		{
-			ufo = new Ufo(*ufoRule, game.getId("STR_UFO_UNIQUE"));
+			ufo = &getRegistry().getService<UfoFactory>().create(*ufoRule, game.getId("STR_UFO_UNIQUE")).get<Ufo>();
 		}
 		else
 		{
-			ufo = new Ufo(*ufoRule, game.getId("STR_UFO_UNIQUE"), hunterKillerPercentage, huntMode, huntBehavior);
+			ufo = &getRegistry().getService<UfoFactory>().create(*ufoRule, game.getId("STR_UFO_UNIQUE"), hunterKillerPercentage, huntMode, huntBehavior)
+								.get<Ufo>();
 		}
 		ufo->setMissionInfo(this, &trajectory);
 		const RuleRegion &regionRules = *mod.getRegion(_region, true);
@@ -635,57 +639,57 @@ Ufo *AlienMission::spawnUfo(SavedGame &game, const Mod &mod, const Globe &globe,
 		return 0;
 
 	// Spawn according to sequence.
-	Ufo *ufo = new Ufo(*ufoRule, game.getId("STR_UFO_UNIQUE"), hunterKillerPercentage, huntMode, huntBehavior);
-	ufo->setMissionInfo(this, &trajectory);
+	Ufo& ufo = getRegistry().getService<UfoFactory>().create(*ufoRule, game.getId("STR_UFO_UNIQUE"), hunterKillerPercentage, huntMode, huntBehavior).get<Ufo>();
+	ufo.setMissionInfo(this, &trajectory);
 	const RuleRegion &regionRules = *mod.getRegion(_region, true);
-	std::pair<double, double> pos = getWaypoint(wave, trajectory, 0, globe, regionRules, *ufo);
-	ufo->setAltitude(trajectory.getAltitude(0));
+	std::pair<double, double> pos = getWaypoint(wave, trajectory, 0, globe, regionRules, ufo);
+	ufo.setAltitude(trajectory.getAltitude(0));
 	if (trajectory.getAltitude(0) == "STR_GROUND")
 	{
-		ufo->setSecondsRemaining(trajectory.groundTimer()*5);
+		ufo.setSecondsRemaining(trajectory.groundTimer()*5);
 	}
-	ufo->setSpeed((int)(trajectory.getSpeedPercentage(0) * ufo->getCraftStats().speedMax));
-	ufo->setLongitude(pos.first);
-	ufo->setLatitude(pos.second);
+	ufo.setSpeed((int)(trajectory.getSpeedPercentage(0) * ufo.getCraftStats().speedMax));
+	ufo.setLongitude(pos.first);
+	ufo.setLatitude(pos.second);
 	if (_rule.getOperationType() != AMOT_SPACE && _base)
 	{
 		// override starting location for Earth-based alien operations
-		ufo->setLongitude(_base->getLongitude());
-		ufo->setLatitude(_base->getLatitude());
+		ufo.setLongitude(_base->getLongitude());
+		ufo.setLatitude(_base->getLatitude());
 	}
 	Waypoint *wp = new Waypoint();
 	if (trajectory.getWaypointCount() > 1)
 	{
-		pos = getWaypoint(wave, trajectory, 1, globe, regionRules, *ufo);
+		pos = getWaypoint(wave, trajectory, 1, globe, regionRules, ufo);
 	}
 	else
 	{
 		std::stringstream ss;
 		ss << "Missing second waypoint! Error occurred while trying to determine UFO waypoint for mission type: " << _rule.getType();
-		ss << " in region: " << regionRules.getType() << "; ufo type: " << ufo->getRules()->getType() << ", trajectory ID: " << trajectory.getID() << ".";
+		ss << " in region: " << regionRules.getType() << "; ufo type: " << ufo.getRules()->getType() << ", trajectory ID: " << trajectory.getID() << ".";
 		throw Exception(ss.str());
 	}
 	wp->setLongitude(pos.first);
 	wp->setLatitude(pos.second);
-	ufo->setDestination(wp);
+	ufo.setDestination(wp);
 
 	// Only hunter-killers can escort
-	if (ufo->isHunterKiller() && wave.escort)
+	if (ufo.isHunterKiller() && wave.escort)
 	{
-		ufo->setEscort(true);
+		ufo.setEscort(true);
 		// Find a UFO to escort
 		auto escortUfo = [ufo](const Ufo& escortUfo) {
-			return escortUfo.getMission()->getId() == ufo->getMission()->getId() // From the same mission
+			return escortUfo.getMission()->getId() == ufo.getMission()->getId() // From the same mission
 				&& !escortUfo.isHunterKiller(); }; // But not another hunter-killer, we escort only normal UFOs
 		if (Ufo* ufoToBeEscorted = getRegistry().findValue_if<Ufo>(escortUfo))
 		{
-			ufo->setLongitude(ufoToBeEscorted->getLongitude());
-			ufo->setLatitude(ufoToBeEscorted->getLatitude());
-			ufo->setEscortedUfo(ufoToBeEscorted);
+			ufo.setLongitude(ufoToBeEscorted->getLongitude());
+			ufo.setLatitude(ufoToBeEscorted->getLatitude());
+			ufo.setEscortedUfo(ufoToBeEscorted);
 		}
 	}
-	logUfo(ufo, game, this);
-	return ufo;
+	logUfo(&ufo, game, this);
+	return &ufo;
 }
 
 void AlienMission::start(Game &engine, const Globe &globe, size_t initialCount)

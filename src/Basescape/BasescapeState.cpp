@@ -40,6 +40,7 @@
 #include "../Engine/Options.h"
 #include "../Engine/Unicode.h"
 #include "../Entity/Common/GeoPosition.h"
+#include "../Entity/Common/Type.h"
 #include "../Entity/Game/BaseFactory.h"
 #include "../Geoscape/AllocatePsiTrainingState.h"
 #include "../Geoscape/AllocateTrainingState.h"
@@ -225,7 +226,7 @@ void BasescapeState::init()
 
 	if (const GeoPosition* position = selectedBase.try_get<GeoPosition>(); position->region)
 	{
-		_txtLocation->setText(tr(position->region.get<Region>().getRules()->getType()));
+		_txtLocation->setText(tr(position->region.get<Type>().type));
 	}
 
 	_txtFunds->setText(tr("STR_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));

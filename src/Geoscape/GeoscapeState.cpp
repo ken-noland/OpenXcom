@@ -1166,7 +1166,7 @@ void GeoscapeState::time5Seconds()
 				delete craft;
 				continue;
 			}
-			if (xcraft->getDestination() != 0)
+			if (xcraft->getDestination())
 			{
 				Ufo* u = dynamic_cast<Ufo*>(xcraft->getDestination());
 				if (u != 0)

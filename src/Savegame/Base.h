@@ -153,9 +153,9 @@ public:
 	/// Gets the base's marker sprite.
 	int getMarker() const override;
 	/// Gets the base's facilities.
-	[[nodiscard]] std::vector<BaseFacility*>& getFacilities() { return _facilities; }
+	[[deprecated("being moved to ecs")]] [[nodiscard]] std::vector<BaseFacility*>& getFacilities() { return _facilities; }
 	/// Gets the base's facilities.
-	[[nodiscard]] const std::vector<BaseFacility*>& getFacilities() const { return _facilities; }
+	[[deprecated("being moved to ecs")]] [[nodiscard]] const std::vector<BaseFacility*>& getFacilities() const { return _facilities; }
 	/// Gets the base's soldiers.
 	[[nodiscard]] std::vector<Soldier*>& getSoldiers() { return _soldiers; }
 	/// Gets the base's soldiers.
