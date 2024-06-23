@@ -59,10 +59,7 @@ void MovingTarget::load(const YAML::Node &node)
 YAML::Node MovingTarget::save() const
 {
 	YAML::Node node = Target::save();
-	if (_dest != 0)
-	{
-		node["dest"] = _dest->saveId();
-	}
+	if (_dest) { node["dest"] = _dest->saveId(); }
 	node["speedLon"] = serializeDouble(_speedLon);
 	node["speedLat"] = serializeDouble(_speedLat);
 	node["speedRadian"] = serializeDouble(_speedRadian);
@@ -100,10 +97,8 @@ void MovingTarget::setDestination(Target *dest)
 	}
 	_dest = dest;
 	// Add moving target to new destination's followers
-	if (_dest != 0)
-	{
-		_dest->getFollowers()->push_back(this);
-	}
+	if (_dest) { _dest->getFollowers()->push_back(this); }
+
 	// Recalculate meeting point for any followers
 	for (auto* mt : *getFollowers())
 	{

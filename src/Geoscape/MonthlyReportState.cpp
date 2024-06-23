@@ -53,9 +53,7 @@ namespace OpenXcom
  * @param psi Show psi training afterwards?
  * @param globe Pointer to the globe.
  */
-MonthlyReportState::MonthlyReportState(Globe* globe)
-	: State("MonthlyReportState", true), _gameOver(0), _ratingTotal(0), _fundingDiff(0),
-	_lastMonthsRating(0), _happyList(0), _sadList(0), _pactList(0), _cancelPactList(0)
+MonthlyReportState::MonthlyReportState(Globe* globe) : State("MonthlyReportState", true)
 {
 	_globe = globe;
 
@@ -119,7 +117,8 @@ MonthlyReportState::MonthlyReportState(Globe* globe)
 
 	calculateChanges();
 
-	int month = getGame()->getSavedGame()->getTime()->getMonth() - 1, year = getGame()->getSavedGame()->getTime()->getYear();
+	int month = getGame()->getSavedGame()->getTime()->getMonth() - 1,
+		year = getGame()->getSavedGame()->getTime()->getYear();
 	if (month == 0)
 	{
 		month = 12;
@@ -174,7 +173,7 @@ MonthlyReportState::MonthlyReportState(Globe* globe)
 	{
 		int diff = getGame()->getSavedGame()->getDifficulty();
 		auto& custom = getGame()->getMod()->getMonthlyRatingThresholds();
-		if (custom.size() > (size_t)diff)
+		if (custom.size() > static_cast<size_t>(diff))
 		{
 			// only negative values are allowed!
 			if (custom[diff] < 0)
@@ -218,9 +217,8 @@ MonthlyReportState::MonthlyReportState(Globe* globe)
 	_txtRating->setText(tr("STR_MONTHLY_RATING").arg(_ratingTotal).arg(rating));
 
 	int64_t monthlyFunding = CountrySystem::getCountriesMonthlyFundingTotal();
-	std::string formattedIncome = std::format("{}> {}{} ({}{})",
+	std::string formattedIncome = std::format("{}> \x01{} ({}{})",
 		tr("STR_INCOME").c_str(),
-		Unicode::TOK_COLOR_FLIP,
 		Unicode::formatFunding(monthlyFunding),
 		_fundingDiff > 0 ? "+" : "",
 		Unicode::formatFunding(_fundingDiff)
@@ -228,9 +226,8 @@ MonthlyReportState::MonthlyReportState(Globe* globe)
 	_txtIncome->setText(formattedIncome);
 
 	int64_t baseMaintiance = BaseSystem::getBasesMaintenanceCost();
-	std::string formattedMaintanceCost = std::format("{}> {}{}",
+	std::string formattedMaintanceCost = std::format("{}> \x01{}",
 		tr("STR_MAINTENANCE").c_str(),
-		Unicode::TOK_COLOR_FLIP,
 		Unicode::formatFunding(baseMaintiance));
 	_txtMaintenance->setText(formattedMaintanceCost);
 
@@ -239,10 +236,9 @@ MonthlyReportState::MonthlyReportState(Globe* globe)
 	{
 		// increase funds by performance bonus
 		getGame()->getSavedGame()->setFunds(getGame()->getSavedGame()->getFunds() + performanceBonus);
-		// display
-		std::ostringstream ss4;
-		ss4 << tr("STR_PERFORMANCE_BONUS") << "> " << Unicode::TOK_COLOR_FLIP << Unicode::formatFunding(performanceBonus);
-		_txtBonus->setText(ss4.str());
+		std::string bonus = std::format("{}> \x01{}", tr("STR_PERFORMANCE_BONUS").c_str(),
+			Unicode::formatFunding(performanceBonus));
+
 		// shuffle the fields a bit for better overview
 		int upper = _txtMaintenance->getY();
 		int lower = _txtBonus->getY();
@@ -257,9 +253,9 @@ MonthlyReportState::MonthlyReportState(Globe* globe)
 		_txtDesc->setY(_txtBonus->getY());
 	}
 
-	std::ostringstream ss3;
-	ss3 << tr("STR_BALANCE") << "> " << Unicode::TOK_COLOR_FLIP << Unicode::formatFunding(getGame()->getSavedGame()->getFunds());
-	_txtBalance->setText(ss3.str());
+	std::string balance = std::format("{}> \x01{}", tr("STR_BALANCE").c_str(),
+		Unicode::formatFunding(getGame()->getSavedGame()->getFunds()));
+	_txtBalance->setText(balance);
 
 	_txtDesc->setWordWrap(true);
 	_txtDesc->setScrollable(true);
@@ -326,8 +322,7 @@ MonthlyReportState::MonthlyReportState(Globe* globe)
 	// Give modders some handles on political situation
 	for (const auto& traitorName : _pactList)
 	{
-		auto traitor = getGame()->getMod()->getCountry(traitorName, false);
-		if (traitor)
+		if (RuleCountry* traitor = getGame()->getMod()->getCountry(traitorName, false))
 		{
 			getGame()->getSavedGame()->spawnEvent(traitor->getSignedPactEvent());
 		}

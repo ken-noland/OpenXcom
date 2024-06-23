@@ -226,7 +226,7 @@ void BasescapeState::init()
 
 	if (const GeoPosition* position = selectedBase.try_get<GeoPosition>(); position->region)
 	{
-		_txtLocation->setText(tr(position->region.get<Type>()));
+		_txtLocation->setText(tr(position->region.get<Type>().type));
 	}
 
 	_txtFunds->setText(tr("STR_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
