@@ -39,7 +39,7 @@ namespace OpenXcom
 Text::Text(int width, int height, int x, int y) : InteractiveSurface(width, height, x, y),
 	_big(0), _small(0), _font(0), _fontOrig(0), _lang(0),
 	_wrap(false), _invert(false), _contrast(false), _indent(false), _scroll(false), _ignoreSeparators(false),
-	_align(ALIGN_LEFT), _valign(ALIGN_TOP), _color(0), _color2(0), _scrollY(0)
+	_align(TextHAlign::ALIGN_LEFT), _valign(TextVAlign::ALIGN_TOP), _color(0), _color2(0), _scrollY(0)
 {
 }
 
@@ -454,12 +454,12 @@ int Text::getLineX(int line) const
 	case DIRECTION_LTR:
 		switch (_align)
 		{
-		case ALIGN_LEFT:
+		case TextHAlign::ALIGN_LEFT:
 			break;
-		case ALIGN_CENTER:
+		case TextHAlign::ALIGN_CENTER:
 			x = (int)ceil((getWidth() + _font->getSpacing() - _lineWidth[line]) / 2.0);
 			break;
-		case ALIGN_RIGHT:
+		case TextHAlign::ALIGN_RIGHT:
 			x = getWidth() - 1 - _lineWidth[line];
 			break;
 		}
@@ -467,13 +467,13 @@ int Text::getLineX(int line) const
 	case DIRECTION_RTL:
 		switch (_align)
 		{
-		case ALIGN_LEFT:
+		case TextHAlign::ALIGN_LEFT:
 			x = getWidth() - 1;
 			break;
-		case ALIGN_CENTER:
+		case TextHAlign::ALIGN_CENTER:
 			x = getWidth() - (int)ceil((getWidth() + _font->getSpacing() - _lineWidth[line]) / 2.0);
 			break;
-		case ALIGN_RIGHT:
+		case TextHAlign::ALIGN_RIGHT:
 			x = _lineWidth[line];
 			break;
 		}
@@ -525,13 +525,13 @@ void Text::draw()
 	{
 		switch (_valign)
 		{
-		case ALIGN_TOP:
+		case TextVAlign::ALIGN_TOP:
 			y = 0;
 			break;
-		case ALIGN_MIDDLE:
+		case TextVAlign::ALIGN_MIDDLE:
 			y = (int)ceil((getHeight() - height) / 2.0);
 			break;
-		case ALIGN_BOTTOM:
+		case TextVAlign::ALIGN_BOTTOM:
 			y = getHeight() - height;
 			break;
 		}

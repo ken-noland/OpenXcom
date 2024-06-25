@@ -72,11 +72,11 @@ OptionsConfirmState::OptionsConfirmState(OptionsOrigin origin) : State("OptionsC
 	_btnNo->onMouseClick((ActionHandler)&OptionsConfirmState::btnNoClick);
 	// no keyboard shortcuts to make sure users can see the message
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setWordWrap(true);
 	_txtTitle->setText(tr("STR_DISPLAY_OPTIONS_CONFIRM"));
 
-	_txtTimer->setAlign(ALIGN_CENTER);
+	_txtTimer->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTimer->setWordWrap(true);
 	_txtTimer->setText(tr("STR_DISPLAY_OPTIONS_REVERT").arg(_countdown));
 

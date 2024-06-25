@@ -127,10 +127,10 @@ SoldierTransformationState::SoldierTransformationState(RuleSoldierTransformation
 	}
 
 	_edtSoldier->setBig();
-	_edtSoldier->setAlign(ALIGN_CENTER);
+	_edtSoldier->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_txtRequiredItems->setText(tr("STR_SPECIAL_MATERIALS_REQUIRED"));
-	_txtRequiredItems->setAlign(ALIGN_CENTER);
+	_txtRequiredItems->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_txtItemNameColumn->setText(tr("STR_ITEM_REQUIRED"));
 	_txtItemNameColumn->setWordWrap(true);
@@ -151,8 +151,8 @@ SoldierTransformationState::SoldierTransformationState(RuleSoldierTransformation
 	{
 		_lstStatChanges->setColumns(13, 90, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 0);
 	}
-	_lstStatChanges->setAlign(ALIGN_RIGHT);
-	_lstStatChanges->setAlign(ALIGN_LEFT, 0);
+	_lstStatChanges->setAlign(TextHAlign::ALIGN_RIGHT);
+	_lstStatChanges->setAlign(TextHAlign::ALIGN_LEFT, 0);
 
 	initTransformationData();
 }

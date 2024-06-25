@@ -63,15 +63,15 @@ SetWindowedRootState::SetWindowedRootState(OptionsOrigin origin, OptionsVideoSta
 	add(_edtWindowedModePositionX, "confirmVideo", "optionsMenu");
 	add(_edtWindowedModePositionY, "confirmVideo", "optionsMenu");
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setWordWrap(true);
 	_txtTitle->setText(tr("STR_DISPLAY_SET_WINDOW_POSITION"));
 
-	_txtWindowedModePositionX->setAlign(ALIGN_RIGHT);
+	_txtWindowedModePositionX->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtWindowedModePositionX->setWordWrap(true);
 	_txtWindowedModePositionX->setText(tr("STR_DISPLAY_WINDOW_POSITION_NEW_X"));
 
-	_txtWindowedModePositionY->setAlign(ALIGN_RIGHT);
+	_txtWindowedModePositionY->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtWindowedModePositionY->setWordWrap(true);
 	_txtWindowedModePositionY->setText(tr("STR_DISPLAY_WINDOW_POSITION_NEW_Y"));
 

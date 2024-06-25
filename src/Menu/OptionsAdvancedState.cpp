@@ -105,7 +105,7 @@ OptionsAdvancedState::OptionsAdvancedState(OptionsOrigin origin) : OptionsBaseSt
 	int leftcol = _lstOptions->getWidth() - rightcol;
 
 	// Set up objects
-	_lstOptions->setAlign(ALIGN_RIGHT, 1);
+	_lstOptions->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 	_lstOptions->setColumns(2, leftcol, rightcol);
 	_lstOptions->setWordWrap(true);
 	_lstOptions->setSelectable(true);

@@ -51,13 +51,13 @@ BattlescapeMessage::BattlescapeMessage(int width, int height, int x, int y) : Su
 
 	_text = new Text(width, height, x, y);
 	_text->setColor(Palette::blockOffset(0)-1);
-	_text->setAlign(ALIGN_CENTER);
-	_text->setVerticalAlign(ALIGN_MIDDLE);
+	_text->setAlign(TextHAlign::ALIGN_CENTER);
+	_text->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_text->setHighContrast(true);
 
 	_txtThinking = new Text(102, 9, HORIZONTAL_OFFSET, VERTICAL_OFFSET - 10);
 	_txtThinking->setColor(Palette::blockOffset(0) - 1);
-	_txtThinking->setAlign(ALIGN_CENTER);
+	_txtThinking->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtThinking->setHighContrast(true);
 
 	_progressBar = new ProgressBar(102, 5, HORIZONTAL_OFFSET, VERTICAL_OFFSET);

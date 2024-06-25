@@ -138,7 +138,7 @@ StoresState::StoresState(Base* base) : State("StoresState", true), _base(base)
 	_btnGrandTotal->onMouseClick((ActionHandler)&StoresState::btnGrandTotalClick);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_STORES"));
 
 	_txtItem->setText(tr("STR_ITEM"));
@@ -149,9 +149,9 @@ StoresState::StoresState(Base* base) : State("StoresState", true), _base(base)
 
 //	_lstStores->setColumns(4, 162, 40, 50, 34);
 	_lstStores->setColumns(4, 162, 20, 40, 64);
-	_lstStores->setAlign(ALIGN_RIGHT, 1);
-	_lstStores->setAlign(ALIGN_RIGHT, 2);
-	_lstStores->setAlign(ALIGN_RIGHT, 3);
+	_lstStores->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstStores->setAlign(TextHAlign::ALIGN_RIGHT, 2);
+	_lstStores->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstStores->setSelectable(true);
 	_lstStores->setBackground(_window);
 	_lstStores->setMargin(2);

@@ -28,8 +28,19 @@ namespace OpenXcom
 class Font;
 class Language;
 
-enum TextHAlign { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT };
-enum TextVAlign { ALIGN_TOP, ALIGN_MIDDLE, ALIGN_BOTTOM };
+enum class TextHAlign
+{
+	ALIGN_LEFT,
+	ALIGN_CENTER,
+	ALIGN_RIGHT
+};
+
+enum class TextVAlign
+{
+	ALIGN_TOP,
+	ALIGN_MIDDLE,
+	ALIGN_BOTTOM
+};
 
 /**
  * Text string displayed on screen.

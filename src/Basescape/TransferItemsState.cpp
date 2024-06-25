@@ -109,7 +109,7 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	_btnCancel->onKeyboardPress((ActionHandler)&TransferItemsState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_TRANSFER"));
 
 	_txtQuantity->setText(tr("STR_QUANTITY_UC"));
@@ -123,9 +123,9 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	_lstItems->setArrowColumn(193, ARROW_VERTICAL);
 //	_lstItems->setColumns(4, 162, 58, 40, 27);
 	_lstItems->setColumns(4, 162, 20, 58, 42, 5);
-	_lstItems->setAlign(ALIGN_RIGHT, 1);
-	_lstItems->setAlign(ALIGN_RIGHT, 2);
-	_lstItems->setAlign(ALIGN_RIGHT, 3);
+	_lstItems->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstItems->setAlign(TextHAlign::ALIGN_RIGHT, 2);
+	_lstItems->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstItems->setSelectable(true);
 	_lstItems->setBackground(_window);
 	_lstItems->setMargin(2);

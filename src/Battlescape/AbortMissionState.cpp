@@ -159,7 +159,7 @@ AbortMissionState::AbortMissionState(SavedBattleGame* battleGame, BattlescapeSta
 	}
 
 	_txtAbort->setBig();
-	_txtAbort->setAlign(ALIGN_CENTER);
+	_txtAbort->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtAbort->setHighContrast(true);
 	_txtAbort->setText(tr("STR_ABORT_MISSION_QUESTION"));
 	if (_battleGame->isPreview())

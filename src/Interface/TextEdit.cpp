@@ -333,13 +333,13 @@ void TextEdit::draw()
 			int x = 0;
 			switch (_text->getAlign())
 			{
-			case ALIGN_LEFT:
+			case TextHAlign::ALIGN_LEFT:
 				x = 0;
 				break;
-			case ALIGN_CENTER:
+			case TextHAlign::ALIGN_CENTER:
 				x = (_text->getWidth() - _text->getTextWidth()) / 2;
 				break;
-			case ALIGN_RIGHT:
+			case TextHAlign::ALIGN_RIGHT:
 				x = _text->getWidth() - _text->getTextWidth();
 				break;
 			}
@@ -351,13 +351,13 @@ void TextEdit::draw()
 			int y = 0;
 			switch (_text->getVerticalAlign())
 			{
-			case ALIGN_TOP:
+			case TextVAlign::ALIGN_TOP:
 				y = 0;
 				break;
-			case ALIGN_MIDDLE:
+			case TextVAlign::ALIGN_MIDDLE:
 				y = (int)ceil((getHeight() - _text->getTextHeight()) / 2.0);
 				break;
-			case ALIGN_BOTTOM:
+			case TextVAlign::ALIGN_BOTTOM:
 				y = getHeight() - _text->getTextHeight();
 				break;
 			}

@@ -65,7 +65,7 @@ TechTreeSelectState::TechTreeSelectState(TechTreeViewerState* parent) : State("T
 	// Set up objects
 	setWindowBackground(_window, "techTreeSelect");
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_AVAILABLE_TOPICS"));
 
 	_btnOk->setText(tr("STR_OK"));
@@ -76,7 +76,7 @@ TechTreeSelectState::TechTreeSelectState(TechTreeViewerState* parent) : State("T
 	_lstTopics->setSelectable(true);
 	_lstTopics->setBackground(_window);
 	_lstTopics->setMargin(0);
-	_lstTopics->setAlign(ALIGN_CENTER);
+	_lstTopics->setAlign(TextHAlign::ALIGN_CENTER);
 	_lstTopics->onMouseClick((ActionHandler)&TechTreeSelectState::onSelectTopic);
 
 	_btnQuickSearch->setText(""); // redraw

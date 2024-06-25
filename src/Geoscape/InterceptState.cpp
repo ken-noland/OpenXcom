@@ -128,7 +128,7 @@ InterceptState::InterceptState(Globe* globe, bool useCustomSound, Base* base, Ta
 	_btnGotoBase->onMouseClick((ActionHandler)&InterceptState::btnGotoBaseClick);
 	_btnGotoBase->setVisible(_base != 0);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_LAUNCH_INTERCEPTION"));
 
@@ -140,14 +140,14 @@ InterceptState::InterceptState(Globe* globe, bool useCustomSound, Base* base, Ta
 
 	if (Options::oxceInterceptGuiMaintenanceTime > 0)
 	{
-		_txtWeapons->setAlign(ALIGN_RIGHT);
+		_txtWeapons->setAlign(TextHAlign::ALIGN_RIGHT);
 	}
 	_txtWeapons->setText(tr("STR_WEAPONS_CREW_HWPS"));
 
 	if (Options::oxceInterceptGuiMaintenanceTime > 0)
 	{
 		_lstCrafts->setColumns(4, WIDTH_CRAFT, WIDTH_STATUS, WIDTH_BASE, WIDTH_WEAPONS);
-		_lstCrafts->setAlign(ALIGN_RIGHT, 3);
+		_lstCrafts->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	}
 	else
 	{

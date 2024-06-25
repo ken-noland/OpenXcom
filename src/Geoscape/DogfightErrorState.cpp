@@ -68,11 +68,11 @@ DogfightErrorState::DogfightErrorState(Craft* craft, const std::string& msg) : S
 	_btnBase->onMouseClick((ActionHandler)&DogfightErrorState::btnBaseClick);
 	_btnBase->onKeyboardPress((ActionHandler)&DogfightErrorState::btnBaseClick, Options::keyOk);
 
-	_txtCraft->setAlign(ALIGN_CENTER);
+	_txtCraft->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtCraft->setBig();
 	_txtCraft->setText(_craft->getName(getGame()->getLanguage()));
 
-	_txtMessage->setAlign(ALIGN_CENTER);
+	_txtMessage->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtMessage->setWordWrap(true);
 	_txtMessage->setText(msg);
 }

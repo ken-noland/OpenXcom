@@ -69,7 +69,7 @@ CommendationLateState::CommendationLateState(std::vector<Soldier*> soldiersMedal
 	_btnOk->onKeyboardPress((ActionHandler)&CommendationLateState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_LOST_IN_SERVICE"));
 
 	_lstSoldiers->setColumns(3, 114, 90, 84);

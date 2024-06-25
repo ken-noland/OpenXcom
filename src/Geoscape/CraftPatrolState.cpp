@@ -72,14 +72,14 @@ CraftPatrolState::CraftPatrolState(Craft* craft, Globe* globe) : State("CraftPat
 	_btnRedirect->onKeyboardPress((ActionHandler)&CraftPatrolState::btnRedirectClick, Options::keyOk);
 
 	_txtDestination->setBig();
-	_txtDestination->setAlign(ALIGN_CENTER);
+	_txtDestination->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtDestination->setWordWrap(true);
 	_txtDestination->setText(tr("STR_CRAFT_HAS_REACHED_DESTINATION")
 							 .arg(_craft->getName(getGame()->getLanguage()))
 							 .arg(_craft->getDestination()->getName(getGame()->getLanguage())));
 
 	_txtPatrolling->setBig();
-	_txtPatrolling->setAlign(ALIGN_CENTER);
+	_txtPatrolling->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtPatrolling->setText(tr("STR_NOW_PATROLLING"));
 }
 

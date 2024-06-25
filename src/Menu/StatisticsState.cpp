@@ -79,7 +79,7 @@ StatisticsState::StatisticsState() : State("StatisticsState", true)
 	_btnOk->onKeyboardPress((ActionHandler)&StatisticsState::btnOkClick, Options::keyOk);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_lstStats->setColumns(2, 200, 80);
 	_lstStats->setDot(true);

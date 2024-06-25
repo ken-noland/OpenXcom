@@ -40,8 +40,8 @@ OptionsNoAudioState::OptionsNoAudioState(OptionsOrigin origin) : OptionsBaseStat
 	centerAllSurfaces();
 
 	// Set up objects
-	_txtError->setAlign(ALIGN_CENTER);
-	_txtError->setVerticalAlign(ALIGN_MIDDLE);
+	_txtError->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtError->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtError->setBig();
 	_txtError->setWordWrap(true);
 	_txtError->setText(tr("STR_NO_AUDIO_HARDWARE_DETECTED"));

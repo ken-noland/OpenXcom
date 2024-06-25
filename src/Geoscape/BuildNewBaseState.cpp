@@ -142,7 +142,7 @@ BuildNewBaseState::BuildNewBaseState(entt::handle newBaseHandle, Globe *globe, b
 	_btnCancel->onKeyboardPress((ActionHandler)&BuildNewBaseState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setText(tr("STR_SELECT_SITE_FOR_NEW_BASE"));
-	_txtTitle->setVerticalAlign(ALIGN_MIDDLE);
+	_txtTitle->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtTitle->setWordWrap(true);
 
 	if (_first)

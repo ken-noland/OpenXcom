@@ -214,7 +214,7 @@ void StatsForNerdsState::buildUI(bool debug, bool ids, bool defaults)
 	setWindowBackground(_window, "statsForNerds");
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_STATS_FOR_NERDS"));
 
 	_txtArticle->setText(tr("STR_ARTICLE").arg(tr(_topicId)));
@@ -332,7 +332,7 @@ void StatsForNerdsState::init()
 				else
 					_btnPreview->setText(tr("STR_CRAFT_DEPLOYMENT_PREVIEW"));
 
-				_txtTitle->setAlign(ALIGN_LEFT);
+				_txtTitle->setAlign(TextHAlign::ALIGN_LEFT);
 				_btnPreview->setVisible(true);
 			}
 		}
@@ -1814,7 +1814,7 @@ void StatsForNerdsState::initItemList()
 	_cbxRelatedStuff->setVisible(_filterOptions.size() > 1);
 	if (_filterOptions.size() > 1)
 	{
-		_txtTitle->setAlign(ALIGN_LEFT);
+		_txtTitle->setAlign(TextHAlign::ALIGN_LEFT);
 	}
 
 	const auto itemBattleType = itemRule->getBattleType();
@@ -2741,7 +2741,7 @@ void StatsForNerdsState::initArmorList()
 	_cbxRelatedStuff->setVisible(_filterOptions.size() > 1);
 	if (_filterOptions.size() > 1)
 	{
-		_txtTitle->setAlign(ALIGN_LEFT);
+		_txtTitle->setAlign(TextHAlign::ALIGN_LEFT);
 	}
 
 	addIntegerPercent(ss, armorRule->getHeatVision(), "heatVision");

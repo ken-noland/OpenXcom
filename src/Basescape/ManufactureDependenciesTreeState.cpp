@@ -64,7 +64,7 @@ ManufactureDependenciesTreeState::ManufactureDependenciesTreeState(const std::st
 	// Set up objects
 	setWindowBackground(_window, "dependencyTree");
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_TOPIC").arg(tr(_selectedItem)));
 
 	_btnShowAll->setText(tr("STR_SHOW_ALL"));
@@ -77,7 +77,7 @@ ManufactureDependenciesTreeState::ManufactureDependenciesTreeState(const std::st
 	_lstTopics->setColumns(1, 182);
 	_lstTopics->setBackground(_window);
 	_lstTopics->setMargin(0);
-	_lstTopics->setAlign(ALIGN_CENTER);
+	_lstTopics->setAlign(TextHAlign::ALIGN_CENTER);
 
 	if (Options::oxceDisableProductionDependencyTree)
 	{

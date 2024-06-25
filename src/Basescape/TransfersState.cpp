@@ -72,7 +72,7 @@ TransfersState::TransfersState(Base* base) : State("TransfersState", true), _bas
 	_btnOk->onKeyboardPress((ActionHandler)&TransfersState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_TRANSFERS"));
 
 	_txtItem->setText(tr("STR_ITEM"));

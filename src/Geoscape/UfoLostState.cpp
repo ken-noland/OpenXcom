@@ -61,7 +61,7 @@ UfoLostState::UfoLostState(const std::string& id)
 	_btnOk->onKeyboardPress((ActionHandler)&UfoLostState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	std::string s = _id;
 	s += '\n';
 	s += tr("STR_TRACKING_LOST");

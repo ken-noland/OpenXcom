@@ -84,7 +84,7 @@ SoldierAvatarState::SoldierAvatarState(Base* base, size_t soldier) : State("Sold
 	_origAvatar = SoldierAvatar("original", s->getGender(), s->getLook(), s->getLookVariant());
 	initPreview(s);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_AVATAR_FOR").arg(s->getName()));
 
 	_txtType->setText(tr("STR_TYPE"));

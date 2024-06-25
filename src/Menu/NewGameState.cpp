@@ -124,11 +124,11 @@ NewGameState::NewGameState() : State("NewGameState", true)
 	_btnCancel->onMouseClick((ActionHandler)&NewGameState::btnCancelClick);
 	_btnCancel->onKeyboardPress((ActionHandler)&NewGameState::btnCancelClick, Options::keyCancel);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_DIFFICULTY_LEVEL"));
 
 	_txtIronman->setWordWrap(true);
-	_txtIronman->setVerticalAlign(ALIGN_MIDDLE);
+	_txtIronman->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtIronman->setText(tr("STR_IRONMAN_DESC"));
 }
 

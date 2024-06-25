@@ -137,8 +137,8 @@ namespace OpenXcom
 
 				_lstInfo->setColor(_listColor1);
 				_lstInfo->setColumns(3, 100, 20, 10);
-				_lstInfo->setAlign(ALIGN_RIGHT, 1);
-				_lstInfo->setAlign(ALIGN_RIGHT, 2);
+				_lstInfo->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+				_lstInfo->setAlign(TextHAlign::ALIGN_RIGHT, 2);
 				_lstInfo->setDot(true);
 				_lstInfo->setDotFirstColumn(true);
 

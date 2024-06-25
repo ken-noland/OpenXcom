@@ -130,7 +130,7 @@ ListGamesState::ListGamesState(OptionsOrigin origin, int firstValidRow, bool aut
 	_btnCancel->onKeyboardPress((ActionHandler)&ListGamesState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 
 	if (isMobile)
 	{
@@ -140,7 +140,7 @@ ListGamesState::ListGamesState(OptionsOrigin origin, int firstValidRow, bool aut
 	else
 	{
 		_btnDelete->setVisible(false);
-		_txtDelete->setAlign(ALIGN_CENTER);
+		_txtDelete->setAlign(TextHAlign::ALIGN_CENTER);
 		_txtDelete->setText(tr("STR_RIGHT_CLICK_TO_DELETE"));
 	}
 

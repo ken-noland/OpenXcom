@@ -139,12 +139,12 @@ void ManufactureInfoState::buildUi()
 
 	_txtTitle->setText(tr(_item ? _item->getName() : _production->getRules()->getName()));
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_txtAllocatedEngineer->setText(tr("STR_ENGINEERS__ALLOCATED"));
 	_txtAllocatedEngineer->setBig();
 	_txtAllocatedEngineer->setWordWrap(true);
-	_txtAllocatedEngineer->setVerticalAlign(ALIGN_BOTTOM);
+	_txtAllocatedEngineer->setVerticalAlign(TextVAlign::ALIGN_BOTTOM);
 
 	_txtAllocated->setBig();
 
@@ -153,7 +153,7 @@ void ManufactureInfoState::buildUi()
 	_txtUnitToProduce->setText(tr("STR_UNITS_TO_PRODUCE"));
 	_txtUnitToProduce->setBig();
 	_txtUnitToProduce->setWordWrap(true);
-	_txtUnitToProduce->setVerticalAlign(ALIGN_BOTTOM);
+	_txtUnitToProduce->setVerticalAlign(TextVAlign::ALIGN_BOTTOM);
 
 	_txtEngineerUp->setText(tr("STR_INCREASE_UC"));
 

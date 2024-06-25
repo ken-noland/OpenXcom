@@ -73,15 +73,15 @@ ResearchCompleteState::ResearchCompleteState(const RuleResearch *newResearch, co
 	_btnReport->onMouseClick((ActionHandler)&ResearchCompleteState::btnReportClick);
 	_btnReport->onKeyboardPress((ActionHandler)&ResearchCompleteState::btnReportClick, Options::keyOk);
 
-	_txtBase->setAlign(ALIGN_CENTER);
+	_txtBase->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtBase->setText(base->getName());
 	_txtBase->setVisible(Options::oxceShowBaseNameInPopups);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_RESEARCH_COMPLETED"));
 
-	_txtResearch->setAlign(ALIGN_CENTER);
+	_txtResearch->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtResearch->setBig();
 	_txtResearch->setWordWrap(true);
 	if (research)

@@ -629,7 +629,7 @@ void BaseView::draw()
 				ss << fac->getBuildTime();
 			if (fac->getIfHadPreviousFacility()) // Indicate that this facility still counts for connectivity
 				ss << "*";
-			text->setAlign(ALIGN_CENTER);
+			text->setAlign(TextHAlign::ALIGN_CENTER);
 			text->setColor(_cellColor);
 			text->setText(ss.str());
 			text->blit(this->getSurface());

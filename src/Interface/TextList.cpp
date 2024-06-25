@@ -320,10 +320,7 @@ void TextList::addRow(int cols, ...)
 		txt->initText(_big, _small, _lang);
 		txt->setColor(_color);
 		txt->setSecondaryColor(_color2);
-		if (_align[i])
-		{
-			txt->setAlign(_align[i]);
-		}
+		txt->setAlign(_align[i]);
 		txt->setHighContrast(_contrast);
 		if (_font == _big)
 		{
@@ -353,13 +350,13 @@ void TextList::addRow(int cols, ...)
 			unsigned int w = txt->getTextWidth();
 			while (w < _columns[i])
 			{
-				if (_align[i] != ALIGN_RIGHT)
+				if (_align[i] != TextHAlign::ALIGN_RIGHT)
 				{
 					char fillChar = (i < cols - 1 ? '.' : ' ');
 					w += _font->getChar(fillChar).getCrop()->w + _font->getSpacing();
 					buf += fillChar;
 				}
-				if (_align[i] != ALIGN_LEFT)
+				if (_align[i] != TextHAlign::ALIGN_LEFT)
 				{
 					char fillChar = (i > 0 ? '.' : ' ');
 					w += _font->getChar(fillChar).getCrop()->w + _font->getSpacing();

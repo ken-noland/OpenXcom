@@ -78,7 +78,7 @@ CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft)
 
 	Craft *c = _base->getCrafts().at(_craft);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_PILOT"));
 
 	_txtName->setText(tr("STR_NAME"));
@@ -88,8 +88,8 @@ CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft)
 	_txtBravery->setText(tr("STR_BRAVERY_ABBREVIATION"));
 
 	_lstPilot->setColumns(4, 124, 20, 20, 20);
-	_lstPilot->setAlign(ALIGN_RIGHT);
-	_lstPilot->setAlign(ALIGN_LEFT, 0);
+	_lstPilot->setAlign(TextHAlign::ALIGN_RIGHT);
+	_lstPilot->setAlign(TextHAlign::ALIGN_LEFT, 0);
 	_lstPilot->setSelectable(true);
 	_lstPilot->setMargin(8);
 	_lstPilot->setBackground(_window);

@@ -199,7 +199,7 @@ InventoryState::InventoryState(bool tu, BattlescapeState *parent, Base *base, bo
 
 	_txtItem->setHighContrast(true);
 
-	_txtAmmo->setAlign(ALIGN_CENTER);
+	_txtAmmo->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtAmmo->setHighContrast(true);
 
 	_btnOk->onMouseClick((ActionHandler)&InventoryState::btnOkClick);

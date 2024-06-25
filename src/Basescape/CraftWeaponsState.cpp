@@ -85,7 +85,7 @@ CraftWeaponsState::CraftWeaponsState(Base* base, size_t craft, size_t weapon) : 
 	_btnCancel->onKeyboardPress((ActionHandler)&CraftWeaponsState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_ARMAMENT"));
 
 	_txtArmament->setText(tr("STR_ARMAMENT"));
@@ -94,7 +94,7 @@ CraftWeaponsState::CraftWeaponsState(Base* base, size_t craft, size_t weapon) : 
 
 	_txtAmmunition->setText(tr("STR_AMMUNITION_AVAILABLE"));
 	_txtAmmunition->setWordWrap(true);
-	_txtAmmunition->setVerticalAlign(ALIGN_BOTTOM);
+	_txtAmmunition->setVerticalAlign(TextVAlign::ALIGN_BOTTOM);
 
 	const std::string slotName = _craft->getRules()->getWeaponSlotString((int)weapon);
 	CraftWeapon *current = _craft->getWeapons().at(_weapon);

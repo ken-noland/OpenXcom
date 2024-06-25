@@ -72,7 +72,7 @@ SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin)
 	// Set up objects
 	setWindowBackground(_window, "selectMusicTrack");
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_SELECT_MUSIC_TRACK"));
 
@@ -84,7 +84,7 @@ SelectMusicTrackState::SelectMusicTrackState(SelectMusicTrackOrigin origin)
 	_lstTracks->setSelectable(true);
 	_lstTracks->setBackground(_window);
 	_lstTracks->setMargin(8);
-	_lstTracks->setAlign(ALIGN_CENTER);
+	_lstTracks->setAlign(TextHAlign::ALIGN_CENTER);
 	_lstTracks->onMouseClick((ActionHandler)&SelectMusicTrackState::lstTrackClick);
 
 	const std::string search = _origin == SMT_BATTLESCAPE ? "GMTAC" : "GMGEO";

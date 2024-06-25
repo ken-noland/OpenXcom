@@ -44,12 +44,12 @@ Slider::Slider(int width, int height, int x, int y) : InteractiveSurface(width, 
 
 	_frame->setThickness(_thickness);
 
-	_txtMinus->setAlign(ALIGN_CENTER);
-	_txtMinus->setVerticalAlign(ALIGN_MIDDLE);
+	_txtMinus->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtMinus->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtMinus->setText("-");
 
-	_txtPlus->setAlign(ALIGN_CENTER);
-	_txtPlus->setVerticalAlign(ALIGN_MIDDLE);
+	_txtPlus->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtPlus->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtPlus->setText("+");
 
 	_minX = _frame->getX();

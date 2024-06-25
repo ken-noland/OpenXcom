@@ -72,7 +72,7 @@ BuildFacilitiesState::BuildFacilitiesState(entt::handle baseId, State *state)
 	_btnOk->onKeyboardPress((ActionHandler)&BuildFacilitiesState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_INSTALLATION"));
 
 	_lstFacilities->setColumns(1, 104);

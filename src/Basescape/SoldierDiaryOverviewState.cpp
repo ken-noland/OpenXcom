@@ -148,7 +148,7 @@ SoldierDiaryOverviewState::SoldierDiaryOverviewState(Base* base, size_t soldierI
 	}
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	// Text is decided in init()
 
 	_txtMission->setText(tr("STR_MISSION"));

@@ -65,8 +65,8 @@ AliensCrashState::AliensCrashState() : State("AliensCrashState", true)
 
 	_txtTitle->setHighContrast(true);
 	_txtTitle->setText(tr("STR_ALL_ALIENS_KILLED_IN_CRASH"));
-	_txtTitle->setAlign(ALIGN_CENTER);
-	_txtTitle->setVerticalAlign(ALIGN_MIDDLE);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtTitle->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtTitle->setBig();
 	_txtTitle->setWordWrap(true);
 }

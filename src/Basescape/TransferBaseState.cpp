@@ -78,7 +78,7 @@ TransferBaseState::TransferBaseState(Base* base, DebriefingState* debriefingStat
 	_btnCancel->onKeyboardPress((ActionHandler)&TransferBaseState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_DESTINATION_BASE"));
 
 	_txtFunds->setText(tr("STR_CURRENT_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));

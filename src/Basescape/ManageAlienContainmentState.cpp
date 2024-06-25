@@ -134,22 +134,22 @@ ManageAlienContainmentState::ManageAlienContainmentState(Base* base, int prisonT
 	_btnCleanup->onMouseClick((ActionHandler)&ManageAlienContainmentState::btnCleanupClick);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(trAlt("STR_MANAGE_CONTAINMENT", _prisonType));
 
 	_txtItem->setText(trAlt("STR_ALIEN", _prisonType));
 
 	_txtLiveAliens->setText(trAlt("STR_LIVE_ALIENS", _prisonType));
 	_txtLiveAliens->setWordWrap(true);
-	_txtLiveAliens->setVerticalAlign(ALIGN_BOTTOM);
+	_txtLiveAliens->setVerticalAlign(TextVAlign::ALIGN_BOTTOM);
 
 	_txtDeadAliens->setText(trAlt("STR_DEAD_ALIENS", _prisonType));
 	_txtDeadAliens->setWordWrap(true);
-	_txtDeadAliens->setVerticalAlign(ALIGN_BOTTOM);
+	_txtDeadAliens->setVerticalAlign(TextVAlign::ALIGN_BOTTOM);
 
 	_txtInterrogatedAliens->setText(trAlt("STR_UNDER_INTERROGATION", _prisonType));
 	_txtInterrogatedAliens->setWordWrap(true);
-	_txtInterrogatedAliens->setVerticalAlign(ALIGN_BOTTOM);
+	_txtInterrogatedAliens->setVerticalAlign(TextVAlign::ALIGN_BOTTOM);
 
 	_lstAliens->setArrowColumn(184, ARROW_HORIZONTAL);
 	if (Options::canSellLiveAliens) {

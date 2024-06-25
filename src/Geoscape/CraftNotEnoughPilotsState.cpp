@@ -72,8 +72,8 @@ CraftNotEnoughPilotsState::CraftNotEnoughPilotsState(Craft* craft)
 		_btnAssignPilots->setVisible(false);
 	}
 
-	_txtMessage->setAlign(ALIGN_CENTER);
-	_txtMessage->setVerticalAlign(ALIGN_MIDDLE);
+	_txtMessage->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtMessage->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtMessage->setBig();
 	_txtMessage->setWordWrap(true);
 	_txtMessage->setText(tr("STR_NOT_ENOUGH_PILOTS").arg(_craft->getRules()->getPilots()));

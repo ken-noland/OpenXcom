@@ -71,7 +71,7 @@ NewPossibleCraftState::NewPossibleCraftState(Base* base, const std::vector<RuleC
 	_btnPurchase->onMouseClick((ActionHandler)&NewPossibleCraftState::btnPurchaseClick);
 	_btnPurchase->onKeyboardPress((ActionHandler)&NewPossibleCraftState::btnPurchaseClick, Options::keyOk);
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_WE_CAN_NOW_RENT"));
 
 	// Caveat
@@ -92,14 +92,14 @@ NewPossibleCraftState::NewPossibleCraftState(Base* base, const std::vector<RuleC
 		}
 		std::string argument = ss.str();
 
-		_txtCaveat->setAlign(ALIGN_CENTER);
+		_txtCaveat->setAlign(TextHAlign::ALIGN_CENTER);
 		_txtCaveat->setText(tr("STR_REQUIRED_BASE_SERVICES").arg(argument));
 		_txtCaveat->setVisible(requiredServices.any());
 	}
 
 	_lstPossibilities->setColumns(1, 250);
 	_lstPossibilities->setBig();
-	_lstPossibilities->setAlign(ALIGN_CENTER);
+	_lstPossibilities->setAlign(TextHAlign::ALIGN_CENTER);
 	_lstPossibilities->setScrolling(true, 0);
 	for (const auto* ruleCraft : possibilities)
 	{

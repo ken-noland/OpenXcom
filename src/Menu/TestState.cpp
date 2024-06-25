@@ -116,7 +116,7 @@ TestState::TestState() : State("TestState", true)
 	setWindowBackground(_window, "tests");
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_TEST_SCREEN"));
 
 	_txtPalette->setText(tr("STR_PALETTE"));

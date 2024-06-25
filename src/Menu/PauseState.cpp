@@ -109,7 +109,7 @@ PauseState::PauseState(OptionsOrigin origin) : State("PauseState", false), _orig
 		}
 	}
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_OPTIONS_UC"));
 

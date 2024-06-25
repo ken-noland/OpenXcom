@@ -275,7 +275,7 @@ GraphsState::GraphsState()
 	// set up the vertical measurement unit
 	for (auto* scaleText : _txtScale)
 	{
-		scaleText->setAlign(ALIGN_RIGHT);
+		scaleText->setAlign(TextHAlign::ALIGN_RIGHT);
 	}
 	btnUfoRegionClick(0);
 
@@ -289,7 +289,7 @@ GraphsState::GraphsState()
 		getGame()->getMod()->getSurface("GRAPHS.SPK")->blitNShade(_bg, 0, 0);
 	}
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_txtFactor->setText(tr("STR_FINANCE_THOUSANDS"));
 

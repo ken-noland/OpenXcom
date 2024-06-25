@@ -73,7 +73,7 @@ DeleteGameState::DeleteGameState(OptionsOrigin origin, const std::string &save)
 	_btnNo->onMouseClick((ActionHandler)&DeleteGameState::btnNoClick);
 	_btnNo->onKeyboardPress((ActionHandler)&DeleteGameState::btnNoClick, Options::keyCancel);
 
-	_txtMessage->setAlign(ALIGN_CENTER);
+	_txtMessage->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtMessage->setBig();
 	_txtMessage->setWordWrap(true);
 	_txtMessage->setText(tr("STR_IS_IT_OK_TO_DELETE_THE_SAVED_GAME"));

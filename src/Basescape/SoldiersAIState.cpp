@@ -130,7 +130,7 @@ void SoldiersAIState::_commonConstruct()
 
 	//_lstUnits->setArrowColumn(188, ARROW_VERTICAL);	//Input mostly temporary vector, so reordering not persistent. Disable completly
 	_lstUnits->setColumns(noCol, cWidths[0], cWidths[1], cWidths[2], cWidths[3]);	//TODO with or without gap?
-	_lstUnits->setAlign(ALIGN_RIGHT, 3);
+	_lstUnits->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstUnits->setSelectable(true);
 	_lstUnits->setBackground(_window);
 

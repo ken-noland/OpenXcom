@@ -65,7 +65,7 @@ ConfirmCydoniaState::ConfirmCydoniaState(Craft* craft)
 	_btnNo->onMouseClick((ActionHandler)&ConfirmCydoniaState::btnNoClick);
 	_btnNo->onKeyboardPress((ActionHandler)&ConfirmCydoniaState::btnNoClick, Options::keyCancel);
 
-	_txtMessage->setAlign(ALIGN_CENTER);
+	_txtMessage->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtMessage->setBig();
 	_txtMessage->setWordWrap(true);
 	_txtMessage->setText(tr("STR_ARE_YOU_SURE_CYDONIA"));

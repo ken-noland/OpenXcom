@@ -84,12 +84,12 @@ MissionDetectedState::MissionDetectedState(MissionSite* mission, GeoscapeState* 
 	_btnCancel->onKeyboardPress((ActionHandler)&MissionDetectedState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setWordWrap(true);
 	_txtTitle->setText(tr(mission->getDeployment()->getAlertMessage()));
 
 	_txtCity->setBig();
-	_txtCity->setAlign(ALIGN_CENTER);
+	_txtCity->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtCity->setText(tr(mission->getCity()));
 }
 

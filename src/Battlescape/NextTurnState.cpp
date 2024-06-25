@@ -155,8 +155,8 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 
 
 	_txtMessageReinforcements->setBig();
-	_txtMessageReinforcements->setAlign(ALIGN_CENTER);
-	_txtMessageReinforcements->setVerticalAlign(ALIGN_BOTTOM);
+	_txtMessageReinforcements->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtMessageReinforcements->setVerticalAlign(TextVAlign::ALIGN_BOTTOM);
 	_txtMessageReinforcements->setWordWrap(true);
 	_txtMessageReinforcements->setHighContrast(true);
 	_txtMessageReinforcements->setColor(getGame()->getMod()->getInterface("inventory")->getElement("weight")->color2); // red
@@ -167,13 +167,13 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	_btnBriefingReinforcements->setVisible(false);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setHighContrast(true);
 	_txtTitle->setText(tr("STR_OPENXCOM"));
 
 
 	_txtTurn->setBig();
-	_txtTurn->setAlign(ALIGN_CENTER);
+	_txtTurn->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTurn->setHighContrast(true);
 	std::stringstream ss;
 	ss << tr("STR_TURN").arg(_currentTurn);
@@ -190,23 +190,23 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 
 
 	_txtSide->setBig();
-	_txtSide->setAlign(ALIGN_CENTER);
+	_txtSide->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtSide->setHighContrast(true);
 	_txtSide->setText(tr("STR_SIDE").arg(tr((_battleGame->getSide() == FACTION_PLAYER ? "STR_XCOM" : "STR_ALIENS"))));
 
 
 	_txtMessage->setBig();
-	_txtMessage->setAlign(ALIGN_CENTER);
+	_txtMessage->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtMessage->setHighContrast(true);
 	_txtMessage->setText(tr("STR_PRESS_BUTTON_TO_CONTINUE"));
 
 	_txtMessage2->setBig();
-	_txtMessage2->setAlign(ALIGN_CENTER);
+	_txtMessage2->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtMessage2->setHighContrast(true);
 	_txtMessage2->setText("");
 
 	_txtMessage3->setBig();
-	_txtMessage3->setAlign(ALIGN_CENTER);
+	_txtMessage3->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtMessage3->setHighContrast(true);
 	_txtMessage3->setText("");
 

@@ -99,7 +99,7 @@ ManufactureState::ManufactureState(Base* base) : State("ManufactureState", true)
 	_btnOk->onKeyboardPress((ActionHandler)&ManufactureState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_CURRENT_PRODUCTION"));
 
 	_txtFunds->setText(tr("STR_CURRENT_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
@@ -119,8 +119,8 @@ ManufactureState::ManufactureState(Base* base) : State("ManufactureState", true)
 	_txtTimeLeft->setWordWrap(true);
 
 	_lstManufacture->setColumns(5, 114, 16, 52, 56, 48);
-	_lstManufacture->setAlign(ALIGN_RIGHT);
-	_lstManufacture->setAlign(ALIGN_LEFT, 0);
+	_lstManufacture->setAlign(TextHAlign::ALIGN_RIGHT);
+	_lstManufacture->setAlign(TextHAlign::ALIGN_LEFT, 0);
 	_lstManufacture->setSelectable(true);
 	_lstManufacture->setBackground(_window);
 

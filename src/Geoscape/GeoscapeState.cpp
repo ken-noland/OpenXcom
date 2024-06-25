@@ -392,11 +392,11 @@ GeoscapeState::GeoscapeState()
 	_btnZoomOut->onMouseClick((ActionHandler)&GeoscapeState::btnZoomOutRightClick, SDL_BUTTON_RIGHT);
 	_btnZoomOut->onKeyboardPress((ActionHandler)&GeoscapeState::btnZoomOutLeftClick, Options::keyGeoZoomOut);
 
-	_txtFunds->setAlign(ALIGN_CENTER);
+	_txtFunds->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtFunds->setVisible(Options::showFundsOnGeoscape);
 
 	_txtHour->setBig();
-	_txtHour->setAlign(ALIGN_RIGHT);
+	_txtHour->setAlign(TextHAlign::ALIGN_RIGHT);
 
 	_txtHourSep->setBig();
 	_txtHourSep->setText(":");
@@ -406,15 +406,15 @@ GeoscapeState::GeoscapeState()
 	_txtMinSep->setBig();
 	_txtMinSep->setText(":");
 
-	_txtWeekday->setAlign(ALIGN_CENTER);
+	_txtWeekday->setAlign(TextHAlign::ALIGN_CENTER);
 
-	_txtDay->setAlign(ALIGN_CENTER);
+	_txtDay->setAlign(TextHAlign::ALIGN_CENTER);
 
-	_txtMonth->setAlign(ALIGN_CENTER);
+	_txtMonth->setAlign(TextHAlign::ALIGN_CENTER);
 
-	_txtYear->setAlign(ALIGN_CENTER);
+	_txtYear->setAlign(TextHAlign::ALIGN_CENTER);
 
-	_txtSlacking->setAlign(ALIGN_RIGHT);
+	_txtSlacking->setAlign(TextHAlign::ALIGN_RIGHT);
 
 	if (Options::showFundsOnGeoscape)
 	{

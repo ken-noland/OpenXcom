@@ -202,8 +202,8 @@ CraftEquipmentState::CraftEquipmentState(Base* base, size_t craft) : State("Craf
 	else
 	{
 		_lstEquipment->setColumns(3, 140, 50, 50, 40);
-		_lstEquipment->setAlign(ALIGN_RIGHT, 1);
-		_lstEquipment->setAlign(ALIGN_RIGHT, 2);
+		_lstEquipment->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+		_lstEquipment->setAlign(TextHAlign::ALIGN_RIGHT, 2);
 	}
 	_lstEquipment->setSelectable(true);
 	_lstEquipment->setBackground(_window);

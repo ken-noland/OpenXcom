@@ -139,16 +139,16 @@ OptionsVideoState::OptionsVideoState(OptionsOrigin origin) : OptionsBaseState(or
 	_displaySurface->onMouseIn((ActionHandler)&OptionsVideoState::txtTooltipIn);
 	_displaySurface->onMouseOut((ActionHandler)&OptionsVideoState::txtTooltipOut);
 
-	_txtDisplayWidth->setAlign(ALIGN_CENTER);
+	_txtDisplayWidth->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtDisplayWidth->setBig();
 	_txtDisplayWidth->setConstraint(TEC_NUMERIC_POSITIVE);
 	_txtDisplayWidth->onChange((ActionHandler)&OptionsVideoState::txtDisplayWidthChange);
 
-	_txtDisplayX->setAlign(ALIGN_CENTER);
+	_txtDisplayX->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtDisplayX->setBig();
 	_txtDisplayX->setText("x");
 
-	_txtDisplayHeight->setAlign(ALIGN_CENTER);
+	_txtDisplayHeight->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtDisplayHeight->setBig();
 	_txtDisplayHeight->setConstraint(TEC_NUMERIC_POSITIVE);
 	_txtDisplayHeight->onChange((ActionHandler)&OptionsVideoState::txtDisplayHeightChange);

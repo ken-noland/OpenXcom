@@ -96,21 +96,21 @@ HiddenAlienActivityState::HiddenAlienActivityState(GeoscapeState* state, SavedGa
 
 	_txtInfo->setBig();
 	_txtInfo->setText(tr("STR_HIDDEN_ALIEN_ACTIVITY"));
-	_txtInfo->setAlign(ALIGN_CENTER);
+	_txtInfo->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_txtHeaderRegions->setText(tr("STR_UFO_ACTIVITY_IN_AREAS"));
 	_txtSightingsRegions->setText(tr("STR_UFO_SIGHTINGS"));
-	_txtSightingsRegions->setAlign(ALIGN_RIGHT);
+	_txtSightingsRegions->setAlign(TextHAlign::ALIGN_RIGHT);
 
 	_lstHiddenAlienActivityRegions->setColumns(2, 140, 40);
-	_lstHiddenAlienActivityRegions->setAlign(ALIGN_RIGHT, 1);
+	_lstHiddenAlienActivityRegions->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 
 	_txtHeaderCountries->setText(tr("STR_UFO_ACTIVITY_IN_COUNTRIES"));
 	_txtSightingsCountries->setText(tr("STR_UFO_SIGHTINGS"));
-	_txtSightingsCountries->setAlign(ALIGN_RIGHT);
+	_txtSightingsCountries->setAlign(TextHAlign::ALIGN_RIGHT);
 
 	_lstHiddenAlienActivityCountries->setColumns(2, 140, 40);
-	_lstHiddenAlienActivityCountries->setAlign(ALIGN_RIGHT, 1);
+	_lstHiddenAlienActivityCountries->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 
 	_btnOk->setText(tr("STR_OK_5_SECONDS"));
 	_btnOk->onMouseClick((ActionHandler)&HiddenAlienActivityState::btnOkClick);

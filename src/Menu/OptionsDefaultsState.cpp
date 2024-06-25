@@ -67,7 +67,7 @@ OptionsDefaultsState::OptionsDefaultsState(OptionsOrigin origin, OptionsBaseStat
 	_btnNo->onMouseClick((ActionHandler)&OptionsDefaultsState::btnNoClick);
 	_btnNo->onKeyboardPress((ActionHandler)&OptionsDefaultsState::btnNoClick, Options::keyCancel);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setWordWrap(true);
 	_txtTitle->setText(tr("STR_RESTORE_DEFAULTS_QUESTION"));

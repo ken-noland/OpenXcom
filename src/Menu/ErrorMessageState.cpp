@@ -92,8 +92,8 @@ void ErrorMessageState::create(const std::string &str, SDL_Color *palette, Uint8
 	_btnOk->onKeyboardPress((ActionHandler)&ErrorMessageState::btnOkClick, Options::keyCancel);
 
 	_txtMessage->setColor(color);
-	_txtMessage->setAlign(ALIGN_CENTER);
-	_txtMessage->setVerticalAlign(ALIGN_MIDDLE);
+	_txtMessage->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtMessage->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtMessage->setBig();
 	_txtMessage->setWordWrap(true);
 	_txtMessage->setText(str);

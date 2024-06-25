@@ -81,7 +81,7 @@ UfopaediaSelectState::UfopaediaSelectState(const std::string &section, int heigh
 	setWindowBackground(_window, "ufopaedia");
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_ITEM"));
 
 	_btnOk->setText(tr("STR_OK"));
@@ -93,7 +93,7 @@ UfopaediaSelectState::UfopaediaSelectState(const std::string &section, int heigh
 	_lstSelection->setSelectable(true);
 	_lstSelection->setBackground(_window);
 	_lstSelection->setMargin(18);
-	_lstSelection->setAlign(ALIGN_CENTER);
+	_lstSelection->setAlign(TextHAlign::ALIGN_CENTER);
 	_lstSelection->onMouseClick((ActionHandler)&UfopaediaSelectState::lstSelectionClick, SDL_BUTTON_LEFT);
 	_lstSelection->onMouseClick((ActionHandler)&UfopaediaSelectState::lstSelectionClickRight, SDL_BUTTON_RIGHT);
 

@@ -102,14 +102,14 @@ ConfirmLandingState::ConfirmLandingState(Craft *craft, Texture *missionTexture, 
 	_btnNo->onKeyboardRelease((ActionHandler)&ConfirmLandingState::togglePatrolButton, SDLK_RCTRL);
 
 	_txtMessage->setBig();
-	_txtMessage->setAlign(ALIGN_CENTER);
+	_txtMessage->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtMessage->setWordWrap(true);
 	_txtMessage->setText(tr("STR_CRAFT_READY_TO_LAND_NEAR_DESTINATION")
 						 .arg(_craft->getName(getGame()->getLanguage()))
 						 .arg(_craft->getDestination()->getName(getGame()->getLanguage())));
 
 	_txtBegin->setBig();
-	_txtBegin->setAlign(ALIGN_CENTER);
+	_txtBegin->setAlign(TextHAlign::ALIGN_CENTER);
 	std::ostringstream ss;
 	ss << Unicode::TOK_COLOR_FLIP << tr("STR_BEGIN_MISSION");
 	_txtBegin->setText(ss.str());

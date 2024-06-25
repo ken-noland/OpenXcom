@@ -171,7 +171,7 @@ NewBattleState::NewBattleState()
 	// Set up objects
 	setWindowBackground(_window, "newBattleMenu");
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_MISSION_GENERATOR"));
 
@@ -321,7 +321,7 @@ NewBattleState::NewBattleState()
 
 	_lstSelect->setColumns(1, 280);
 	_lstSelect->setBackground(_window);
-	_lstSelect->setAlign(ALIGN_CENTER);
+	_lstSelect->setAlign(TextHAlign::ALIGN_CENTER);
 	_lstSelect->setMargin(8);
 	_lstSelect->setSelectable(true);
 	_lstSelect->onMouseClick((ActionHandler)&NewBattleState::lstSelectClick);

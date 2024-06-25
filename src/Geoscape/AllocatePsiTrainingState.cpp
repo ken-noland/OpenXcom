@@ -104,7 +104,7 @@ AllocatePsiTrainingState::AllocatePsiTrainingState(Base* base) : State("Allocate
 	}
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_PSIONIC_TRAINING"));
 
 	_labSpace = base->getAvailablePsiLabs() - base->getUsedPsiLabs();

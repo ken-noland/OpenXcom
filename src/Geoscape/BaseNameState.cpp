@@ -76,7 +76,7 @@ BaseNameState::BaseNameState(entt::handle newBaseHandle, Globe *globe, bool firs
 	//something must be in the name before it is acceptable
 	_btnOk->setVisible(false);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_BASE_NAME"));
 

@@ -19,14 +19,74 @@
  */
 #include "../Engine/Surface.h"
 
+
+
 namespace OpenXcom
 {
 
+class Text;
+class ComboBox;
+class SurfaceComponent;
+class TickableComponent;
+class DrawableComponent;
+
+
 class TextButtonComponent
 {
+private:
+	SurfaceComponent& _surfaceComponent;
+
+	Uint8 _color;
+	Text* _text;
+	//TextButton** _group;
+	bool _contrast, _geoscapeButton;
+	ComboBox* _comboBox;
+	// for use by RuleInterface
+//	void setSecondaryColor(Uint8 color) override { setTextColor(color); }
+
+protected:
+//	bool isButtonHandled(Uint8 button = 0) override;
+
 public:
-	TextButtonComponent();
+	TextButtonComponent(SurfaceComponent& surfaceComponent, TickableComponent& tickableComponent,
+						DrawableComponent& drawableComponent);
 	~TextButtonComponent();
+
+	/// Sets the text button's color.
+	void setColor(Uint8 color); //override
+	/// Gets the text button's color.
+	Uint8 getColor() const;
+	/// Sets the text button's text color.
+	void setTextColor(Uint8 color);
+	/// Sets the text size to big.
+	void setBig();
+	/// Sets the text size to small.
+	void setSmall();
+	/// Gets the text button's current font.
+	Font* getFont() const;
+	/// Initializes the text edit's resources.
+	void initText(Font* big, Font* small, Language* lang);	//override
+	/// Sets the text button's high contrast color setting.
+	void setHighContrast(bool contrast); // override
+	/// Sets the text button's text.
+	void setText(const std::string& text);
+	/// Gets the text button's text.
+	std::string getText() const;
+	/// Sets the text button's group.
+	//void setGroup(TextButton** group);
+	/// Sets the text button's palette.
+	void setPalette(const SDL_Color* colors, int firstcolor = 0, int ncolors = 256); //override
+	/// Draws the text button.
+	void draw();	//override
+	/// Special handling for mouse presses.
+	//void mousePress(Action* action, State* state); //override
+	///// Special handling for mouse releases.
+	//void mouseRelease(Action* action, State* state); //override
+	/// Attaches this button to a combobox.
+	void setComboBox(ComboBox* comboBox);
+	void setWidth(int width); // override
+	void setHeight(int height); // override
+	void setGeoscapeButton(bool geo);
 };
 
 } // namespace OpenXcom

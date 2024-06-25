@@ -81,15 +81,15 @@ GlobalAlienContainmentState::GlobalAlienContainmentState(bool openedFromBasescap
 	_btnOk->onKeyboardPress((ActionHandler)&GlobalAlienContainmentState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_PRISONER_OVERVIEW"));
 
 	_txtPrisoner->setText(tr("STR_PRISONER"));
 
-	_txtPrisonerAmount->setAlign(ALIGN_CENTER);
+	_txtPrisonerAmount->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtPrisonerAmount->setText(tr("STR_PRISONER_AMOUNT"));
 
-	_txtPrisonersInterrogated->setAlign(ALIGN_CENTER);
+	_txtPrisonersInterrogated->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtPrisonersInterrogated->setText(tr("STR_PRISONER_INTERROGATED"));
 
 
@@ -99,8 +99,8 @@ GlobalAlienContainmentState::GlobalAlienContainmentState(bool openedFromBasescap
 
 	_lstPrisoners->setMargin(2);
 	_lstPrisoners->setWordWrap(true);
-	_lstPrisoners->setAlign(ALIGN_CENTER, 1);
-	_lstPrisoners->setAlign(ALIGN_CENTER, 2);
+	_lstPrisoners->setAlign(TextHAlign::ALIGN_CENTER, 1);
+	_lstPrisoners->setAlign(TextHAlign::ALIGN_CENTER, 2);
 	_lstPrisoners->onMouseClick((ActionHandler)&GlobalAlienContainmentState::onSelectBase, SDL_BUTTON_LEFT);
 	_lstPrisoners->onMouseClick((ActionHandler)&GlobalAlienContainmentState::onOpenTechTreeViewer, SDL_BUTTON_MIDDLE);
 }

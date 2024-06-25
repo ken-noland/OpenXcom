@@ -65,7 +65,7 @@ TrainingState::TrainingState() : State("TrainingState", true)
 	_btnOk->onKeyboardPress((ActionHandler)&TrainingState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_PHYSICAL_TRAINING"));
 
 	int buttons = 0;

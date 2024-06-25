@@ -195,10 +195,10 @@ CraftInfoState::CraftInfoState(Base* base, size_t craftId) : State("CraftInfoSta
 	_btnPilots->setVisible(pilots);
 
 	_edtCraft->setBig();
-	_edtCraft->setAlign(ALIGN_CENTER);
+	_edtCraft->setAlign(TextHAlign::ALIGN_CENTER);
 	_edtCraft->onChange((ActionHandler)&CraftInfoState::edtCraftChange);
 
-	_txtSkin->setAlign(ALIGN_CENTER);
+	_txtSkin->setAlign(TextHAlign::ALIGN_CENTER);
 	if (_craft->getRules()->getMaxSkinIndex() > 0)
 	{
 		_txtSkin->setText(tr("STR_CRAFT_SKIN_ID").arg(_craft->getSkinIndex()));

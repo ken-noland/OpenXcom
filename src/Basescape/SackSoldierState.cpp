@@ -72,13 +72,13 @@ SackSoldierState::SackSoldierState(Base* base, size_t soldierId) : State("SackSo
 	_btnCancel->onMouseClick((ActionHandler)&SackSoldierState::btnCancelClick);
 	_btnCancel->onKeyboardPress((ActionHandler)&SackSoldierState::btnCancelClick, Options::keyCancel);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SACK"));
 
 	std::ostringstream ss;
 	ss << _base->getSoldiers().at(_soldierId)->getName(true) << "?";
 
-	_txtSoldier->setAlign(ALIGN_CENTER);
+	_txtSoldier->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtSoldier->setText(ss.str());
 }
 

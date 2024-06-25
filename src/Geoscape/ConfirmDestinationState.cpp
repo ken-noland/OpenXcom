@@ -130,8 +130,8 @@ ConfirmDestinationState::ConfirmDestinationState(std::vector<Craft*> crafts, Tar
 	}
 
 	_txtTarget->setBig();
-	_txtTarget->setAlign(ALIGN_CENTER);
-	_txtTarget->setVerticalAlign(ALIGN_MIDDLE);
+	_txtTarget->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtTarget->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtTarget->setWordWrap(true);
 	if (w != 0 && w->getId() == 0)
 	{
@@ -164,7 +164,7 @@ ConfirmDestinationState::ConfirmDestinationState(std::vector<Craft*> crafts, Tar
 				if (days > 0) ssStatus << "/";
 				ssStatus << tr("STR_HOUR_SHORT").arg(hours);
 			}
-			_txtETA->setAlign(ALIGN_CENTER);
+			_txtETA->setAlign(TextHAlign::ALIGN_CENTER);
 			_txtETA->setText(tr("STR_ETA").arg(ssStatus.str()));
 		}
 	}

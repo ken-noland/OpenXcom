@@ -201,86 +201,86 @@ DebriefingState::DebriefingState()
 	_txtItem->setText(tr("STR_LIST_ITEM"));
 
 	_txtQuantity->setText(tr("STR_QUANTITY_UC"));
-	_txtQuantity->setAlign(ALIGN_RIGHT);
+	_txtQuantity->setAlign(TextHAlign::ALIGN_RIGHT);
 
 	_txtScore->setText(tr("STR_SCORE"));
-	_txtScore->setAlign(ALIGN_RIGHT);
+	_txtScore->setAlign(TextHAlign::ALIGN_RIGHT);
 
 //	_lstStats->setColumns(3, 224, 30, 64);
 	_lstStats->setColumns(3, 188, 50, 50);
-	_lstStats->setAlign(ALIGN_RIGHT, 1);
-	_lstStats->setAlign(ALIGN_RIGHT, 2);
+	_lstStats->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstStats->setAlign(TextHAlign::ALIGN_RIGHT, 2);
 	_lstStats->setDot(true);
 
 //	_lstRecovery->setColumns(3, 224, 30, 64);
 	_lstRecovery->setColumns(3, 188, 50, 50);
-	_lstRecovery->setAlign(ALIGN_RIGHT, 1);
-	_lstRecovery->setAlign(ALIGN_RIGHT, 2);
+	_lstRecovery->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstRecovery->setAlign(TextHAlign::ALIGN_RIGHT, 2);
 	_lstRecovery->setDot(true);
 
 //	_lstTotal->setColumns(2, 254, 64);
 	_lstTotal->setColumns(2, 238, 50);
-	_lstTotal->setAlign(ALIGN_RIGHT, 1);
+	_lstTotal->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 	_lstTotal->setDot(true);
 
 	// Second page
 	_txtSoldier->setText(tr("STR_NAME_UC"));
 
-	_txtTU->setAlign(ALIGN_RIGHT);
+	_txtTU->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtTU->setText(tr("STR_TIME_UNITS_ABBREVIATION"));
 	_txtTU->setTooltip("STR_TIME_UNITS");
 	_txtTU->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtTU->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtStamina->setAlign(ALIGN_RIGHT);
+	_txtStamina->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtStamina->setText(tr("STR_STAMINA_ABBREVIATION"));
 	_txtStamina->setTooltip("STR_STAMINA");
 	_txtStamina->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtStamina->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtHealth->setAlign(ALIGN_RIGHT);
+	_txtHealth->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtHealth->setText(tr("STR_HEALTH_ABBREVIATION"));
 	_txtHealth->setTooltip("STR_HEALTH");
 	_txtHealth->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtHealth->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtBravery->setAlign(ALIGN_RIGHT);
+	_txtBravery->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtBravery->setText(tr("STR_BRAVERY_ABBREVIATION"));
 	_txtBravery->setTooltip("STR_BRAVERY");
 	_txtBravery->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtBravery->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtReactions->setAlign(ALIGN_RIGHT);
+	_txtReactions->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtReactions->setText(tr("STR_REACTIONS_ABBREVIATION"));
 	_txtReactions->setTooltip("STR_REACTIONS");
 	_txtReactions->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtReactions->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtFiring->setAlign(ALIGN_RIGHT);
+	_txtFiring->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtFiring->setText(tr("STR_FIRING_ACCURACY_ABBREVIATION"));
 	_txtFiring->setTooltip("STR_FIRING_ACCURACY");
 	_txtFiring->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtFiring->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtThrowing->setAlign(ALIGN_RIGHT);
+	_txtThrowing->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtThrowing->setText(tr("STR_THROWING_ACCURACY_ABBREVIATION"));
 	_txtThrowing->setTooltip("STR_THROWING_ACCURACY");
 	_txtThrowing->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtThrowing->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtMelee->setAlign(ALIGN_RIGHT);
+	_txtMelee->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtMelee->setText(tr("STR_MELEE_ACCURACY_ABBREVIATION"));
 	_txtMelee->setTooltip("STR_MELEE_ACCURACY");
 	_txtMelee->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtMelee->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtStrength->setAlign(ALIGN_RIGHT);
+	_txtStrength->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtStrength->setText(tr("STR_STRENGTH_ABBREVIATION"));
 	_txtStrength->setTooltip("STR_STRENGTH");
 	_txtStrength->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtStrength->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtPsiStrength->setAlign(ALIGN_RIGHT);
+	_txtPsiStrength->setAlign(TextHAlign::ALIGN_RIGHT);
 	if (getGame()->getMod()->isManaFeatureEnabled())
 	{
 		_txtPsiStrength->setText(tr("STR_MANA_ABBREVIATION"));
@@ -294,20 +294,20 @@ DebriefingState::DebriefingState()
 	_txtPsiStrength->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtPsiStrength->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
-	_txtPsiSkill->setAlign(ALIGN_RIGHT);
+	_txtPsiSkill->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtPsiSkill->setText(tr("STR_PSIONIC_SKILL_ABBREVIATION"));
 	_txtPsiSkill->setTooltip("STR_PSIONIC_SKILL");
 	_txtPsiSkill->onMouseIn((ActionHandler)&DebriefingState::txtTooltipIn);
 	_txtPsiSkill->onMouseOut((ActionHandler)&DebriefingState::txtTooltipOut);
 
 	_lstSoldierStats->setColumns(13, 90, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 0);
-	_lstSoldierStats->setAlign(ALIGN_RIGHT);
-	_lstSoldierStats->setAlign(ALIGN_LEFT, 0);
+	_lstSoldierStats->setAlign(TextHAlign::ALIGN_RIGHT);
+	_lstSoldierStats->setAlign(TextHAlign::ALIGN_LEFT, 0);
 	_lstSoldierStats->setDot(true);
 
 	// Third page
 	_lstRecoveredItems->setColumns(2, 238, 50);
-	_lstRecoveredItems->setAlign(ALIGN_RIGHT, 1);
+	_lstRecoveredItems->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 	_lstRecoveredItems->setDot(true);
 }
 

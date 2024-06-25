@@ -90,7 +90,7 @@ ManufactureStartState::ManufactureStartState(Base* base, RuleManufacture* item) 
 
 	_txtTitle->setText(tr(_item->getName()));
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_txtManHour->setText(tr("STR_ENGINEER_HOURS_TO_PRODUCE_ONE_UNIT").arg(_item->getManufactureTime()));
 
@@ -108,7 +108,7 @@ ManufactureStartState::ManufactureStartState(Base* base, RuleManufacture* item) 
 	//productionPossible &= (availableWorkSpace > 0);
 
 	_txtRequiredItemsTitle->setText(tr("STR_SPECIAL_MATERIALS_REQUIRED"));
-	_txtRequiredItemsTitle->setAlign(ALIGN_CENTER);
+	_txtRequiredItemsTitle->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_txtItemNameColumn->setText(tr("STR_ITEM_REQUIRED"));
 	_txtItemNameColumn->setWordWrap(true);

@@ -88,7 +88,7 @@ AlienInventoryState::AlienInventoryState(BattleUnit* unit)
 
 	_txtName->setBig();
 	_txtName->setHighContrast(true);
-	_txtName->setAlign(ALIGN_CENTER);
+	_txtName->setAlign(TextHAlign::ALIGN_CENTER);
 
 	if (Options::oxceDisableAlienInventory)
 	{
@@ -131,12 +131,12 @@ AlienInventoryState::AlienInventoryState(BattleUnit* unit)
 
 	_txtLeftHand->setBig();
 	_txtLeftHand->setHighContrast(true);
-	_txtLeftHand->setAlign(ALIGN_CENTER);
+	_txtLeftHand->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtLeftHand->setVisible(false);
 
 	_txtRightHand->setBig();
 	_txtRightHand->setHighContrast(true);
-	_txtRightHand->setAlign(ALIGN_CENTER);
+	_txtRightHand->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtRightHand->setVisible(false);
 
 	_btnArmor->onKeyboardPress((ActionHandler)&AlienInventoryState::btnToggleClick, SDLK_F1);

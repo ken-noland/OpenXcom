@@ -70,7 +70,7 @@ ModConfirmExtendedState::ModConfirmExtendedState(ModListState* state, const ModI
 	_btnNo->setText(tr("STR_CANCEL"));
 	_btnNo->onMouseClick((ActionHandler)&ModConfirmExtendedState::btnNoClick);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setWordWrap(true);
 	if (masterInfo && !modInfo->isParentMasterOk(masterInfo))

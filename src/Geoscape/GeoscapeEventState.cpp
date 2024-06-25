@@ -83,17 +83,17 @@ GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : State("Geos
 	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	windowComponent.setBackground(getGame()->getMod()->getSurface(_eventRule.getBackground()));
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setWordWrap(true);
 	_txtTitle->setText(tr(_eventRule.getName()));
 
-	_txtMessage->setVerticalAlign(ALIGN_TOP);
+	_txtMessage->setVerticalAlign(TextVAlign::ALIGN_TOP);
 	_txtMessage->setWordWrap(true);
 	_txtMessage->setText(tr(_eventRule.getDescription()));
 	if (_eventRule.alignBottom())
 	{
-		_txtMessage->setVerticalAlign(ALIGN_BOTTOM);
+		_txtMessage->setVerticalAlign(TextVAlign::ALIGN_BOTTOM);
 	}
 	_txtMessage->setScrollable(true);
 

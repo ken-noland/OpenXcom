@@ -108,7 +108,7 @@ FundingState::FundingState() : State("FundingState", false)
 	_btnOk->onKeyboardPress((ActionHandler)&FundingState::btnOkClick, Options::keyCancel);
 	_btnOk->onKeyboardPress((ActionHandler)&FundingState::btnOkClick, Options::keyGeoFunding);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_INTERNATIONAL_RELATIONS"));
 
@@ -120,8 +120,8 @@ FundingState::FundingState() : State("FundingState", false)
 
 	//	_lstCountries->setColumns(3, 108, 100, 52);
 	_lstCountries->setColumns(3, 100, 60, 100);
-	_lstCountries->setAlign(ALIGN_RIGHT, 1);
-	_lstCountries->setAlign(ALIGN_RIGHT, 2);
+	_lstCountries->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstCountries->setAlign(TextHAlign::ALIGN_RIGHT, 2);
 	_lstCountries->setDot(true);
 
 	_sortName->setX(_sortName->getX() + _txtCountry->getTextWidth() + 4);

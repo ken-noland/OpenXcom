@@ -164,7 +164,7 @@ namespace OpenXcom
 		_txtTitle->setColor(_textColor);
 		_txtTitle->setBig();
 		_txtTitle->setWordWrap(true);
-		_txtTitle->setAlign(ALIGN_CENTER);
+		_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 		_txtTitle->setText(tr(defs->getTitleForPage(_state->current_page)));
 
 		_txtInfo->setColor(_textColor);

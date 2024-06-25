@@ -149,7 +149,7 @@ void SellState::delayedInit()
 	_btnTransfer->setVisible(overfull);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELL_ITEMS_SACK_PERSONNEL"));
 
 	_txtFunds->setText(tr("STR_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
@@ -170,9 +170,9 @@ void SellState::delayedInit()
 	_lstItems->setArrowColumn(182, ARROW_VERTICAL);
 //	_lstItems->setColumns(4, 156, 54, 24, 53);
 	_lstItems->setColumns(4, 147, 25, 60, 50, 5);
-	_lstItems->setAlign(ALIGN_RIGHT, 1);
-	_lstItems->setAlign(ALIGN_RIGHT, 2);
-	_lstItems->setAlign(ALIGN_RIGHT, 3);
+	_lstItems->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstItems->setAlign(TextHAlign::ALIGN_RIGHT, 2);
+	_lstItems->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstItems->setSelectable(true);
 	_lstItems->setBackground(_window);
 

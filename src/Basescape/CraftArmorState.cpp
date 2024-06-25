@@ -145,7 +145,7 @@ CraftArmorState::CraftArmorState(Base* base, size_t craft) : State("CraftArmorSt
 	_cbxSortBy->setText(tr("STR_SORT_BY"));
 
 	_lstSoldiers->setColumns(3, 106, 70, 104);
-	_lstSoldiers->setAlign(ALIGN_RIGHT, 3);
+	_lstSoldiers->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstSoldiers->setSelectable(true);
 	_lstSoldiers->setBackground(_window);
 

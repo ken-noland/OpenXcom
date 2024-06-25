@@ -127,8 +127,8 @@ ProductionCompleteState::ProductionCompleteState(Base *base, const std::string &
 		_btnSummary->setVisible(false);
 	}
 
-	_txtMessage->setAlign(ALIGN_CENTER);
-	_txtMessage->setVerticalAlign(ALIGN_MIDDLE);
+	_txtMessage->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtMessage->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtMessage->setBig();
 	_txtMessage->setWordWrap(true);
 	std::string s;

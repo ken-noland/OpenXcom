@@ -121,23 +121,23 @@ SoldierTransformationListState::SoldierTransformationListState(Base* base, Combo
 	_cbxSoldierStatus->onChange((ActionHandler)&SoldierTransformationListState::cbxSoldierStatusChange);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_TRANSFORMATIONS_OVERVIEW"));
 
-	_txtProject->setAlign(ALIGN_LEFT);
+	_txtProject->setAlign(TextHAlign::ALIGN_LEFT);
 	_txtProject->setText(tr("STR_PROJECT_NAME"));
 
-	_txtNumber->setAlign(ALIGN_CENTER);
+	_txtNumber->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtNumber->setWordWrap(true);
 	_txtNumber->setText(tr("STR_AVAILABLE_MATERIALS"));
 
-	_txtSoldierNumber->setAlign(ALIGN_CENTER);
+	_txtSoldierNumber->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtSoldierNumber->setWordWrap(true);
 	_txtSoldierNumber->setText(tr("STR_ELIGIBLE_SOLDIERS"));
 
 	_lstTransformations->setColumns(3, 178, 10, 78);
-	_lstTransformations->setAlign(ALIGN_RIGHT, 1);
-	_lstTransformations->setAlign(ALIGN_RIGHT, 2);
+	_lstTransformations->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstTransformations->setAlign(TextHAlign::ALIGN_RIGHT, 2);
 	_lstTransformations->setSelectable(true);
 	_lstTransformations->setBackground(_window);
 	_lstTransformations->setMargin(8);

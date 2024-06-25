@@ -92,7 +92,7 @@ MonthlyCostsState::MonthlyCostsState(Base* base) : State("MonthlyCostsState", tr
 	_btnOk->onKeyboardPress((ActionHandler)&MonthlyCostsState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_MONTHLY_COSTS"));
 
 	_txtCost->setText(tr("STR_COST_PER_UNIT"));
@@ -113,9 +113,9 @@ MonthlyCostsState::MonthlyCostsState(Base* base) : State("MonthlyCostsState", tr
 
 //	_lstCrafts->setColumns(4, 125, 70, 44, 50);
 	_lstCrafts->setColumns(4, 115, 50, 50, 85);
-	_lstCrafts->setAlign(ALIGN_RIGHT, 1);
-	_lstCrafts->setAlign(ALIGN_RIGHT, 2);
-	_lstCrafts->setAlign(ALIGN_RIGHT, 3);
+	_lstCrafts->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstCrafts->setAlign(TextHAlign::ALIGN_RIGHT, 2);
+	_lstCrafts->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstCrafts->setDot(true);
 
 	for (auto& craftType : getGame()->getMod()->getCraftsList())
@@ -135,9 +135,9 @@ MonthlyCostsState::MonthlyCostsState(Base* base) : State("MonthlyCostsState", tr
 
 //	_lstSalaries->setColumns(4, 125, 70, 44, 50);
 	_lstSalaries->setColumns(4, 115, 50, 50, 85);
-	_lstSalaries->setAlign(ALIGN_RIGHT, 1);
-	_lstSalaries->setAlign(ALIGN_RIGHT, 2);
-	_lstSalaries->setAlign(ALIGN_RIGHT, 3);
+	_lstSalaries->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstSalaries->setAlign(TextHAlign::ALIGN_RIGHT, 2);
+	_lstSalaries->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstSalaries->setDot(true);
 
 	auto& soldierTypes = getGame()->getMod()->getSoldiersList();
@@ -205,7 +205,7 @@ MonthlyCostsState::MonthlyCostsState(Base* base) : State("MonthlyCostsState", tr
 
 //	_lstMaintenance->setColumns(2, 239, 60);
 	_lstMaintenance->setColumns(2, 250, 50);
-	_lstMaintenance->setAlign(ALIGN_RIGHT, 1);
+	_lstMaintenance->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 	_lstMaintenance->setDot(true);
 	std::ostringstream ss7;
 	ss7 << Unicode::TOK_COLOR_FLIP << Unicode::formatFunding(_base->getFacilityMaintenance());
@@ -213,7 +213,7 @@ MonthlyCostsState::MonthlyCostsState(Base* base) : State("MonthlyCostsState", tr
 
 //	_lstTotal->setColumns(2, 44, 55);
 	_lstTotal->setColumns(2, 55, 50);
-	_lstTotal->setAlign(ALIGN_RIGHT, 1);
+	_lstTotal->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 	_lstTotal->setDot(true);
 	_lstTotal->addRow(2, tr("STR_TOTAL").c_str(), Unicode::formatFunding(_base->getMonthlyMaintenace()).c_str());
 }

@@ -67,7 +67,7 @@ ConfirmLoadState::ConfirmLoadState(OptionsOrigin origin, const std::string& file
 	_btnNo->onMouseClick((ActionHandler)&ConfirmLoadState::btnNoClick);
 	_btnNo->onKeyboardPress((ActionHandler)&ConfirmLoadState::btnNoClick, Options::keyCancel);
 
-	_txtText->setAlign(ALIGN_CENTER);
+	_txtText->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtText->setBig();
 	_txtText->setWordWrap(true);
 	_txtText->setText(tr("STR_MISSING_CONTENT_PROMPT"));

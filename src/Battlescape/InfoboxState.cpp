@@ -50,8 +50,8 @@ InfoboxState::InfoboxState(const std::string& msg) : State("InfoboxState", false
 	_frame->setHighContrast(true);
 	_frame->setThickness(9);
 
-	_text->setAlign(ALIGN_CENTER);
-	_text->setVerticalAlign(ALIGN_MIDDLE);
+	_text->setAlign(TextHAlign::ALIGN_CENTER);
+	_text->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_text->setBig();
 	_text->setWordWrap(true);
 	_text->setText(msg);

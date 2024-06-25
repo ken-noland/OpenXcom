@@ -129,7 +129,7 @@ ModListState::ModListState() : State("ModListState", true), _curMasterIdx(0)
 
 	_lstMods->setArrowColumn(leftcol + 1, ARROW_VERTICAL);
 	_lstMods->setColumns(3, leftcol, arrowCol, rightcol);
-	_lstMods->setAlign(ALIGN_RIGHT, 1);
+	_lstMods->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 	_lstMods->setSelectable(true);
 	_lstMods->setBackground(_window);
 	_lstMods->setWordWrap(true);

@@ -83,7 +83,7 @@ namespace OpenXcom
 		_txtInfo->setScrollable(true);
 		if (defs->align_bottom)
 		{
-			_txtInfo->setVerticalAlign(ALIGN_BOTTOM);
+			_txtInfo->setVerticalAlign(TextVAlign::ALIGN_BOTTOM);
 		}
 		_txtInfo->setText(tr(defs->getTextForPage(_state->current_page)));
 

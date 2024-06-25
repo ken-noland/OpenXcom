@@ -135,7 +135,7 @@ SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe
 	_btnCancel->onKeyboardPress((ActionHandler)&SelectDestinationState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setText(tr("STR_SELECT_DESTINATION"));
-	_txtTitle->setVerticalAlign(ALIGN_MIDDLE);
+	_txtTitle->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtTitle->setWordWrap(true);
 
 	if (_crafts.size() != 1 ||

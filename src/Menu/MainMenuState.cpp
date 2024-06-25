@@ -123,7 +123,7 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	//_btnUpdate->onMouseClick((ActionHandler)& MainMenuState::btnUpdateClick);
 	//_btnUpdate->setVisible(false);
 
-	_txtUpdateInfo->setAlign(ALIGN_CENTER);
+	_txtUpdateInfo->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtUpdateInfo->setWordWrap(true);
 	_txtUpdateInfo->setText(tr("STR_LATEST_VERSION_INFO"));
 	_txtUpdateInfo->setVisible(false);
@@ -191,7 +191,7 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	}
 #endif
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	std::ostringstream title;
 	title << tr("STR_OPENXCOM") << Unicode::TOK_NL_SMALL;

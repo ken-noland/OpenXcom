@@ -121,7 +121,7 @@ void LoadGameState::buildUi(SDL_Color *palette)
 
 	// Set up objects
 	_txtStatus->setBig();
-	_txtStatus->setAlign(ALIGN_CENTER);
+	_txtStatus->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtStatus->setText(tr("STR_LOADING_GAME"));
 
 }

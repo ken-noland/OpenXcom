@@ -69,7 +69,7 @@ CommendationState::CommendationState(std::vector<Soldier*> soldiersMedalled)
 	_btnOk->onKeyboardPress((ActionHandler)&CommendationState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setText(tr("STR_MEDALS"));
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 
 	_lstSoldiers->setColumns(2, 204, 84);

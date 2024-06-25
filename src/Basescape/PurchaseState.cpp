@@ -139,7 +139,7 @@ PurchaseState::PurchaseState(Base* base, CannotReequipState* parent) : State("Pu
 	_btnCancel->onKeyboardPress((ActionHandler)&PurchaseState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_PURCHASE_HIRE_PERSONNEL"));
 
 	_txtFunds->setText(tr("STR_CURRENT_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
@@ -158,9 +158,9 @@ PurchaseState::PurchaseState(Base* base, CannotReequipState* parent) : State("Pu
 	_lstItems->setArrowColumn(227, ARROW_VERTICAL);
 //	_lstItems->setColumns(4, 150, 55, 50, 32);
 	_lstItems->setColumns(4, 140, 40, 40, 50, 17);
-	_lstItems->setAlign(ALIGN_RIGHT, 1);
-	_lstItems->setAlign(ALIGN_RIGHT, 2);
-	_lstItems->setAlign(ALIGN_RIGHT, 3);
+	_lstItems->setAlign(TextHAlign::ALIGN_RIGHT, 1);
+	_lstItems->setAlign(TextHAlign::ALIGN_RIGHT, 2);
+	_lstItems->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstItems->setSelectable(true);
 	_lstItems->setBackground(_window);
 

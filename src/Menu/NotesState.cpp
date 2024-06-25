@@ -70,7 +70,7 @@ NotesState::NotesState(OptionsOrigin origin) : State("NotesState", false), _orig
 	setWindowBackground(_window, "noteMenu");
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_NOTES"));
 
 #ifdef __MOBILE__
@@ -78,7 +78,7 @@ NotesState::NotesState(OptionsOrigin origin) : State("NotesState", false), _orig
 	_btnDelete->setText(tr("STR_RIGHT_CLICK_TO_DELETE"));
 #else
 	_btnDelete->setVisible(false);
-	_txtDelete->setAlign(ALIGN_CENTER);
+	_txtDelete->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtDelete->setText(tr("STR_RIGHT_CLICK_TO_DELETE"));
 #endif
 

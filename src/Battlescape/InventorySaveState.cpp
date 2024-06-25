@@ -70,7 +70,7 @@ InventorySaveState::InventorySaveState(InventoryState* parent)
 	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtTitle->setHighContrast(true);
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SAVE_EQUIPMENT_TEMPLATE"));
 
 	_lstLayout->setHighContrast(true);

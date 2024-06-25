@@ -96,7 +96,7 @@ UfoTrackerState::UfoTrackerState(GeoscapeState* state, Globe* globe)
 	_btnCancel->onKeyboardPress((ActionHandler)&UfoTrackerState::btnCancelClick, Options::keyCancel);
 	_btnCancel->onKeyboardPress((ActionHandler)&UfoTrackerState::btnCancelClick, Options::keyGeoUfoTracker);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_UFO_TRACKER"));
 
@@ -108,11 +108,11 @@ UfoTrackerState::UfoTrackerState(GeoscapeState* state, Globe* globe)
 
 	_txtHeading->setText(tr("STR_HEADING"));
 
-	_txtSpeed->setAlign(ALIGN_RIGHT);
+	_txtSpeed->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtSpeed->setText(tr("STR_SPEED"));
 
 	_lstObjects->setColumns(5, WIDTH_OBJECT, WIDTH_SIZE, WIDTH_ALTITUDE, WIDTH_HEADING, WIDTH_SPEED);
-	_lstObjects->setAlign(ALIGN_RIGHT, 4);
+	_lstObjects->setAlign(TextHAlign::ALIGN_RIGHT, 4);
 	_lstObjects->setSelectable(true);
 	_lstObjects->setBackground(_window);
 	_lstObjects->setMargin(2);

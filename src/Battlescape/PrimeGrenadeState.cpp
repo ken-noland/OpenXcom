@@ -78,7 +78,7 @@ PrimeGrenadeState::PrimeGrenadeState(BattleAction *action, bool inInventoryView,
 	_frame->setHighContrast(true);
 
 	add(_title, "grenadeMenu", "battlescape");
-	_title->setAlign(ALIGN_CENTER);
+	_title->setAlign(TextHAlign::ALIGN_CENTER);
 	_title->setBig();
 	_title->setText(tr("STR_SET_TIMER"));
 	_title->setHighContrast(true);
@@ -105,8 +105,8 @@ PrimeGrenadeState::PrimeGrenadeState(BattleAction *action, bool inInventoryView,
 		_number[i]->setBig();
 		_number[i]->setText(ss.str());
 		_number[i]->setHighContrast(true);
-		_number[i]->setAlign(ALIGN_CENTER);
-		_number[i]->setVerticalAlign(ALIGN_MIDDLE);
+		_number[i]->setAlign(TextHAlign::ALIGN_CENTER);
+		_number[i]->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	}
 
 	centerAllSurfaces();

@@ -78,10 +78,10 @@ DismantleFacilityState::DismantleFacilityState(Base* base, BaseView* view, BaseF
 	_btnCancel->onMouseClick((ActionHandler)&DismantleFacilityState::btnCancelClick);
 	_btnCancel->onKeyboardPress((ActionHandler)&DismantleFacilityState::btnCancelClick, Options::keyCancel);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_DISMANTLE"));
 
-	_txtFacility->setAlign(ALIGN_CENTER);
+	_txtFacility->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtFacility->setText(tr(_fac->getRules()->getType()));
 
 	int refundValue = 0;
@@ -96,7 +96,7 @@ DismantleFacilityState::DismantleFacilityState(Base* base, BaseView* view, BaseF
 		refundValue = _fac->getRules()->getRefundValue();
 	}
 
-	_txtRefundValue->setAlign(ALIGN_CENTER);
+	_txtRefundValue->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtRefundValue->setText(tr("STR_REFUND_VALUE").arg(Unicode::formatFunding(refundValue)));
 	_txtRefundValue->setVisible(refundValue != 0);
 }

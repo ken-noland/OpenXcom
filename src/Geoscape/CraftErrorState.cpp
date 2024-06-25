@@ -78,8 +78,8 @@ CraftErrorState::CraftErrorState(GeoscapeState* state, const std::string& msg, b
 	}
 	_btnOk5Secs->setVisible(_state != 0);
 
-	_txtMessage->setAlign(ALIGN_CENTER);
-	_txtMessage->setVerticalAlign(ALIGN_MIDDLE);
+	_txtMessage->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtMessage->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtMessage->setBig();
 	_txtMessage->setWordWrap(true);
 	_txtMessage->setText(msg);

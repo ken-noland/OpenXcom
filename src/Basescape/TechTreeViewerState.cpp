@@ -113,7 +113,7 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 	setWindowBackground(_window, "techTreeViewer");
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_TECH_TREE_VIEWER"));
 
 	_txtSelectedTopic->setText(tr("STR_TOPIC").arg(""));
@@ -235,7 +235,7 @@ TechTreeViewerState::TechTreeViewerState(const RuleResearch *r, const RuleManufa
 		}
 	}
 
-	_txtProgress->setAlign(ALIGN_RIGHT);
+	_txtProgress->setAlign(TextHAlign::ALIGN_RIGHT);
 	_txtProgress->setText(tr("STR_RESEARCH_PROGRESS").arg(discoveredSum * 100 / totalSum));
 }
 

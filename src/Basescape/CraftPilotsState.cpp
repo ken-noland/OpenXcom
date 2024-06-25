@@ -100,23 +100,23 @@ CraftPilotsState::CraftPilotsState(Base* base, size_t craft) : State("CraftPilot
 	Craft *c = _base->getCrafts().at(_craft);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_PILOTS_FOR_CRAFT").arg(c->getName(getGame()->getLanguage())));
 
 	_txtFiringAcc->setText(tr("STR_FIRING_ACCURACY"));
-	_txtFiringAcc->setAlign(ALIGN_RIGHT);
+	_txtFiringAcc->setAlign(TextHAlign::ALIGN_RIGHT);
 
 	_txtReactions->setText(tr("STR_REACTIONS"));
-	_txtReactions->setAlign(ALIGN_RIGHT);
+	_txtReactions->setAlign(TextHAlign::ALIGN_RIGHT);
 
 	_txtBravery->setText(tr("STR_BRAVERY"));
-	_txtBravery->setAlign(ALIGN_RIGHT);
+	_txtBravery->setAlign(TextHAlign::ALIGN_RIGHT);
 
 	_txtPilots->setText(tr("STR_PILOTS"));
 
 	_lstPilots->setColumns(5, 114, 58, 58, 58, 0);
-	_lstPilots->setAlign(ALIGN_RIGHT);
-	_lstPilots->setAlign(ALIGN_LEFT, 0);
+	_lstPilots->setAlign(TextHAlign::ALIGN_RIGHT);
+	_lstPilots->setAlign(TextHAlign::ALIGN_LEFT, 0);
 	_lstPilots->setDot(true);
 
 	_txtRequired->setText(tr("STR_PILOTS_REQUIRED").arg(c->getRules()->getPilots()));

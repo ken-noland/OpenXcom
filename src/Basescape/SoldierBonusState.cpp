@@ -80,7 +80,7 @@ SoldierBonusState::SoldierBonusState(Base* base, size_t soldier) : State("Soldie
 	_btnCancel->onKeyboardPress((ActionHandler)&SoldierBonusState::btnCancelClick, Options::keyCancel);
 
 	Soldier *s = _base ? _base->getSoldiers().at(_soldier) : getGame()->getSavedGame()->getDeadSoldiers().at(_soldier);
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SOLDIER_BONUSES_FOR").arg(s->getName()));
 
 	_txtType->setText(tr("STR_TYPE"));
@@ -101,7 +101,7 @@ SoldierBonusState::SoldierBonusState(Base* base, size_t soldier) : State("Soldie
 	_lstBonuses->onMouseClick((ActionHandler)& SoldierBonusState::lstBonusesClick);
 
 	_lstSummary->setColumns(2, 122, 20);
-	_lstSummary->setAlign(ALIGN_RIGHT, 1);
+	_lstSummary->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 	_lstSummary->setSelectable(true);
 	_lstSummary->setMargin(8);
 	_lstSummary->setVisible(false);

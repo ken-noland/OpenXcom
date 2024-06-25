@@ -114,7 +114,7 @@ UfopaediaStartState::UfopaediaStartState()
 	setWindowBackground(_window, "ufopaedia");
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_UFOPAEDIA"));
 
 	_btnOk->setText(tr("STR_OK"));

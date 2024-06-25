@@ -61,8 +61,8 @@ InfoboxOKState::InfoboxOKState(const std::string& msg) : State("InfoboxOKState",
 	_btnOk->setHighContrast(true);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
-	_txtTitle->setVerticalAlign(ALIGN_MIDDLE);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtTitle->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtTitle->setHighContrast(true);
 	_txtTitle->setWordWrap(true);
 	_txtTitle->setText(msg);

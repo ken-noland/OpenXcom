@@ -73,7 +73,7 @@ ConfirmEndMissionState::ConfirmEndMissionState(SavedBattleGame *battleGame, int 
 	_txtWounded->setText(tr("STR_UNITS_WITH_FATAL_WOUNDS", _wounded));
 
 	_txtConfirm->setBig();
-	_txtConfirm->setAlign(ALIGN_CENTER);
+	_txtConfirm->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtConfirm->setHighContrast(true);
 	_txtConfirm->setText(tr("STR_END_MISSION_QUESTION"));
 

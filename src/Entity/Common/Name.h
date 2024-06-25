@@ -23,7 +23,7 @@ namespace OpenXcom {
 
 /**
  * @brief Name Component for a display name. Usually comes from user input.
- * Not guranteed to be unique.
+ * Not guaranteed to be unique.
  */
 struct Name
 {

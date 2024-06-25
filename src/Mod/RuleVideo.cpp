@@ -52,8 +52,8 @@ static void _loadSlide(SlideshowSlide &slide, const YAML::Node &node)
 
 	slide.color = node["captionColor"].as<int>(INT_MAX);
 	slide.transitionSeconds = node["transitionSeconds"].as<int>(0);
-	slide.align = (TextHAlign)node["captionAlign"].as<int>(ALIGN_LEFT);
-	slide.valign = (TextVAlign)node["captionVerticalAlign"].as<int>(ALIGN_TOP);
+	slide.align = static_cast<TextHAlign>(node["captionAlign"].as<int>((int)TextHAlign::ALIGN_LEFT));
+	slide.valign = static_cast<TextVAlign>(node["captionVerticalAlign"].as<int>((int)TextVAlign::ALIGN_TOP));
 }
 
 void RuleVideo::load(const YAML::Node &node)

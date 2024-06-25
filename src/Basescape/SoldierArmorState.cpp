@@ -102,7 +102,7 @@ SoldierArmorState::SoldierArmorState(Base* base, size_t soldier, SoldierArmorOri
 	_btnCancel->onKeyboardPress((ActionHandler)&SoldierArmorState::btnCancelClick, Options::keyCancel);
 
 	Soldier *s = _base->getSoldiers().at(_soldier);
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_ARMOR_FOR_SOLDIER").arg(s->getName()));
 
 	_txtType->setText(tr("STR_TYPE"));

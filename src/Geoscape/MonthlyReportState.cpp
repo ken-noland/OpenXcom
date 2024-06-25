@@ -109,8 +109,8 @@ MonthlyReportState::MonthlyReportState(Globe* globe) : State("MonthlyReportState
 	_txtTitle->setText(tr("STR_XCOM_PROJECT_MONTHLY_REPORT"));
 
 	_txtFailure->setBig();
-	_txtFailure->setAlign(ALIGN_CENTER);
-	_txtFailure->setVerticalAlign(ALIGN_MIDDLE);
+	_txtFailure->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtFailure->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtFailure->setWordWrap(true);
 	_txtFailure->setText(tr("STR_YOU_HAVE_FAILED"));
 	_txtFailure->setVisible(false);

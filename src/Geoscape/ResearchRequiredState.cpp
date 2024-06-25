@@ -64,8 +64,8 @@ ResearchRequiredState::ResearchRequiredState(RuleItem *item) : State("ResearchRe
 	_btnOk->onKeyboardPress((ActionHandler)&ResearchRequiredState::btnOkClick, Options::keyOk);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
-	_txtTitle->setVerticalAlign(ALIGN_MIDDLE);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
+	_txtTitle->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_txtTitle->setText(tr("STR_YOU_NEED_TO_RESEARCH_ITEM_TO_PRODUCE_ITEM")
 					   .arg(tr(clip))
 					   .arg(tr(weapon)));

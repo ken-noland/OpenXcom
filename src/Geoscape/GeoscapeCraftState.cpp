@@ -249,7 +249,7 @@ GeoscapeCraftState::GeoscapeCraftState(Craft* craft, Globe* globe, Waypoint* way
 	}
 
 	_txtRedirect->setBig();
-	_txtRedirect->setAlign(ALIGN_CENTER);
+	_txtRedirect->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtRedirect->setText(tr("STR_REDIRECT_CRAFT"));
 
 	std::ostringstream ss11;
@@ -286,7 +286,7 @@ GeoscapeCraftState::GeoscapeCraftState(Craft* craft, Globe* globe, Waypoint* way
 					if (days > 0) ssStatus << "/";
 					ssStatus << tr("STR_HOUR_SHORT").arg(hours);
 				}
-				_txtETA->setAlign(ALIGN_CENTER);
+				_txtETA->setAlign(TextHAlign::ALIGN_CENTER);
 				_txtETA->setText(tr("STR_ETA").arg(ssStatus.str()));
 			}
 		}

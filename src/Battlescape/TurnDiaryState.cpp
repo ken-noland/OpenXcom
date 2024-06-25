@@ -61,7 +61,7 @@ TurnDiaryState::TurnDiaryState(const HitLog *hitLog) : State("TurnDiaryState", f
 	windowComponent.setHighContrast(true);
 	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 	_txtTitle->setHighContrast(true);
 	_txtTitle->setText(tr("STR_HIT_LOG"));
@@ -75,7 +75,7 @@ TurnDiaryState::TurnDiaryState(const HitLog *hitLog) : State("TurnDiaryState", f
 	_lstTurnDiary->setSelectable(true);
 	_lstTurnDiary->setBackground(_window);
 	_lstTurnDiary->setMargin(8);
-	_lstTurnDiary->setAlign(ALIGN_CENTER);
+	_lstTurnDiary->setAlign(TextHAlign::ALIGN_CENTER);
 	_lstTurnDiary->setHighContrast(true);
 	_lstTurnDiary->setWordWrap(true);
 

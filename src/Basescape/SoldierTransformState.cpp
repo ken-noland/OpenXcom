@@ -88,7 +88,7 @@ SoldierTransformState::SoldierTransformState(Base* base, size_t soldier)
 	_btnCancel->onKeyboardPress((ActionHandler)&SoldierTransformState::btnCancelClick, Options::keyCancel);
 
 	Soldier *s = _base->getSoldiers().at(_soldier);
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SELECT_TRANSFORMATION_FOR").arg(s->getName()));
 
 	_txtType->setText(tr("STR_TYPE"));

@@ -94,7 +94,7 @@ ExtendedInventoryLinksState::ExtendedInventoryLinksState(InventoryState* parent,
 	setWindowBackground(_window, "oxceLinks");
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_EXTENDED_LINKS"));
 
 	_btnOk->setText(tr("STR_OK"));

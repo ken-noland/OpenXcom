@@ -71,7 +71,7 @@ SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : State("Soldie
 	_btnCancel->onKeyboardPress((ActionHandler)&SoldierRankState::btnCancelClick, Options::keyCancel);
 
 	Soldier *soldier = _base->getSoldiers().at(_soldierId);
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_PROMOTE_SOLDIER").arg(tr(soldier->getRankString())).arg(soldier->getName()));
 
 	_txtRank->setText(tr("STR_RANK_HEADER"));

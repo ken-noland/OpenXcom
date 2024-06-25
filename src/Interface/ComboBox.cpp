@@ -83,7 +83,7 @@ ComboBox::ComboBox(State *state, int width, int height, int x, int y, bool popup
 	_list->setColumns(1, _list->getWidth());
 	_list->setSelectable(true);
 	_list->setBackground(_window);
-	_list->setAlign(ALIGN_CENTER);
+	_list->setAlign(TextHAlign::ALIGN_CENTER);
 	_list->setScrolling(true, 0);
 
 	toggle(true, false);

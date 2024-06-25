@@ -90,7 +90,7 @@ NewManufactureListState::NewManufactureListState(Base* base) : State("NewManufac
 
 	_txtTitle->setText(tr("STR_PRODUCTION_ITEMS"));
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_txtItem->setText(tr("STR_ITEM"));
 

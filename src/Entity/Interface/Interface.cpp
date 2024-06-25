@@ -53,7 +53,11 @@ entt::entity InterfaceFactory::createTextButton(const std::string& name, const s
 {
 	entt::entity entity = _surfaceFactory.createSurface(name, width, height, x, y);
 
-	_registry.emplace<TextButtonComponent>(entity);
+	SurfaceComponent& surfaceComponent = _registry.get<SurfaceComponent>(entity);
+	DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
+	TickableComponent& tickableComponent = _registry.emplace<TickableComponent>(entity);
+
+	_registry.emplace<TextButtonComponent>(entity, surfaceComponent, tickableComponent, drawableComponent);
 
 	return entity;
 }

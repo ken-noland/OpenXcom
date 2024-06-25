@@ -98,7 +98,7 @@ PlaceLiftState::PlaceLiftState(entt::handle newBaseHandle, Globe *globe, bool fi
 	}
 
 	_txtHeader->setBig();
-	_txtHeader->setAlign(ALIGN_CENTER);
+	_txtHeader->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtHeader->setText(tr("STR_INSTALLATION"));
 
 	_lstAccessLifts->setColumns(1, 104);

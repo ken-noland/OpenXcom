@@ -66,7 +66,7 @@ CraftEquipmentSaveState::CraftEquipmentSaveState(CraftEquipmentState* parent) : 
 	// Set up objects
 	setWindowBackground(_window, "craftEquipmentSave");
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_SAVE_CRAFT_LOADOUT_TEMPLATE"));
 
 	_lstLoadout->setColumns(1, 192);

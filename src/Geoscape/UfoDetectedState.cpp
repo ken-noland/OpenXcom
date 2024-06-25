@@ -151,7 +151,7 @@ UfoDetectedState::UfoDetectedState(Ufo* ufo, GeoscapeState* state, bool detected
 		_txtDetected->setText("");
 	}
 
-	_txtHyperwave->setAlign(ALIGN_CENTER);
+	_txtHyperwave->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtHyperwave->setWordWrap(true);
 	_txtHyperwave->setText(tr("STR_HYPER_WAVE_TRANSMISSIONS_ARE_DECODED"));
 

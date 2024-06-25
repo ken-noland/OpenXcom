@@ -152,7 +152,7 @@ SoldiersState::SoldiersState(Base* base) : State("SoldiersState", true), _base(b
 	_cbxFilterByCraft->onChange((ActionHandler)&SoldiersState::cbxFilterCraftByChange);	
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_LEFT);
+	_txtTitle->setAlign(TextHAlign::ALIGN_LEFT);
 	_txtTitle->setText(tr("STR_SOLDIER_LIST"));
 
 	_txtName->setText(tr("STR_NAME_UC"));
@@ -209,7 +209,7 @@ SoldiersState::SoldiersState(Base* base) : State("SoldiersState", true), _base(b
 
 	//_lstSoldiers->setArrowColumn(188, ARROW_VERTICAL);
 	_lstSoldiers->setColumns(3, 106, 98, 76);
-	_lstSoldiers->setAlign(ALIGN_RIGHT, 3);
+	_lstSoldiers->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstSoldiers->setSelectable(true);
 	_lstSoldiers->setBackground(_window);
 	_lstSoldiers->setMargin(8);

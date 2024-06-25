@@ -176,7 +176,7 @@ namespace OpenXcom
 		_txtTitle->setText(tr(defs->getTitleForPage(_state->current_page)));
 
 		_txtWeight->setColor(_textColor);
-		_txtWeight->setAlign(ALIGN_RIGHT);
+		_txtWeight->setAlign(TextHAlign::ALIGN_RIGHT);
 
 		// IMAGE
 		_image = new Surface(32, 48, 157, 5);
@@ -327,14 +327,14 @@ namespace OpenXcom
 			_txtAmmoType[i] = new Text(82, 16, 194, 20 + i*49);
 			add(_txtAmmoType[i]);
 			_txtAmmoType[i]->setColor(_textColor);
-			_txtAmmoType[i]->setAlign(ALIGN_CENTER);
-			_txtAmmoType[i]->setVerticalAlign(ALIGN_MIDDLE);
+			_txtAmmoType[i]->setAlign(TextHAlign::ALIGN_CENTER);
+			_txtAmmoType[i]->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 			_txtAmmoType[i]->setWordWrap(true);
 
 			_txtAmmoDamage[i] = new Text(82, 17, 194, 40 + i*49);
 			add(_txtAmmoDamage[i]);
 			_txtAmmoDamage[i]->setColor(_ammoColor);
-			_txtAmmoDamage[i]->setAlign(ALIGN_CENTER);
+			_txtAmmoDamage[i]->setAlign(TextHAlign::ALIGN_CENTER);
 			_txtAmmoDamage[i]->setBig();
 
 			_imageAmmo[i] = new Surface(32, 48, 280, 16 + i*49);
@@ -367,13 +367,13 @@ namespace OpenXcom
 				_txtDamage = new Text(82, 10, 194, 7);
 				add(_txtDamage);
 				_txtDamage->setColor(_textColor);
-				_txtDamage->setAlign(ALIGN_CENTER);
+				_txtDamage->setAlign(TextHAlign::ALIGN_CENTER);
 				_txtDamage->setText(tr("STR_DAMAGE_UC"));
 
 				_txtAmmo = new Text(50, 10, 268, 7);
 				add(_txtAmmo);
 				_txtAmmo->setColor(_textColor);
-				_txtAmmo->setAlign(ALIGN_CENTER);
+				_txtAmmo->setAlign(TextHAlign::ALIGN_CENTER);
 				_txtAmmo->setText(tr("STR_AMMO"));
 
 				if (ammo_data->empty())
@@ -419,7 +419,7 @@ namespace OpenXcom
 				_txtDamage = new Text(82, 10, 194, 7);
 				add(_txtDamage);
 				_txtDamage->setColor(_textColor);
-				_txtDamage->setAlign(ALIGN_CENTER);
+				_txtDamage->setAlign(TextHAlign::ALIGN_CENTER);
 				_txtDamage->setText(tr("STR_DAMAGE_UC"));
 
 				addAmmoDamagePower(0, item);
@@ -431,7 +431,7 @@ namespace OpenXcom
 		_txtArrows = new Text(32, 9, 280, 183);
 		add(_txtArrows);
 		_txtArrows->setColor(_arrowColor);
-		_txtArrows->setAlign(ALIGN_RIGHT);
+		_txtArrows->setAlign(TextHAlign::ALIGN_RIGHT);
 		std::ostringstream ss2;
 		if (_state->hasPrevArticlePage()) ss2 << "<<";
 		if (_state->hasNextArticlePage()) ss2 << " >>";

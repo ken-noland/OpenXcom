@@ -86,15 +86,15 @@ TargetInfoState::TargetInfoState(Target* target, Globe* globe)
 	_btnOk->onKeyboardPress((ActionHandler)&TargetInfoState::btnOkClick, Options::keyCancel);
 
 	_edtTitle->setBig();
-	_edtTitle->setAlign(ALIGN_CENTER);
-	_edtTitle->setVerticalAlign(ALIGN_MIDDLE);
+	_edtTitle->setAlign(TextHAlign::ALIGN_CENTER);
+	_edtTitle->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_edtTitle->setWordWrap(true);
 	_edtTitle->setText(_target->getName(getGame()->getLanguage()));
 	_edtTitle->onChange((ActionHandler)&TargetInfoState::edtTitleChange);
 
-	_txtTargetted->setAlign(ALIGN_CENTER);
+	_txtTargetted->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTargetted->setText(tr("STR_TARGETTED_BY"));
-	_txtFollowers->setAlign(ALIGN_CENTER);
+	_txtFollowers->setAlign(TextHAlign::ALIGN_CENTER);
 	std::ostringstream ss;
 	for (const auto* follower : *_target->getFollowers())
 	{
@@ -130,7 +130,7 @@ TargetInfoState::TargetInfoState(Target* target, Globe* globe)
 
 	if (_deploymentRule && _deploymentRule->getDespawnPenalty() != 0)
 	{
-		_txtPenalty->setAlign(ALIGN_CENTER);
+		_txtPenalty->setAlign(TextHAlign::ALIGN_CENTER);
 		_txtPenalty->setText(tr("STR_DESPAWN_PENALTY").arg(_deploymentRule->getDespawnPenalty()));
 	}
 }

@@ -277,7 +277,7 @@ UnitInfoState::UnitInfoState(BattleUnit *unit, BattlescapeState *parent, bool fr
 	Uint8 color = getGame()->getMod()->getInterface("stats")->getElement("text")->color;
 	Uint8 color2 = getGame()->getMod()->getInterface("stats")->getElement("text")->color2;
 
-	_txtName->setAlign(ALIGN_CENTER);
+	_txtName->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtName->setBig();
 	_txtName->setHighContrast(true);
 

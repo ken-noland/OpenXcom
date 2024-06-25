@@ -72,12 +72,12 @@ TrainingFinishedState::TrainingFinishedState(Base* base, const std::vector<Soldi
 	_btnOpen->onMouseClick((ActionHandler)&TrainingFinishedState::btnOpenClick);
 	_btnOpen->onKeyboardPress((ActionHandler)&TrainingFinishedState::btnOpenClick, Options::keyOk);
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr(_psi ? "STR_PSI_TRAINING_FINISHED" : "STR_TRAINING_FINISHED").arg(base->getName()));
 
 	_lstPossibilities->setColumns(1, 250);
 	_lstPossibilities->setBig();
-	_lstPossibilities->setAlign(ALIGN_CENTER);
+	_lstPossibilities->setAlign(TextHAlign::ALIGN_CENTER);
 	_lstPossibilities->setScrolling(true, 0);
 	for (const auto* soldier : list)
 	{

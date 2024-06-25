@@ -83,7 +83,7 @@ ItemsArrivingState::ItemsArrivingState(GeoscapeState* state) : State("ItemsArriv
 	_btnGotoBase->onKeyboardPress((ActionHandler)&ItemsArrivingState::btnGotoBaseClick, Options::keyOk);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_ITEMS_ARRIVING"));
 
 	_txtItem->setText(tr("STR_ITEM"));

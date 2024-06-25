@@ -69,7 +69,7 @@ MedikitTitle::MedikitTitle (int y, const std::string & title) : Text (73, 9, 186
 {
 	this->setText(title);
 	this->setHighContrast(true);
-	this->setAlign(ALIGN_CENTER);
+	this->setAlign(TextHAlign::ALIGN_CENTER);
 }
 
 /**
@@ -91,7 +91,7 @@ MedikitTxt::MedikitTxt(int y) : Text(33, 17, 220, y)
 	// Note: we can't set setBig here. The needed font is only set when added to State
 	this->setColor(Palette::blockOffset(1));
 	this->setHighContrast(true);
-	this->setAlign(ALIGN_CENTER);
+	this->setAlign(TextHAlign::ALIGN_CENTER);
 }
 
 /**

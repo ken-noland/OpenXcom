@@ -95,9 +95,9 @@ SoldierDiaryMissionState::SoldierDiaryMissionState(Soldier* soldier, int rowEntr
 	_btnNext->onMouseClick((ActionHandler)&SoldierDiaryMissionState::btnNextClick);
 	_btnNext->onKeyboardPress((ActionHandler)&SoldierDiaryMissionState::btnNextClick, Options::keyBattlePrevUnit);
 
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 
-	_txtUFO->setAlign(ALIGN_CENTER);
+	_txtUFO->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_lstKills->setColumns(3, 60, 110, 100);
 }
@@ -177,7 +177,7 @@ void SoldierDiaryMissionState::init()
 							 tr(battleUnitKills->weapon).c_str());
 	}
 
-	_txtNoRecord->setAlign(ALIGN_CENTER);
+	_txtNoRecord->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtNoRecord->setText(tr("STR_NO_RECORD"));
 	_txtNoRecord->setVisible(!stunOrKill);
 

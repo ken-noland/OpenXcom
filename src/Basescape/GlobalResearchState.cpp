@@ -81,7 +81,7 @@ GlobalResearchState::GlobalResearchState(bool openedFromBasescape) : State("Glob
 	_btnOk->onKeyboardPress((ActionHandler)&GlobalResearchState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setText(tr("STR_RESEARCH_OVERVIEW"));
 
 	_txtProject->setWordWrap(true);
@@ -94,7 +94,7 @@ GlobalResearchState::GlobalResearchState(bool openedFromBasescape) : State("Glob
 
 //	_lstResearch->setColumns(3, 158, 58, 70);
 	_lstResearch->setColumns(4, 148, 20, 40, 98);
-	_lstResearch->setAlign(ALIGN_RIGHT, 1);
+	_lstResearch->setAlign(TextHAlign::ALIGN_RIGHT, 1);
 	_lstResearch->setSelectable(true);
 	_lstResearch->setBackground(_window);
 

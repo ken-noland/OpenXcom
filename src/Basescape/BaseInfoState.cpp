@@ -334,7 +334,7 @@ void BaseInfoState::init()
 		ss9 << defenseProbabilityPercentage;
 		ss9 << " %";
 		_numDefense->setText(ss9.str());
-		_numDefense->setAlign(ALIGN_RIGHT);
+		_numDefense->setAlign(TextHAlign::ALIGN_RIGHT);
 
 		_barDefense->setScale(1.0);
 		_barDefense->setMax(100);
@@ -363,7 +363,7 @@ void BaseInfoState::init()
 		ss10 << shortRangeDetectionProbabilityPercentage;
 		ss10 << " %";
 		_numShortRange->setText(ss10.str());
-		_numShortRange->setAlign(ALIGN_RIGHT);
+		_numShortRange->setAlign(TextHAlign::ALIGN_RIGHT);
 
 		_barShortRange->setScale(1.0);
 		_barShortRange->setMax(100);
@@ -374,7 +374,7 @@ void BaseInfoState::init()
 		ss11 << longRangeDetectionProbabilityPercentage;
 		ss11 << " %";
 		_numLongRange->setText(ss11.str());
-		_numLongRange->setAlign(ALIGN_RIGHT);
+		_numLongRange->setAlign(TextHAlign::ALIGN_RIGHT);
 
 		_barLongRange->setScale(1.0);
 		_barLongRange->setMax(100);

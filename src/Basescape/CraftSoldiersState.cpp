@@ -171,7 +171,7 @@ CraftSoldiersState::CraftSoldiersState(Base *base, size_t craft)
 
 	_lstSoldiers->setArrowColumn(188, ARROW_VERTICAL);
 	_lstSoldiers->setColumns(3, 106, 98, 76);
-	_lstSoldiers->setAlign(ALIGN_RIGHT, 3);
+	_lstSoldiers->setAlign(TextHAlign::ALIGN_RIGHT, 3);
 	_lstSoldiers->setSelectable(true);
 	_lstSoldiers->setBackground(_window);
 

@@ -71,11 +71,11 @@ NewPossibleResearchState::NewPossibleResearchState(Base* base, const std::vector
 	_btnResearch->onMouseClick((ActionHandler)&NewPossibleResearchState::btnResearchClick);
 	_btnResearch->onKeyboardPress((ActionHandler)&NewPossibleResearchState::btnResearchClick, Options::keyOk);
 	_txtTitle->setBig();
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 
 	_lstPossibilities->setColumns(1, 250);
 	_lstPossibilities->setBig();
-	_lstPossibilities->setAlign(ALIGN_CENTER);
+	_lstPossibilities->setAlign(TextHAlign::ALIGN_CENTER);
 	_lstPossibilities->setScrolling(true, 0);
 
 	bool foundNew = false;

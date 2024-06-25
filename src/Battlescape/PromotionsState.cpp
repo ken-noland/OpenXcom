@@ -73,7 +73,7 @@ PromotionsState::PromotionsState() : State("PromotionsState", true)
 	_btnOk->onKeyboardPress((ActionHandler)&PromotionsState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setText(tr("STR_PROMOTIONS"));
-	_txtTitle->setAlign(ALIGN_CENTER);
+	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
 
 	_txtName->setText(tr("STR_NAME"));

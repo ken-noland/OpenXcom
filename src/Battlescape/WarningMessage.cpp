@@ -37,8 +37,8 @@ WarningMessage::WarningMessage(int width, int height, int x, int y) : Surface(wi
 {
 	_text = new Text(width, height, 0, 0);
 	_text->setHighContrast(true);
-	_text->setAlign(ALIGN_CENTER);
-	_text->setVerticalAlign(ALIGN_MIDDLE);
+	_text->setAlign(TextHAlign::ALIGN_CENTER);
+	_text->setVerticalAlign(TextVAlign::ALIGN_MIDDLE);
 	_text->setWordWrap(true);
 
 	_timer = new Timer(50);
