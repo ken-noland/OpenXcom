@@ -74,7 +74,7 @@ void ErrorMessageState::create(const std::string &str, SDL_Color *palette, Uint8
 	if (bgColor != -1)
 		setStatePalette(getGame()->getMod()->getPalette("BACKPALS.DAT")->getColors(Palette::blockOffset(bgColor)), Palette::backPos, 16);
 
-	add(_window, "window", "errorMessage");
+	add(_window, "window", "errorMessages");
 	add(_btnOk);
 	add(_txtMessage);
 
