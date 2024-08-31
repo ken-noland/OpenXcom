@@ -37,7 +37,7 @@ private:
 	Base *_base;
 
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtItem, *_txtQuantity, *_txtArrivalTime;
 	TextList *_lstTransfers;
 public:

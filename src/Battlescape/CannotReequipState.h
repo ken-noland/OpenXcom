@@ -41,7 +41,7 @@ private:
 	Base *_base;
 
 	TextButton *_btnOk, *_btnManufacture, *_btnPurchase;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtItem, *_txtQuantity, *_txtCraft;
 	TextList *_lstItems;
 public:

@@ -36,7 +36,7 @@ class Ufo;
 class BaseDestroyedState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtMessage;
 	TextButton *_btnOk;
 	TextList *_lstDestroyedFacilities;

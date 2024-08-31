@@ -38,7 +38,7 @@ private:
 	TechTreeViewerState *_parent;
 	TextButton *_btnOk;
 	TextEdit *_btnQuickSearch;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextList *_lstTopics;
 	std::vector<std::string> _availableTopics;

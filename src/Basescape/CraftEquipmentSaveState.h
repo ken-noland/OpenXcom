@@ -36,7 +36,7 @@ class CraftEquipmentSaveState : public State
 {
 private:
 	CraftEquipmentState *_parent;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextList *_lstLoadout;
 	TextButton *_btnCancel, *_btnSave;

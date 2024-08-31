@@ -35,7 +35,7 @@ class RuleResearch;
  */
 class ResearchCompleteState : public State
 {
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtResearch, *_txtBase;
 	TextButton *_btnReport, *_btnOk;
 	const RuleResearch * _research, * _bonus;

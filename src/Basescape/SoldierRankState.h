@@ -48,7 +48,7 @@ private:
 	size_t _soldierId;
 
 	TextButton *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtRank, *_txtOpening;
 	TextList *_lstRanks;
 	std::vector<RankItem> _ranks;

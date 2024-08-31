@@ -39,7 +39,7 @@ private:
 	GeoscapeState *_state;
 
 	TextButton *_btnIntercept, *_btnCentre, *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtUfo, *_txtDetected, *_txtHyperwave;
 	TextList *_lstInfo, *_lstInfo2;
 public:

@@ -47,7 +47,7 @@ private:
 	std::vector<std::string> _index;
 
 	TextButton *_btnOk, *_btnGotoBase, *_btnSummary;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtMessage, *_txtItem, *_txtQuantity;
 	TextList *_lstSummary;
 	productionProgress_e _endType;

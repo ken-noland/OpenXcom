@@ -36,7 +36,7 @@ class CraftsState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtBase, *_txtName, *_txtStatus, *_txtWeapon, *_txtCrew, *_txtHwp;
 	TextList *_lstCrafts;
 	Base *_base;

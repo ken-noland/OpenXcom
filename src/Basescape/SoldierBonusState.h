@@ -43,7 +43,7 @@ private:
 
 	TextButton *_btnCancel;
 	ToggleTextButton *_btnSummary;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtType;
 	TextList *_lstBonuses;
 	TextList *_lstSummary;

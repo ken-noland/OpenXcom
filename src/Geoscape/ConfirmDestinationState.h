@@ -38,7 +38,7 @@ class ConfirmDestinationState : public State
 private:
 	std::vector<Craft*> _crafts;
 	Target *_target;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTarget;
 	Text *_txtETA;
 	TextButton *_btnOk, *_btnTransfer, *_btnCancel;

@@ -36,7 +36,7 @@ class ListLoadOriginalState : public State
 {
 private:
 	TextButton *_btnNew, *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtName, *_txtTime, *_txtDate;
 	TextButton *_btnSlot[SaveConverter::NUM_SAVES];
 	Text *_txtSlotName[SaveConverter::NUM_SAVES];

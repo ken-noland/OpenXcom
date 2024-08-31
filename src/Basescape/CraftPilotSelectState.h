@@ -39,7 +39,7 @@ private:
 	size_t _craft;
 
 	TextButton *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtName, *_txtFiringAcc, *_txtReactions, *_txtBravery;
 	TextList *_lstPilot;
 	std::vector<int> _pilot;

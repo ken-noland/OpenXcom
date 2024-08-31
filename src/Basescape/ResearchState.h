@@ -36,7 +36,7 @@ class ResearchState : public State
 private:
 	Base *_base;
 	TextButton *_btnNew, *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtAvailable, *_txtAllocated, *_txtSpace, *_txtProject, *_txtScientists, *_txtProgress;
 	TextList *_lstResearch;
 public:

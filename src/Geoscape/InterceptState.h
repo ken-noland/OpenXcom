@@ -40,7 +40,7 @@ class InterceptState : public State
 {
 private:
 	TextButton *_btnCancel, *_btnGotoBase;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtCraft, *_txtStatus, *_txtBase, *_txtWeapons;
 	TextList *_lstCrafts;
 	Globe *_globe;

@@ -35,7 +35,7 @@ class CommendationState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextList *_lstSoldiers;
 	std::vector<std::string> _commendationsNames;

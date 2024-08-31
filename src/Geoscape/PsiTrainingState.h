@@ -34,7 +34,7 @@ class PsiTrainingState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	std::vector<TextButton*> _btnBases;
 	std::vector<Base*> _bases;

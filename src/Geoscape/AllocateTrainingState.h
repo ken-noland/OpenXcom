@@ -42,7 +42,7 @@ class AllocateTrainingState : public State
 private:
 	TextButton *_btnOk;
 	ToggleTextButton *_btnPlus;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtTraining, *_txtName, *_txtRemaining;
 	Text *_txtTu, *_txtStamina, *_txtHealth, *_txtFiring, *_txtThrowing, *_txtMelee, *_txtStrength;
 	ComboBox *_cbxSortBy;

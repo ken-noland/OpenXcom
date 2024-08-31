@@ -40,7 +40,7 @@ private:
 	std::vector<Craft*> _crafts; 
 	Globe *_globe;
 	InteractiveSurface *_btnRotateLeft, *_btnRotateRight, *_btnRotateUp, *_btnRotateDown, *_btnZoomIn, *_btnZoomOut;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextButton *_btnCancel, *_btnCydonia;
 public:

@@ -41,7 +41,7 @@ class BaseDefenseState : public State
 private:
 	TextButton *_btnOk;
 	TextButton *_btnStart, *_btnAbort;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtInit;
 	TextList *_lstDefenses;
 	Base *_base;

@@ -438,6 +438,7 @@ set ( entity_common_src
 set ( entity_engine_src
   Entity/Engine/Drawable.cpp
   Entity/Engine/ECS.cpp
+  Entity/Engine/Palette.cpp
   Entity/Engine/Surface.cpp
   Entity/Engine/Tickable.cpp
 )
@@ -454,6 +455,7 @@ set ( entity_game_src
 set ( entity_interface_src
   Entity/Interface/ArrowButton.cpp
   Entity/Interface/Interface.cpp
+  Entity/Interface/Text.cpp
   Entity/Interface/TextButton.cpp
   Entity/Interface/Window.cpp
 )

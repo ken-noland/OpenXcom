@@ -37,7 +37,7 @@ class PauseState : public State
 private:
 	OptionsOrigin _origin;
 	TextButton *_btnLoad, *_btnSave, *_btnAbandon, *_btnOptions, *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 public:
 	/// Creates the Pause state.

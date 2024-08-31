@@ -48,7 +48,7 @@ private:
 	DebriefingState *_debriefingState;
 	TextButton *_btnOk, *_btnCancel, *_btnTransfer;
 	TextEdit *_btnQuickSearch;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtSales, *_txtFunds, *_txtQuantity, *_txtSell, *_txtValue, *_txtSpaceUsed;
 	ComboBox *_cbxCategory;
 	TextList *_lstItems;

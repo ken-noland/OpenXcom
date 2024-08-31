@@ -45,7 +45,7 @@ class Craft;
 class NewBattleState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Frame *_frameLeft, *_frameRight;
 	Text *_txtTitle, *_txtMapOptions, *_txtAlienOptions;
 	Text *_txtMission, *_txtCraft, *_txtDarkness, *_txtTerrain, *_txtDifficulty, *_txtAlienRace, *_txtAlienTech, *_txtDepth;

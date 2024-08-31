@@ -34,7 +34,7 @@ class PromotionsState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtName, *_txtRank, *_txtBase;
 	TextList *_lstSoldiers;
 public:

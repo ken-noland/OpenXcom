@@ -38,7 +38,7 @@ class ComboBox;
 class ModListState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtMaster;
 	ComboBox *_cbxMasters;
 	TextList *_lstMods;

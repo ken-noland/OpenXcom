@@ -35,7 +35,7 @@ class RuleEvent;
 class GeoscapeEventState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtMessage;
 	Text *_txtItem, *_txtQuantity;
 	TextButton *_btnOk;

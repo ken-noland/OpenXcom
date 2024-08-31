@@ -34,7 +34,7 @@ class BattlescapeState;
 class AbortMissionState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtInEntrance, *_txtInExit, *_txtOutside, *_txtAbort;
 	TextButton *_btnOk, *_btnCancel;
 	SavedBattleGame *_battleGame;

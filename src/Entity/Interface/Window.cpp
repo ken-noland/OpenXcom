@@ -28,13 +28,10 @@ namespace OpenXcom
 
 const double WindowComponent::POPUP_SPEED = 0.05;
 
-WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, TickableComponent& tickableComponent,
-	DrawableComponent& drawableComponent, State* state, WindowPopup popup)
+WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, State* state, WindowPopup popup)
 	: _surfaceComponent(surfaceComponent), _bg(0), _color(0), _popup(popup), _popupStep(0.0),
 	_state(state), _contrast(false), _screen(false), _thinBorder(false), _innerColor(0), _mute(false)
 {
-	drawableComponent.addDrawable(std::bind(&WindowComponent::draw, this));
-	tickableComponent.addTickable(std::bind(&WindowComponent::tick, this));
 
 	// the background image is always positioned at 0,0, so this sets the initial position of the background to be cropped
 	_dx = -_surfaceComponent.getSurface()->getX();

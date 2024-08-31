@@ -70,8 +70,8 @@ StartState::StartState()
 	_font->loadTerminal();
 	_lang = new Language();
 
-	_text = new Text(Options::baseXResolution, Options::baseYResolution, 0, 0);
-	_cursor = new Text(_font->getWidth(), _font->getHeight(), 0, 0);
+	_text = new Text(Options::baseXResolution, Options::baseYResolution, 0, 0, _font, _font, _lang);
+	_cursor = new Text(_font->getWidth(), _font->getHeight(), 0, 0, _font, _font, _lang);
 	_timer = new Timer(150);
 
 	setStatePalette(Font::TerminalColors, 0, (int)std::size(Font::TerminalColors));
@@ -80,11 +80,9 @@ StartState::StartState()
 	add(_cursor);
 
 	// Set up objects
-	_text->initText(_font, _font, _lang);
 	_text->setColor(0);
 	_text->setWordWrap(true);
 
-	_cursor->initText(_font, _font, _lang);
 	_cursor->setColor(0);
 	_cursor->setText("_");
 

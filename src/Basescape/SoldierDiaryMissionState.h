@@ -38,7 +38,7 @@ private:
 	Soldier *_soldier;
 
 	TextButton *_btnOk, *_btnPrev, *_btnNext;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtUFO, *_txtScore, *_txtKills, *_txtLocation, *_txtRace, *_txtDaylight, *_txtDaysWounded;
 	Text *_txtNoRecord;
 	TextList *_lstKills;

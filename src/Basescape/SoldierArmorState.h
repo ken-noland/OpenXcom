@@ -68,7 +68,7 @@ private:
 	SoldierArmorOrigin _origin;
 	TextButton *_btnCancel;
 	TextEdit *_btnQuickSearch;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtType, *_txtQuantity;
 	TextList *_lstArmor;
 	ArrowButton *_sortName;

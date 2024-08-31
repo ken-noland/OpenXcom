@@ -42,7 +42,7 @@ class OptionsBaseState : public State
 {
 protected:
 	OptionsOrigin _origin;
-	entt::entity _window;
+	entt::handle _window;
 	TextButton *_btnVideo, *_btnAudio, *_btnControls, *_btnGeoscape, *_btnBattlescape, *_btnAdvanced, *_btnFolders;
 	TextButton *_btnOk, *_btnCancel, *_btnDefault;
 	Text *_txtTooltip;

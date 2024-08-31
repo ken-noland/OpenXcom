@@ -37,7 +37,7 @@ private:
 	TextButton *_btnOk;
 	TextButton *_btnTouch, *_btnNightVision, *_btnPersonalLights, *_btnBrightness, *_btnTurnDiary, *_btnBriefing, *_btnNotes, *_btnMusic;
 	TextButton *_btnKillAll;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	BattlescapeState *_parent;
 	SavedBattleGame* _save;

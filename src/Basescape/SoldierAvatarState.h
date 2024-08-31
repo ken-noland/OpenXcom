@@ -43,7 +43,7 @@ private:
 	size_t _soldier;
 
 	TextButton *_btnCancel, *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtType;
 	Surface *_soldierSurface;
 	TextList *_lstAvatar;

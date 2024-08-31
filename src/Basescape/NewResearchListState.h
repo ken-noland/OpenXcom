@@ -45,7 +45,7 @@ private:
 	ComboBox *_cbxSort;
 	ToggleTextButton *_btnShowOnlyNew;
 	TextEdit *_btnQuickSearch;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextList *_lstResearch;
 	size_t _lstScroll;

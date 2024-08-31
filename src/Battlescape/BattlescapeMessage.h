@@ -40,7 +40,7 @@ private:
 	static const int HORIZONTAL_OFFSET;
 	static const int VERTICAL_OFFSET;
 
-	entt::entity _window;
+	entt::handle _window;
 	Text *_text;
 	Text *_txtThinking;
 	ProgressBar *_progressBar;

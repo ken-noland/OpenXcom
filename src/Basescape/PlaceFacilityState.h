@@ -43,7 +43,7 @@ protected:
 
 	BaseView *_view;
 	TextButton *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtFacility, *_txtCost, *_numCost, *_numResources, *_txtTime, *_numTime, *_txtMaintenance, *_numMaintenance;
 public:
 	/// Creates the Place Facility state.

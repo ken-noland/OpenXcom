@@ -46,7 +46,7 @@ private:
 	RuleBaseFacility *_lift;
 
 	std::vector<RuleBaseFacility*> _accessLifts;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtHeader;
 	TextList *_lstAccessLifts;
 public:

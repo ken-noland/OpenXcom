@@ -25,6 +25,8 @@
 #include "../Engine/ShaderDraw.h"
 #include "../Engine/ShaderMove.h"
 #include "../Engine/Action.h"
+#include "../Engine/Game.h"
+#include "../Mod/Mod.h"
 
 namespace OpenXcom
 {
@@ -36,11 +38,27 @@ namespace OpenXcom
  * @param x X position in pixels.
  * @param y Y position in pixels.
  */
-Text::Text(int width, int height, int x, int y) : InteractiveSurface(width, height, x, y),
-	_big(0), _small(0), _font(0), _fontOrig(0), _lang(0),
+Text::Text(int width, int height, int x, int y, Font* big, Font* small, Language* lang) : InteractiveSurface(width, height, x, y),
+	_big(big), _small(small), _font(0), _fontOrig(0), _lang(lang),
 	_wrap(false), _invert(false), _contrast(false), _indent(false), _scroll(false), _ignoreSeparators(false),
 	_align(TextHAlign::ALIGN_LEFT), _valign(TextVAlign::ALIGN_TOP), _color(0), _color2(0), _scrollY(0)
 {
+	if (!_big)
+	{
+		_big = getGame()->getMod()->getFont("FONT_BIG");
+	}
+
+	if (!small)
+	{
+		_small = getGame()->getMod()->getFont("FONT_SMALL");
+	}
+
+	if (!_lang)
+	{
+		_lang = getGame()->getLanguage();
+	}
+
+	setSmall();
 }
 
 /**
@@ -78,23 +96,6 @@ void Text::setSmall()
 Font *Text::getFont() const
 {
 	return _font;
-}
-
-/**
- * Changes the various resources needed for text rendering.
- * The different fonts need to be passed in advance since the
- * text size can change mid-text, and the language affects
- * how the text is rendered.
- * @param big Pointer to large-size font.
- * @param small Pointer to small-size font.
- * @param lang Pointer to current language.
- */
-void Text::initText(Font *big, Font *small, Language *lang)
-{
-	_big = big;
-	_small = small;
-	_lang = lang;
-	setSmall();
 }
 
 /**
@@ -581,7 +582,7 @@ void Text::draw()
 		{
 			if (dir < 0)
 				x += dir * font->getCharSize(*c).w;
-			auto chr = font->getChar(*c);
+			SurfaceCrop chr = font->getChar(*c);
 			chr.setX(x);
 			chr.setY(y);
 			ShaderDraw<PaletteShift>(ShaderSurface(this, 0, 0), ShaderCrop(chr), ShaderScalar(color), ShaderScalar(mul), ShaderScalar(mid));

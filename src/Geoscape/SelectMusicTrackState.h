@@ -43,7 +43,7 @@ class SelectMusicTrackState : public State
 {
 private:
 	SelectMusicTrackOrigin _origin;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextButton *_btnCancel;
 	TextList *_lstTracks;

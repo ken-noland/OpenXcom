@@ -34,7 +34,7 @@ class HitLog;
 class TurnDiaryState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextButton *_btnCancel;
 	TextList *_lstTurnDiary;

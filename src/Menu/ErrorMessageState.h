@@ -34,7 +34,7 @@ class ErrorMessageState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtMessage;
 
 	void create(const std::string &str, SDL_Color *palette, Uint8 color, const std::string &bg, int bgColor);

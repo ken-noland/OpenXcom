@@ -35,7 +35,7 @@ class DeleteGameState : public State
 {
 private:
 	TextButton *_btnNo, *_btnYes;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtMessage;
 	std::string _filename;
 	OptionsOrigin _origin;

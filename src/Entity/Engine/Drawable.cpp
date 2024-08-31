@@ -18,6 +18,8 @@
  */
 #include "Drawable.h"
 #include "../Interface/Window.h"
+#include "../Interface/Text.h"
+#include "../Interface/TextButton.h"
 #include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
 #include "../../Engine/Registry.h"
@@ -26,7 +28,7 @@
 namespace OpenXcom
 {
 
-DrawableComponent::DrawableComponent()
+DrawableComponent::DrawableComponent() : _surfaceComponent(nullptr)
 {
 }
 
@@ -45,7 +47,7 @@ void DrawableComponent::draw()
 
 //	if (surface->getVisible() && !surface->isHidden())
 	{
-		if (surface->getRedraw())
+		//if (surface->getRedraw())
 		{
 			_drawables.call();
 		}
@@ -65,22 +67,22 @@ DrawableSystem::~DrawableSystem()
 {
 }
 
-void DrawableSystem::draw(entt::entity& entity)
+void DrawableSystem::draw(entt::handle& entity)
 {
 	//KN NOTE: Right, so, not everything has been migrated over to ECS yet, so this function is a bit mixed.
 
 	// KN NOTE: A bit of a hack for now until we have more of the surface stuff
 	//  moved over to ECS. Some are using the old draw method(blitting) whereas
 	//  others are using the new DrawableComponent
-
-	if (getRegistry().raw().any_of<WindowComponent>(entity))
+	
+	if (entity.any_of<WindowComponent, TextButtonComponent, TextComponent>())
 	{
-		DrawableComponent& drawableComponent = getRegistry().raw().get<DrawableComponent>(entity);
+		DrawableComponent& drawableComponent = entity.get<DrawableComponent>();
 		drawableComponent.draw();
 	}
 	else
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(entity).getSurface();
+		Surface* surface = entity.get<SurfaceComponent>().getSurface();
 		surface->blit(getGame()->getScreen()->getSurface());
 	}
 }

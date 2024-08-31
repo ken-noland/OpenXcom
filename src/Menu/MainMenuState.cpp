@@ -78,8 +78,8 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	_btnOptions = factory.createTextButton("btnOptions", tr("STR_OPTIONS"), 92, 20, 164, 118, [](Action*) { getGame()->pushState(new OptionsVideoState(OPT_MENU)); });
 	_btnMods = factory.createTextButton("btnMods", tr("STR_MODS"), 92, 20, 64, 146, [](Action*) { getGame()->pushState(new ModListState); });
 	_btnQuit = factory.createTextButton("btnQuit", tr("STR_QUIT"), 92, 20, 164, 146, [](Action*) { getGame()->quit(); });
-	_btnUpdate = factory.createTextButton("btnUpdate", tr("STR_UPDATE"), 72, 16, 209, 27, [this](Action* action) { btnUpdateClick(action); });
-	_txtUpdateInfo = new Text(320, 17, 0, 11);
+	//_btnUpdate = factory.createTextButton("btnUpdate", tr("STR_UPDATE"), 72, 16, 209, 27, [this](Action* action) { btnUpdateClick(action); });
+	//_txtUpdateInfo = new Text(320, 17, 0, 11);
 	_txtTitle = new Text(256, 30, 32, 45);
 
 	// Set palette
@@ -92,8 +92,8 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	add(_btnOptions, "button", "mainMenu");
 	add(_btnMods, "button", "mainMenu");
 	add(_btnQuit, "button", "mainMenu");
-	add(_btnUpdate, "button", "mainMenu");
-	add(_txtUpdateInfo, "text", "mainMenu");
+	//add(_btnUpdate, "button", "mainMenu");
+	//add(_txtUpdateInfo, "text", "mainMenu");
 	add(_txtTitle, "text", "mainMenu");
 
 	centerAllSurfaces();
@@ -123,10 +123,10 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	//_btnUpdate->onMouseClick((ActionHandler)& MainMenuState::btnUpdateClick);
 	//_btnUpdate->setVisible(false);
 
-	_txtUpdateInfo->setAlign(TextHAlign::ALIGN_CENTER);
-	_txtUpdateInfo->setWordWrap(true);
-	_txtUpdateInfo->setText(tr("STR_LATEST_VERSION_INFO"));
-	_txtUpdateInfo->setVisible(false);
+	//_txtUpdateInfo->setAlign(TextHAlign::ALIGN_CENTER);
+	//_txtUpdateInfo->setWordWrap(true);
+	//_txtUpdateInfo->setText(tr("STR_LATEST_VERSION_INFO"));
+	//_txtUpdateInfo->setVisible(false);
 
 #ifdef _WIN32
 	//_debugInVisualStudio = true; // uncomment when debugging in Visual Studio (working dir and exe dir are not the same)

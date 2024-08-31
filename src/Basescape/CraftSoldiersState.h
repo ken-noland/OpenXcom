@@ -41,7 +41,7 @@ class CraftSoldiersState : public State
 private:
 	TextButton *_btnOk;
 	TextButton *_btnPreview;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtName, *_txtRank, *_txtCraft, *_txtAvailable, *_txtUsed;
 	ComboBox *_cbxSortBy;
 	TextList *_lstSoldiers;

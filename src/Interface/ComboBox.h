@@ -44,7 +44,7 @@ private:
 
 	TextButton *_button;
 	Surface *_arrow;
-	entt::entity _window;
+	entt::handle _window;
 	TextList *_list;
 
 	ActionHandler _change;

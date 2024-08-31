@@ -37,7 +37,7 @@ class RuleResearch;
 class NewPossibleResearchState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextList * _lstPossibilities;
 	TextButton *_btnResearch, *_btnOk;

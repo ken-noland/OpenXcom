@@ -41,7 +41,7 @@ class CraftArmorState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtName, *_txtCraft, *_txtArmor;
 	ComboBox *_cbxSortBy;
 	TextList *_lstSoldiers;

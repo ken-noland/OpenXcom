@@ -43,7 +43,7 @@ protected:
 	size_t _lstScroll;
 
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextList *_lstFacilities;
 public:

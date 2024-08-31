@@ -37,7 +37,7 @@ class SoldierMemorialState : public State
 private:
 	TextButton *_btnOk, *_btnStatistics;
 	TextEdit *_btnQuickSearch;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtName, *_txtRank, *_txtDate, *_txtRecruited, *_txtLost;
 	TextList *_lstSoldiers;
 	std::vector<int> _indices;

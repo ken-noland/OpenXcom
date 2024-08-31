@@ -42,7 +42,7 @@ private:
 	size_t _weapon;
 
 	TextButton *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtArmament, *_txtQuantity, *_txtAmmunition, *_txtCurrentWeapon;
 	TextList *_lstWeapons;
 	std::vector<RuleCraftWeapon*> _weapons;

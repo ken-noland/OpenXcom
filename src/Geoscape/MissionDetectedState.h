@@ -38,7 +38,7 @@ private:
 	GeoscapeState *_state;
 
 	TextButton *_btnIntercept, *_btnCenter, *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtCity;
 public:
 	/// Creates the Mission Detected state.

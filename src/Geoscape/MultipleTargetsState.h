@@ -44,7 +44,7 @@ private:
 	GeoscapeState *_state;
 	bool _useCustomSound;
 
-	entt::entity _window;
+	entt::handle _window;
 	std::vector<TextButton*> _btnTargets;
 public:
 	/// Creates the Multiple Targets state.

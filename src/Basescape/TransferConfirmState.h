@@ -35,7 +35,7 @@ class TransferConfirmState : public State
 {
 private:
 	TextButton *_btnCancel, *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtCost, *_txtTotal;
 	Base *_base;
 	TransferItemsState *_state;

@@ -37,7 +37,7 @@ private:
 	OptionsOrigin _origin;
 	std::string _fileName;
 	TextButton *_btnYes, *_btnNo;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtText;
 public:
 	/// Creates a new confirmation state.

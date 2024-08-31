@@ -59,7 +59,7 @@ protected:
 	bool _mute;
 
 public:
-	WindowComponent(SurfaceComponent& surfaceComponent, TickableComponent& tickableComponent, DrawableComponent& drawableComponent, State* state, WindowPopup popup);
+	WindowComponent(SurfaceComponent& surfaceComponent, State* state, WindowPopup popup);
 	~WindowComponent();
 
 	/// Sets the background surface.

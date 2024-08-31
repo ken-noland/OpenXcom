@@ -39,7 +39,7 @@ private:
 	GeoscapeState *_state;
 	Base *_base;
 	TextButton *_btnOk, *_btnGotoBase;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtItem, *_txtQuantity, *_txtDestination;
 	TextList *_lstTransfers;
 public:

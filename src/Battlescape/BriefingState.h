@@ -37,7 +37,7 @@ class BriefingState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtTarget, *_txtCraft, *_txtBriefing;
 	std::string _cutsceneId, _musicId;
 	bool _infoOnly;

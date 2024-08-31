@@ -37,7 +37,7 @@ private:
 	size_t _soldierId;
 
 	TextButton *_btnOk, *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtSoldier;
 public:
 	/// Creates the Sack Soldier state.

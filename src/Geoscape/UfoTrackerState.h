@@ -39,7 +39,7 @@ class UfoTrackerState : public State
 {
 private:
 	TextButton *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtObject, *_txtSize, *_txtAltitude, *_txtHeading, *_txtSpeed;
 	TextList *_lstObjects;
 	GeoscapeState *_state;

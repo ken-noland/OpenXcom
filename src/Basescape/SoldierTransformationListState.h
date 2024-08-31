@@ -45,7 +45,7 @@ private:
 	ComboBox* _screenActions;
 	TextButton* _btnOK;
 	ToggleTextButton* _btnOnlyEligible;
-	entt::entity _window;
+	entt::handle _window;
 	Text* _txtTitle, * _txtProject, * _txtNumber, * _txtSoldierNumber;
 	ComboBox* _cbxSoldierType, * _cbxSoldierStatus;
 	TextEdit* _btnQuickSearch;

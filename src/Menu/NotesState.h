@@ -37,7 +37,7 @@ class ToggleTextButton;
 class NotesState : public State
 {
 protected:
-	entt::entity _window;
+	entt::handle _window;
 	Text* _txtTitle;
 	Text* _txtDelete;
 	TextList* _lstNotes;

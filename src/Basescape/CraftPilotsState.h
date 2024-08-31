@@ -37,7 +37,7 @@ private:
 	size_t _craft;
 
 	TextButton *_btnOk, *_btnAdd, *_btnRemoveAll;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtFiringAcc, *_txtReactions, *_txtBravery, *_txtPilots;
 	Text *_txtRequired;
 	TextList *_lstPilots;

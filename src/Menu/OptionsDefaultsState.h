@@ -36,7 +36,7 @@ class OptionsDefaultsState : public State
 private:
 	OptionsOrigin _origin;
 	TextButton *_btnYes, *_btnNo;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	OptionsBaseState *_state;
 public:

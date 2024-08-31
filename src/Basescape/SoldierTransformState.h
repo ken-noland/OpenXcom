@@ -59,7 +59,7 @@ private:
 
 	TextButton *_btnCancel;
 	TextEdit *_btnQuickSearch;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtType;
 	TextList *_lstTransformations;
 	ArrowButton *_sortName;

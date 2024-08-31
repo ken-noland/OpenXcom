@@ -55,7 +55,7 @@ struct PaletteTestMetadata {
 class TestState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	TextButton *_btnRun, *_btnCancel;
 	Text *_txtPalette;
 	Text *_txtTitle, *_txtTestCase, *_txtDescription;

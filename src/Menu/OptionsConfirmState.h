@@ -37,7 +37,7 @@ class OptionsConfirmState : public State
 private:
 	OptionsOrigin _origin;
 	TextButton *_btnYes, *_btnNo;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtTimer;
 	Timer *_timer;
 	int _countdown;

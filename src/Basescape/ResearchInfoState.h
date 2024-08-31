@@ -42,7 +42,7 @@ private:
 	TextButton *_btnOk;
 	TextButton *_btnCancel;
 	ArrowButton *_btnMore, *_btnLess;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtAvailableScientist, *_txtAvailableSpace, *_txtAllocatedScientist, *_txtMore, *_txtLess;
 	void setAssignedScientist();
 	ResearchProject *_project;

@@ -44,7 +44,7 @@ namespace OpenXcom
 		void init() override;
 	protected:
 		std::string _section;
-		entt::entity _window;
+		entt::handle _window;
 		TextEdit *_btnQuickSearch;
 		Text *_txtTitle;
 		TextButton *_btnOk;

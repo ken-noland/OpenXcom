@@ -36,7 +36,7 @@ private:
 	TextButton *_btnOk;
 	TextButton *_btnFunding, *_btnTechTree, *_btnGlobalResearch, *_btnGlobalProduction, *_btnUfoTracker, *_btnPilotExp, *_btnNotes, *_btnMusic;
 	TextButton *_btnTest;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	GeoscapeState *_parent;
 public:

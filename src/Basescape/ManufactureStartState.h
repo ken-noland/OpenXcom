@@ -36,7 +36,7 @@ class ManufactureStartState : public State
 private:
 	Base *_base;
 	RuleManufacture *_item;
-	entt::entity _window;
+	entt::handle _window;
 	TextButton *_btnCancel, *_btnStart;
 	Text *_txtTitle, *_txtManHour, *_txtCost, *_txtWorkSpace, *_txtRequiredItemsTitle, *_txtItemNameColumn, *_txtUnitRequiredColumn, *_txtUnitAvailableColumn;
 	TextList *_lstRequiredItems;

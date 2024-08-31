@@ -39,7 +39,7 @@ private:
 	TextButton *_difficulty;
 	ToggleTextButton *_btnIronman;
 	TextButton *_btnOk, *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtIronman;
 public:
 	/// Creates the New Game state.

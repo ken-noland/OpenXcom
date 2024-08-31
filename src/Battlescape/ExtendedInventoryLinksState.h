@@ -36,7 +36,7 @@ class ExtendedInventoryLinksState : public State
 private:
 	TextButton *_btnOk;
 	TextButton *_btnArmor, *_btnAvatar, *_btnEquipmentSave, *_btnEquipmentLoad, *_btnPersonalSave, *_btnPersonalLoad, *_btnNotes, *_btnUfopedia, *_btnAutoEquip;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	InventoryState *_parent;
 	SavedBattleGame* _save;

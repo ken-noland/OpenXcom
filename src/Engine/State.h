@@ -53,7 +53,7 @@ class State
 protected:
 	std::string _name;
 
-	std::vector<entt::entity> _surfaces;
+	std::vector<entt::handle> _surfaces;
 	bool _screen;
 	bool _soundPlayed;
 	InteractiveSurface *_modal;
@@ -85,16 +85,16 @@ public:
 	/// Set interface rules.
 	void setInterface(const std::string &s, bool alterPal = false, SavedBattleGame *battleGame = 0);
 	/// Set window background.
-	/*[[deprecated]]*/ void setWindowBackground(entt::entity window, const std::string& s);
+	[[deprecated]] void setWindowBackground(entt::entity window, const std::string& s);
 	/// Set window background by image name (instead of by interface name).
-	/*[[deprecated]]*/ void setWindowBackgroundImage(entt::entity window, const std::string& bgImageName);
+	[[deprecated]] void setWindowBackgroundImage(entt::entity window, const std::string& bgImageName);
 	/// Adds a child element to the state.
-	/*[[deprecated]]*/ void add(Surface* surface);
+	[[deprecated]] void add(Surface* surface);
 	/// Adds a child element to the state.
-	/*[[deprecated]]*/ void add(Surface* surface, const std::string& id, const std::string& category, Surface* parent = 0);
+	[[deprecated]] void add(Surface* surface, const std::string& id, const std::string& category, Surface* parent = 0);
 
 	/// Adds a child entity to the state.
-	void add(entt::entity entity, const std::string& id, const std::string& category, Surface* parent = 0);
+	void add(entt::handle entity, const std::string& id, const std::string& category, Surface* parent = 0);
 
 	/// Gets whether the state is a full-screen.
 	bool isScreen() const;

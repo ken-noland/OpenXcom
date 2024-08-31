@@ -34,7 +34,7 @@ class TextButton;
 class ConfirmCydoniaState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtMessage;
 	TextButton *_btnNo, *_btnYes;
 	Craft *_craft;

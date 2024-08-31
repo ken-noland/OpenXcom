@@ -35,7 +35,7 @@ class UfoLostState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	std::string _id;
 public:

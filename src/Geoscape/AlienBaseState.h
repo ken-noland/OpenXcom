@@ -38,7 +38,7 @@ private:
 	GeoscapeState *_state;
 	AlienBase *_base;
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 public:
 	/// Creates the Alien Base Detected state.

@@ -40,7 +40,7 @@ private:
 	BaseFacility *_fac;
 
 	TextButton *_btnOk, *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtFacility, *_txtRefundValue;
 public:
 	/// Creates the Dismantle Facility state.

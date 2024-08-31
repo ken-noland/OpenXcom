@@ -34,7 +34,7 @@ protected:
 	std::unique_ptr<Surface> _surface;
 
 public:
-	SurfaceComponent(DrawableComponent& drawable, std::unique_ptr<Surface>& surface);
+	SurfaceComponent(std::unique_ptr<Surface>& surface);
 	~SurfaceComponent() = default;
 
 	// temp
@@ -53,8 +53,8 @@ public:
 	SurfaceFactory(entt::registry& registry); // KN NOTE: I do plan on passing the renderer here so that Surface is abstracted.
 	~SurfaceFactory();
 
-	entt::entity createSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
-	entt::entity createInteractiveSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
+	entt::handle createSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
+	entt::handle createInteractiveSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
 };
 
 } // namespace OpenXcom

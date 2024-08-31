@@ -42,7 +42,7 @@ private:
 	Base * _base;
 	RuleManufacture * _item;
 	Production * _production;
-	entt::entity _window;
+	entt::handle _window;
 	ArrowButton * _btnUnitInfinity, * _btnUnitMinimum;
 	ArrowButton * _btnUnitUp, * _btnUnitDown, * _btnEngineerUp, * _btnEngineerDown;
 	TextButton * _btnStop, * _btnOk;

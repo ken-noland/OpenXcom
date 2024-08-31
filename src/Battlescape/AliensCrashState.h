@@ -34,7 +34,7 @@ class AliensCrashState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 public:
 	/// Creates the Aliens Crash state.

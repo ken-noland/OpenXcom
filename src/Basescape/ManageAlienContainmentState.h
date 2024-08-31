@@ -43,7 +43,7 @@ private:
 	int _prisonType;
 	OptionsOrigin _origin;
 	TextButton *_btnOk, *_btnSell, *_btnCancel, *_btnTransfer, *_btnCleanup;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtUsed, *_txtAvailable, *_txtValueOfSales, *_txtItem, *_txtLiveAliens, *_txtDeadAliens, *_txtInterrogatedAliens;
 	TextList *_lstAliens;
 	Timer *_timerInc, *_timerDec;

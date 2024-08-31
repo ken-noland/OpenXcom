@@ -45,7 +45,7 @@ private:
 
 	TextButton* _btnOk;
 	TextButton* _btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtInfo, *_txtHeaderRegions, *_txtSightingsRegions, *_txtHeaderCountries, *_txtSightingsCountries;
 	TextList *_lstHiddenAlienActivityRegions, *_lstHiddenAlienActivityCountries;
 

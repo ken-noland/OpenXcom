@@ -39,7 +39,7 @@ private:
 	Globe *_globe;
 
 	TextButton *_btnOk, *_btnRedirect;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtDestination, *_txtPatrolling;
 public:
 	/// Creates the Geoscape Craft state.

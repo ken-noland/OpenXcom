@@ -35,7 +35,7 @@ class BattlescapeGame;
 class ConfirmEndMissionState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtWounded, *_txtConfirm;
 	TextButton *_btnOk, *_btnCancel;
 	SavedBattleGame *_battleGame;

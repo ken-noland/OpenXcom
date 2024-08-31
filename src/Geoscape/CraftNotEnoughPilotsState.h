@@ -35,7 +35,7 @@ class CraftNotEnoughPilotsState : public State
 {
 private:
 	TextButton *_btnOk, *_btnAssignPilots;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtMessage;
 	Craft *_craft;
 public:

@@ -37,7 +37,7 @@ class ConfirmLandingState : public State
 {
 private:
 	Craft *_craft;
-	entt::entity _window;
+	entt::handle _window;
 	Texture *_missionTexture, *_globeTexture;
 	int _shade;
 	Text *_txtMessage, *_txtBegin;

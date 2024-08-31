@@ -38,7 +38,7 @@ class BriefingLightState : public State
 private:
 	TextButton *_btnOk;
 	ToggleTextButton *_btnArmors;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtBriefing, *_txtArmors;
 	TextList* _lstArmors;
 	std::vector<std::pair<std::string, std::string> > _armorNameList;

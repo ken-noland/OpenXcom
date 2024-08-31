@@ -38,7 +38,7 @@ class RuleBaseFacility;
 class NewPossibleFacilityState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextList * _lstPossibilities;
 	Text* _txtCaveat;

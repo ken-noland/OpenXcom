@@ -39,7 +39,7 @@ private:
 	GeoscapeState *_state;
 
 	TextButton *_btnOk, *_btnOk5Secs;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtMessage;
 public:
 	/// Creates the Low Fuel state.

@@ -32,7 +32,7 @@ class TextList;
 class ManufactureDependenciesTreeState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextList *_lstTopics;
 	TextButton *_btnOk, *_btnShowAll;

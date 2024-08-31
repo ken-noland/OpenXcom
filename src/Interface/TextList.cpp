@@ -748,9 +748,9 @@ void TextList::setBackground(Surface* bg)
  * Changes the surface used to draw the background of the selector.
  * @param bg New background.
  */
-void TextList::setBackground(entt::entity& bgEntity)
+void TextList::setBackground(entt::handle& bgEntity)
 {
-	Surface* surface = getRegistry().raw().get<SurfaceComponent>(bgEntity).getSurface();
+	Surface* surface = bgEntity.get<SurfaceComponent>().getSurface();
 	_bg = surface;
 	_scrollbar->setBackground(_bg);
 }

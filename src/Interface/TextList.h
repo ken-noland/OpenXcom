@@ -145,7 +145,7 @@ public:
 	/// Sets the background for the selector.
 	[[deprecated]] void setBackground(Surface* bg); // KN NOTE: I've deprecated this function because it shouldn't be taking a raw surface pointer.
 	/// Sets the background for the selector.
-	void setBackground(entt::entity& bg);
+	void setBackground(entt::handle& bg);
 	/// Gets the selected row in the list.
 	unsigned int getSelectedRow() const;
 	/// Sets the margin of the text list.

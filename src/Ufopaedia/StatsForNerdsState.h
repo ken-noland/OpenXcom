@@ -46,7 +46,7 @@ template<typename T, typename I> class ScriptValues;
 class StatsForNerdsState : public State
 {
 private:
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	ComboBox *_cbxRelatedStuff;
 	Text *_txtArticle;

@@ -39,7 +39,7 @@ class MonthlyReportState : public State
 {
 private:
 	TextButton *_btnOk, *_btnBigOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtMonth, *_txtRating;
 	Text *_txtIncome, *_txtMaintenance, *_txtBalance, *_txtBonus;
 	Text *_txtDesc, *_txtFailure;

@@ -38,7 +38,7 @@ class ConfirmNewBaseState : public State
 private:
 	entt::handle _newBaseHandle;
 	Globe *_globe;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtCost, *_txtArea;
 	TextButton *_btnOk, *_btnCancel;
 	int _cost = 0;

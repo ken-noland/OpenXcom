@@ -20,10 +20,12 @@
 
 #include "Window.h"
 #include "ArrowButton.h"
+#include "Text.h"
 #include "TextButton.h"
 
 #include "../Engine/Tickable.h"
 #include "../Engine/Drawable.h"
+#include "../Engine/Palette.h"
 
 namespace OpenXcom
 {
@@ -37,41 +39,53 @@ InterfaceFactory::~InterfaceFactory()
 {
 }
 
-entt::entity InterfaceFactory::createArrowButton(const std::string& name, ArrowShape shape, int width, int height, int x, int y)
+entt::handle InterfaceFactory::createArrowButton(const std::string& name, ArrowShape shape, int width, int height, int x, int y)
 {
-	entt::entity entity = _surfaceFactory.createSurface(name, width, height, x, y);
-
-	SurfaceComponent& surfaceComponent = _registry.get<SurfaceComponent>(entity);
-	DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
-	TickableComponent& tickableComponent = _registry.emplace<TickableComponent>(entity);
-	_registry.emplace<ArrowButtonComponent>(entity, surfaceComponent, tickableComponent, drawableComponent, shape);
+	entt::handle entity = _surfaceFactory.createSurface(name, width, height, x, y);
 
 	return entity;
 }
 
-entt::entity InterfaceFactory::createTextButton(const std::string& name, const std::string& text, int width, int height, int x, int y, std::function<void(Action*)> onClickCallback)
+entt::handle InterfaceFactory::createText(const std::string& name, const std::string& text, int width, int height, int x, int y)
 {
-	entt::entity entity = _surfaceFactory.createSurface(name, width, height, x, y);
+	entt::handle entity = _surfaceFactory.createSurface(name, width, height, x, y);
 
-	SurfaceComponent& surfaceComponent = _registry.get<SurfaceComponent>(entity);
+	SurfaceComponent& surfaceComponent = entity.get<SurfaceComponent>();
+	entity.emplace<TextComponent>(text, &surfaceComponent);
+
 	DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
-	TickableComponent& tickableComponent = _registry.emplace<TickableComponent>(entity);
-
-	_registry.emplace<TextButtonComponent>(entity, surfaceComponent, tickableComponent, drawableComponent);
+	drawableComponent.addDrawable(std::bind(&TextComponent::draw, &entity.get<TextComponent>()));
 
 	return entity;
 }
 
-entt::entity InterfaceFactory::createWindow(const std::string& name, State* state, int width, int height, int x, int y, WindowPopup popup)
+entt::handle InterfaceFactory::createTextButton(const std::string& name, const std::string& text, int width, int height, int x, int y, std::function<void(Action*)> onClickCallback)
+{
+	entt::handle entity = _surfaceFactory.createSurface(name, width, height, x, y);
+
+	SurfaceComponent& surfaceComponent = entity.get<SurfaceComponent>();
+	TextButtonComponent& textButtonComponent = entity.emplace<TextButtonComponent>(text, surfaceComponent);
+
+	DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
+	drawableComponent.addDrawable(std::bind(&TextButtonComponent::draw, &textButtonComponent));
+
+	return entt::handle(_registry, entity);
+}
+
+entt::handle InterfaceFactory::createWindow(const std::string& name, State* state, int width, int height, int x, int y, WindowPopup popup)
 {
 	entt::entity entity = _surfaceFactory.createSurface(name, width, height, x, y);
 
 	SurfaceComponent& surfaceComponent = _registry.get<SurfaceComponent>(entity);
-	DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
-	TickableComponent& tickableComponent = _registry.emplace<TickableComponent>(entity);
-	_registry.emplace<WindowComponent>(entity, surfaceComponent, tickableComponent, drawableComponent, state, popup);
+	WindowComponent& windowComponent = _registry.emplace<WindowComponent>(entity, surfaceComponent, state, popup);
 
-	return entity;
+	DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
+	drawableComponent.addDrawable(std::bind(&WindowComponent::draw, &windowComponent));
+
+	TickableComponent& tickableComponent = _registry.emplace<TickableComponent>(entity);
+	tickableComponent.addTickable(std::bind(&WindowComponent::tick, &windowComponent));
+
+	return entt::handle(_registry, entity);
 }
 
 

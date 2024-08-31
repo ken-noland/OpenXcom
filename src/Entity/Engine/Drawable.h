@@ -52,7 +52,7 @@ public:
 	DrawableSystem();
 	~DrawableSystem();
 
-	void draw(entt::entity& entity);
+	void draw(entt::handle& entity);
 };
 
 } // namespace OpenXcom

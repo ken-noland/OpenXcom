@@ -17,42 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../Engine/InteractiveSurface.h"
-#include <vector>
-#include <string>
-#include "../Engine/Unicode.h"
+#include "../Engine/Surface.h"
+#include "../../Engine/Unicode.h"
+
+//KN NOTE: temp - until I move the rest of the definitions here
+#include "../../Interface/Text.h"
 
 namespace OpenXcom
 {
 
-class Font;
-class Language;
-
-enum class TextHAlign
-{
-	ALIGN_LEFT,
-	ALIGN_CENTER,
-	ALIGN_RIGHT
-};
-
-enum class TextVAlign
-{
-	ALIGN_TOP,
-	ALIGN_MIDDLE,
-	ALIGN_BOTTOM
-};
-
-/**
- * Text string displayed on screen.
- * Takes the characters from a Font and puts them together on screen
- * to display a string of text, taking care of any required aligning
- * or wrapping.
- */
-class Text : public InteractiveSurface
+class TextComponent
 {
 private:
+	// KN Note: Temporarily putting in the SurfaceComponent so we can use it to process text, but that should get moved to a text rendering system rather than being in the text component
+	SurfaceComponent* _surfaceComponent;
+
 	Font *_big, *_small, *_font, *_fontOrig;
-	Language *_lang;
+	Language* _lang;
 	std::string _text;
 	UString _processedText;
 	std::vector<int> _lineWidth, _lineHeight;
@@ -66,55 +47,67 @@ private:
 	void processText();
 	/// Gets the X position of a text line.
 	int getLineX(int line) const;
+
 public:
 	/// Creates a new text with the specified size and position.
-	Text(int width, int height, int x = 0, int y = 0, Font* big = nullptr, Font* small = nullptr, Language* lang = nullptr);
+	TextComponent(const std::string& text, SurfaceComponent* surfaceComponent);
 	/// Cleans up the text.
-	~Text();
+	~TextComponent();
+
 	/// Sets the text size to big.
 	void setBig();
 	/// Sets the text size to small.
 	void setSmall();
 	/// Gets the text's current font.
-	Font *getFont() const;
+	Font* getFont() const;
+
 	/// Sets the text's string.
-	void setText(const std::string &text);
+	void setText(const std::string& text);
 	/// Gets the text's string.
 	std::string getText() const;
+
 	/// Sets the text's wordwrap setting.
 	void setWordWrap(bool wrap, bool indent = false, bool ignoreSeparators = false);
 	/// Sets the text's color invert setting.
 	void setInvert(bool invert);
+
 	/// Sets the text's high contrast color setting.
-	void setHighContrast(bool contrast) override;
+	void setHighContrast(bool contrast); // override;
+
 	/// Sets the text's horizontal alignment.
 	void setAlign(TextHAlign align);
 	/// Gets the text's horizontal alignment.
 	TextHAlign getAlign() const;
+
 	/// Sets the text's vertical alignment.
 	void setVerticalAlign(TextVAlign valign);
 	/// Gets the text's vertical alignment.
 	TextVAlign getVerticalAlign() const;
+
 	/// Sets the text's color.
-	void setColor(Uint8 color) override;
+	void setColor(Uint8 color); // override;
 	/// Gets the text's color.
 	Uint8 getColor() const;
+
 	/// Sets the text's secondary color.
-	void setSecondaryColor(Uint8 color) override;
+	void setSecondaryColor(Uint8 color);
 	/// Gets the text's secondary color.
 	Uint8 getSecondaryColor() const;
+
 	/// Gets the number of lines in the (wrapped, if wrapping is enabled) text
 	int getNumLines() const;
 	/// Gets the rendered text's width.
 	int getTextWidth(int line = -1) const;
 	/// Gets the rendered text's height.
 	int getTextHeight(int line = -1) const;
+
 	/// Draws the text.
-	void draw() override;
+	void draw();// override;
+
 	/// Sets the text's scrollable setting.
 	void setScrollable(bool scroll);
 	/// Special handling for mouse presses.
-	void mousePress(Action* action, State* state) override;
+	//void mousePress(Action* action, State* state) override;
 };
 
 }

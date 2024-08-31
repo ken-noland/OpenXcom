@@ -34,7 +34,7 @@ class DogfightExperienceState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtFiringAcc, *_txtReactions, *_txtBravery, *_txtPilots;
 	TextList *_lstPilots;
 public:

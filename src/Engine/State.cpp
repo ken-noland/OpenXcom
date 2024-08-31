@@ -39,9 +39,12 @@
 #include "../Mod/RuleInterface.h"
 
 #include "../Entity/Engine/Surface.h"
+#include "../Entity/Engine/Palette.h"
 #include "../Entity/Engine/Tickable.h"
 #include "../Entity/Engine/Drawable.h"
 #include "../Entity/Interface/Window.h"
+#include "../Entity/Interface/Text.h"
+#include "../Entity/Interface/TextButton.h"
 
 namespace OpenXcom
 {
@@ -166,11 +169,16 @@ void State::add(Surface *surface)
 		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
 
 	entt::registry& registry = getRegistry().raw();
-	entt::entity surfaceEnt = registry.create();
-	DrawableComponent& drawableComponent = registry.emplace<DrawableComponent>(surfaceEnt);
+	entt::handle surfaceEnt = entt::handle(registry, registry.create());
+
+	DrawableComponent& drawableComponent = surfaceEnt.emplace<DrawableComponent>();
+
 	std::unique_ptr<Surface> surfacePtr(surface);
-	SurfaceComponent& surfaceComponent = registry.emplace<SurfaceComponent>(surfaceEnt, drawableComponent, surfacePtr);
+	SurfaceComponent& surfaceComponent = surfaceEnt.emplace<SurfaceComponent>(surfacePtr);
+
+	// KN TODO; remove call to setSurfaceComponent when flags have been moved over
 	drawableComponent.setSurfaceComponent(&surfaceComponent);
+	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
 
 	_surfaces.push_back(surfaceEnt);
 }
@@ -243,24 +251,30 @@ void State::add(Surface *surface, const std::string &id, const std::string &cate
 		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
 
 	entt::registry& registry = getRegistry().raw();
-	entt::entity surfaceEnt = registry.create();
-	DrawableComponent& drawableComponent = registry.emplace<DrawableComponent>(surfaceEnt);
+	entt::handle surfaceEnt = entt::handle(registry, registry.create());
+	DrawableComponent& drawableComponent = surfaceEnt.emplace<DrawableComponent>();
 	std::unique_ptr<Surface> surfacePtr(surface);
-	SurfaceComponent& surfaceComponent = registry.emplace<SurfaceComponent>(surfaceEnt, drawableComponent, surfacePtr);
+	SurfaceComponent& surfaceComponent = surfaceEnt.emplace<SurfaceComponent>(surfacePtr);
+
+	// KN TODO; remove call to setSurfaceComponent when flags have been moved over
 	drawableComponent.setSurfaceComponent(&surfaceComponent);
+	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
 
 	_surfaces.push_back(surfaceEnt);
 }
 
-void State::add(entt::entity entity, const std::string& id, const std::string& category, Surface* parent)
+void State::add(entt::handle entity, const std::string& id, const std::string& category, Surface* parent)
 {
-	Surface* surface = getRegistry().raw().get<SurfaceComponent>(entity).getSurface();
+	SurfaceComponent& surfaceComponent = getRegistry().raw().get<SurfaceComponent>(entity);
+	Surface* surface = surfaceComponent.getSurface();
 
 	// Set palette
-	surface->setPalette(_palette);
+	PaletteComponent& paletteComponent = getRegistry().raw().get<PaletteComponent>(entity);
+	paletteComponent.setPalette(_palette);
 
-	// this only works if we're dealing with a battlescape button
-	BattlescapeButton* bsbtn = dynamic_cast<BattlescapeButton*>(surface);
+
+	bool TFTDMode = false;
+	int primaryColor = 0, secondaryColor = 0, borderColor = 0;
 
 	if (getGame()->getMod()->getInterface(category))
 	{
@@ -287,18 +301,46 @@ void State::add(entt::entity entity, const std::string& id, const std::string& c
 
 			if (element->color != INT_MAX)
 			{
-				surface->setColor(element->color);
+				primaryColor = element->color;
 			}
 			if (element->color2 != INT_MAX)
 			{
-				surface->setSecondaryColor(element->color2);
+				secondaryColor = element->color2;
 			}
 			if (element->border != INT_MAX)
 			{
-				surface->setBorderColor(element->border);
+				borderColor = element->border;
 			}
 		}
 	}
+
+	//KN Note: Need to move the color stuff to its own component, but for now, this'll do
+	{
+		TextComponent* text = entity.try_get<TextComponent>();
+		if (text)
+		{
+			text->setColor(primaryColor);
+			text->setSecondaryColor(secondaryColor);
+		}
+
+		TextButtonComponent* textButton = entity.try_get<TextButtonComponent>();
+		if (textButton)
+		{
+			textButton->setColor(primaryColor);
+			surface->setColor(primaryColor);
+		}
+
+		WindowComponent* window = entity.try_get<WindowComponent>();
+		if (window)
+		{
+			window->setColor(primaryColor);
+			surface->setColor(primaryColor);
+		}
+	}
+
+
+	// this only works if we're dealing with a battlescape button
+	BattlescapeButton* bsbtn = dynamic_cast<BattlescapeButton*>(surface);
 
 	if (bsbtn)
 	{
@@ -416,9 +458,9 @@ void State::handle(Action *action)
 {
 	if (!_modal)
 	{
-		for (std::vector<entt::entity>::reverse_iterator i = _surfaces.rbegin(); i != _surfaces.rend(); ++i)
+		for (std::vector<entt::handle>::reverse_iterator i = _surfaces.rbegin(); i != _surfaces.rend(); ++i)
 		{
-			Surface* surface = getRegistry().raw().get<SurfaceComponent>(*i).getSurface();
+			Surface* surface = (*i).get<SurfaceComponent>().getSurface();
 			InteractiveSurface* j = dynamic_cast<InteractiveSurface*>(surface);
 			if (j != 0)
 				j->handle(action, this);
@@ -437,7 +479,7 @@ void State::handle(Action *action)
 void State::blit()
 {
 	DrawableSystem& drawable = getSystem<DrawableSystem>();
-	for (entt::entity& surfaceEnt : _surfaces)
+	for (entt::handle& surfaceEnt : _surfaces)
 	{
 		drawable.draw(surfaceEnt);
 	}
@@ -448,9 +490,9 @@ void State::blit()
  */
 void State::hideAll()
 {
-	for (entt::entity surfaceEnt : _surfaces)
+	for (entt::handle& surfaceEnt : _surfaces)
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
 		surface->setHidden(true);
 	}
 }
@@ -460,9 +502,9 @@ void State::hideAll()
  */
 void State::showAll()
 {
-	for (entt::entity surfaceEnt : _surfaces)
+	for (entt::handle& surfaceEnt : _surfaces)
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
 		surface->setHidden(false);
 	}
 }
@@ -544,9 +586,9 @@ LocalizedText State::tr(const std::string &id, SoldierGender gender) const
  */
 void State::centerAllSurfaces()
 {
-	for (entt::entity surfaceEnt : _surfaces)
+	for (entt::handle surfaceEnt : _surfaces)
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
 		surface->setX(surface->getX() + getGame()->getScreen()->getDX());
 		surface->setY(surface->getY() + getGame()->getScreen()->getDY());
 	}
@@ -575,16 +617,16 @@ void State::applyBattlescapeTheme(const std::string& category)
 	{
 		altBg = "TAC00.SCR";
 	}
-	for (entt::entity surfaceEnt : _surfaces)
+	for (entt::handle surfaceEnt : _surfaces)
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
 		surface->setColor(element->color);
 		surface->setHighContrast(true);
 
 
-		if(getRegistry().raw().all_of<WindowComponent, SurfaceComponent>(surfaceEnt))
+		if (surfaceEnt.all_of<WindowComponent, SurfaceComponent>())
 		{
-			WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(surfaceEnt);
+			WindowComponent& windowComponent = surfaceEnt.get<WindowComponent>();
 			windowComponent.setBackground(getGame()->getMod()->getSurface(altBg));
 		}
 		TextList* list = dynamic_cast<TextList*>(surface);
@@ -605,9 +647,9 @@ void State::applyBattlescapeTheme(const std::string& category)
  */
 void State::redrawText()
 {
-	for (entt::entity surfaceEnt : _surfaces)
+	for (entt::handle surfaceEnt : _surfaces)
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
 		Text* text = dynamic_cast<Text*>(surface);
 		TextButton* button = dynamic_cast<TextButton*>(surface);
 		TextEdit* edit = dynamic_cast<TextEdit*>(surface);
@@ -730,9 +772,9 @@ void State::resize(int &dX, int &dY)
  */
 void State::recenter(int dX, int dY)
 {
-	for (entt::entity surfaceEnt : _surfaces)
+	for (entt::handle surfaceEnt : _surfaces)
 	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
 		surface->setX(surface->getX() + dX / 2);
 		surface->setY(surface->getY() + dY / 2);
 	}

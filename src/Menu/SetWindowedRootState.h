@@ -39,7 +39,7 @@ private:
 	OptionsOrigin _origin;
 	OptionsVideoState *_optionsVideoState;
 	TextButton *_btnOk, *_btnCancel;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtWindowedModePositionX, *_txtWindowedModePositionY;
 	TextEdit *_edtWindowedModePositionX, *_edtWindowedModePositionY;
 public:

@@ -17,37 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <string>
-#include "../Engine/State.h"
+#include "../../Engine/Surface.h"
 
 namespace OpenXcom
 {
 
-class TextButton;
-
-class Text;
-class Craft;
-
-/**
- * Window used to notify the player when
- * an error occurs with a dogfight procedure.
- */
-class DogfightErrorState : public State
+class PaletteComponent
 {
-private:
-	Craft *_craft;
-	TextButton *_btnIntercept, *_btnBase;
-	entt::handle _window;
-	Text *_txtCraft, *_txtMessage;
+protected:
+	// KN TODO: Move the palette from Surface to here
+	Surface* _surface;
+
 public:
-	/// Creates the Craft Error state.
-	DogfightErrorState(Craft *craft, const std::string &msg);
-	/// Cleans up the Craft Error state.
-	~DogfightErrorState();
-	/// Handler for clicking the Continue Interception button.
-	void btnInterceptClick(Action *action);
-	/// Handler for clicking the Return To Base button.
-	void btnBaseClick(Action *action);
+	PaletteComponent(Surface* surface);
+	~PaletteComponent();
+
+	void setPalette(const SDL_Color* palette, int first = 0, int ncolors = 256);
 };
 
 }

@@ -41,7 +41,7 @@ class SoldiersState : public State
 {
 private:
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtName, *_txtRank, *_txtCraft;
 	ComboBox *_cbxSortBy, *_cbxScreenActions, *_cbxFilterByCraft;
 	TextList *_lstSoldiers;

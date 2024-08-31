@@ -34,7 +34,7 @@ class RuleItem;
  */
 class ResearchRequiredState : public State
 {
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextButton *_btnOk;
 public:

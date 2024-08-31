@@ -38,7 +38,7 @@ class InventorySaveState : public State
 {
 private:
 	InventoryState *_parent;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextList *_lstLayout;
 	TextButton *_btnCancel, *_btnSave, *_btnSaveWithArmor;

@@ -71,7 +71,7 @@ private:
 	TextButton *_btnOk;
 	TextEdit *_btnQuickSearch;
 	ToggleTextButton *_btnGrandTotal;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtItem, *_txtQuantity, *_txtSize, *_txtSpaceUsed;
 	TextList *_lstStores;
 	ArrowButton *_sortName, *_sortQuantity, *_sortSize, *_sortSpaceUsed;

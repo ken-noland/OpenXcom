@@ -44,7 +44,7 @@ private:
 	static constexpr int noCol = 4;	//Name Rank AI-Control Aggresiveness
 
 	TextButton *_btnOk;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle, *_txtName, *_txtRank;
 	Text *_txtControlled, *_txtAgressiveness;
 	TextList *_lstUnits;

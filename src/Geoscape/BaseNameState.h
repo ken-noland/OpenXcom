@@ -41,7 +41,7 @@ class BaseNameState : public State
 private:
 	entt::handle _newBaseHandle;
 	Globe *_globe;
-	entt::entity _window;
+	entt::handle _window;
 	Text *_txtTitle;
 	TextEdit *_edtName;
 	TextButton *_btnOk;

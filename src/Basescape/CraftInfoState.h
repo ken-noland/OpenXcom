@@ -44,7 +44,7 @@ private:
 	int _weaponNum;
 
 	TextButton *_btnOk, *_btnW[RuleCraft::WeaponMax], *_btnCrew, *_btnEquip, *_btnArmor, *_btnPilots, *_btnNewBattle;
-	entt::entity _window;
+	entt::handle _window;
 	TextEdit *_edtCraft;
 	Text *_txtDamage, *_txtShield, *_txtFuel, *_txtSkin;
 	Text *_txtWName[RuleCraft::WeaponMax], *_txtWAmmo[RuleCraft::WeaponMax];

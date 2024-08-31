@@ -38,7 +38,7 @@ namespace OpenXcom
 		ModListState *_state;
 		bool _isMaster;
 		TextButton *_btnYes, *_btnNo;
-		entt::entity _window;
+		entt::handle _window;
 		Text *_txtTitle;
 	public:
 		/// Creates the Confirm OXCE state.

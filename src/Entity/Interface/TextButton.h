@@ -29,6 +29,7 @@ class ComboBox;
 class SurfaceComponent;
 class TickableComponent;
 class DrawableComponent;
+class PaletteComponent;
 
 
 class TextButtonComponent
@@ -38,6 +39,7 @@ private:
 
 	Uint8 _color;
 	Text* _text;
+
 	//TextButton** _group;
 	bool _contrast, _geoscapeButton;
 	ComboBox* _comboBox;
@@ -48,8 +50,7 @@ protected:
 //	bool isButtonHandled(Uint8 button = 0) override;
 
 public:
-	TextButtonComponent(SurfaceComponent& surfaceComponent, TickableComponent& tickableComponent,
-						DrawableComponent& drawableComponent);
+	TextButtonComponent(const std::string& text, SurfaceComponent& surfaceComponent);
 	~TextButtonComponent();
 
 	/// Sets the text button's color.
@@ -64,18 +65,17 @@ public:
 	void setSmall();
 	/// Gets the text button's current font.
 	Font* getFont() const;
-	/// Initializes the text edit's resources.
-	void initText(Font* big, Font* small, Language* lang);	//override
+
 	/// Sets the text button's high contrast color setting.
 	void setHighContrast(bool contrast); // override
 	/// Sets the text button's text.
 	void setText(const std::string& text);
 	/// Gets the text button's text.
 	std::string getText() const;
+
 	/// Sets the text button's group.
 	//void setGroup(TextButton** group);
-	/// Sets the text button's palette.
-	void setPalette(const SDL_Color* colors, int firstcolor = 0, int ncolors = 256); //override
+
 	/// Draws the text button.
 	void draw();	//override
 	/// Special handling for mouse presses.
@@ -84,8 +84,8 @@ public:
 	//void mouseRelease(Action* action, State* state); //override
 	/// Attaches this button to a combobox.
 	void setComboBox(ComboBox* comboBox);
-	void setWidth(int width); // override
-	void setHeight(int height); // override
+
+	/// Sets the button as a geoscape button.
 	void setGeoscapeButton(bool geo);
 };
 
