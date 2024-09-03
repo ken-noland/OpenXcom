@@ -1590,6 +1590,12 @@ void log(int level, const std::ostringstream& baremsgstream) {
 	if (failed || !logToFile(logFileName, msg)) {
 		logBuffer.push_back(std::make_pair(level, msg));
 	}
+
+	#ifdef _WIN32
+	//output to visual studio
+	OutputDebugStringA(msg.c_str());
+	#endif
+
 }
 
 #if defined(EMBED_ASSETS)
