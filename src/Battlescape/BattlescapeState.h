@@ -125,7 +125,7 @@ public:
 	/// Initializes the battlescapestate.
 	void init() override;
 	/// Runs the timers and handles popups.
-	void think() override;
+	void update() override;
 	/// Handler for moving mouse over the map.
 	void mapOver(Action *action);
 	/// Handler for pressing the map.

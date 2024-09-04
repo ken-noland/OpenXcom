@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <SDL.h>
+#include <chrono>
 #include "State.h"
 #include "Surface.h"
 
@@ -49,7 +50,7 @@ private:
 
 public:
 	/// Creates a stopped timer.
-	Timer(Uint32 interval, bool frameSkipping = false);
+	[[deprecated]] Timer(Uint32 interval, bool frameSkipping = false);
 	/// Cleans up the timer.
 	~Timer();
 	/// Starts the timer.
@@ -69,5 +70,138 @@ public:
 	/// Hooks a surface action handler to the timer interval.
 	void onSurface(SurfaceHandler handler);
 };
+
+/**
+ * Time system updates once per frame and can be used to retrieve the duration of the last frame for purposes of animation.
+ */
+class TimeSystem
+{
+private:
+	std::chrono::high_resolution_clock::time_point _lastTime;
+	uint64_t _elapsedTime;
+	uint64_t _frameTime;
+
+public:
+	TimeSystem();
+	~TimeSystem() = default;
+
+	void update();
+
+	/**
+	 * Gets the total elapsed time since the system started.
+	 * @return Elapsed time in nanoseconds.
+	 */
+	inline uint64_t getElapsedTimeNS() const
+	{
+		return _elapsedTime;
+	}
+
+	/**
+	 * Gets the time it took to render the last frame.
+	 * @return Frame time in nanoseconds.
+	 */
+	inline uint64_t getFrameTimeNS() const
+	{
+		return _frameTime;
+	}
+
+	/**
+	 * Gets the total elapsed time since the system started.
+	 * @return Elapsed time in milliseconds.
+	 */
+	inline uint64_t getElapsedTimeMS() const
+	{
+		return getElapsedTimeNS() / 1000000;
+	}
+
+	/**
+	 * Gets the time it took to render the last frame.
+	 * @return Frame time in milliseconds.
+	 */
+	inline uint64_t getFrameTimeMS() const
+	{
+		return getFrameTimeNS() / 1000000;
+	}
+
+	/**
+	 * Gets the time it took to render the last frame.
+	 * @return Frame time in seconds.
+	 */
+	inline float getFrameTimeSeconds() const
+	{
+		return static_cast<float>(_frameTime) * 1e-9f; // Convert nanoseconds to seconds
+	}
+};
+
+
+/**
+ * Timer used to represent progress within a time space(duration).
+ */
+struct ProgressTimerComponent
+{
+	using ProgressCallback = std::function<void(entt::handle, double)>;
+	using CompleteCallback = std::function<void(entt::handle)>;
+
+	ProgressTimerComponent(uint64_t durationMS, ProgressCallback onProgress, CompleteCallback onComplete)
+		: _duration(durationMS), _elapsed(0), _onProgress(onProgress), _onComplete(onComplete), _active(true) {}
+
+	uint64_t _duration;                     // Total duration of the timer in milliseconds
+	uint64_t _elapsed;                      // Elapsed time since the timer started in milliseconds
+
+	bool _active;                           // Whether the timer is active
+
+	ProgressCallback _onProgress;                  // Callback that receives the current progress (0 to 1)
+	CompleteCallback _onComplete; // Callback when the timer reaches 100% (1.0)
+};
+
+/**
+ * System for running progress timers
+ */
+class ProgressTimerSystem
+{
+protected:
+	entt::registry& _registry;
+	const TimeSystem& _timeSystem;
+
+	void callUpdate(entt::entity entity, ProgressTimerComponent& component, float progress);
+	void callComplete(entt::entity entity, ProgressTimerComponent& component);
+
+public:
+	ProgressTimerSystem(entt::registry& registry, const TimeSystem& timeSystem);
+	~ProgressTimerSystem() = default;
+
+	void update();
+};
+
+/**
+ * Timer used to run code in fixed intervals.
+ * Used for code that should run at the same fixed interval
+ * in various machines, based on milliseconds instead of CPU cycles.
+ */
+struct IntervalTimerComponent
+{
+	Uint32 interval;
+	Uint32 duration;
+	Uint32 elapsed;
+	Uint32 remaining;
+
+	std::function<void(entt::handle)> onInterval;
+	std::function<void(entt::handle)> onEnd;
+};
+
+/**
+ * System for running interval timers.
+ */
+class IntervalTimerSystem
+{
+public:
+	IntervalTimerSystem() = default;
+	~IntervalTimerSystem() = default;
+
+	void update();
+};
+
+
+
 
 }

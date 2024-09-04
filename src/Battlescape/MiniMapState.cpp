@@ -160,9 +160,9 @@ void MiniMapState::animate()
 /**
  * Handles timers.
  */
-void MiniMapState::think()
+void MiniMapState::update()
 {
-	State::think();
+	State::update();
 	_timerAnimate->think(true, false);
 }
 

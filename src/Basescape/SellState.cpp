@@ -373,9 +373,9 @@ void SellState::init()
 /**
  * Runs the arrow timers.
  */
-void SellState::think()
+void SellState::update()
 {
-	State::think();
+	State::update();
 
 	_timerInc->think(true, false);
 	_timerDec->think(true, false);

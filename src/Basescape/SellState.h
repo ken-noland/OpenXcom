@@ -82,7 +82,7 @@ public:
 	/// Resets state.
 	void init() override;
 	/// Runs the timers.
-	void think() override;
+	void update() override;
 	/// Updates the item list.
 	void updateList();
 	/// Handler for clicking the OK button.

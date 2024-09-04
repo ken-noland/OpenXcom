@@ -37,7 +37,7 @@ class ScannerState : public State
 	ScannerView *_scannerView;
 	BattleAction *_action;
 	/// Updates scanner interface.
-	void update();
+	void updateScanner();
 	Timer *_timerAnimate;
 	/// Handles Minimap animation.
 	void animate();
@@ -48,7 +48,7 @@ public:
 	/// Handler for right-clicking anything.
 	void handle(Action *action) override;
 	/// Handles timers.
-	void think() override;
+	void update() override;
 	/// Handler for exiting the state.
 	void exitClick(Action *action);
 };

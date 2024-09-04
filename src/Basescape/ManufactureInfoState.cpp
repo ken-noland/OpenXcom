@@ -734,9 +734,9 @@ void ManufactureInfoState::handleWheelUnit(Action *action)
 /**
  * Runs state functionality every cycle (used to update the timer).
  */
-void ManufactureInfoState::think()
+void ManufactureInfoState::update()
 {
-	State::think();
+	State::update();
 	_timerMoreEngineer->think(true, false);
 	_timerLessEngineer->think(true, false);
 	_timerMoreUnit->think(true, false);

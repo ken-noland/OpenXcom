@@ -729,7 +729,7 @@ bool DogfightState::isUfoAttacking() const
 /**
  * Runs the higher level dogfight functionality.
  */
-void DogfightState::think()
+void DogfightState::update()
 {
 	if (!_delayedRecolorDone)
 	{
@@ -756,7 +756,7 @@ void DogfightState::think()
 	}
 	if (!_endDogfight)
 	{
-		update();
+		updateCraft();
 		_craftDamageAnimTimer->think(true, false);
 	}
 	if (!_ufoIsAttacking || _ufo->getStatus() == Ufo::LANDED)
@@ -937,7 +937,7 @@ void DogfightState::animate()
  * weapons fire, projectile movement, ufo escape conditions,
  * craft and ufo destruction conditions, and retaliation mission generation, as applicable.
  */
-void DogfightState::update()
+void DogfightState::updateCraft()
 {
 	bool finalRun = false;
 	// Check if craft is not low on fuel when window minimized, and

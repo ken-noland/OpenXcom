@@ -1,7 +1,6 @@
 
 set ( root_src
   lodepng.cpp
-  main.cpp
   md5.cpp
 )
 set ( basescape_src
@@ -136,6 +135,7 @@ set ( engine_src
   Engine/AdlibMusic.cpp
   Engine/CatFile.cpp
   Engine/CrossPlatform.cpp
+  Engine/Exception.cpp
   Engine/FastLineClip.cpp
   Engine/FileMap.cpp
   Engine/FlcPlayer.cpp
@@ -438,6 +438,7 @@ set ( entity_common_src
 set ( entity_engine_src
   Entity/Engine/Drawable.cpp
   Entity/Engine/ECS.cpp
+  Entity/Engine/Hierarchical.cpp
   Entity/Engine/Palette.cpp
   Entity/Engine/Surface.cpp
   Entity/Engine/Tickable.cpp
@@ -701,10 +702,14 @@ if (( APPLE AND CREATE_BUNDLE ) OR CPACK_GENERATOR STREQUAL "7Z" )
   set ( CMAKE_INSTALL_BINDIR "." )
 endif ()
 
-add_executable ( openxcom  ${application_type} ${openxcom_src} ${openxcom_icon})
+add_library(openxcom_lib STATIC ${openxcom_src})
+target_include_directories(openxcom_lib PUBLIC ${yaml-cpp_SOURCE_DIR}/include ${lua_SOURCE_DIR} ${EnTT_SOURCE_DIR}/single_include)
+target_compile_definitions(openxcom_lib PUBLIC YAML_CPP_STATIC_DEFINE)
+
+add_executable ( openxcom  ${application_type} main.cpp ${openxcom_icon})
 
 if (MSVC)
-    target_compile_options(openxcom PRIVATE /bigobj)
+    target_compile_options(openxcom_lib PRIVATE /bigobj)
 endif()
 
 if ( EMBED_ASSETS )
@@ -732,8 +737,8 @@ if (WIN32)
   set(WIN32_LIBS imagehlp dbghelp)
 endif(WIN32)
 
-target_link_libraries ( openxcom PUBLIC ${system_libs} ${PKG_DEPS_LDFLAGS} ${WIN32_LIBS} yaml-cpp::yaml-cpp lua )
-target_include_directories ( openxcom PUBLIC ${yaml-cpp_SOURCE_DIR}/include ${lua_SOURCE_DIR} ${EnTT_SOURCE_DIR}/single_include)
+target_link_libraries ( openxcom_lib PUBLIC ${system_libs} ${PKG_DEPS_LDFLAGS} ${WIN32_LIBS} yaml-cpp::yaml-cpp lua )
+target_link_libraries ( openxcom PUBLIC openxcom_lib )
 
 # Pack libraries into bundle and link executable appropriately
 if ( APPLE AND CREATE_BUNDLE )
@@ -758,6 +763,9 @@ if ( NOT EMBED_ASSETS )
     endif ()
   endforeach ()
 endif ()
+
+# Add the tests subdirectory
+add_subdirectory(Tests)
 
 # Copy Windows DLLs to bin folder
 if ( WIN32 )

@@ -70,8 +70,8 @@ MissionDetectedState::MissionDetectedState(MissionSite* mission, GeoscapeState* 
 	centerAllSurfaces();
 
 	// Set up objects
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setBackground(getGame()->getMod()->getSurface(mission->getDeployment()->getAlertBackground()));
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setBackground(_window, getGame()->getMod()->getSurface(mission->getDeployment()->getAlertBackground()));
 
 	_btnIntercept->setText(tr("STR_INTERCEPT"));
 	_btnIntercept->onMouseClick((ActionHandler)&MissionDetectedState::btnInterceptClick);

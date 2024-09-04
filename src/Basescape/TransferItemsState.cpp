@@ -68,7 +68,7 @@ TransferItemsState::TransferItemsState(Base *baseFrom, Base *baseTo, DebriefingS
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
-	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
+	_window = factory.createWindow("transferMenu", this, 320, 200, 0, 0);
 	_btnQuickSearch = new TextEdit(this, 48, 9, 10, 13);
 	_btnOk = new TextButton(148, 16, 8, 176);
 	_btnCancel = new TextButton(148, 16, 164, 176);
@@ -286,9 +286,9 @@ TransferItemsState::~TransferItemsState()
 /**
  * Runs the arrow timers.
  */
-void TransferItemsState::think()
+void TransferItemsState::update()
 {
-	State::think();
+	State::update();
 
 	_timerInc->think(true, false);
 	_timerDec->think(true, false);

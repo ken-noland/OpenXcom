@@ -54,7 +54,7 @@ SoldierTransformationState::SoldierTransformationState(RuleSoldierTransformation
 {
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
-	_window = factory.createWindow("windowName", this, 320, 200, 0, 0);
+	_window = factory.createWindow("soldierTransformation", this, 320, 200, 0, 0);
 	_btnCancel = new TextButton(148, 16, 8, 176);
 	_btnStart = new TextButton(148, 16, 164, 176);
 

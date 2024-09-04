@@ -51,11 +51,10 @@ AliensCrashState::AliensCrashState() : State("AliensCrashState", true)
 
 	centerAllSurfaces();
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-
 	// Set up objects
-	windowComponent.setHighContrast(true);
-	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setHighContrast(_window, true);
+	windowSystem.setBackground(_window, getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_btnOk->setHighContrast(true);
 	_btnOk->setText(tr("STR_OK"));

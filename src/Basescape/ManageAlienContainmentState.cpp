@@ -305,9 +305,9 @@ void ManageAlienContainmentState::resetListAndTotals()
 /**
  * Runs the arrow timers.
  */
-void ManageAlienContainmentState::think()
+void ManageAlienContainmentState::update()
 {
-	State::think();
+	State::update();
 
 	_timerInc->think(true, false);
 	_timerDec->think(true, false);

@@ -2046,7 +2046,7 @@ void InventoryState::handle(Action *action)
 /**
  * Cycle through loaded ammo in hover over item.
  */
-void InventoryState::think()
+void InventoryState::update()
 {
 	if (_mouseHoverItem)
 	{
@@ -2105,7 +2105,7 @@ void InventoryState::think()
 			_selAmmo->clear();
 		}
 	}
-	State::think();
+	State::update();
 }
 
 /**

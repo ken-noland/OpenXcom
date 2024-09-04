@@ -22,6 +22,7 @@
 #include "Game.h"
 #include "Screen.h"
 #include "Surface.h"
+#include "Timer.h"
 #include "Language.h"
 #include "LocalizedText.h"
 #include "Palette.h"
@@ -54,7 +55,9 @@ namespace OpenXcom
  * By default states are full-screen.
  * @param game Pointer to the core game.
  */
-State::State(const std::string& name, bool screen) : _name(name), _screen(screen), _soundPlayed(false), _modal(0), _ruleInterface(0), _ruleInterfaceParent(0), _customSound(nullptr)
+State::State(const std::string& name, bool screen)
+	: _progressTimerSystem(getSystem<ProgressTimerSystem>()),
+	_name(name), _screen(screen), _soundPlayed(false), _modal(0), _ruleInterface(0), _ruleInterfaceParent(0), _customSound(nullptr)
 {
 	// initialize palette to all black
 	memset(_palette, 0, sizeof(_palette));
@@ -130,7 +133,7 @@ void State::setInterface(const std::string& category, bool alterPal, SavedBattle
  * @param window Window handle.
  * @param s ID of the interface ruleset entry.
  */
-void State::setWindowBackground(entt::entity window, const std::string& s)
+void State::setWindowBackground(entt::handle window, const std::string& s)
 {
 	auto& bgImageName = getGame()->getMod()->getInterface(s)->getBackgroundImage();
 	setWindowBackgroundImage(window, bgImageName);
@@ -141,12 +144,12 @@ void State::setWindowBackground(entt::entity window, const std::string& s)
  * @param window Window handle.
  * @param s ID of the image.
  */
-void State::setWindowBackgroundImage(entt::entity window, const std::string& bgImageName)
+void State::setWindowBackgroundImage(entt::handle window, const std::string& bgImageName)
 {
 	const auto* bgImage = getGame()->getMod()->getSurface(bgImageName);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(window);
-	windowComponent.setBackground(bgImage);
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setBackground(window, bgImage);
 }
 
 /**
@@ -177,7 +180,7 @@ void State::add(Surface *surface)
 	SurfaceComponent& surfaceComponent = surfaceEnt.emplace<SurfaceComponent>(surfacePtr);
 
 	// KN TODO; remove call to setSurfaceComponent when flags have been moved over
-	drawableComponent.setSurfaceComponent(&surfaceComponent);
+//	drawableComponent.setSurfaceComponent(&surfaceComponent);
 	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
 
 	_surfaces.push_back(surfaceEnt);
@@ -257,7 +260,7 @@ void State::add(Surface *surface, const std::string &id, const std::string &cate
 	SurfaceComponent& surfaceComponent = surfaceEnt.emplace<SurfaceComponent>(surfacePtr);
 
 	// KN TODO; remove call to setSurfaceComponent when flags have been moved over
-	drawableComponent.setSurfaceComponent(&surfaceComponent);
+//	drawableComponent.setSurfaceComponent(&surfaceComponent);
 	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
 
 	_surfaces.push_back(surfaceEnt);
@@ -265,94 +268,11 @@ void State::add(Surface *surface, const std::string &id, const std::string &cate
 
 void State::add(entt::handle entity, const std::string& id, const std::string& category, Surface* parent)
 {
-	SurfaceComponent& surfaceComponent = getRegistry().raw().get<SurfaceComponent>(entity);
-	Surface* surface = surfaceComponent.getSurface();
+	add(entity);
+}
 
-	// Set palette
-	PaletteComponent& paletteComponent = getRegistry().raw().get<PaletteComponent>(entity);
-	paletteComponent.setPalette(_palette);
-
-
-	bool TFTDMode = false;
-	int primaryColor = 0, secondaryColor = 0, borderColor = 0;
-
-	if (getGame()->getMod()->getInterface(category))
-	{
-		Element* element = getGame()->getMod()->getInterface(category)->getElement(id);
-		if (element)
-		{
-			if (parent && element->w != INT_MAX && element->h != INT_MAX)
-			{
-				surface->setWidth(element->w);
-				surface->setHeight(element->h);
-			}
-
-			if (parent && element->x != INT_MAX && element->y != INT_MAX)
-			{
-				surface->setX(parent->getX() + element->x);
-				surface->setY(parent->getY() + element->y);
-			}
-
-			auto inter = dynamic_cast<InteractiveSurface*>(surface);
-			if (inter)
-			{
-				inter->setTFTDMode(element->TFTDMode);
-			}
-
-			if (element->color != INT_MAX)
-			{
-				primaryColor = element->color;
-			}
-			if (element->color2 != INT_MAX)
-			{
-				secondaryColor = element->color2;
-			}
-			if (element->border != INT_MAX)
-			{
-				borderColor = element->border;
-			}
-		}
-	}
-
-	//KN Note: Need to move the color stuff to its own component, but for now, this'll do
-	{
-		TextComponent* text = entity.try_get<TextComponent>();
-		if (text)
-		{
-			text->setColor(primaryColor);
-			text->setSecondaryColor(secondaryColor);
-		}
-
-		TextButtonComponent* textButton = entity.try_get<TextButtonComponent>();
-		if (textButton)
-		{
-			textButton->setColor(primaryColor);
-			surface->setColor(primaryColor);
-		}
-
-		WindowComponent* window = entity.try_get<WindowComponent>();
-		if (window)
-		{
-			window->setColor(primaryColor);
-			surface->setColor(primaryColor);
-		}
-	}
-
-
-	// this only works if we're dealing with a battlescape button
-	BattlescapeButton* bsbtn = dynamic_cast<BattlescapeButton*>(surface);
-
-	if (bsbtn)
-	{
-		// this will initialize the graphics and settings of the battlescape button.
-		bsbtn->copy(parent);
-		bsbtn->initSurfaces();
-	}
-
-	// Set default text resources
-	if (getGame()->getLanguage() && getGame()->getMod())
-		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
-
+void State::add(entt::handle entity)
+{
 	_surfaces.push_back(entity);
 }
 
@@ -415,19 +335,20 @@ void State::init()
 		}
 	}
 
-	for (entt::entity surfaceEnt : _surfaces)
-	{
-		if (getRegistry().raw().all_of<WindowComponent, SurfaceComponent>(surfaceEnt))
-		{
-			WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(surfaceEnt);
-			SurfaceComponent& surfaceComponent = getRegistry().raw().get<SurfaceComponent>(surfaceEnt);
-			if (muteWindowPopupSound)
-			{
-				windowComponent.mute();
-			}
-			surfaceComponent.getSurface()->invalidate();
-		}
-	}
+//	// KN NOTE: Need to re-enable this
+//	for (entt::entity surfaceEnt : _surfaces)
+//	{
+//		if (getRegistry().raw().all_of<WindowComponent, SurfaceComponent>(surfaceEnt))
+//		{
+//			WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(surfaceEnt);
+//			SurfaceComponent& surfaceComponent = getRegistry().raw().get<SurfaceComponent>(surfaceEnt);
+//			if (muteWindowPopupSound)
+//			{
+//				windowComponent.mute();
+//			}
+//			surfaceComponent.getSurface()->invalidate();
+//		}
+//	}
 	if (_ruleInterface != 0 && !_ruleInterface->getMusic().empty())
 	{
 		getGame()->getMod()->playMusic(_ruleInterface->getMusic());
@@ -438,7 +359,7 @@ void State::init()
  * Runs any code the state needs to keep updating every
  * game cycle, like timers and other real-time elements.
  */
-void State::think()
+void State::update()
 {
 	for (entt::entity surfaceEnt : _surfaces)
 	{
@@ -626,8 +547,8 @@ void State::applyBattlescapeTheme(const std::string& category)
 
 		if (surfaceEnt.all_of<WindowComponent, SurfaceComponent>())
 		{
-			WindowComponent& windowComponent = surfaceEnt.get<WindowComponent>();
-			windowComponent.setBackground(getGame()->getMod()->getSurface(altBg));
+			WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+			windowSystem.setBackground(surfaceEnt, getGame()->getMod()->getSurface(altBg));
 		}
 		TextList* list = dynamic_cast<TextList*>(surface);
 		if (list)

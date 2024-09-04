@@ -131,7 +131,7 @@ BaseDefenseState::~BaseDefenseState()
 	delete _timer;
 }
 
-void BaseDefenseState::think()
+void BaseDefenseState::update()
 {
 	_timer->think(true, false);
 }

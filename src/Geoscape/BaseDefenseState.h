@@ -56,7 +56,7 @@ public:
 	/// Cleans up the Base Defense state.
 	~BaseDefenseState();
 	/// Handle the Timer.
-	void think() override;
+	void update() override;
 	/// do the next step.
 	void nextStep();
 	/// Handler for clicking the OK button.

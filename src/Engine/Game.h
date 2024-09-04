@@ -37,6 +37,7 @@ class FpsCounter;
 class Action;
 class GeoscapeState;
 class ModFile;
+class TimeSystem;
 
 namespace Lua
 {

@@ -70,20 +70,56 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 #endif
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
+	// Set palette
+	setInterface("mainMenu");
+
 	// Create objects
-	_window = factory.createWindow("mainMenu", this, 256, 160, 32, 20, WindowPopup::POPUP_BOTH);
-	_btnNewGame = factory.createTextButton("btnNewGame", tr("STR_NEW_GAME"), 92, 20, 64, 90, [](Action*) { getGame()->pushState(new NewGameState); });
-	_btnNewBattle = factory.createTextButton("btnNewBattle", tr("STR_NEW_BATTLE"), 92, 20, 164, 90, [](Action*) { getGame()->pushState(new NewBattleState); });
-	_btnLoad = factory.createTextButton("btnLoad", tr("STR_LOAD_SAVED_GAME"), 92, 20, 64, 118, [](Action*) { getGame()->pushState(new ListLoadState(OPT_MENU)); });
-	_btnOptions = factory.createTextButton("btnOptions", tr("STR_OPTIONS"), 92, 20, 164, 118, [](Action*) { getGame()->pushState(new OptionsVideoState(OPT_MENU)); });
-	_btnMods = factory.createTextButton("btnMods", tr("STR_MODS"), 92, 20, 64, 146, [](Action*) { getGame()->pushState(new ModListState); });
-	_btnQuit = factory.createTextButton("btnQuit", tr("STR_QUIT"), 92, 20, 164, 146, [](Action*) { getGame()->quit(); });
+
+	// Window
+	InterfaceFactory::CreateWindowParams windowParams{"mainMenu", this, 256, 160, 32, 20,
+		WindowPopup::POPUP_BOTH, getPalette(), 0, 256, "window", "mainMenu"};
+	_window = factory.createWindow(windowParams);
+
+	// New Game
+	std::function<void(Action*)> btnNewGameClick = [this](Action* action) { getGame()->pushState(new NewGameState); };
+	InterfaceFactory::CreateTextButtonParams btnNewGameParams{"btnNewGame", tr("STR_NEW_GAME"), 92, 20, 64, 90,
+		btnNewGameClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	_btnNewGame = factory.createTextButton(btnNewGameParams);
+
+	// New Battle
+	std::function<void(Action*)> btnNewBattleClick = [this](Action* action)	{ getGame()->pushState(new NewBattleState); };
+	InterfaceFactory::CreateTextButtonParams btnNewBattleParams{"btnNewBattle", tr("STR_NEW_BATTLE"), 92, 20, 164, 90,
+		btnNewBattleClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	_btnNewBattle = factory.createTextButton(btnNewBattleParams);
+
+	// Load
+	std::function<void(Action*)> btnLoadClick = [this](Action* action) { getGame()->pushState(new ListLoadState(OPT_MENU)); };
+	InterfaceFactory::CreateTextButtonParams btnLoadParams{"btnLoad", tr("STR_LOAD_SAVED_GAME"), 92, 20, 64, 118,
+		btnLoadClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	_btnLoad = factory.createTextButton(btnLoadParams);
+
+	// Options
+	std::function<void(Action*)> btnOptionsClick = [this](Action* action) { getGame()->pushState(new OptionsVideoState(OPT_MENU)); };
+	InterfaceFactory::CreateTextButtonParams btnOptionsParams{"btnOptions", tr("STR_OPTIONS"), 92, 20, 164, 118,
+		btnOptionsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	_btnOptions = factory.createTextButton(btnOptionsParams);
+
+	// Mods
+	std::function<void(Action*)> btnModsClick = [this](Action* action) { getGame()->pushState(new ModListState); };
+	InterfaceFactory::CreateTextButtonParams btnModsParams{"btnMods", tr("STR_MODS"), 92, 20, 64, 146,
+		btnModsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	_btnMods = factory.createTextButton(btnModsParams);
+
+	// Quit
+	std::function<void(Action*)> btnQuitClick = [this](Action* action) { getGame()->quit(); };
+	InterfaceFactory::CreateTextButtonParams btnQuitParams{"btnQuit", tr("STR_QUIT"), 92, 20, 164, 146,
+		btnQuitClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	_btnQuit = factory.createTextButton(btnQuitParams);
+
 	//_btnUpdate = factory.createTextButton("btnUpdate", tr("STR_UPDATE"), 72, 16, 209, 27, [this](Action* action) { btnUpdateClick(action); });
 	//_txtUpdateInfo = new Text(320, 17, 0, 11);
 	_txtTitle = new Text(256, 30, 32, 45);
 
-	// Set palette
-	setInterface("mainMenu");
 
 	add(_window, "window", "mainMenu");
 	add(_btnNewGame, "button", "mainMenu");
@@ -101,24 +137,6 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	// Set up objects
 	setWindowBackground(_window, "mainMenu");
 
-	//_btnNewGame->setText(tr("STR_NEW_GAME"));
-	//_btnNewGame->onMouseClick((ActionHandler)&MainMenuState::btnNewGameClick);
-
-	//_btnNewBattle->setText(tr("STR_NEW_BATTLE"));
-	//_btnNewBattle->onMouseClick((ActionHandler)&MainMenuState::btnNewBattleClick);
-
-	//_btnLoad->setText(tr("STR_LOAD_SAVED_GAME"));
-	//_btnLoad->onMouseClick((ActionHandler)&MainMenuState::btnLoadClick);
-
-	//_btnOptions->setText(tr("STR_OPTIONS"));
-	//_btnOptions->onMouseClick((ActionHandler)&MainMenuState::btnOptionsClick);
-
-	//_btnMods->setText(tr("STR_MODS"));
-	//_btnMods->onMouseClick((ActionHandler)&MainMenuState::btnModsClick);
-
-	//_btnQuit->setText(tr("STR_QUIT"));
-	//_btnQuit->onMouseClick((ActionHandler)&MainMenuState::btnQuitClick);
-
 	//_btnUpdate->setText(tr("STR_UPDATE"));
 	//_btnUpdate->onMouseClick((ActionHandler)& MainMenuState::btnUpdateClick);
 	//_btnUpdate->setVisible(false);
@@ -128,68 +146,68 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	//_txtUpdateInfo->setText(tr("STR_LATEST_VERSION_INFO"));
 	//_txtUpdateInfo->setVisible(false);
 
-#ifdef _WIN32
-	//_debugInVisualStudio = true; // uncomment when debugging in Visual Studio (working dir and exe dir are not the same)
-
-	// delete (old) update batch file
-	if (updateCheck && CrossPlatform::fileExists("oxce-upd.bat"))
-	{
-		CrossPlatform::deleteFile("oxce-upd.bat");
-	}
-
-	if (updateCheck && Options::oxceUpdateCheck)
-	{
-		int checkProgress = 0;
-		const std::string relativeExeFilename = (_debugInVisualStudio ? "Debug/" + CrossPlatform::getExeFilename(false) : CrossPlatform::getExeFilename(false));
-		// (naive) check if working directory and exe directory are the same
-		if (!relativeExeFilename.empty() && CrossPlatform::fileExists(relativeExeFilename))
-		{
-			checkProgress = 1;
-			const std::string internetConnectionCheckUrl = "https://openxcom.org/";
-			if (CrossPlatform::testInternetConnection(internetConnectionCheckUrl))
-			{
-				checkProgress = 2;
-				const std::string updateMetadataUrl = "https://openxcom.org/oxce/update.txt";
-				const std::string updateMetadataFilename = Options::getUserFolder() + "oxce-update.txt";
-				if (CrossPlatform::downloadFile(updateMetadataUrl, updateMetadataFilename))
-				{
-					checkProgress = 3;
-					if (CrossPlatform::fileExists(updateMetadataFilename))
-					{
-						checkProgress = 4;
-						try
-						{
-							YAML::Node doc = YAML::Load(*CrossPlatform::readFile(updateMetadataFilename));
-							checkProgress = 5;
-							if (doc["updateInfo"])
-							{
-								checkProgress = 6;
-								std::string msg = doc["updateInfo"].as<std::string>();
-								_txtUpdateInfo->setText(msg);
-								_txtUpdateInfo->setVisible(true);
-							}
-							else if (doc["newVersion"])
-							{
-								checkProgress = 7;
-								_newVersion = doc["newVersion"].as<std::string>();
-//								if (CrossPlatform::isHigherThanCurrentVersion(_newVersion))
-//									_btnUpdate->setVisible(true);
-//								else
-//									_txtUpdateInfo->setVisible(true);
-							}
-							CrossPlatform::deleteFile(updateMetadataFilename);
-						}
-						catch (YAML::Exception &e)
-						{
-							Log(LOG_ERROR) << e.what();
-						}
-					}
-				}
-			}
-		}
-		Log(LOG_INFO) << "Update check status: " << checkProgress << "; newVersion: v" << _newVersion << "; ";
-	}
-#endif
+//#ifdef _WIN32
+//	//_debugInVisualStudio = true; // uncomment when debugging in Visual Studio (working dir and exe dir are not the same)
+//
+//	// delete (old) update batch file
+//	if (updateCheck && CrossPlatform::fileExists("oxce-upd.bat"))
+//	{
+//		CrossPlatform::deleteFile("oxce-upd.bat");
+//	}
+//
+//	if (updateCheck && Options::oxceUpdateCheck)
+//	{
+//		int checkProgress = 0;
+//		const std::string relativeExeFilename = (_debugInVisualStudio ? "Debug/" + CrossPlatform::getExeFilename(false) : CrossPlatform::getExeFilename(false));
+//		// (naive) check if working directory and exe directory are the same
+//		if (!relativeExeFilename.empty() && CrossPlatform::fileExists(relativeExeFilename))
+//		{
+//			checkProgress = 1;
+//			const std::string internetConnectionCheckUrl = "https://openxcom.org/";
+//			if (CrossPlatform::testInternetConnection(internetConnectionCheckUrl))
+//			{
+//				checkProgress = 2;
+//				const std::string updateMetadataUrl = "https://openxcom.org/oxce/update.txt";
+//				const std::string updateMetadataFilename = Options::getUserFolder() + "oxce-update.txt";
+//				if (CrossPlatform::downloadFile(updateMetadataUrl, updateMetadataFilename))
+//				{
+//					checkProgress = 3;
+//					if (CrossPlatform::fileExists(updateMetadataFilename))
+//					{
+//						checkProgress = 4;
+//						try
+//						{
+//							YAML::Node doc = YAML::Load(*CrossPlatform::readFile(updateMetadataFilename));
+//							checkProgress = 5;
+//							if (doc["updateInfo"])
+//							{
+//								checkProgress = 6;
+//								std::string msg = doc["updateInfo"].as<std::string>();
+//								_txtUpdateInfo->setText(msg);
+//								_txtUpdateInfo->setVisible(true);
+//							}
+//							else if (doc["newVersion"])
+//							{
+//								checkProgress = 7;
+//								_newVersion = doc["newVersion"].as<std::string>();
+////								if (CrossPlatform::isHigherThanCurrentVersion(_newVersion))
+////									_btnUpdate->setVisible(true);
+////								else
+////									_txtUpdateInfo->setVisible(true);
+//							}
+//							CrossPlatform::deleteFile(updateMetadataFilename);
+//						}
+//						catch (YAML::Exception &e)
+//						{
+//							Log(LOG_ERROR) << e.what();
+//						}
+//					}
+//				}
+//			}
+//		}
+//		Log(LOG_INFO) << "Update check status: " << checkProgress << "; newVersion: v" << _newVersion << "; ";
+//	}
+//#endif
 
 	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();

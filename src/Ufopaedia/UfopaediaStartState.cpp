@@ -30,6 +30,8 @@
 #include "../Engine/Timer.h"
 #include "../fmath.h"
 #include "../Engine/Screen.h"
+
+#include "../Entity/Engine/Surface.h"
 #include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
@@ -60,8 +62,8 @@ UfopaediaStartState::UfopaediaStartState()
 	// set background window
 	_window = factory.createWindow("windowName", this, 256, 180 + _heightOffset, 32, 10 - _windowOffset, WindowPopup::POPUP_BOTH);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setInnerColor(239); // almost black = darkest index from backpals.dat
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setInnerColor(_window, 239); // almost black = darkest index from backpals.dat
 
 	// set title
 	_txtTitle = new Text(220, 17, 50, 33);
@@ -144,9 +146,9 @@ UfopaediaStartState::~UfopaediaStartState()
 /**
 	* Run timers.
 	*/
-void UfopaediaStartState::think()
+void UfopaediaStartState::update()
 {
-	State::think();
+	State::update();
 	_timerScroll->think(true, false);
 }
 

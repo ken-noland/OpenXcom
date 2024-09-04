@@ -145,7 +145,7 @@ public:
 	/// Handles keypresses.
 	void handle(Action *action) override;
 	/// Runs state functionality every cycle.
-	void think() override;
+	void update() override;
 	/// Handler for showing tooltip.
 	void txtTooltipIn(Action *action);
 	/// Handler for hiding tooltip.

@@ -35,6 +35,8 @@
 #include "../Savegame/SavedGame.h"
 #include "../Ufopaedia/Ufopaedia.h"
 #include "../Mod/RuleInterface.h"
+
+#include "../Entity/Engine/Surface.h"
 #include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
@@ -55,7 +57,7 @@ PlaceLiftState::PlaceLiftState(entt::handle newBaseHandle, Globe *globe, bool fi
 	// Create objects
 	_view = new BaseView(192, 192, 0, 8);
 	_txtTitle = new Text(320, 9, 0, 0);
-	_window = factory.createWindow("placeFacility", this, 128, 160, 192, 40, WindowPopup::POPUP_NONE);
+	_window = factory.createWindow("selectFacility", this, 128, 160, 192, 40, WindowPopup::POPUP_NONE);
 	_txtHeader = new Text(118, 17, 197, 48);
 	_lstAccessLifts = new TextList(104, 104, 200, 64);
 

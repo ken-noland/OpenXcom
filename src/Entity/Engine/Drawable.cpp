@@ -28,7 +28,7 @@
 namespace OpenXcom
 {
 
-DrawableComponent::DrawableComponent() : _surfaceComponent(nullptr)
+DrawableComponent::DrawableComponent()
 {
 }
 
@@ -43,20 +43,7 @@ void DrawableComponent::addDrawable(const DrawableCallback& drawable)
 
 void DrawableComponent::draw()
 {
-	Surface* surface = _surfaceComponent->getSurface();
-
-//	if (surface->getVisible() && !surface->isHidden())
-	{
-		//if (surface->getRedraw())
-		{
-			_drawables.call();
-		}
-
-		SDL_Rect target{};
-		target.x = surface->getX();
-		target.y = surface->getY();
-		SDL_BlitSurface(surface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
-	}	
+	_drawables.call();
 }
 
 DrawableSystem::DrawableSystem()
@@ -74,17 +61,37 @@ void DrawableSystem::draw(entt::handle& entity)
 	// KN NOTE: A bit of a hack for now until we have more of the surface stuff
 	//  moved over to ECS. Some are using the old draw method(blitting) whereas
 	//  others are using the new DrawableComponent
-	
-	if (entity.any_of<WindowComponent, TextButtonComponent, TextComponent>())
+
+	if (entity.any_of<WindowComponent>())
+	{
+		WindowSystem& windowSystem = getSystem<WindowSystem>();
+		windowSystem.draw(entity);
+	}
+	else if (entity.any_of<TextButtonComponent, TextComponent>())
 	{
 		DrawableComponent& drawableComponent = entity.get<DrawableComponent>();
 		drawableComponent.draw();
+
+		//TODO: I'm not sure this is needed once we have the systems up and running
+		{
+			SurfaceComponent& surfaceComponent = entity.get<SurfaceComponent>();
+			Surface* surface = surfaceComponent.getSurface();
+
+			SDL_Rect target{};
+			target.x = surface->getX();
+			target.y = surface->getY();
+			SDL_BlitSurface(surface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
+		}
 	}
 	else
 	{
 		Surface* surface = entity.get<SurfaceComponent>().getSurface();
 		surface->blit(getGame()->getScreen()->getSurface());
 	}
+}
+
+void DrawableSystem::update()
+{
 }
 
 } // namespace OpenXcom

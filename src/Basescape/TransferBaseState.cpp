@@ -49,7 +49,7 @@ TransferBaseState::TransferBaseState(Base* base, DebriefingState* debriefingStat
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
-	_window = factory.createWindow("windowName", this, 280, 140, 20, 30);
+	_window = factory.createWindow("transferBaseSelect", this, 280, 140, 20, 30);
 	_btnCancel = new TextButton(264, 16, 28, 146);
 	_txtTitle = new Text(270, 17, 25, 38);
 	_txtFunds = new Text(250, 9, 30, 54);

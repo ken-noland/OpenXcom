@@ -48,6 +48,8 @@
 #include "Map.h"
 #include "TileEngine.h"
 #include "Pathfinding.h"
+
+#include "../Entity/Engine/Surface.h"
 #include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
@@ -148,10 +150,11 @@ NextTurnState::NextTurnState(SavedBattleGame* battleGame, BattlescapeState* stat
 	_txtMessage3->setY(y + 172);
 
 	// Set up objects
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setColor(Palette::blockOffset(0) - 1);
-	windowComponent.setHighContrast(true);
-	windowComponent.setBackground(getGame()->getMod()->getSurface(_battleGame->getHiddenMovementBackground()));
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+
+	windowSystem.setColor(_window, Palette::blockOffset(0) - 1);
+	windowSystem.setHighContrast(_window, true);
+	windowSystem.setBackground(_window, getGame()->getMod()->getSurface(_battleGame->getHiddenMovementBackground()));
 
 
 	_txtMessageReinforcements->setBig();
@@ -502,7 +505,7 @@ void NextTurnState::handle(Action *action)
 /**
  * Keeps the timer running.
  */
-void NextTurnState::think()
+void NextTurnState::update()
 {
 	if (_timer)
 	{

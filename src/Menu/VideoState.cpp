@@ -542,6 +542,12 @@ void VideoState::init()
 	Music::stop();
 #endif
 
+	// KN Note: Because of the way the video is played, all of the systems in ECS never
+	// receive an update. In order to compensate for this, we need to manually update
+	// the systems here so that the timers are updated
+	getGame()->getECS().update();
+
+
 	getGame()->getCursor()->setVisible(true);
 	CutsceneState::resetDisplay(wasLetterboxed);
 	getGame()->popState();

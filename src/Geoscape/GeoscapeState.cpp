@@ -753,9 +753,9 @@ void GeoscapeState::init()
 /**
  * Runs the game timer and handles popups.
  */
-void GeoscapeState::think()
+void GeoscapeState::update()
 {
-	State::think();
+	State::update();
 
 	_zoomInEffectTimer->think(true, false);
 	_zoomOutEffectTimer->think(true, false);
@@ -3171,7 +3171,7 @@ void GeoscapeState::handleDogfights()
 		{
 			_globe->rotateStop();
 		}
-		dfs->think();
+		dfs->update();
 		if (dfs->dogfightEnded())
 		{
 			if (dfs->isMinimized())

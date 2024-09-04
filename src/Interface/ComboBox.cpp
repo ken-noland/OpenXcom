@@ -29,6 +29,7 @@
 #include "../Engine/Screen.h"
 
 #include "../Engine/Game.h"
+#include "../Entity/Engine/Surface.h"
 #include "../Entity/Interface/Interface.h"
 
 namespace OpenXcom
@@ -72,8 +73,8 @@ ComboBox::ComboBox(State *state, int width, int height, int x, int y, bool popup
 	int popupY = getPopupWindowY(height, y, popupHeight, popupAboveButton);
 	_window = factory.createWindow("windowName", state, width, popupHeight, x, popupY);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setThinBorder();
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setThinBorder(_window);
 
 	_list = new TextList(width - HORIZONTAL_MARGIN * 2 - BUTTON_WIDTH + 1,
 						popupHeight - (VERTICAL_MARGIN * 2 + 2),
@@ -175,8 +176,8 @@ void ComboBox::initText(Font *big, Font *small, Language *lang)
  */
 void ComboBox::setBackground(Surface *bg)
 {
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setBackground(bg);
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setBackground(_window, bg);
 }
 
 /**
@@ -189,8 +190,8 @@ void ComboBox::setColor(Uint8 color)
 	drawArrow();
 	_button->setColor(_color);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setColor(_color);
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setColor(_window, _color);
 
 	_list->setColor(_color);
 }
@@ -254,8 +255,8 @@ void ComboBox::setHighContrast(bool contrast)
 {
 	_button->setHighContrast(contrast);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setHighContrast(contrast);
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setHighContrast(_window, contrast);
 
 	_list->setHighContrast(contrast);
 }
@@ -420,8 +421,8 @@ void ComboBox::think()
 	_arrow->think();
 
 	// TEMP! This should be done in the TickableComponent
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.tick();
+//	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+//	windowSystem.update(_window);
 
 	_list->think();
 	InteractiveSurface::think();

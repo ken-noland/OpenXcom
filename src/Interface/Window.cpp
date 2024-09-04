@@ -23,6 +23,7 @@
 #include "../Engine/Timer.h"
 #include "../Engine/Sound.h"
 #include "../Engine/RNG.h"
+#include "Window.h"
 
 namespace OpenXcom
 {
@@ -301,5 +302,6 @@ namespace OpenXcom
 //{
 //	_innerColor = innerColor;
 //}
+
 
 }

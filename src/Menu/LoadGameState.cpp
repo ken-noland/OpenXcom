@@ -142,9 +142,9 @@ void LoadGameState::init()
 /**
  * Loads the specified save.
  */
-void LoadGameState::think()
+void LoadGameState::update()
 {
-	State::think();
+	State::update();
 	// Make sure it gets drawn properly
 	if (_firstRun < 10)
 	{

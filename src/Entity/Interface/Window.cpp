@@ -17,168 +17,108 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Window.h"
-#include "../../fmath.h"
+
+#include <SDL_mixer.h>
+
 #include "../../Engine/Timer.h"
 #include "../../Engine/RNG.h"
 #include "../Engine/Tickable.h"
 #include "../Engine/Drawable.h"
+#include "../Engine/Surface.h"
+#include "../Engine/Hierarchical.h"
+
+#include "../../Engine/Game.h"
+#include "../../Engine/Screen.h"
+#include "../../Engine/Sound.h"
 
 namespace OpenXcom
 {
 
-const double WindowComponent::POPUP_SPEED = 0.05;
+const uint64_t WindowSystem::POPUP_SPEED_MS = 200;
 
-WindowComponent::WindowComponent(SurfaceComponent& surfaceComponent, State* state, WindowPopup popup)
-	: _surfaceComponent(surfaceComponent), _bg(0), _color(0), _popup(popup), _popupStep(0.0),
-	_state(state), _contrast(false), _screen(false), _thinBorder(false), _innerColor(0), _mute(false)
+
+WindowSystem::WindowSystem()
 {
-
-	// the background image is always positioned at 0,0, so this sets the initial position of the background to be cropped
-	_dx = -_surfaceComponent.getSurface()->getX();
-	_dy = -_surfaceComponent.getSurface()->getY();
-
-	_timer = new Timer(10);
-	_timer->onSurface(std::bind(&WindowComponent::popup, this));
-
-	if (_popup == WindowPopup::POPUP_NONE)
-	{
-		_popupStep = 1.0;
-	}
-	else
-	{
-		_surfaceComponent.getSurface()->setHidden(true);
-
-		_timer->start();
-		if (_state != 0)
-		{
-			_screen = state->isScreen();
-			if (_screen)
-				_state->toggleScreen();
-		}
-	}
 }
 
-WindowComponent::~WindowComponent()
+WindowSystem::~WindowSystem()
 {
-	delete _timer;
 }
 
-/// Sets the background surface.
-void WindowComponent::setBackground(const Surface* bg)
+void WindowSystem::setBackground(entt::handle windowEntity, const Surface* bg)
 {
-	_bg = bg;
-	_surfaceComponent.getSurface()->setRedraw(true);
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._bg = bg;
 }
 
-/// Sets the border color.
-void WindowComponent::setColor(Uint8 color)
+void WindowSystem::setColor(entt::handle windowEntity, uint8_t color)
 {
-	_color = color;
-	_surfaceComponent.getSurface()->setRedraw(true);
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._color = color;
 }
 
-/// Gets the border color.
-Uint8 WindowComponent::getColor() const
+uint8_t WindowSystem::getColor(entt::handle windowEntity) const
 {
-	return _color;
+	const WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	return windowComponent._color;
 }
 
-/// Sets the high contrast color setting.
-void WindowComponent::setHighContrast(bool contrast)
+void WindowSystem::setHighContrast(entt::handle windowEntity, bool contrast)
 {
-	_contrast = contrast;
-	_surfaceComponent.getSurface()->setRedraw(true);
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._contrast = contrast;
 }
 
-/// Handles the timers.
-void WindowComponent::tick()
+void WindowSystem::draw(entt::handle windowEntity)
 {
-	Surface* windowSurface = _surfaceComponent.getSurface();
-	if (windowSurface->isHidden() && _popupStep < 1.0)
-	{
-		_state->hideAll();
-		_surfaceComponent.getSurface()->setHidden(false);
-	}
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	SurfaceComponent& surfaceComponent = windowEntity.get<SurfaceComponent>();
+	ProgressTimerComponent& progressTimerComponent = windowEntity.get<ProgressTimerComponent>();
 
-	_timer->think(false, true);
-}
+	Surface* windowSurface = surfaceComponent.getSurface();
 
-/// Popups the window.
-void WindowComponent::popup()
-{
-	//if (!_mute && AreSame(_popupStep, 0.0))
-	//{
-	//	int sound = RNG::seedless(0, 2);
-	//	if (soundPopup[sound] != 0)
-	//	{
-	//		soundPopup[sound]->play(Mix_GroupAvailable(0));
-	//	}
-	//}
-	if (_popupStep < 1.0)
-	{
-		_popupStep += POPUP_SPEED;
-	}
-	else
-	{
-		if (_screen)
-		{
-			_state->toggleScreen();
-		}
-		_state->showAll();
-		_popupStep = 1.0;
-		_timer->stop();
-	}
-
-	Surface* windowSurface = _surfaceComponent.getSurface();
-	windowSurface->setRedraw(true);
-}
-
-/// Draws the window.
-void WindowComponent::draw()
-{
-	Surface* windowSurface = _surfaceComponent.getSurface();
 	windowSurface->draw();
-
+	
 	SDL_Rect square;
-
+	
 	Sint16 width = windowSurface->getWidth();
 	Sint16 height = windowSurface->getHeight();
-
-	if (_popup == WindowPopup::POPUP_HORIZONTAL || _popup == WindowPopup::POPUP_BOTH)
+	
+	if (windowComponent._popup == WindowPopup::POPUP_HORIZONTAL || windowComponent._popup == WindowPopup::POPUP_BOTH)
 	{
-		square.x = (Sint16)((width - (width * _popupStep)) / 2);
-		square.w = (Sint16)(width * _popupStep);
+		square.x = (Sint16)((width - (width * windowComponent._popupStep)) / 2);
+		square.w = (Sint16)(width * windowComponent._popupStep);
 	}
 	else
 	{
 		square.x = 0;
 		square.w = width;
 	}
-	if (_popup == WindowPopup::POPUP_VERTICAL || _popup == WindowPopup::POPUP_BOTH)
+	if (windowComponent._popup == WindowPopup::POPUP_VERTICAL || windowComponent._popup == WindowPopup::POPUP_BOTH)
 	{
-		square.y = (Sint16)((height - (height * _popupStep)) / 2);
-		square.h = (Sint16)(height * _popupStep);
+		square.y = (Sint16)((height - (height * windowComponent._popupStep)) / 2);
+		square.h = (Sint16)(height * windowComponent._popupStep);
 	}
 	else
 	{
 		square.y = 0;
 		square.h = height;
 	}
-
+	
 	int mul = 1;
-	if (_contrast)
+	if (windowComponent._contrast)
 	{
 		mul = 2;
 	}
-	Uint8 color = _color + 3 * mul;
-
-	if (_thinBorder)
+	Uint8 color = windowComponent._color + 3 * mul;
+	
+	if (windowComponent._thinBorder)
 	{
-		color = _color + 1 * mul;
+		color = windowComponent._color + 1 * mul;
 		for (int i = 0; i < 5; ++i)
 		{
 			windowSurface->drawRect(&square, color);
-
+	
 			if (i % 2 == 0)
 			{
 				square.x++;
@@ -186,22 +126,22 @@ void WindowComponent::draw()
 			}
 			square.w--;
 			square.h--;
-
+	
 			switch (i)
 			{
 			case 0:
-				color = _color + 5 * mul;
+				color = windowComponent._color + 5 * mul;
 				windowSurface->setPixel(square.w, 0, color);
 				break;
 			case 1:
-				color = _color + 2 * mul;
+				color = windowComponent._color + 2 * mul;
 				break;
 			case 2:
-				color = _color + 4 * mul;
+				color = windowComponent._color + 4 * mul;
 				windowSurface->setPixel(square.w + 1, 1, color);
 				break;
 			case 3:
-				color = _color + 3 * mul;
+				color = windowComponent._color + 3 * mul;
 				break;
 			}
 		}
@@ -221,55 +161,105 @@ void WindowComponent::draw()
 				square.w -= 2;
 			else
 				square.w = 1;
-
+	
 			if (square.h >= 2)
 				square.h -= 2;
 			else
 				square.h = 1;
 		}
-		if (_innerColor != 0)
+		if (windowComponent._innerColor != 0)
 		{
-			windowSurface->drawRect(&square, _innerColor);
+			windowSurface->drawRect(&square, windowComponent._innerColor);
 		}
 	}
-
-	if (_bg != 0)
+	
+	if (windowComponent._bg != 0)
 	{
-		auto crop = _bg->getCrop();
-		crop.getCrop()->x = square.x - _dx;
-		crop.getCrop()->y = square.y - _dy;
+		SurfaceCrop crop = windowComponent._bg->getCrop();
+		crop.getCrop()->x = square.x - windowComponent._dx;
+		crop.getCrop()->y = square.y - windowComponent._dy;
 		crop.getCrop()->w = square.w;
 		crop.getCrop()->h = square.h;
 		crop.setX(square.x);
 		crop.setY(square.y);
 		crop.blit(windowSurface);
 	}
+
+	if (windowComponent._popupStep >= 1.0)
+	{
+		// Now render the window contents
+		HierarchySystem& hierarchySystem = getSystem<HierarchySystem>();
+		hierarchySystem.visit(windowEntity, [&](entt::handle child) {
+			DrawableSystem& drawableSystem = getSystem<DrawableSystem>();
+			drawableSystem.draw(child);
+		});
+	}
+
+
+	SDL_Rect target{};
+	target.x = surfaceComponent.getX();
+	target.y = surfaceComponent.getY();
+	SDL_BlitSurface(windowSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
 }
 
-/// sets the X delta.
-void WindowComponent::setDX(int dx)
+void WindowSystem::setDX(entt::handle windowEntity, int dx)
 {
-	_dx = dx;
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._dx = dx;
 }
 
-/// sets the Y delta.
-void WindowComponent::setDY(int dy)
+void WindowSystem::setDY(entt::handle windowEntity, int dy)
 {
-	_dy = dy;
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._dy = dy;
 }
 
-/// Give this window a thin border.
-void WindowComponent::setThinBorder()
+void WindowSystem::setThinBorder(entt::handle windowEntity)
 {
-	_thinBorder = true;
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._thinBorder = true;
 }
 
-/// Give this window a custom inner color.
-void WindowComponent::setInnerColor(Uint8 innerColor)
+void WindowSystem::setInnerColor(entt::handle windowEntity, uint8_t innerColor)
 {
-	_innerColor = innerColor;
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._innerColor = innerColor;
 }
 
+void WindowSystem::playSound(entt::handle windowEntity)
+{
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	if (!windowComponent._mute && soundPopup.size() > 0)
+	{
+		int sound = RNG::seedless(0, (int)soundPopup.size()-1);
+		if (soundPopup[sound] != 0)
+		{
+			soundPopup[sound]->play(Mix_GroupAvailable(0));
+		}
+	}
+}
 
+void WindowSystem::setMute(entt::handle windowEntity, bool mute)
+{
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._mute = mute;
+}
+
+void WindowSystem::UpdateProgress(entt::handle windowEntity, double progress)
+{
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._popupStep = progress;
+}
+
+void WindowSystem::CompleteProgress(entt::handle windowEntity)
+{
+	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	windowComponent._popupStep = 1.0;
+}
+
+void WindowSystem::addPopupSound(Sound* sound)
+{
+	soundPopup.push_back(sound);
+}
 
 } // namespace OpenXcom

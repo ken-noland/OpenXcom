@@ -51,7 +51,7 @@ public:
 	/// Validates game.
 	void init() override;
 	/// Loads the game.
-	void think() override;
+	void update() override;
 	/// Shows an error message.
 	void error(const std::string &msg, SavedGame *save);
 };

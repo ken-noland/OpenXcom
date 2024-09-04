@@ -76,6 +76,7 @@
 #include "../Engine/FileMap.h"
 #include "../Engine/Font.h"
 #include "../Engine/GMCat.h"
+#include "../Engine/Game.h"
 #include "../Engine/Logger.h"
 #include "../Engine/Music.h"
 #include "../Engine/Options.h"
@@ -95,7 +96,6 @@
 #include "../fmath.h"
 #include "../Geoscape/Globe.h"
 #include "../Interface/TextButton.h"
-#include "../Interface/Window.h"
 #include "../Savegame/AlienStrategy.h"
 #include "../Savegame/Base.h"
 #include "../Savegame/BattleUnit.h"
@@ -113,6 +113,8 @@
 #include "../Savegame/Transfer.h"
 #include "../Ufopaedia/Ufopaedia.h"
 #include "../version.h"
+
+#include "../Entity/Interface/Window.h"
 
 #define ARRAYLEN(x) (std::size(x))
 
@@ -6059,9 +6061,11 @@ void Mod::loadExtraResources()
 	}
 
 	TextButton::soundPress = getSound("GEO.CAT", Mod::BUTTON_PRESS);
-	//Window::soundPopup[0] = getSound("GEO.CAT", Mod::WINDOW_POPUP[0]);
-	//Window::soundPopup[1] = getSound("GEO.CAT", Mod::WINDOW_POPUP[1]);
-	//Window::soundPopup[2] = getSound("GEO.CAT", Mod::WINDOW_POPUP[2]);
+
+	WindowSystem& windowSystem = getSystem<WindowSystem>();
+	windowSystem.addPopupSound(getSound("GEO.CAT", Mod::WINDOW_POPUP[0]));
+	windowSystem.addPopupSound(getSound("GEO.CAT", Mod::WINDOW_POPUP[1]));
+	windowSystem.addPopupSound(getSound("GEO.CAT", Mod::WINDOW_POPUP[2]));
 }
 
 void Mod::loadExtraSprite(ExtraSprites *spritePack)

@@ -37,11 +37,10 @@ Uint32 slowTick()
 	return (Uint32)(false_time >> accurate);
 }
 
-}//namespace
+} // namespace
 
 Uint32 Timer::gameSlowSpeed = 1;
 int Timer::maxFrameSkip = 8; // this is a pretty good default at 60FPS.
-
 
 /**
  * Initializes a new timer with a set interval.
@@ -109,7 +108,7 @@ bool Timer::isRunning() const
 void Timer::think(bool state, bool surface)
 {
 	Sint64 now = slowTick(); // must be signed to permit negative numbers
-	//assert(!game || game->isState(state));
+	// assert(!game || game->isState(state));
 
 	if (_running)
 	{
@@ -132,7 +131,8 @@ void Timer::think(bool state, bool surface)
 				_surfaceFunction();
 			}
 			_start = slowTick();
-			if (_start > _frameSkipStart) _frameSkipStart = _start; // don't play animations in ffwd to catch up :P
+			if (_start > _frameSkipStart)
+				_frameSkipStart = _start; // don't play animations in ffwd to catch up :P
 		}
 	}
 }
@@ -163,5 +163,82 @@ void Timer::onSurface(SurfaceHandler handler)
 {
 	_surfaceFunction = handler;
 }
+
+TimeSystem::TimeSystem() : _lastTime(std::chrono::high_resolution_clock::now()), _frameTime(0), _elapsedTime(0)
+{
+}
+
+/**
+ * Updates the time system.
+ */
+void TimeSystem::update()
+{
+	std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+	_frameTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - _lastTime).count();
+	_elapsedTime += _frameTime;
+	_lastTime = currentTime;
+}
+
+ProgressTimerSystem::ProgressTimerSystem(entt::registry& registry, const TimeSystem& timeSystem)
+	: _registry(registry), _timeSystem(timeSystem)
+{
+}
+
+void ProgressTimerSystem::update()
+{
+	int64_t frameTime = _timeSystem.getFrameTimeMS();
+
+	auto view = _registry.view<ProgressTimerComponent>();
+	for (const entt::entity& entity : view)
+	{
+		ProgressTimerComponent& progressTimer = view.get<ProgressTimerComponent>(entity);
+		if (progressTimer._active)
+		{
+			progressTimer._elapsed += frameTime;
+
+			double progress = (double)progressTimer._elapsed / (double)progressTimer._duration;
+
+			if (progress < 1.0)
+			{
+				callUpdate(entity, progressTimer, progress);
+			}
+
+			if (progressTimer._elapsed >= progressTimer._duration)
+			{
+				progressTimer._elapsed = progressTimer._duration;
+				progressTimer._active = false;
+				if (progressTimer._onComplete)
+				{
+					callUpdate(entity, progressTimer, 1.0);
+					callComplete(entity, progressTimer);
+				}
+			}
+		}
+	}
+}
+
+void ProgressTimerSystem::callUpdate(entt::entity entity, ProgressTimerComponent& component, float progress)
+{
+	if (component._onProgress)
+	{
+		component._onProgress(entt::handle(_registry, entity), progress);
+	}
+}
+
+void ProgressTimerSystem::callComplete(entt::entity entity, ProgressTimerComponent& component)
+{
+	if (component._onComplete)
+	{
+		component._onComplete(entt::handle(_registry, entity));
+	}
+}
+
+/**
+ * Updates the time system.
+ */
+void IntervalTimerSystem::update()
+{
+}
+
 
 }

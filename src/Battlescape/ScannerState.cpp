@@ -98,7 +98,7 @@ void ScannerState::handle(Action *action)
 /**
  * Updates scanner state.
  */
-void ScannerState::update()
+void ScannerState::updateScanner()
 {
 	//_scannerView->draw();
 }
@@ -114,9 +114,9 @@ void ScannerState::animate()
 /**
  * Handles timers.
  */
-void ScannerState::think()
+void ScannerState::update()
 {
-	State::think();
+	State::update();
 	_timerAnimate->think(true, false);
 }
 

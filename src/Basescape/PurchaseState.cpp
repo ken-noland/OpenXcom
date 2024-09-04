@@ -377,9 +377,9 @@ PurchaseState::~PurchaseState()
 /**
  * Runs the arrow timers.
  */
-void PurchaseState::think()
+void PurchaseState::update()
 {
-	State::think();
+	State::update();
 
 	_timerInc->think(true, false);
 	_timerDec->think(true, false);

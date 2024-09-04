@@ -44,7 +44,7 @@ public:
 	/// Handler for clicking anything.
 	void handle(Action *action) override;
 	/// Handles the timers.
-	void think() override;
+	void update() override;
 	/// Closes the window.
 	void close();
 

@@ -57,6 +57,7 @@
 #include <algorithm>
 #include "../fallthrough.h"
 #include "../Geoscape/GeoscapeState.h"
+#include "Timer.h"
 
 #include "../Lua/LuaMod.h"
 
@@ -375,8 +376,12 @@ void Game::run()
 		// Process rendering
 		if (runningState != PAUSED)
 		{
-			// Process logic
-			_states.back()->think();
+			// Process state logic
+			_states.back()->update();
+
+			// Process entity logic
+			_ecs.update();
+
 			_fpsCounter->think();
 			if (Options::FPS > 0 && !(Options::useOpenGL && Options::vSyncForOpenGL))
 			{

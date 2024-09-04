@@ -20,6 +20,7 @@
 #include "../../Engine/Registry.h"
 #include "../../Engine/Screen.h"
 #include "../Interface/Window.h"
+#include "Surface.h"
 #include "Tickable.h"
 #include "ECS.h"
 
@@ -64,6 +65,10 @@ void TickableSystem::tick(entt::entity& entity)
 		Surface* surface = getRegistry().raw().get<SurfaceComponent>(entity).getSurface();
 		surface->think();
 	}
+}
+
+void TickableSystem::update()
+{
 }
 
 } // namespace OpenXcom

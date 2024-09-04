@@ -854,7 +854,7 @@ void BattlescapeState::init()
 /**
  * Runs the timers and handles popups.
  */
-void BattlescapeState::think()
+void BattlescapeState::update()
 {
 	static bool popped = false;
 
@@ -862,7 +862,7 @@ void BattlescapeState::think()
 	{
 		if (_popups.empty())
 		{
-			State::think();
+			State::update();
 			int ret = _battleGame->think();
 			if (ret > -1)
 			{

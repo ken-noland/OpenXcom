@@ -414,8 +414,10 @@ void MonthlyReportState::btnOkClick(Action*)
 		}
 		else
 		{
-			WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-			windowComponent.setColor(getGame()->getMod()->getInterface("monthlyReport")->getElement("window")->color2);
+			int color = getGame()->getMod()->getInterface("monthlyReport")->getElement("window")->color2;
+
+			WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+			windowSystem.setColor(_window, color);
 
 			_txtTitle->setVisible(false);
 			_txtMonth->setVisible(false);

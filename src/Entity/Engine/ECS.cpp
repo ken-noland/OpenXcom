@@ -22,23 +22,60 @@
 #include "Drawable.h"
 #include "Tickable.h"
 #include "Surface.h"
+#include "Hierarchical.h"
+
+#include "../../Engine/Timer.h"
+
 #include "../Interface/Interface.h"
+#include "../Interface/Window.h"
 
 namespace OpenXcom
 {
 
 ECS::ECS()
 {
-	//temporarily putting System and Factory registration here
-	registerSystem<TickableSystem>();
-	registerSystem<DrawableSystem>();
+	// ---
+	// Systems
+	// 
+	// Systems are updated in the order that they are registered.
+	{
+		// KN NOTE: I don't think we need these anymore
+		registerSystem<TickableSystem>();
+		registerSystem<DrawableSystem>();
+	}
+
+	registerSystem<HierarchySystem>();
+
+	registerSystem<WindowSystem>();
+
+	// Timers get processed last
+	const TimeSystem& timeSystem = registerSystem<TimeSystem>();
+
+	registerSystem<ProgressTimerSystem>(getRegistry().raw(), timeSystem);
+	registerSystem<IntervalTimerSystem>();
+
+	// ---
+	// Factories
 
 	registerFactory<SurfaceFactory>(_registry.raw());
-	registerFactory<InterfaceFactory>(_registry.raw(), getFactory<SurfaceFactory>());
+	registerFactory<InterfaceFactory>(*this, nullptr); // KN TODO: When I get around to rewriting Mod, I'll need to pass it in here
 }
 
 ECS::~ECS()
 {
+}
+
+void ECS::update()
+{
+	// Update all systems
+	for (std::pair<const std::type_index, TypeErasedUpdatePtr>& pair : _systemRegistry)
+	{
+		TypeErasedUpdatePtr& system = pair.second;
+		if (system.hasUpdate())
+		{
+			system.update();
+		}
+	}
 }
 
 } // namespace OpenXcom

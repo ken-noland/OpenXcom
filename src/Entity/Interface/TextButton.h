@@ -24,69 +24,53 @@
 namespace OpenXcom
 {
 
+class Action;
 class Text;
 class ComboBox;
-class SurfaceComponent;
-class TickableComponent;
-class DrawableComponent;
-class PaletteComponent;
 
-
-class TextButtonComponent
+/**
+ * Component for text buttons.
+ */
+struct TextButtonComponent
 {
-private:
-	SurfaceComponent& _surfaceComponent;
-
 	Uint8 _color;
-	Text* _text;
 
-	//TextButton** _group;
 	bool _contrast, _geoscapeButton;
 	ComboBox* _comboBox;
-	// for use by RuleInterface
-//	void setSecondaryColor(Uint8 color) override { setTextColor(color); }
+};
 
-protected:
-//	bool isButtonHandled(Uint8 button = 0) override;
-
+/**
+ * System for handling text buttons.
+ */
+class TextButtonSystem
+{
 public:
-	TextButtonComponent(const std::string& text, SurfaceComponent& surfaceComponent);
-	~TextButtonComponent();
+	TextButtonSystem() = default;
+	~TextButtonSystem() = default;
 
 	/// Sets the text button's color.
-	void setColor(Uint8 color); //override
+	void setColor(entt::handle entity, Uint8 color); // override
+
 	/// Gets the text button's color.
-	Uint8 getColor() const;
+	Uint8 getColor(entt::handle entity) const;
+
 	/// Sets the text button's text color.
-	void setTextColor(Uint8 color);
+	void setTextColor(entt::handle entity, Uint8 color);
+
 	/// Sets the text size to big.
-	void setBig();
+	void setBig(entt::handle entity);
+
 	/// Sets the text size to small.
-	void setSmall();
+	void setSmall(entt::handle entity);
+
 	/// Gets the text button's current font.
-	Font* getFont() const;
-
-	/// Sets the text button's high contrast color setting.
-	void setHighContrast(bool contrast); // override
-	/// Sets the text button's text.
-	void setText(const std::string& text);
-	/// Gets the text button's text.
-	std::string getText() const;
-
-	/// Sets the text button's group.
-	//void setGroup(TextButton** group);
-
+	Font* getFont(entt::handle entity) const;
+		
 	/// Draws the text button.
-	void draw();	//override
-	/// Special handling for mouse presses.
-	//void mousePress(Action* action, State* state); //override
-	///// Special handling for mouse releases.
-	//void mouseRelease(Action* action, State* state); //override
-	/// Attaches this button to a combobox.
-	void setComboBox(ComboBox* comboBox);
-
-	/// Sets the button as a geoscape button.
-	void setGeoscapeButton(bool geo);
+	void draw(entt::handle entity);
+		
+	/// Handles the input for the text button.
+	void handle(entt::handle entity, Action* action);
 };
 
 } // namespace OpenXcom

@@ -57,7 +57,7 @@ public:
 	/// Resets globe.
 	void init() override;
 	/// Runs the timer.
-	void think() override;
+	void update() override;
 	/// Handles actions.
 	void handle(Action *action) override;
 	/// Handler for clicking the globe.

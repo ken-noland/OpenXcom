@@ -100,9 +100,9 @@ OptionsConfirmState::~OptionsConfirmState()
 /**
  * Runs the countdown timer.
  */
-void OptionsConfirmState::think()
+void OptionsConfirmState::update()
 {
-	State::think();
+	State::update();
 
 	_timer->think(true, false);
 }

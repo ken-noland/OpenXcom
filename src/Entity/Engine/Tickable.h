@@ -50,6 +50,8 @@ public:
 	~TickableSystem();
 
 	void tick(entt::entity& entity);
+
+	void update();
 };
 
 } // namespace OpenXcom

@@ -63,8 +63,8 @@ BriefingLightState::BriefingLightState(AlienDeployment* deployment) : State("Bri
 	BriefingData data = deployment->getBriefingData();
 	setStandardPalette("PAL_GEOSCAPE", data.palette);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setBackground(getGame()->getMod()->getSurface(data.background));
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setBackground(_window, getGame()->getMod()->getSurface(data.background));
 
 	add(_window, "window", "briefing");
 	add(_btnOk, "button", "briefing");

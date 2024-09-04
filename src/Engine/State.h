@@ -36,6 +36,8 @@ class SavedBattleGame;
 class RuleInterface;
 class Sound;
 
+class ProgressTimerSystem;
+
 enum SoldierGender : char;
 
 /**
@@ -51,6 +53,10 @@ class State
 	friend class Timer;
 
 protected:
+
+	// ECS Systems
+	ProgressTimerSystem& _progressTimerSystem;
+
 	std::string _name;
 
 	std::vector<entt::handle> _surfaces;
@@ -85,16 +91,18 @@ public:
 	/// Set interface rules.
 	void setInterface(const std::string &s, bool alterPal = false, SavedBattleGame *battleGame = 0);
 	/// Set window background.
-	[[deprecated]] void setWindowBackground(entt::entity window, const std::string& s);
+	[[deprecated]] void setWindowBackground(entt::handle window, const std::string& s);
 	/// Set window background by image name (instead of by interface name).
-	[[deprecated]] void setWindowBackgroundImage(entt::entity window, const std::string& bgImageName);
+	[[deprecated]] void setWindowBackgroundImage(entt::handle window, const std::string& bgImageName);
 	/// Adds a child element to the state.
 	[[deprecated]] void add(Surface* surface);
 	/// Adds a child element to the state.
 	[[deprecated]] void add(Surface* surface, const std::string& id, const std::string& category, Surface* parent = 0);
 
 	/// Adds a child entity to the state.
-	void add(entt::handle entity, const std::string& id, const std::string& category, Surface* parent = 0);
+	[[deprecated]] void add(entt::handle entity, const std::string& id, const std::string& category, Surface* parent = 0);
+
+	void add(entt::handle entity);
 
 	/// Gets whether the state is a full-screen.
 	bool isScreen() const;
@@ -104,8 +112,10 @@ public:
 	virtual void init();
 	/// Handles any events.
 	virtual void handle(Action *action);
+
 	/// Runs state functionality every cycle.
-	virtual void think();
+	virtual void update();
+
 	/// Blits the state to the screen.
 	virtual void blit();
 	/// Hides all the state surfaces.

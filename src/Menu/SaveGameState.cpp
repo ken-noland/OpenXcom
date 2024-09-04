@@ -133,9 +133,9 @@ void SaveGameState::buildUi(SDL_Color *palette)
 /**
  * Saves the current save.
  */
-void SaveGameState::think()
+void SaveGameState::update()
 {
-	State::think();
+	State::update();
 	// Make sure it gets drawn properly
 	if (_firstRun < 10)
 	{

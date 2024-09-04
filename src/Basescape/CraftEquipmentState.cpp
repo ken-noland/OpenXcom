@@ -513,9 +513,9 @@ void CraftEquipmentState::initList()
 /**
  * Runs the arrow timers.
  */
-void CraftEquipmentState::think()
+void CraftEquipmentState::update()
 {
-	State::think();
+	State::update();
 
 	_timerLeft->think(true, false);
 	_timerRight->think(true, false);

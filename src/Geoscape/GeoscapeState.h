@@ -95,7 +95,7 @@ public:
 	/// Updates the palette and timer.
 	void init() override;
 	/// Runs the timer.
-	void think() override;
+	void update() override;
 	/// Displays the game time/date. (+Funds)
 	void timeDisplay();
 	/// Advances the game timer.

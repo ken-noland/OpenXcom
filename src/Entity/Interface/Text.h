@@ -26,12 +26,9 @@
 namespace OpenXcom
 {
 
-class TextComponent
-{
-private:
-	// KN Note: Temporarily putting in the SurfaceComponent so we can use it to process text, but that should get moved to a text rendering system rather than being in the text component
-	SurfaceComponent* _surfaceComponent;
 
+struct TextComponent
+{
 	Font *_big, *_small, *_font, *_fontOrig;
 	Language* _lang;
 	std::string _text;
@@ -42,6 +39,12 @@ private:
 	TextVAlign _valign;
 	Uint8 _color, _color2;
 	int _scrollY;
+};
+
+
+class TextSystem
+{
+private:
 
 	/// Processes the contained text.
 	void processText();
@@ -49,63 +52,61 @@ private:
 	int getLineX(int line) const;
 
 public:
-	/// Creates a new text with the specified size and position.
-	TextComponent(const std::string& text, SurfaceComponent* surfaceComponent);
-	/// Cleans up the text.
-	~TextComponent();
+	TextSystem();
+	~TextSystem();
 
 	/// Sets the text size to big.
-	void setBig();
+	void setBig(entt::handle textHandle);
 	/// Sets the text size to small.
-	void setSmall();
+	void setSmall(entt::handle textHandle);
 	/// Gets the text's current font.
-	Font* getFont() const;
+	Font* getFont(entt::handle textHandle) const;
 
 	/// Sets the text's string.
-	void setText(const std::string& text);
+	void setText(entt::handle textHandle, const std::string& text);
 	/// Gets the text's string.
-	std::string getText() const;
+	std::string getText(entt::handle textHandle) const;
 
 	/// Sets the text's wordwrap setting.
-	void setWordWrap(bool wrap, bool indent = false, bool ignoreSeparators = false);
+	void setWordWrap(entt::handle textHandle, bool wrap, bool indent = false, bool ignoreSeparators = false);
 	/// Sets the text's color invert setting.
-	void setInvert(bool invert);
+	void setInvert(entt::handle textHandle, bool invert);
 
 	/// Sets the text's high contrast color setting.
-	void setHighContrast(bool contrast); // override;
+	void setHighContrast(entt::handle textHandle, bool contrast); // override;
 
 	/// Sets the text's horizontal alignment.
-	void setAlign(TextHAlign align);
+	void setAlign(entt::handle textHandle, TextHAlign align);
 	/// Gets the text's horizontal alignment.
-	TextHAlign getAlign() const;
+	TextHAlign getAlign(entt::handle textHandle) const;
 
 	/// Sets the text's vertical alignment.
-	void setVerticalAlign(TextVAlign valign);
+	void setVerticalAlign(entt::handle textHandle, TextVAlign valign);
 	/// Gets the text's vertical alignment.
-	TextVAlign getVerticalAlign() const;
+	TextVAlign getVerticalAlign(entt::handle textHandle) const;
 
 	/// Sets the text's color.
-	void setColor(Uint8 color); // override;
+	void setColor(entt::handle textHandle, Uint8 color); // override;
 	/// Gets the text's color.
-	Uint8 getColor() const;
+	Uint8 getColor(entt::handle textHandle) const;
 
 	/// Sets the text's secondary color.
-	void setSecondaryColor(Uint8 color);
+	void setSecondaryColor(entt::handle textHandle, Uint8 color);
 	/// Gets the text's secondary color.
-	Uint8 getSecondaryColor() const;
+	Uint8 getSecondaryColor(entt::handle textHandle) const;
 
 	/// Gets the number of lines in the (wrapped, if wrapping is enabled) text
-	int getNumLines() const;
+	int getNumLines(entt::handle textHandle) const;
 	/// Gets the rendered text's width.
-	int getTextWidth(int line = -1) const;
+	int getTextWidth(entt::handle textHandle, int line = -1) const;
 	/// Gets the rendered text's height.
-	int getTextHeight(int line = -1) const;
+	int getTextHeight(entt::handle textHandle, int line = -1) const;
 
 	/// Draws the text.
-	void draw();// override;
+	void draw(entt::handle textHandle); // override;
 
 	/// Sets the text's scrollable setting.
-	void setScrollable(bool scroll);
+	void setScrollable(entt::handle textHandle, bool scroll);
 	/// Special handling for mouse presses.
 	//void mousePress(Action* action, State* state) override;
 };

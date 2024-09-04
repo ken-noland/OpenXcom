@@ -509,9 +509,9 @@ void SoldierDiaryPerformanceState::lstInfoMouseClick(Action *)
  * Runs state functionality every cycle.
  * Used to update sprite vector
  */
-void SoldierDiaryPerformanceState::think()
+void SoldierDiaryPerformanceState::update()
 {
-	State::think();
+	State::update();
 
 	if ((unsigned int)_lastScrollPos != _lstCommendations->getScroll())
 	{

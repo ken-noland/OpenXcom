@@ -38,7 +38,12 @@ public:
 	~SurfaceComponent() = default;
 
 	// temp
-	Surface* getSurface() { return _surface.get(); }
+	[[deprecated]] Surface* getSurface() { return _surface.get(); }
+
+	int getX() const;
+	int getY() const;
+	int getWidth() const;
+	int getHeight() const;
 
 	void blit();
 
@@ -53,8 +58,8 @@ public:
 	SurfaceFactory(entt::registry& registry); // KN NOTE: I do plan on passing the renderer here so that Surface is abstracted.
 	~SurfaceFactory();
 
-	entt::handle createSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
-	entt::handle createInteractiveSurface(const std::string& name, int width, int height, int x = 0, int y = 0);
+	entt::handle createSurface(const std::string& name, int x, int y, int width, int height, SDL_Color* palette, int firstColor, int nColors);
+	entt::handle createInteractiveSurface(const std::string& name, int x, int y, int width, int height, SDL_Color* palette, int firstColor, int nColors);
 };
 
 } // namespace OpenXcom

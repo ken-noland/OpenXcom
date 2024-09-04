@@ -31,6 +31,26 @@ SurfaceComponent::SurfaceComponent(std::unique_ptr<Surface>& surface)
 {
 }
 
+int SurfaceComponent::getX() const
+{
+	return _surface->getX();
+}
+
+int SurfaceComponent::getY() const
+{
+	return _surface->getY();
+}
+
+int SurfaceComponent::getWidth() const
+{
+	return _surface->getWidth();
+}
+
+int SurfaceComponent::getHeight() const
+{
+	return _surface->getHeight();
+}
+
 void SurfaceComponent::blit()
 {
 	_surface->blit(getGame()->getScreen()->getSurface());
@@ -45,27 +65,33 @@ SurfaceFactory::~SurfaceFactory()
 {
 }
 
-entt::handle SurfaceFactory::createSurface(const std::string& name, int width, int height, int x, int y)
+entt::handle SurfaceFactory::createSurface(const std::string& name, int x, int y, int width, int height, SDL_Color* palette, int firstColor, int nColors)
 {
 	entt::entity entity = _registry.create();
 	_registry.emplace<Name>(entity, name);
 
-	DrawableComponent& drawableComponent = _registry.emplace<DrawableComponent>(entity);
-
+	//this is mostly a hack until I get surface converted to a pure component
 	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
 	SurfaceComponent& surfaceComponent = _registry.emplace<SurfaceComponent>(entity, surface);
-	PaletteComponent& paletteComponent = _registry.emplace<PaletteComponent>(entity, surfaceComponent.getSurface());
 
-	// TODO: we need to remove this setSurfaceComponent hack!
-	drawableComponent.setSurfaceComponent(&surfaceComponent);
+	PaletteComponent& paletteComponent = _registry.emplace<PaletteComponent>(entity, surfaceComponent.getSurface());
+	if (palette)
+	{
+		paletteComponent.setPalette(palette, firstColor, nColors);
+	}
+
+	// KN NOTE: DrawableComponent is going away... soon
+	DrawableComponent& drawableComponent = _registry.emplace<DrawableComponent>(entity);
+//	drawableComponent.setSurfaceComponent(&surfaceComponent);
 	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
+
 
 	return entt::handle(_registry, entity);
 }
 
-entt::handle SurfaceFactory::createInteractiveSurface(const std::string& name, int width, int height, int x, int y)
+entt::handle SurfaceFactory::createInteractiveSurface(const std::string& name, int width, int height, int x, int y, SDL_Color* palette, int firstColor, int nColors)
 {
-	entt::handle entity = createSurface(name, width, height, x, y);
+	entt::handle entity = createSurface(name, width, height, x, y, palette, firstColor, nColors);
 
 	return entity;
 }

@@ -67,11 +67,12 @@ SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe
 
 	_window = factory.createWindow("windowName", this, 256, 28, 0, 0);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
-
 	windowSurface->setX(dx);
-	windowComponent.setDY(0);
+
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setDY(_window, 0);
+
 	_btnCancel = new TextButton(60, 12, 110 + dx, 8);
 	_btnCydonia = new TextButton(60, 12, 180 + dx, 8);
 	_txtTitle = new Text(100, 16, 10 + dx, 6);
@@ -194,9 +195,9 @@ void SelectDestinationState::init()
 /**
  * Runs the globe rotation timer.
  */
-void SelectDestinationState::think()
+void SelectDestinationState::update()
 {
-	State::think();
+	State::update();
 	_globe->think();
 }
 

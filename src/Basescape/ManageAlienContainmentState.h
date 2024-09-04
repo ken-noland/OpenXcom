@@ -68,7 +68,7 @@ public:
 	/// Resets the list and the totals, updates button visibility.
 	void resetListAndTotals();
 	/// Runs the timers.
-	void think() override;
+	void update() override;
 	/// Handler for clicking the OK button.
 	void btnOkClick(Action *action);
 	/// Handler for opening the Global Alien Containment UI.

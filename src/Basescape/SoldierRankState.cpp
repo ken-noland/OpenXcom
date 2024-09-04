@@ -44,7 +44,7 @@ SoldierRankState::SoldierRankState(Base* base, size_t soldierId) : State("Soldie
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
-	_window = factory.createWindow("selectNewManufacture", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);
+	_window = factory.createWindow("soldierRank", this, 192, 160, 64, 20, WindowPopup::POPUP_BOTH);
 	_btnCancel = new TextButton(140, 16, 90, 156);
 	_txtTitle = new Text(182, 17, 69, 28);
 	_txtRank = new Text(90, 9, 80, 52);

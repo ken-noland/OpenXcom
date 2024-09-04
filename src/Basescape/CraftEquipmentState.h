@@ -76,7 +76,7 @@ public:
 	/// Resets state.
 	void init() override;
 	/// Runs the timers.
-	void think() override;
+	void update() override;
 	/// Handler for clicking the OK button.
 	void btnOkClick(Action *action);
 	/// Handlers for Quick Search.

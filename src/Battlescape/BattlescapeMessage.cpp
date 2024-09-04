@@ -22,6 +22,8 @@
 #include "../Interface/ProgressBar.h"
 #include "../Engine/Palette.h"
 #include "../Engine/Game.h"
+
+#include "../Entity/Engine/Surface.h"
 #include "../Entity/Interface/Window.h"
 #include "../Entity/Interface/Interface.h"
 
@@ -44,10 +46,10 @@ BattlescapeMessage::BattlescapeMessage(int width, int height, int x, int y) : Su
 
 	_window = factory.createWindow("battlescapeMessage", 0, width, height, x, y, WindowPopup::POPUP_NONE);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
 
-	windowComponent.setColor(Palette::blockOffset(0) - 1);
-	windowComponent.setHighContrast(true);
+	windowSystem.setColor(_window, Palette::blockOffset(0) - 1);
+	windowSystem.setHighContrast(_window, true);
 
 	_text = new Text(width, height, x, y);
 	_text->setColor(Palette::blockOffset(0)-1);
@@ -113,8 +115,8 @@ void BattlescapeMessage::setY(int y)
  */
 void BattlescapeMessage::setBackground(Surface *background)
 {
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setBackground(background);
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setBackground(_window, background);
 }
 
 /**

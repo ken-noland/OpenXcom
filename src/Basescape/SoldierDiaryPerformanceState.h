@@ -89,7 +89,7 @@ public:
 	/// Handler for clicking on a medal.
 	void lstInfoMouseClick(Action *action);
 	/// Runs state functionality every cycle.
-	void think() override;
+	void update() override;
 };
 
 }

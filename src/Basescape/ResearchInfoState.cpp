@@ -346,9 +346,9 @@ void ResearchInfoState::lessByValue(int change)
 /**
  * Runs state functionality every cycle (used to update the timer).
  */
-void ResearchInfoState::think()
+void ResearchInfoState::update()
 {
-	State::think();
+	State::update();
 
 	_timerLess->think (this, 0);
 	_timerMore->think (this, 0);

@@ -19,7 +19,6 @@
  */
 #include <entt/entt.hpp>
 #include "Window.h"
-#include "../Engine/Surface.h"
 
 //temp includes
 #include "../../Interface/ArrowButton.h"
@@ -40,17 +39,29 @@
 #include "../../Interface/TextList.h"
 #include "../../Interface/ToggleTextButton.h"
 
+#include "../../Mod/RuleInterface.h"
+
+
 namespace OpenXcom
 {
+
+class ECS;
+class SurfaceFactory;
+class Mod;
 
 class InterfaceFactory
 {
 protected:
-	entt::registry& _registry;
+	ECS& _ecs;
+	Mod* _mod;
+
+	//cache the surface factory since we will be using it a lot
 	SurfaceFactory& _surfaceFactory;
 
+	Element getElementFromRule(const std::string& ruleCategory, const std::string& ruleID, int x, int y, int width, int height, entt::handle parent);
+
 public:
-	InterfaceFactory(entt::registry& registry, SurfaceFactory& sf);
+	InterfaceFactory(ECS& ecs, Mod* mod = nullptr);
 	~InterfaceFactory();
 
 	entt::handle createArrowButton(const std::string& name, ArrowShape shape, int width, int height, int x = 0, int y = 0);
@@ -65,12 +76,83 @@ public:
 	entt::handle createProgressBar(const std::string& name, int width, int height, int x = 0, int y = 0);
 	entt::handle createScrollBar(const std::string& name, int width, int height, int x = 0, int y = 0);
 	entt::handle createSlider(const std::string& name, int width, int height, int x = 0, int y = 0);
-	entt::handle createText(const std::string& name, const std::string& text, int width, int height, int x = 0, int y = 0);
-	entt::handle createTextButton(const std::string& name, const std::string& text, int width, int height, int x, int y, std::function<void(Action*)> onClickCallback);
+
+	struct CreateTextParams
+	{
+		std::string name;
+		std::string text;
+		int width;
+		int height;
+		int x;
+		int y;
+
+		TextHAlign align = TextHAlign::ALIGN_LEFT;
+		TextVAlign verticalAlign = TextVAlign::ALIGN_TOP;
+		bool wordWrap = false;
+
+		SDL_Color* palette = nullptr;
+		int firstColor = 0;
+		int nColors = 256;
+
+		std::string ruleCategory = "";
+		std::string ruleID = "";
+
+		entt::handle parent;
+	};
+	entt::handle createText(const CreateTextParams& params);
+
+	struct CreateTextButtonParams
+	{
+		std::string name;
+		std::string text;
+		int width;
+		int height;
+		int x;
+		int y;
+
+		std::function<void(Action*)> onLeftClickCallback;
+		std::function<void(Action*)> onRightClickCallback;
+
+		SDL_Color* palette = nullptr;
+		int firstColor = 0;
+		int nColors = 256;
+
+		std::string ruleID = "";
+		std::string ruleCategory = "";
+
+		entt::handle parent;
+	};
+	entt::handle createTextButton(const CreateTextButtonParams& params);
+
 	entt::handle createTextEdit(const std::string& name, State* state, int width, int height, int x = 0, int y = 0);
 	entt::handle createTextList(const std::string& name, int width, int height, int x = 0, int y = 0);
 	entt::handle createToggleTextButton(const std::string& name, int width, int height, int x, int y);
-	entt::handle createWindow(const std::string& name, State* state, int width, int height, int x = 0, int y = 0, WindowPopup popup = WindowPopup::POPUP_NONE);
+
+	struct CreateWindowParams
+	{
+		std::string name;
+
+		State* state = nullptr;
+
+		int width;
+		int height;
+		int x;
+		int y;
+		WindowPopup popup = WindowPopup::POPUP_NONE;
+
+		// KN TODO: perhaps use a palette handle instead of a pointer?
+		SDL_Color* palette = nullptr;
+		int firstColor = 0;
+		int nColors = 256;
+
+		std::string ruleID = "";
+		std::string ruleCategory = "";
+
+		entt::handle parent;
+	};
+
+	[[deprecated("Use createWindow(const CreateWindowParams& params) instead")]] entt::handle createWindow(const std::string& name, State* state, int width, int height, int x = 0, int y = 0, WindowPopup popup = WindowPopup::POPUP_NONE);
+	entt::handle createWindow(const CreateWindowParams& params);
 };
 
 } // namespace OpenXcom

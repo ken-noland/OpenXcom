@@ -48,8 +48,8 @@ UfopaediaSelectState::UfopaediaSelectState(const std::string &section, int heigh
 	// set background window
 	_window = factory.createWindow("windowName", this, 256, 180 + heightOffset, 32, 10 - windowOffset, WindowPopup::POPUP_NONE);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setInnerColor(239); // almost black = darkest index from backpals.dat
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setInnerColor(_window, 239); // almost black = darkest index from backpals.dat
 
 	_btnQuickSearch = new TextEdit(this, 48, 9, 48, 30 - windowOffset);
 

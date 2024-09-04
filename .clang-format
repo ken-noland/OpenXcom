@@ -1,11 +1,12 @@
 {
 	BasedOnStyle: LLVM,
-	Standard: c++03,
+	Standard: c++20,
 	ColumnLimit: 0,
 	UseTab: ForContinuationAndIndentation,
 	IndentWidth: 4,	
 	TabWidth: 4,
 	BreakBeforeBraces: Allman,
+ 	AllowShortIfStatementsOnASingleLine: true,
 	FixNamespaceComments: false,
 	PointerAlignment: Left,
 	AccessModifierOffset: -4,

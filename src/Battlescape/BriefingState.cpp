@@ -92,18 +92,18 @@ BriefingState::BriefingState(Craft* craft, Base* base, bool infoOnly, BriefingDa
 	std::string title = mission;
 	std::string desc = title + "_BRIEFING";
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
 	if (!deployment && !customBriefing) // none defined - should never happen, but better safe than sorry i guess.
 	{
 		setStandardPalette("PAL_GEOSCAPE", 0);
 		_musicId = "GMDEFEND";
-		windowComponent.setBackground(getGame()->getMod()->getSurface("BACK16.SCR"));
+		windowSystem.setBackground(_window, getGame()->getMod()->getSurface("BACK16.SCR"));
 	}
 	else
 	{
 		BriefingData data = customBriefing ? *customBriefing : deployment->getBriefingData();
 		setStandardPalette("PAL_GEOSCAPE", data.palette);
-		windowComponent.setBackground(getGame()->getMod()->getSurface(data.background));
+		windowSystem.setBackground(_window, getGame()->getMod()->getSurface(data.background));
 		_txtCraft->setY(56 + data.textOffset);
 		_txtBriefing->setY(72 + data.textOffset);
 		_txtTarget->setVisible(data.showTarget);

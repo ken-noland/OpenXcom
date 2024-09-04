@@ -84,11 +84,11 @@ public:
 	/// Returns true if this is a hunter-killer dogfight.
 	bool isUfoAttacking() const;
 	/// Runs the timers.
-	void think() override;
+	void update() override;
 	/// Animates the window.
 	void animate();
 	/// Moves the craft.
-	void update();
+	void updateCraft();
 	// Fires the weapons.
 	void fireWeapon(int i);
 	// Fires UFO weapon.

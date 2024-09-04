@@ -81,7 +81,7 @@ public:
 	/// Handler for clicking anything.
 	void handle(Action *action) override;
 	/// Handles the timer.
-	void think() override;
+	void update() override;
 	/// Closes the window.
 	void close();
 	void resize(int &dX, int &dY) override;

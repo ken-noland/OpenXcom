@@ -42,7 +42,7 @@ TransfersState::TransfersState(Base* base) : State("TransfersState", true), _bas
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
-	_window = factory.createWindow("windowName", this, 320, 184, 0, 8, WindowPopup::POPUP_BOTH);
+	_window = factory.createWindow("transferInfo", this, 320, 184, 0, 8, WindowPopup::POPUP_BOTH);
 	_btnOk = new TextButton(288, 16, 16, 166);
 	_txtTitle = new Text(278, 17, 21, 18);
 	_txtItem = new Text(114, 9, 16, 34);

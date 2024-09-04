@@ -45,7 +45,7 @@ TransferConfirmState::TransferConfirmState(Base* base, TransferItemsState* state
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 
 	// Create objects
-	_window = factory.createWindow("windowName", this, 320, 80, 0, 60);
+	_window = factory.createWindow("transferConfirm", this, 320, 80, 0, 60);
 	_btnCancel = new TextButton(128, 16, 176, 115);
 	_btnOk = new TextButton(128, 16, 16, 115);
 	_txtTitle = new Text(310, 17, 5, 75);

@@ -60,9 +60,9 @@ ConfirmEndMissionState::ConfirmEndMissionState(SavedBattleGame *battleGame, int 
 	add(_btnCancel, "messageWindowButtons", "battlescape");
 
 	// Set up objects
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setHighContrast(true);
-	windowComponent.setBackground(getGame()->getMod()->getSurface("TAC00.SCR"));
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setHighContrast(_window, true);
+	windowSystem.setBackground(_window, getGame()->getMod()->getSurface("TAC00.SCR"));
 
 	_txtTitle->setBig();
 	_txtTitle->setHighContrast(true);

@@ -81,9 +81,9 @@ void ErrorMessageState::create(const std::string &str, SDL_Color *palette, Uint8
 	centerAllSurfaces();
 
 	// Set up objects
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setColor(color);
-	windowComponent.setBackground(getGame()->getMod()->getSurface(bg));
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setColor(_window, color);
+	windowSystem.setBackground(_window, getGame()->getMod()->getSurface(bg));
 
 	_btnOk->setColor(color);
 	_btnOk->setText(tr("STR_OK"));
@@ -100,7 +100,7 @@ void ErrorMessageState::create(const std::string &str, SDL_Color *palette, Uint8
 
 	if (bgColor == -1)
 	{
-		windowComponent.setHighContrast(true);
+		windowSystem.setHighContrast(_window, true);
 		_btnOk->setHighContrast(true);
 		_txtMessage->setHighContrast(true);
 	}

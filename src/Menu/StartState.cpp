@@ -152,9 +152,9 @@ void StartState::init()
 /**
  * If the loading fails, it shows an error, otherwise moves on to the game.
  */
-void StartState::think()
+void StartState::update()
 {
-	State::think();
+	State::update();
 	_timer->think(true, false);
 
 	switch (loading)

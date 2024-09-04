@@ -18,38 +18,13 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../../Engine/Registry.h"
+#include "../../Engine/TypeErasedPtr.h"
 
 #include <unordered_map>
-#include <memory>
 #include <typeindex>
-#include <any>
 
 namespace OpenXcom
 {
-
-/// Wrapper class for type erasure
-class TypeErasedPtr
-{
-public:
-	template <typename T>
-	TypeErasedPtr(std::unique_ptr<T> ptr)
-		: ptr_(ptr.release()), deleter_([](void* p) { delete static_cast<T*>(p); }) {}
-
-	~TypeErasedPtr()
-	{
-		deleter_(ptr_);
-	}
-
-	template <typename T>
-	T& get()
-	{
-		return *static_cast<T*>(ptr_);
-	}
-
-private:
-	void* ptr_;
-	std::function<void(void*)> deleter_;
-};
 
 
 /// Entity Component System.
@@ -58,21 +33,17 @@ class ECS
 protected:
 	Registry _registry;
 
-	// It is worth noting that there are ways we could use an array instead of a map, with the
-	// added benefit that we could save on a ton of memory, but at the moment I'm not sure if
-	// it is worth it.
-
-	using SystemRegistryContainer = std::unordered_map<std::type_index, TypeErasedPtr>;
+	using SystemRegistryContainer = std::unordered_map<std::type_index, TypeErasedUpdatePtr>;
 	SystemRegistryContainer _systemRegistry;
 
 	template <typename SystemType, typename... Args>
-	inline void registerSystem(Args&&... args);
+	inline SystemType& registerSystem(Args&&... args);
 
 	using FactoryRegistryContainer = std::unordered_map<std::type_index, TypeErasedPtr>;
 	FactoryRegistryContainer _factoryRegistry;
 
 	template <typename FactoryType, typename... Args>
-	inline void registerFactory(Args&&... args);
+	inline FactoryType& registerFactory(Args&&... args);
 
 public:
 	ECS();
@@ -88,24 +59,27 @@ public:
 	/// Return a factory
 	template <typename FactoryType>
 	inline FactoryType& getFactory();
+
+	/// Update all systems
+	void update();
 };
 
 /// Register a system
 template <typename SystemType, typename... Args>
-inline void ECS::registerSystem(Args&&... args)
+inline SystemType& ECS::registerSystem(Args&&... args)
 {
-	_systemRegistry.emplace(
-		std::type_index(typeid(SystemType)),
-		std::make_unique<SystemType>(std::forward<Args>(args)...));
+	TypeErasedUpdatePtr ptr(new SystemType(std::forward<Args>(args)...));
+	auto [it, inserted] = _systemRegistry.emplace(std::type_index(typeid(SystemType)), std::move(ptr));
+	return it->second.get<SystemType>();
 }
 
 /// Register a factory
 template <typename FactoryType, typename... Args>
-inline void ECS::registerFactory(Args&&... args)
+inline FactoryType& ECS::registerFactory(Args&&... args)
 {
-	_factoryRegistry.emplace(
-		std::type_index(typeid(FactoryType)),
-		std::make_unique<FactoryType>(std::forward<Args>(args)...));
+	TypeErasedPtr ptr = new FactoryType(std::forward<Args>(args)...);
+	auto [it, inserted] = _factoryRegistry.emplace(std::type_index(typeid(FactoryType)), std::move(ptr));
+	return it->second.get<FactoryType>();
 }
 
 /// Return a system
@@ -141,16 +115,9 @@ extern Game* getGame();
 
 /// Return a system
 template <typename SystemType>
-SystemType& getSystem()
+inline SystemType& getSystem()
 {
 	return getGame()->getECS().getSystem<SystemType>();
 }
-
-///// Return a factory
-//template <typename FactoryType>
-//FactoryType& getFactory()
-//{
-//	return getGame()->getECS().getFactory<FactoryType>();
-//}
 
 } // namespace OpenXcom

@@ -57,7 +57,7 @@ public:
 	/// Reset everything.
 	void init() override;
 	/// Displays messages.
-	void think() override;
+	void update() override;
 	/// Handles key clicks.
 	void handle(Action *action) override;
 	/// Animates the terminal.

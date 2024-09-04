@@ -95,7 +95,7 @@ void InfoboxState::handle(Action *action)
 /**
  * Keeps the animation timers running.
  */
-void InfoboxState::think()
+void InfoboxState::update()
 {
 	_timer->think(true, false);
 }

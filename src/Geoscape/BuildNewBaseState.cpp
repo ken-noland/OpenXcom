@@ -71,11 +71,11 @@ BuildNewBaseState::BuildNewBaseState(entt::handle newBaseHandle, Globe *globe, b
 
 	_window = factory.createWindow("windowName", this, 256, 28, 0, 0);
 
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
 	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
-
 	windowSurface->setX(dx);
-	windowComponent.setDY(0);
+
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setDY(_window, 0);
 
 	_btnCancel = new TextButton(54, 12, 186 + dx, 8);
 	_txtTitle = new Text(180, 16, 8 + dx, 6);
@@ -177,9 +177,9 @@ void BuildNewBaseState::init()
 /**
  * Runs the globe rotation timer.
  */
-void BuildNewBaseState::think()
+void BuildNewBaseState::update()
 {
-	State::think();
+	State::update();
 	_globe->think();
 	_hoverTimer->think(true, false);
 }

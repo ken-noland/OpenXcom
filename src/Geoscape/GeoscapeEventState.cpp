@@ -80,8 +80,8 @@ GeoscapeEventState::GeoscapeEventState(const RuleEvent& eventRule) : State("Geos
 	centerAllSurfaces();
 
 	// Set up objects
-	WindowComponent& windowComponent = getRegistry().raw().get<WindowComponent>(_window);
-	windowComponent.setBackground(getGame()->getMod()->getSurface(_eventRule.getBackground()));
+	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	windowSystem.setBackground(_window, getGame()->getMod()->getSurface(_eventRule.getBackground()));
 
 	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtTitle->setBig();
