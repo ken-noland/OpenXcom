@@ -40,11 +40,6 @@ public:
 	// temp
 	[[deprecated]] Surface* getSurface() { return _surface.get(); }
 
-	int getX() const;
-	int getY() const;
-	int getWidth() const;
-	int getHeight() const;
-
 	void blit();
 
 };
@@ -60,6 +55,18 @@ public:
 
 	entt::handle createSurface(const std::string& name, int x, int y, int width, int height, SDL_Color* palette, int firstColor, int nColors);
 	entt::handle createInteractiveSurface(const std::string& name, int x, int y, int width, int height, SDL_Color* palette, int firstColor, int nColors);
+};
+
+struct ScreenRectComponent
+{
+	ScreenRectComponent() = default;
+	ScreenRectComponent(int x, int y, int width, int height)
+		: x(x), y(y), width(width), height(height) { }
+
+	int x;
+	int y;
+	int width;
+	int height;
 };
 
 } // namespace OpenXcom

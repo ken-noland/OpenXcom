@@ -76,43 +76,59 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	// Create objects
 
 	// Window
-	InterfaceFactory::CreateWindowParams windowParams{"mainMenu", this, 256, 160, 32, 20,
-		WindowPopup::POPUP_BOTH, getPalette(), 0, 256, "window", "mainMenu"};
+	InterfaceFactory::CreateWindowParams windowParams{
+		.name = "mainMenu",
+		.state = this,
+		.x = 32,
+		.y = 20,
+		.width = 256,
+		.height = 160,
+		.popup = WindowPopup::POPUP_BOTH,
+		.palette = getPalette(),
+		.firstColor = 0,
+		.nColors = 256,
+		.primaryColor = 0,
+
+		.ruleID = "window",
+		.ruleCategory = "mainMenu",
+
+		.background = nullptr,		//use the background from the rules
+	};
 	_window = factory.createWindow(windowParams);
 
 	// New Game
 	std::function<void(Action*)> btnNewGameClick = [this](Action* action) { getGame()->pushState(new NewGameState); };
-	InterfaceFactory::CreateTextButtonParams btnNewGameParams{"btnNewGame", tr("STR_NEW_GAME"), 92, 20, 64, 90,
+	InterfaceFactory::CreateTextButtonParams btnNewGameParams{"btnNewGame", tr("STR_NEW_GAME"), 64, 90, 92, 20,
 		btnNewGameClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
 	_btnNewGame = factory.createTextButton(btnNewGameParams);
 
 	// New Battle
 	std::function<void(Action*)> btnNewBattleClick = [this](Action* action)	{ getGame()->pushState(new NewBattleState); };
-	InterfaceFactory::CreateTextButtonParams btnNewBattleParams{"btnNewBattle", tr("STR_NEW_BATTLE"), 92, 20, 164, 90,
+	InterfaceFactory::CreateTextButtonParams btnNewBattleParams{"btnNewBattle", tr("STR_NEW_BATTLE"), 164, 90, 92, 20,
 		btnNewBattleClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
 	_btnNewBattle = factory.createTextButton(btnNewBattleParams);
 
 	// Load
 	std::function<void(Action*)> btnLoadClick = [this](Action* action) { getGame()->pushState(new ListLoadState(OPT_MENU)); };
-	InterfaceFactory::CreateTextButtonParams btnLoadParams{"btnLoad", tr("STR_LOAD_SAVED_GAME"), 92, 20, 64, 118,
+	InterfaceFactory::CreateTextButtonParams btnLoadParams{"btnLoad", tr("STR_LOAD_SAVED_GAME"), 64, 118, 92, 20,
 		btnLoadClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
 	_btnLoad = factory.createTextButton(btnLoadParams);
 
 	// Options
 	std::function<void(Action*)> btnOptionsClick = [this](Action* action) { getGame()->pushState(new OptionsVideoState(OPT_MENU)); };
-	InterfaceFactory::CreateTextButtonParams btnOptionsParams{"btnOptions", tr("STR_OPTIONS"), 92, 20, 164, 118,
+	InterfaceFactory::CreateTextButtonParams btnOptionsParams{"btnOptions", tr("STR_OPTIONS"), 164, 118, 92, 20,
 		btnOptionsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
 	_btnOptions = factory.createTextButton(btnOptionsParams);
 
 	// Mods
 	std::function<void(Action*)> btnModsClick = [this](Action* action) { getGame()->pushState(new ModListState); };
-	InterfaceFactory::CreateTextButtonParams btnModsParams{"btnMods", tr("STR_MODS"), 92, 20, 64, 146,
+	InterfaceFactory::CreateTextButtonParams btnModsParams{"btnMods", tr("STR_MODS"), 64, 146, 92, 20,
 		btnModsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
 	_btnMods = factory.createTextButton(btnModsParams);
 
 	// Quit
 	std::function<void(Action*)> btnQuitClick = [this](Action* action) { getGame()->quit(); };
-	InterfaceFactory::CreateTextButtonParams btnQuitParams{"btnQuit", tr("STR_QUIT"), 92, 20, 164, 146,
+	InterfaceFactory::CreateTextButtonParams btnQuitParams{"btnQuit", tr("STR_QUIT"), 164, 146, 92, 20,
 		btnQuitClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
 	_btnQuit = factory.createTextButton(btnQuitParams);
 
@@ -135,7 +151,7 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	centerAllSurfaces();
 
 	// Set up objects
-	setWindowBackground(_window, "mainMenu");
+	//setWindowBackground(_window, "mainMenu");
 
 	//_btnUpdate->setText(tr("STR_UPDATE"));
 	//_btnUpdate->onMouseClick((ActionHandler)& MainMenuState::btnUpdateClick);

@@ -44,9 +44,8 @@ enum class WindowPopup
  */
 struct WindowComponent
 {
-	WindowComponent(WindowPopup popup) : _dx(0), _dy(0), _bg(nullptr), _color(0), _popup(popup), _popupStep(0.0), _state(nullptr), _contrast(false), _screen(false), _thinBorder(false), _innerColor(0), _mute(false) {}
+	WindowComponent(WindowPopup popup) : _bg(nullptr), _color(0), _popup(popup), _popupStep(0.0), _state(nullptr), _contrast(false), _screen(false), _thinBorder(false), _innerColor(0), _mute(false) {}
 
-	int _dx, _dy;
 	const Surface* _bg;
 	uint8_t _color;
 	WindowPopup _popup;
@@ -55,6 +54,16 @@ struct WindowComponent
 	bool _contrast, _screen, _thinBorder;
 	uint8_t _innerColor;
 	bool _mute;
+};
+
+/**
+ * The window background component
+ */
+struct BackgroundComponent
+{
+	BackgroundComponent(const Surface* bg) : _dx(0), _dy(0), _bg(bg) {}
+	int _dx, _dy;
+	const Surface* _bg;
 };
 
 

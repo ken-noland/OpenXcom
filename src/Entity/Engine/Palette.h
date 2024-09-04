@@ -29,7 +29,7 @@ protected:
 	Surface* _surface;
 
 public:
-	PaletteComponent(Surface* surface);
+	PaletteComponent(Surface* surface, const SDL_Color* palette, int first = 0, int ncolors = 256);
 	~PaletteComponent();
 
 	void setPalette(const SDL_Color* palette, int first = 0, int ncolors = 256);

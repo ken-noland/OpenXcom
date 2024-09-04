@@ -72,7 +72,9 @@ void WindowSystem::setHighContrast(entt::handle windowEntity, bool contrast)
 void WindowSystem::draw(entt::handle windowEntity)
 {
 	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	BackgroundComponent* backgroundComponent = windowEntity.try_get<BackgroundComponent>();
 	SurfaceComponent& surfaceComponent = windowEntity.get<SurfaceComponent>();
+	ScreenRectComponent& screenRectComponent = windowEntity.get<ScreenRectComponent>();
 	ProgressTimerComponent& progressTimerComponent = windowEntity.get<ProgressTimerComponent>();
 
 	Surface* windowSurface = surfaceComponent.getSurface();
@@ -81,8 +83,8 @@ void WindowSystem::draw(entt::handle windowEntity)
 	
 	SDL_Rect square;
 	
-	Sint16 width = windowSurface->getWidth();
-	Sint16 height = windowSurface->getHeight();
+	Sint16 width = screenRectComponent.width;
+	Sint16 height = screenRectComponent.height;
 	
 	if (windowComponent._popup == WindowPopup::POPUP_HORIZONTAL || windowComponent._popup == WindowPopup::POPUP_BOTH)
 	{
@@ -173,11 +175,11 @@ void WindowSystem::draw(entt::handle windowEntity)
 		}
 	}
 	
-	if (windowComponent._bg != 0)
+	if (backgroundComponent)
 	{
-		SurfaceCrop crop = windowComponent._bg->getCrop();
-		crop.getCrop()->x = square.x - windowComponent._dx;
-		crop.getCrop()->y = square.y - windowComponent._dy;
+		SurfaceCrop crop = backgroundComponent->_bg->getCrop();
+		crop.getCrop()->x = square.x - backgroundComponent->_dx;
+		crop.getCrop()->y = square.y - backgroundComponent->_dy;
 		crop.getCrop()->w = square.w;
 		crop.getCrop()->h = square.h;
 		crop.setX(square.x);
@@ -197,22 +199,22 @@ void WindowSystem::draw(entt::handle windowEntity)
 
 
 	SDL_Rect target{};
-	target.x = surfaceComponent.getX();
-	target.y = surfaceComponent.getY();
+	target.x = screenRectComponent.x;
+	target.y = screenRectComponent.y;
 	SDL_BlitSurface(windowSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
 }
-
-void WindowSystem::setDX(entt::handle windowEntity, int dx)
-{
-	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
-	windowComponent._dx = dx;
-}
-
-void WindowSystem::setDY(entt::handle windowEntity, int dy)
-{
-	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
-	windowComponent._dy = dy;
-}
+//
+//void WindowSystem::setDX(entt::handle windowEntity, int dx)
+//{
+//	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+//	windowComponent._dx = dx;
+//}
+//
+//void WindowSystem::setDY(entt::handle windowEntity, int dy)
+//{
+//	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+//	windowComponent._dy = dy;
+//}
 
 void WindowSystem::setThinBorder(entt::handle windowEntity)
 {

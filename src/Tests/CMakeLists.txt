@@ -24,7 +24,7 @@ add_executable(
   "Engine/TestECS.cpp"
   "Engine/TestTypeErasedPtr.cpp"
   "Entity/Interface/WindowTest.cpp"
-)
+  "Entity/Interface/ButtonTest.cpp")
 
 # Link Google Test libraries with your test executable
 target_link_libraries(OpenXcomTests PUBLIC openxcom_lib GTest::gtest_main)

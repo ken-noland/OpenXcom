@@ -572,6 +572,9 @@ void Game::loadMods()
 	_mod = std::make_unique<Mod>(*_modFiles);
 	_mod->loadAll();
 
+	// set the mod in ECS
+	_ecs.setMod(_mod.get());
+
 	//lua
 	_luaMod = std::make_unique<Lua::LuaMod>(*this, *_modFiles); // KN TODO: pass in game functions as a function pointer interface instead of the whole game object
 	_luaMod->loadAll();

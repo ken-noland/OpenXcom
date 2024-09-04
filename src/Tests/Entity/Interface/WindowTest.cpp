@@ -20,10 +20,10 @@ protected:
 
 		InterfaceFactory::CreateWindowParams params = {
 			.name = "TestWindow",
-			.width = 100,
-			.height = 100,
 			.x = 0,
 			.y = 0,
+			.width = 100,
+			.height = 100,
 			.popup = WindowPopup::POPUP_BOTH
 		};
 		windowEntity = factory.createWindow(params);
@@ -36,10 +36,10 @@ TEST_F(WindowSystemTest, WindowComponentParameterPropagation)
 	// Setup parameters for window creation
 	InterfaceFactory::CreateWindowParams params = {
 		.name = "PropagatedWindow",
-		.width = 200,
-		.height = 150,
 		.x = 10,
 		.y = 20,
+		.width = 200,
+		.height = 150,
 		.popup = WindowPopup::POPUP_BOTH
 	};
 
@@ -50,8 +50,6 @@ TEST_F(WindowSystemTest, WindowComponentParameterPropagation)
 	const WindowComponent& windowComponent = newWindowEntity.get<WindowComponent>();
 
 	// Check that the parameters were propagated correctly
-	EXPECT_EQ(windowComponent._dx, 0);                          // Assuming _dx is initialized to 0
-	EXPECT_EQ(windowComponent._dy, 0);                          // Assuming _dy is initialized to 0
 	EXPECT_EQ(windowComponent._popup, WindowPopup::POPUP_BOTH); // Popup should match the passed parameter
 	EXPECT_EQ(windowComponent._popupStep, 0.0);                 // Assuming _popupStep is initialized to 0
 	EXPECT_FALSE(windowComponent._contrast);                    // Check default initialization
@@ -75,23 +73,6 @@ TEST_F(WindowSystemTest, SetAndGetColor)
 
 	// Test if the color was correctly set
 	EXPECT_EQ(windowSystem.getColor(windowEntity), color);
-}
-
-// Test case: Setting and getting delta values (DX and DY)
-TEST_F(WindowSystemTest, SetDXAndDY)
-{
-	WindowSystem& windowSystem = ecs.getSystem<WindowSystem>();
-
-	int dx = 10;
-	int dy = 20;
-
-	windowSystem.setDX(windowEntity, dx);
-	windowSystem.setDY(windowEntity, dy);
-
-	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
-
-	EXPECT_EQ(windowComponent._dx, dx);
-	EXPECT_EQ(windowComponent._dy, dy);
 }
 
 // Test case: Testing high contrast setting

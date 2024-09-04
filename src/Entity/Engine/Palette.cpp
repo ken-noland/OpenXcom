@@ -22,8 +22,9 @@
 namespace OpenXcom
 {
 
-PaletteComponent::PaletteComponent(Surface* surface) : _surface(surface)
+PaletteComponent::PaletteComponent(Surface* surface, const SDL_Color* palette, int first, int ncolors) : _surface(surface)
 {
+	setPalette(palette, first, ncolors);
 }
 
 PaletteComponent::~PaletteComponent()
@@ -32,7 +33,10 @@ PaletteComponent::~PaletteComponent()
 
 void PaletteComponent::setPalette(const SDL_Color* palette, int first, int ncolors)
 {
-	_surface->setPalette(palette, first, ncolors);
+	if (palette)
+	{
+		_surface->setPalette(palette, first, ncolors);
+	}
 }
 
 }

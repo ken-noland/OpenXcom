@@ -21,19 +21,15 @@
 
 
 #include "Window.h"
-#include "ArrowButton.h"
-#include "Text.h"
-#include "TextButton.h"
+#include "Button.h"
 
 #include "../Engine/ECS.h"
 #include "../Engine/Surface.h"
 
 #include "../Engine/Tickable.h"
 #include "../Engine/Drawable.h"
-#include "../Engine/Palette.h"
 #include "../Engine/Hierarchical.h"
 
-#include "../../Engine/Game.h"
 #include "../../Engine/Timer.h"
 #include "../../Mod/Mod.h"
 
@@ -46,6 +42,11 @@ InterfaceFactory::InterfaceFactory(ECS& ecs, Mod* mod)
 
 InterfaceFactory::~InterfaceFactory()
 {
+}
+
+void InterfaceFactory::setMod(Mod* mod)
+{
+	_mod = mod;
 }
 
 Element InterfaceFactory::getElementFromRule(const std::string& ruleCategory, const std::string& ruleID, int x, int y, int width, int height, entt::handle parent)
@@ -83,10 +84,10 @@ Element InterfaceFactory::getElementFromRule(const std::string& ruleCategory, co
 
 			if (isParentValid && element->x != INT_MAX && element->y != INT_MAX)
 			{
-				SurfaceComponent& parentSurface = parent.get<SurfaceComponent>();
+				ScreenRectComponent& parentRect = parent.get<ScreenRectComponent>();
 
-				ret.x = parentSurface.getX() + element->x;
-				ret.y = parentSurface.getY() + element->y;
+				ret.x = parentRect.x + element->x;
+				ret.y = parentRect.y + element->y;
 			}
 
 			ret.TFTDMode = element->TFTDMode;
@@ -136,32 +137,46 @@ entt::handle InterfaceFactory::createText(const CreateTextParams& params)
 
 entt::handle InterfaceFactory::createTextButton(const CreateTextButtonParams& params)
 {
+	HierarchySystem& hierarchySystem = _ecs.getSystem<HierarchySystem>();
+
 	Element element = getElementFromRule(params.ruleCategory, params.ruleID, params.x, params.y, params.width, params.height, params.parent);
 
-	//create the button
+	//create the surface
 	entt::handle button = _surfaceFactory.createSurface(params.name, element.x, element.y, element.w, element.h, params.palette, params.firstColor, params.nColors);
 
+	ButtonComponent& buttonComponent = button.emplace<ButtonComponent>();
+
+	HierarchyComponent& hierarchy = button.emplace<HierarchyComponent>();
 
 	if (params.parent.valid())
 	{
-		HierarchySystem& hierarchySystem = _ecs.getSystem<HierarchySystem>();
 		hierarchySystem.addChild(params.parent, button);
 	}
 
-	//SurfaceComponent& surfaceComponent = button.get<SurfaceComponent>();
-	//TextButtonComponent& textButtonComponent = button.emplace<TextButtonComponent>(params.text, surfaceComponent);
-	//textButtonComponent.setColor(element.color);
+	// create the text
+	CreateTextParams textParams
+	{
+		.name = params.name + "_text",
+		.text = params.text,
+		.x = params.x,
+		.y = params.y,
+		.width = params.width,
+		.height = params.height,
+		.align = TextHAlign::ALIGN_CENTER,
+		.verticalAlign = TextVAlign::ALIGN_MIDDLE,
+		.wordWrap = false,
+		.palette = params.palette,
+		.firstColor = 0,
+		.nColors = 256,
+		.ruleCategory = params.ruleCategory,
+		.ruleID = params.ruleID,
+		.parent = button
+	};
 
-	//DrawableComponent& drawableComponent = button.get<DrawableComponent>();
-	//drawableComponent.addDrawable(std::bind(&TextButtonComponent::draw, &textButtonComponent));
+	entt::handle text = createText(textParams);
 
-
-
-	//entt::handle text = _surfaceFactory.createText(params.name, element.x, element.y, element.w, element.h, params.palette, params.firstColor, params.nColors);
-
-	//// add text to the button
-	//HierarchyComponent& hierarchy = button.emplace<HierarchyComponent>();
-	//hierarchy.addChild(text);
+	// add the text to the button
+	hierarchySystem.addChild(button, text);
 
 	return button;
 }
@@ -217,6 +232,18 @@ TickableComponent& tickableComponent = window.emplace<TickableComponent>();
 	else
 	{
 		windowSystem.CompleteProgress(window);
+	}
+
+	Surface* background = params.background;
+	if (_mod)
+	{
+		std::string bgImageName = _mod->getInterface(params.ruleCategory)->getBackgroundImage();
+		background = _mod->getSurface(bgImageName);
+	}
+
+	if(background)
+	{
+		window.emplace<BackgroundComponent>(background);
 	}
 
 	// hmmm, maybe a separate color component?

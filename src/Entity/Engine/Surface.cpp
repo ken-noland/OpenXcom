@@ -31,26 +31,6 @@ SurfaceComponent::SurfaceComponent(std::unique_ptr<Surface>& surface)
 {
 }
 
-int SurfaceComponent::getX() const
-{
-	return _surface->getX();
-}
-
-int SurfaceComponent::getY() const
-{
-	return _surface->getY();
-}
-
-int SurfaceComponent::getWidth() const
-{
-	return _surface->getWidth();
-}
-
-int SurfaceComponent::getHeight() const
-{
-	return _surface->getHeight();
-}
-
 void SurfaceComponent::blit()
 {
 	_surface->blit(getGame()->getScreen()->getSurface());
@@ -67,22 +47,18 @@ SurfaceFactory::~SurfaceFactory()
 
 entt::handle SurfaceFactory::createSurface(const std::string& name, int x, int y, int width, int height, SDL_Color* palette, int firstColor, int nColors)
 {
-	entt::entity entity = _registry.create();
-	_registry.emplace<Name>(entity, name);
+	entt::handle entity = entt::handle(_registry, _registry.create());
+	entity.emplace<Name>(name);
 
 	//this is mostly a hack until I get surface converted to a pure component
 	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
-	SurfaceComponent& surfaceComponent = _registry.emplace<SurfaceComponent>(entity, surface);
-
-	PaletteComponent& paletteComponent = _registry.emplace<PaletteComponent>(entity, surfaceComponent.getSurface());
-	if (palette)
-	{
-		paletteComponent.setPalette(palette, firstColor, nColors);
-	}
+	SurfaceComponent& surfaceComponent = entity.emplace<SurfaceComponent>(surface);
+	PaletteComponent& paletteComponent = entity.emplace<PaletteComponent>(surfaceComponent.getSurface(), palette, firstColor, nColors);
+	ScreenRectComponent& screenRectComponent = entity.emplace<ScreenRectComponent>(x, y, width, height);
 
 	// KN NOTE: DrawableComponent is going away... soon
-	DrawableComponent& drawableComponent = _registry.emplace<DrawableComponent>(entity);
-//	drawableComponent.setSurfaceComponent(&surfaceComponent);
+	DrawableComponent& drawableComponent = entity.emplace<DrawableComponent>();
+	//	drawableComponent.setSurfaceComponent(&surfaceComponent);
 	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
 
 

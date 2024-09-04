@@ -26,6 +26,7 @@
 namespace OpenXcom
 {
 
+class Mod;
 
 /// Entity Component System.
 class ECS
@@ -48,6 +49,9 @@ protected:
 public:
 	ECS();
 	~ECS();
+
+	/// Set Mod(used by factories to apply rules)
+	void setMod(Mod* mod);
 
 	/// Returns the registry.
 	Registry& getRegistry() { return _registry; };

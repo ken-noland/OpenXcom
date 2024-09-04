@@ -1,3 +1,4 @@
+#include "ECS.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -28,6 +29,8 @@
 
 #include "../Interface/Interface.h"
 #include "../Interface/Window.h"
+#include "../Interface/Button.h"
+#include "../Interface/Text.h"
 
 namespace OpenXcom
 {
@@ -47,6 +50,8 @@ ECS::ECS()
 	registerSystem<HierarchySystem>();
 
 	registerSystem<WindowSystem>();
+	registerSystem<ButtonSystem>();
+	registerSystem<TextSystem>();
 
 	// Timers get processed last
 	const TimeSystem& timeSystem = registerSystem<TimeSystem>();
@@ -63,6 +68,13 @@ ECS::ECS()
 
 ECS::~ECS()
 {
+}
+
+void ECS::setMod(Mod* mod)
+{
+	// KN TODO: When I get around to rewriting Mod, I'll need to pass it in here
+	InterfaceFactory& interfaceFactory = getFactory<InterfaceFactory>();
+	interfaceFactory.setMod(mod);
 }
 
 void ECS::update()

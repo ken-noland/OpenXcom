@@ -19,7 +19,7 @@
 #include "Drawable.h"
 #include "../Interface/Window.h"
 #include "../Interface/Text.h"
-#include "../Interface/TextButton.h"
+#include "../Interface/Button.h"
 #include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
 #include "../../Engine/Registry.h"
@@ -67,7 +67,7 @@ void DrawableSystem::draw(entt::handle& entity)
 		WindowSystem& windowSystem = getSystem<WindowSystem>();
 		windowSystem.draw(entity);
 	}
-	else if (entity.any_of<TextButtonComponent, TextComponent>())
+	else if (entity.any_of<ButtonComponent, TextComponent>())
 	{
 		DrawableComponent& drawableComponent = entity.get<DrawableComponent>();
 		drawableComponent.draw();

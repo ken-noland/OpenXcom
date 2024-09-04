@@ -45,7 +45,7 @@
 #include "../Entity/Engine/Drawable.h"
 #include "../Entity/Interface/Window.h"
 #include "../Entity/Interface/Text.h"
-#include "../Entity/Interface/TextButton.h"
+#include "../Entity/Interface/Button.h"
 
 namespace OpenXcom
 {
@@ -507,11 +507,12 @@ LocalizedText State::tr(const std::string &id, SoldierGender gender) const
  */
 void State::centerAllSurfaces()
 {
+	// KN NOTE: ummm, what? This is not how you center things.
 	for (entt::handle surfaceEnt : _surfaces)
 	{
-		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
-		surface->setX(surface->getX() + getGame()->getScreen()->getDX());
-		surface->setY(surface->getY() + getGame()->getScreen()->getDY());
+		//Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
+		//surface->setX(surface->getX() + getGame()->getScreen()->getDX());
+		//surface->setY(surface->getY() + getGame()->getScreen()->getDY());
 	}
 }
 

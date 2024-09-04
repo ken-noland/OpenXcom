@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "TextButton.h"
+#include "Button.h"
 #include "Text.h"
 #include "../../Engine/Game.h"
 #include "Interface.h"
@@ -24,6 +24,27 @@
 
 namespace OpenXcom
 {
+
+void ButtonSystem::setColor(entt::handle entity, Uint8 color)
+{
+	ButtonComponent& buttonComponent = entity.get<ButtonComponent>();
+	buttonComponent._color = color;
+}
+
+Uint8 ButtonSystem::getColor(entt::handle entity) const
+{
+	const ButtonComponent& buttonComponent = entity.get<ButtonComponent>();
+	return buttonComponent._color;
+}
+
+void ButtonSystem::draw(entt::handle entity)
+{
+}
+
+void ButtonSystem::handle(entt::handle entity, Action* action)
+{
+}
+
 //
 //TextButtonComponent::TextButtonComponent(const std::string& text, SurfaceComponent& surfaceComponent)
 //	: _surfaceComponent(surfaceComponent), _color(0), _contrast(false), _geoscapeButton(false), _comboBox(nullptr)

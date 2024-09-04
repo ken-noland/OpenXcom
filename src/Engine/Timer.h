@@ -176,7 +176,7 @@ public:
 /**
  * Timer used to run code in fixed intervals.
  * Used for code that should run at the same fixed interval
- * in various machines, based on milliseconds instead of CPU cycles.
+ * in various machines, based on milliseconds
  */
 struct IntervalTimerComponent
 {

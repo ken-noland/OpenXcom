@@ -29,9 +29,9 @@ class Text;
 class ComboBox;
 
 /**
- * Component for text buttons.
+ * Component for buttons.
  */
-struct TextButtonComponent
+struct ButtonComponent
 {
 	Uint8 _color;
 
@@ -40,36 +40,24 @@ struct TextButtonComponent
 };
 
 /**
- * System for handling text buttons.
+ * System for handling buttons.
  */
-class TextButtonSystem
+class ButtonSystem
 {
 public:
-	TextButtonSystem() = default;
-	~TextButtonSystem() = default;
+	ButtonSystem() = default;
+	~ButtonSystem() = default;
 
 	/// Sets the text button's color.
-	void setColor(entt::handle entity, Uint8 color); // override
+	void setColor(entt::handle entity, Uint8 color);
 
 	/// Gets the text button's color.
 	Uint8 getColor(entt::handle entity) const;
-
-	/// Sets the text button's text color.
-	void setTextColor(entt::handle entity, Uint8 color);
-
-	/// Sets the text size to big.
-	void setBig(entt::handle entity);
-
-	/// Sets the text size to small.
-	void setSmall(entt::handle entity);
-
-	/// Gets the text button's current font.
-	Font* getFont(entt::handle entity) const;
 		
 	/// Draws the text button.
 	void draw(entt::handle entity);
 		
-	/// Handles the input for the text button.
+	/// Handles the input for the button.
 	void handle(entt::handle entity, Action* action);
 };
 

@@ -41,7 +41,6 @@ struct TextComponent
 	int _scrollY;
 };
 
-
 class TextSystem
 {
 private:

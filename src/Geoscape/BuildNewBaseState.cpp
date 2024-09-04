@@ -71,11 +71,8 @@ BuildNewBaseState::BuildNewBaseState(entt::handle newBaseHandle, Globe *globe, b
 
 	_window = factory.createWindow("windowName", this, 256, 28, 0, 0);
 
-	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
-	windowSurface->setX(dx);
-
-	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
-	windowSystem.setDY(_window, 0);
+	ScreenRectComponent& screenRect = _window.get<ScreenRectComponent>();
+	screenRect.x = dx;	//KN NOTE: ??? Why?
 
 	_btnCancel = new TextButton(54, 12, 186 + dx, 8);
 	_txtTitle = new Text(180, 16, 8 + dx, 6);

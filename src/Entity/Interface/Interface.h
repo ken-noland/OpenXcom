@@ -63,6 +63,8 @@ protected:
 public:
 	InterfaceFactory(ECS& ecs, Mod* mod = nullptr);
 	~InterfaceFactory();
+		
+	void setMod(Mod* mod); // KN Note: Until we have a new mod interface, this will have to do.
 
 	entt::handle createArrowButton(const std::string& name, ArrowShape shape, int width, int height, int x = 0, int y = 0);
 	entt::handle createBar(const std::string& name, int width, int height, int x = 0, int y = 0);
@@ -81,10 +83,10 @@ public:
 	{
 		std::string name;
 		std::string text;
-		int width;
-		int height;
 		int x;
 		int y;
+		int width;
+		int height;
 
 		TextHAlign align = TextHAlign::ALIGN_LEFT;
 		TextVAlign verticalAlign = TextVAlign::ALIGN_TOP;
@@ -105,10 +107,10 @@ public:
 	{
 		std::string name;
 		std::string text;
-		int width;
-		int height;
 		int x;
 		int y;
+		int width;
+		int height;
 
 		std::function<void(Action*)> onLeftClickCallback;
 		std::function<void(Action*)> onRightClickCallback;
@@ -134,10 +136,10 @@ public:
 
 		State* state = nullptr;
 
-		int width;
-		int height;
 		int x;
 		int y;
+		int width;
+		int height;
 		WindowPopup popup = WindowPopup::POPUP_NONE;
 
 		// KN TODO: perhaps use a palette handle instead of a pointer?
@@ -145,8 +147,12 @@ public:
 		int firstColor = 0;
 		int nColors = 256;
 
+		int primaryColor = 0;
+
 		std::string ruleID = "";
 		std::string ruleCategory = "";
+
+		Surface* background = nullptr;
 
 		entt::handle parent;
 	};

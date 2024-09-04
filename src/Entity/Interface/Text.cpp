@@ -24,6 +24,16 @@
 namespace OpenXcom
 {
 
+TextSystem::TextSystem()
+{
+}
+
+TextSystem::~TextSystem()
+{
+}
+
+
+
 //TextComponent::TextComponent(const std::string& text, SurfaceComponent* surfaceComponent)
 //	: _surfaceComponent(surfaceComponent),
 //	_big(nullptr), _small(nullptr), _font(nullptr), _fontOrig(nullptr), _lang(nullptr),

@@ -70,8 +70,8 @@ SelectDestinationState::SelectDestinationState(std::vector<Craft*> crafts, Globe
 	Surface* windowSurface = getRegistry().raw().get<SurfaceComponent>(_window).getSurface();
 	windowSurface->setX(dx);
 
-	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
-	windowSystem.setDY(_window, 0);
+	//WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	//windowSystem.setDY(_window, 0);
 
 	_btnCancel = new TextButton(60, 12, 110 + dx, 8);
 	_btnCydonia = new TextButton(60, 12, 180 + dx, 8);
