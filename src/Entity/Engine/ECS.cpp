@@ -23,6 +23,7 @@
 #include "Drawable.h"
 #include "Tickable.h"
 #include "Surface.h"
+#include "Palette.h"
 #include "Hierarchical.h"
 
 #include "../../Engine/Timer.h"
@@ -52,6 +53,8 @@ ECS::ECS()
 	registerSystem<WindowSystem>();
 	registerSystem<ButtonSystem>();
 	registerSystem<TextSystem>();
+
+	registerSystem<PaletteSystem>();
 
 	// Timers get processed last
 	const TimeSystem& timeSystem = registerSystem<TimeSystem>();

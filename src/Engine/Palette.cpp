@@ -28,8 +28,16 @@ namespace OpenXcom
 /**
  * Initializes a brand new palette.
  */
-Palette::Palette() : _colors(0), _count(0)
+Palette::Palette(const std::string& name, const SDL_Color* pal, int first, int ncolors) : _name(name), _colors(nullptr), _count(0)
 {
+	if (pal == nullptr)
+	{
+		initBlack();
+	}
+	else
+	{
+		setColors(pal, ncolors);
+	}
 }
 
 /**
@@ -53,7 +61,11 @@ void Palette::loadDat(const std::string &filename, int ncolors, int offset)
 {
 	auto palFile = FileMap::getIStream(filename);
 	if (_colors != 0)
-		throw Exception("loadDat can be run only once");
+	{
+		delete[] _colors;
+		_colors = nullptr;
+	}
+
 	_count = ncolors;
 	_colors = new SDL_Color[_count];
 	memset(_colors, 0, sizeof(SDL_Color) * _count);
@@ -80,7 +92,11 @@ void Palette::loadDat(const std::string &filename, int ncolors, int offset)
 void Palette::initBlack()
 {
 	if (_colors != 0)
-		throw Exception("initBlack can be run only once");
+	{
+		delete[] _colors;
+		_colors = nullptr;
+	}
+
 	_count = 256;
 	_colors = new SDL_Color[_count];
 	memset(_colors, 0, sizeof(SDL_Color) * _count);
@@ -211,10 +227,14 @@ void Palette::savePalJasc(const std::string &file) const
 	CrossPlatform::writeFile(file, out.str());
 }
 
-void Palette::setColors(SDL_Color* pal, int ncolors)
+void Palette::setColors(const SDL_Color* pal, int ncolors)
 {
 	if (_colors != 0)
-		throw Exception("setColors can be run only once");
+	{
+		delete[] _colors;
+		_colors = nullptr;
+	}
+
 	_count = ncolors;
 	_colors = new SDL_Color[_count];
 	memset(_colors, 0, sizeof(SDL_Color) * _count);

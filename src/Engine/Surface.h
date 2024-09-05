@@ -27,6 +27,8 @@
 
 #include "GraphSubset.h"
 
+#include "../Entity/Engine/PaletteHandle.h"
+
 namespace OpenXcom
 {
 
@@ -164,7 +166,8 @@ public:
 	/// Draws a string on the surface.
 	void drawString(Sint16 x, Sint16 y, const char *s, Uint8 color);
 	/// Sets the surface's palette.
-	virtual void setPalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256);
+	[[deprecated("Use palette system for setting palette")]] virtual void setPalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256);
+
 	/**
 	 * Returns the surface's 8bpp palette.
 	 * @return Pointer to the palette's colors.

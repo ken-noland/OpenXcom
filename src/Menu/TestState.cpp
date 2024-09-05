@@ -43,6 +43,8 @@
 #include "../Mod/AlienDeployment.h"
 #include "../Entity/Interface/Interface.h"
 
+#include "../Entity/Engine/Palette.h"
+
 namespace OpenXcom
 {
 
@@ -121,13 +123,16 @@ TestState::TestState() : State("TestState", true)
 
 	_txtPalette->setText(tr("STR_PALETTE"));
 
-	for (auto pal : getGame()->getMod()->getPalettes())
-	{
-		if (pal.first.find("BACKUP_") != 0)
-		{
-			_paletteList.push_back(pal.first);
-		}
-	}
+	// KN NOTE: Why copy only the backup palettes? I have to ocmment this out because
+	// the palette system is not yet implemented
+	// 
+	//for (auto pal : getGame()->getMod()->getPalettes())
+	//{
+	//	if (pal.first.find("BACKUP_") != 0)
+	//	{
+	//		_paletteList.push_back(pal.first);
+	//	}
+	//}
 
 	_cbxPalette->setOptions(_paletteList, true);
 
@@ -171,9 +176,10 @@ TestState::TestState() : State("TestState", true)
 
 TestState::~TestState()
 {
+	PaletteSystem& paletteSystem = getGame()->getECS().getSystem<PaletteSystem>();
 	for (auto item : _vanillaPalettes)
 	{
-		delete item.second;
+		paletteSystem.removePalette(item.second);
 	}
 }
 
@@ -475,13 +481,15 @@ void TestState::testCase3()
 
 void TestState::testCase2()
 {
+	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
+
 	_lstOutput->addRow(1, tr("STR_TESTS_STARTING").c_str());
 	if (_vanillaPalettes.empty())
 	{
 		for (auto item : _paletteMetadataMap)
 		{
-			_vanillaPalettes[item.first] = new Palette();
-			_vanillaPalettes[item.first]->initBlack();
+			PaletteHandle handle = paletteSystem.addPalette(item.second.paletteName, nullptr, 0, 256);
+			_vanillaPalettes[item.first] = handle;
 
 			// Load from JASC file
 			auto palFile = FileMap::getIStream(item.second.palettePath);
@@ -499,7 +507,7 @@ void TestState::testCase2()
 					ss >> r;
 					ss >> g;
 					ss >> b;
-					_vanillaPalettes[item.first]->copyColor(j, r, g, b); // raw RGB copy, no side effects!
+					paletteSystem.getPalette(handle)->copyColor(j, r, g, b); // raw RGB copy, no side effects!
 				}
 			}
 			else
@@ -625,8 +633,10 @@ int TestState::checkPalette(const std::string& fullPath, int width, int height)
 	return 0;
 }
 
-int TestState::matchPalette(Surface *image, int index, Palette *test)
+int TestState::matchPalette(Surface* image, int index, PaletteHandle testHandle)
 {
+	Palette* test = getSystem<PaletteSystem>().getPalette(testHandle);
+
 	SDL_Color *colors = image->getSurface()->format->palette->colors;
 	int matched = 0;
 

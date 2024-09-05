@@ -25,10 +25,12 @@
 
 #include "../Engine/ECS.h"
 #include "../Engine/Surface.h"
+#include "../Engine/Palette.h"
 
 #include "../Engine/Tickable.h"
 #include "../Engine/Drawable.h"
 #include "../Engine/Hierarchical.h"
+#include "../Interface/Text.h"
 
 #include "../../Engine/Timer.h"
 #include "../../Mod/Mod.h"
@@ -66,13 +68,13 @@ Element InterfaceFactory::getElementFromRule(const std::string& ruleCategory, co
 
 	if (_mod)
 	{
-		ruleInterface = _mod->getInterface(ruleCategory);
+		ruleInterface = _mod->getInterface(ruleID);
 	}
 
 	// get the element from the mod rule interface
 	if (ruleInterface)
 	{
-		Element* element = ruleInterface->getElement(ruleID);
+		Element* element = ruleInterface->getElement(ruleCategory);
 		if (element)
 		{
 			bool isParentValid = _ecs.getRegistry().raw().valid(parent);
@@ -110,7 +112,6 @@ Element InterfaceFactory::getElementFromRule(const std::string& ruleCategory, co
 	return ret;
 }
 
-
 entt::handle InterfaceFactory::createArrowButton(const std::string& name, ArrowShape shape, int width, int height, int x, int y)
 {
 	return entt::handle(_ecs.getRegistry().raw(), entt::entity(entt::null));
@@ -118,32 +119,66 @@ entt::handle InterfaceFactory::createArrowButton(const std::string& name, ArrowS
 
 entt::handle InterfaceFactory::createText(const CreateTextParams& params)
 {
+	TextSystem& textSystem = _ecs.getSystem<TextSystem>();
+
+	std::string ruleCategory = params.ruleCategory.empty() ? "text" : params.ruleCategory;
+
+	PaletteHandle palette = params.palette;
+	if (palette == PaletteHandle::Invalid)
+	{
+		palette = _ecs.getSystem<PaletteSystem>().getPaletteByID(params.ruleID);
+	}
+
+	// create the surface
 	Element element = getElementFromRule(params.ruleCategory, params.ruleID, params.x, params.y, params.width, params.height, params.parent);
-	entt::handle entity = _surfaceFactory.createSurface(params.name, element.x, element.y, element.w, element.h, params.palette, params.firstColor, params.nColors);
+	entt::handle text = _surfaceFactory.createSurface(params.name, element.x, element.y, element.w, element.h, palette);
 
-	//SurfaceComponent& surfaceComponent = entity.get<SurfaceComponent>();
-	//TextComponent& textComponent = entity.emplace<TextComponent>(params.text, &surfaceComponent);
+	SurfaceComponent& surfaceComponent = text.get<SurfaceComponent>();
+	TextComponent& textComponent = text.emplace<TextComponent>(params.text);
 
-	//textComponent.setColor(element.color);
-	//textComponent.setSecondaryColor(element.color2);
+	Font* bigFont = params.bigFont;
+	Font* smallFont = params.smallFont;
+	bool isSmall = params.isSmall;
 
-	//DrawableComponent& drawableComponent = _registry.get<DrawableComponent>(entity);
-	//drawableComponent.addDrawable(std::bind(&TextComponent::draw, &entity.get<TextComponent>()));
+	// get font from mod if it is not set
+	if (bigFont == nullptr && _mod != nullptr)
+	{
+		bigFont = _mod->getFont("FONT_BIG");
+	}
+	if (smallFont == nullptr && _mod != nullptr)
+	{
+		smallFont = _mod->getFont("FONT_SMALL");
+	}
 
+	TextFontComponent& textFontComponent = text.emplace<TextFontComponent>(bigFont, smallFont, isSmall);
+	TextAlignmentComponent& textAlignmentComponent = text.emplace<TextAlignmentComponent>(params.align, params.verticalAlign);
 
+	textSystem.setColor(text, element.color);
+	textSystem.setSecondaryColor(text, element.color2);
 
-	return entity;
+	DrawableComponent& drawableComponent = text.get<DrawableComponent>();
+	drawableComponent.addDrawable(std::bind_front(&TextSystem::draw, textSystem, text));
+
+	return text;
 }
 
 entt::handle InterfaceFactory::createTextButton(const CreateTextButtonParams& params)
 {
 	HierarchySystem& hierarchySystem = _ecs.getSystem<HierarchySystem>();
 
+	std::string ruleCategory = params.ruleCategory.empty() ? "button" : params.ruleCategory;
+
+	PaletteHandle palette = params.palette;
+	if (palette == PaletteHandle::Invalid)
+	{
+		palette = _ecs.getSystem<PaletteSystem>().getPaletteByID(params.ruleID);
+	}
+
+	// create the surface
 	Element element = getElementFromRule(params.ruleCategory, params.ruleID, params.x, params.y, params.width, params.height, params.parent);
+	entt::handle button = _surfaceFactory.createSurface(params.name, element.x, element.y, element.w, element.h, palette);
 
-	//create the surface
-	entt::handle button = _surfaceFactory.createSurface(params.name, element.x, element.y, element.w, element.h, params.palette, params.firstColor, params.nColors);
-
+	// Button Component
 	ButtonComponent& buttonComponent = button.emplace<ButtonComponent>();
 
 	HierarchyComponent& hierarchy = button.emplace<HierarchyComponent>();
@@ -152,6 +187,10 @@ entt::handle InterfaceFactory::createTextButton(const CreateTextButtonParams& pa
 	{
 		hierarchySystem.addChild(params.parent, button);
 	}
+
+	ButtonSystem& buttonSystem = _ecs.getSystem<ButtonSystem>();
+	DrawableComponent& drawableComponent = button.get<DrawableComponent>();
+	drawableComponent.addDrawable(std::bind_front(&ButtonSystem::draw, buttonSystem, button));
 
 	// create the text
 	CreateTextParams textParams
@@ -166,9 +205,7 @@ entt::handle InterfaceFactory::createTextButton(const CreateTextButtonParams& pa
 		.verticalAlign = TextVAlign::ALIGN_MIDDLE,
 		.wordWrap = false,
 		.palette = params.palette,
-		.firstColor = 0,
-		.nColors = 256,
-		.ruleCategory = params.ruleCategory,
+		.ruleCategory = ruleCategory,
 		.ruleID = params.ruleID,
 		.parent = button
 	};
@@ -186,16 +223,11 @@ entt::handle InterfaceFactory::createWindow(const std::string& name, State* stat
 	CreateWindowParams params;
 
 	params.name = name;
-	params.state = state;
 	params.width = width;
 	params.height = height;
 	params.x = x;
 	params.y = y;
 	params.popup = popup;
-
-	params.palette = state->getPalette();
-	params.firstColor = 0;
-	params.nColors = 256;
 
 	params.ruleCategory = "window";
 	params.ruleID = name;
@@ -207,24 +239,26 @@ entt::handle InterfaceFactory::createWindow(const CreateWindowParams& params)
 {
 	WindowSystem& windowSystem = _ecs.getSystem<WindowSystem>();
 
-	Element element = getElementFromRule(params.ruleCategory, params.ruleID, params.x, params.y, params.width, params.height, params.parent);
-	entt::handle window = _surfaceFactory.createSurface(params.name, element.x, element.y, element.w, element.h, params.palette, params.firstColor, params.nColors);
+	std::string ruleCategory = params.ruleCategory.empty() ? "window" : params.ruleCategory;
+
+	PaletteHandle palette = params.palette;
+	if (palette == PaletteHandle::Invalid)
+	{
+		palette = _ecs.getSystem<PaletteSystem>().getPaletteByID(params.ruleID);
+	}
+
+	Element element = getElementFromRule(ruleCategory, params.ruleID, params.x, params.y, params.width, params.height, params.parent);
+	entt::handle window = _surfaceFactory.createSurface(params.name, element.x, element.y, element.w, element.h, palette);
 
 	WindowComponent& windowComponent = window.emplace<WindowComponent>(params.popup);
-
-//KN NOTE: I'm going to remove tickable and drawable component in the near future, but I'm just getting the timer set up and I don't have time to deal with the added mess
-TickableComponent& tickableComponent = window.emplace<TickableComponent>();
-//tickableComponent.addTickable(std::bind(&WindowComponent::tick, &windowComponent));
-
 
 	// Hierarchical Component
 	HierarchyComponent& hierarchy = window.emplace<HierarchyComponent>();
 	
-	// Progress Timer Component
-
 	// if we aren't popping up the window, we don't need a progress timer
 	if (params.popup != WindowPopup::POPUP_NONE)
 	{
+		// Progress Timer Component
 		ProgressTimerComponent::ProgressCallback updateProgress = std::bind_front(&WindowSystem::UpdateProgress, windowSystem);
 		ProgressTimerComponent::CompleteCallback completeProgress = std::bind_front(&WindowSystem::CompleteProgress, windowSystem);
 		ProgressTimerComponent& progressComponent = window.emplace<ProgressTimerComponent>(WindowSystem::POPUP_SPEED_MS, updateProgress, completeProgress);
@@ -237,17 +271,20 @@ TickableComponent& tickableComponent = window.emplace<TickableComponent>();
 	Surface* background = params.background;
 	if (_mod)
 	{
-		std::string bgImageName = _mod->getInterface(params.ruleCategory)->getBackgroundImage();
+		std::string bgImageName = _mod->getInterface(params.ruleID)->getBackgroundImage();
 		background = _mod->getSurface(bgImageName);
 	}
 
 	if(background)
 	{
+		// Background Component
 		window.emplace<BackgroundComponent>(background);
 	}
 
 	// hmmm, maybe a separate color component?
 	windowSystem.setColor(window, element.color);
+
+	// I couldn't think of a better place to put this(maybe in the State startup?)
 	windowSystem.playSound(window);
 
 	return window;

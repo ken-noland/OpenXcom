@@ -18,6 +18,8 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../Engine/State.h"
+#include "../Entity/Engine/PaletteHandle.h"
+
 #include <map>
 #include <set>
 
@@ -64,14 +66,14 @@ private:
 	ComboBox *_cbxTestCase;
 	TextList *_lstOutput;
 	std::vector<std::string> _paletteList;
-	std::map<int, Palette*> _vanillaPalettes;
+	std::map<int, PaletteHandle> _vanillaPalettes;
 	std::vector<std::string> _testCases;
 	/// Test cases.
 	void testCase4();
 	void testCase3();
 	void testCase2();
 	int checkPalette(const std::string& fullPath, int width, int height);
-	int matchPalette(Surface *image, int index, Palette *test);
+	int matchPalette(Surface* image, int index, PaletteHandle testHandle);
 	void testCase1();
 	int checkMCD(RuleTerrain *terrainRule, std::map<std::string, std::set<int>> &uniqueResults);
 	void testCase0();

@@ -45,7 +45,7 @@ SurfaceFactory::~SurfaceFactory()
 {
 }
 
-entt::handle SurfaceFactory::createSurface(const std::string& name, int x, int y, int width, int height, SDL_Color* palette, int firstColor, int nColors)
+entt::handle SurfaceFactory::createSurface(const std::string& name, int x, int y, int width, int height, PaletteHandle palette)
 {
 	entt::handle entity = entt::handle(_registry, _registry.create());
 	entity.emplace<Name>(name);
@@ -53,21 +53,21 @@ entt::handle SurfaceFactory::createSurface(const std::string& name, int x, int y
 	//this is mostly a hack until I get surface converted to a pure component
 	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
 	SurfaceComponent& surfaceComponent = entity.emplace<SurfaceComponent>(surface);
-	PaletteComponent& paletteComponent = entity.emplace<PaletteComponent>(surfaceComponent.getSurface(), palette, firstColor, nColors);
-	ScreenRectComponent& screenRectComponent = entity.emplace<ScreenRectComponent>(x, y, width, height);
+	entity.emplace<PaletteComponent>(surfaceComponent.getSurface(), palette);
+	entity.emplace<ScreenRectComponent>(x, y, width, height);
 
 	// KN NOTE: DrawableComponent is going away... soon
 	DrawableComponent& drawableComponent = entity.emplace<DrawableComponent>();
 	//	drawableComponent.setSurfaceComponent(&surfaceComponent);
-	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
+	//drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
 
 
 	return entt::handle(_registry, entity);
 }
 
-entt::handle SurfaceFactory::createInteractiveSurface(const std::string& name, int width, int height, int x, int y, SDL_Color* palette, int firstColor, int nColors)
+entt::handle SurfaceFactory::createInteractiveSurface(const std::string& name, int width, int height, int x, int y, PaletteHandle palette)
 {
-	entt::handle entity = createSurface(name, width, height, x, y, palette, firstColor, nColors);
+	entt::handle entity = createSurface(name, width, height, x, y, palette);
 
 	return entity;
 }

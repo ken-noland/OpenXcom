@@ -361,13 +361,13 @@ void State::init()
  */
 void State::update()
 {
-	for (entt::entity surfaceEnt : _surfaces)
-	{
-		TickableSystem& tickable = getSystem<TickableSystem>();
-		tickable.tick(surfaceEnt);
-		//Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
-		//surface->think();
-	}
+	//for (entt::entity surfaceEnt : _surfaces)
+	//{
+	//	TickableSystem& tickable = getSystem<TickableSystem>();
+	//	tickable.tick(surfaceEnt);
+	//	//Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+	//	//surface->think();
+	//}
 }
 
 /**
@@ -377,20 +377,20 @@ void State::update()
  */
 void State::handle(Action *action)
 {
-	if (!_modal)
-	{
-		for (std::vector<entt::handle>::reverse_iterator i = _surfaces.rbegin(); i != _surfaces.rend(); ++i)
-		{
-			Surface* surface = (*i).get<SurfaceComponent>().getSurface();
-			InteractiveSurface* j = dynamic_cast<InteractiveSurface*>(surface);
-			if (j != 0)
-				j->handle(action, this);
-		}
-	}
-	else
-	{
-		_modal->handle(action, this);
-	}
+	//if (!_modal)
+	//{
+	//	for (std::vector<entt::handle>::reverse_iterator i = _surfaces.rbegin(); i != _surfaces.rend(); ++i)
+	//	{
+	//		Surface* surface = (*i).get<SurfaceComponent>().getSurface();
+	//		InteractiveSurface* j = dynamic_cast<InteractiveSurface*>(surface);
+	//		if (j != 0)
+	//			j->handle(action, this);
+	//	}
+	//}
+	//else
+	//{
+	//	_modal->handle(action, this);
+	//}
 }
 
 /**
@@ -436,16 +436,16 @@ void State::showAll()
  */
 void State::resetAll()
 {
-	for (entt::entity surfaceEnt : _surfaces)
-	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
-		InteractiveSurface* s = dynamic_cast<InteractiveSurface*>(surface);
-		if (s != 0)
-		{
-			s->unpress(this);
-			//s->setFocus(false);
-		}
-	}
+	//for (entt::entity surfaceEnt : _surfaces)
+	//{
+	//	Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+	//	InteractiveSurface* s = dynamic_cast<InteractiveSurface*>(surface);
+	//	if (s != 0)
+	//	{
+	//		s->unpress(this);
+	//		//s->setFocus(false);
+	//	}
+	//}
 }
 
 /**
@@ -694,12 +694,12 @@ void State::resize(int &dX, int &dY)
  */
 void State::recenter(int dX, int dY)
 {
-	for (entt::handle surfaceEnt : _surfaces)
-	{
-		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
-		surface->setX(surface->getX() + dX / 2);
-		surface->setY(surface->getY() + dY / 2);
-	}
+	//for (entt::handle surfaceEnt : _surfaces)
+	//{
+	//	Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
+	//	surface->setX(surface->getX() + dX / 2);
+	//	surface->setY(surface->getY() + dY / 2);
+	//}
 }
 
 }

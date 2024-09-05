@@ -71,9 +71,9 @@ void WindowSystem::setHighContrast(entt::handle windowEntity, bool contrast)
 
 void WindowSystem::draw(entt::handle windowEntity)
 {
+	SurfaceComponent& surfaceComponent = windowEntity.get<SurfaceComponent>();
 	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
 	BackgroundComponent* backgroundComponent = windowEntity.try_get<BackgroundComponent>();
-	SurfaceComponent& surfaceComponent = windowEntity.get<SurfaceComponent>();
 	ScreenRectComponent& screenRectComponent = windowEntity.get<ScreenRectComponent>();
 	ProgressTimerComponent& progressTimerComponent = windowEntity.get<ProgressTimerComponent>();
 
@@ -187,6 +187,11 @@ void WindowSystem::draw(entt::handle windowEntity)
 		crop.blit(windowSurface);
 	}
 
+	SDL_Rect target{};
+	target.x = screenRectComponent.x;
+	target.y = screenRectComponent.y;
+	SDL_BlitSurface(windowSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
+
 	if (windowComponent._popupStep >= 1.0)
 	{
 		// Now render the window contents
@@ -196,25 +201,7 @@ void WindowSystem::draw(entt::handle windowEntity)
 			drawableSystem.draw(child);
 		});
 	}
-
-
-	SDL_Rect target{};
-	target.x = screenRectComponent.x;
-	target.y = screenRectComponent.y;
-	SDL_BlitSurface(windowSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
 }
-//
-//void WindowSystem::setDX(entt::handle windowEntity, int dx)
-//{
-//	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
-//	windowComponent._dx = dx;
-//}
-//
-//void WindowSystem::setDY(entt::handle windowEntity, int dy)
-//{
-//	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
-//	windowComponent._dy = dy;
-//}
 
 void WindowSystem::setThinBorder(entt::handle windowEntity)
 {

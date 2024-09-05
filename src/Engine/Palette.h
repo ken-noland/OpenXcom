@@ -31,19 +31,29 @@ namespace OpenXcom
 class Palette
 {
 private:
+	std::string _name;
 	SDL_Color *_colors;
 	int _count;
-public:
+
+	friend class PaletteSystem;
+
 	/// Creates a blank palette.
-	Palette();
+	Palette(const std::string& name, const SDL_Color* pal, int first, int ncolors);
 	/// Cleans up the palette.
 	~Palette();
+
+public:
+
 	/// Loads the colors from an X-Com palette.
 	void loadDat(const std::string &filename, int ncolors, int offset = 0);
 	/// Initializes an all-black palette.
 	void initBlack();
 	/// Loads the colors from an existing palette.
 	void copyFrom(Palette *srcPal);
+
+	/// get the palette name
+	const std::string& getName() const { return _name; }
+
 	// Gets a certain color from the palette.
 	SDL_Color *getColors(int offset = 0) const;
 	// Gets a number of colors in the palette.
@@ -52,7 +62,7 @@ public:
 	void savePal(const std::string &file) const;
 	void savePalMod(const std::string &file, const std::string &type, const std::string &target) const;
 	void savePalJasc(const std::string &file) const;
-	void setColors(SDL_Color* pal, int ncolors);
+	void setColors(const SDL_Color* pal, int ncolors);
 	void setColor(int index, int r, int g, int b);
 	void copyColor(int index, int r, int g, int b);
 	/// Converts a given color into a RGBA color value.
@@ -76,5 +86,6 @@ public:
 	/// Position of the background colors block in an X-Com palette (used for background images in screens).
 	static const int backPos = 224;
 };
+
 
 }

@@ -29,16 +29,58 @@ namespace OpenXcom
 
 struct TextComponent
 {
-	Font *_big, *_small, *_font, *_fontOrig;
-	Language* _lang;
+	TextComponent(const std::string& text)
+		:
+		_text(text), _processedText(), _lineWidth(), _lineHeight(), _wrap(false), _invert(false), _contrast(false),
+		_indent(false), _scroll(false), _ignoreSeparators(false), _color(0), _color2(0), _scrollY(0)
+	{
+	}
+
 	std::string _text;
 	UString _processedText;
 	std::vector<int> _lineWidth, _lineHeight;
 	bool _wrap, _invert, _contrast, _indent, _scroll, _ignoreSeparators;
+
+	Uint8 _color, _color2;
+
+	int _scrollY;
+};
+
+struct TextFontComponent
+{
+	TextFontComponent(Font* big, Font* small, bool isSmall)
+		: _big(big), _small(small), _font(nullptr), _fontOrig(nullptr)
+	{
+		if (isSmall)
+		{
+			_font = _small;
+		}
+		else
+		{
+			_font = _big;
+		}
+	}
+
+	// KN TODO: Move these to TextSystem?
+	Font *_big, *_small;
+	Font *_font, *_fontOrig;
+};
+
+struct TextAlignmentComponent
+{
+	TextAlignmentComponent(TextHAlign align, TextVAlign valign)
+		: _align(align), _valign(valign)
+	{
+	}
+
 	TextHAlign _align;
 	TextVAlign _valign;
-	Uint8 _color, _color2;
-	int _scrollY;
+};
+
+struct TextLangComponent
+{
+	TextLangComponent(Language* lang) : _lang(lang) {}
+	Language* _lang;
 };
 
 class TextSystem
@@ -46,12 +88,19 @@ class TextSystem
 private:
 
 	/// Processes the contained text.
-	void processText();
+	void processText(ScreenRectComponent& screenRectComponent, TextComponent& textComponent,
+		TextFontComponent& textFontComponent, Language* textLang) const;
+
 	/// Gets the X position of a text line.
-	int getLineX(int line) const;
+	int getLineX(int line, ScreenRectComponent& screenRectComponent, TextComponent& textComponent,
+		TextAlignmentComponent& textAlignComponent, TextFontComponent& textFontComponent,
+		Language* textLang) const;
+
+	/// Get the text height from component references
+	int getTextHeight(TextComponent& textComponent, int line) const;
 
 public:
-	TextSystem();
+	TextSystem();	
 	~TextSystem();
 
 	/// Sets the text size to big.

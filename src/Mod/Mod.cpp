@@ -115,6 +115,7 @@
 #include "../version.h"
 
 #include "../Entity/Interface/Window.h"
+#include "../Entity/Engine/Palette.h"
 
 #define ARRAYLEN(x) (std::size(x))
 
@@ -613,10 +614,6 @@ Mod::~Mod()
 	{
 		delete pair.second;
 	}
-	for (auto& pair : _palettes)
-	{
-		delete pair.second;
-	}
 	for (auto& pair : _musics)
 	{
 		delete pair.second;
@@ -1048,7 +1045,9 @@ Sound *Mod::getSound(const std::string &set, int sound) const
  */
 Palette *Mod::getPalette(const std::string &name, bool error) const
 {
-	return getRule(name, "Palette", _palettes, error);
+	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
+	PaletteHandle paletteHandle = paletteSystem.getPaletteByName(name);
+	return paletteSystem.getPalette(paletteHandle);
 }
 
 /**
@@ -5302,6 +5301,7 @@ void Mod::loadVanillaResources()
 {
 	// Create Geoscape surface
 	_sets["GlobeMarkers"] = new SurfaceSet(3, 3);
+
 	// dummy resources, that need to be defined in order for mod loading to work correctly
 	_sets["CustomArmorPreviews"] = new SurfaceSet(12, 20);
 	_sets["CustomItemPreviews"] = new SurfaceSet(12, 20);
@@ -5309,26 +5309,32 @@ void Mod::loadVanillaResources()
 	_sets["Touch"] = new SurfaceSet(32, 24);
 
 	// Load palettes
+	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
 	const char *pal[] = { "PAL_GEOSCAPE", "PAL_BASESCAPE", "PAL_GRAPHS", "PAL_UFOPAEDIA", "PAL_BATTLEPEDIA" };
 	for (size_t i = 0; i < ARRAYLEN(pal); ++i)
 	{
-		std::string s = "GEODATA/PALETTES.DAT";
-		_palettes[pal[i]] = new Palette();
-		_palettes[pal[i]]->loadDat(s, 256, Palette::palOffset((int)i));
+		std::string filename = "GEODATA/PALETTES.DAT";
+		PaletteHandle paletteHandle = paletteSystem.addPalette(pal[i]);
+		Palette* palette = paletteSystem.getPalette(paletteHandle);
+		palette->loadDat(filename, 256, Palette::palOffset((int)i));
 	}
 	{
-		std::string s1 = "GEODATA/BACKPALS.DAT";
-		std::string s2 = "BACKPALS.DAT";
-		_palettes[s2] = new Palette();
-		_palettes[s2]->loadDat(s1, 128);
+		std::string filename = "GEODATA/BACKPALS.DAT";
+		std::string paletteName = "BACKPALS.DAT";
+		PaletteHandle paletteHandle = paletteSystem.addPalette(paletteName);
+		Palette* palette = paletteSystem.getPalette(paletteHandle);
+		palette->loadDat(filename, 128);
 	}
 
 	// Correct Battlescape palette
 	{
-		std::string s1 = "GEODATA/PALETTES.DAT";
-		std::string s2 = "PAL_BATTLESCAPE";
-		_palettes[s2] = new Palette();
-		_palettes[s2]->loadDat(s1, 256, Palette::palOffset(4));
+		std::string filename = "GEODATA/PALETTES.DAT";
+		std::string paletteName = "PAL_BATTLESCAPE";
+
+		PaletteHandle paletteHandle = paletteSystem.addPalette(paletteName);
+		Palette* palette = paletteSystem.getPalette(paletteHandle);
+
+		palette->loadDat(filename, 256, Palette::palOffset(4));
 
 		// Last 16 colors are a greyish gradient
 		SDL_Color gradient[] = { { 140, 152, 148, 255 },
@@ -5349,7 +5355,7 @@ void Mod::loadVanillaResources()
 		{ 3, 3, 6, 255 } };
 		for (size_t i = 0; i < ARRAYLEN(gradient); ++i)
 		{
-			SDL_Color* color = _palettes[s2]->getColors(Palette::backPos + 16 + (int)i);
+			SDL_Color* color = palette->getColors(Palette::backPos + 16 + (int)i);
 			*color = gradient[i];
 		}
 		//_palettes[s2]->savePalMod("../../../customPalettes.rul", "PAL_BATTLESCAPE_CUSTOM", "PAL_BATTLESCAPE");
@@ -5677,6 +5683,7 @@ void Mod::loadBattlescapeResources()
 	{ 2, 9, 24, 255 },
 	{ 2, 0, 24, 255 } };
 
+	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
 	const auto& ufographContents = FileMap::getVFolderContents("UFOGRAPH");
 	for (size_t i = 0; i < ARRAYLEN(lbms); ++i)
 	{
@@ -5687,16 +5694,20 @@ void Mod::loadBattlescapeResources()
 
 		if (!i)
 		{
-			delete _palettes["PAL_BATTLESCAPE"];
+			//KN NOTE: WTH!?!? Why do we need to delete this palette?
+			PaletteHandle paletteHandle = paletteSystem.getPaletteByName("PAL_BATTLESCAPE");
+			paletteSystem.removePalette(paletteHandle);
 		}
 		// TODO: if we need only the palette, say so.
 		Surface *tempSurface = new Surface(1, 1);
 		tempSurface->loadImage("UFOGRAPH/" + lbms[i]);
-		_palettes[pals[i]] = new Palette();
+		PaletteHandle handle = paletteSystem.addPalette(pals[i]);
+		Palette* palette = paletteSystem.getPalette(handle);
+
 		SDL_Color *colors = tempSurface->getPalette();
 		colors[255] = backPal[i];
-		_palettes[pals[i]]->setColors(colors, 256);
-		createTransparencyLUT(_palettes[pals[i]]);
+		palette->setColors(colors, 256);
+		createTransparencyLUT(palette);
 		delete tempSurface;
 	}
 
@@ -5982,22 +5993,26 @@ void Mod::loadExtraResources()
 	}
 
 	Log(LOG_INFO) << "Loading custom palettes from ruleset...";
+	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
+
 	for (const auto& pair : _customPalettes)
 	{
 		CustomPalettes *palDef = pair.second;
-		const auto& palTargetName = palDef->getTarget();
-		if (_palettes.find(palTargetName) == _palettes.end())
+		std::string palTargetName = palDef->getTarget();
+
+		PaletteHandle paletteHandle = paletteSystem.getPaletteByName(palTargetName);
+
+		if (paletteHandle == PaletteHandle::Invalid)
 		{
 			Log(LOG_INFO) << "Creating a new palette: " << palTargetName;
-			_palettes[palTargetName] = new Palette();
-			_palettes[palTargetName]->initBlack();
+			paletteHandle = paletteSystem.addPalette(palTargetName);
 		}
 		else
 		{
 			Log(LOG_VERBOSE) << "Replacing items in target palette: " << palTargetName;
 		}
 
-		Palette *target = _palettes[palTargetName];
+		Palette* target = paletteSystem.getPalette(paletteHandle);
 		const auto& fileName = palDef->getFile();
 		if (fileName.empty())
 		{
@@ -6027,36 +6042,41 @@ void Mod::loadExtraResources()
 		}
 	}
 
-	bool backup_logged = false;
-	for (auto pal : _palettes)
-	{
-		if (pal.first.find("PAL_") == 0)
-		{
-			if (!backup_logged) { Log(LOG_INFO) << "Making palette backups..."; backup_logged = true; }
-			Log(LOG_VERBOSE) << "Creating a backup for palette: " << pal.first;
-			std::string newName = "BACKUP_" + pal.first;
-			_palettes[newName] = new Palette();
-			_palettes[newName]->initBlack();
-			_palettes[newName]->copyFrom(pal.second);
-		}
-	}
+	// KN NOTE: why are we making palette backups?
+	//bool backup_logged = false;
+	//for (auto pal : _palettes)
+	//{
+	//	if (pal.first.find("PAL_") == 0)
+	//	{
+	//		if (!backup_logged) { Log(LOG_INFO) << "Making palette backups..."; backup_logged = true; }
+	//		Log(LOG_VERBOSE) << "Creating a backup for palette: " << pal.first;
+	//		std::string newName = "BACKUP_" + pal.first;
+	//		_palettes[newName] = new Palette();
+	//		_palettes[newName]->initBlack();
+	//		_palettes[newName]->copyFrom(pal.second);
+	//	}
+	//}
 
 	// Support for UFO-based mods and hybrid mods
 	if (_transparencyLUTs.empty() && !_transparencies.empty())
 	{
-		if (_palettes["PAL_BATTLESCAPE"])
+		PaletteHandle palBattlescapeHandle = paletteSystem.getPaletteByName("PAL_BATTLESCAPE");
+		if (palBattlescapeHandle != PaletteHandle::Invalid)
 		{
 			Log(LOG_INFO) << "Creating transparency LUTs for PAL_BATTLESCAPE...";
-			createTransparencyLUT(_palettes["PAL_BATTLESCAPE"]);
+			createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle));
 		}
-		if (_palettes["PAL_BATTLESCAPE_1"] &&
-			_palettes["PAL_BATTLESCAPE_2"] &&
-			_palettes["PAL_BATTLESCAPE_3"])
+		PaletteHandle palBattlescapeHandle1 = paletteSystem.getPaletteByName("PAL_BATTLESCAPE_1");
+		PaletteHandle palBattlescapeHandle2 = paletteSystem.getPaletteByName("PAL_BATTLESCAPE_2");
+		PaletteHandle palBattlescapeHandle3 = paletteSystem.getPaletteByName("PAL_BATTLESCAPE_3");
+		if (palBattlescapeHandle1 != PaletteHandle::Invalid &&
+			palBattlescapeHandle2 != PaletteHandle::Invalid &&
+			palBattlescapeHandle3 != PaletteHandle::Invalid)
 		{
 			Log(LOG_INFO) << "Creating transparency LUTs for hybrid custom palettes...";
-			createTransparencyLUT(_palettes["PAL_BATTLESCAPE_1"]);
-			createTransparencyLUT(_palettes["PAL_BATTLESCAPE_2"]);
-			createTransparencyLUT(_palettes["PAL_BATTLESCAPE_3"]);
+			createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle1));
+			createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle2));
+			createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle3));
 		}
 	}
 

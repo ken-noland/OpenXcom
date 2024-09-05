@@ -19,8 +19,12 @@
 #include "Button.h"
 #include "Text.h"
 #include "../../Engine/Game.h"
+#include "../../Engine/Screen.h"
+
 #include "Interface.h"
 #include "../Engine/Palette.h"
+#include "../Engine/Hierarchical.h"
+#include "../Engine/Drawable.h"
 
 namespace OpenXcom
 {
@@ -37,8 +41,106 @@ Uint8 ButtonSystem::getColor(entt::handle entity) const
 	return buttonComponent._color;
 }
 
-void ButtonSystem::draw(entt::handle entity)
+void ButtonSystem::draw(entt::handle buttonEntity)
 {
+	ButtonComponent& buttonComponent = buttonEntity.get<ButtonComponent>();
+	SurfaceComponent& surfaceComponent = buttonEntity.get<SurfaceComponent>();
+	ScreenRectComponent& screenRectComponent = buttonEntity.get<ScreenRectComponent>();
+
+	Surface* buttonSurface = surfaceComponent.getSurface();
+
+	buttonSurface->draw();
+
+	SDL_Rect square;
+	
+	int mul = 1;
+	if (buttonComponent._contrast)
+	{
+		mul = 2;
+	}
+	
+	int color = buttonComponent._color + 1 * mul;
+	
+	square.x = 0;
+	square.y = 0;
+	square.w = screenRectComponent.width;
+	square.h = screenRectComponent.height;
+	
+	for (int i = 0; i < 5; ++i)
+	{
+		buttonSurface->drawRect(&square, color);
+	
+		if (i % 2 == 0)
+		{
+			square.x++;
+			square.y++;
+		}
+		square.w--;
+		square.h--;
+	
+		switch (i)
+		{
+		case 0:
+			color = buttonComponent._color + 5 * mul;
+			buttonSurface->setPixel(square.w, 0, color);
+			break;
+		case 1:
+			color = buttonComponent._color + 2 * mul;
+			break;
+		case 2:
+			color = buttonComponent._color + 4 * mul;
+			buttonSurface->setPixel(square.w + 1, 1, color);
+			break;
+		case 3:
+			color = buttonComponent._color + 3 * mul;
+			break;
+		case 4:
+			if (buttonComponent._geoscapeButton)
+			{
+				buttonSurface->setPixel(0, 0, buttonComponent._color);
+				buttonSurface->setPixel(1, 1, buttonComponent._color);
+			}
+			break;
+		}
+	}
+
+	SDL_Rect target{};
+	target.x = screenRectComponent.x;
+	target.y = screenRectComponent.y;
+	SDL_BlitSurface(buttonSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
+
+	// Now render the button contents
+	HierarchySystem& hierarchySystem = getSystem<HierarchySystem>();
+	hierarchySystem.visit(buttonEntity, [](entt::handle child) {
+		DrawableSystem& drawableSystem = getSystem<DrawableSystem>();
+		drawableSystem.draw(child);
+	});
+
+	//bool press;
+	//if (_group == 0)
+	//	press = isButtonPressed();
+	//else
+	//	press = (*_group == this);
+	
+	//if (press)
+	//{
+	//	if (_geoscapeButton)
+	//	{
+	//		this->invert(_color + 2 * mul);
+	//	}
+	//	else
+	//	{
+	//		this->invert(_color + 3 * mul);
+	//	}
+	//}
+	//_text->setInvert(press);
+//	_text.setColor(1);
+	
+	
+	//_text->setPalette(surface->getPalette());
+	
+	//_text->draw();
+	//_text->blit(surface->getSurface());
 }
 
 void ButtonSystem::handle(entt::handle entity, Action* action)

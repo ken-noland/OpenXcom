@@ -20,6 +20,8 @@
 #include <entt/entt.hpp>
 #include "Window.h"
 
+#include "../Engine/PaletteHandle.h"
+
 //temp includes
 #include "../../Interface/ArrowButton.h"
 #include "../../Interface/Bar.h"
@@ -48,6 +50,8 @@ namespace OpenXcom
 class ECS;
 class SurfaceFactory;
 class Mod;
+class Font;
+class Palette;
 
 class InterfaceFactory
 {
@@ -92,9 +96,11 @@ public:
 		TextVAlign verticalAlign = TextVAlign::ALIGN_TOP;
 		bool wordWrap = false;
 
-		SDL_Color* palette = nullptr;
-		int firstColor = 0;
-		int nColors = 256;
+		PaletteHandle palette = PaletteHandle::Invalid;
+
+		Font* bigFont = nullptr;
+		Font* smallFont = nullptr;
+		bool isSmall = true;
 
 		std::string ruleCategory = "";
 		std::string ruleID = "";
@@ -109,15 +115,13 @@ public:
 		std::string text;
 		int x;
 		int y;
-		int width;
-		int height;
+		int width = 100;
+		int height = 50;
 
-		std::function<void(Action*)> onLeftClickCallback;
-		std::function<void(Action*)> onRightClickCallback;
+		std::function<void(Action*)> onLeftClickCallback = nullptr;
+		std::function<void(Action*)> onRightClickCallback = nullptr;
 
-		SDL_Color* palette = nullptr;
-		int firstColor = 0;
-		int nColors = 256;
+		PaletteHandle palette = PaletteHandle::Invalid;
 
 		std::string ruleID = "";
 		std::string ruleCategory = "";
@@ -134,18 +138,13 @@ public:
 	{
 		std::string name;
 
-		State* state = nullptr;
-
 		int x;
 		int y;
 		int width;
 		int height;
 		WindowPopup popup = WindowPopup::POPUP_NONE;
 
-		// KN TODO: perhaps use a palette handle instead of a pointer?
-		SDL_Color* palette = nullptr;
-		int firstColor = 0;
-		int nColors = 256;
+		PaletteHandle palette = PaletteHandle::Invalid;
 
 		int primaryColor = 0;
 

@@ -67,21 +67,25 @@ void DrawableSystem::draw(entt::handle& entity)
 		WindowSystem& windowSystem = getSystem<WindowSystem>();
 		windowSystem.draw(entity);
 	}
-	else if (entity.any_of<ButtonComponent, TextComponent>())
+	else if (entity.any_of<ButtonComponent>())
 	{
-		DrawableComponent& drawableComponent = entity.get<DrawableComponent>();
-		drawableComponent.draw();
+		ButtonSystem& buttonSystem = getSystem<ButtonSystem>();
+		buttonSystem.draw(entity);
+	}
+	else if (entity.any_of<TextComponent>())
+	{
+		TextSystem& textSystem = getSystem<TextSystem>();
+		textSystem.draw(entity);
+
+		//DrawableComponent& drawableComponent = entity.get<DrawableComponent>();
+		//drawableComponent.draw();
 
 		//TODO: I'm not sure this is needed once we have the systems up and running
-		{
-			SurfaceComponent& surfaceComponent = entity.get<SurfaceComponent>();
-			Surface* surface = surfaceComponent.getSurface();
-
-			SDL_Rect target{};
-			target.x = surface->getX();
-			target.y = surface->getY();
-			SDL_BlitSurface(surface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
-		}
+		//{
+		//	SurfaceComponent& surfaceComponent = entity.get<SurfaceComponent>();
+		//	ScreenRectComponent& screenRectComponent = entity.get<ScreenRectComponent>();
+		//	Surface* surface = surfaceComponent.getSurface();
+		//}
 	}
 	else
 	{

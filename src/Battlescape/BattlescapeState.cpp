@@ -738,22 +738,24 @@ BattlescapeState::~BattlescapeState()
 
 void BattlescapeState::resetPalettes()
 {
-	if (_paletteResetNeeded)
-	{
-		for (auto origPal : getGame()->getMod()->getPalettes())
-		{
-			if (origPal.first.find("PAL_") == 0)
-			{
-				std::string backupName = "BACKUP_" + origPal.first;
-				Palette *backupPal = getGame()->getMod()->getPalette(backupName, false);
-				if (backupPal)
-				{
-					origPal.second->copyFrom(backupPal);
-				}
-			}
-		}
-		_paletteResetNeeded = false;
-	}
+	// KN NOTE: With the new palette system, this *should be* no longer needed.
+
+	//if (_paletteResetNeeded)
+	//{
+	//	for (auto origPal : getGame()->getMod()->getPalettes())
+	//	{
+	//		if (origPal.first.find("PAL_") == 0)
+	//		{
+	//			std::string backupName = "BACKUP_" + origPal.first;
+	//			Palette *backupPal = getGame()->getMod()->getPalette(backupName, false);
+	//			if (backupPal)
+	//			{
+	//				origPal.second->copyFrom(backupPal);
+	//			}
+	//		}
+	//	}
+	//	_paletteResetNeeded = false;
+	//}
 }
 
 /**

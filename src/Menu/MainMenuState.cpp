@@ -77,60 +77,75 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 
 	// Window
 	InterfaceFactory::CreateWindowParams windowParams{
-		.name = "mainMenu",
-		.state = this,
+		.name = "wndMainMenu",
 		.x = 32,
 		.y = 20,
 		.width = 256,
 		.height = 160,
 		.popup = WindowPopup::POPUP_BOTH,
-		.palette = getPalette(),
-		.firstColor = 0,
-		.nColors = 256,
-		.primaryColor = 0,
 
-		.ruleID = "window",
-		.ruleCategory = "mainMenu",
-
+		.ruleID = "mainMenu",
 		.background = nullptr,		//use the background from the rules
 	};
 	_window = factory.createWindow(windowParams);
 
 	// New Game
 	std::function<void(Action*)> btnNewGameClick = [this](Action* action) { getGame()->pushState(new NewGameState); };
-	InterfaceFactory::CreateTextButtonParams btnNewGameParams{"btnNewGame", tr("STR_NEW_GAME"), 64, 90, 92, 20,
-		btnNewGameClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	InterfaceFactory::CreateTextButtonParams btnNewGameParams {
+		.name = "btnNewGame",
+		.text = tr("STR_NEW_GAME"),
+		.x = 64,
+		.y = 90,
+		.width = 92,
+		.height = 20,
+
+		.onLeftClickCallback = btnNewGameClick,
+
+		.ruleID = "mainMenu",
+		.parent = _window
+	};
 	_btnNewGame = factory.createTextButton(btnNewGameParams);
 
 	// New Battle
 	std::function<void(Action*)> btnNewBattleClick = [this](Action* action)	{ getGame()->pushState(new NewBattleState); };
-	InterfaceFactory::CreateTextButtonParams btnNewBattleParams{"btnNewBattle", tr("STR_NEW_BATTLE"), 164, 90, 92, 20,
-		btnNewBattleClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	InterfaceFactory::CreateTextButtonParams btnNewBattleParams{
+		.name = "btnNewBattle",
+		.text = tr("STR_NEW_BATTLE"),
+		.x = 164,
+		.y = 90,
+		.width = 92,
+		.height = 20,
+
+		.onLeftClickCallback = btnNewBattleClick,
+
+		.ruleID = "mainMenu",
+		.parent = _window
+	};
 	_btnNewBattle = factory.createTextButton(btnNewBattleParams);
 
-	// Load
-	std::function<void(Action*)> btnLoadClick = [this](Action* action) { getGame()->pushState(new ListLoadState(OPT_MENU)); };
-	InterfaceFactory::CreateTextButtonParams btnLoadParams{"btnLoad", tr("STR_LOAD_SAVED_GAME"), 64, 118, 92, 20,
-		btnLoadClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
-	_btnLoad = factory.createTextButton(btnLoadParams);
+	//// Load
+	//std::function<void(Action*)> btnLoadClick = [this](Action* action) { getGame()->pushState(new ListLoadState(OPT_MENU)); };
+	//InterfaceFactory::CreateTextButtonParams btnLoadParams{"btnLoad", tr("STR_LOAD_SAVED_GAME"), 64, 118, 92, 20,
+	//	btnLoadClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	//_btnLoad = factory.createTextButton(btnLoadParams);
 
-	// Options
-	std::function<void(Action*)> btnOptionsClick = [this](Action* action) { getGame()->pushState(new OptionsVideoState(OPT_MENU)); };
-	InterfaceFactory::CreateTextButtonParams btnOptionsParams{"btnOptions", tr("STR_OPTIONS"), 164, 118, 92, 20,
-		btnOptionsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
-	_btnOptions = factory.createTextButton(btnOptionsParams);
+	//// Options
+	//std::function<void(Action*)> btnOptionsClick = [this](Action* action) { getGame()->pushState(new OptionsVideoState(OPT_MENU)); };
+	//InterfaceFactory::CreateTextButtonParams btnOptionsParams{"btnOptions", tr("STR_OPTIONS"), 164, 118, 92, 20,
+	//	btnOptionsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	//_btnOptions = factory.createTextButton(btnOptionsParams);
 
-	// Mods
-	std::function<void(Action*)> btnModsClick = [this](Action* action) { getGame()->pushState(new ModListState); };
-	InterfaceFactory::CreateTextButtonParams btnModsParams{"btnMods", tr("STR_MODS"), 64, 146, 92, 20,
-		btnModsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
-	_btnMods = factory.createTextButton(btnModsParams);
+	//// Mods
+	//std::function<void(Action*)> btnModsClick = [this](Action* action) { getGame()->pushState(new ModListState); };
+	//InterfaceFactory::CreateTextButtonParams btnModsParams{"btnMods", tr("STR_MODS"), 64, 146, 92, 20,
+	//	btnModsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	//_btnMods = factory.createTextButton(btnModsParams);
 
-	// Quit
-	std::function<void(Action*)> btnQuitClick = [this](Action* action) { getGame()->quit(); };
-	InterfaceFactory::CreateTextButtonParams btnQuitParams{"btnQuit", tr("STR_QUIT"), 164, 146, 92, 20,
-		btnQuitClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
-	_btnQuit = factory.createTextButton(btnQuitParams);
+	//// Quit
+	//std::function<void(Action*)> btnQuitClick = [this](Action* action) { getGame()->quit(); };
+	//InterfaceFactory::CreateTextButtonParams btnQuitParams{"btnQuit", tr("STR_QUIT"), 164, 146, 92, 20,
+	//	btnQuitClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
+	//_btnQuit = factory.createTextButton(btnQuitParams);
 
 	//_btnUpdate = factory.createTextButton("btnUpdate", tr("STR_UPDATE"), 72, 16, 209, 27, [this](Action* action) { btnUpdateClick(action); });
 	//_txtUpdateInfo = new Text(320, 17, 0, 11);
@@ -138,17 +153,17 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 
 
 	add(_window, "window", "mainMenu");
-	add(_btnNewGame, "button", "mainMenu");
-	add(_btnNewBattle, "button", "mainMenu");
-	add(_btnLoad, "button", "mainMenu");
-	add(_btnOptions, "button", "mainMenu");
-	add(_btnMods, "button", "mainMenu");
-	add(_btnQuit, "button", "mainMenu");
-	//add(_btnUpdate, "button", "mainMenu");
-	//add(_txtUpdateInfo, "text", "mainMenu");
+	//add(_btnNewGame, "button", "mainMenu");
+	//add(_btnNewBattle, "button", "mainMenu");
+	//add(_btnLoad, "button", "mainMenu");
+	//add(_btnOptions, "button", "mainMenu");
+	//add(_btnMods, "button", "mainMenu");
+	//add(_btnQuit, "button", "mainMenu");
+	////add(_btnUpdate, "button", "mainMenu");
+	////add(_txtUpdateInfo, "text", "mainMenu");
 	add(_txtTitle, "text", "mainMenu");
 
-	centerAllSurfaces();
+	//centerAllSurfaces();
 
 	// Set up objects
 	//setWindowBackground(_window, "mainMenu");
@@ -312,205 +327,205 @@ void MainMenuState::btnQuitClick(Action *)
  */
 void MainMenuState::btnUpdateClick(Action*)
 {
-#ifdef _WIN32
-	const std::string subdir = "v" + _newVersion + "/";
-
-#ifdef _WIN64
-	const std::string relativeExeZipFileName = _debugInVisualStudio ? "Debug/exe64.zip" : "exe64.zip";
-#else
-	const std::string relativeExeZipFileName = _debugInVisualStudio ? "Debug/exe.zip" : "exe.zip";
-#endif
-	const std::string relativeExeNewFileName = _debugInVisualStudio ? "Debug/OpenXcomEx.exe.new" : "OpenXcomEx.exe.new";
-
-	const std::string commonDirFilename = Options::getDataFolder() + "common";
-	const std::string commonZipFilename = Options::getDataFolder() + "common.zip";
-	const std::string commonZipUrl = "https://openxcom.org/oxce/" + subdir + "common.zip";
-
-	const std::string standardDirFilename = Options::getDataFolder() + "standard";
-	const std::string standardZipFilename = Options::getDataFolder() + "standard.zip";
-	const std::string standardZipUrl = "https://openxcom.org/oxce/" + subdir + "standard.zip";
-
-	const std::string now = CrossPlatform::now();
-
-	const std::string exePath = CrossPlatform::getExeFolder();
-	const std::string exeFilenameOnly = CrossPlatform::getExeFilename(false);
-	const std::string exeFilenameFullPath = CrossPlatform::getExeFilename(true);
-
-#ifdef _WIN64
-	const std::string exeZipFilename = exePath + "exe64.zip";
-#else
-	const std::string exeZipFilename = exePath + "exe.zip";
-#endif
-	const std::string exeNewFilename = exePath + "OpenXcomEx.exe.new";
-#ifdef _WIN64
-	const std::string exeZipUrl = "https://openxcom.org/oxce/" + subdir + "exe64.zip";
-#else
-	const std::string exeZipUrl = "https://openxcom.org/oxce/" + subdir + "exe.zip";
-#endif
-
-	// stop using the common/standard zip files, so that we can back them up
-	FileMap::clear(true, false);
-
-	// 0. backup the exe
-	if (CrossPlatform::fileExists(exeFilenameFullPath))
-	{
-		if (CrossPlatform::copyFile(exeFilenameFullPath, exeFilenameFullPath + "-" + now + ".bak"))
-			Log(LOG_INFO) << "Update step 0 done.";
-		else return;
-	}
-
-	// 1. backup common dir
-	if (CrossPlatform::fileExists(commonDirFilename))
-	{
-		if (CrossPlatform::moveFile(commonDirFilename, commonDirFilename + "-" + now))
-			Log(LOG_INFO) << "Update step 1 done.";
-		else return;
-	}
-
-	// 2. backup common zip
-	if (CrossPlatform::fileExists(commonZipFilename))
-	{
-		if (CrossPlatform::moveFile(commonZipFilename, commonZipFilename + "-" + now + ".bak"))
-			Log(LOG_INFO) << "Update step 2 done.";
-		else return;
-	}
-
-	// 3. backup standard dir
-	if (CrossPlatform::fileExists(standardDirFilename))
-	{
-		if (CrossPlatform::moveFile(standardDirFilename, standardDirFilename + "-" + now))
-			Log(LOG_INFO) << "Update step 3 done.";
-		else return;
-	}
-
-	// 4. backup standard zip
-	if (CrossPlatform::fileExists(standardZipFilename))
-	{
-		if (CrossPlatform::moveFile(standardZipFilename, standardZipFilename + "-" + now + ".bak"))
-			Log(LOG_INFO) << "Update step 4 done.";
-		else return;
-	}
-
-	// 5. delete exe zip
-	if (CrossPlatform::fileExists(exeZipFilename))
-	{
-		if (CrossPlatform::deleteFile(exeZipFilename))
-			Log(LOG_INFO) << "Update step 5 done.";
-		else return;
-	}
-
-	// 6. delete unpacked exe zip
-	if (CrossPlatform::fileExists(exeNewFilename))
-	{
-		if (CrossPlatform::deleteFile(exeNewFilename))
-			Log(LOG_INFO) << "Update step 6 done.";
-		else return;
-	}
-
-	// 7. download common zip
-	if (CrossPlatform::downloadFile(commonZipUrl, commonZipFilename))
-	{
-		Log(LOG_INFO) << "Update step 7 done.";
-	}
-	else return;
-
-	// 8. download standard zip
-	if (CrossPlatform::downloadFile(standardZipUrl, standardZipFilename))
-	{
-		Log(LOG_INFO) << "Update step 8 done.";
-	}
-	else return;
-
-	// 9. download exe zip
-	if (CrossPlatform::downloadFile(exeZipUrl, exeZipFilename))
-	{
-		Log(LOG_INFO) << "Update step 9 done.";
-	}
-	else return;
-
-	// 10. extract exe zip
-	if (CrossPlatform::fileExists(exeZipFilename) && CrossPlatform::fileExists(relativeExeZipFileName))
-	{
-		const std::string file_to_extract = "OpenXcomEx.exe.new";
-		SDL_RWops *rwo_read = FileMap::zipGetFileByName(relativeExeZipFileName, file_to_extract);
-		if (!rwo_read) {
-			Log(LOG_ERROR) << "Step 10a: failed to unzip file.";
-			return;
-		}
-		size_t size = 0;
-		auto data = SDL_LoadFile_RW(rwo_read, &size, SDL_TRUE);
-		if (!data) {
-			Log(LOG_ERROR) << "Step 10b: failed to unzip file." << SDL_GetError(); // out of memory for a copy ?
-			return;
-		}
-		SDL_RWops *rwo_write = SDL_RWFromFile(relativeExeNewFileName.c_str(), "wb");
-		if (!rwo_write) {
-			Log(LOG_ERROR) << "Step 10c: failed to open exe.new file for writing." << SDL_GetError();
-			return;
-		}
-		auto wsize = SDL_RWwrite(rwo_write, data, (int)size, 1);
-		if (wsize != 1) {
-			Log(LOG_ERROR) << "Step 10d: failed to write exe.new file." << SDL_GetError();
-			return;
-		}
-		if (SDL_RWclose(rwo_write)) {
-			Log(LOG_ERROR) << "Step 10e: failed to write exe.new file." << SDL_GetError();
-			return;
-		}
-	} else {
-		Log(LOG_ERROR) << "Update step 10 failed."; // exe dir and working dir not the same
-		return;
-	}
-
-	// 11. check if extracted exe exists
-	if (!CrossPlatform::fileExists(exeNewFilename))
-	{
-		Log(LOG_ERROR) << "Update step 11 failed.";
-		return;
-	}
-
-	// 12. delete exe zip (again)
-	if (CrossPlatform::fileExists(exeZipFilename))
-	{
-		if (CrossPlatform::deleteFile(exeZipFilename))
-			Log(LOG_INFO) << "Update step 12 done.";
-		else return;
-	}
-
-	// 13. create the update batch file
-	{
-		std::ofstream batch;
-		batch.open("oxce-upd.bat", std::ios::out);
-
-		batch << "@echo OFF\n";
-		batch << "echo OpenXcom is updating, please wait...\n";
-		batch << "timeout 5\n";
-		if (!_debugInVisualStudio)
-		{
-			batch << "echo Removing the old version...\n";
-			batch << "del " << exeFilenameOnly << "\n";
-			batch << "echo Preparing the new version...\n";
-			batch << "ren OpenXcomEx.exe.new " << exeFilenameOnly << "\n";
-			batch << "echo Starting the new version...\n";
-			batch << "timeout 2\n";
-			batch << "start " << exeFilenameOnly << "\n"; // asynchronous
-			batch << "exit\n";
-		}
-
-		batch.close();
-	}
-
-	// 14. Clear the SDL event queue (i.e. ignore input from impatient users)
-	SDL_Event e;
-	while (SDL_PollEvent(&e))
-	{
-		// do nothing
-	}
-
-	Log(LOG_INFO) << "Update prepared, restarting.";
-	getGame()->setUpdateFlag(true);
-	getGame()->quit();
-#endif
+//#ifdef _WIN32
+//	const std::string subdir = "v" + _newVersion + "/";
+//
+//#ifdef _WIN64
+//	const std::string relativeExeZipFileName = _debugInVisualStudio ? "Debug/exe64.zip" : "exe64.zip";
+//#else
+//	const std::string relativeExeZipFileName = _debugInVisualStudio ? "Debug/exe.zip" : "exe.zip";
+//#endif
+//	const std::string relativeExeNewFileName = _debugInVisualStudio ? "Debug/OpenXcomEx.exe.new" : "OpenXcomEx.exe.new";
+//
+//	const std::string commonDirFilename = Options::getDataFolder() + "common";
+//	const std::string commonZipFilename = Options::getDataFolder() + "common.zip";
+//	const std::string commonZipUrl = "https://openxcom.org/oxce/" + subdir + "common.zip";
+//
+//	const std::string standardDirFilename = Options::getDataFolder() + "standard";
+//	const std::string standardZipFilename = Options::getDataFolder() + "standard.zip";
+//	const std::string standardZipUrl = "https://openxcom.org/oxce/" + subdir + "standard.zip";
+//
+//	const std::string now = CrossPlatform::now();
+//
+//	const std::string exePath = CrossPlatform::getExeFolder();
+//	const std::string exeFilenameOnly = CrossPlatform::getExeFilename(false);
+//	const std::string exeFilenameFullPath = CrossPlatform::getExeFilename(true);
+//
+//#ifdef _WIN64
+//	const std::string exeZipFilename = exePath + "exe64.zip";
+//#else
+//	const std::string exeZipFilename = exePath + "exe.zip";
+//#endif
+//	const std::string exeNewFilename = exePath + "OpenXcomEx.exe.new";
+//#ifdef _WIN64
+//	const std::string exeZipUrl = "https://openxcom.org/oxce/" + subdir + "exe64.zip";
+//#else
+//	const std::string exeZipUrl = "https://openxcom.org/oxce/" + subdir + "exe.zip";
+//#endif
+//
+//	// stop using the common/standard zip files, so that we can back them up
+//	FileMap::clear(true, false);
+//
+//	// 0. backup the exe
+//	if (CrossPlatform::fileExists(exeFilenameFullPath))
+//	{
+//		if (CrossPlatform::copyFile(exeFilenameFullPath, exeFilenameFullPath + "-" + now + ".bak"))
+//			Log(LOG_INFO) << "Update step 0 done.";
+//		else return;
+//	}
+//
+//	// 1. backup common dir
+//	if (CrossPlatform::fileExists(commonDirFilename))
+//	{
+//		if (CrossPlatform::moveFile(commonDirFilename, commonDirFilename + "-" + now))
+//			Log(LOG_INFO) << "Update step 1 done.";
+//		else return;
+//	}
+//
+//	// 2. backup common zip
+//	if (CrossPlatform::fileExists(commonZipFilename))
+//	{
+//		if (CrossPlatform::moveFile(commonZipFilename, commonZipFilename + "-" + now + ".bak"))
+//			Log(LOG_INFO) << "Update step 2 done.";
+//		else return;
+//	}
+//
+//	// 3. backup standard dir
+//	if (CrossPlatform::fileExists(standardDirFilename))
+//	{
+//		if (CrossPlatform::moveFile(standardDirFilename, standardDirFilename + "-" + now))
+//			Log(LOG_INFO) << "Update step 3 done.";
+//		else return;
+//	}
+//
+//	// 4. backup standard zip
+//	if (CrossPlatform::fileExists(standardZipFilename))
+//	{
+//		if (CrossPlatform::moveFile(standardZipFilename, standardZipFilename + "-" + now + ".bak"))
+//			Log(LOG_INFO) << "Update step 4 done.";
+//		else return;
+//	}
+//
+//	// 5. delete exe zip
+//	if (CrossPlatform::fileExists(exeZipFilename))
+//	{
+//		if (CrossPlatform::deleteFile(exeZipFilename))
+//			Log(LOG_INFO) << "Update step 5 done.";
+//		else return;
+//	}
+//
+//	// 6. delete unpacked exe zip
+//	if (CrossPlatform::fileExists(exeNewFilename))
+//	{
+//		if (CrossPlatform::deleteFile(exeNewFilename))
+//			Log(LOG_INFO) << "Update step 6 done.";
+//		else return;
+//	}
+//
+//	// 7. download common zip
+//	if (CrossPlatform::downloadFile(commonZipUrl, commonZipFilename))
+//	{
+//		Log(LOG_INFO) << "Update step 7 done.";
+//	}
+//	else return;
+//
+//	// 8. download standard zip
+//	if (CrossPlatform::downloadFile(standardZipUrl, standardZipFilename))
+//	{
+//		Log(LOG_INFO) << "Update step 8 done.";
+//	}
+//	else return;
+//
+//	// 9. download exe zip
+//	if (CrossPlatform::downloadFile(exeZipUrl, exeZipFilename))
+//	{
+//		Log(LOG_INFO) << "Update step 9 done.";
+//	}
+//	else return;
+//
+//	// 10. extract exe zip
+//	if (CrossPlatform::fileExists(exeZipFilename) && CrossPlatform::fileExists(relativeExeZipFileName))
+//	{
+//		const std::string file_to_extract = "OpenXcomEx.exe.new";
+//		SDL_RWops *rwo_read = FileMap::zipGetFileByName(relativeExeZipFileName, file_to_extract);
+//		if (!rwo_read) {
+//			Log(LOG_ERROR) << "Step 10a: failed to unzip file.";
+//			return;
+//		}
+//		size_t size = 0;
+//		auto data = SDL_LoadFile_RW(rwo_read, &size, SDL_TRUE);
+//		if (!data) {
+//			Log(LOG_ERROR) << "Step 10b: failed to unzip file." << SDL_GetError(); // out of memory for a copy ?
+//			return;
+//		}
+//		SDL_RWops *rwo_write = SDL_RWFromFile(relativeExeNewFileName.c_str(), "wb");
+//		if (!rwo_write) {
+//			Log(LOG_ERROR) << "Step 10c: failed to open exe.new file for writing." << SDL_GetError();
+//			return;
+//		}
+//		auto wsize = SDL_RWwrite(rwo_write, data, (int)size, 1);
+//		if (wsize != 1) {
+//			Log(LOG_ERROR) << "Step 10d: failed to write exe.new file." << SDL_GetError();
+//			return;
+//		}
+//		if (SDL_RWclose(rwo_write)) {
+//			Log(LOG_ERROR) << "Step 10e: failed to write exe.new file." << SDL_GetError();
+//			return;
+//		}
+//	} else {
+//		Log(LOG_ERROR) << "Update step 10 failed."; // exe dir and working dir not the same
+//		return;
+//	}
+//
+//	// 11. check if extracted exe exists
+//	if (!CrossPlatform::fileExists(exeNewFilename))
+//	{
+//		Log(LOG_ERROR) << "Update step 11 failed.";
+//		return;
+//	}
+//
+//	// 12. delete exe zip (again)
+//	if (CrossPlatform::fileExists(exeZipFilename))
+//	{
+//		if (CrossPlatform::deleteFile(exeZipFilename))
+//			Log(LOG_INFO) << "Update step 12 done.";
+//		else return;
+//	}
+//
+//	// 13. create the update batch file
+//	{
+//		std::ofstream batch;
+//		batch.open("oxce-upd.bat", std::ios::out);
+//
+//		batch << "@echo OFF\n";
+//		batch << "echo OpenXcom is updating, please wait...\n";
+//		batch << "timeout 5\n";
+//		if (!_debugInVisualStudio)
+//		{
+//			batch << "echo Removing the old version...\n";
+//			batch << "del " << exeFilenameOnly << "\n";
+//			batch << "echo Preparing the new version...\n";
+//			batch << "ren OpenXcomEx.exe.new " << exeFilenameOnly << "\n";
+//			batch << "echo Starting the new version...\n";
+//			batch << "timeout 2\n";
+//			batch << "start " << exeFilenameOnly << "\n"; // asynchronous
+//			batch << "exit\n";
+//		}
+//
+//		batch.close();
+//	}
+//
+//	// 14. Clear the SDL event queue (i.e. ignore input from impatient users)
+//	SDL_Event e;
+//	while (SDL_PollEvent(&e))
+//	{
+//		// do nothing
+//	}
+//
+//	Log(LOG_INFO) << "Update prepared, restarting.";
+//	getGame()->setUpdateFlag(true);
+//	getGame()->quit();
+//#endif
 }
 
 /**

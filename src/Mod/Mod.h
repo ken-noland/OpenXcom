@@ -150,7 +150,6 @@ private:
 	Sound *_muteSound;
 	std::string _playingMusic, _currentMusicTrack;
 
-	std::map<std::string, Palette*> _palettes;
 	std::map<std::string, Font*> _fonts;
 	std::map<std::string, Surface*> _surfaces;
 	std::map<std::string, SurfaceSet*> _sets;
@@ -466,10 +465,8 @@ public:
 	void playMusic(const std::string &name, int id = 0);
 	/// Gets a particular sound.
 	Sound *getSound(const std::string &set, int sound) const;
-	/// Gets all palettes.
-	const std::map<std::string, Palette*> &getPalettes() const { return _palettes; }
 	/// Gets a particular palette.
-	Palette *getPalette(const std::string &name, bool error = true) const;
+	[[deprecated("Use PaletteSystem::getPalette")]] Palette *getPalette(const std::string &name, bool error = true) const;
 	/// Gets list of voxel data.
 	const std::vector<Uint16> *getVoxelData() const;
 	/// Returns a specific sound from either the land or underwater sound set.

@@ -18,11 +18,13 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../../Engine/Surface.h"
+#include "PaletteHandle.h"
 #include <entt/entt.hpp>
 
 namespace OpenXcom
 {
 
+class Palette;
 class DrawableComponent;
 
 /// The SurfaceComponent class will eventually be the raw data model, but for now I am
@@ -53,8 +55,8 @@ public:
 	SurfaceFactory(entt::registry& registry); // KN NOTE: I do plan on passing the renderer here so that Surface is abstracted.
 	~SurfaceFactory();
 
-	entt::handle createSurface(const std::string& name, int x, int y, int width, int height, SDL_Color* palette, int firstColor, int nColors);
-	entt::handle createInteractiveSurface(const std::string& name, int x, int y, int width, int height, SDL_Color* palette, int firstColor, int nColors);
+	entt::handle createSurface(const std::string& name, int x, int y, int width, int height, PaletteHandle palette);
+	entt::handle createInteractiveSurface(const std::string& name, int x, int y, int width, int height, PaletteHandle palette);
 };
 
 struct ScreenRectComponent
