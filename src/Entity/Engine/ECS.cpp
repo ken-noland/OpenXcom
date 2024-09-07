@@ -25,6 +25,7 @@
 #include "Surface.h"
 #include "Palette.h"
 #include "Hierarchical.h"
+#include "Input.h"
 
 #include "../../Engine/Timer.h"
 
@@ -47,6 +48,8 @@ ECS::ECS()
 		registerSystem<TickableSystem>();
 		registerSystem<DrawableSystem>();
 	}
+
+	registerSystem<InputHandlerSystem>();
 
 	registerSystem<HierarchySystem>();
 

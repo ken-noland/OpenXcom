@@ -21,7 +21,12 @@
 #include <string>
 #include <memory>
 #include <SDL_events.h>
+
 #include "../Entity/Engine/ECS.h"
+
+#if defined(ENABLE_ENTITY_INSPECTOR)
+#include "../Inspector/Inspector.h"
+#endif
 
 namespace OpenXcom
 {
@@ -68,6 +73,10 @@ private:
 
 	/// central entity component system
 	ECS _ecs;
+
+	#if defined(ENABLE_ENTITY_INSPECTOR)
+	Inspector _inspector;
+	#endif
 
 	/// Lua mods
 	std::unique_ptr<Lua::LuaMod> _luaMod;

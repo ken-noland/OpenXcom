@@ -40,9 +40,10 @@
 #include "../Mod/RuleInterface.h"
 
 #include "../Entity/Engine/Surface.h"
+#include "../Entity/Engine/Input.h"
 #include "../Entity/Engine/Palette.h"
-#include "../Entity/Engine/Tickable.h"
 #include "../Entity/Engine/Drawable.h"
+#include "../Entity/Engine/Hierarchical.h"
 #include "../Entity/Interface/Window.h"
 #include "../Entity/Interface/Text.h"
 #include "../Entity/Interface/Button.h"
@@ -69,8 +70,11 @@ State::State(const std::string& name, bool screen)
  */
 State::~State()
 {
-	for(entt::entity surfaceEnt : _surfaces)
+	HierarchySystem& hierarchySystem = getGame()->getECS().getSystem<HierarchySystem>();
+	for (const entt::handle& surfaceEnt : _surfaces)
 	{
+		hierarchySystem.visitRecursive(surfaceEnt, [this](entt::handle entity) { entity.destroy(); });
+
 		getRegistry().raw().destroy(surfaceEnt);
 	}
 }
@@ -377,20 +381,18 @@ void State::update()
  */
 void State::handle(Action *action)
 {
-	//if (!_modal)
-	//{
-	//	for (std::vector<entt::handle>::reverse_iterator i = _surfaces.rbegin(); i != _surfaces.rend(); ++i)
-	//	{
-	//		Surface* surface = (*i).get<SurfaceComponent>().getSurface();
-	//		InteractiveSurface* j = dynamic_cast<InteractiveSurface*>(surface);
-	//		if (j != 0)
-	//			j->handle(action, this);
-	//	}
-	//}
-	//else
-	//{
-	//	_modal->handle(action, this);
-	//}
+	if (!_modal)
+	{
+		InputHandlerSystem& inputSystem = getSystem<InputHandlerSystem>();
+		for (entt::handle& surfaceEnt : _surfaces)
+		{
+			inputSystem.handle(surfaceEnt, action);
+		}
+	}
+	else
+	{
+		_modal->handle(action, this);
+	}
 }
 
 /**

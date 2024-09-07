@@ -119,6 +119,8 @@ entt::handle InterfaceFactory::createArrowButton(const std::string& name, ArrowS
 
 entt::handle InterfaceFactory::createText(const CreateTextParams& params)
 {
+	HierarchySystem& hierarchySystem = _ecs.getSystem<HierarchySystem>();
+
 	TextSystem& textSystem = _ecs.getSystem<TextSystem>();
 
 	std::string ruleCategory = params.ruleCategory.empty() ? "text" : params.ruleCategory;
@@ -133,7 +135,12 @@ entt::handle InterfaceFactory::createText(const CreateTextParams& params)
 	Element element = getElementFromRule(params.ruleCategory, params.ruleID, params.x, params.y, params.width, params.height, params.parent);
 	entt::handle text = _surfaceFactory.createSurface(params.name, element.x, element.y, element.w, element.h, palette);
 
-	SurfaceComponent& surfaceComponent = text.get<SurfaceComponent>();
+	
+	if (params.parent.valid())
+	{
+		hierarchySystem.addChild(params.parent, text);
+	}
+
 	TextComponent& textComponent = text.emplace<TextComponent>(params.text);
 
 	Font* bigFont = params.bigFont;
@@ -211,9 +218,6 @@ entt::handle InterfaceFactory::createTextButton(const CreateTextButtonParams& pa
 	};
 
 	entt::handle text = createText(textParams);
-
-	// add the text to the button
-	hierarchySystem.addChild(button, text);
 
 	return button;
 }

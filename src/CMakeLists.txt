@@ -1,3 +1,5 @@
+# Define option to enable or disable the EntityInspector
+option(ENABLE_ENTITY_INSPECTOR "Enable the EntityInspector for debugging and editing entities." ON)
 
 set ( root_src
   lodepng.cpp
@@ -439,6 +441,7 @@ set ( entity_engine_src
   Entity/Engine/Drawable.cpp
   Entity/Engine/ECS.cpp
   Entity/Engine/Hierarchical.cpp
+  Entity/Engine/Input.cpp
   Entity/Engine/Palette.cpp
   Entity/Engine/Surface.cpp
   Entity/Engine/Tickable.cpp
@@ -461,6 +464,12 @@ set ( entity_interface_src
   Entity/Interface/Window.cpp
 )
 
+set (inspector_src
+  Inspector/Inspector.cpp
+  Inspector/InspectorFrame.cpp
+  Inspector/InspectorApp.cpp
+)
+
 set ( cxx_src
     ${root_src}
     ${basescape_src}
@@ -478,6 +487,10 @@ set ( cxx_src
     ${entity_game_src}
     ${entity_interface_src}
 )
+
+if(ENABLE_ENTITY_INSPECTOR)
+  list(APPEND cxx_src ${inspector_src})
+endif()
 
 set ( c_src
   ../libs/miniz/miniz.c
@@ -565,6 +578,38 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(EnTT)
 
+# Fetch SimpleRTTR
+#  SimpleRTTR is used for reflection in the Entity Component System
+set(SIMPLERTTR_BUILD_TESTS OFF CACHE BOOL "Build SimpleRTTR Tests and Examples")
+FetchContent_Declare(
+  SimpleRTTR
+  GIT_REPOSITORY https://github.com/ken-noland/SimpleRTTR
+  GIT_TAG "origin/main"
+)
+FetchContent_MakeAvailable(SimpleRTTR)
+
+# Fetch wxWidgets
+#  wxWidgets is used for the entity inspector
+if(ENABLE_ENTITY_INSPECTOR)
+
+    # ------------------ wxWidgets ------------------
+    set(wxBUILD_SHARED OFF CACHE BOOL "Build wx libraries as shared libs")
+    set(wxBUILD_PRECOMP OFF CACHE BOOL "Use precompiled headers")
+    set(wxBUILD_MONOLITHIC OFF CACHE BOOL "Build a single library")
+
+    set(wxWidgets_USE_STATIC 1)
+
+    FetchContent_Declare(
+        wxWidgets 
+        GIT_REPOSITORY https://github.com/wxWidgets/wxWidgets.git
+        GIT_TAG        v3.2.1
+        GIT_SHALLOW     TRUE
+    )
+    
+    FetchContent_GetProperties(wxWidgets)
+    FetchContent_MakeAvailable(wxWidgets)
+    
+endif() # ENABLE_ENTITY_INSPECTOR
 
 set ( data_install_dir bin )
 if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
@@ -702,9 +747,31 @@ if (( APPLE AND CREATE_BUNDLE ) OR CPACK_GENERATOR STREQUAL "7Z" )
   set ( CMAKE_INSTALL_BINDIR "." )
 endif ()
 
+set(openxcom_defines
+  YAML_CPP_STATIC_DEFINE
+)
+
+set(openxcom_includes
+  ${yaml-cpp_SOURCE_DIR}/include
+  ${lua_SOURCE_DIR}
+  ${EnTT_SOURCE_DIR}/single_include
+)
+
+set(openxcom_libs
+  yaml-cpp::yaml-cpp
+  lua
+)
+
+if(ENABLE_ENTITY_INSPECTOR)
+  list(APPEND openxcom_defines ENABLE_ENTITY_INSPECTOR)
+  list(APPEND openxcom_includes ${wxWidgets_INCLUDE_DIRS})
+  list(APPEND openxcom_libs wxbase wxcore)
+endif()
+
 add_library(openxcom_lib STATIC ${openxcom_src})
-target_include_directories(openxcom_lib PUBLIC ${yaml-cpp_SOURCE_DIR}/include ${lua_SOURCE_DIR} ${EnTT_SOURCE_DIR}/single_include)
-target_compile_definitions(openxcom_lib PUBLIC YAML_CPP_STATIC_DEFINE)
+target_include_directories(openxcom_lib PUBLIC ${openxcom_includes})
+target_compile_definitions(openxcom_lib PUBLIC ${openxcom_defines})
+target_link_libraries(openxcom_lib PUBLIC wxbase wxcore)
 
 add_executable ( openxcom  ${application_type} main.cpp ${openxcom_icon})
 
@@ -737,7 +804,7 @@ if (WIN32)
   set(WIN32_LIBS imagehlp dbghelp)
 endif(WIN32)
 
-target_link_libraries ( openxcom_lib PUBLIC ${system_libs} ${PKG_DEPS_LDFLAGS} ${WIN32_LIBS} yaml-cpp::yaml-cpp lua )
+target_link_libraries ( openxcom_lib PUBLIC ${system_libs} ${PKG_DEPS_LDFLAGS} ${WIN32_LIBS} ${openxcom_libs} )
 target_link_libraries ( openxcom PUBLIC openxcom_lib )
 
 # Pack libraries into bundle and link executable appropriately

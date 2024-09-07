@@ -46,7 +46,8 @@ class MainMenuState : public State
 private:
 	entt::handle _btnNewGame, _btnNewBattle, _btnLoad, _btnOptions, _btnMods, _btnQuit, _btnUpdate;
 	entt::handle _window;
-	Text *_txtTitle, *_txtUpdateInfo;
+	entt::handle _txtTitle;
+
 #ifdef _WIN32
 	bool _debugInVisualStudio;
 	std::string _newVersion;

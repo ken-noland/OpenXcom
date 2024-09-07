@@ -18,11 +18,16 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define OPENXCOM_VERSION_ENGINE "Lua"
-#define OPENXCOM_VERSION_SHORT "Lua 0.01"
-#define OPENXCOM_VERSION_LONG "0.0.1.0"
-#define OPENXCOM_VERSION_NUMBER 0,0,1,0
+#include "WxInclude.h"
 
-#ifndef OPENXCOM_VERSION_GIT
-#define OPENXCOM_VERSION_GIT " (v2024-09-05)"
-#endif
+namespace OpenXcom
+{
+
+class InspectorApp : public wxApp
+{
+public:
+	virtual bool OnInit() override;
+};
+
+
+}

@@ -83,11 +83,28 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 		.width = 256,
 		.height = 160,
 		.popup = WindowPopup::POPUP_BOTH,
-
 		.ruleID = "mainMenu",
-		.background = nullptr,		//use the background from the rules
 	};
 	_window = factory.createWindow(windowParams);
+		
+	// Title
+	std::ostringstream title;
+	title << tr("STR_OPENXCOM") << Unicode::TOK_NL_SMALL;
+	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
+	InterfaceFactory::CreateTextParams textTitleParams{
+		.text = title.str(),
+		.x = 32,
+		.y = 45,
+		.width = 256,
+		.height = 30,
+		.align = TextHAlign::ALIGN_CENTER,
+		.verticalAlign = TextVAlign::ALIGN_MIDDLE,
+		.isSmall = false,
+		.ruleID = "mainMenu",
+		.parent = _window
+	};
+
+	_txtTitle = factory.createText(textTitleParams);
 
 	// New Game
 	std::function<void(Action*)> btnNewGameClick = [this](Action* action) { getGame()->pushState(new NewGameState); };
@@ -123,129 +140,78 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	};
 	_btnNewBattle = factory.createTextButton(btnNewBattleParams);
 
-	//// Load
-	//std::function<void(Action*)> btnLoadClick = [this](Action* action) { getGame()->pushState(new ListLoadState(OPT_MENU)); };
-	//InterfaceFactory::CreateTextButtonParams btnLoadParams{"btnLoad", tr("STR_LOAD_SAVED_GAME"), 64, 118, 92, 20,
-	//	btnLoadClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
-	//_btnLoad = factory.createTextButton(btnLoadParams);
+	// Load
+	std::function<void(Action*)> btnLoadClick = [this](Action* action) { getGame()->pushState(new ListLoadState(OPT_MENU)); };
+	InterfaceFactory::CreateTextButtonParams btnLoadParams{
+		.name = "btnLoad",
+		.text = tr("STR_LOAD_SAVED_GAME"),
+		.x = 64,
+		.y = 118,
+		.width = 92,
+		.height = 20,
 
-	//// Options
-	//std::function<void(Action*)> btnOptionsClick = [this](Action* action) { getGame()->pushState(new OptionsVideoState(OPT_MENU)); };
-	//InterfaceFactory::CreateTextButtonParams btnOptionsParams{"btnOptions", tr("STR_OPTIONS"), 164, 118, 92, 20,
-	//	btnOptionsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
-	//_btnOptions = factory.createTextButton(btnOptionsParams);
+		.onLeftClickCallback = btnLoadClick,
 
-	//// Mods
-	//std::function<void(Action*)> btnModsClick = [this](Action* action) { getGame()->pushState(new ModListState); };
-	//InterfaceFactory::CreateTextButtonParams btnModsParams{"btnMods", tr("STR_MODS"), 64, 146, 92, 20,
-	//	btnModsClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
-	//_btnMods = factory.createTextButton(btnModsParams);
+		.ruleID = "mainMenu",
+		.parent = _window
+	};
+	_btnLoad = factory.createTextButton(btnLoadParams);
 
-	//// Quit
-	//std::function<void(Action*)> btnQuitClick = [this](Action* action) { getGame()->quit(); };
-	//InterfaceFactory::CreateTextButtonParams btnQuitParams{"btnQuit", tr("STR_QUIT"), 164, 146, 92, 20,
-	//	btnQuitClick, nullptr, getPalette(), 0, 256, "button", "mainMenu", _window};
-	//_btnQuit = factory.createTextButton(btnQuitParams);
+	// Options
+	std::function<void(Action*)> btnOptionsClick = [this](Action* action) { getGame()->pushState(new OptionsVideoState(OPT_MENU)); };
+	InterfaceFactory::CreateTextButtonParams btnOptionsParams{
+		.name = "btnOptions",
+		.text = tr("STR_OPTIONS"),
+		.x = 164,
+		.y = 118,
+		.width = 92,
+		.height = 20,
 
-	//_btnUpdate = factory.createTextButton("btnUpdate", tr("STR_UPDATE"), 72, 16, 209, 27, [this](Action* action) { btnUpdateClick(action); });
-	//_txtUpdateInfo = new Text(320, 17, 0, 11);
-	_txtTitle = new Text(256, 30, 32, 45);
+		.onLeftClickCallback = btnOptionsClick,
+
+		.ruleID = "mainMenu",
+		.parent = _window
+	};
+	_btnOptions = factory.createTextButton(btnOptionsParams);
+
+	// Mods
+	std::function<void(Action*)> btnModsClick = [this](Action* action) { getGame()->pushState(new ModListState); };
+	InterfaceFactory::CreateTextButtonParams btnModsParams
+	{
+		.name = "btnMods",
+		.text = tr("STR_MODS"),
+		.x = 64,
+		.y = 146,
+		.width = 92,
+		.height = 20,
+
+		.onLeftClickCallback = btnModsClick,
+
+		.ruleID = "mainMenu",
+		.parent = _window
+	};
+	_btnMods = factory.createTextButton(btnModsParams);
+
+	// Quit
+	std::function<void(Action*)> btnQuitClick = [this](Action* action) { getGame()->quit(); };
+	InterfaceFactory::CreateTextButtonParams btnQuitParams
+	{
+		.name = "btnQuit",
+		.text = tr("STR_QUIT"),
+		.x = 164,
+		.y = 146,
+		.width = 92,
+		.height = 20,
+
+		.onLeftClickCallback = btnQuitClick,
+
+		.ruleID = "mainMenu",
+		.parent = _window
+	};
+	_btnQuit = factory.createTextButton(btnQuitParams);
 
 
 	add(_window, "window", "mainMenu");
-	//add(_btnNewGame, "button", "mainMenu");
-	//add(_btnNewBattle, "button", "mainMenu");
-	//add(_btnLoad, "button", "mainMenu");
-	//add(_btnOptions, "button", "mainMenu");
-	//add(_btnMods, "button", "mainMenu");
-	//add(_btnQuit, "button", "mainMenu");
-	////add(_btnUpdate, "button", "mainMenu");
-	////add(_txtUpdateInfo, "text", "mainMenu");
-	add(_txtTitle, "text", "mainMenu");
-
-	//centerAllSurfaces();
-
-	// Set up objects
-	//setWindowBackground(_window, "mainMenu");
-
-	//_btnUpdate->setText(tr("STR_UPDATE"));
-	//_btnUpdate->onMouseClick((ActionHandler)& MainMenuState::btnUpdateClick);
-	//_btnUpdate->setVisible(false);
-
-	//_txtUpdateInfo->setAlign(TextHAlign::ALIGN_CENTER);
-	//_txtUpdateInfo->setWordWrap(true);
-	//_txtUpdateInfo->setText(tr("STR_LATEST_VERSION_INFO"));
-	//_txtUpdateInfo->setVisible(false);
-
-//#ifdef _WIN32
-//	//_debugInVisualStudio = true; // uncomment when debugging in Visual Studio (working dir and exe dir are not the same)
-//
-//	// delete (old) update batch file
-//	if (updateCheck && CrossPlatform::fileExists("oxce-upd.bat"))
-//	{
-//		CrossPlatform::deleteFile("oxce-upd.bat");
-//	}
-//
-//	if (updateCheck && Options::oxceUpdateCheck)
-//	{
-//		int checkProgress = 0;
-//		const std::string relativeExeFilename = (_debugInVisualStudio ? "Debug/" + CrossPlatform::getExeFilename(false) : CrossPlatform::getExeFilename(false));
-//		// (naive) check if working directory and exe directory are the same
-//		if (!relativeExeFilename.empty() && CrossPlatform::fileExists(relativeExeFilename))
-//		{
-//			checkProgress = 1;
-//			const std::string internetConnectionCheckUrl = "https://openxcom.org/";
-//			if (CrossPlatform::testInternetConnection(internetConnectionCheckUrl))
-//			{
-//				checkProgress = 2;
-//				const std::string updateMetadataUrl = "https://openxcom.org/oxce/update.txt";
-//				const std::string updateMetadataFilename = Options::getUserFolder() + "oxce-update.txt";
-//				if (CrossPlatform::downloadFile(updateMetadataUrl, updateMetadataFilename))
-//				{
-//					checkProgress = 3;
-//					if (CrossPlatform::fileExists(updateMetadataFilename))
-//					{
-//						checkProgress = 4;
-//						try
-//						{
-//							YAML::Node doc = YAML::Load(*CrossPlatform::readFile(updateMetadataFilename));
-//							checkProgress = 5;
-//							if (doc["updateInfo"])
-//							{
-//								checkProgress = 6;
-//								std::string msg = doc["updateInfo"].as<std::string>();
-//								_txtUpdateInfo->setText(msg);
-//								_txtUpdateInfo->setVisible(true);
-//							}
-//							else if (doc["newVersion"])
-//							{
-//								checkProgress = 7;
-//								_newVersion = doc["newVersion"].as<std::string>();
-////								if (CrossPlatform::isHigherThanCurrentVersion(_newVersion))
-////									_btnUpdate->setVisible(true);
-////								else
-////									_txtUpdateInfo->setVisible(true);
-//							}
-//							CrossPlatform::deleteFile(updateMetadataFilename);
-//						}
-//						catch (YAML::Exception &e)
-//						{
-//							Log(LOG_ERROR) << e.what();
-//						}
-//					}
-//				}
-//			}
-//		}
-//		Log(LOG_INFO) << "Update check status: " << checkProgress << "; newVersion: v" << _newVersion << "; ";
-//	}
-//#endif
-
-	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
-	_txtTitle->setBig();
-	std::ostringstream title;
-	title << tr("STR_OPENXCOM") << Unicode::TOK_NL_SMALL;
-	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
-	_txtTitle->setText(title.str());
 }
 
 void MainMenuState::init()

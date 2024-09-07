@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 #ifndef DUMP_CORE
 #ifdef _MSC_VER
 	// Uncomment to check memory leaks in VS
-	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 
 	SetUnhandledExceptionFilter(crashLogger);
 #ifdef __MINGW32__
@@ -132,6 +132,8 @@ int main(int argc, char *argv[])
 	{
 		CrossPlatform::startUpdateProcess();
 	}
+
+	_CrtDumpMemoryLeaks();
 
 	return EXIT_SUCCESS;
 }

@@ -65,6 +65,11 @@ struct ScreenRectComponent
 	ScreenRectComponent(int x, int y, int width, int height)
 		: x(x), y(y), width(width), height(height) { }
 
+	bool contains(int x, int y) const
+	{
+		return x >= this->x && x < this->x + width && y >= this->y && y < this->y + height;
+	}
+
 	int x;
 	int y;
 	int width;

@@ -38,6 +38,9 @@
 #include <SDL_mixer.h>
 #include <SDL_thread.h>
 
+#include "../Entity/Engine/Palette.h"
+#include "../Engine/Palette.h"
+
 namespace OpenXcom
 {
 
@@ -74,7 +77,11 @@ StartState::StartState()
 	_cursor = new Text(_font->getWidth(), _font->getHeight(), 0, 0, _font, _font, _lang);
 	_timer = new Timer(150);
 
-	setStatePalette(Font::TerminalColors, 0, (int)std::size(Font::TerminalColors));
+	// Set up palette
+	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
+	PaletteHandle paletteHandle = paletteSystem.addPalette("Terminal", Font::TerminalColors, 0, (int)std::size(Font::TerminalColors));
+	Palette* palette = paletteSystem.getPalette(paletteHandle);
+	setStatePalette(palette->getColors(), 0, palette->getColorCount());
 
 	add(_text);
 	add(_cursor);

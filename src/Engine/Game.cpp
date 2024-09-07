@@ -144,6 +144,11 @@ Game::Game(const std::string &title)
 	_lang = new Language();
 
 	_timeOfLastFrame = 0;
+
+	
+	#if defined(ENABLE_ENTITY_INSPECTOR)
+	_inspector.create();
+	#endif
 }
 
 /**
@@ -151,6 +156,10 @@ Game::Game(const std::string &title)
  */
 Game::~Game()
 {
+	#if defined(ENABLE_ENTITY_INSPECTOR)
+	_inspector.destroy();
+	#endif
+
 	Sound::stop();
 	Music::stop();
 
