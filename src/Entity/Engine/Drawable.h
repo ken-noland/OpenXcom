@@ -20,6 +20,7 @@
 #include "Delegate.h"
 #include <entt/entt.hpp>
 
+
 namespace OpenXcom
 {
 
@@ -27,11 +28,11 @@ class SurfaceComponent;//TEMP
 
 using DrawableCallback = std::function<void()>;
 
-class DrawableComponent
+struct DrawableComponent
 {
+public:
 	MulticastDelegate<void()> _drawables;
 
-public:
 	DrawableComponent();
 	~DrawableComponent();
 

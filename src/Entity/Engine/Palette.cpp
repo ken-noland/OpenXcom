@@ -24,6 +24,14 @@
 #include "../../Mod/Mod.h"
 #include "../../Mod/RuleInterface.h"
 
+
+#include <simplerttr.h>
+SIMPLERTTR
+{
+	SimpleRTTR::Registration().Type<OpenXcom::PaletteComponent>();
+}
+
+
 namespace OpenXcom
 {
 

@@ -22,8 +22,13 @@
 #include "../Interface/Button.h"
 #include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
-#include "../../Engine/Registry.h"
 #include "ECS.h"
+
+#include <simplerttr.h>
+SIMPLERTTR
+{
+	SimpleRTTR::Registration().Type<OpenXcom::DrawableComponent>();
+}
 
 namespace OpenXcom
 {

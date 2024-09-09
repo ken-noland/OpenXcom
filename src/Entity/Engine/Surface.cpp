@@ -23,6 +23,13 @@
 #include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
 
+
+#include <simplerttr.h>
+SIMPLERTTR
+{
+	SimpleRTTR::Registration().Type<OpenXcom::SurfaceComponent>();
+}
+
 namespace OpenXcom
 {
 
@@ -48,7 +55,7 @@ SurfaceFactory::~SurfaceFactory()
 entt::handle SurfaceFactory::createSurface(const std::string& name, int x, int y, int width, int height, PaletteHandle palette)
 {
 	entt::handle entity = entt::handle(_registry, _registry.create());
-	entity.emplace<Name>(name);
+	entity.emplace<NameComponent>(name);
 
 	//this is mostly a hack until I get surface converted to a pure component
 	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);

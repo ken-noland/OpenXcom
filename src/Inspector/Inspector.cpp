@@ -1,4 +1,3 @@
-#include "Inspector.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -21,29 +20,31 @@
 #include "InspectorApp.h"
 #include "InspectorFrame.h"
 
+#include "../Engine/Game.h"
+
 namespace OpenXcom
 {
 
 
 Inspector::Inspector()
 {
-	if (!wxTheApp)
-	{
-		_app = new InspectorApp();              // Create a new wxApp instance
-		wxApp::SetInstance(_app); // Create a new wxApp instance
-		wxEntryStart(0, nullptr);        // Initialize wxWidgets
-		wxTheApp->CallOnInit();          // Initialize the app
-	}
-	_frame = new InspectorFrame("OpenXcom Inspector"); // Create the inspector window
+
 }
 
 Inspector::~Inspector()
 {
-	destroy();
 }
 
 void Inspector::create()
 {
+	if (!wxTheApp)
+	{
+		_app = new InspectorApp(); // Create a new wxApp instance
+		wxApp::SetInstance(_app);  // Create a new wxApp instance
+		wxEntryStart(0, nullptr);  // Initialize wxWidgets
+		wxTheApp->CallOnInit();    // Initialize the app
+	}
+	_frame = new InspectorFrame("OpenXcom Inspector", getGame()->getECS()); // Create the inspector window
 	show();
 }
 

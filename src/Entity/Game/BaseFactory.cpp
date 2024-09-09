@@ -37,7 +37,7 @@ entt::handle BaseFactory::create(const Mod& mod)
 	entt::entity baseId = _registry.create();
 	_registry.emplace<Base>(baseId, &mod);
 	_registry.emplace<Index>(baseId, _nextBaseIndex++);
-	_registry.emplace<Name>(baseId, "");
+	_registry.emplace<NameComponent>(baseId, "");
 	_registry.emplace<GeoPosition>(baseId, 0.0, 0.0);
 
 	// velocity!? Well, why not. Costs little if it does not move, and if we want to let them move later, we can!
@@ -63,7 +63,7 @@ entt::handle BaseFactory::create(const Mod& mod, const YAML::Node& node, SavedGa
 	};
 
 	_registry.emplace<GeoPosition>(baseId, position);
-	_registry.emplace<Name>(baseId, node["name"].as<std::string>(""));
+	_registry.emplace<NameComponent>(baseId, node["name"].as<std::string>(""));
 
 	// velocity!? Well, why not. Costs little if it does not move, and if we want to let them move later, we can!
 	_registry.emplace<GeoVelocity>(baseId, 0.0, 0.0);

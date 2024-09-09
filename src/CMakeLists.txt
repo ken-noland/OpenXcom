@@ -465,6 +465,7 @@ set ( entity_interface_src
 )
 
 set (inspector_src
+  Inspector/EntityPanel.cpp
   Inspector/Inspector.cpp
   Inspector/InspectorFrame.cpp
   Inspector/InspectorApp.cpp
@@ -581,6 +582,7 @@ FetchContent_MakeAvailable(EnTT)
 # Fetch SimpleRTTR
 #  SimpleRTTR is used for reflection in the Entity Component System
 set(SIMPLERTTR_BUILD_TESTS OFF CACHE BOOL "Build SimpleRTTR Tests and Examples")
+set(SIMPLERTTR_BUILD_EXAMPLES OFF CACHE BOOL "Build SimpleRTTR Tests and Examples")
 FetchContent_Declare(
   SimpleRTTR
   GIT_REPOSITORY https://github.com/ken-noland/SimpleRTTR
@@ -755,6 +757,7 @@ set(openxcom_includes
   ${yaml-cpp_SOURCE_DIR}/include
   ${lua_SOURCE_DIR}
   ${EnTT_SOURCE_DIR}/single_include
+  ${SimpleRTTR_SOURCE_DIR}/include
 )
 
 set(openxcom_libs

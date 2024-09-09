@@ -25,5 +25,8 @@
 #include <wx/wx.h>
 #include <wx/notebook.h>
 #include <wx/treectrl.h>
+#include <wx/timer.h>
+#include <wx/splitter.h>
+#include <wx/srchctrl.h>
 
 #pragma pop_macro("Log")

@@ -43,7 +43,7 @@ entt::handle UfoFactory::create(const RuleUfo& ruleUfo, int uniqueId, int hunter
 	entt::entity ufoId = _registry.create();
 	_registry.emplace<Ufo>(ufoId, ruleUfo, uniqueId, hunterKillerPercentage, huntMode, huntBehavior);
 
-	_registry.emplace<Name>(ufoId, "");
+	_registry.emplace<NameComponent>(ufoId, "");
 
 	_registry.emplace<Type>(ufoId, ruleUfo.getType());
 

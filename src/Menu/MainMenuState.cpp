@@ -92,6 +92,7 @@ MainMenuState::MainMenuState(bool updateCheck) : State("MainMenuState", true)
 	title << tr("STR_OPENXCOM") << Unicode::TOK_NL_SMALL;
 	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
 	InterfaceFactory::CreateTextParams textTitleParams{
+		.name = "txtTitle",
 		.text = title.str(),
 		.x = 32,
 		.y = 45,

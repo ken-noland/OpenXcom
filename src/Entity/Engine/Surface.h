@@ -25,7 +25,7 @@ namespace OpenXcom
 {
 
 class Palette;
-class DrawableComponent;
+struct DrawableComponent;
 
 /// The SurfaceComponent class will eventually be the raw data model, but for now I am
 /// using it as a temporary placeholder for the Surface class.

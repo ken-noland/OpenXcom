@@ -23,20 +23,28 @@
 namespace OpenXcom
 {
 
+class ECS;
+class EntityPanel;
+
 class InspectorFrame : public wxFrame
 {
 private:
 	void SetupUI();
-	void PopulateEntityTree();
 
 	void OnClose(wxCloseEvent& event);
 
-	wxNotebook* notebook;
-	wxTreeCtrl* entityTree;
-	wxListBox* systemList;
+
+	wxNotebook* _notebook;
+	wxListBox* _systemList;
+	EntityPanel* _entityPanel;
+
+	ECS& _ecs;
+
+		
+    //wxDECLARE_EVENT_TABLE();
 
 public:
-	InspectorFrame(const wxString& title);
+	InspectorFrame(const wxString& title, ECS& ecs);
 };
 
 }

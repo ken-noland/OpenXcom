@@ -20,6 +20,7 @@
 #include <entt/entt.hpp>
 #include <vector>
 
+
 namespace OpenXcom
 {
 
