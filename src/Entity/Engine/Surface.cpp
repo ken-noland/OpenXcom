@@ -27,7 +27,19 @@
 #include <simplerttr.h>
 SIMPLERTTR
 {
+	/// RTTR Registration for SurfaceComponent
 	SimpleRTTR::Registration().Type<OpenXcom::SurfaceComponent>();
+
+	/// RTTR Registration for ScreenRectComponent
+	SimpleRTTR::Registration().Type<OpenXcom::ScreenRectComponent>()
+		.Property(&OpenXcom::ScreenRectComponent::x, "x")
+		.Property(&OpenXcom::ScreenRectComponent::y, "y")
+		.Property(&OpenXcom::ScreenRectComponent::width, "width")
+		.Property(&OpenXcom::ScreenRectComponent::height, "height");
+
+	// putting this here for now because it's been optimized out by the linker when it is in Name.cpp
+	SimpleRTTR::Registration().Type<OpenXcom::NameComponent>()
+		.Property(&OpenXcom::NameComponent::name, "name");
 }
 
 namespace OpenXcom

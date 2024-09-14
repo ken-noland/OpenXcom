@@ -26,8 +26,21 @@
 #include "../Engine/Hierarchical.h"
 #include "../Engine/Drawable.h"
 
+#include "../Common/RTTR.h"
+
+
 namespace OpenXcom
 {
+
+SIMPLERTTR
+{
+	/// RTTR Registration for ButtonComponent
+	SimpleRTTR::Registration().Type<ButtonComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<ButtonComponent>)
+		.Property(&ButtonComponent::_color, "color")
+		.Property(&ButtonComponent::_contrast, "contrast")
+		.Property(&ButtonComponent::_geoscapeButton, "geoscapeButton");
+}
 
 void ButtonSystem::setColor(entt::handle entity, Uint8 color)
 {

@@ -23,7 +23,7 @@
 namespace OpenXcom
 {
 
-class SurfaceComponent; // TEMP
+struct SurfaceComponent; // TEMP
 
 using TickableCallback = std::function<void()>;
 

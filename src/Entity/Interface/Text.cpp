@@ -27,8 +27,55 @@
 #include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
 
+#include "../Common/RTTR.h"
+
+
 namespace OpenXcom
 {
+
+SIMPLERTTR
+{
+	SimpleRTTR::Registration().Type<TextHAlign>()
+		.Value(TextHAlign::ALIGN_LEFT, "ALIGN_LEFT")
+		.Value(TextHAlign::ALIGN_CENTER, "ALIGN_CENTER")
+		.Value(TextHAlign::ALIGN_RIGHT, "ALIGN_RIGHT");
+
+	SimpleRTTR::Registration().Type<TextVAlign>()
+		.Value(TextVAlign::ALIGN_TOP, "ALIGN_TOP")
+		.Value(TextVAlign::ALIGN_MIDDLE, "ALIGN_MIDDLE")
+		.Value(TextVAlign::ALIGN_BOTTOM, "ALIGN_BOTTOM");
+
+	/// RTTR Registration for TextComponent
+	SimpleRTTR::Registration().Type<TextComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+		.Property(&TextComponent::_text, "text")
+		.Property(&TextComponent::_wrap, "wrap")
+		.Property(&TextComponent::_invert, "invert")
+		.Property(&TextComponent::_contrast, "contrast")
+		.Property(&TextComponent::_indent, "indent")
+		.Property(&TextComponent::_scroll, "scroll")
+		.Property(&TextComponent::_scrollY, "scrollY")
+		.Property(&TextComponent::_ignoreSeparators, "ignoreSeparators")
+		.Property(&TextComponent::_color, "color")
+		.Property(&TextComponent::_color2, "color2");
+
+	/// RTTR Registration for TextFontComponent
+	SimpleRTTR::Registration().Type<TextFontComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+		.Property(&TextFontComponent::_font, "font");
+
+	/// RTTR Registration for TextAlignmentComponentt
+	SimpleRTTR::Registration().Type<TextAlignmentComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+		.Property(&TextAlignmentComponent::_align, "align")
+		.Property(&TextAlignmentComponent::_valign, "valign");
+
+	/// RTTR Registration for TextLangComponent
+	SimpleRTTR::Registration().Type<TextLangComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+		.Property(&TextLangComponent::_lang, "lang");
+}
+
 TextSystem::TextSystem()
 {
 }

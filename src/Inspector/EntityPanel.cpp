@@ -17,9 +17,14 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "EntityPanel.h"
+#include "InspectorFrame.h"
+
 #include "../Entity/Common/Name.h"
 
 #include <simplerttr.h>
+
+#include "../Entity/Common/RTTR.h"
+
 
 namespace OpenXcom
 {
@@ -29,6 +34,19 @@ wxBEGIN_EVENT_TABLE(EntityPanel, wxPanel)
 	EVT_TREE_SEL_CHANGED(ID_EntityTree, EntityPanel::onEntitySelected)
 	EVT_TIMER(ID_RefreshTimer, EntityPanel::onTimer)
 wxEND_EVENT_TABLE()
+
+// Custom data to attach to tree items
+class EntityComponentData : public wxTreeItemData
+{
+public:
+	entt::handle _entityHandle;
+
+	SimpleRTTR::Type _componentType;
+	GetComponentFunc _getComponentFunc;
+
+	EntityComponentData(entt::handle entityHandle, const SimpleRTTR::Type& componentType = SimpleRTTR::Type::InvalidType(), GetComponentFunc getComponentFunc = nullptr)
+		: _entityHandle(entityHandle), _componentType(componentType), _getComponentFunc(getComponentFunc) {}
+};
 
 
 EntityPanel::EntityPanel(wxWindow* parent, entt::registry& registry)
@@ -74,8 +92,17 @@ void EntityPanel::setupUI()
 	// Panel for entity details on the right side
 	_entityDetailPanel = new wxPanel(splitter, wxID_ANY);
 	wxBoxSizer* detailSizer = new wxBoxSizer(wxVERTICAL);
-	wxStaticText* detailLabel = new wxStaticText(_entityDetailPanel, wxID_ANY, "Select an entity to view details.");
-	detailSizer->Add(detailLabel, 1, wxALL | wxEXPAND, 10);
+
+	
+	// Create a wxPropertyGrid to display properties
+	_entityDetailGrid = new wxPropertyGrid(_entityDetailPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxPG_DEFAULT_STYLE);
+	detailSizer->Add(_entityDetailGrid, 1, wxALL | wxEXPAND, 10);
+	_entityDetailGrid->Hide(); // Hide initially
+
+	_entityDetailLabel = new wxStaticText(_entityDetailPanel, wxID_ANY, "Select an entity or component to view details.");
+	detailSizer->Add(_entityDetailLabel, 1, wxALL | wxEXPAND, 10);
+
+
 	_entityDetailPanel->SetSizer(detailSizer);
 
 	// Split the window horizontally
@@ -87,6 +114,80 @@ void EntityPanel::setupUI()
 
 	// Set sizer for the main panel
 	this->SetSizer(mainSizer);
+
+	showInitialMessage();
+}
+
+void EntityPanel::showInitialMessage()
+{
+	showMessage("Select an entity or component to view details.");
+}
+
+void OpenXcom::EntityPanel::showMessage(const std::string& message)
+{
+	_entityDetailGrid->Hide(); // Hide initially
+	_entityDetailLabel->SetLabelText(message);
+	_entityDetailLabel->Show();
+}
+
+void EntityPanel::showEntityDetails(EntityComponentData* data)
+{
+	_entityDetailGrid->Clear();
+
+	NameComponent* nameComponent = data->_entityHandle.try_get<NameComponent>();
+	std::string entityName = "<unnamed>";
+	if (nameComponent)
+	{
+		std::string entityName = data->_componentType.Name();
+	}
+
+	_entityDetailGrid->Append(new wxStringProperty("Entity", wxPG_LABEL, entityName));
+}
+
+void EntityPanel::showComponentDetails(EntityComponentData* data)
+{
+	_entityDetailGrid->Clear();
+
+	std::string componentName = data->_componentType.Name();
+
+	_entityDetailGrid->Append(new wxStringProperty("Component", wxPG_LABEL, componentName));
+
+	if (data->_componentType != SimpleRTTR::Type::InvalidType())
+	{
+		void* component = data->_getComponentFunc(data->_entityHandle);
+
+		// loop through the properties
+		for (const SimpleRTTR::Property& property : data->_componentType.Properties())
+		{
+			// get the property type
+			SimpleRTTR::Type propertyType = property.Type();
+			std::string propertyName = property.Name();
+
+			//TEST
+			wxPGProperty* prop = _typePropertyMapping.createProperty(data->_entityHandle, data->_getComponentFunc, data->_componentType, property);
+			if (prop)
+			{
+				_entityDetailGrid->Append(new wxStringProperty(propertyName, wxPG_LABEL, propertyType.Name()));
+			}
+			else
+			{
+				std::string message = "Unable to find property handler for type " + propertyType.Name();
+				wxStringProperty* prop = new wxStringProperty(propertyName, wxPG_LABEL, message);
+				prop->ChangeFlag(wxPG_PROP_READONLY, true);
+				_entityDetailGrid->Append(prop);
+			}
+		}
+	}
+
+	_entityDetailLabel->Hide();
+	_entityDetailGrid->Show();
+
+	_entityDetailPanel->Layout(); // Refresh layout
+
+	// set the name column width to 30% of the initial width
+	int width = _entityDetailGrid->GetClientSize().GetWidth();
+	int splitterPos = static_cast<int>(width * 0.3); // 30% of the initial width
+	_entityDetailGrid->SetSplitterPosition(splitterPos);
 }
 
 void EntityPanel::setupEntityCallbacks()
@@ -98,47 +199,88 @@ void EntityPanel::setupEntityCallbacks()
 
 void EntityPanel::populateEntityTree()
 {
+	_needsRefresh = false;
+
 	// remove the entities that were removed
 	for (entt::entity entity : _entitiesRemoved)
 	{
 		wxTreeItemId item = _entityToTreeItemMap[entity];
 		_entityTree->Delete(item);
 		_entityToTreeItemMap.erase(entity);
+
+		_needsRefresh = true;
 	}
 	_entitiesRemoved.clear();
 
 	// add the entities that were added
 	for (entt::entity entity : _entitiesAdded)
 	{
+		wxTreeItemId rootItem = _entityTree->GetRootItem();
+		bool rootHadNoChildren = !_entityTree->ItemHasChildren(rootItem);
+
 		NameComponent* name = _registry.try_get<NameComponent>(entity);
-		std::string nameStr = name ? name->name : "<unnamed>";
-		wxTreeItemId entityItem = _entityTree->AppendItem(_entityTree->GetRootItem(), nameStr.c_str());
+		std::string nameStr = name != nullptr ? name->name : "<unnamed>";
+
+		wxTreeItemId entityItem = _entityTree->AppendItem(rootItem, nameStr.c_str());
+		_entityTree->Expand(entityItem);
+
+		_entityTree->SetItemData(entityItem, new EntityComponentData(entt::handle(_registry, entity)));
 
 		// now lets visit each component
 		for (const entt::registry::iterable::value_type& storage : _registry.storage())
 		{
-			if (storage.second.contains(entity))
+			entt::basic_sparse_set<entt::entity>& entities = storage.second;
+			if (entities.contains(entity))
 			{
 				// get the type information
-				std::string typeName = std::string(storage.second.type().name());
+				std::string typeName = std::string(entities.type().name());
 				SimpleRTTR::Type type = SimpleRTTR::Types().GetType(typeName);
 
+				wxTreeItemId componentItem;
 				if (type != SimpleRTTR::Type::InvalidType())
 				{
-					_entityTree->AppendItem(entityItem, type.Name());
+					componentItem = _entityTree->AppendItem(entityItem, type.Name());
+
+					// This may look a bit funny, but basically since there is no way to get a reference or pointer to a component
+					// without knowing the component type, we have to work around this by pre-registering a function which strips
+					// all the type data away so we can then use the run time type information to drive the rest of the property
+					// pages. This means that each type we want to have property pages for, we need to register a Meta key/value pair
+					// which uses GetComponentFuncName as the key and a pointer to a function with the signature of GetComponentFunc.
+					// From there, we can extract the properties and display them in the property grid.
+					if (type.Meta().Has(GetComponentFuncName))
+					{
+						const SimpleRTTR::Meta& getComponentMeta = type.Meta().Get(GetComponentFuncName);
+						GetComponentFunc getComponentFunc = getComponentMeta.Value().GetAs<GetComponentFunc>();
+
+						_entityTree->SetItemData(componentItem, new EntityComponentData(entt::handle(_registry, entity), type, getComponentFunc));
+					}
+					else
+					{
+						_entityTree->SetItemData(componentItem, new EntityComponentData(entt::handle(_registry, entity), type));
+					}
 				}
 				else
 				{
-					_entityTree->AppendItem(entityItem, storage.second.type().name().data());
+					componentItem = _entityTree->AppendItem(entityItem, entities.type().name().data());
 				}
 			}
 		}
 
+		// If the root had no children before, expand it now
+		if (rootHadNoChildren)
+		{
+			_entityTree->Expand(rootItem);
+		}
+
 		_entityToTreeItemMap[entity] = entityItem;
+		_needsRefresh = true;
 	}
 	_entitiesAdded.clear();
 
-	_entityTree->ExpandAll();
+	if (_needsRefresh)
+	{
+		_entityTree->Refresh();
+	}
 }
 
 void EntityPanel::onTimer(wxTimerEvent& event)
@@ -156,11 +298,41 @@ void EntityPanel::onSearch(wxCommandEvent& event)
 
 void EntityPanel::onEntitySelected(wxTreeEvent& event)
 {
-	wxTreeItemId selected = _entityTree->GetSelection();
-	if (selected.IsOk())
+	wxTreeItemId selectedItem = _entityTree->GetSelection();
+	if (selectedItem.IsOk())
 	{
-		//wxLogMessage("Entity selected: %s", _entityTree->GetItemText(selected));
-		// Update the right-side panel with entity details.
+		EntityComponentData* data = dynamic_cast<EntityComponentData*>(_entityTree->GetItemData(selectedItem));
+		if (data)
+		{
+			if (data->_componentType != SimpleRTTR::Type::InvalidType())
+			{
+				if (data->_getComponentFunc)
+				{
+					// we have a component that is properly registered, so display it's property pages
+					showComponentDetails(data);
+				}
+				else
+				{
+					// we have a component, but it isn't properly registered(likely missing GetComponentFuncName Metadata)
+					showMessage("Unable to get component data for component type \"" + data->_componentType.Name() + "\"");
+				}
+			}
+			else
+			{
+				// we are displaying an entity
+				showEntityDetails(data);
+			}
+		}
+		else
+		{
+			// hmm... no data
+			showMessage("Unable to get data for selection");
+		}
+	}
+	else
+	{
+		// no entity selected
+		showInitialMessage();
 	}
 }
 

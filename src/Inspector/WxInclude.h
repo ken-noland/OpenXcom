@@ -28,5 +28,6 @@
 #include <wx/timer.h>
 #include <wx/splitter.h>
 #include <wx/srchctrl.h>
+#include <wx/propgrid/propgrid.h>
 
 #pragma pop_macro("Log")

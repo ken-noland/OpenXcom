@@ -434,7 +434,7 @@ set ( lua_src
 )
 
 set ( entity_common_src
-  
+  Entity/Common/Name.cpp
 )
 
 set ( entity_engine_src
@@ -469,6 +469,7 @@ set (inspector_src
   Inspector/Inspector.cpp
   Inspector/InspectorFrame.cpp
   Inspector/InspectorApp.cpp
+  Inspector/TypePropertyMapping.cpp
 )
 
 set ( cxx_src
@@ -774,7 +775,7 @@ endif()
 add_library(openxcom_lib STATIC ${openxcom_src})
 target_include_directories(openxcom_lib PUBLIC ${openxcom_includes})
 target_compile_definitions(openxcom_lib PUBLIC ${openxcom_defines})
-target_link_libraries(openxcom_lib PUBLIC wxbase wxcore)
+target_link_libraries(openxcom_lib PUBLIC wxbase wxcore wxpropgrid)
 
 add_executable ( openxcom  ${application_type} main.cpp ${openxcom_icon})
 

@@ -24,13 +24,10 @@
 namespace OpenXcom
 {
 
-class SurfaceComponent;//TEMP
-
 using DrawableCallback = std::function<void()>;
 
 struct DrawableComponent
 {
-public:
 	MulticastDelegate<void()> _drawables;
 
 	DrawableComponent();

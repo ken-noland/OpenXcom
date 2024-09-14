@@ -134,6 +134,14 @@ PaletteHandle PaletteSystem::getPaletteByID(const std::string& id, bool alterPal
 	int paletteBlock = -1;
 	std::string paletteName;
 
+	// KN NOTE: Okay, this whole section is a bit strange. In order to set up the palette, we need
+	// to know the name of the palette and the block to use. The block is used to set the palette
+	// for the background images. The palette name is used to get the actual palette. The palette
+	// name is set by the mod interface, but the block is not. The block is set by the mod interface
+	// parent. This is a bit of a mess, but it's how the original code works. We should probably
+	// clean this up at some point.
+
+
 	// Until we have a proper palette system, we need to lean on the mod interface.
 	RuleInterface* ruleInterface = getGame()->getMod()->getInterface(id);
 	if (ruleInterface)
@@ -156,6 +164,7 @@ PaletteHandle PaletteSystem::getPaletteByID(const std::string& id, bool alterPal
 		}
 		if (element)
 		{
+			// KN NOTE: Okay, so the palette block comes from the element COLOR or COLOR2. WTF?!?
 			int block = alterPal ? element->color2 : element->color;
 			if (block != INT_MAX)
 			{

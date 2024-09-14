@@ -31,8 +31,36 @@
 #include "../../Engine/Screen.h"
 #include "../../Engine/Sound.h"
 
+#include "../Common/RTTR.h"
+
 namespace OpenXcom
 {
+
+SIMPLERTTR
+{
+	SimpleRTTR::Registration().Type<WindowPopup>()
+		.Value(WindowPopup::POPUP_NONE, "POPUP_NONE")
+		.Value(WindowPopup::POPUP_HORIZONTAL, "POPUP_HORIZONTAL")
+		.Value(WindowPopup::POPUP_VERTICAL, "POPUP_VERTICAL")
+		.Value(WindowPopup::POPUP_BOTH, "POPUP_BOTH");
+
+	SimpleRTTR::Registration().Type<OpenXcom::WindowComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<WindowComponent>)
+		.Property(&WindowComponent::_popup, "popup")
+		.Property(&WindowComponent::_popupStep, "popupStep")
+		.Property(&WindowComponent::_color, "color")
+		.Property(&WindowComponent::_contrast, "contrast")
+		.Property(&WindowComponent::_thinBorder, "thinBorder")
+		.Property(&WindowComponent::_innerColor, "innerColor")
+		.Property(&WindowComponent::_mute, "mute");
+
+	SimpleRTTR::Registration().Type<BackgroundComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<BackgroundComponent>)
+		.Property(&BackgroundComponent::_bg, "bg")
+		.Property(&BackgroundComponent::_dx, "dx")
+		.Property(&BackgroundComponent::_dy, "dy");
+}
+
 
 const uint64_t WindowSystem::POPUP_SPEED_MS = 200;
 

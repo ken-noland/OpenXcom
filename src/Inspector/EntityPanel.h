@@ -19,21 +19,24 @@
  */
 #include "WxInclude.h"
 #include <entt/entt.hpp>
+#include "TypePropertyMapping.h"
 
 namespace OpenXcom
 {
 
+class InspectorFrame;	
+class EntityComponentData;
+
 class EntityPanel : public wxPanel
 {
-public:
-	EntityPanel(wxWindow* parent, entt::registry& registry);
-
 private:
 	entt::registry& _registry;
 
 	wxSearchCtrl* _searchCtrl;
 	wxTreeCtrl* _entityTree;
 	wxPanel* _entityDetailPanel;
+	wxPropertyGrid* _entityDetailGrid;
+	wxStaticText* _entityDetailLabel;
 
 	//between updates, these are the entities that have been added
 	//  KN TODO: maybe we should just have a single list with a flag for added/removed/updated so that order of operations remains consistent?
@@ -44,11 +47,19 @@ private:
 	bool _needsRefresh;
 
 	std::unordered_map<entt::entity, wxTreeItemId> _entityToTreeItemMap;
+	TypePropertyMapping _typePropertyMapping;
 
 	void setupUI();
 	void setupEntityCallbacks();
 
 	void populateEntityTree();
+
+	void showInitialMessage();
+	void showMessage(const std::string& message);
+
+	void showEntityDetails(EntityComponentData* data);
+	void showComponentDetails(EntityComponentData* data);
+
 
 	void onEntityAdded(entt::registry& registry, entt::entity entity);
 	void onEntityRemoved(entt::registry& registry, entt::entity entity);
@@ -59,6 +70,9 @@ private:
 	void onEntitySelected(wxTreeEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
+
+public:
+	EntityPanel(wxWindow* parent, entt::registry& registry);
 };
 
 enum

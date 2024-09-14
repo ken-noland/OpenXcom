@@ -17,17 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <string>
+#include <entt/entt.hpp>
+#include <simplerttr.h>
 
-namespace OpenXcom {
-
-/**
- * @brief Name Component for a display name.
- * Not guaranteed to be unique.
- */
-struct NameComponent
+namespace OpenXcom
 {
-	std::string name;
-};
 
-} // namespace OpenXcom
+/// Function signature for getting a component from an entity.
+using GetComponentFunc = void* (*)(entt::handle);
+
+/// Name of the function to get a component from an entity.
+const char* const GetComponentFuncName = "GetComponentFunc";
+
+/// Function to allow access to get a raw pointer to a component from an entity to
+///  be used by the RTTR library
+template <typename ComponentType>
+void* GetComponentRawPointer(entt::handle handle)
+{
+	return &handle.get<ComponentType>();
+}
+
+
+} // OpenXcom

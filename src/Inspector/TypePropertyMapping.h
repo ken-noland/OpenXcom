@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2024-2024 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -17,17 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <string>
 
-namespace OpenXcom {
+#include "WxInclude.h"
+#include <simplerttr.h>
+#include "../Entity/Common/RTTR.h"
 
-/**
- * @brief Name Component for a display name.
- * Not guaranteed to be unique.
- */
-struct NameComponent
+namespace OpenXcom
 {
-	std::string name;
+
+class TypePropertyMapping
+{
+protected:
+	void createTypeMapping();
+
+public:
+	TypePropertyMapping();
+	~TypePropertyMapping();
+
+	wxPGProperty* createProperty(entt::handle handle, GetComponentFunc getComponentFunc, const SimpleRTTR::Type& type, const SimpleRTTR::Property& property);
+	void updateProperty(wxPGProperty* property);
 };
 
 } // namespace OpenXcom

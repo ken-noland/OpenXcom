@@ -56,6 +56,9 @@ void InspectorFrame::SetupUI()
 	SetSizer(mainSizer);
 }
 
+
+
+
 void InspectorFrame::OnClose(wxCloseEvent& event)
 {
 	// Hide the window instead of destroying it
