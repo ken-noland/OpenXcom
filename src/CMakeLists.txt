@@ -465,6 +465,7 @@ set ( entity_interface_src
 )
 
 set (inspector_src
+  Inspector/CustomPropertyGrid.cpp
   Inspector/EntityPanel.cpp
   Inspector/Inspector.cpp
   Inspector/InspectorFrame.cpp

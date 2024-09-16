@@ -95,13 +95,12 @@ void EntityPanel::setupUI()
 
 	
 	// Create a wxPropertyGrid to display properties
-	_entityDetailGrid = new wxPropertyGrid(_entityDetailPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxPG_DEFAULT_STYLE);
-	detailSizer->Add(_entityDetailGrid, 1, wxALL | wxEXPAND, 10);
+	_entityDetailGrid = new CustomPropertyGrid(_entityDetailPanel);
+	detailSizer->Add(_entityDetailGrid, 1, wxALL | wxEXPAND, 0);
 	_entityDetailGrid->Hide(); // Hide initially
 
 	_entityDetailLabel = new wxStaticText(_entityDetailPanel, wxID_ANY, "Select an entity or component to view details.");
 	detailSizer->Add(_entityDetailLabel, 1, wxALL | wxEXPAND, 10);
-
 
 	_entityDetailPanel->SetSizer(detailSizer);
 
@@ -132,7 +131,7 @@ void OpenXcom::EntityPanel::showMessage(const std::string& message)
 
 void EntityPanel::showEntityDetails(EntityComponentData* data)
 {
-	_entityDetailGrid->Clear();
+//	_entityDetailGrid->Clear();
 
 	NameComponent* nameComponent = data->_entityHandle.try_get<NameComponent>();
 	std::string entityName = "<unnamed>";
@@ -141,7 +140,7 @@ void EntityPanel::showEntityDetails(EntityComponentData* data)
 		std::string entityName = data->_componentType.Name();
 	}
 
-	_entityDetailGrid->Append(new wxStringProperty("Entity", wxPG_LABEL, entityName));
+//	_entityDetailGrid->Append(new wxStringProperty("Entity", wxPG_LABEL, entityName));
 }
 
 void EntityPanel::showComponentDetails(EntityComponentData* data)
@@ -150,12 +149,10 @@ void EntityPanel::showComponentDetails(EntityComponentData* data)
 
 	std::string componentName = data->_componentType.Name();
 
-	_entityDetailGrid->Append(new wxStringProperty("Component", wxPG_LABEL, componentName));
+	_entityDetailGrid->Add("Component", [&componentName](wxWindow* parent) { return new wxStaticText(parent, wxID_ANY, componentName); });
 
 	if (data->_componentType != SimpleRTTR::Type::InvalidType())
 	{
-		void* component = data->_getComponentFunc(data->_entityHandle);
-
 		// loop through the properties
 		for (const SimpleRTTR::Property& property : data->_componentType.Properties())
 		{
@@ -164,18 +161,21 @@ void EntityPanel::showComponentDetails(EntityComponentData* data)
 			std::string propertyName = property.Name();
 
 			//TEST
-			wxPGProperty* prop = _typePropertyMapping.createProperty(data->_entityHandle, data->_getComponentFunc, data->_componentType, property);
-			if (prop)
-			{
-				_entityDetailGrid->Append(new wxStringProperty(propertyName, wxPG_LABEL, propertyType.Name()));
-			}
-			else
-			{
-				std::string message = "Unable to find property handler for type " + propertyType.Name();
-				wxStringProperty* prop = new wxStringProperty(propertyName, wxPG_LABEL, message);
-				prop->ChangeFlag(wxPG_PROP_READONLY, true);
-				_entityDetailGrid->Append(prop);
-			}
+			std::string message = "Unable to create property sheet for type \"" + propertyType.Name() + "\"";
+			_entityDetailGrid->Add(propertyName, [&](wxWindow* parent)
+				{ return _typePropertyMapping.createProperty(parent, data->_entityHandle, data->_componentType, property); });
+			//	{ return new wxStaticText(parent, wxID_ANY, message); });
+
+
+
+			//wxPGProperty* prop = _typePropertyMapping.createProperty(data->_entityHandle, data->_getComponentFunc, data->_componentType, property);
+			//if (prop)
+			//{
+			//	//this needs to be changed around a bit
+			//}
+			//else
+			//{
+			//}
 		}
 	}
 
@@ -183,11 +183,6 @@ void EntityPanel::showComponentDetails(EntityComponentData* data)
 	_entityDetailGrid->Show();
 
 	_entityDetailPanel->Layout(); // Refresh layout
-
-	// set the name column width to 30% of the initial width
-	int width = _entityDetailGrid->GetClientSize().GetWidth();
-	int splitterPos = static_cast<int>(width * 0.3); // 30% of the initial width
-	_entityDetailGrid->SetSplitterPosition(splitterPos);
 }
 
 void EntityPanel::setupEntityCallbacks()

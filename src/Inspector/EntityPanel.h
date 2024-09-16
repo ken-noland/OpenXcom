@@ -20,6 +20,7 @@
 #include "WxInclude.h"
 #include <entt/entt.hpp>
 #include "TypePropertyMapping.h"
+#include "CustomPropertyGrid.h"
 
 namespace OpenXcom
 {
@@ -35,7 +36,7 @@ private:
 	wxSearchCtrl* _searchCtrl;
 	wxTreeCtrl* _entityTree;
 	wxPanel* _entityDetailPanel;
-	wxPropertyGrid* _entityDetailGrid;
+	CustomPropertyGrid* _entityDetailGrid;
 	wxStaticText* _entityDetailLabel;
 
 	//between updates, these are the entities that have been added

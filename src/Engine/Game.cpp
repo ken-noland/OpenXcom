@@ -230,6 +230,10 @@ void Game::run()
 		// Process events
 		while (SDL_PollEvent(&_event))
 		{
+			#if defined(ENABLE_ENTITY_INSPECTOR)
+			_inspector.handleEvent(_event);
+			#endif
+
 			if (CrossPlatform::isQuitShortcut(_event))
 				_event.type = SDL_QUIT;
 			switch (_event.type)
@@ -363,12 +367,6 @@ void Game::run()
 								Options::debugUi = !Options::debugUi;
 								_states.back()->redrawText();
 							}
-						}
-
-						//temp hack to force lua bound event
-						if (action.getDetails()->key.keysym.sym == SDLK_l && isCtrlPressed())
-						{
-							getLuaMod().getUIScript().getOnTestEvent().dispatchCallback();
 						}
 					}
 					_states.back()->handle(&action);

@@ -24,26 +24,32 @@
 #include "../../Engine/Screen.h"
 
 
-#include <simplerttr.h>
-SIMPLERTTR
-{
-	/// RTTR Registration for SurfaceComponent
-	SimpleRTTR::Registration().Type<OpenXcom::SurfaceComponent>();
-
-	/// RTTR Registration for ScreenRectComponent
-	SimpleRTTR::Registration().Type<OpenXcom::ScreenRectComponent>()
-		.Property(&OpenXcom::ScreenRectComponent::x, "x")
-		.Property(&OpenXcom::ScreenRectComponent::y, "y")
-		.Property(&OpenXcom::ScreenRectComponent::width, "width")
-		.Property(&OpenXcom::ScreenRectComponent::height, "height");
-
-	// putting this here for now because it's been optimized out by the linker when it is in Name.cpp
-	SimpleRTTR::Registration().Type<OpenXcom::NameComponent>()
-		.Property(&OpenXcom::NameComponent::name, "name");
-}
+#include "../Common/RTTR.h"
 
 namespace OpenXcom
 {
+
+
+SIMPLERTTR
+{
+	/// RTTR Registration for SurfaceComponent
+	SimpleRTTR::Registration().Type<SurfaceComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<SurfaceComponent>);
+
+	/// RTTR Registration for ScreenRectComponent
+	SimpleRTTR::Registration().Type<ScreenRectComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<ScreenRectComponent>)
+		.Property(&ScreenRectComponent::x, "x")
+		.Property(&ScreenRectComponent::y, "y")
+		.Property(&ScreenRectComponent::width, "width")
+		.Property(&ScreenRectComponent::height, "height");
+
+	// putting this here for now because it's been optimized out by the linker when it is in Name.cpp
+	SimpleRTTR::Registration().Type<NameComponent>()
+		.Meta(GetComponentFuncName, &GetComponentRawPointer<NameComponent>)
+		.Property(&NameComponent::name, "name");
+}
+
 
 SurfaceComponent::SurfaceComponent(std::unique_ptr<Surface>& surface)
 	: _surface(std::move(surface))

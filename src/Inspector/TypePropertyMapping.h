@@ -30,11 +30,14 @@ class TypePropertyMapping
 protected:
 	void createTypeMapping();
 
+	using TypeMap = std::unordered_map<std::size_t, std::function<wxWindow*(wxWindow*, entt::handle, const SimpleRTTR::Type&, const SimpleRTTR::Property&)>>;
+	TypeMap _typeMapping;
+
 public:
 	TypePropertyMapping();
 	~TypePropertyMapping();
 
-	wxPGProperty* createProperty(entt::handle handle, GetComponentFunc getComponentFunc, const SimpleRTTR::Type& type, const SimpleRTTR::Property& property);
+	wxWindow* createProperty(wxWindow* parent, entt::handle entityHandle, const SimpleRTTR::Type& componentType, const SimpleRTTR::Property& componentProperty);
 	void updateProperty(wxPGProperty* property);
 };
 

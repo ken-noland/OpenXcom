@@ -1,3 +1,4 @@
+#include "Inspector.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -56,6 +57,40 @@ void Inspector::destroy()
 		_frame = nullptr;
 	}
 	wxEntryCleanup(); // Clean up wxWidgets
+}
+
+#include <SDL/SDL_keysym.h>
+
+int SDLKeyToWxKey(int sdlKey) {
+	// Map SDL key codes to wxWidgets key codes
+	switch (sdlKey) {
+	case SDLK_RETURN:
+		return WXK_RETURN;
+	case SDLK_BACKSPACE:
+		return WXK_BACK;
+	// Add more key mappings as needed
+	default:
+		return sdlKey; // Fallback to direct mapping if possible
+	}
+}
+
+wxKeyEvent ConvertSDLEventToWx(const SDL_Event& sdlEvent) {
+	// Create a wxKeyEvent based on SDL event data
+	int keyCode = SDLKeyToWxKey(sdlEvent.key.keysym.sym);
+	wxKeyEvent wxEvent(sdlEvent.type == SDL_KEYDOWN ? wxEVT_KEY_DOWN : wxEVT_KEY_UP);
+	wxEvent.SetId(keyCode);
+//	wxEvent.SetKeyCode(keyCode);
+	// Set additional event properties like modifiers here if needed
+
+	return wxEvent;
+}
+
+void Inspector::handleEvent(const SDL_Event& event)
+{
+	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+		wxKeyEvent keyEvent = ConvertSDLEventToWx(event);
+		wxPostEvent(wxTheApp->GetTopWindow(), keyEvent);
+	}
 }
 
 void Inspector::show()

@@ -28,6 +28,8 @@
 #include <wx/timer.h>
 #include <wx/splitter.h>
 #include <wx/srchctrl.h>
+#include <wx/statline.h>
+#include <wx/valnum.h>
 #include <wx/propgrid/propgrid.h>
 
 #pragma pop_macro("Log")

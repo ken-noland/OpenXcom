@@ -17,37 +17,42 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include <SDL/SDL_events.h>
+#include "WxInclude.h"
 
 namespace OpenXcom
 {
 
-class InspectorApp;
-class InspectorFrame;
-
-class Inspector
+class CustomSplitterWindow : public wxSplitterWindow
 {
-	// Manually managed app
-	InspectorApp* _app;
-
-	// The main inspector window
-	InspectorFrame* _frame;
-
-	// Whether the inspector is currently shown
-	bool _isShown = false;
-
 public:
-	Inspector();
-	~Inspector();
+	CustomSplitterWindow(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
+						 const wxSize& size = wxDefaultSize, long style = wxSP_3D);
 
-	void create();
-	void destroy();
+protected:
+	void DrawSashTracker(int x, int y) override;
+	//	void OnSashPositionChanging(int newSashPosition) override;
+};
 
-	void handleEvent(const SDL_Event& event);
 
-	void show();
-	void hide();
+class CustomPropertyGrid : public wxScrolledWindow
+{
+public:
+	CustomPropertyGrid(wxWindow* parent);
+	~CustomPropertyGrid();
+
+	void Add(const wxString& name, std::function<wxWindow*(wxWindow*)> createValueCtrl);
+
+	void Clear();
+
+private:
+	CustomSplitterWindow* _splitterWindow;
+	wxPanel* _leftPanel;
+	wxPanel* _rightPanel;
+
+	wxBoxSizer* _leftSizer;
+	wxBoxSizer* _rightSizer;
+
+	int _totalContentHeight;
 };
 
 } // namespace OpenXcom
