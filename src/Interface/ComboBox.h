@@ -51,7 +51,7 @@ private:
 	size_t _sel;
 	State *_state;
 	Language *_lang;
-	Uint8 _color;
+	uint8_t _color;
 	bool _toggled;
 	bool _popupAboveButton;
 
@@ -73,13 +73,13 @@ public:
 	/// Sets the background surface.
 	void setBackground(Surface *bg);
 	/// Sets the border color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the border color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the high contrast color setting.
 	void setHighContrast(bool contrast) override;
 	/// Sets the arrow color of the text list.
-	void setArrowColor(Uint8 color);
+	void setArrowColor(uint8_t color);
 	/// Gets the selected option in the list.
 	size_t getSelected() const;
 	/// Gets the item that is currently hovered over in the popup list, or the current

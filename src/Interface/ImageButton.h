@@ -32,7 +32,7 @@ namespace OpenXcom
 class ImageButton : public InteractiveSurface
 {
 protected:
-	Uint8 _color;
+	uint8_t _color;
 	ImageButton **_group;
 	bool _inverted;
 public:
@@ -41,9 +41,9 @@ public:
 	/// Cleans up the image button.
 	virtual ~ImageButton();
 	/// Sets the image button's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the image button's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the image button's group.
 	void setGroup(ImageButton **group);
 	/// Special handling for mouse presses.

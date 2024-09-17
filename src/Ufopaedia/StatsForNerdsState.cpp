@@ -628,7 +628,7 @@ std::string StatsForNerdsState::trp(const std::string &propertyName)
 /**
  * Adds a section name to the table.
  */
-void StatsForNerdsState::addSection(const std::string &name, const std::string &desc, Uint8 color, bool forceShow)
+void StatsForNerdsState::addSection(const std::string &name, const std::string &desc, uint8_t color, bool forceShow)
 {
 	if (_showDefaults || forceShow)
 	{

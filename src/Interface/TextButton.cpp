@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "TextButton.h"
-#include <SDL.h>
+
 #include <SDL_mixer.h>
 #include "Text.h"
 #include "../Engine/Sound.h"
@@ -54,7 +54,7 @@ TextButton::~TextButton()
 	delete _text;
 }
 
-bool TextButton::isButtonHandled(Uint8 button)
+bool TextButton::isButtonHandled(uint8_t button)
 {
 	if (_comboBox != 0)
 	{
@@ -70,7 +70,7 @@ bool TextButton::isButtonHandled(Uint8 button)
  * Changes the color for the button and text.
  * @param color Color value.
  */
-void TextButton::setColor(Uint8 color)
+void TextButton::setColor(uint8_t color)
 {
 	_color = color;
 	_text->setColor(color);
@@ -81,7 +81,7 @@ void TextButton::setColor(Uint8 color)
  * Returns the color for the button and text.
  * @return Color value.
  */
-Uint8 TextButton::getColor() const
+uint8_t TextButton::getColor() const
 {
 	return _color;
 }
@@ -90,7 +90,7 @@ Uint8 TextButton::getColor() const
  * Changes the color for the text only.
  * @param color Color value.
  */
-void TextButton::setTextColor(Uint8 color)
+void TextButton::setTextColor(uint8_t color)
 {
 	_text->setColor(color);
 	_redraw = true;

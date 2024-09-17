@@ -34,12 +34,12 @@ private:
 	Position _screenData;
 	Position _subVoxelVelocity;
 	Position _subVoxelAcceleration;
-	Uint8 _drift;
-	Uint8 _layerZ;
-	Uint8 _color, _opacity, _size;
+	uint8_t _drift;
+	uint8_t _layerZ;
+	uint8_t _color, _opacity, _size;
 public:
 	/// Create a particle.
-	Particle(Position voxelPos, Position subVoxelOffset, Position subVoxelVel, Position subVoxelAcc, Uint8 drift, Uint8 color, Uint8 opacity, Uint8 size);
+	Particle(Position voxelPos, Position subVoxelOffset, Position subVoxelVel, Position subVoxelAcc, uint8_t drift, uint8_t color, uint8_t opacity, uint8_t size);
 	/// Default copy constructor
 	Particle(const Particle&) = default;
 	/// Default move constructor
@@ -57,9 +57,9 @@ public:
 	/// Get the size value.
 	int getSize() const { return _size; }
 	/// Get the color.
-	Uint8 getColor() const { return _color; }
+	uint8_t getColor() const { return _color; }
 	/// Get the opacity.
-	Uint8 getOpacity() const { return (Uint8)_screenData.z; }
+	uint8_t getOpacity() const { return (uint8_t)_screenData.z; }
 	/// Gets screen offset X relative to tile.
 	int getOffsetX() const { return _screenData.x; }
 	/// Gets screen offset Y relative to tile.

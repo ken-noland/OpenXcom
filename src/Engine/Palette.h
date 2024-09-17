@@ -18,7 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <string>
-#include <SDL.h>
+
 
 namespace OpenXcom
 {
@@ -66,7 +66,7 @@ public:
 	void setColor(int index, int r, int g, int b);
 	void copyColor(int index, int r, int g, int b);
 	/// Converts a given color into a RGBA color value.
-	static Uint32 getRGBA(SDL_Color* pal, Uint8 color);
+	static uint32_t getRGBA(SDL_Color* pal, uint8_t color);
 	/// Gets the position of a given palette.
 	/**
 	 * Returns the position of a palette inside an X-Com palette file (each is a 768-byte chunks).
@@ -82,7 +82,7 @@ public:
 	 * @param block Requested block.
 	 * @return Color position.
 	 */
-	static inline Uint8 blockOffset(Uint8 block) { return block*16; }
+	static inline uint8_t blockOffset(uint8_t block) { return block*16; }
 	/// Position of the background colors block in an X-Com palette (used for background images in screens).
 	static const int backPos = 224;
 };

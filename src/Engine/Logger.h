@@ -40,6 +40,9 @@ enum SeverityLevel
 	LOG_UNCENSORED  /**< Makes sure everything makes it into log buffer until there's a logfile set up */
 };
 
+/// Log something.
+void log(int, const std::ostringstream& msg);
+
 /**
  * A basic logging and debugging class, prints output to stdout/files.
  * @note Wasn't really satisfied with any of the libraries around
@@ -49,7 +52,7 @@ class Logger
 {
 public:
 	Logger() : _level(LOG_INFO) { };
-	virtual ~Logger() { CrossPlatform::log(_level, os); };
+	virtual ~Logger() { log(_level, os); };
 	std::ostringstream& get(SeverityLevel level = LOG_INFO) { _level = level; return os; };
 
 	static SeverityLevel& reportingLevel() {

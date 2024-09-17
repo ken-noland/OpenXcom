@@ -100,7 +100,8 @@ ManufactureStartState::ManufactureStartState(Base* base, RuleManufacture* item) 
 
 	_btnCancel->setText(tr("STR_CANCEL_UC"));
 	_btnCancel->onMouseClick((ActionHandler)&ManufactureStartState::btnCancelClick);
-	_btnCancel->onKeyboardPress((ActionHandler)&ManufactureStartState::btnCancelClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnCancel->onKeyboardPress((ActionHandler)&ManufactureStartState::btnCancelClick, Options::keyCancel);
 
 	bool productionPossible = _item->haveEnoughMoneyForOneMoreUnit(getGame()->getSavedGame()->getFunds());
 	// check available workspace later
@@ -213,7 +214,8 @@ ManufactureStartState::ManufactureStartState(Base* base, RuleManufacture* item) 
 
 	_btnStart->setText(tr("STR_START_PRODUCTION"));
 	_btnStart->onMouseClick((ActionHandler)&ManufactureStartState::btnStartClick);
-	_btnStart->onKeyboardPress((ActionHandler)&ManufactureStartState::btnStartClick, Options::keyOk);
+// OPTIONSHACK
+	//_btnStart->onKeyboardPress((ActionHandler)&ManufactureStartState::btnStartClick, Options::keyOk);
 	_btnStart->setVisible(productionPossible);
 
 	if (_item)
@@ -241,14 +243,15 @@ void ManufactureStartState::btnCancelClick(Action *)
  */
 void ManufactureStartState::btnStartClick(Action *)
 {
-	if (_item->getProducedCraft() && _base->getAvailableHangars(_item->getProducedCraft()->getHangarType()) - _base->getUsedHangars(_item->getProducedCraft()->getHangarType()) <= 0)
-	{
-		getGame()->pushState(new ErrorMessageState(tr("STR_NO_FREE_HANGARS_FOR_CRAFT_PRODUCTION"), _palette, getGame()->getMod()->getInterface("basescape")->getElement("errorMessage")->color, "BACK17.SCR", getGame()->getMod()->getInterface("basescape")->getElement("errorPalette")->color));
-	}
-	else
-	{
-		getGame()->pushState(new ManufactureInfoState(_base, _item));
-	}
+// SDLHACK
+	//if (_item->getProducedCraft() && _base->getAvailableHangars(_item->getProducedCraft()->getHangarType()) - _base->getUsedHangars(_item->getProducedCraft()->getHangarType()) <= 0)
+	//{
+	//	getGame()->pushState(new ErrorMessageState(tr("STR_NO_FREE_HANGARS_FOR_CRAFT_PRODUCTION"), _palette, getGame()->getMod()->getInterface("basescape")->getElement("errorMessage")->color, "BACK17.SCR", getGame()->getMod()->getInterface("basescape")->getElement("errorPalette")->color));
+	//}
+	//else
+	//{
+	//	getGame()->pushState(new ManufactureInfoState(_base, _item));
+	//}
 }
 
 }

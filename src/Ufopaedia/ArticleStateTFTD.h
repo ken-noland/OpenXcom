@@ -37,7 +37,7 @@ namespace OpenXcom
 	protected:
 		Text *_txtTitle;
 		Text *_txtInfo;
-		Uint8 _buttonColor, _textColor, _textColor2, _listColor1, _listColor2, _ammoColor, _arrowColor;
+		uint8_t _buttonColor, _textColor, _textColor2, _listColor1, _listColor2, _ammoColor, _arrowColor;
 		int _listStyle;
 	};
 }

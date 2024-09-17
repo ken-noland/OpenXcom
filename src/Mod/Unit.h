@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
-#include <SDL_types.h>
 #include "../Engine/RNG.h"
 
 namespace OpenXcom
@@ -38,8 +37,8 @@ enum SpecialTileType : int;
 enum MovementType : int;
 
 
-enum ForcedTorso : Uint8 { TORSO_USE_GENDER, TORSO_ALWAYS_MALE, TORSO_ALWAYS_FEMALE };
-enum UnitSide : Uint8 { SIDE_FRONT, SIDE_LEFT, SIDE_RIGHT, SIDE_REAR, SIDE_UNDER, SIDE_LEFT_FRONT, SIDE_LEFT_REAR, SIDE_RIGHT_FRONT, SIDE_RIGHT_REAR, SIDE_MAX };
+enum ForcedTorso : uint8_t { TORSO_USE_GENDER, TORSO_ALWAYS_MALE, TORSO_ALWAYS_FEMALE };
+enum UnitSide : uint8_t { SIDE_FRONT, SIDE_LEFT, SIDE_RIGHT, SIDE_REAR, SIDE_UNDER, SIDE_LEFT_FRONT, SIDE_LEFT_REAR, SIDE_RIGHT_FRONT, SIDE_RIGHT_REAR, SIDE_MAX };
 enum UnitStatus {STATUS_STANDING, STATUS_WALKING, STATUS_FLYING, STATUS_TURNING, STATUS_AIMING, STATUS_COLLAPSING, STATUS_DEAD, STATUS_UNCONSCIOUS, STATUS_PANICKING, STATUS_BERSERK, STATUS_IGNORE_ME};
 enum UnitFaction : int {FACTION_NONE = -1, FACTION_PLAYER = 0, FACTION_HOSTILE = 1, FACTION_NEUTRAL = 2};
 enum UnitBodyPart : int {BODYPART_HEAD, BODYPART_TORSO, BODYPART_RIGHTARM, BODYPART_LEFTARM, BODYPART_RIGHTLEG, BODYPART_LEFTLEG, BODYPART_MAX};
@@ -50,7 +49,7 @@ enum UnitBodyPartEx {BODYPART_LEGS = BODYPART_MAX, BODYPART_COLLAPSING, BODYPART
  */
 struct UnitStats
 {
-	using Type = Sint16;
+	using Type = int16_t;
 	using Ptr = Type UnitStats::*;
 
 	/// Max value that is allowed to set to stat, less that max value allowed by type.
@@ -139,7 +138,7 @@ struct UnitStats
 					if ((currentStats.*p) <= (upperBound.*p))
 					{
 						// 2. consider upperBound
-						Sint16 tmp = (upperBound.*p) - (currentStats.*p);
+						int16_t tmp = (upperBound.*p) - (currentStats.*p);
 						(r.*p) = std::min((statChange.*p), tmp);
 					}
 					else
@@ -178,15 +177,15 @@ struct UnitStats
 		fieldLoop(
 			[&](Ptr p)
 			{
-				Sint16 min = std::min((a.*p), (b.*p));
-				Sint16 max = std::max((a.*p), (b.*p));
+				int16_t min = std::min((a.*p), (b.*p));
+				int16_t max = std::max((a.*p), (b.*p));
 				if (min == max)
 				{
 					(r.*p) = max;
 				}
 				else
 				{
-					Sint16 rnd = RNG::generate(min, max);
+					int16_t rnd = RNG::generate(min, max);
 					(r.*p) = rnd;
 				}
 			}
@@ -455,7 +454,7 @@ private:
 	bool _waitIfOutsideWeaponRange;
 	int _aiTargetMode;
 	int _pickUpWeaponsMoreActively;
-	Sint8 _avoidsFire;
+	int8_t _avoidsFire;
 	bool _vip;
 	bool _cosmetic, _ignoredByAI;
 	bool _canPanic;

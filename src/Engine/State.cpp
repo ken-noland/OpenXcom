@@ -57,12 +57,12 @@ namespace OpenXcom
  * @param game Pointer to the core game.
  */
 State::State(const std::string& name, bool screen)
-	: _progressTimerSystem(getSystem<ProgressTimerSystem>()),
-	_name(name), _screen(screen), _soundPlayed(false), _modal(0), _ruleInterface(0), _ruleInterfaceParent(0), _customSound(nullptr)
+	: 
+	_name(name), _screen(screen), _soundPlayed(false), /*_modal(0), */_ruleInterface(0), _ruleInterfaceParent(0), _customSound(nullptr)
 {
 	// initialize palette to all black
-	memset(_palette, 0, sizeof(_palette));
-	_cursorColor = getGame()->getCursor()->getColor();
+//	memset(_palette, 0, sizeof(_palette));
+//	_cursorColor = getGame()->getCursor()->getColor();
 }
 
 /**
@@ -87,49 +87,49 @@ State::~State()
  */
 void State::setInterface(const std::string& category, bool alterPal, SavedBattleGame *battleGame)
 {
-	int backPal = -1;
-	std::string pal = "PAL_GEOSCAPE";
+	//int backPal = -1;
+	//std::string pal = "PAL_GEOSCAPE";
 
-	_interfaceCategory = category;
-	_ruleInterface = getGame()->getMod()->getInterface(category);
-	if (_ruleInterface)
-	{
-		_ruleInterfaceParent = getGame()->getMod()->getInterface(_ruleInterface->getParent());
-		pal = _ruleInterface->getPalette();
-		Element *element = _ruleInterface->getElement("palette");
-		if (_ruleInterfaceParent)
-		{
-			if (!element)
-			{
-				element = _ruleInterfaceParent->getElement("palette");
-			}
-			if (pal.empty())
-			{
-				pal = _ruleInterfaceParent->getPalette();
-			}
-		}
-		if (element)
-		{
-			int color = alterPal ? element->color2 : element->color;
-			if (color != INT_MAX)
-			{
-				backPal = color;
-			}
-		}
-	}
-	if (battleGame)
-	{
-		battleGame->setPaletteByDepth(this);
-	}
-	else if (pal.empty())
-	{
-		pal = "PAL_GEOSCAPE";
-		setStandardPalette(pal, backPal);
-	}
-	else
-	{
-		setStandardPalette(pal, backPal);
-	}
+	//_interfaceCategory = category;
+	//_ruleInterface = getGame()->getMod()->getInterface(category);
+	//if (_ruleInterface)
+	//{
+	//	_ruleInterfaceParent = getGame()->getMod()->getInterface(_ruleInterface->getParent());
+	//	pal = _ruleInterface->getPalette();
+	//	Element *element = _ruleInterface->getElement("palette");
+	//	if (_ruleInterfaceParent)
+	//	{
+	//		if (!element)
+	//		{
+	//			element = _ruleInterfaceParent->getElement("palette");
+	//		}
+	//		if (pal.empty())
+	//		{
+	//			pal = _ruleInterfaceParent->getPalette();
+	//		}
+	//	}
+	//	if (element)
+	//	{
+	//		int color = alterPal ? element->color2 : element->color;
+	//		if (color != INT_MAX)
+	//		{
+	//			backPal = color;
+	//		}
+	//	}
+	//}
+	//if (battleGame)
+	//{
+	//	battleGame->setPaletteByDepth(this);
+	//}
+	//else if (pal.empty())
+	//{
+	//	pal = "PAL_GEOSCAPE";
+	//	setStandardPalette(pal, backPal);
+	//}
+	//else
+	//{
+	//	setStandardPalette(pal, backPal);
+	//}
 }
 
 /**
@@ -139,8 +139,8 @@ void State::setInterface(const std::string& category, bool alterPal, SavedBattle
  */
 void State::setWindowBackground(entt::handle window, const std::string& s)
 {
-	auto& bgImageName = getGame()->getMod()->getInterface(s)->getBackgroundImage();
-	setWindowBackgroundImage(window, bgImageName);
+	//auto& bgImageName = getGame()->getMod()->getInterface(s)->getBackgroundImage();
+	//setWindowBackgroundImage(window, bgImageName);
 }
 
 /**
@@ -150,10 +150,10 @@ void State::setWindowBackground(entt::handle window, const std::string& s)
  */
 void State::setWindowBackgroundImage(entt::handle window, const std::string& bgImageName)
 {
-	const auto* bgImage = getGame()->getMod()->getSurface(bgImageName);
+	//const auto* bgImage = getGame()->getMod()->getSurface(bgImageName);
 
-	WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
-	windowSystem.setBackground(window, bgImage);
+	//WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	//windowSystem.setBackground(window, bgImage);
 }
 
 /**
@@ -168,26 +168,26 @@ void State::setWindowBackgroundImage(entt::handle window, const std::string& bgI
  */
 void State::add(Surface *surface)
 {
-	// Set palette
-	surface->setPalette(_palette);
-
-	// Set default text resources
-	if (getGame()->getLanguage() && getGame()->getMod())
-		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
-
-	entt::registry& registry = getRegistry().raw();
-	entt::handle surfaceEnt = entt::handle(registry, registry.create());
-
-	DrawableComponent& drawableComponent = surfaceEnt.emplace<DrawableComponent>();
-
-	std::unique_ptr<Surface> surfacePtr(surface);
-	SurfaceComponent& surfaceComponent = surfaceEnt.emplace<SurfaceComponent>(surfacePtr);
-
-	// KN TODO; remove call to setSurfaceComponent when flags have been moved over
-//	drawableComponent.setSurfaceComponent(&surfaceComponent);
-	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
-
-	_surfaces.push_back(surfaceEnt);
+//	// Set palette
+//	surface->setPalette(_palette);
+//
+//	// Set default text resources
+//	if (getGame()->getLanguage() && getGame()->getMod())
+//		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
+//
+//	entt::registry& registry = getRegistry().raw();
+//	entt::handle surfaceEnt = entt::handle(registry, registry.create());
+//
+//	DrawableComponent& drawableComponent = surfaceEnt.emplace<DrawableComponent>();
+//
+//	std::unique_ptr<Surface> surfacePtr(surface);
+//	SurfaceComponent& surfaceComponent = surfaceEnt.emplace<SurfaceComponent>(surfacePtr);
+//
+//	// KN TODO; remove call to setSurfaceComponent when flags have been moved over
+////	drawableComponent.setSurfaceComponent(&surfaceComponent);
+//	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
+//
+//	_surfaces.push_back(surfaceEnt);
 }
 
 /**
@@ -202,72 +202,72 @@ void State::add(Surface *surface)
  */
 void State::add(Surface *surface, const std::string &id, const std::string &category, Surface *parent)
 {
-	// Set palette
-	surface->setPalette(_palette);
-
-	// this only works if we're dealing with a battlescape button
-	BattlescapeButton *bsbtn = dynamic_cast<BattlescapeButton*>(surface);
-
-	if (getGame()->getMod()->getInterface(category))
-	{
-		Element *element = getGame()->getMod()->getInterface(category)->getElement(id);
-		if (element)
-		{
-			if (parent && element->w != INT_MAX && element->h != INT_MAX)
-			{
-				surface->setWidth(element->w);
-				surface->setHeight(element->h);
-			}
-
-			if (parent && element->x != INT_MAX && element->y != INT_MAX)
-			{
-				surface->setX(parent->getX() + element->x);
-				surface->setY(parent->getY() + element->y);
-			}
-
-			auto inter = dynamic_cast<InteractiveSurface*>(surface);
-			if (inter)
-			{
-				inter->setTFTDMode(element->TFTDMode);
-			}
-
-			if (element->color != INT_MAX)
-			{
-				surface->setColor(element->color);
-			}
-			if (element->color2 != INT_MAX)
-			{
-				surface->setSecondaryColor(element->color2);
-			}
-			if (element->border != INT_MAX)
-			{
-				surface->setBorderColor(element->border);
-			}
-		}
-	}
-
-	if (bsbtn)
-	{
-		// this will initialize the graphics and settings of the battlescape button.
-		bsbtn->copy(parent);
-		bsbtn->initSurfaces();
-	}
-
-	// Set default text resources
-	if (getGame()->getLanguage() && getGame()->getMod())
-		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
-
-	entt::registry& registry = getRegistry().raw();
-	entt::handle surfaceEnt = entt::handle(registry, registry.create());
-	DrawableComponent& drawableComponent = surfaceEnt.emplace<DrawableComponent>();
-	std::unique_ptr<Surface> surfacePtr(surface);
-	SurfaceComponent& surfaceComponent = surfaceEnt.emplace<SurfaceComponent>(surfacePtr);
-
-	// KN TODO; remove call to setSurfaceComponent when flags have been moved over
-//	drawableComponent.setSurfaceComponent(&surfaceComponent);
-	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
-
-	_surfaces.push_back(surfaceEnt);
+//	// Set palette
+//	surface->setPalette(_palette);
+//
+//	// this only works if we're dealing with a battlescape button
+//	BattlescapeButton *bsbtn = dynamic_cast<BattlescapeButton*>(surface);
+//
+//	if (getGame()->getMod()->getInterface(category))
+//	{
+//		Element *element = getGame()->getMod()->getInterface(category)->getElement(id);
+//		if (element)
+//		{
+//			if (parent && element->w != INT_MAX && element->h != INT_MAX)
+//			{
+//				surface->setWidth(element->w);
+//				surface->setHeight(element->h);
+//			}
+//
+//			if (parent && element->x != INT_MAX && element->y != INT_MAX)
+//			{
+//				surface->setX(parent->getX() + element->x);
+//				surface->setY(parent->getY() + element->y);
+//			}
+//
+//			auto inter = dynamic_cast<InteractiveSurface*>(surface);
+//			if (inter)
+//			{
+//				inter->setTFTDMode(element->TFTDMode);
+//			}
+//
+//			if (element->color != INT_MAX)
+//			{
+//				surface->setColor(element->color);
+//			}
+//			if (element->color2 != INT_MAX)
+//			{
+//				surface->setSecondaryColor(element->color2);
+//			}
+//			if (element->border != INT_MAX)
+//			{
+//				surface->setBorderColor(element->border);
+//			}
+//		}
+//	}
+//
+//	if (bsbtn)
+//	{
+//		// this will initialize the graphics and settings of the battlescape button.
+//		bsbtn->copy(parent);
+//		bsbtn->initSurfaces();
+//	}
+//
+//	// Set default text resources
+//	if (getGame()->getLanguage() && getGame()->getMod())
+//		surface->initText(getGame()->getMod()->getFont("FONT_BIG"), getGame()->getMod()->getFont("FONT_SMALL"), getGame()->getLanguage());
+//
+//	entt::registry& registry = getRegistry().raw();
+//	entt::handle surfaceEnt = entt::handle(registry, registry.create());
+//	DrawableComponent& drawableComponent = surfaceEnt.emplace<DrawableComponent>();
+//	std::unique_ptr<Surface> surfacePtr(surface);
+//	SurfaceComponent& surfaceComponent = surfaceEnt.emplace<SurfaceComponent>(surfacePtr);
+//
+//	// KN TODO; remove call to setSurfaceComponent when flags have been moved over
+////	drawableComponent.setSurfaceComponent(&surfaceComponent);
+//	drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
+//
+//	_surfaces.push_back(surfaceEnt);
 }
 
 void State::add(entt::handle entity, const std::string& id, const std::string& category, Surface* parent)
@@ -313,31 +313,31 @@ void State::toggleScreen()
  */
 void State::init()
 {
-	getGame()->getScreen()->setPalette(_palette);
-	getGame()->getCursor()->setPalette(_palette);
-	getGame()->getCursor()->setColor(_cursorColor);
-	getGame()->getCursor()->draw();
-	getGame()->getFpsCounter()->setPalette(_palette);
-	getGame()->getFpsCounter()->setColor(_cursorColor);
-	getGame()->getFpsCounter()->draw();
+	//getGame()->getScreen()->setPalette(_palette);
+	//getGame()->getCursor()->setPalette(_palette);
+	//getGame()->getCursor()->setColor(_cursorColor);
+	//getGame()->getCursor()->draw();
+	//getGame()->getFpsCounter()->setPalette(_palette);
+	//getGame()->getFpsCounter()->setColor(_cursorColor);
+	//getGame()->getFpsCounter()->draw();
 
-	// Highest priority: custom sound set explicitly in the code
-	// Medium priority: sound defined by the interface ruleset
-	// Lowest priority: default window popup sound
-	bool muteWindowPopupSound = false;
-	if (!_soundPlayed)
-	{
-		_soundPlayed = true;
-		if (!_customSound && _ruleInterface && _ruleInterface->getSound() != Mod::NO_SOUND)
-		{
-			_customSound = getGame()->getMod()->getSound("GEO.CAT", _ruleInterface->getSound());
-		}
-		if (_customSound)
-		{
-			muteWindowPopupSound = true;
-			_customSound->play();
-		}
-	}
+	//// Highest priority: custom sound set explicitly in the code
+	//// Medium priority: sound defined by the interface ruleset
+	//// Lowest priority: default window popup sound
+	//bool muteWindowPopupSound = false;
+	//if (!_soundPlayed)
+	//{
+	//	_soundPlayed = true;
+	//	if (!_customSound && _ruleInterface && _ruleInterface->getSound() != Mod::NO_SOUND)
+	//	{
+	//		_customSound = getGame()->getMod()->getSound("GEO.CAT", _ruleInterface->getSound());
+	//	}
+	//	if (_customSound)
+	//	{
+	//		muteWindowPopupSound = true;
+	//		_customSound->play();
+	//	}
+	//}
 
 //	// KN NOTE: Need to re-enable this
 //	for (entt::entity surfaceEnt : _surfaces)
@@ -353,10 +353,10 @@ void State::init()
 //			surfaceComponent.getSurface()->invalidate();
 //		}
 //	}
-	if (_ruleInterface != 0 && !_ruleInterface->getMusic().empty())
-	{
-		getGame()->getMod()->playMusic(_ruleInterface->getMusic());
-	}
+	//if (_ruleInterface != 0 && !_ruleInterface->getMusic().empty())
+	//{
+	//	getGame()->getMod()->playMusic(_ruleInterface->getMusic());
+	//}
 }
 
 /**
@@ -381,18 +381,18 @@ void State::update()
  */
 void State::handle(Action *action)
 {
-	if (!_modal)
-	{
-		InputHandlerSystem& inputSystem = getSystem<InputHandlerSystem>();
-		for (entt::handle& surfaceEnt : _surfaces)
-		{
-			inputSystem.handle(surfaceEnt, action);
-		}
-	}
-	else
-	{
-		_modal->handle(action, this);
-	}
+	//if (!_modal)
+	//{
+	//	InputHandlerSystem& inputSystem = getSystem<InputHandlerSystem>();
+	//	for (entt::handle& surfaceEnt : _surfaces)
+	//	{
+	//		inputSystem.handle(surfaceEnt, action);
+	//	}
+	//}
+	//else
+	//{
+	//	_modal->handle(action, this);
+	//}
 }
 
 /**
@@ -413,11 +413,11 @@ void State::blit()
  */
 void State::hideAll()
 {
-	for (entt::handle& surfaceEnt : _surfaces)
-	{
-		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
-		surface->setHidden(true);
-	}
+	//for (entt::handle& surfaceEnt : _surfaces)
+	//{
+	//	Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
+	//	surface->setHidden(true);
+	//}
 }
 
 /**
@@ -425,11 +425,11 @@ void State::hideAll()
  */
 void State::showAll()
 {
-	for (entt::handle& surfaceEnt : _surfaces)
-	{
-		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
-		surface->setHidden(false);
-	}
+	//for (entt::handle& surfaceEnt : _surfaces)
+	//{
+	//	Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
+	//	surface->setHidden(false);
+	//}
 }
 
 /**
@@ -458,7 +458,9 @@ void State::resetAll()
  */
 LocalizedText State::tr(const std::string &id) const
 {
-	return getGame()->getLanguage()->getString(id);
+//	return getGame()->getLanguage()->getString(id);
+	assert(!"Not implemented");
+	return LocalizedText();
 }
 
 /**
@@ -470,14 +472,16 @@ LocalizedText State::tr(const std::string &id) const
 */
 LocalizedText State::trAlt(const std::string &id, int alt) const
 {
-	std::ostringstream ss;
-	ss << id;
-	// alt = 0 is the original, alt > 0 are the alternatives
-	if (alt > 0)
-	{
-		ss << "_" << alt;
-	}
-	return getGame()->getLanguage()->getString(ss.str());
+	//std::ostringstream ss;
+	//ss << id;
+	//// alt = 0 is the original, alt > 0 are the alternatives
+	//if (alt > 0)
+	//{
+	//	ss << "_" << alt;
+	//}
+	//return getGame()->getLanguage()->getString(ss.str());
+	assert(!"Not implemented");
+	return LocalizedText();
 }
 
 /**
@@ -489,7 +493,9 @@ LocalizedText State::trAlt(const std::string &id, int alt) const
  */
 LocalizedText State::tr(const std::string &id, unsigned n) const
 {
-	return getGame()->getLanguage()->getString(id, n);
+	//return getGame()->getLanguage()->getString(id, n);
+	assert(!"Not implemented");
+	return LocalizedText();
 }
 
 /**
@@ -501,7 +507,9 @@ LocalizedText State::tr(const std::string &id, unsigned n) const
  */
 LocalizedText State::tr(const std::string &id, SoldierGender gender) const
 {
-	return getGame()->getLanguage()->getString(id, gender);
+	//return getGame()->getLanguage()->getString(id, gender);
+	assert(!"Not implemented");
+	return LocalizedText();
 }
 
 /**
@@ -523,11 +531,11 @@ void State::centerAllSurfaces()
  */
 void State::lowerAllSurfaces()
 {
-	for (entt::entity surfaceEnt : _surfaces)
-	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
-		surface->setY(surface->getY() + getGame()->getScreen()->getDY() / 2);
-	}
+	//for (entt::entity surfaceEnt : _surfaces)
+	//{
+	//	Surface* surface = getRegistry().raw().get<SurfaceComponent>(surfaceEnt).getSurface();
+	//	surface->setY(surface->getY() + getGame()->getScreen()->getDY() / 2);
+	//}
 }
 
 /**
@@ -535,35 +543,35 @@ void State::lowerAllSurfaces()
  */
 void State::applyBattlescapeTheme(const std::string& category)
 {
-	Element * element = getGame()->getMod()->getInterface("mainMenu")->getElement("battlescapeTheme");
-	std::string altBg = getGame()->getMod()->getInterface(category)->getAltBackgroundImage();
-	if (altBg.empty())
-	{
-		altBg = "TAC00.SCR";
-	}
-	for (entt::handle surfaceEnt : _surfaces)
-	{
-		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
-		surface->setColor(element->color);
-		surface->setHighContrast(true);
+	//Element * element = getGame()->getMod()->getInterface("mainMenu")->getElement("battlescapeTheme");
+	//std::string altBg = getGame()->getMod()->getInterface(category)->getAltBackgroundImage();
+	//if (altBg.empty())
+	//{
+	//	altBg = "TAC00.SCR";
+	//}
+	//for (entt::handle surfaceEnt : _surfaces)
+	//{
+	//	Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
+	//	surface->setColor(element->color);
+	//	surface->setHighContrast(true);
 
 
-		if (surfaceEnt.all_of<WindowComponent, SurfaceComponent>())
-		{
-			WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
-			windowSystem.setBackground(surfaceEnt, getGame()->getMod()->getSurface(altBg));
-		}
-		TextList* list = dynamic_cast<TextList*>(surface);
-		if (list)
-		{
-			list->setArrowColor(element->border);
-		}
-		ComboBox *combo = dynamic_cast<ComboBox*>(surface);
-		if (combo)
-		{
-			combo->setArrowColor(element->border);
-		}
-	}
+	//	if (surfaceEnt.all_of<WindowComponent, SurfaceComponent>())
+	//	{
+	//		WindowSystem& windowSystem = getGame()->getECS().getSystem<WindowSystem>();
+	//		windowSystem.setBackground(surfaceEnt, getGame()->getMod()->getSurface(altBg));
+	//	}
+	//	TextList* list = dynamic_cast<TextList*>(surface);
+	//	if (list)
+	//	{
+	//		list->setArrowColor(element->border);
+	//	}
+	//	ComboBox *combo = dynamic_cast<ComboBox*>(surface);
+	//	if (combo)
+	//	{
+	//		combo->setArrowColor(element->border);
+	//	}
+	//}
 }
 
 /**
@@ -594,7 +602,7 @@ void State::redrawText()
  */
 void State::setModal(InteractiveSurface *surface)
 {
-	_modal = surface;
+//	_modal = surface;
 }
 
 /**
@@ -603,25 +611,25 @@ void State::setModal(InteractiveSurface *surface)
  * @param firstcolor Offset of the first color to replace.
  * @param ncolors Amount of colors to replace.
  */
-void State::setStatePalette(const SDL_Color *colors, int firstcolor, int ncolors)
-{
-	if (colors)
-	{
-		memcpy(_palette + firstcolor, colors, ncolors * sizeof(SDL_Color));
-	}
-}
+//void State::setStatePalette(const SDL_Color *colors, int firstcolor, int ncolors)
+//{
+//	if (colors)
+//	{
+//		memcpy(_palette + firstcolor, colors, ncolors * sizeof(SDL_Color));
+//	}
+//}
 
 /**
  * Set palette for helper surfaces like cursor or fps counter.
  */
 void State::setModPalette()
 {
-	{
-		getGame()->getCursor()->setPalette(_palette);
-		getGame()->getCursor()->draw();
-		getGame()->getFpsCounter()->setPalette(_palette);
-		getGame()->getFpsCounter()->draw();
-	}
+	//{
+	//	getGame()->getCursor()->setPalette(_palette);
+	//	getGame()->getCursor()->draw();
+	//	getGame()->getFpsCounter()->setPalette(_palette);
+	//	getGame()->getFpsCounter()->draw();
+	//}
 }
 
 /**
@@ -631,30 +639,30 @@ void State::setModPalette()
  */
 void State::setStandardPalette(const std::string &palette, int backpals)
 {
-	setStatePalette(getGame()->getMod()->getPalette(palette)->getColors(), 0, 256);
-	if (palette == "PAL_GEOSCAPE")
-	{
-		_cursorColor = Mod::GEOSCAPE_CURSOR;
-	}
-	else if (palette == "PAL_BASESCAPE")
-	{
-		_cursorColor = Mod::BASESCAPE_CURSOR;
-	}
-	else if (palette == "PAL_UFOPAEDIA")
-	{
-		_cursorColor = Mod::UFOPAEDIA_CURSOR;
-	}
-	else if (palette == "PAL_GRAPHS")
-	{
-		_cursorColor = Mod::GRAPHS_CURSOR;
-	}
-	else
-	{
-		_cursorColor = Mod::BATTLESCAPE_CURSOR;
-	}
-	if (backpals != -1)
-		setStatePalette(getGame()->getMod()->getPalette("BACKPALS.DAT")->getColors(Palette::blockOffset(backpals)), Palette::backPos, 16);
-	setModPalette(); // delay actual update to the end
+	//setStatePalette(getGame()->getMod()->getPalette(palette)->getColors(), 0, 256);
+	//if (palette == "PAL_GEOSCAPE")
+	//{
+	//	_cursorColor = Mod::GEOSCAPE_CURSOR;
+	//}
+	//else if (palette == "PAL_BASESCAPE")
+	//{
+	//	_cursorColor = Mod::BASESCAPE_CURSOR;
+	//}
+	//else if (palette == "PAL_UFOPAEDIA")
+	//{
+	//	_cursorColor = Mod::UFOPAEDIA_CURSOR;
+	//}
+	//else if (palette == "PAL_GRAPHS")
+	//{
+	//	_cursorColor = Mod::GRAPHS_CURSOR;
+	//}
+	//else
+	//{
+	//	_cursorColor = Mod::BATTLESCAPE_CURSOR;
+	//}
+	//if (backpals != -1)
+	//	setStatePalette(getGame()->getMod()->getPalette("BACKPALS.DAT")->getColors(Palette::blockOffset(backpals)), Palette::backPos, 16);
+	//setModPalette(); // delay actual update to the end
 }
 
 /**
@@ -662,21 +670,21 @@ void State::setStandardPalette(const std::string &palette, int backpals)
 * @param colors Pointer to the set of colors.
 * @param cursorColor Cursor color to use.
 */
-void State::setCustomPalette(SDL_Color *colors, int cursorColor)
-{
-	setStatePalette(colors, 0, 256);
-	_cursorColor = cursorColor;
-	setModPalette(); // delay actual update to the end
-}
+//void State::setCustomPalette(SDL_Color *colors, int cursorColor)
+//{
+//	setStatePalette(colors, 0, 256);
+//	_cursorColor = cursorColor;
+//	setModPalette(); // delay actual update to the end
+//}
 
 /**
  * Returns the state's 8bpp palette.
  * @return Pointer to the palette's colors.
  */
-SDL_Color *State::getPalette()
-{
-	return _palette;
-}
+//SDL_Color *State::getPalette()
+//{
+//	return _palette;
+//}
 
 /**
  * Each state will probably need its own resize handling,

@@ -638,11 +638,11 @@ void Projectile::applyAccuracy(Position origin, Position *target, double accurac
 			}
 			else // Find the center of exposed part
 			{
-				struct // Sint16 overflows, cannot use regular Position-type variable
+				struct // int16_t overflows, cannot use regular Position-type variable
 				{
-					Sint32 x = 0;
-					Sint32 y = 0;
-					Sint32 z = 0;
+					int32_t x = 0;
+					int32_t y = 0;
+					int32_t z = 0;
 				} temp;
 
 				for (const Position &vox : exposedVoxels) // Sum all exposed voxels to a single point with HUGE coordinates
@@ -1117,7 +1117,7 @@ void Projectile::addVaporCloud()
 		auto density = std::get<5>(arg.data);
 		auto particleLifetime = std::get<6>(arg.data);
 
-		Uint8 size = 0;
+		uint8_t size = 0;
 		//size is initialized at 0
 		if (density < 100)
 		{

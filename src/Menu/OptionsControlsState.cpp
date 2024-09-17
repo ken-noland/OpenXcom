@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "OptionsControlsState.h"
-#include <SDL.h>
+
 #include "../Engine/Options.h"
 #include "../Engine/LocalizedText.h"
 #include "../Interface/Window.h"

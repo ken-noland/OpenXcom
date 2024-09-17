@@ -84,7 +84,8 @@ GlobalManufactureState::GlobalManufactureState(bool openedFromBasescape) : State
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&GlobalManufactureState::btnOkClick);
-	_btnOk->onKeyboardPress((ActionHandler)&GlobalManufactureState::btnOkClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnOk->onKeyboardPress((ActionHandler)&GlobalManufactureState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
 	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);

@@ -131,8 +131,10 @@ BasescapeState::BasescapeState(BasescapeSystem& basescapeSystem, Globe *globe) :
 	}
 	_view->setTexture(getGame()->getMod()->getSurfaceSet("BASEBITS.PCK"));
 	_view->onMouseClick((ActionHandler)&BasescapeState::viewLeftClick, SDL_BUTTON_LEFT);
-	_view->onMouseClick((ActionHandler)&BasescapeState::viewRightClick, SDL_BUTTON_RIGHT);
-	_view->onMouseClick((ActionHandler)&BasescapeState::viewMiddleClick, SDL_BUTTON_MIDDLE);
+// SDLHACK
+	//_view->onMouseClick((ActionHandler)&BasescapeState::viewRightClick, SDL_BUTTON_RIGHT);
+// SDLHACK
+	//_view->onMouseClick((ActionHandler)&BasescapeState::viewMiddleClick, SDL_BUTTON_MIDDLE);
 	_view->onMouseOver((ActionHandler)&BasescapeState::viewMouseOver);
 	_view->onMouseOut((ActionHandler)&BasescapeState::viewMouseOut);
 
@@ -143,47 +145,58 @@ BasescapeState::BasescapeState(BasescapeSystem& basescapeSystem, Globe *globe) :
 
 	_btnNewBase->setText(tr("STR_BUILD_NEW_BASE_UC"));
 	_btnNewBase->onMouseClick((ActionHandler)&BasescapeState::btnNewBaseClick);
-	_btnNewBase->onKeyboardPress((ActionHandler)&BasescapeState::btnNewBaseClick, Options::keyBasescapeBuildNewBase);
+// OPTIONSHACK
+	//_btnNewBase->onKeyboardPress((ActionHandler)&BasescapeState::btnNewBaseClick, Options::keyBasescapeBuildNewBase);
 
 	_btnBaseInfo->setText(tr("STR_BASE_INFORMATION"));
 	_btnBaseInfo->onMouseClick((ActionHandler)&BasescapeState::btnBaseInfoClick);
-	_btnBaseInfo->onKeyboardPress((ActionHandler)&BasescapeState::btnBaseInfoClick, Options::keyBasescapeBaseInfo);
+// OPTIONSHACK
+	//_btnBaseInfo->onKeyboardPress((ActionHandler)&BasescapeState::btnBaseInfoClick, Options::keyBasescapeBaseInfo);
 
 	_btnSoldiers->setText(tr("STR_SOLDIERS_UC"));
 	_btnSoldiers->onMouseClick((ActionHandler)&BasescapeState::btnSoldiersClick);
-	_btnSoldiers->onKeyboardPress((ActionHandler)&BasescapeState::btnSoldiersClick, Options::keyBasescapeSoldiers);
+// OPTIONSHACK
+	//_btnSoldiers->onKeyboardPress((ActionHandler)&BasescapeState::btnSoldiersClick, Options::keyBasescapeSoldiers);
 
 	_btnCrafts->setText(tr("STR_EQUIP_CRAFT"));
 	_btnCrafts->onMouseClick((ActionHandler)&BasescapeState::btnCraftsClick);
-	_btnCrafts->onKeyboardPress((ActionHandler)&BasescapeState::btnCraftsClick, Options::keyBasescapeCrafts);
+// OPTIONSHACK
+	//_btnCrafts->onKeyboardPress((ActionHandler)&BasescapeState::btnCraftsClick, Options::keyBasescapeCrafts);
 
 	_btnFacilities->setText(tr("STR_BUILD_FACILITIES"));
 	_btnFacilities->onMouseClick((ActionHandler)&BasescapeState::btnFacilitiesClick);
-	_btnFacilities->onKeyboardPress((ActionHandler)&BasescapeState::btnFacilitiesClick, Options::keyBasescapeFacilities);
+// OPTIONSHACK
+	//_btnFacilities->onKeyboardPress((ActionHandler)&BasescapeState::btnFacilitiesClick, Options::keyBasescapeFacilities);
 
 	_btnResearch->setText(tr("STR_RESEARCH"));
 	_btnResearch->onMouseClick((ActionHandler)&BasescapeState::btnResearchClick);
-	_btnResearch->onKeyboardPress((ActionHandler)&BasescapeState::btnResearchClick, Options::keyBasescapeResearch);
+// OPTIONSHACK
+	//_btnResearch->onKeyboardPress((ActionHandler)&BasescapeState::btnResearchClick, Options::keyBasescapeResearch);
 
 	_btnManufacture->setText(tr("STR_MANUFACTURE"));
 	_btnManufacture->onMouseClick((ActionHandler)&BasescapeState::btnManufactureClick);
-	_btnManufacture->onKeyboardPress((ActionHandler)&BasescapeState::btnManufactureClick, Options::keyBasescapeManufacture);
+// OPTIONSHACK
+	//_btnManufacture->onKeyboardPress((ActionHandler)&BasescapeState::btnManufactureClick, Options::keyBasescapeManufacture);
 
 	_btnTransfer->setText(tr("STR_TRANSFER_UC"));
 	_btnTransfer->onMouseClick((ActionHandler)&BasescapeState::btnTransferClick);
-	_btnTransfer->onKeyboardPress((ActionHandler)&BasescapeState::btnTransferClick, Options::keyBasescapeTransfer);
+// OPTIONSHACK
+	//_btnTransfer->onKeyboardPress((ActionHandler)&BasescapeState::btnTransferClick, Options::keyBasescapeTransfer);
 
 	_btnPurchase->setText(tr("STR_PURCHASE_RECRUIT"));
 	_btnPurchase->onMouseClick((ActionHandler)&BasescapeState::btnPurchaseClick);
-	_btnPurchase->onKeyboardPress((ActionHandler)&BasescapeState::btnPurchaseClick, Options::keyBasescapePurchase);
+// OPTIONSHACK
+	//_btnPurchase->onKeyboardPress((ActionHandler)&BasescapeState::btnPurchaseClick, Options::keyBasescapePurchase);
 
 	_btnSell->setText(tr("STR_SELL_SACK_UC"));
 	_btnSell->onMouseClick((ActionHandler)&BasescapeState::btnSellClick);
-	_btnSell->onKeyboardPress((ActionHandler)&BasescapeState::btnSellClick, Options::keyBasescapeSell);
+// OPTIONSHACK
+	//_btnSell->onKeyboardPress((ActionHandler)&BasescapeState::btnSellClick, Options::keyBasescapeSell);
 
 	_btnGeoscape->setText(tr("STR_GEOSCAPE_UC"));
 	_btnGeoscape->onMouseClick((ActionHandler)&BasescapeState::btnGeoscapeClick);
-	_btnGeoscape->onKeyboardPress((ActionHandler)&BasescapeState::btnGeoscapeClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnGeoscape->onKeyboardPress((ActionHandler)&BasescapeState::btnGeoscapeClick, Options::keyCancel);
 }
 
 /**
@@ -230,7 +243,9 @@ void BasescapeState::init()
 	}
 
 	_txtFunds->setText(tr("STR_FUNDS").arg(Unicode::formatFunding(getGame()->getSavedGame()->getFunds())));
-	_btnNewBase->setVisible(_basescapeSystem.getBaseCount() < Options::maxNumberOfBases);
+// OPTIONSHACK
+	//_btnNewBase->setVisible(_basescapeSystem.getBaseCount() < Options::maxNumberOfBases);
+	_btnNewBase->setVisible(true);
 
 	if (!getGame()->getMod()->getNewBaseUnlockResearch().empty()
 		&& !getGame()->getSavedGame()->isResearched(getGame()->getMod()->getNewBaseUnlockResearch(), true)) {
@@ -380,45 +395,48 @@ void BasescapeState::viewLeftClick(Action *)
 			// Is facility in use?
 			if (BasePlacementErrors placementErrorCode = fac->inUse())
 			{
-				switch (placementErrorCode)
-				{
-				case BPE_Used_Stores:
-					getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_STORAGE"), _palette, errorColor1, "BACK13.SCR", errorColor2));
-					break;
-				case BPE_Used_Quarters:
-					getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_QUARTERS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
-					break;
-				case BPE_Used_Laboratories:
-					getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_LABORATORIES"), _palette, errorColor1, "BACK13.SCR", errorColor2));
-					break;
-				case BPE_Used_Workshops:
-					getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_WORKSHOPS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
-					break;
-				case BPE_Used_Hangars:
-					getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_HANGARS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
-					break;
-				case BPE_Used_PsiLabs:
-					getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_PSI_LABS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
-					break;
-				case BPE_Used_Gyms:
-					getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_GYMS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
-					break;
-				case BPE_Used_AlienContainment:
-					getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_PRISONS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
-					break;
-				default:
-					getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE"), _palette, errorColor1, "BACK13.SCR", errorColor2));
-				}
+// SDLHACK
+				// switch (placementErrorCode)
+				//{
+				//case BPE_Used_Stores:
+				//	getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_STORAGE"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+				//	break;
+				//case BPE_Used_Quarters:
+				//	getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_QUARTERS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+				//	break;
+				//case BPE_Used_Laboratories:
+				//	getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_LABORATORIES"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+				//	break;
+				//case BPE_Used_Workshops:
+				//	getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_WORKSHOPS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+				//	break;
+				//case BPE_Used_Hangars:
+				//	getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_HANGARS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+				//	break;
+				//case BPE_Used_PsiLabs:
+				//	getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_PSI_LABS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+				//	break;
+				//case BPE_Used_Gyms:
+				//	getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_GYMS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+				//	break;
+				//case BPE_Used_AlienContainment:
+				//	getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE_PRISONS"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+				//	break;
+				//default:
+				//	getGame()->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+				//}
 			}
 			// Would base become disconnected?
 			else if (!base.getDisconnectedFacilities(fac).empty() && fac->getRules()->getLeavesBehindOnSell().size() == 0)
 			{
-				getGame()->pushState(new ErrorMessageState(tr("STR_CANNOT_DISMANTLE_FACILITY"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+// SDLHACK
+				// getGame()->pushState(new ErrorMessageState(tr("STR_CANNOT_DISMANTLE_FACILITY"), _palette, errorColor1, "BACK13.SCR", errorColor2));
 			}
 			// Is this facility being built from a dismantled one or building over a previous building?
 			else if (fac->getBuildTime() > 0 && fac->getIfHadPreviousFacility())
 			{
-				getGame()->pushState(new ErrorMessageState(tr("STR_CANNOT_DISMANTLE_FACILITY_UPGRADING"), _palette, errorColor1, "BACK13.SCR", errorColor2));
+// SDLHACK
+				//getGame()->pushState(new ErrorMessageState(tr("STR_CANNOT_DISMANTLE_FACILITY_UPGRADING"), _palette, errorColor1, "BACK13.SCR", errorColor2));
 			}
 			else
 			{
@@ -449,8 +467,10 @@ void BasescapeState::viewRightClick(Action *)
 			case 2: getGame()->pushState(new ManufactureState(&base)); break;
 			case 3: getGame()->pushState(new ResearchState(&base)); break;
 			case 4: getGame()->pushState(new AllocateTrainingState(&base)); break;
-			case 5: if (Options::anytimePsiTraining) getGame()->pushState(new AllocatePsiTrainingState(&base)); break;
-			case 6: getGame()->pushState(new SoldiersState(&base)); break;
+// OPTIONSHACK
+			//case 5:	if (Options::anytimePsiTraining) getGame()->pushState(new AllocatePsiTrainingState(&base));	break;
+			case 5:	getGame()->pushState(new AllocatePsiTrainingState(&base));	break;
+			case 6:	getGame()->pushState(new SoldiersState(&base));	break;
 			case 7: getGame()->pushState(new SellState(&base, 0)); break;
 			default: getGame()->popState(); break;
 		}
@@ -488,10 +508,11 @@ void BasescapeState::viewRightClick(Action *)
 	{
 		getGame()->pushState(new SoldiersState(&base));
 	}
-	else if (f->getRules()->getPsiLaboratories() > 0 && Options::anytimePsiTraining && base.getAvailablePsiLabs() > 0)
-	{
-		getGame()->pushState(new AllocatePsiTrainingState(&base));
-	}
+// OPTIONSHACK
+	//else if (f->getRules()->getPsiLaboratories() > 0 && Options::anytimePsiTraining && base.getAvailablePsiLabs() > 0)
+	//{
+	//	getGame()->pushState(new AllocatePsiTrainingState(&base));
+	//}
 	else if (f->getRules()->getTrainingFacilities() > 0 && base.getAvailableTraining() > 0)
 	{
 		getGame()->pushState(new AllocateTrainingState(&base));

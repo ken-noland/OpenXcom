@@ -19,7 +19,7 @@
  */
 #include <string>
 #include <stdint.h>
-#include <SDL.h>
+
 
 namespace OpenXcom
 {
@@ -28,7 +28,7 @@ namespace OpenXcom
  * Represents a 32-bit Unicode codepoint.
  * Not technically a character, but close enough for our purposes.
  */
-typedef Uint32 UCode;
+typedef uint32_t UCode;
 /**
  * Represents a string where each character
  * is a Unicode codepoint. Used for rendering text.

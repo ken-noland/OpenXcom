@@ -42,13 +42,13 @@ SIMPLERTTR
 		.Property(&ButtonComponent::_geoscapeButton, "geoscapeButton");
 }
 
-void ButtonSystem::setColor(entt::handle entity, Uint8 color)
+void ButtonSystem::setColor(entt::handle entity, uint8_t color)
 {
 	ButtonComponent& buttonComponent = entity.get<ButtonComponent>();
 	buttonComponent._color = color;
 }
 
-Uint8 ButtonSystem::getColor(entt::handle entity) const
+uint8_t ButtonSystem::getColor(entt::handle entity) const
 {
 	const ButtonComponent& buttonComponent = entity.get<ButtonComponent>();
 	return buttonComponent._color;
@@ -56,104 +56,73 @@ Uint8 ButtonSystem::getColor(entt::handle entity) const
 
 void ButtonSystem::draw(entt::handle buttonEntity)
 {
-	ButtonComponent& buttonComponent = buttonEntity.get<ButtonComponent>();
-	SurfaceComponent& surfaceComponent = buttonEntity.get<SurfaceComponent>();
-	ScreenRectComponent& screenRectComponent = buttonEntity.get<ScreenRectComponent>();
+	//ButtonComponent& buttonComponent = buttonEntity.get<ButtonComponent>();
+	//SurfaceComponent& surfaceComponent = buttonEntity.get<SurfaceComponent>();
+	//ScreenRectComponent& screenRectComponent = buttonEntity.get<ScreenRectComponent>();
 
-	Surface* buttonSurface = surfaceComponent.getSurface();
+	//Surface* buttonSurface = surfaceComponent.getSurface();
 
-	buttonSurface->draw();
+	//buttonSurface->draw();
 
-	SDL_Rect square;
-	
-	int mul = 1;
-	if (buttonComponent._contrast)
-	{
-		mul = 2;
-	}
-	
-	int color = buttonComponent._color + 1 * mul;
-	
-	square.x = 0;
-	square.y = 0;
-	square.w = screenRectComponent.width;
-	square.h = screenRectComponent.height;
-	
-	for (int i = 0; i < 5; ++i)
-	{
-		buttonSurface->drawRect(&square, color);
-	
-		if (i % 2 == 0)
-		{
-			square.x++;
-			square.y++;
-		}
-		square.w--;
-		square.h--;
-	
-		switch (i)
-		{
-		case 0:
-			color = buttonComponent._color + 5 * mul;
-			buttonSurface->setPixel(square.w, 0, color);
-			break;
-		case 1:
-			color = buttonComponent._color + 2 * mul;
-			break;
-		case 2:
-			color = buttonComponent._color + 4 * mul;
-			buttonSurface->setPixel(square.w + 1, 1, color);
-			break;
-		case 3:
-			color = buttonComponent._color + 3 * mul;
-			break;
-		case 4:
-			if (buttonComponent._geoscapeButton)
-			{
-				buttonSurface->setPixel(0, 0, buttonComponent._color);
-				buttonSurface->setPixel(1, 1, buttonComponent._color);
-			}
-			break;
-		}
-	}
+	//SDL_Rect square;
 
-	SDL_Rect target{};
-	target.x = screenRectComponent.x;
-	target.y = screenRectComponent.y;
-	SDL_BlitSurface(buttonSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
+	//int mul = 1;
+	//if (buttonComponent._contrast) {
+	//	mul = 2;
+	//}
 
-	// Now render the button contents
-	HierarchySystem& hierarchySystem = getSystem<HierarchySystem>();
-	hierarchySystem.visit(buttonEntity, [](entt::handle child) {
-		DrawableSystem& drawableSystem = getSystem<DrawableSystem>();
-		drawableSystem.draw(child);
-	});
+	//int color = buttonComponent._color + 1 * mul;
 
-	//bool press;
-	//if (_group == 0)
-	//	press = isButtonPressed();
-	//else
-	//	press = (*_group == this);
-	
-	//if (press)
-	//{
-	//	if (_geoscapeButton)
-	//	{
-	//		this->invert(_color + 2 * mul);
+	//square.x = 0;
+	//square.y = 0;
+	//square.w = screenRectComponent.width;
+	//square.h = screenRectComponent.height;
+
+	//for (int i = 0; i < 5; ++i) {
+	//	buttonSurface->drawRect(&square, color);
+
+	//	if (i % 2 == 0) {
+	//		square.x++;
+	//		square.y++;
 	//	}
-	//	else
-	//	{
-	//		this->invert(_color + 3 * mul);
+	//	square.w--;
+	//	square.h--;
+
+	//	switch (i) {
+	//	case 0:
+	//		color = buttonComponent._color + 5 * mul;
+	//		buttonSurface->setPixel(square.w, 0, color);
+	//		break;
+	//	case 1:
+	//		color = buttonComponent._color + 2 * mul;
+	//		break;
+	//	case 2:
+	//		color = buttonComponent._color + 4 * mul;
+	//		buttonSurface->setPixel(square.w + 1, 1, color);
+	//		break;
+	//	case 3:
+	//		color = buttonComponent._color + 3 * mul;
+	//		break;
+	//	case 4:
+	//		if (buttonComponent._geoscapeButton) {
+	//			buttonSurface->setPixel(0, 0, buttonComponent._color);
+	//			buttonSurface->setPixel(1, 1, buttonComponent._color);
+	//		}
+	//		break;
 	//	}
 	//}
-	//_text->setInvert(press);
-//	_text.setColor(1);
-	
-	
-	//_text->setPalette(surface->getPalette());
-	
-	//_text->draw();
-	//_text->blit(surface->getSurface());
+
+	//SDL_Rect target{};
+	//target.x = screenRectComponent.x;
+	//target.y = screenRectComponent.y;
+	//SDL_BlitSurface(buttonSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
+
+	//// Now render the button contents
+	//HierarchySystem& hierarchySystem = getSystem<HierarchySystem>();
+	//hierarchySystem.visit(buttonEntity, [](entt::handle child) {
+	//	DrawableSystem& drawableSystem = getSystem<DrawableSystem>();
+	//	drawableSystem.draw(child);
+	//});
 }
 
 void ButtonSystem::handle(entt::handle entity, Action* action)
@@ -189,7 +158,7 @@ void ButtonSystem::handle(entt::handle entity, Action* action)
 // * Changes the color for the button and text.
 // * @param color Color value.
 // */
-//void TextButtonComponent::setColor(Uint8 color)
+//void TextButtonComponent::setColor(uint8_t color)
 //{
 //	//_color = color;
 //
@@ -203,7 +172,7 @@ void ButtonSystem::handle(entt::handle entity, Action* action)
 // * Returns the color for the button and text.
 // * @return Color value.
 // */
-//Uint8 TextButtonComponent::getColor() const
+//uint8_t TextButtonComponent::getColor() const
 //{
 //	return _color;
 //}
@@ -212,7 +181,7 @@ void ButtonSystem::handle(entt::handle entity, Action* action)
 // * Changes the color for the text only.
 // * @param color Color value.
 // */
-//void TextButtonComponent::setTextColor(Uint8 color)
+//void TextButtonComponent::setTextColor(uint8_t color)
 //{
 //	//TextComponent& textComponent = _text.get<TextComponent>();
 //	//textComponent.setColor(color);

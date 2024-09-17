@@ -73,7 +73,7 @@ void Palette::loadDat(const std::string &filename, int ncolors, int offset)
 	// Move pointer to proper palette
 	palFile->seekg(offset, std::ios::beg);
 
-	Uint8 value[3];
+	uint8_t value[3];
 
 	for (int i = 0; i < _count && palFile->read((char*)value, 3); ++i)
 	{
@@ -139,9 +139,9 @@ SDL_Color *Palette::getColors(int offset) const
  * @param color Requested color in the palette.
  * @return Hexadecimal RGBA value.
  */
-Uint32 Palette::getRGBA(SDL_Color* pal, Uint8 color)
+uint32_t Palette::getRGBA(SDL_Color* pal, uint8_t color)
 {
-	return ((Uint32) pal[color].r << 24) | ((Uint32) pal[color].g << 16) | ((Uint32) pal[color].b << 8) | (Uint32) 0xFF;
+	return ((uint32_t) pal[color].r << 24) | ((uint32_t) pal[color].g << 16) | ((uint32_t) pal[color].b << 8) | (uint32_t) 0xFF;
 }
 
 void Palette::savePal(const std::string &file) const

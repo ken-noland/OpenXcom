@@ -29,8 +29,8 @@
 namespace OpenXcom
 {
 
-enum ForcedTorso : Uint8;
-enum UnitSide : Uint8;
+enum ForcedTorso : uint8_t;
+enum UnitSide : uint8_t;
 
 class BattleUnit;
 class RuleItem;
@@ -160,8 +160,8 @@ private:
 	ForcedTorso _forcedTorso;
 	int _faceColorGroup, _hairColorGroup, _utileColorGroup, _rankColorGroup;
 	std::vector<int> _faceColor, _hairColor, _utileColor, _rankColor;
-	Sint8  _fearImmune, _bleedImmune, _painImmune, _zombiImmune;
-	Sint8 _ignoresMeleeThreat, _createsMeleeThreat;
+	int8_t  _fearImmune, _bleedImmune, _painImmune, _zombiImmune;
+	int8_t _ignoresMeleeThreat, _createsMeleeThreat;
 	float _overKill, _meleeDodgeBackPenalty;
 	RuleStatBonus _psiDefence, _meleeDodge;
 	RuleStatBonus _timeRecovery, _energyRecovery, _moraleRecovery, _healthRecovery, _stunRecovery, _manaRecovery;
@@ -169,7 +169,7 @@ private:
 
 	ScriptValues<Armor> _scriptValues;
 	std::vector<int> _customArmorPreviewIndex;
-	Sint8 _allowsRunning, _allowsStrafing, _allowsSneaking, _allowsKneeling, _allowsMoving;
+	int8_t _allowsRunning, _allowsStrafing, _allowsSneaking, _allowsKneeling, _allowsMoving;
 	bool _isPilotArmor;
 	bool _allowTwoMainWeapons;
 	bool _instantWoundRecovery;

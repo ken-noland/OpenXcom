@@ -44,7 +44,7 @@ private:
 	int _anim;
 	std::string _oldMaster;
 
-	SDL_Thread *_thread;
+//	SDL_Thread *_thread;
 	std::ostringstream _output;
 public:
 	static LoadingPhase loading;
@@ -53,7 +53,7 @@ public:
 	/// Creates the Start state.
 	StartState();
 	/// Cleans up the Start state.
-	~StartState();
+	virtual ~StartState();
 	/// Reset everything.
 	void init() override;
 	/// Displays messages.

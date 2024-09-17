@@ -48,7 +48,7 @@ public:
 	/// Plays the music.
 	void play(int loop = -1) const override;
 	/// Adlib music player.
-	static void player(void *udata, Uint8 *stream, int len);
+	static void player(void *udata, uint8_t *stream, int len);
 	bool isPlaying();
 };
 

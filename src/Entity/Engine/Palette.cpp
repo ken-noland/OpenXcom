@@ -18,7 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Palette.h"
-#include "../../Engine/Palette.h"
+//#include "../../Engine/Palette.h"
 
 #include "../../Engine/Game.h"
 #include "../../Mod/Mod.h"
@@ -58,13 +58,13 @@ PaletteSystem::PaletteSystem()
 
 PaletteSystem::~PaletteSystem()
 {
-	for (Palette* palette : _palettes)
-	{
-		if (palette != nullptr)
-		{
-			delete palette;
-		}
-	}
+	//for (Palette* palette : _palettes)
+	//{
+	//	if (palette != nullptr)
+	//	{
+	//		delete palette;
+	//	}
+	//}
 }
 
 
@@ -90,9 +90,10 @@ Palette* PaletteSystem::getPaletteByHandle(PaletteHandle handle) const
 
 PaletteHandle PaletteSystem::addPalette(const std::string& name, const SDL_Color* palette, int first, int ncolors)
 {
-	Palette* newPalette = new Palette(name, palette, first, ncolors);
-	_palettes.push_back(newPalette);
-	return (PaletteHandle)(_palettes.size() - 1);
+	//Palette* newPalette = new Palette(name, palette, first, ncolors);
+	//_palettes.push_back(newPalette);
+	//return (PaletteHandle)(_palettes.size() - 1);
+	return PaletteHandle::Invalid;
 }
 
 void PaletteSystem::removePalette(PaletteHandle handle)
@@ -101,13 +102,13 @@ void PaletteSystem::removePalette(PaletteHandle handle)
 	// palettes. This isn't much of a concern for most use cases, so leaving empty slots
 	// in the palette list is fine.
 
-	int index = getPaletteIndex(handle);
-	Palette* palette = getPaletteByHandle(handle);
-	if (palette != nullptr)
-	{
-		delete palette;
-		_palettes[index] = nullptr;
-	}
+	//int index = getPaletteIndex(handle);
+	//Palette* palette = getPaletteByHandle(handle);
+	//if (palette != nullptr)
+	//{
+	//	delete palette;
+	//	_palettes[index] = nullptr;
+	//}
 }
 
 [[deprecated("Direct access to Palette should not be allowed")]]
@@ -118,13 +119,13 @@ Palette* PaletteSystem::getPalette(PaletteHandle handle) const
 
 PaletteHandle PaletteSystem::getPaletteByName(const std::string& name) const
 {
-	for (size_t i = 0; i < _palettes.size(); i++)
-	{
-		if (_palettes[i]->getName() == name)
-		{
-			return (PaletteHandle)i;
-		}
-	}
+	//for (size_t i = 0; i < _palettes.size(); i++)
+	//{
+	//	if (_palettes[i]->getName() == name)
+	//	{
+	//		return (PaletteHandle)i;
+	//	}
+	//}
 	return PaletteHandle::Invalid;
 }
 
@@ -134,44 +135,44 @@ PaletteHandle PaletteSystem::getPaletteByID(const std::string& id, bool alterPal
 	int paletteBlock = -1;
 	std::string paletteName;
 
-	// KN NOTE: Okay, this whole section is a bit strange. In order to set up the palette, we need
-	// to know the name of the palette and the block to use. The block is used to set the palette
-	// for the background images. The palette name is used to get the actual palette. The palette
-	// name is set by the mod interface, but the block is not. The block is set by the mod interface
-	// parent. This is a bit of a mess, but it's how the original code works. We should probably
-	// clean this up at some point.
+	//// KN NOTE: Okay, this whole section is a bit strange. In order to set up the palette, we need
+	//// to know the name of the palette and the block to use. The block is used to set the palette
+	//// for the background images. The palette name is used to get the actual palette. The palette
+	//// name is set by the mod interface, but the block is not. The block is set by the mod interface
+	//// parent. This is a bit of a mess, but it's how the original code works. We should probably
+	//// clean this up at some point.
 
 
-	// Until we have a proper palette system, we need to lean on the mod interface.
-	RuleInterface* ruleInterface = getGame()->getMod()->getInterface(id);
-	if (ruleInterface)
-	{
-		RuleInterface* ruleInterfaceParent = getGame()->getMod()->getInterface(ruleInterface->getParent());
-		paletteName = ruleInterface->getPalette();
+	//// Until we have a proper palette system, we need to lean on the mod interface.
+	//RuleInterface* ruleInterface = getGame()->getMod()->getInterface(id);
+	//if (ruleInterface)
+	//{
+	//	RuleInterface* ruleInterfaceParent = getGame()->getMod()->getInterface(ruleInterface->getParent());
+	//	paletteName = ruleInterface->getPalette();
 
-		Element* element = ruleInterface->getElement("palette");
+	//	Element* element = ruleInterface->getElement("palette");
 
-		if (ruleInterfaceParent)
-		{
-			if (!element)
-			{
-				element = ruleInterfaceParent->getElement("palette");
-			}
-			if (paletteName.empty())
-			{
-				paletteName = ruleInterfaceParent->getPalette();
-			}
-		}
-		if (element)
-		{
-			// KN NOTE: Okay, so the palette block comes from the element COLOR or COLOR2. WTF?!?
-			int block = alterPal ? element->color2 : element->color;
-			if (block != INT_MAX)
-			{
-				paletteBlock = block;
-			}
-		}
-	}
+	//	if (ruleInterfaceParent)
+	//	{
+	//		if (!element)
+	//		{
+	//			element = ruleInterfaceParent->getElement("palette");
+	//		}
+	//		if (paletteName.empty())
+	//		{
+	//			paletteName = ruleInterfaceParent->getPalette();
+	//		}
+	//	}
+	//	if (element)
+	//	{
+	//		// KN NOTE: Okay, so the palette block comes from the element COLOR or COLOR2. WTF?!?
+	//		int block = alterPal ? element->color2 : element->color;
+	//		if (block != INT_MAX)
+	//		{
+	//			paletteBlock = block;
+	//		}
+	//	}
+	//}
 
 	if (paletteName.empty())
 	{
@@ -198,7 +199,8 @@ void PaletteSystem::setSurfacePalette(Surface* surface, PaletteHandle paletteHan
 	Palette* pal = getPaletteByHandle(paletteHandle);
 	if (pal != nullptr)
 	{
-		SDL_SetColors(surface->getSDLSurface(), pal->getColors(), 0, pal->getColorCount());
+// SDLHACK
+//		SDL_SetColors(surface->getSDLSurface(), pal->getColors(), 0, pal->getColorCount());
 	}
 
 	// KN NOTE: All of this is only used (as far as I can tell) for background images. It would
@@ -219,7 +221,8 @@ void PaletteSystem::setSurfacePalette(Surface* surface, PaletteHandle paletteHan
 			}
 		}
 
-		SDL_SetColors(surface->getSDLSurface(), _backpal->getColors() + Palette::blockOffset(chunk), Palette::backPos, 16);
+// SDLHACK
+		//SDL_SetColors(surface->getSDLSurface(), _backpal->getColors() + Palette::blockOffset(chunk), Palette::backPos, 16);
 	}
 }
 

@@ -18,8 +18,6 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL_rwops.h>
-
 namespace OpenXcom
 {
 
@@ -38,10 +36,11 @@ struct FileRecord
 
 	FileRecord();
 
-	/// Open file warped in RWops.
-	SDL_RWops* getRWops() const;
-	/// Read the whole file to memory and warp in RWops.
-	SDL_RWops* getRWopsReadAll() const;
+// SDLHACK
+	///// Open file warped in RWops.
+	//SDL_RWops* getRWops() const;
+	///// Read the whole file to memory and warp in RWops.
+	//SDL_RWops* getRWopsReadAll() const;
 
 	std::unique_ptr<std::istream> getIStream() const;
 	YAML::Node getYAML() const;

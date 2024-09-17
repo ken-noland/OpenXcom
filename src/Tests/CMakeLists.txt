@@ -20,11 +20,13 @@ enable_testing()
 # Add the test executable
 add_executable(
   OpenXcomTests
-  "Engine/TestTimer.cpp"
   "Engine/TestECS.cpp"
+  "Engine/TestOptions.cpp"
+  "Engine/TestTimer.cpp"
   "Engine/TestTypeErasedPtr.cpp"
   "Entity/Interface/WindowTest.cpp"
-  "Entity/Interface/ButtonTest.cpp")
+  "Entity/Interface/ButtonTest.cpp"
+)
 
 # Link Google Test libraries with your test executable
 target_link_libraries(OpenXcomTests PUBLIC openxcom_lib GTest::gtest_main)

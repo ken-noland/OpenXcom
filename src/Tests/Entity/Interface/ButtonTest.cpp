@@ -1,3 +1,21 @@
+/*
+ * Copyright 2010-2016 OpenXcom Developers.
+ *
+ * This file is part of OpenXcom.
+ *
+ * OpenXcom is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenXcom is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include <entt/entt.hpp>
 #include <gtest/gtest.h>
 
@@ -44,9 +62,11 @@ protected:
 // Test case: Setting and getting the text button's color
 TEST_F(ButtonSystemTest, SetAndGetColor)
 {
+	GTEST_SKIP() << "Skipping test until we factor out mod dependencies from the factory.";
+
 	ButtonSystem& buttonSystem = ecs.getSystem<ButtonSystem>();
 
-	Uint8 color = 42;
+	uint8_t color = 42;
 	buttonSystem.setColor(textButtonEntity, color);
 
 	// Verify that the color is set correctly

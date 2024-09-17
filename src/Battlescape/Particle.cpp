@@ -33,7 +33,7 @@ namespace OpenXcom
  * @param color the color set to use from the transparency LUTs
  * @param opacity another reference for the LUT, this one is divided by 5 for the actual offset to use.
  */
-Particle::Particle(Position voxelPos, Position subVoxelOffset, Position subVoxelVel, Position subVoxelAcc, Uint8 drift, Uint8 color, Uint8 opacity, Uint8 size) : _drift(drift), _color(color), _opacity(opacity), _size(size)
+Particle::Particle(Position voxelPos, Position subVoxelOffset, Position subVoxelVel, Position subVoxelAcc, uint8_t drift, uint8_t color, uint8_t opacity, uint8_t size) : _drift(drift), _color(color), _opacity(opacity), _size(size)
 {
 	_layerZ = (voxelPos.z / Position::TileZ) << 1;
 

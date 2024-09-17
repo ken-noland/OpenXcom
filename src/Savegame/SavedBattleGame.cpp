@@ -200,20 +200,20 @@ void SavedBattleGame::load(const YAML::Node &node, Mod *mod, SavedGame* savedGam
 		size_t totalTiles = node["totalTiles"].as<size_t>();
 
 		serKey.index = node["tileIndexSize"].as<char>(def.index);
-		serKey.totalBytes = node["tileTotalBytesPer"].as<Uint32>(def.totalBytes);
+		serKey.totalBytes = node["tileTotalBytesPer"].as<uint32_t>(def.totalBytes);
 		serKey._fire = node["tileFireSize"].as<char>(def._fire);
 		serKey._smoke = node["tileSmokeSize"].as<char>(def._smoke);
 		serKey._mapDataID = node["tileIDSize"].as<char>(def._mapDataID);
 		serKey._mapDataSetID = node["tileSetIDSize"].as<char>(def._mapDataSetID);
-		serKey.boolFields = node["tileBoolFieldsSize"].as<char>(def.boolFields); // boolean flags used to be stored in an unmentioned byte (Uint8) :|
+		serKey.boolFields = node["tileBoolFieldsSize"].as<char>(def.boolFields); // boolean flags used to be stored in an unmentioned byte (uint8_t) :|
 		serKey._lastExploredByHostile = node["lastExploredByHostile"].as<int>(def._lastExploredByHostile);
 		serKey._lastExploredByNeutral = node["lastExploredByNeutral"].as<int>(def._lastExploredByNeutral);
 		serKey._lastExploredByPlayer = node["lastExploredByPlayer"].as<int>(def._lastExploredByPlayer);
 		// load binary tile data!
 		YAML::Binary binTiles = node["binTiles"].as<YAML::Binary>();
 
-		Uint8 *r = (Uint8*)binTiles.data();
-		Uint8 *dataEnd = r + totalTiles * serKey.totalBytes;
+		uint8_t *r = (uint8_t*)binTiles.data();
+		uint8_t *dataEnd = r + totalTiles * serKey.totalBytes;
 
 		while (r < dataEnd)
 		{
@@ -661,8 +661,8 @@ YAML::Node SavedBattleGame::save() const
 	node["lastExploredByHostile"] = static_cast<char>(def._lastExploredByHostile);
 
 	size_t tileDataSize = def.totalBytes * _mapsize_z * _mapsize_y * _mapsize_x;
-	Uint8* tileData = (Uint8*) calloc(tileDataSize, 1);
-	Uint8* w = tileData;
+	uint8_t* tileData = (uint8_t*) calloc(tileDataSize, 1);
+	uint8_t* w = tileData;
 
 	for (int i = 0; i < _mapsize_z * _mapsize_y * _mapsize_x; ++i)
 	{

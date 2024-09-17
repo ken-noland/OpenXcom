@@ -31,8 +31,8 @@ struct OpenSetEntry;
  */
 struct PathfindingCost
 {
-	Sint16 time = 0;
-	Sint16 energy = 0;
+	int16_t time = 0;
+	int16_t energy = 0;
 
 	/// Default constructor.
 	PathfindingCost() = default;
@@ -43,8 +43,8 @@ struct PathfindingCost
 	PathfindingCost operator+(PathfindingCost c) const
 	{
 		return {
-			static_cast<Sint16>(time + c.time),
-			static_cast<Sint16>(energy + c.energy),
+			static_cast<int16_t>(time + c.time),
+			static_cast<int16_t>(energy + c.energy),
 		};
 	}
 
@@ -90,11 +90,11 @@ private:
 	PathfindingNode* _prevNode;
 	int _prevDir;
 	/// Approximate cost to reach goal position.
-	Sint16 _tuGuess;
+	int16_t _tuGuess;
 	/// Is best path find for this tile.
 	bool _checked;
 	// Invasive field needed by PathfindingOpenSet
-	Uint8 _openentry;
+	uint8_t _openentry;
 	friend class PathfindingOpenSet;
 public:
 	/// Creates a new PathfindingNode class.

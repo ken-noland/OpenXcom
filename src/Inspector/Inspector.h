@@ -18,8 +18,6 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL/SDL_events.h>
-
 namespace OpenXcom
 {
 
@@ -43,8 +41,6 @@ public:
 
 	void create();
 	void destroy();
-
-	void handleEvent(const SDL_Event& event);
 
 	void show();
 	void hide();

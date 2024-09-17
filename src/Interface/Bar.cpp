@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Bar.h"
-#include <SDL.h>
+
 
 namespace OpenXcom
 {
@@ -45,7 +45,7 @@ Bar::~Bar()
  * Changes the color used to draw the border and contents.
  * @param color Color value.
  */
-void Bar::setColor(Uint8 color)
+void Bar::setColor(uint8_t color)
 {
 	_color = color;
 	_redraw = true;
@@ -55,7 +55,7 @@ void Bar::setColor(Uint8 color)
  * Returns the color used to draw the bar.
  * @return Color value.
  */
-Uint8 Bar::getColor() const
+uint8_t Bar::getColor() const
 {
 	return _color;
 }
@@ -64,7 +64,7 @@ Uint8 Bar::getColor() const
  * Changes the color used to draw the second contents.
  * @param color Color value.
  */
-void Bar::setSecondaryColor(Uint8 color)
+void Bar::setSecondaryColor(uint8_t color)
 {
 	_color2 = color;
 	_redraw = true;
@@ -74,7 +74,7 @@ void Bar::setSecondaryColor(Uint8 color)
  * Returns the second color used to draw the bar.
  * @return Color value.
  */
-Uint8 Bar::getSecondaryColor() const
+uint8_t Bar::getSecondaryColor() const
 {
 	return _color2;
 }
@@ -175,7 +175,7 @@ void Bar::draw()
 
 	square.x = 0;
 	square.y = 0;
-	square.w = (Uint16)(_scale * _max) + 1;
+	square.w = (uint16_t)(_scale * _max) + 1;
 	square.h = getHeight();
 
 	if (_borderColor)
@@ -191,16 +191,16 @@ void Bar::draw()
 
 	if (_secondOnTop)
 	{
-		square.w = (Uint16)(_scale * _value);
+		square.w = (uint16_t)(_scale * _value);
 		drawRect(&square, _color);
-		square.w = (Uint16)(_scale * _value2);
+		square.w = (uint16_t)(_scale * _value2);
 		drawRect(&square, _color2);
 	}
 	else
 	{
-		square.w = (Uint16)(_scale * _value2);
+		square.w = (uint16_t)(_scale * _value2);
 		drawRect(&square, _color2);
-		square.w = (Uint16)(_scale * _value);
+		square.w = (uint16_t)(_scale * _value);
 		drawRect(&square, _color);
 	}
 }
@@ -210,7 +210,7 @@ void Bar::draw()
  * @param bc the color for the outline of the bar.
  * @note will use base colour + 4 if none is defined here.
  */
-void Bar::setBorderColor(Uint8 bc)
+void Bar::setBorderColor(uint8_t bc)
 {
 	_borderColor = bc;
 }

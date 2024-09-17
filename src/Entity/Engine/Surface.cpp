@@ -58,7 +58,7 @@ SurfaceComponent::SurfaceComponent(std::unique_ptr<Surface>& surface)
 
 void SurfaceComponent::blit()
 {
-	_surface->blit(getGame()->getScreen()->getSurface());
+	//_surface->blit(getGame()->getScreen()->getSurface());
 }
 
 SurfaceFactory::SurfaceFactory(entt::registry& registry)
@@ -73,18 +73,18 @@ SurfaceFactory::~SurfaceFactory()
 entt::handle SurfaceFactory::createSurface(const std::string& name, int x, int y, int width, int height, PaletteHandle palette)
 {
 	entt::handle entity = entt::handle(_registry, _registry.create());
-	entity.emplace<NameComponent>(name);
+	//entity.emplace<NameComponent>(name);
 
-	//this is mostly a hack until I get surface converted to a pure component
-	std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
-	SurfaceComponent& surfaceComponent = entity.emplace<SurfaceComponent>(surface);
-	entity.emplace<PaletteComponent>(surfaceComponent.getSurface(), palette);
-	entity.emplace<ScreenRectComponent>(x, y, width, height);
+	////this is mostly a hack until I get surface converted to a pure component
+	//std::unique_ptr<Surface> surface = std::make_unique<Surface>(width, height, x, y);
+	//SurfaceComponent& surfaceComponent = entity.emplace<SurfaceComponent>(surface);
+	//entity.emplace<PaletteComponent>(surfaceComponent.getSurface(), palette);
+	//entity.emplace<ScreenRectComponent>(x, y, width, height);
 
-	// KN NOTE: DrawableComponent is going away... soon
-	DrawableComponent& drawableComponent = entity.emplace<DrawableComponent>();
-	//	drawableComponent.setSurfaceComponent(&surfaceComponent);
-	//drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
+	//// KN NOTE: DrawableComponent is going away... soon
+	//DrawableComponent& drawableComponent = entity.emplace<DrawableComponent>();
+	////	drawableComponent.setSurfaceComponent(&surfaceComponent);
+	////drawableComponent.addDrawable(std::bind(&SurfaceComponent::blit, &surfaceComponent));
 
 
 	return entt::handle(_registry, entity);

@@ -82,13 +82,13 @@ public:
 	/// Sets the text edit constraint.
 	void setConstraint(TextEditConstraint constraint);
 	/// Sets the text edit's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the text edit's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the text edit's secondary color.
-	void setSecondaryColor(Uint8 color) override;
+	void setSecondaryColor(uint8_t color) override;
 	/// Gets the text edit's secondary color.
-	Uint8 getSecondaryColor() const;
+	uint8_t getSecondaryColor() const;
 	/// Sets the text edit's palette.
 	void setPalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256) override;
 	/// Handles the timers.

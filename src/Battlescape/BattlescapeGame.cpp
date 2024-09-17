@@ -1425,7 +1425,7 @@ bool BattlescapeGame::noActionsPending(BattleUnit *bu)
  * Sets the timer interval for think() calls of the state.
  * @param interval An interval in ms.
  */
-void BattlescapeGame::setStateInterval(Uint32 interval)
+void BattlescapeGame::setStateInterval(uint32_t interval)
 {
 	_parentState->setStateInterval(interval);
 }

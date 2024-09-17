@@ -19,7 +19,6 @@
  */
 #include <string>
 #include <yaml-cpp/yaml.h>
-#include <SDL_stdinc.h>
 
 namespace OpenXcom
 {
@@ -28,7 +27,7 @@ namespace OpenXcom
 constexpr int defIntNullable = -1;
 
 // Default value that is interpreted as null.
-constexpr Sint8 defBoolNullable = -1;
+constexpr int8_t defBoolNullable = -1;
 
 /// Load bool from yaml.
 inline void loadBool(bool& value, const YAML::Node& node)
@@ -56,7 +55,7 @@ inline void loadBoolNullable(int& value, const YAML::Node& node)
 }
 
 /// Load bool as int from yaml.
-inline void loadBoolNullable(Sint8& value, const YAML::Node& node)
+inline void loadBoolNullable(int8_t& value, const YAML::Node& node)
 {
 	if (node)
 	{

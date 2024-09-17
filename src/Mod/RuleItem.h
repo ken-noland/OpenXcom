@@ -54,7 +54,7 @@ enum ExperienceTrainingMode {
 	ETM_PSI_STRENGTH_OR_SKILL, ETM_PSI_STRENGTH_OR_SKILL_2X,
 	ETM_NOTHING
 };
-enum BattleActionType : Uint8
+enum BattleActionType : uint8_t
 {
 	BA_NONE = 0,
 

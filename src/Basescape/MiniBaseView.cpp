@@ -42,16 +42,17 @@ MiniBaseView::MiniBaseView(BasescapeSystem& basescapeSystem, int width, int heig
 {
 	_unsubscribeId = _basescapeSystem.connectListener(std::bind_front(&MiniBaseView::draw, this));
 
-	_baseKeys = {
-		Options::keyBaseSelect1,
-		Options::keyBaseSelect2,
-		Options::keyBaseSelect3,
-		Options::keyBaseSelect4,
-		Options::keyBaseSelect5,
-		Options::keyBaseSelect6,
-		Options::keyBaseSelect7,
-		Options::keyBaseSelect8
-	};
+// OPTIONSHACK
+	//_baseKeys = {
+	//	Options::keyBaseSelect1,
+	//	Options::keyBaseSelect2,
+	//	Options::keyBaseSelect3,
+	//	Options::keyBaseSelect4,
+	//	Options::keyBaseSelect5,
+	//	Options::keyBaseSelect6,
+	//	Options::keyBaseSelect7,
+	//	Options::keyBaseSelect8
+	//};
 }
 
 MiniBaseView::~MiniBaseView()
@@ -70,7 +71,7 @@ void MiniBaseView::draw()
 	size_t selectedBaseIndex = _basescapeSystem.getBasescapeData().getSelectedBaseVisibleIndex();
 	auto visibleBases = _basescapeSystem.getVisibleBases() | std::views::reverse;
 	auto baseIterator = visibleBases.begin();
-	for (Sint16 index = 0; index < BasescapeData::MAX_VISIBLE_BASES; ++index)
+	for (int16_t index = 0; index < BasescapeData::MAX_VISIBLE_BASES; ++index)
 	{
 		// Draw base squares
 		if (index == selectedBaseIndex)
@@ -101,10 +102,10 @@ void MiniBaseView::draw()
 					color = _red;
 
 				SDL_Rect r{
-					.x = static_cast<Sint16>(index * (MINI_SIZE + 2) + 2 + fac->getX() * 2),
-					.y = static_cast<Sint16>(2 + fac->getY() * 2),
-					.w = static_cast<Uint16>(fac->getRules()->getSizeX() * 2),
-					.h = static_cast<Uint16>(fac->getRules()->getSizeY() * 2),
+					.x = static_cast<int16_t>(index * (MINI_SIZE + 2) + 2 + fac->getX() * 2),
+					.y = static_cast<int16_t>(2 + fac->getY() * 2),
+					.w = static_cast<uint16_t>(fac->getRules()->getSizeX() * 2),
+					.h = static_cast<uint16_t>(fac->getRules()->getSizeY() * 2),
 				};
 
 				drawRect(&r, color + 3);

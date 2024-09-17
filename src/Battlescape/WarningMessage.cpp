@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "WarningMessage.h"
-#include <SDL.h>
+
 #include <string>
 #include "../fmath.h"
 #include "../Engine/Timer.h"
@@ -60,7 +60,7 @@ WarningMessage::~WarningMessage()
  * Changes the color for the message background.
  * @param color Color value.
  */
-void WarningMessage::setColor(Uint8 color)
+void WarningMessage::setColor(uint8_t color)
 {
 	_color = color;
 }
@@ -69,7 +69,7 @@ void WarningMessage::setColor(Uint8 color)
  * Changes the color for the message text.
  * @param color Color value.
  */
-void WarningMessage::setTextColor(Uint8 color)
+void WarningMessage::setTextColor(uint8_t color)
 {
 	_text->setColor(color);
 }

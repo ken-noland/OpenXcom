@@ -18,12 +18,17 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <istream>
-#include <SDL.h>
 #include <string>
 #include <vector>
 #include <array>
 #include <memory>
 #include <utility>
+
+// SDLHACK
+namespace {
+class SDL_Event{};
+class SDL_RWops{};
+}
 
 namespace OpenXcom
 {
@@ -241,9 +246,11 @@ namespace CrossPlatform
 	bool writeFile(const std::string& filename, const std::string& data);
 	bool writeFile(const std::string& filename, const std::vector<unsigned char>& data);
 	/// Reads in a file
-	std::unique_ptr<std::istream> readFile(const std::string& filename);
+// SDLHACK
+//	std::unique_ptr<std::istream> readFile(const std::string& filename);
 	/// Reads file until "\n---" sequence is met or to the end. To be used only for savegames.
-	std::unique_ptr<std::istream> getYamlSaveHeader (const std::string& filename);
+// SDLHACK
+//	std::unique_ptr<std::istream> getYamlSaveHeader (const std::string& filename);
 	/// Flashes the game window.
 	void flashWindow();
 	/// Gets the DOS-style executable path.
@@ -252,19 +259,13 @@ namespace CrossPlatform
 	void setWindowIcon(int winResource, const std::string &unixPath);
 	/// Produces a stack trace.
 	void stackTrace(void *ctx);
-	/// Produces a quick timestamp.
-	std::string now();
 	/// Produces a crash dump.
 	void crashDump(void *ex, const std::string &err);
 	/// Opens a URL.
 	bool openExplorer(const std::string &url);
-	/// Log something.
-	void log(int, const std::ostringstream& msg);
-	/// The log file name
-	void setLogFileName(const std::string &path);
-	const std::string& getLogFileName();
+
 	/// Get an SDL_RWops to an embedded asset. NULL if not there.
-	SDL_RWops *getEmbeddedAsset(const std::string& assetName);
+//	SDL_RWops *getEmbeddedAsset(const std::string& assetName);
 	/// Tests the internet connection.
 	bool testInternetConnection(const std::string& url);
 	/// Downloads a file from a given URL to the filesystem.

@@ -48,7 +48,7 @@ private:
 
 	Base *_base;
 	size_t _craft;
-	Uint8 _otherCraftColor;
+	uint8_t _otherCraftColor;
 	std::vector<Soldier *> _origSoldierOrder;
 	std::vector<SortFunctor *> _sortFunctors;
 	getStatFn_t _dynGetter;

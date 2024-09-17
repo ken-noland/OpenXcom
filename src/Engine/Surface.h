@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <SDL.h>
 #include <string>
 #include <vector>
 #include <memory>
@@ -38,6 +37,11 @@ class ScriptWorkerBase;
 class SurfaceCrop;
 template<typename Pixel> class SurfaceRaw;
 
+// SDLHACK
+class SDL_Surface{};
+class SDL_Rect{};
+class SDL_Color{};
+
 /**
  * Element that is blit (rendered) onto the screen.
  * Mainly an encapsulation for SDL's SDL_Surface struct, so it
@@ -50,14 +54,14 @@ class Surface
 public:
 	struct UniqueBufferDeleter
 	{
-		void operator()(Uint8*);
+		void operator()(uint8_t*);
 	};
 	struct UniqueSurfaceDeleter
 	{
 		void operator()(SDL_Surface*);
 	};
 
-	using UniqueBufferPtr = std::unique_ptr<Uint8, UniqueBufferDeleter>;
+	using UniqueBufferPtr = std::unique_ptr<uint8_t, UniqueBufferDeleter>;
 	using UniqueSurfacePtr = std::unique_ptr<SDL_Surface, UniqueSurfaceDeleter>;
 
 	/// Create aligned buffer for surface.
@@ -88,11 +92,11 @@ public:
 protected:
 	UniqueBufferPtr _alignedBuffer;
 	UniqueSurfacePtr _surface;
-	Sint16 _x, _y;
-	Uint16 _width, _height, _pitch;
-	Uint8 _visible: 1;
-	Uint8 _hidden: 1;
-	Uint8 _redraw: 1;
+	int16_t _x, _y;
+	int16_t _width, _height, _pitch;
+	uint8_t _visible : 1;
+	uint8_t _hidden : 1;
+	uint8_t _redraw : 1;
 
 	/// Copies raw pixels.
 	template <typename T>
@@ -140,7 +144,7 @@ public:
 	/// Offsets the surface's colors in a color block.
 	void offsetBlock(int off, int blk = 16, int mul = 1);
 	/// Inverts the surface's colors.
-	void invert(Uint8 mid);
+	void invert(uint8_t mid);
 	/// Runs surface functionality every cycle
 	virtual void think();
 	/// Draws the surface's graphic.
@@ -152,19 +156,19 @@ public:
 	/// Copies a portion of another surface into this one.
 	void copy(Surface *surface);
 	/// Draws a filled rectangle on the surface.
-	void drawRect(SDL_Rect *rect, Uint8 color);
+	void drawRect(SDL_Rect *rect, uint8_t color);
 	/// Draws a filled rectangle on the surface.
-	void drawRect(Sint16 x, Sint16 y, Sint16 w, Sint16 h, Uint8 color);
+	void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t color);
 	/// Draws a line on the surface.
-	void drawLine(Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint8 color);
+	void drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color);
 	/// Draws a filled circle on the surface.
-	void drawCircle(Sint16 x, Sint16 y, Sint16 r, Uint8 color);
+	void drawCircle(int16_t x, int16_t y, int16_t r, uint8_t color);
 	/// Draws a filled polygon on the surface.
-	void drawPolygon(Sint16 *x, Sint16 *y, int n, Uint8 color);
+	void drawPolygon(int16_t *x, int16_t *y, int n, uint8_t color);
 	/// Draws a textured polygon on the surface.
-	void drawTexturedPolygon(Sint16 *x, Sint16 *y, int n, Surface *texture, int dx, int dy);
+	void drawTexturedPolygon(int16_t *x, int16_t *y, int n, Surface *texture, int dx, int dy);
 	/// Draws a string on the surface.
-	void drawString(Sint16 x, Sint16 y, const char *s, Uint8 color);
+	void drawString(int16_t x, int16_t y, const char *s, uint8_t color);
 	/// Sets the surface's palette.
 	[[deprecated("Use palette system for setting palette")]] virtual void setPalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256);
 
@@ -174,7 +178,7 @@ public:
 	 */
 	SDL_Color *getPalette() const
 	{
-		return _surface->format->palette->colors;
+		return nullptr;//_surface->format->palette->colors;
 	}
 	/// Sets the X position of the surface.
 	virtual void setX(int x);
@@ -215,7 +219,7 @@ public:
 	 * @param y Y position of the pixel.
 	 * @param pixel New color for the pixel.
 	 */
-	void setPixel(int x, int y, Uint8 pixel)
+	void setPixel(int x, int y, uint8_t pixel)
 	{
 		if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())
 		{
@@ -231,7 +235,7 @@ public:
 	 * @param y Pointer to the Y position of the pixel. Changed to the next Y position in the sequence.
 	 * @param pixel New color for the pixel.
 	 */
-	void setPixelIterative(int *x, int *y, Uint8 pixel)
+	void setPixelIterative(int *x, int *y, uint8_t pixel)
 	{
 		setPixel(*x, *y, pixel);
 		(*x)++;
@@ -247,7 +251,7 @@ public:
 	 * @param y Y position of the pixel.
 	 * @return Color of the pixel, zero if the position is invalid.
 	 */
-	Uint8 getPixel(int x, int y) const
+	uint8_t getPixel(int x, int y) const
 	{
 		if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())
 		{
@@ -261,9 +265,9 @@ public:
 	 * @param y Y position of the pixel.
 	 * @return Pointer to the pixel.
 	 */
-	const Uint8 *getRaw(int x, int y) const
+	const uint8_t *getRaw(int x, int y) const
 	{
-		return (Uint8 *)_surface->pixels + (y * _surface->pitch + x * _surface->format->BytesPerPixel);
+		return nullptr;//(uint8_t *)_surface->pixels + (y * _surface->pitch + x * _surface->format->BytesPerPixel);
 	}
 	/**
 	 * Returns the pointer to a specified pixel in the surface.
@@ -271,9 +275,9 @@ public:
 	 * @param y Y position of the pixel.
 	 * @return Pointer to the pixel.
 	 */
-	Uint8 *getRaw(int x, int y)
+	uint8_t *getRaw(int x, int y)
 	{
-		return (Uint8 *)_surface->pixels + (y * _surface->pitch + x * _surface->format->BytesPerPixel);
+		return nullptr; //(uint8_t *)_surface->pixels + (y * _surface->pitch + x * _surface->format->BytesPerPixel);
 	}
 	/**
 	 * Returns the internal SDL_Surface for SDL calls.
@@ -309,12 +313,12 @@ public:
 		return _pitch;
 	}
 	/// Get pointer to buffer
-	Uint8* getBuffer()
+	uint8_t* getBuffer()
 	{
 		return _alignedBuffer.get();
 	}
 	/// Get pointer to buffer
-	const Uint8* getBuffer() const
+	const uint8_t* getBuffer() const
 	{
 		return _alignedBuffer.get();
 	}
@@ -327,20 +331,20 @@ public:
 	/// Unlocks the surface.
 	void unlock();
 	/// Specific blit function to blit battlescape terrain data in different shades in a fast way.
-	static void blitRaw(SurfaceRaw<Uint8> dest, SurfaceRaw<const Uint8> src, int x, int y, int shade, bool half = false, int newBaseColor = 0);
+	static void blitRaw(SurfaceRaw<uint8_t> dest, SurfaceRaw<const uint8_t> src, int x, int y, int shade, bool half = false, int newBaseColor = 0);
 	/// Specific blit function to blit battlescape terrain data in different shades in a fast way.
-	void blitNShade(SurfaceRaw<Uint8> surface, int x, int y, int shade = 0, bool half = false, int newBaseColor = 0) const;
+	void blitNShade(SurfaceRaw<uint8_t> surface, int x, int y, int shade = 0, bool half = false, int newBaseColor = 0) const;
 	/// Specific blit function to blit battlescape terrain data in different shades in a fast way.
-	void blitNShade(SurfaceRaw<Uint8> surface, int x, int y, int shade, GraphSubset range) const;
+	void blitNShade(SurfaceRaw<uint8_t> surface, int x, int y, int shade, GraphSubset range) const;
 	/// Invalidate the surface: force it to be redrawn
 	void invalidate(bool valid = true);
 
 	/// Sets the color of the surface.
-	virtual void setColor(Uint8 /*color*/) { /* empty by design */ };
+	virtual void setColor(uint8_t /*color*/) { /* empty by design */ };
 	/// Sets the secondary color of the surface.
-	virtual void setSecondaryColor(Uint8 /*color*/) { /* empty by design */ };
+	virtual void setSecondaryColor(uint8_t /*color*/) { /* empty by design */ };
 	/// Sets the border colour of the surface.
-	virtual void setBorderColor(Uint8 /*color*/) { /* empty by design */ };
+	virtual void setBorderColor(uint8_t /*color*/) { /* empty by design */ };
 	/// Sets the high contrast color setting of the surface.
 	virtual void setHighContrast(bool /*contrast*/) { /* empty by design */ };
 
@@ -354,7 +358,7 @@ template<typename Pixel>
 class SurfaceRaw
 {
 	Pixel* _buffer;
-	Uint16 _width, _height, _pitch;
+	uint16_t _width, _height, _pitch;
 
 public:
 	/// Default constructor
@@ -376,70 +380,74 @@ public:
 	/// Constructor
 	SurfaceRaw(Pixel* buffer, int width, int height, int pitch) :
 		_buffer{ buffer },
-		_width{ static_cast<Uint16>(width) },
-		_height{ static_cast<Uint16>(height) },
-		_pitch{ static_cast<Uint16>(pitch) }
+		_width{ static_cast<uint16_t>(width) },
+		_height{ static_cast<uint16_t>(height) },
+		_pitch{ static_cast<uint16_t>(pitch) }
 	{
 
 	}
 
-	/// Constructor, SFINAE enable it only for `Uint8`
-	template<typename = std::enable_if<std::is_same<Uint8, Pixel>::value, void>>
+	/// Constructor, SFINAE enable it only for `uint8_t`
+	template<typename = std::enable_if<std::is_same<uint8_t, Pixel>::value, void>>
 	SurfaceRaw(Surface* surf) : SurfaceRaw{ }
 	{
-		if (surf)
-		{
-			*this = SurfaceRaw{ surf->getBuffer(), surf->getWidth(), surf->getHeight(), surf->getPitch() };
-		}
+		assert(!"Not implemented anymore(part of SDL to Vulkan conversion)");
+		// if (surf)
+		//{
+		//	*this = SurfaceRaw{ surf->getBuffer(), surf->getWidth(), surf->getHeight(), surf->getPitch() };
+		//}
 	}
 
-	/// Constructor, SFINAE enable it only for `Uint8`
-	template<typename = std::enable_if<std::is_same<const Uint8, Pixel>::value, void>>
+	/// Constructor, SFINAE enable it only for `uint8_t`
+	template<typename = std::enable_if<std::is_same<const uint8_t, Pixel>::value, void>>
 	SurfaceRaw(const Surface* surf) : SurfaceRaw{ }
 	{
-		if (surf)
-		{
-			*this = SurfaceRaw{ surf->getBuffer(), surf->getWidth(), surf->getHeight(), surf->getPitch() };
-		}
+		assert(!"Not implemented anymore(part of SDL to Vulkan conversion)");
+		// if (surf)
+		//{
+		//	*this = SurfaceRaw{ surf->getBuffer(), surf->getWidth(), surf->getHeight(), surf->getPitch() };
+		//}
 	}
 
-	/// Constructor, SFINAE enable it only for `Uint8`
-	template<typename = std::enable_if<std::is_same<Uint8, Pixel>::value, void>>
+	/// Constructor, SFINAE enable it only for `uint8_t`
+	template<typename = std::enable_if<std::is_same<uint8_t, Pixel>::value, void>>
 	SurfaceRaw(SDL_Surface* surf) : SurfaceRaw{ }
 	{
-		if (surf)
-		{
-			*this = SurfaceRaw{ (Pixel*)surf->pixels, surf->w, surf->h, surf->pitch };
-		}
+		assert(!"Not implemented anymore(part of SDL to Vulkan conversion)");
+		// if (surf)
+		//{
+		//	*this = SurfaceRaw{ (Pixel*)surf->pixels, surf->w, surf->h, surf->pitch };
+		//}
 	}
 
-	/// Constructor, SFINAE enable it only for `const Uint8`
-	template<typename = std::enable_if<std::is_same<const Uint8, Pixel>::value, void>>
+	/// Constructor, SFINAE enable it only for `const uint8_t`
+	template<typename = std::enable_if<std::is_same<const uint8_t, Pixel>::value, void>>
 	SurfaceRaw(const SDL_Surface* surf) : SurfaceRaw{ }
 	{
-		if (surf)
-		{
-			*this = SurfaceRaw{ (Pixel*)surf->pixels, surf->w, surf->h, surf->pitch };
-		}
+		assert(!"Not implemented anymore(part of SDL to Vulkan conversion)");
+		//if (surf)
+		//{
+		//	*this = SurfaceRaw{ (Pixel*)surf->pixels, surf->w, surf->h, surf->pitch };
+		//}
 	}
 
 	/// Constructor, SFINAE enable it only for non const `PixelType`
 	template<typename = std::enable_if<std::is_const<Pixel>::value == false, void>>
-	SurfaceRaw(std::vector<Pixel>& vec, int width, int height) : SurfaceRaw{ vec.data(), width, height, static_cast<Uint16>(width*sizeof(Pixel)) }
+	SurfaceRaw(std::vector<Pixel>& vec, int width, int height) : SurfaceRaw{ vec.data(), width, height, static_cast<uint16_t>(width*sizeof(Pixel)) }
 	{
 		assert((size_t)(width*height) <= vec.size() && "Incorrect dimensions compared to vector size");
 	}
 
 	/// Constructor, SFINAE enable it only for `const PixelType`
 	template<typename = std::enable_if<std::is_const<Pixel>::value, void>>
-	SurfaceRaw(const std::vector<typename std::remove_const<Pixel>::type>& vec, int width, int height) : SurfaceRaw{ vec.data(), width, height, static_cast<Uint16>(width*sizeof(Pixel)) }
+	SurfaceRaw(const std::vector<typename std::remove_const<Pixel>::type>& vec, int width, int height) : SurfaceRaw{ vec.data(), width, height, static_cast<uint16_t>(width*sizeof(Pixel)) }
 	{
 		assert((size_t)(width*height) <= vec.size() && "Incorrect dimensions compared to vector size");
 	}
 
 	/// Constructor
 	template<int I>
-	SurfaceRaw(Pixel (&buffer)[I], int width, int height) : SurfaceRaw{ buffer, width, height, static_cast<Uint16>(width*sizeof(Pixel)) }
+	SurfaceRaw(Pixel (&buffer)[I], int width, int height) : SurfaceRaw{ buffer, width, height, static_cast<uint16_t>(width*sizeof(Pixel)) }
 	{
 		assert(width*height <= I && "Incorrect dimensions compared to array size");
 	}

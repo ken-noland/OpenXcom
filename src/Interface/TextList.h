@@ -45,7 +45,7 @@ private:
 	Font *_big, *_small, *_font;
 	Language *_lang;
 	size_t _scroll, _visibleRows, _selRow;
-	Uint8 _color, _color2;
+	uint8_t _color, _color2;
 	std::map<int, TextHAlign> _align;
 	bool _dot, _dotFirstColumn, _selectable, _condensed, _contrast, _wrap, _flooding, _ignoreSeparators;
 	Surface *_bg, *_selector;
@@ -81,9 +81,9 @@ public:
 	/// Unpresses the surface.
 	void unpress(State *state) override;
 	/// Sets the text color of a certain cell.
-	void setCellColor(size_t row, size_t column, Uint8 color);
+	void setCellColor(size_t row, size_t column, uint8_t color);
 	/// Sets the text color of a certain row.
-	void setRowColor(size_t row, Uint8 color);
+	void setRowColor(size_t row, uint8_t color);
 	/// Gets the text of a certain cell.
 	std::string getCellText(size_t row, size_t column) const;
 	/// Sets the text of a certain cell.
@@ -117,13 +117,13 @@ public:
 	/// Sets the height of the surface.
 	void setHeight(int height) override;
 	/// Sets the text color of the text list.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the text color of the text list.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the secondary color of the text list.
-	void setSecondaryColor(Uint8 color) override;
+	void setSecondaryColor(uint8_t color) override;
 	/// Gets the secondary color of the text list.
-	Uint8 getSecondaryColor() const;
+	uint8_t getSecondaryColor() const;
 	/// Sets the text list's wordwrap setting.
 	void setWordWrap(bool wrap);
 	/// Sets the text list's high contrast color setting.
@@ -157,7 +157,7 @@ public:
 	/// Checks if a given coordinate is inside of the no scroll area of the text list.
 	bool isInsideNoScrollArea(int x);
 	/// Sets the arrow color of the text list.
-	void setArrowColor(Uint8 color);
+	void setArrowColor(uint8_t color);
 	/// Sets the arrow column of the text list.
 	void setArrowColumn(int pos, ArrowOrientation type);
 	/// Hooks an action handler to a mouse click on the left arrows.
@@ -206,7 +206,7 @@ public:
 	void setComboBox(ComboBox *comboBox);
 	/// Check for a combobox.
 	ComboBox *getComboBox() const;
-	void setBorderColor(Uint8 color) override;
+	void setBorderColor(uint8_t color) override;
 	int getScrollbarColor();
 	bool isScrollbarVisible() const;
 	/// Allows the cell to flood into other columns.

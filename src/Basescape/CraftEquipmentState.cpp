@@ -117,10 +117,11 @@ CraftEquipmentState::CraftEquipmentState(Base* base, size_t craft) : State("Craf
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&CraftEquipmentState::btnOkClick);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnOkClick, Options::keyCancel);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnClearClick, Options::keyRemoveEquipmentFromCraft);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnLoadClick, Options::keyCraftLoadoutLoad);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnSaveClick, Options::keyCraftLoadoutSave);
+// OPTIONSHACK
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnOkClick, Options::keyCancel);
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnClearClick, Options::keyRemoveEquipmentFromCraft);
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnLoadClick, Options::keyCraftLoadoutLoad);
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnSaveClick, Options::keyCraftLoadoutSave);
 
 	_btnClear->setText(tr("STR_UNLOAD_CRAFT"));
 	_btnClear->onMouseClick((ActionHandler)&CraftEquipmentState::btnClearClick);
@@ -129,7 +130,8 @@ CraftEquipmentState::CraftEquipmentState(Base* base, size_t craft) : State("Craf
 	_btnInventory->setText(tr("STR_INVENTORY"));
 	_btnInventory->onMouseClick((ActionHandler)&CraftEquipmentState::btnInventoryClick);
 	_btnInventory->setVisible(craftHasACrew && !_isNewBattle);
-	_btnInventory->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnInventoryClick, Options::keyBattleInventory);
+// OPTIONSHACK
+	//_btnInventory->onKeyboardPress((ActionHandler)&CraftEquipmentState::btnInventoryClick, Options::keyBattleInventory);
 
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_EQUIPMENT_FOR_CRAFT").arg(c->getName(getGame()->getLanguage())));
@@ -195,11 +197,12 @@ CraftEquipmentState::CraftEquipmentState(Base* base, size_t craft) : State("Craf
 	_cbxFilterBy->onChange((ActionHandler)&CraftEquipmentState::cbxFilterByChange);
 
 	_lstEquipment->setArrowColumn(203, ARROW_HORIZONTAL);
-	if (Options::oxceAlternateCraftEquipmentManagement)
-	{
-		_lstEquipment->setColumns(3, 156, 83, 41);
-	}
-	else
+// OPTIONSHACK
+	//if (Options::oxceAlternateCraftEquipmentManagement)
+	//{
+	//	_lstEquipment->setColumns(3, 156, 83, 41);
+	//}
+	//else
 	{
 		_lstEquipment->setColumns(3, 140, 50, 50, 40);
 		_lstEquipment->setAlign(TextHAlign::ALIGN_RIGHT, 1);
@@ -220,7 +223,8 @@ CraftEquipmentState::CraftEquipmentState(Base* base, size_t craft) : State("Craf
 	_btnQuickSearch->onEnter((ActionHandler)&CraftEquipmentState::btnQuickSearchApply);
 	_btnQuickSearch->setVisible(false);
 
-	_btnOk->onKeyboardRelease((ActionHandler)&CraftEquipmentState::btnQuickSearchToggle, Options::keyToggleQuickSearch);
+// OPTIONSHACK
+	//_btnOk->onKeyboardRelease((ActionHandler)&CraftEquipmentState::btnQuickSearchToggle, Options::keyToggleQuickSearch);
 
 	_timerLeft = new Timer(250);
 	_timerLeft->onState(std::bind(&CraftEquipmentState::moveLeft, this));
@@ -261,23 +265,24 @@ void CraftEquipmentState::init()
 	// don't reload after closing error popups
 	if (_reload)
 	{
-		if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
-		{
-			// skip when returning from craft equipment template load/save
-			if (!_returningFromGlobalTemplates)
-			{
-				c->calculateTotalSoldierEquipment();
-			}
-			if (_returningFromInventory)
-			{
-				// now that we're back from the inventory screen, we need to remove all the excess base gear
-				for (_sel = 0; _sel != _items.size(); ++_sel)
-				{
-					int excessQty = c->getItems()->getItem(_items[_sel]) - (c->getExtraItems()->getItem(_items[_sel]) + c->getSoldierItems()->getItem(_items[_sel]));
-					moveLeftByValue(excessQty);
-				}
-			}
-		}
+// OPTIONSHACK
+		//if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
+		//{
+		//	// skip when returning from craft equipment template load/save
+		//	if (!_returningFromGlobalTemplates)
+		//	{
+		//		c->calculateTotalSoldierEquipment();
+		//	}
+		//	if (_returningFromInventory)
+		//	{
+		//		// now that we're back from the inventory screen, we need to remove all the excess base gear
+		//		for (_sel = 0; _sel != _items.size(); ++_sel)
+		//		{
+		//			int excessQty = c->getItems()->getItem(_items[_sel]) - (c->getExtraItems()->getItem(_items[_sel]) + c->getSoldierItems()->getItem(_items[_sel]));
+		//			moveLeftByValue(excessQty);
+		//		}
+		//	}
+		//}
 		initList();
 	}
 	_reload = true;
@@ -362,10 +367,11 @@ void CraftEquipmentState::initList()
 
 		int bQty = _base->getStorageItems()->getItem(rule);
 		int reserved = 0;
-		if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
-		{
-			reserved = c->getSoldierItems()->getItem(rule);
-		}
+// OPTIONSHACK
+		//if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
+		//{
+		//	reserved = c->getSoldierItems()->getItem(rule);
+		//}
 		if ((isVehicle || rule->isInventoryItem()) && rule->canBeEquippedToCraftInventory() &&
 			(bQty > 0 || cQty > 0 || reserved > 0))
 		{
@@ -433,34 +439,35 @@ void CraftEquipmentState::initList()
 
 			_items.push_back(itemType);
 			std::ostringstream ss, ss2;
-			if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
-			{
-				// doing this once (on opening the screen) is enough
-				// and just to make sure, we must skip this when returning from craft equipment template load/save
-				if (_firstInit && !isVehicle && cQty < reserved && !_returningFromGlobalTemplates)
-				{
-					// try to automatically add more items (if possible)
-					int itemsToAdd = std::min(bQty, reserved - cQty);
-					if (itemsToAdd > 0)
-					{
-						_base->getStorageItems()->removeItem(rule, itemsToAdd);
-						bQty -= itemsToAdd;
-						c->getItems()->addItem(rule, itemsToAdd);
-						cQty += itemsToAdd;
-						_totalItems += itemsToAdd;
-						_totalItemStorageSize += itemsToAdd * rule->getSize();
-					}
-				}
-				if (isVehicle)
-					ss2 << cQty;
-				else if (cQty - reserved > 0)
-					ss2 << reserved << "/+" << cQty - reserved;
-				else if (cQty - reserved == 0)
-					ss2 << cQty;
-				else
-					ss2 << cQty << "/" << cQty - reserved;
-			}
-			else
+// OPTIONSHACK
+			//if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
+			//{
+			//	// doing this once (on opening the screen) is enough
+			//	// and just to make sure, we must skip this when returning from craft equipment template load/save
+			//	if (_firstInit && !isVehicle && cQty < reserved && !_returningFromGlobalTemplates)
+			//	{
+			//		// try to automatically add more items (if possible)
+			//		int itemsToAdd = std::min(bQty, reserved - cQty);
+			//		if (itemsToAdd > 0)
+			//		{
+			//			_base->getStorageItems()->removeItem(rule, itemsToAdd);
+			//			bQty -= itemsToAdd;
+			//			c->getItems()->addItem(rule, itemsToAdd);
+			//			cQty += itemsToAdd;
+			//			_totalItems += itemsToAdd;
+			//			_totalItemStorageSize += itemsToAdd * rule->getSize();
+			//		}
+			//	}
+			//	if (isVehicle)
+			//		ss2 << cQty;
+			//	else if (cQty - reserved > 0)
+			//		ss2 << reserved << "/+" << cQty - reserved;
+			//	else if (cQty - reserved == 0)
+			//		ss2 << cQty;
+			//	else
+			//		ss2 << cQty << "/" << cQty - reserved;
+			//}
+			//else
 			{
 				ss2 << cQty;
 			}
@@ -480,7 +487,7 @@ void CraftEquipmentState::initList()
 			}
 			_lstEquipment->addRow(3, s.c_str(), ss.str().c_str(), ss2.str().c_str());
 
-			Uint8 color;
+			uint8_t color;
 			if (cQty == 0)
 			{
 				if (rule->getBattleType() == BT_AMMO)
@@ -537,8 +544,9 @@ void CraftEquipmentState::btnOkClick(Action *)
  */
 void CraftEquipmentState::lstEquipmentLeftArrowPress(Action *action)
 {
-	_sel = _lstEquipment->getSelectedRow();
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT && !_timerLeft->isRunning()) _timerLeft->start();
+// SDLHACK
+	//_sel = _lstEquipment->getSelectedRow();
+	//if (action->getDetails()->button.button == SDL_BUTTON_LEFT && !_timerLeft->isRunning()) _timerLeft->start();
 }
 
 /**
@@ -547,10 +555,11 @@ void CraftEquipmentState::lstEquipmentLeftArrowPress(Action *action)
  */
 void CraftEquipmentState::lstEquipmentLeftArrowRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
-	{
-		_timerLeft->stop();
-	}
+// SDLHACK
+	//if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	//{
+	//	_timerLeft->stop();
+	//}
 }
 
 /**
@@ -559,13 +568,14 @@ void CraftEquipmentState::lstEquipmentLeftArrowRelease(Action *action)
  */
 void CraftEquipmentState::lstEquipmentLeftArrowClick(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT) moveLeftByValue(INT_MAX);
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
-	{
-		moveLeftByValue(1);
-		_timerRight->setInterval(250);
-		_timerLeft->setInterval(250);
-	}
+// SDLHACK
+	//if (action->getDetails()->button.button == SDL_BUTTON_RIGHT) moveLeftByValue(INT_MAX);
+	//if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	//{
+	//	moveLeftByValue(1);
+	//	_timerRight->setInterval(250);
+	//	_timerLeft->setInterval(250);
+	//}
 }
 
 /**
@@ -574,8 +584,9 @@ void CraftEquipmentState::lstEquipmentLeftArrowClick(Action *action)
  */
 void CraftEquipmentState::lstEquipmentRightArrowPress(Action *action)
 {
-	_sel = _lstEquipment->getSelectedRow();
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT && !_timerRight->isRunning()) _timerRight->start();
+// SDLHACK
+	//_sel = _lstEquipment->getSelectedRow();
+	//if (action->getDetails()->button.button == SDL_BUTTON_LEFT && !_timerRight->isRunning()) _timerRight->start();
 }
 
 /**
@@ -584,10 +595,11 @@ void CraftEquipmentState::lstEquipmentRightArrowPress(Action *action)
  */
 void CraftEquipmentState::lstEquipmentRightArrowRelease(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
-	{
-		_timerRight->stop();
-	}
+// SDLHACK
+	//if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	//{
+	//	_timerRight->stop();
+	//}
 }
 
 /**
@@ -596,13 +608,14 @@ void CraftEquipmentState::lstEquipmentRightArrowRelease(Action *action)
  */
 void CraftEquipmentState::lstEquipmentRightArrowClick(Action *action)
 {
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT) moveRightByValue(INT_MAX);
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
-	{
-		moveRightByValue(1);
-		_timerRight->setInterval(250);
-		_timerLeft->setInterval(250);
-	}
+// SDLHACK
+	//if (action->getDetails()->button.button == SDL_BUTTON_RIGHT) moveRightByValue(INT_MAX);
+	//if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	//{
+	//	moveRightByValue(1);
+	//	_timerRight->setInterval(250);
+	//	_timerLeft->setInterval(250);
+	//}
 }
 
 /**
@@ -611,34 +624,35 @@ void CraftEquipmentState::lstEquipmentRightArrowClick(Action *action)
  */
 void CraftEquipmentState::lstEquipmentMousePress(Action *action)
 {
-	_sel = _lstEquipment->getSelectedRow();
-	if (action->getDetails()->button.button == SDL_BUTTON_WHEELUP)
-	{
-		_timerRight->stop();
-		_timerLeft->stop();
-		if (action->getAbsoluteXMouse() >= _lstEquipment->getArrowsLeftEdge() &&
-			action->getAbsoluteXMouse() <= _lstEquipment->getArrowsRightEdge())
-		{
-			moveRightByValue(Options::changeValueByMouseWheel);
-		}
-	}
-	else if (action->getDetails()->button.button == SDL_BUTTON_WHEELDOWN)
-	{
-		_timerRight->stop();
-		_timerLeft->stop();
-		if (action->getAbsoluteXMouse() >= _lstEquipment->getArrowsLeftEdge() &&
-			action->getAbsoluteXMouse() <= _lstEquipment->getArrowsRightEdge())
-		{
-			moveLeftByValue(Options::changeValueByMouseWheel);
-		}
-	}
-	else if (action->getDetails()->button.button == SDL_BUTTON_MIDDLE)
-	{
-		_lstScroll = _lstEquipment->getScroll();
-		RuleItem *rule = getGame()->getMod()->getItem(_items[_sel]);
-		std::string articleId = rule->getUfopediaType();
-		Ufopaedia::openArticle(getGame(), articleId);
-	}
+// SDLHACK
+	//_sel = _lstEquipment->getSelectedRow();
+	//if (action->getDetails()->button.button == SDL_BUTTON_WHEELUP)
+	//{
+	//	_timerRight->stop();
+	//	_timerLeft->stop();
+	//	if (action->getAbsoluteXMouse() >= _lstEquipment->getArrowsLeftEdge() &&
+	//		action->getAbsoluteXMouse() <= _lstEquipment->getArrowsRightEdge())
+	//	{
+	//		moveRightByValue(Options::changeValueByMouseWheel);
+	//	}
+	//}
+	//else if (action->getDetails()->button.button == SDL_BUTTON_WHEELDOWN)
+	//{
+	//	_timerRight->stop();
+	//	_timerLeft->stop();
+	//	if (action->getAbsoluteXMouse() >= _lstEquipment->getArrowsLeftEdge() &&
+	//		action->getAbsoluteXMouse() <= _lstEquipment->getArrowsRightEdge())
+	//	{
+	//		moveLeftByValue(Options::changeValueByMouseWheel);
+	//	}
+	//}
+	//else if (action->getDetails()->button.button == SDL_BUTTON_MIDDLE)
+	//{
+	//	_lstScroll = _lstEquipment->getScroll();
+	//	RuleItem *rule = getGame()->getMod()->getItem(_items[_sel]);
+	//	std::string articleId = rule->getUfopediaType();
+	//	Ufopaedia::openArticle(getGame(), articleId);
+	//}
 }
 
 /**
@@ -667,24 +681,25 @@ void CraftEquipmentState::updateQuantity()
 	{
 		ss << "-";
 	}
-	if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
-	{
-		int reserved = c->getSoldierItems()->getItem(item);
-		if (item->getVehicleUnit())
-			ss2 << cQty;
-		else if (cQty - reserved > 0)
-			ss2 << reserved << "/+" << cQty - reserved;
-		else if (cQty - reserved == 0)
-			ss2 << cQty;
-		else
-			ss2 << cQty << "/" << cQty - reserved;
-	}
-	else
+// OPTIONSHACK
+	//if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
+	//{
+	//	int reserved = c->getSoldierItems()->getItem(item);
+	//	if (item->getVehicleUnit())
+	//		ss2 << cQty;
+	//	else if (cQty - reserved > 0)
+	//		ss2 << reserved << "/+" << cQty - reserved;
+	//	else if (cQty - reserved == 0)
+	//		ss2 << cQty;
+	//	else
+	//		ss2 << cQty << "/" << cQty - reserved;
+	//}
+	//else
 	{
 		ss2 << cQty;
 	}
 
-	Uint8 color;
+	uint8_t color;
 	if (cQty == 0)
 	{
 		if (item->getBattleType() == BT_AMMO)
@@ -730,20 +745,21 @@ void CraftEquipmentState::moveLeftByValue(int change)
 	if (item->getVehicleUnit()) cQty = c->getVehicleCount(_items[_sel]);
 	else cQty = c->getItems()->getItem(item);
 	if (change <= 0 || cQty <= 0) return;
-	if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
-	{
-		int reserved = c->getSoldierItems()->getItem(item);
-		if (cQty - reserved > 0)
-		{
-			change = std::min(cQty - reserved, change);
-		}
-		else
-		{
-			//change = 0;
-			return;
-		}
-	}
-	else
+// OPTIONSHACK
+	//if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
+	//{
+	//	int reserved = c->getSoldierItems()->getItem(item);
+	//	if (cQty - reserved > 0)
+	//	{
+	//		change = std::min(cQty - reserved, change);
+	//	}
+	//	else
+	//	{
+	//		//change = 0;
+	//		return;
+	//	}
+	//}
+	//else
 	{
 		change = std::min(cQty, change);
 	}
@@ -863,11 +879,12 @@ void CraftEquipmentState::moveRightByValue(int change, bool suppressErrors)
 				{
 					if (!suppressErrors)
 					{
-						// So we haven't managed to increase the count of vehicles because of the ammo
-						_timerRight->stop();
-						LocalizedText msg(tr("STR_NOT_ENOUGH_AMMO_TO_ARM_HWP").arg(ammoPerVehicle).arg(tr(ammo->getType())));
-						getGame()->pushState(new ErrorMessageState(msg, _palette, getGame()->getMod()->getInterface("craftEquipment")->getElement("errorMessage")->color, "BACK04.SCR", getGame()->getMod()->getInterface("craftEquipment")->getElement("errorPalette")->color));
-						_reload = false;
+// SDLHACK
+						//// So we haven't managed to increase the count of vehicles because of the ammo
+						//_timerRight->stop();
+						//LocalizedText msg(tr("STR_NOT_ENOUGH_AMMO_TO_ARM_HWP").arg(ammoPerVehicle).arg(tr(ammo->getType())));
+						//getGame()->pushState(new ErrorMessageState(msg, _palette, getGame()->getMod()->getInterface("craftEquipment")->getElement("errorMessage")->color, "BACK04.SCR", getGame()->getMod()->getInterface("craftEquipment")->getElement("errorPalette")->color));
+						//_reload = false;
 					}
 				}
 			}
@@ -889,10 +906,11 @@ void CraftEquipmentState::moveRightByValue(int change, bool suppressErrors)
 		{
 			if (!suppressErrors)
 			{
-				_timerRight->stop();
-				LocalizedText msg(tr("STR_NO_MORE_EQUIPMENT_ALLOWED", craft->getMaxItemsClamped()));
-				getGame()->pushState(new ErrorMessageState(msg, _palette, getGame()->getMod()->getInterface("craftEquipment")->getElement("errorMessage")->color, "BACK04.SCR", getGame()->getMod()->getInterface("craftEquipment")->getElement("errorPalette")->color));
-				_reload = false;
+// SDLHACK
+				//_timerRight->stop();
+				//LocalizedText msg(tr("STR_NO_MORE_EQUIPMENT_ALLOWED", craft->getMaxItemsClamped()));
+				//getGame()->pushState(new ErrorMessageState(msg, _palette, getGame()->getMod()->getInterface("craftEquipment")->getElement("errorMessage")->color, "BACK04.SCR", getGame()->getMod()->getInterface("craftEquipment")->getElement("errorPalette")->color));
+				//_reload = false;
 			}
 			change = craft->getMaxItemsClamped() - _totalItems;
 			if (change < 0)
@@ -914,10 +932,11 @@ void CraftEquipmentState::moveRightByValue(int change, bool suppressErrors)
 			}
 			if (!suppressErrors)
 			{
-				_timerRight->stop();
-				LocalizedText msg(tr("STR_NO_MORE_EQUIPMENT_ALLOWED_BY_SIZE").arg(craft->getMaxStorageSpaceClamped()));
-				getGame()->pushState(new ErrorMessageState(msg, _palette, getGame()->getMod()->getInterface("craftEquipment")->getElement("errorMessage")->color, "BACK04.SCR", getGame()->getMod()->getInterface("craftEquipment")->getElement("errorPalette")->color));
-				_reload = false;
+// SDLHACK
+				//_timerRight->stop();
+				//LocalizedText msg(tr("STR_NO_MORE_EQUIPMENT_ALLOWED_BY_SIZE").arg(craft->getMaxStorageSpaceClamped()));
+				//getGame()->pushState(new ErrorMessageState(msg, _palette, getGame()->getMod()->getInterface("craftEquipment")->getElement("errorMessage")->color, "BACK04.SCR", getGame()->getMod()->getInterface("craftEquipment")->getElement("errorPalette")->color));
+				//_reload = false;
 			}
 		}
 		craft->getItems()->addItem(item, change);
@@ -959,33 +978,34 @@ void CraftEquipmentState::btnInventoryClick(Action *)
 	Craft *craft = _base->getCrafts().at(_craft);
 	if (craft->getNumTotalSoldiers() > 0)
 	{
-		if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
-		{
-			// This is a bit tricky... here's what we're doing:
-			// * Remember the extra craft items (i.e. items that are on the craft, but not equipped by soldiers)
-			// * Move all equipment from the base into the craft.
-			// * Run the inventory screen.
-			// * Remove excess items from the craft when CraftEquipmentState::init() is called after leaving the inventory screen.
-			// (After this, the craft should have all the updated soldier equipment, and the same extra items as before.)
+// OPTIONSHACK
+		//if (Options::oxceAlternateCraftEquipmentManagement && !_isNewBattle)
+		//{
+		//	// This is a bit tricky... here's what we're doing:
+		//	// * Remember the extra craft items (i.e. items that are on the craft, but not equipped by soldiers)
+		//	// * Move all equipment from the base into the craft.
+		//	// * Run the inventory screen.
+		//	// * Remove excess items from the craft when CraftEquipmentState::init() is called after leaving the inventory screen.
+		//	// (After this, the craft should have all the updated soldier equipment, and the same extra items as before.)
 
-			// Note: the current implementation assumes no limit to the number or size of items a craft can hold.
-			//       If the craft has limited space, then we just won't have all the base items available on the inventory screen.
+		//	// Note: the current implementation assumes no limit to the number or size of items a craft can hold.
+		//	//       If the craft has limited space, then we just won't have all the base items available on the inventory screen.
 
-			auto& extras = *craft->getExtraItems();
-			extras.clear();
-			for (_sel = 0; _sel != _items.size(); ++_sel)
-			{
-				RuleItem* rule = getGame()->getMod()->getItem(_items[_sel], true);
-				if (craft->getItems()->getItem(rule) > 0)
-				{
-					extras.addItem(rule, craft->getItems()->getItem(rule) - craft->getSoldierItems()->getItem(rule));
-				}
-				if (!rule->getVehicleUnit() && rule->canBeEquippedBeforeBaseDefense())
-				{
-					moveRightByValue(INT_MAX, true);
-				}
-			}
-		}
+		//	auto& extras = *craft->getExtraItems();
+		//	extras.clear();
+		//	for (_sel = 0; _sel != _items.size(); ++_sel)
+		//	{
+		//		RuleItem* rule = getGame()->getMod()->getItem(_items[_sel], true);
+		//		if (craft->getItems()->getItem(rule) > 0)
+		//		{
+		//			extras.addItem(rule, craft->getItems()->getItem(rule) - craft->getSoldierItems()->getItem(rule));
+		//		}
+		//		if (!rule->getVehicleUnit() && rule->canBeEquippedBeforeBaseDefense())
+		//		{
+		//			moveRightByValue(INT_MAX, true);
+		//		}
+		//	}
+		//}
 
 		SavedBattleGame *bgame = new SavedBattleGame(getGame()->getMod(), getGame()->getLanguage());
 		getGame()->getSavedGame()->setBattleGame(bgame);
@@ -1033,8 +1053,9 @@ void CraftEquipmentState::saveGlobalLoadout(int index)
 void CraftEquipmentState::loadGlobalLoadout(int index, bool onlyAddItems)
 {
 	// temporarily turn off alternate craft equipment management to allow removing all items from the craft
-	bool backup = Options::oxceAlternateCraftEquipmentManagement;
-	Options::oxceAlternateCraftEquipmentManagement = false;
+// OPTIONSHACK
+	//bool backup = Options::oxceAlternateCraftEquipmentManagement;
+	//Options::oxceAlternateCraftEquipmentManagement = false;
 
 	// reset filters and reload the full equipment list
 	_btnQuickSearch->setText("");
@@ -1125,8 +1146,9 @@ void CraftEquipmentState::loadGlobalLoadout(int index, bool onlyAddItems)
 		getGame()->pushState(new CannotReequipState(_missingItems, _base));
 	}
 
-	// turn back the original setting
-	Options::oxceAlternateCraftEquipmentManagement = backup;
+// OPTIONSHACK
+	//// turn back the original setting
+	//Options::oxceAlternateCraftEquipmentManagement = backup;
 }
 
 /**

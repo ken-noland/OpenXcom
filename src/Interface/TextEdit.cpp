@@ -230,7 +230,7 @@ void TextEdit::setConstraint(TextEditConstraint constraint)
  * in the palette to be displayed.
  * @param color Color value.
  */
-void TextEdit::setColor(Uint8 color)
+void TextEdit::setColor(uint8_t color)
 {
 	_text->setColor(color);
 	_caret->setColor(color);
@@ -240,7 +240,7 @@ void TextEdit::setColor(Uint8 color)
  * Returns the color used to render the text.
  * @return Color value.
  */
-Uint8 TextEdit::getColor() const
+uint8_t TextEdit::getColor() const
 {
 	return _text->getColor();
 }
@@ -251,7 +251,7 @@ Uint8 TextEdit::getColor() const
  * a 0x01 in the string.
  * @param color Color value.
  */
-void TextEdit::setSecondaryColor(Uint8 color)
+void TextEdit::setSecondaryColor(uint8_t color)
 {
 	_text->setSecondaryColor(color);
 }
@@ -260,7 +260,7 @@ void TextEdit::setSecondaryColor(Uint8 color)
  * Returns the secondary color used to render the text.
  * @return Color value.
  */
-Uint8 TextEdit::getSecondaryColor() const
+uint8_t TextEdit::getSecondaryColor() const
 {
 	return _text->getSecondaryColor();
 }

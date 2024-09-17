@@ -657,9 +657,9 @@ int TestState::matchPalette(Surface* image, int index, PaletteHandle testHandle)
 			}
 		}
 
-		Uint8 rdiff = (colors[i].r > test->getColors(i)->r ? colors[i].r - test->getColors(i)->r : test->getColors(i)->r - colors[i].r);
-		Uint8 gdiff = (colors[i].g > test->getColors(i)->g ? colors[i].g - test->getColors(i)->g : test->getColors(i)->g - colors[i].g);
-		Uint8 bdiff = (colors[i].b > test->getColors(i)->b ? colors[i].b - test->getColors(i)->b : test->getColors(i)->b - colors[i].b);
+		uint8_t rdiff = (colors[i].r > test->getColors(i)->r ? colors[i].r - test->getColors(i)->r : test->getColors(i)->r - colors[i].r);
+		uint8_t gdiff = (colors[i].g > test->getColors(i)->g ? colors[i].g - test->getColors(i)->g : test->getColors(i)->g - colors[i].g);
+		uint8_t bdiff = (colors[i].b > test->getColors(i)->b ? colors[i].b - test->getColors(i)->b : test->getColors(i)->b - colors[i].b);
 
 		if (rdiff <= maxTolerance && gdiff <= maxTolerance && bdiff <= maxTolerance)
 		{

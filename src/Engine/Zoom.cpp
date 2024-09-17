@@ -76,8 +76,8 @@ static int zoomSurface2X_64bit(SDL_Surface *src, SDL_Surface *dst)
 {
 	Uint64 dataSrc;
 	Uint64 dataDst;
-	Uint8 *pixelSrc = (Uint8*)src->pixels;
-	Uint8 *pixelDstRow = (Uint8*)dst->pixels;
+	uint8_t *pixelSrc = (uint8_t*)src->pixels;
+	uint8_t *pixelDstRow = (uint8_t*)dst->pixels;
 	int sx, sy;
 	static bool proclaimed = false;
 
@@ -149,10 +149,10 @@ static int zoomSurface2X_64bit(SDL_Surface *src, SDL_Surface *dst)
 /*
 static int zoomSurface2X_32bit(SDL_Surface *src, SDL_Surface *dst)
 {
-	Uint32 dataSrc;
-	Uint32 dataDst;
-	Uint8 *pixelSrc = (Uint8*)src->pixels;
-	Uint8 *pixelDstRow = (Uint8*)dst->pixels;
+	uint32_t dataSrc;
+	uint32_t dataDst;
+	uint8_t *pixelSrc = (uint8_t*)src->pixels;
+	uint8_t *pixelDstRow = (uint8_t*)dst->pixels;
 	int sx, sy;
 	static bool proclaimed = false;
 
@@ -165,11 +165,11 @@ static int zoomSurface2X_32bit(SDL_Surface *src, SDL_Surface *dst)
 
 	for (sy = 0; sy < src->h; ++sy, pixelDstRow += dst->pitch*2)
 	{
-		Uint32 *pixelDst = (Uint32*)pixelDstRow;
-		Uint32 *pixelDst2 = (Uint32*)(pixelDstRow + dst->pitch);
+		uint32_t *pixelDst = (uint32_t*)pixelDstRow;
+		uint32_t *pixelDst2 = (uint32_t*)(pixelDstRow + dst->pitch);
 		for (sx = 0; sx < src->w; sx += 4, pixelSrc += 4)
 		{
-			dataSrc = *((Uint32*) pixelSrc);
+			dataSrc = *((uint32_t*) pixelSrc);
 
 			// boo
 			dataSrc = SDL_SwapLE32(dataSrc);
@@ -214,8 +214,8 @@ static int zoomSurface4X_64bit(SDL_Surface *src, SDL_Surface *dst)
 {
 	Uint64 dataSrc;
 	Uint64 dataDst;
-	Uint8 *pixelSrc = (Uint8*)src->pixels;
-	Uint8 *pixelDstRow = (Uint8*)dst->pixels;
+	uint8_t *pixelSrc = (uint8_t*)src->pixels;
+	uint8_t *pixelDstRow = (uint8_t*)dst->pixels;
 	int sx, sy;
 	static bool proclaimed = false;
 
@@ -227,7 +227,7 @@ static int zoomSurface4X_64bit(SDL_Surface *src, SDL_Surface *dst)
 
 	for (sy = 0; sy < src->h; ++sy, pixelDstRow += dst->pitch*4)
 	{
-		Uint8 *pixelDst = pixelDstRow;
+		uint8_t *pixelDst = pixelDstRow;
 
 		for (sx = 0; sx < src->w; sx += 8, pixelSrc += 8)
 		{
@@ -280,10 +280,10 @@ static int zoomSurface4X_64bit(SDL_Surface *src, SDL_Surface *dst)
 /*
 static int zoomSurface4X_32bit(SDL_Surface *src, SDL_Surface *dst)
 {
-	Uint32 dataSrc;
-	Uint32 dataDst;
-	Uint8 *pixelSrc = (Uint8*)src->pixels;
-	Uint8 *pixelDstRow = (Uint8*)dst->pixels;
+	uint32_t dataSrc;
+	uint32_t dataDst;
+	uint8_t *pixelSrc = (uint8_t*)src->pixels;
+	uint8_t *pixelDstRow = (uint8_t*)dst->pixels;
 	int sx, sy;
 	static bool proclaimed = false;
 
@@ -295,13 +295,13 @@ static int zoomSurface4X_32bit(SDL_Surface *src, SDL_Surface *dst)
 
 	for (sy = 0; sy < src->h; ++sy, pixelDstRow += dst->pitch*4)
 	{
-		Uint32 *pixelDst = (Uint32*)pixelDstRow;
-		Uint32 *pixelDst2 = (Uint32*)(pixelDstRow + dst->pitch);
-		Uint32 *pixelDst3 = (Uint32*)(pixelDstRow + 2*dst->pitch);
-		Uint32 *pixelDst4 = (Uint32*)(pixelDstRow + 3*dst->pitch);
+		uint32_t *pixelDst = (uint32_t*)pixelDstRow;
+		uint32_t *pixelDst2 = (uint32_t*)(pixelDstRow + dst->pitch);
+		uint32_t *pixelDst3 = (uint32_t*)(pixelDstRow + 2*dst->pitch);
+		uint32_t *pixelDst4 = (uint32_t*)(pixelDstRow + 3*dst->pitch);
 		for (sx = 0; sx < src->w; sx += 4, pixelSrc += 4)
 		{
-			dataSrc = *((Uint32*) pixelSrc);
+			dataSrc = *((uint32_t*) pixelSrc);
 			// boo
 			dataSrc = SDL_SwapLE32(dataSrc);
 
@@ -341,17 +341,17 @@ static int zoomSurface4X_32bit(SDL_Surface *src, SDL_Surface *dst)
 /*
 static int zoomSurface2X_XAxis_32bit(SDL_Surface *src, SDL_Surface *dst)
 {
-	Uint32 dataSrc;
-	Uint32 dataDst;
-	Uint8 *pixelSrc;
-	Uint8 *pixelDstRow = (Uint8*)dst->pixels;
-	Uint8 *pixelSrcRow = (Uint8*)src->pixels;
+	uint32_t dataSrc;
+	uint32_t dataDst;
+	uint8_t *pixelSrc;
+	uint8_t *pixelDstRow = (uint8_t*)dst->pixels;
+	uint8_t *pixelSrcRow = (uint8_t*)src->pixels;
 	int sx;
 	int dsty;
 	static bool proclaimed = false;
 
-	static Uint32 *say = 0;
-	Uint32 *csay;
+	static uint32_t *say = 0;
+	uint32_t *csay;
 	int csy;
 
 	if (!proclaimed)
@@ -360,7 +360,7 @@ static int zoomSurface2X_XAxis_32bit(SDL_Surface *src, SDL_Surface *dst)
 		Log(LOG_INFO) << "Using mediocre scaling routine due to screen height.";
 	}
 
-	if ((say = (Uint32 *) realloc(say, (dst->h + 1) * sizeof(Uint32))) == NULL) {
+	if ((say = (uint32_t *) realloc(say, (dst->h + 1) * sizeof(uint32_t))) == NULL) {
 		say = 0;
 		return (-1);
 	}
@@ -382,13 +382,13 @@ static int zoomSurface2X_XAxis_32bit(SDL_Surface *src, SDL_Surface *dst)
 	{
 		if (!say[dsty]) continue;
 
-		Uint32 *pixelDst = (Uint32*)pixelDstRow;
+		uint32_t *pixelDst = (uint32_t*)pixelDstRow;
 		pixelSrc = pixelSrcRow;
 		pixelSrcRow += say[dsty];
 
 		for (sx = 0; sx < src->w; sx += 4, pixelSrc += 4)
 		{
-			dataSrc = *((Uint32*) pixelSrc);
+			dataSrc = *((uint32_t*) pixelSrc);
 			// boo
 			dataSrc = SDL_SwapLE32(dataSrc);
 
@@ -402,7 +402,7 @@ static int zoomSurface2X_XAxis_32bit(SDL_Surface *src, SDL_Surface *dst)
 				{
 					if (dsty + j >= dst->h) break;
 
-					*(pixelDst + (dst->pitch/sizeof(Uint32))*j) = dataDst;
+					*(pixelDst + (dst->pitch/sizeof(uint32_t))*j) = dataDst;
 				} while (say[dsty + ++j] == 0); // fill in all relevant rows
 
 				dataSrc >>= 16;
@@ -429,17 +429,17 @@ static int zoomSurface2X_XAxis_32bit(SDL_Surface *src, SDL_Surface *dst)
 /*
 static int zoomSurface4X_XAxis_32bit(SDL_Surface *src, SDL_Surface *dst)
 {
-	Uint32 dataSrc;
-	Uint32 dataDst;
-	Uint8 *pixelSrc;
-	Uint8 *pixelDstRow = (Uint8*)dst->pixels;
-	Uint8 *pixelSrcRow = (Uint8*)src->pixels;
+	uint32_t dataSrc;
+	uint32_t dataDst;
+	uint8_t *pixelSrc;
+	uint8_t *pixelDstRow = (uint8_t*)dst->pixels;
+	uint8_t *pixelSrcRow = (uint8_t*)src->pixels;
 	int sx;
 	int dsty;
 	static bool proclaimed = false;
 
-	static Uint32 *say = 0;
-	Uint32 *csay;
+	static uint32_t *say = 0;
+	uint32_t *csay;
 	int csy;
 
 	if (!proclaimed)
@@ -448,7 +448,7 @@ static int zoomSurface4X_XAxis_32bit(SDL_Surface *src, SDL_Surface *dst)
 		Log(LOG_INFO) << "Using mediocre scaling routine due to screen height.";
 	}
 
-	if ((say = (Uint32 *) realloc(say, (dst->h + 1) * sizeof(Uint32))) == NULL) {
+	if ((say = (uint32_t *) realloc(say, (dst->h + 1) * sizeof(uint32_t))) == NULL) {
 		say = 0;
 		return (-1);
 	}
@@ -470,13 +470,13 @@ static int zoomSurface4X_XAxis_32bit(SDL_Surface *src, SDL_Surface *dst)
 	{
 		if (!say[dsty]) continue;
 
-		Uint32 *pixelDst = (Uint32*)pixelDstRow;
+		uint32_t *pixelDst = (uint32_t*)pixelDstRow;
 		pixelSrc = pixelSrcRow;
 		pixelSrcRow += say[dsty];
 
 		for (sx = 0; sx < src->w; sx += 4, pixelSrc += 4)
 		{
-			dataSrc = *((Uint32*) pixelSrc);
+			dataSrc = *((uint32_t*) pixelSrc);
 			// boo
 			dataSrc = SDL_SwapLE32(dataSrc);
 
@@ -490,7 +490,7 @@ static int zoomSurface4X_XAxis_32bit(SDL_Surface *src, SDL_Surface *dst)
 				{
 					if (dsty + j >= dst->h) break;
 
-					*(pixelDst + (dst->pitch/sizeof(Uint32))*j) = dataDst;
+					*(pixelDst + (dst->pitch/sizeof(uint32_t))*j) = dataDst;
 				} while (say[dsty + ++j] == 0); // fill in all relevant rows
 
 				dataSrc >>= 8;
@@ -520,8 +520,8 @@ static int zoomSurface4X_SSE2(SDL_Surface *src, SDL_Surface *dst)
 {
 	__m128i dataSrc;
 	__m128i dataDst;
-	Uint8 *pixelSrc = (Uint8*)src->pixels;
-	Uint8 *pixelDstRow = (Uint8*)dst->pixels;
+	uint8_t *pixelSrc = (uint8_t*)src->pixels;
+	uint8_t *pixelDstRow = (uint8_t*)dst->pixels;
 	int sx, sy;
 	static bool proclaimed = false;
 
@@ -534,9 +534,9 @@ static int zoomSurface4X_SSE2(SDL_Surface *src, SDL_Surface *dst)
 	for (sy = 0; sy < src->h; ++sy, pixelDstRow += dst->pitch*4)
 	{
 		__m128i *pixelDst =  (__m128i*)pixelDstRow;
-		__m128i *pixelDst2 = (__m128i*)((Uint8*)pixelDstRow + dst->pitch);
-		__m128i *pixelDst3 = (__m128i*)((Uint8*)pixelDstRow + dst->pitch*2);
-		__m128i *pixelDst4 = (__m128i*)((Uint8*)pixelDstRow + dst->pitch*3);
+		__m128i *pixelDst2 = (__m128i*)((uint8_t*)pixelDstRow + dst->pitch);
+		__m128i *pixelDst3 = (__m128i*)((uint8_t*)pixelDstRow + dst->pitch*2);
+		__m128i *pixelDst4 = (__m128i*)((uint8_t*)pixelDstRow + dst->pitch*3);
 		for (sx = 0; sx < src->w; sx += 16, pixelSrc += 16)
 		{
 			dataSrc = *((__m128i*) pixelSrc);
@@ -588,8 +588,8 @@ static int zoomSurface2X_SSE2(SDL_Surface *src, SDL_Surface *dst)
 {
 	__m128i dataSrc;
 	__m128i dataDst;
-	Uint8 *pixelSrc = (Uint8*)src->pixels;
-	Uint8 *pixelDstRow = (Uint8*)dst->pixels;
+	uint8_t *pixelSrc = (uint8_t*)src->pixels;
+	uint8_t *pixelDstRow = (uint8_t*)dst->pixels;
 	int sx, sy;
 	static bool proclaimed = false;
 
@@ -602,7 +602,7 @@ static int zoomSurface2X_SSE2(SDL_Surface *src, SDL_Surface *dst)
 	for (sy = 0; sy < src->h; ++sy, pixelDstRow += dst->pitch*2)
 	{
 		__m128i *pixelDst =  (__m128i*)pixelDstRow;
-		__m128i *pixelDst2 = (__m128i*)((Uint8*)pixelDstRow + dst->pitch);
+		__m128i *pixelDst2 = (__m128i*)((uint8_t*)pixelDstRow + dst->pitch);
 
 		for (sx = 0; sx < src->w; sx += 16, pixelSrc += 16)
 		{
@@ -687,7 +687,7 @@ void Zoom::flipWithZoom(SDL_Surface *src, SDL_Surface *dst, int topBlackBand, in
 	}
 	else if (dstWidth == src->w && dstHeight == src->h)
 	{
-		SDL_Rect dstrect = {(Sint16)leftBlackBand, (Sint16)topBlackBand, (Uint16)src->w, (Uint16)src->h};
+		SDL_Rect dstrect = {(int16_t)leftBlackBand, (int16_t)topBlackBand, (uint16_t)src->w, (uint16_t)src->h};
 		SDL_BlitSurface(src, NULL, dst, &dstrect);
 	}
 	else
@@ -698,7 +698,7 @@ void Zoom::flipWithZoom(SDL_Surface *src, SDL_Surface *dst, int topBlackBand, in
 		{
 			SDL_SetPalette(tmp, SDL_LOGPAL|SDL_PHYSPAL, src->format->palette->colors, 0, src->format->palette->ncolors);
 		}
-		SDL_Rect dstrect = {(Sint16)leftBlackBand, (Sint16)topBlackBand, (Uint16)tmp->w, (Uint16)tmp->h};
+		SDL_Rect dstrect = {(int16_t)leftBlackBand, (int16_t)topBlackBand, (uint16_t)tmp->w, (uint16_t)tmp->h};
 		SDL_BlitSurface(tmp, NULL, dst, &dstrect);
 		SDL_FreeSurface(tmp);
 	}
@@ -722,10 +722,10 @@ void Zoom::flipWithZoom(SDL_Surface *src, SDL_Surface *dst, int topBlackBand, in
 int Zoom::_zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst, int flipx, int flipy)
 {
 	int x, y;
-	static Uint32 *sax, *say;
-	Uint32 *csax, *csay;
+	static uint32_t *sax, *say;
+	uint32_t *csax, *csay;
 	int csx, csy;
-	Uint8 *sp, *dp, *csp;
+	uint8_t *sp, *dp, *csp;
 	int dgap;
 	static bool proclaimed = false;
 
@@ -846,11 +846,11 @@ int Zoom::_zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst, int flipx, int fli
 	/*
 	* Allocate memory for row increments
 	*/
-	if ((sax = (Uint32 *) realloc(sax, (dst->w + 1) * sizeof(Uint32))) == NULL) {
+	if ((sax = (uint32_t *) realloc(sax, (dst->w + 1) * sizeof(uint32_t))) == NULL) {
 		sax = 0;
 		return (-1);
 	}
-	if ((say = (Uint32 *) realloc(say, (dst->h + 1) * sizeof(Uint32))) == NULL) {
+	if ((say = (uint32_t *) realloc(say, (dst->h + 1) * sizeof(uint32_t))) == NULL) {
 		say = 0;
 		//free(sax);
 		return (-1);
@@ -859,12 +859,12 @@ int Zoom::_zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst, int flipx, int fli
 	/*
 	* Pointer setup
 	*/
-	sp = csp = (Uint8 *) src->pixels;
-	dp = (Uint8 *) dst->pixels;
+	sp = csp = (uint8_t *) src->pixels;
+	dp = (uint8_t *) dst->pixels;
 	dgap = dst->pitch - dst->w;
 
 	if (flipx) csp += (src->w-1);
-	if (flipy) csp  = ( (Uint8*)csp + src->pitch*(src->h-1) );
+	if (flipy) csp  = ( (uint8_t*)csp + src->pitch*(src->h-1) );
 
 	/*
 	* Precalculate row increments

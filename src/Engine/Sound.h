@@ -17,10 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <SDL_rwops.h>
-#include <SDL_mixer.h>
 #include <string>
 #include <memory>
+
+// SDLHACK
+class Mix_Chunk;
+class SDL_RWops;
 
 namespace OpenXcom
 {
@@ -58,7 +60,7 @@ public:
 	/// Loads sound from the specified file.
 	void load(const std::string &filename);
 	/// Loads sound from SDL_RWops
-	void load(SDL_RWops *rw);
+//	void load(SDL_RWops *rw);
 	/// Plays the sound.
 	void play(int channel = -1, int angle = 0, int distance = 0) const;
 	/// Stops all sounds.

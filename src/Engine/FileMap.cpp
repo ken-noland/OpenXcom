@@ -78,8 +78,8 @@ SDL_RWops *SDL_RWFromMZ(mz_zip_archive *zip, mz_uint file_index) {
 
 /* helpers that are already present in SDL2 */
 #if !SDL_VERSION_ATLEAST(2,0,0)
-Uint8 SDL_ReadU8(SDL_RWops *src) {
-	Uint8 px = 0;
+uint8_t SDL_ReadU8(SDL_RWops *src) {
+	uint8_t px = 0;
 	SDL_RWread(src, &px, 1, 1);
 	return px;
 }

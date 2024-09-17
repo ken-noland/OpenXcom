@@ -40,8 +40,8 @@ public:
 	void mousePress(Action *action, State *state) override;
 	void setPressed(bool pressed);
 	bool getPressed() const { return _isPressed; }
-	void setColor(Uint8 color) override;
-	void setInvertColor(Uint8 color);
+	void setColor(uint8_t color) override;
+	void setInvertColor(uint8_t color);
 };
 
 }

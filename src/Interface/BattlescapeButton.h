@@ -34,7 +34,7 @@ enum InversionType {INVERT_NONE, INVERT_CLICK, INVERT_TOGGLE};
 class BattlescapeButton : public InteractiveSurface
 {
 protected:
-	Uint8 _color;
+	uint8_t _color;
 	BattlescapeButton **_group;
 	bool _inverted;
 	InversionType _toggleMode;
@@ -45,9 +45,9 @@ public:
 	/// Cleans up the image button.
 	virtual ~BattlescapeButton();
 	/// Sets the image button's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the image button's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the image button's group.
 	void setGroup(BattlescapeButton **group);
 	/// Special handling for mouse presses.

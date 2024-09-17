@@ -46,6 +46,6 @@ namespace OpenXcom
 		Text *_txtTitle;
 		TextList *_lstInfo;
 		Text *_txtInfo;
-		Uint8 _buttonColor, _textColor, _textColor2, _listColor1, _listColor2;
+		uint8_t _buttonColor, _textColor, _textColor2, _listColor1, _listColor2;
 	};
 }

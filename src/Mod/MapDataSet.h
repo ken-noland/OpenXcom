@@ -19,7 +19,7 @@
  */
 #include <string>
 #include <vector>
-#include <SDL.h>
+
 #include <yaml-cpp/yaml.h>
 #include "../Mod/MCDPatch.h"
 
@@ -48,7 +48,7 @@ public:
 	MapDataSet(const std::string &name);
 	~MapDataSet();
 	/// Loads voxeldata from a DAT file.
-	static void loadLOFTEMPS(const std::string &filename, std::vector<Uint16> *voxelData);
+	static void loadLOFTEMPS(const std::string &filename, std::vector<uint16_t> *voxelData);
 	/// Gets the dataset name (used for MAP generation).
 	std::string getName() const;
 	/// Gets the dataset size.

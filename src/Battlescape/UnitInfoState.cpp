@@ -274,8 +274,8 @@ UnitInfoState::UnitInfoState(BattleUnit *unit, BattlescapeState *parent, bool fr
 	_exit->onKeyboardPress((ActionHandler)&UnitInfoState::exitClick, Options::keyCancel);
 	_exit->onKeyboardPress((ActionHandler)&UnitInfoState::exitClick, Options::keyBattleStats);
 
-	Uint8 color = getGame()->getMod()->getInterface("stats")->getElement("text")->color;
-	Uint8 color2 = getGame()->getMod()->getInterface("stats")->getElement("text")->color2;
+	uint8_t color = getGame()->getMod()->getInterface("stats")->getElement("text")->color;
+	uint8_t color2 = getGame()->getMod()->getInterface("stats")->getElement("text")->color2;
 
 	_txtName->setAlign(TextHAlign::ALIGN_CENTER);
 	_txtName->setBig();

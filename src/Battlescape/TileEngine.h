@@ -39,9 +39,9 @@ enum UnitBodyPart : int;
 /**
  * Define some part of map
  */
-using MapSubset = AreaSubset<Position, Sint16>;
-enum BattleActionType : Uint8;
-enum LightLayers : Uint8;
+using MapSubset = AreaSubset<Position, int16_t>;
+enum BattleActionType : uint8_t;
+enum LightLayers : uint8_t;
 
 
 /**
@@ -82,11 +82,11 @@ private:
 	 */
 	struct VisibilityBlockCache
 	{
-		Uint32 blockDir;
+		uint32_t blockDir;
 
-		Uint8 bigWall;
+		uint8_t bigWall;
 
-		Uint8 height;
+		uint8_t height;
 	};
 
 	/**
@@ -103,7 +103,7 @@ private:
 	};
 
 	SavedBattleGame *_save;
-	const std::vector<Uint16> *_voxelData;
+	const std::vector<uint16_t> *_voxelData;
 	std::vector<VisibilityBlockCache> _blockVisibility;
 	const RuleInventory *_inventorySlotGround;
 	constexpr static int heightFromCenter[13] = {0,-2,+2,-4,+4,-6,+6,-8,+8,-10,+10,-12,+12};

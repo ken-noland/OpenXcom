@@ -184,7 +184,7 @@ void ComboBox::setBackground(Surface *bg)
  * Changes the color used to draw the combo box.
  * @param color Color value.
  */
-void ComboBox::setColor(Uint8 color)
+void ComboBox::setColor(uint8_t color)
 {
 	_color = color;
 	drawArrow();
@@ -200,7 +200,7 @@ void ComboBox::setColor(Uint8 color)
  * Returns the color used to draw the combo box.
  * @return Color value.
  */
-Uint8 ComboBox::getColor() const
+uint8_t ComboBox::getColor() const
 {
 	return _color;
 }
@@ -265,7 +265,7 @@ void ComboBox::setHighContrast(bool contrast)
  * Changes the color of the arrow buttons in the list.
  * @param color Color value.
  */
-void ComboBox::setArrowColor(Uint8 color)
+void ComboBox::setArrowColor(uint8_t color)
 {
 	_list->setArrowColor(color);
 }

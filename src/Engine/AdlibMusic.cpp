@@ -126,7 +126,7 @@ void AdlibMusic::play(int) const
  * @param stream Raw audio to output.
  * @param len Length of audio to output.
  */
-void AdlibMusic::player(void *udata, Uint8 *stream, int len)
+void AdlibMusic::player(void *udata, uint8_t *stream, int len)
 {
 #ifndef __NO_MUSIC
 	// Check SDL volume for Background Mute functionality

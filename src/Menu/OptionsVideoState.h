@@ -19,7 +19,7 @@
  */
 #include "../Engine/State.h"
 #include "OptionsBaseState.h"
-#include <SDL.h>
+
 
 namespace OpenXcom
 {

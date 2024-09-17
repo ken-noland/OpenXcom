@@ -23,7 +23,6 @@
 #include <string>
 #include <bitset>
 #include <array>
-#include <SDL.h>
 #include <yaml-cpp/yaml.h>
 #include "../Engine/Options.h"
 #include "../Engine/FileMap.h"
@@ -155,8 +154,8 @@ private:
 	std::map<std::string, SurfaceSet*> _sets;
 	std::map<std::string, SoundSet*> _sounds;
 	std::map<std::string, Music*> _musics;
-	std::vector<Uint16> _voxelData;
-	std::vector<std::vector<Uint8> > _transparencyLUTs;
+	std::vector<uint16_t> _voxelData;
+	std::vector<std::vector<uint8_t> > _transparencyLUTs;
 
 	std::map<std::string, RuleCountry*> _countries, _extraGlobeLabels;
 	std::map<std::string, RuleRegion*> _regions;
@@ -295,12 +294,14 @@ private:
 	std::vector<std::string> _skillsIndex, _soldiersIndex, _soldierTransformationIndex, _soldierBonusIndex;
 	std::vector<std::string> _alienMissionsIndex, _terrainIndex, _customPalettesIndex, _arcScriptIndex, _eventScriptIndex, _eventIndex, _missionScriptIndex;
 	std::vector<std::vector<int> > _alienItemLevels;
-	std::vector<std::array<SDL_Color, TransparenciesOpacityLevels>> _transparencies;
+// SDLHACK
+//	std::vector<std::array<SDL_Color, TransparenciesOpacityLevels>> _transparencies;
 	int _facilityListOrder, _craftListOrder, _itemCategoryListOrder, _itemListOrder, _researchListOrder,  _manufactureListOrder;
 	int _soldierBonusListOrder, _transformationListOrder, _ufopaediaListOrder, _invListOrder, _soldierListOrder;
 	
 	const ModInfo* _modCurrent;
-	const SDL_Color *_statePalette;
+// SDLHACK
+//	const SDL_Color* _statePalette;
 
 	std::vector<std::string> _psiRequirements; // it's a cache for psiStrengthEval
 	std::vector<const Armor*> _armorsForSoldiersCache;
@@ -353,7 +354,7 @@ private:
 	/// Loads battlescape specific resources.
 	void loadBattlescapeResources();
 	/// Loads a specified music file.
-	Music* loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFile* aintrocat, GMCatFile* gmcat) const;
+//	Music* loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFile* aintrocat, GMCatFile* gmcat) const;
 	/// Creates a transparency lookup table for a given palette.
 	void createTransparencyLUT(Palette *pal);
 	/// Loads a specified mod content.
@@ -468,11 +469,11 @@ public:
 	/// Gets a particular palette.
 	[[deprecated("Use PaletteSystem::getPalette")]] Palette *getPalette(const std::string &name, bool error = true) const;
 	/// Gets list of voxel data.
-	const std::vector<Uint16> *getVoxelData() const;
+	const std::vector<uint16_t> *getVoxelData() const;
 	/// Returns a specific sound from either the land or underwater sound set.
 	Sound *getSoundByDepth(unsigned int depth, unsigned int sound) const;
 	/// Gets list of LUT data.
-	const std::vector<std::vector<Uint8> > *getLUTs() const;
+	const std::vector<std::vector<uint8_t> > *getLUTs() const;
 
 
 	/// Check for obsolete error based on year.
@@ -484,15 +485,16 @@ public:
 		if (check)
 		{
 			auto ex = LoadRuleException(parent, node, error);
-			if (Options::oxceModValidationLevel < level)
-			{
-				Log(level) << "Supressed " << ex.what();
-				return true;
-			}
-			else
-			{
-				throw ex;
-			}
+// OPTIONSHACK
+			// if (Options::oxceModValidationLevel < level)
+			//{
+			//	Log(level) << "Supressed " << ex.what();
+			//	return true;
+			//}
+			//else
+			//{
+			//	throw ex;
+			//}
 		}
 		return false;
 	}
@@ -503,15 +505,16 @@ public:
 		if (check)
 		{
 			auto ex = LoadRuleException(parent, error);
-			if (Options::oxceModValidationLevel < level)
-			{
-				Log(level) << "Supressed " << ex.what();
-				return true;
-			}
-			else
-			{
-				throw ex;
-			}
+// OPTIONSHACK
+			//if (Options::oxceModValidationLevel < level)
+			//{
+			//	Log(level) << "Supressed " << ex.what();
+			//	return true;
+			//}
+			//else
+			//{
+			//	throw ex;
+			//}
 		}
 		return false;
 	}

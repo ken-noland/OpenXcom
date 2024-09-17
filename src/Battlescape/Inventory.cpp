@@ -194,7 +194,7 @@ void Inventory::drawGrid()
 {
 	_grid->clear();
 	RuleInterface *rule = _game->getMod()->getInterface("inventory");
-	Uint8 color = rule->getElement("grid")->color;
+	uint8_t color = rule->getElement("grid")->color;
 
 	for (const auto& invPair : *_game->getMod()->getInventories())
 	{
@@ -314,8 +314,8 @@ void Inventory::drawItems()
 
 	ScriptWorkerBlit work;
 	_items->clear();
-	Uint8 color = _game->getMod()->getInterface("inventory")->getElement("numStack")->color;
-	Uint8 color2 = _game->getMod()->getInterface("inventory")->getElement("numStack")->color2;
+	uint8_t color = _game->getMod()->getInterface("inventory")->getElement("numStack")->color;
+	uint8_t color2 = _game->getMod()->getInterface("inventory")->getElement("numStack")->color2;
 	if (_selUnit != 0)
 	{
 		SurfaceSet *texture = _game->getMod()->getSurfaceSet("BIGOBS.PCK");

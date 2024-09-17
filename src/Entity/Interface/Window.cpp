@@ -18,8 +18,6 @@
  */
 #include "Window.h"
 
-#include <SDL_mixer.h>
-
 #include "../../Engine/Timer.h"
 #include "../../Engine/RNG.h"
 #include "../Engine/Tickable.h"
@@ -99,136 +97,136 @@ void WindowSystem::setHighContrast(entt::handle windowEntity, bool contrast)
 
 void WindowSystem::draw(entt::handle windowEntity)
 {
-	SurfaceComponent& surfaceComponent = windowEntity.get<SurfaceComponent>();
-	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
-	BackgroundComponent* backgroundComponent = windowEntity.try_get<BackgroundComponent>();
-	ScreenRectComponent& screenRectComponent = windowEntity.get<ScreenRectComponent>();
-	ProgressTimerComponent& progressTimerComponent = windowEntity.get<ProgressTimerComponent>();
+	//SurfaceComponent& surfaceComponent = windowEntity.get<SurfaceComponent>();
+	//WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	//BackgroundComponent* backgroundComponent = windowEntity.try_get<BackgroundComponent>();
+	//ScreenRectComponent& screenRectComponent = windowEntity.get<ScreenRectComponent>();
+	//ProgressTimerComponent& progressTimerComponent = windowEntity.get<ProgressTimerComponent>();
 
-	Surface* windowSurface = surfaceComponent.getSurface();
+	//Surface* windowSurface = surfaceComponent.getSurface();
 
-	windowSurface->draw();
-	
-	SDL_Rect square;
-	
-	Sint16 width = screenRectComponent.width;
-	Sint16 height = screenRectComponent.height;
-	
-	if (windowComponent._popup == WindowPopup::POPUP_HORIZONTAL || windowComponent._popup == WindowPopup::POPUP_BOTH)
-	{
-		square.x = (Sint16)((width - (width * windowComponent._popupStep)) / 2);
-		square.w = (Sint16)(width * windowComponent._popupStep);
-	}
-	else
-	{
-		square.x = 0;
-		square.w = width;
-	}
-	if (windowComponent._popup == WindowPopup::POPUP_VERTICAL || windowComponent._popup == WindowPopup::POPUP_BOTH)
-	{
-		square.y = (Sint16)((height - (height * windowComponent._popupStep)) / 2);
-		square.h = (Sint16)(height * windowComponent._popupStep);
-	}
-	else
-	{
-		square.y = 0;
-		square.h = height;
-	}
-	
-	int mul = 1;
-	if (windowComponent._contrast)
-	{
-		mul = 2;
-	}
-	Uint8 color = windowComponent._color + 3 * mul;
-	
-	if (windowComponent._thinBorder)
-	{
-		color = windowComponent._color + 1 * mul;
-		for (int i = 0; i < 5; ++i)
-		{
-			windowSurface->drawRect(&square, color);
-	
-			if (i % 2 == 0)
-			{
-				square.x++;
-				square.y++;
-			}
-			square.w--;
-			square.h--;
-	
-			switch (i)
-			{
-			case 0:
-				color = windowComponent._color + 5 * mul;
-				windowSurface->setPixel(square.w, 0, color);
-				break;
-			case 1:
-				color = windowComponent._color + 2 * mul;
-				break;
-			case 2:
-				color = windowComponent._color + 4 * mul;
-				windowSurface->setPixel(square.w + 1, 1, color);
-				break;
-			case 3:
-				color = windowComponent._color + 3 * mul;
-				break;
-			}
-		}
-	}
-	else
-	{
-		for (int i = 0; i < 5; ++i)
-		{
-			windowSurface->drawRect(&square, color);
-			if (i < 2)
-				color -= 1 * mul;
-			else
-				color += 1 * mul;
-			square.x++;
-			square.y++;
-			if (square.w >= 2)
-				square.w -= 2;
-			else
-				square.w = 1;
-	
-			if (square.h >= 2)
-				square.h -= 2;
-			else
-				square.h = 1;
-		}
-		if (windowComponent._innerColor != 0)
-		{
-			windowSurface->drawRect(&square, windowComponent._innerColor);
-		}
-	}
-	
-	if (backgroundComponent)
-	{
-		SurfaceCrop crop = backgroundComponent->_bg->getCrop();
-		crop.getCrop()->x = square.x - backgroundComponent->_dx;
-		crop.getCrop()->y = square.y - backgroundComponent->_dy;
-		crop.getCrop()->w = square.w;
-		crop.getCrop()->h = square.h;
-		crop.setX(square.x);
-		crop.setY(square.y);
-		crop.blit(windowSurface);
-	}
+	//windowSurface->draw();
+	//
+	//SDL_Rect square;
+	//
+	//int16_t width = screenRectComponent.width;
+	//int16_t height = screenRectComponent.height;
+	//
+	//if (windowComponent._popup == WindowPopup::POPUP_HORIZONTAL || windowComponent._popup == WindowPopup::POPUP_BOTH)
+	//{
+	//	square.x = (int16_t)((width - (width * windowComponent._popupStep)) / 2);
+	//	square.w = (int16_t)(width * windowComponent._popupStep);
+	//}
+	//else
+	//{
+	//	square.x = 0;
+	//	square.w = width;
+	//}
+	//if (windowComponent._popup == WindowPopup::POPUP_VERTICAL || windowComponent._popup == WindowPopup::POPUP_BOTH)
+	//{
+	//	square.y = (int16_t)((height - (height * windowComponent._popupStep)) / 2);
+	//	square.h = (int16_t)(height * windowComponent._popupStep);
+	//}
+	//else
+	//{
+	//	square.y = 0;
+	//	square.h = height;
+	//}
+	//
+	//int mul = 1;
+	//if (windowComponent._contrast)
+	//{
+	//	mul = 2;
+	//}
+	//uint8_t color = windowComponent._color + 3 * mul;
+	//
+	//if (windowComponent._thinBorder)
+	//{
+	//	color = windowComponent._color + 1 * mul;
+	//	for (int i = 0; i < 5; ++i)
+	//	{
+	//		windowSurface->drawRect(&square, color);
+	//
+	//		if (i % 2 == 0)
+	//		{
+	//			square.x++;
+	//			square.y++;
+	//		}
+	//		square.w--;
+	//		square.h--;
+	//
+	//		switch (i)
+	//		{
+	//		case 0:
+	//			color = windowComponent._color + 5 * mul;
+	//			windowSurface->setPixel(square.w, 0, color);
+	//			break;
+	//		case 1:
+	//			color = windowComponent._color + 2 * mul;
+	//			break;
+	//		case 2:
+	//			color = windowComponent._color + 4 * mul;
+	//			windowSurface->setPixel(square.w + 1, 1, color);
+	//			break;
+	//		case 3:
+	//			color = windowComponent._color + 3 * mul;
+	//			break;
+	//		}
+	//	}
+	//}
+	//else
+	//{
+	//	for (int i = 0; i < 5; ++i)
+	//	{
+	//		windowSurface->drawRect(&square, color);
+	//		if (i < 2)
+	//			color -= 1 * mul;
+	//		else
+	//			color += 1 * mul;
+	//		square.x++;
+	//		square.y++;
+	//		if (square.w >= 2)
+	//			square.w -= 2;
+	//		else
+	//			square.w = 1;
+	//
+	//		if (square.h >= 2)
+	//			square.h -= 2;
+	//		else
+	//			square.h = 1;
+	//	}
+	//	if (windowComponent._innerColor != 0)
+	//	{
+	//		windowSurface->drawRect(&square, windowComponent._innerColor);
+	//	}
+	//}
+	//
+	//if (backgroundComponent)
+	//{
+	//	SurfaceCrop crop = backgroundComponent->_bg->getCrop();
+	//	crop.getCrop()->x = square.x - backgroundComponent->_dx;
+	//	crop.getCrop()->y = square.y - backgroundComponent->_dy;
+	//	crop.getCrop()->w = square.w;
+	//	crop.getCrop()->h = square.h;
+	//	crop.setX(square.x);
+	//	crop.setY(square.y);
+	//	crop.blit(windowSurface);
+	//}
 
-	SDL_Rect target{};
-	target.x = screenRectComponent.x;
-	target.y = screenRectComponent.y;
-	SDL_BlitSurface(windowSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
+	//SDL_Rect target{};
+	//target.x = screenRectComponent.x;
+	//target.y = screenRectComponent.y;
+	//SDL_BlitSurface(windowSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
 
-	if (windowComponent._popupStep >= 1.0)
-	{
-		// Now render the window contents
-		HierarchySystem& hierarchySystem = getSystem<HierarchySystem>();
-		hierarchySystem.visit(windowEntity, [&](entt::handle child) {
-			DrawableSystem& drawableSystem = getSystem<DrawableSystem>();
-			drawableSystem.draw(child);
-		});
-	}
+	//if (windowComponent._popupStep >= 1.0)
+	//{
+	//	// Now render the window contents
+	//	HierarchySystem& hierarchySystem = getSystem<HierarchySystem>();
+	//	hierarchySystem.visit(windowEntity, [&](entt::handle child) {
+	//		DrawableSystem& drawableSystem = getSystem<DrawableSystem>();
+	//		drawableSystem.draw(child);
+	//	});
+	//}
 }
 
 void WindowSystem::setThinBorder(entt::handle windowEntity)
@@ -245,15 +243,15 @@ void WindowSystem::setInnerColor(entt::handle windowEntity, uint8_t innerColor)
 
 void WindowSystem::playSound(entt::handle windowEntity)
 {
-	WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
-	if (!windowComponent._mute && soundPopup.size() > 0)
-	{
-		int sound = RNG::seedless(0, (int)soundPopup.size()-1);
-		if (soundPopup[sound] != 0)
-		{
-			soundPopup[sound]->play(Mix_GroupAvailable(0));
-		}
-	}
+	//WindowComponent& windowComponent = windowEntity.get<WindowComponent>();
+	//if (!windowComponent._mute && soundPopup.size() > 0)
+	//{
+	//	int sound = RNG::seedless(0, (int)soundPopup.size()-1);
+	//	if (soundPopup[sound] != 0)
+	//	{
+	//		soundPopup[sound]->play(Mix_GroupAvailable(0));
+	//	}
+	//}
 }
 
 void WindowSystem::setMute(entt::handle windowEntity, bool mute)

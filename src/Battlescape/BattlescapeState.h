@@ -75,30 +75,30 @@ private:
 	std::vector<NumberText*> _numAmmoLeft, _numAmmoRight;
 	std::vector<NumberText*> _numMedikitLeft, _numMedikitRight;
 	NumberText *_numTwoHandedIndicatorLeft, *_numTwoHandedIndicatorRight;
-	Uint8 _twoHandedRed, _twoHandedGreen;
+	uint8_t _twoHandedRed, _twoHandedGreen;
 	Bar *_barTimeUnits, *_barEnergy, *_barHealth, *_barMorale, *_barMana;
 	bool _manaBarVisible;
 	Timer *_animTimer, *_gameTimer;
 	SavedBattleGame *_save;
 	Text *_txtDebug, *_txtTooltip;
-	Uint8 _tooltipDefaultColor;
-	Uint8 _medikitRed, _medikitGreen, _medikitBlue, _medikitOrange;
+	uint8_t _tooltipDefaultColor;
+	uint8_t _medikitRed, _medikitGreen, _medikitBlue, _medikitOrange;
 	std::vector<State*> _popups;
 	BattlescapeGame *_battleGame;
 	bool _firstInit, _paletteResetNeeded, _paletteResetRequested;
 	bool _isMouseScrolling, _isMouseScrolled;
 	int _xBeforeMouseScrolling, _yBeforeMouseScrolling;
 	Position _mapOffsetBeforeMouseScrolling;
-	Uint32 _mouseScrollingStartTime;
+	uint32_t _mouseScrollingStartTime;
 	int _totalMouseMoveX, _totalMouseMoveY;
 	bool _mouseMovedOverThreshold;
 	bool _mouseOverIcons;
 	std::string _currentTooltip;
 	Position _cursorPosition;
-	Uint8 _barHealthColor;
+	uint8_t _barHealthColor;
 	int _autosave;
 	int _numberOfDirectlyVisibleUnits, _numberOfEnemiesTotal, _numberOfEnemiesTotalPlusWounded;
-	Uint8 _indicatorTextColor, _indicatorGreen, _indicatorBlue, _indicatorPurple;
+	uint8_t _indicatorTextColor, _indicatorGreen, _indicatorBlue, _indicatorPurple;
 	/// Popups a context sensitive list of actions the user can choose from.
 	void handleItemClick(BattleItem *item, bool rightClick);
 	/// Shifts the red colors of the visible unit buttons backgrounds.
@@ -220,7 +220,7 @@ public:
 	/// Handles the battle game state.
 	void handleState();
 	/// Sets the state timer interval.
-	void setStateInterval(Uint32 interval);
+	void setStateInterval(uint32_t interval);
 	/// Gets map.
 	Map *getMap() const;
 	/// Show debug message.

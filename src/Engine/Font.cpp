@@ -136,7 +136,7 @@ void Font::init(size_t index, const UString &str)
 			{
 				for (int y = startY; y < startY + image->height && left == -1; ++y)
 				{
-					Uint8 pixel = surface->getPixel(x, y);
+					uint8_t pixel = surface->getPixel(x, y);
 					if (pixel != 0)
 					{
 						left = x;
@@ -147,7 +147,7 @@ void Font::init(size_t index, const UString &str)
 			{
 				for (int y = startY + image->height; y-- != startY && right == -1;)
 				{
-					Uint8 pixel = surface->getPixel(x, y);
+					uint8_t pixel = surface->getPixel(x, y);
 					if (pixel != 0)
 					{
 						right = x;

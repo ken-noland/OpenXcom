@@ -77,7 +77,8 @@ CraftEquipmentLoadState::CraftEquipmentLoadState(CraftEquipmentState* parent)
 
 	_btnCancel->setText(tr("STR_CANCEL_UC"));
 	_btnCancel->onMouseClick((ActionHandler)&CraftEquipmentLoadState::btnCancelClick);
-	_btnCancel->onKeyboardPress((ActionHandler)&CraftEquipmentLoadState::btnCancelClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnCancel->onKeyboardPress((ActionHandler)&CraftEquipmentLoadState::btnCancelClick, Options::keyCancel);
 
 	for (int i = 0; i < SavedGame::MAX_CRAFT_LOADOUT_TEMPLATES; ++i)
 	{

@@ -46,7 +46,7 @@ private:
 	entt::handle _window;
 	Text *_txtTitle, *_txtSelectedTopic, *_txtProgress, *_txtCostIndicator;
 	TextList *_lstLeft, *_lstRight, *_lstFull;
-	Uint8 _purple, _pink, _blue, _white, _gold, _grey;
+	uint8_t _purple, _pink, _blue, _white, _gold, _grey;
 	std::string _selectedTopic;
 	TTVMode _selectedFlag;
 	std::vector<std::pair<std::string, TTVMode> > _history;
@@ -75,8 +75,8 @@ public:
 	/// Sets the selected topic.
 	void setSelectedTopic(const std::string &selectedTopic, TTVMode topicType);
 	/// Gets the color coding for the given research topic.
-	Uint8 getResearchColor(const std::string &topic) const;
-	Uint8 getAltResearchColor(const std::string &topic) const;
+	uint8_t getResearchColor(const std::string &topic) const;
+	uint8_t getAltResearchColor(const std::string &topic) const;
 	/// Is given research topic discovered/available?
 	bool isDiscoveredResearch(const std::string &topic) const;
 	/// Is given manufacture topic discovered/available?

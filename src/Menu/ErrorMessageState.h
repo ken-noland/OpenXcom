@@ -37,10 +37,10 @@ private:
 	entt::handle _window;
 	Text *_txtMessage;
 
-	void create(const std::string &str, SDL_Color *palette, Uint8 color, const std::string &bg, int bgColor);
+	void create(const std::string &str, SDL_Color *palette, uint8_t color, const std::string &bg, int bgColor);
 public:
 	/// Creates the Error state.
-	ErrorMessageState(const std::string &msg, SDL_Color *palette, Uint8 color, const std::string &bg, int bgColor);
+	ErrorMessageState(const std::string &msg, SDL_Color *palette, uint8_t color, const std::string &bg, int bgColor);
 	/// Cleans up the Error state.
 	~ErrorMessageState();
 	/// Handler for clicking the OK button.

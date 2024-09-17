@@ -52,7 +52,7 @@ private:
 
 	int _selected;
 	OptionInfo *_selKey;
-	Uint8 _colorGroup, _colorSel, _colorNormal;
+	uint8_t _colorGroup, _colorSel, _colorNormal;
 
 	void addControls(const std::vector<OptionInfo> &keys);
 	OptionInfo *getControl(size_t sel);

@@ -18,7 +18,6 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <yaml-cpp/yaml.h>
-#include <SDL_types.h>
 #include <cmath>
 
 namespace OpenXcom
@@ -33,7 +32,7 @@ public:
 	constexpr static int TileXY = 16;
 	constexpr static int TileZ = 24;
 
-	Sint16 x, y, z;
+	int16_t x, y, z;
 
 	/// Null position constructor.
 	constexpr Position() noexcept : x(0), y(0), z(0) {};

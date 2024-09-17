@@ -17,10 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <SDL.h>
 #include <map>
 #include "Surface.h"
 #include "State.h"
+
+// SDLHACK
+using SDLKey = int;
+enum
+{
+	SDL_BUTTON_LEFT = -1
+};
+
 
 namespace OpenXcom
 {
@@ -39,21 +46,21 @@ class InteractiveSurface : public Surface
 private:
 	static const int NUM_BUTTONS = 7;
 	static const SDLKey SDLK_ANY;
-	Uint8 _buttonsPressed;
+	uint8_t _buttonsPressed;
 	std::string _tooltip;
 
 protected:
-	std::map<Uint8, ActionHandler> _click, _press, _release;
+	std::map<uint8_t, ActionHandler> _click, _press, _release;
 	ActionHandler _in, _over, _out;
 	std::map<SDLKey, ActionHandler> _keyPress, _keyRelease;
 	bool _isHovered, _isFocused, _listButton, _tftdMode;
 
 	/// Is this mouse button pressed?
-	bool isButtonPressed(Uint8 button = 0) const;
+	bool isButtonPressed(uint8_t button = 0) const;
 	/// Is this mouse button event handled?
-	virtual bool isButtonHandled(Uint8 button = 0);
+	virtual bool isButtonHandled(uint8_t button = 0);
 	/// Set a mouse button's internal state.
-	void setButtonPressed(Uint8 button, bool pressed);
+	void setButtonPressed(uint8_t button, bool pressed);
 public:
 	/// Creates a new interactive surface with the specified size and position.
 	[[deprecated]] InteractiveSurface(int width, int height, int x = 0, int y = 0);
@@ -70,11 +77,11 @@ public:
 	/// Unpresses the surface.
 	virtual void unpress(State *state);
 	/// Hooks an action handler to a mouse click on the surface.
-	void onMouseClick(ActionHandler handler, Uint8 button = SDL_BUTTON_LEFT);
+	void onMouseClick(ActionHandler handler, uint8_t button = SDL_BUTTON_LEFT);
 	/// Hooks an action handler to a mouse press over the surface.
-	void onMousePress(ActionHandler handler, Uint8 button = 0);
+	void onMousePress(ActionHandler handler, uint8_t button = 0);
 	/// Hooks an action handler to a mouse release over the surface.
-	void onMouseRelease(ActionHandler handler, Uint8 button = 0);
+	void onMouseRelease(ActionHandler handler, uint8_t button = 0);
 	/// Hooks an action handler to moving the mouse into the surface.
 	void onMouseIn(ActionHandler handler);
 	/// Hooks an action handler to moving the mouse over the surface.

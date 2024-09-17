@@ -188,29 +188,30 @@ int BaseView::getGridY() const
  */
 void BaseView::setSelectable(int sizeX, int sizeY)
 {
-	_selSizeX = sizeX;
-	_selSizeY = sizeY;
-	if (_selSizeX > 0 && _selSizeY > 0)
-	{
-		_selector = new Surface(sizeX * GRID_SIZE, sizeY * GRID_SIZE, _x, _y);
-		_selector->setPalette(getPalette());
-		SDL_Rect r;
-		r.w = _selector->getWidth();
-		r.h = _selector->getHeight();
-		r.x = 0;
-		r.y = 0;
-		_selector->drawRect(&r, _selectorColor);
-		r.w -= 2;
-		r.h -= 2;
-		r.x++;
-		r.y++;
-		_selector->drawRect(&r, 0);
-		_selector->setVisible(false);
-	}
-	else
-	{
-		delete _selector;
-	}
+// SDLHACK
+	//_selSizeX = sizeX;
+	//_selSizeY = sizeY;
+	//if (_selSizeX > 0 && _selSizeY > 0)
+	//{
+	//	_selector = new Surface(sizeX * GRID_SIZE, sizeY * GRID_SIZE, _x, _y);
+	//	_selector->setPalette(getPalette());
+	//	SDL_Rect r;
+	//	r.w = _selector->getWidth();
+	//	r.h = _selector->getHeight();
+	//	r.x = 0;
+	//	r.y = 0;
+	//	_selector->drawRect(&r, _selectorColor);
+	//	r.w -= 2;
+	//	r.h -= 2;
+	//	r.x++;
+	//	r.y++;
+	//	_selector->drawRect(&r, 0);
+	//	_selector->setVisible(false);
+	//}
+	//else
+	//{
+	//	delete _selector;
+	//}
 }
 
 /**
@@ -299,48 +300,49 @@ BasePlacementErrors BaseView::getPlacementError(const RuleBaseFacility *rule, Ba
 		}
 	}
 
-	bool bq=Options::allowBuildingQueue;
-	bool hasConnectingFacility = false;
+// OPTIONSHACK
+	// bool bq=Options::allowBuildingQueue;
+	//bool hasConnectingFacility = false;
 
-	// Check for another facility to connect to
-	for (int i = 0; i < rule->getSizeX(); ++i)
-	{
-		// top
-		if (_gridY > 0 && _facilities[_gridX + i][_gridY - 1] != 0)
-		{
-			hasConnectingFacility = true;
-			if ((!buildingOverExisting && bq) || _facilities[_gridX + i][_gridY - 1]->isBuiltOrHadPreviousFacility())
-				return BPE_None;
-		}
-		// bottom
-		if (_gridY + rule->getSizeY() < BASE_SIZE && _facilities[_gridX + i][_gridY + rule->getSizeY()] != 0)
-		{
-			hasConnectingFacility = true;
-			if ((!buildingOverExisting && bq) || _facilities[_gridX + i][_gridY + rule->getSizeY()]->isBuiltOrHadPreviousFacility())
-				return BPE_None;
-		}
-	}
-	for (int i = 0; i < rule->getSizeY(); ++i)
-	{
-		// left
-		if (_gridX > 0 && _facilities[_gridX - 1][_gridY + i] != 0)
-		{
-			hasConnectingFacility = true;
-			if ((!buildingOverExisting && bq) || _facilities[_gridX - 1][_gridY + i]->isBuiltOrHadPreviousFacility())
-				return BPE_None;
-		}
-		// right
-		if (_gridX + rule->getSizeX() < BASE_SIZE && _facilities[_gridX + rule->getSizeX()][_gridY + i] != 0)
-		{
-			hasConnectingFacility = true;
-			if ((!buildingOverExisting && bq) || _facilities[_gridX + rule->getSizeX()][_gridY + i]->isBuiltOrHadPreviousFacility())
-				return BPE_None;
-		}
-	}
+	//// Check for another facility to connect to
+	//for (int i = 0; i < rule->getSizeX(); ++i)
+	//{
+	//	// top
+	//	if (_gridY > 0 && _facilities[_gridX + i][_gridY - 1] != 0)
+	//	{
+	//		hasConnectingFacility = true;
+	//		if ((!buildingOverExisting && bq) || _facilities[_gridX + i][_gridY - 1]->isBuiltOrHadPreviousFacility())
+	//			return BPE_None;
+	//	}
+	//	// bottom
+	//	if (_gridY + rule->getSizeY() < BASE_SIZE && _facilities[_gridX + i][_gridY + rule->getSizeY()] != 0)
+	//	{
+	//		hasConnectingFacility = true;
+	//		if ((!buildingOverExisting && bq) || _facilities[_gridX + i][_gridY + rule->getSizeY()]->isBuiltOrHadPreviousFacility())
+	//			return BPE_None;
+	//	}
+	//}
+	//for (int i = 0; i < rule->getSizeY(); ++i)
+	//{
+	//	// left
+	//	if (_gridX > 0 && _facilities[_gridX - 1][_gridY + i] != 0)
+	//	{
+	//		hasConnectingFacility = true;
+	//		if ((!buildingOverExisting && bq) || _facilities[_gridX - 1][_gridY + i]->isBuiltOrHadPreviousFacility())
+	//			return BPE_None;
+	//	}
+	//	// right
+	//	if (_gridX + rule->getSizeX() < BASE_SIZE && _facilities[_gridX + rule->getSizeX()][_gridY + i] != 0)
+	//	{
+	//		hasConnectingFacility = true;
+	//		if ((!buildingOverExisting && bq) || _facilities[_gridX + rule->getSizeX()][_gridY + i]->isBuiltOrHadPreviousFacility())
+	//			return BPE_None;
+	//	}
+	//}
 
-	// We can assume if we've reached this point that none of the connecting facilities are finished!
-	if (hasConnectingFacility && (!bq || buildingOverExisting))
-		return BPE_Queue;
+	//// We can assume if we've reached this point that none of the connecting facilities are finished!
+	//if (hasConnectingFacility && (!bq || buildingOverExisting))
+	//	return BPE_Queue;
 
 	return BPE_NotConnected;
 }
@@ -376,47 +378,49 @@ bool BaseView::isQueuedBuilding(const RuleBaseFacility *rule) const
  */
 void BaseView::reCalcQueuedBuildings()
 {
-	setBase(_base);
-	std::vector<BaseFacility*> facilities;
-	for (BaseFacility* fac : _base->getFacilities())
-	{
-		if (fac->getAdjustedBuildTime() > 0)
-		{
-			// Set all queued buildings to infinite.
-			if (fac->getAdjustedBuildTime() > fac->getRules()->getBuildTime())
-			{
-				fac->setBuildTime(INT_MAX);
-			}
-			facilities.push_back(fac);
-		}
-	}
+// SDLHACK
 
-	// Applying a simple Dijkstra Algorithm
-	while (!facilities.empty())
-	{
-		auto min = facilities.begin();
-		for (auto it = facilities.begin(); it != facilities.end(); ++it)
-		{
-			if ((*it)->getAdjustedBuildTime() < (*min)->getAdjustedBuildTime())
-			{
-				min = it;
-			}
-		}
-		BaseFacility* facility=(*min);
-		facilities.erase(min);
-		const RuleBaseFacility *rule=facility->getRules();
-		int x=facility->getX(), y=facility->getY();
-		for (int i = 0; i < rule->getSizeX(); ++i)
-		{
-			if (y > 0) updateNeighborFacilityBuildTime(facility,_facilities[x + i][y - 1]);
-			if (y + rule->getSizeY() < BASE_SIZE) updateNeighborFacilityBuildTime(facility,_facilities[x + i][y + rule->getSizeY()]);
-		}
-		for (int i = 0; i < rule->getSizeY(); ++i)
-		{
-			if (x > 0) updateNeighborFacilityBuildTime(facility, _facilities[x - 1][y + i]);
-			if (x + rule->getSizeX() < BASE_SIZE) updateNeighborFacilityBuildTime(facility, _facilities[x + rule->getSizeX()][y + i]);
-		}
-	}
+	//setBase(_base);
+	//std::vector<BaseFacility*> facilities;
+	//for (BaseFacility* fac : _base->getFacilities())
+	//{
+	//	if (fac->getAdjustedBuildTime() > 0)
+	//	{
+	//		// Set all queued buildings to infinite.
+	//		if (fac->getAdjustedBuildTime() > fac->getRules()->getBuildTime())
+	//		{
+	//			fac->setBuildTime(INT_MAX);
+	//		}
+	//		facilities.push_back(fac);
+	//	}
+	//}
+
+	//// Applying a simple Dijkstra Algorithm
+	//while (!facilities.empty())
+	//{
+	//	auto min = facilities.begin();
+	//	for (auto it = facilities.begin(); it != facilities.end(); ++it)
+	//	{
+	//		if ((*it)->getAdjustedBuildTime() < (*min)->getAdjustedBuildTime())
+	//		{
+	//			min = it;
+	//		}
+	//	}
+	//	BaseFacility* facility=(*min);
+	//	facilities.erase(min);
+	//	const RuleBaseFacility *rule=facility->getRules();
+	//	int x=facility->getX(), y=facility->getY();
+	//	for (int i = 0; i < rule->getSizeX(); ++i)
+	//	{
+	//		if (y > 0) updateNeighborFacilityBuildTime(facility,_facilities[x + i][y - 1]);
+	//		if (y + rule->getSizeY() < BASE_SIZE) updateNeighborFacilityBuildTime(facility,_facilities[x + i][y + rule->getSizeY()]);
+	//	}
+	//	for (int i = 0; i < rule->getSizeY(); ++i)
+	//	{
+	//		if (x > 0) updateNeighborFacilityBuildTime(facility, _facilities[x - 1][y + i]);
+	//		if (x + rule->getSizeX() < BASE_SIZE) updateNeighborFacilityBuildTime(facility, _facilities[x + rule->getSizeX()][y + i]);
+	//	}
+	//}
 }
 
 /**
@@ -445,33 +449,34 @@ void BaseView::think()
  */
 void BaseView::blink()
 {
-	_blink = !_blink;
+// SDLHACK
+	//_blink = !_blink;
 
-	if (_selSizeX > 0 && _selSizeY > 0)
-	{
-		SDL_Rect r;
-		if (_blink)
-		{
-			r.w = _selector->getWidth();
-			r.h = _selector->getHeight();
-			r.x = 0;
-			r.y = 0;
-			_selector->drawRect(&r, _selectorColor);
-			r.w -= 2;
-			r.h -= 2;
-			r.x++;
-			r.y++;
-			_selector->drawRect(&r, 0);
-		}
-		else
-		{
-			r.w = _selector->getWidth();
-			r.h = _selector->getHeight();
-			r.x = 0;
-			r.y = 0;
-			_selector->drawRect(&r, 0);
-		}
-	}
+	//if (_selSizeX > 0 && _selSizeY > 0)
+	//{
+	//	SDL_Rect r;
+	//	if (_blink)
+	//	{
+	//		r.w = _selector->getWidth();
+	//		r.h = _selector->getHeight();
+	//		r.x = 0;
+	//		r.y = 0;
+	//		_selector->drawRect(&r, _selectorColor);
+	//		r.w -= 2;
+	//		r.h -= 2;
+	//		r.x++;
+	//		r.y++;
+	//		_selector->drawRect(&r, 0);
+	//	}
+	//	else
+	//	{
+	//		r.w = _selector->getWidth();
+	//		r.h = _selector->getHeight();
+	//		r.x = 0;
+	//		r.y = 0;
+	//		_selector->drawRect(&r, 0);
+	//	}
+	//}
 }
 
 /**
@@ -743,15 +748,15 @@ void BaseView::mouseOut(Action *action, State *state)
 	InteractiveSurface::mouseOut(action, state);
 }
 
-void BaseView::setColor(Uint8 color)
+void BaseView::setColor(uint8_t color)
 {
 	_cellColor = color;
 }
-void BaseView::setSecondaryColor(Uint8 color)
+void BaseView::setSecondaryColor(uint8_t color)
 {
 	_selectorColor = color;
 }
-void BaseView::setOtherColors(Uint8 red, Uint8 yellow, Uint8 green, bool highContrast)
+void BaseView::setOtherColors(uint8_t red, uint8_t yellow, uint8_t green, bool highContrast)
 {
 	_redColor = red;
 	_yellowColor = yellow;

@@ -43,13 +43,13 @@ class Sound;
 //	static const double POPUP_SPEED;
 //	int _dx, _dy;
 //	const Surface *_bg;
-//	Uint8 _color;
+//	uint8_t _color;
 //	WindowPopup _popup;
 //	double _popupStep;
 //	Timer *_timer;
 //	State *_state;
 //	bool _contrast, _screen, _thinBorder;
-//	Uint8 _innerColor;
+//	uint8_t _innerColor;
 //	bool _mute;
 //public:
 //	static Sound *soundPopup[3];
@@ -60,9 +60,9 @@ class Sound;
 //	/// Sets the background surface.
 //	void setBackground(const Surface *bg);
 //	/// Sets the border color.
-//	void setColor(Uint8 color) override;
+//	void setColor(uint8_t color) override;
 //	/// Gets the border color.
-//	Uint8 getColor() const;
+//	uint8_t getColor() const;
 //	/// Sets the high contrast color setting.
 //	void setHighContrast(bool contrast) override;
 //	/// Handles the timers.
@@ -78,7 +78,7 @@ class Sound;
 //	/// Give this window a thin border.
 //	void setThinBorder();
 //	/// Give this window a custom inner color.
-//	void setInnerColor(Uint8 innerColor);
+//	void setInnerColor(uint8_t innerColor);
 //	/// Mute the window.
 //	void mute() { _mute = true; }
 //};

@@ -5,11 +5,10 @@
 	UseTab: ForContinuationAndIndentation,
 	IndentWidth: 4,	
 	TabWidth: 4,
-	#BreakBeforeBraces: Allman,
 	BreakBeforeBraces: Custom,
 	BraceWrapping: {
 		AfterClass: true,
-		AfterControlStatement: false,
+		AfterControlStatement: true,
 		AfterEnum: true,
 		AfterFunction: true,
 		AfterNamespace: true,

@@ -39,14 +39,14 @@ private:
 	TextList *_list;
 	Timer *_timer;
 protected:
-	bool isButtonHandled(Uint8 button = 0) override;
+	bool isButtonHandled(uint8_t button = 0) override;
 public:
 	/// Creates a new arrow button with the specified size and position.
 	ArrowButton(ArrowShape shape, int width, int height, int x = 0, int y = 0);
 	/// Cleans up the arrow button.
 	~ArrowButton();
 	/// Sets the arrow button's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Sets the arrow button's shape.
 	void setShape(ArrowShape shape);
 	/// Sets the arrow button's list.

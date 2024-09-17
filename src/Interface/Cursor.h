@@ -32,7 +32,7 @@ class Action;
 class Cursor : public Surface
 {
 private:
-	Uint8 _color;
+	uint8_t _color;
 
 public:
 	/// Creates a new cursor with the specified size and position.
@@ -42,9 +42,9 @@ public:
 	/// Handles mouse events.
 	void handle(Action *action);
 	/// Sets the cursor's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the cursor's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Draws the cursor.
 	void draw() override;
 };

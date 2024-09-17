@@ -30,8 +30,8 @@ Polygon::Polygon(int points) : _points(points), _texture(0)
 {
 	_lat = new double[_points];
 	_lon = new double[_points];
-	_x = new Sint16[_points];
-	_y = new Sint16[_points];
+	_x = new int16_t[_points];
+	_y = new int16_t[_points];
 	for (int i = 0; i < _points; ++i)
 	{
 		_lat[i] = 0.0;
@@ -50,8 +50,8 @@ Polygon::Polygon(const Polygon& other)
 	_points = other._points;
 	_lat = new double[_points];
 	_lon = new double[_points];
-	_x = new Sint16[_points];
-	_y = new Sint16[_points];
+	_x = new int16_t[_points];
+	_y = new int16_t[_points];
 	for (int i = 0; i < _points; ++i)
 	{
 		_lat[i] = other._lat[i];
@@ -88,8 +88,8 @@ void Polygon::load(const YAML::Node &node)
 	_points = (int)((coords.size() - 1) / 2);
 	_lat = new double[_points];
 	_lon = new double[_points];
-	_x = new Sint16[_points];
-	_y = new Sint16[_points];
+	_x = new int16_t[_points];
+	_y = new int16_t[_points];
 
 	_texture = (int)coords[0];
 	for (size_t i = 1; i < coords.size(); i += 2)
@@ -147,7 +147,7 @@ void Polygon::setLongitude(int i, double lon)
  * @param i Point number (0-max).
  * @return Point's X coordinate.
  */
-Sint16 Polygon::getX(int i) const
+int16_t Polygon::getX(int i) const
 {
 	return _x[i];
 }
@@ -157,7 +157,7 @@ Sint16 Polygon::getX(int i) const
  * @param i Point number (0-max).
  * @param x Point's X coordinate.
  */
-void Polygon::setX(int i, Sint16 x)
+void Polygon::setX(int i, int16_t x)
 {
 	_x[i] = x;
 }
@@ -167,7 +167,7 @@ void Polygon::setX(int i, Sint16 x)
  * @param i Point number (0-max).
  * @return Point's Y coordinate.
  */
-Sint16 Polygon::getY(int i) const
+int16_t Polygon::getY(int i) const
 {
 	return _y[i];
 }
@@ -177,7 +177,7 @@ Sint16 Polygon::getY(int i) const
  * @param i Point number (0-max).
  * @param y Point's Y coordinate.
  */
-void Polygon::setY(int i, Sint16 y)
+void Polygon::setY(int i, int16_t y)
 {
 	_y[i] = y;
 }

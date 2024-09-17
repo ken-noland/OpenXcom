@@ -1924,7 +1924,7 @@ void TechTreeViewerState::setSelectedTopic(const std::string &selectedTopic, TTV
 /**
  * Gets the color coding for the given research topic.
  */
-Uint8 TechTreeViewerState::getResearchColor(const std::string &topic) const
+uint8_t TechTreeViewerState::getResearchColor(const std::string &topic) const
 {
 	if (_disabledResearch.find(topic) != _disabledResearch.end())
 	{
@@ -1940,7 +1940,7 @@ Uint8 TechTreeViewerState::getResearchColor(const std::string &topic) const
 /**
  * Gets the alternative color coding for the given research topic.
  */
-Uint8 TechTreeViewerState::getAltResearchColor(const std::string &topic) const
+uint8_t TechTreeViewerState::getAltResearchColor(const std::string &topic) const
 {
 	if (_disabledResearch.find(topic) != _disabledResearch.end())
 	{

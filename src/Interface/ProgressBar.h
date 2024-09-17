@@ -29,7 +29,7 @@ namespace OpenXcom
 class ProgressBar : public Surface
 {
 private:
-	Uint8 _color, _borderColor;
+	uint8_t _color, _borderColor;
 	int _value;
 public:
 	/// Creates a new progress bar with the specified size and position.
@@ -37,11 +37,11 @@ public:
 	/// Cleans up the progress bar.
 	~ProgressBar();
 	/// Sets the progress bar's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the progress bar's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the outline color for the progress bar.
-	void setBorderColor(Uint8 bc) override;
+	void setBorderColor(uint8_t bc) override;
 	/// Sets the progress bar's current value.
 	void setValue(int value);
 	/// Gets the progress bar's current value.

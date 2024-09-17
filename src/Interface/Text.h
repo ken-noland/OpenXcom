@@ -59,7 +59,7 @@ private:
 	bool _wrap, _invert, _contrast, _indent, _scroll, _ignoreSeparators;
 	TextHAlign _align;
 	TextVAlign _valign;
-	Uint8 _color, _color2;
+	uint8_t _color, _color2;
 	int _scrollY;
 
 	/// Processes the contained text.
@@ -96,13 +96,13 @@ public:
 	/// Gets the text's vertical alignment.
 	TextVAlign getVerticalAlign() const;
 	/// Sets the text's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the text's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the text's secondary color.
-	void setSecondaryColor(Uint8 color) override;
+	void setSecondaryColor(uint8_t color) override;
 	/// Gets the text's secondary color.
-	Uint8 getSecondaryColor() const;
+	uint8_t getSecondaryColor() const;
 	/// Gets the number of lines in the (wrapped, if wrapping is enabled) text
 	int getNumLines() const;
 	/// Gets the rendered text's width.

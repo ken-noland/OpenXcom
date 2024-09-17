@@ -36,20 +36,21 @@ namespace OpenXcom
 namespace
 {
 
-const Uint32 accurate = 4;
-Uint32 slowTick()
+const uint32_t accurate = 4;
+uint32_t slowTick()
 {
-	static Uint32 old_time = SDL_GetTicks();
-	static Uint64 false_time = static_cast<Uint64>(old_time) << accurate;
-	Uint64 new_time = ((Uint64)SDL_GetTicks()) << accurate;
-	false_time += (new_time - old_time) / Timer::gameSlowSpeed;
-	old_time = (Uint32)new_time;
-	return (Uint32)(false_time >> accurate);
+	//static uint32_t old_time = SDL_GetTicks();
+	//static Uint64 false_time = static_cast<Uint64>(old_time) << accurate;
+	//Uint64 new_time = ((Uint64)SDL_GetTicks()) << accurate;
+	//false_time += (new_time - old_time) / Timer::gameSlowSpeed;
+	//old_time = (uint32_t)new_time;
+	//return (uint32_t)(false_time >> accurate);
+	return 0;
 }
 
 } // namespace
 
-Uint32 Timer::gameSlowSpeed = 1;
+uint32_t Timer::gameSlowSpeed = 1;
 int Timer::maxFrameSkip = 8; // this is a pretty good default at 60FPS.
 
 /**
@@ -57,9 +58,9 @@ int Timer::maxFrameSkip = 8; // this is a pretty good default at 60FPS.
  * @param interval Time interval in milliseconds.
  * @param frameSkipping Use frameskipping.
  */
-Timer::Timer(Uint32 interval, bool frameSkipping) : _start(0), _frameSkipStart(0), _interval(interval), _running(false), _frameSkipping(frameSkipping)
+Timer::Timer(uint32_t interval, bool frameSkipping) : _start(0), _frameSkipStart(0), _interval(interval), _running(false), _frameSkipping(frameSkipping)
 {
-	Timer::maxFrameSkip = Options::maxFrameSkip;
+	//Timer::maxFrameSkip = Options::maxFrameSkip;
 }
 
 /**
@@ -91,7 +92,7 @@ void Timer::stop()
  * Returns the time passed since the last interval.
  * @return Time in milliseconds.
  */
-Uint32 Timer::getTime() const
+uint32_t Timer::getTime() const
 {
 	if (_running)
 	{
@@ -117,41 +118,41 @@ bool Timer::isRunning() const
  */
 void Timer::think(bool state, bool surface)
 {
-	Sint64 now = slowTick(); // must be signed to permit negative numbers
-	// assert(!game || game->isState(state));
+	//Sint64 now = slowTick(); // must be signed to permit negative numbers
+	//// assert(!game || game->isState(state));
 
-	if (_running)
-	{
-		if ((now - _frameSkipStart) >= _interval)
-		{
-			for (int i = 0; i <= maxFrameSkip && isRunning() && (now - _frameSkipStart) >= _interval; ++i)
-			{
-				if (state && _stateFunction)
-				{
-					_stateFunction();
-				}
-				_frameSkipStart += _interval;
-				// breaking here after one iteration effectively returns this function to its old functionality:
-				if (!state || !_frameSkipping)
-					break; // if game isn't set, we can't verify *state
-			}
+	//if (_running)
+	//{
+	//	if ((now - _frameSkipStart) >= _interval)
+	//	{
+	//		for (int i = 0; i <= maxFrameSkip && isRunning() && (now - _frameSkipStart) >= _interval; ++i)
+	//		{
+	//			if (state && _stateFunction)
+	//			{
+	//				_stateFunction();
+	//			}
+	//			_frameSkipStart += _interval;
+	//			// breaking here after one iteration effectively returns this function to its old functionality:
+	//			if (!state || !_frameSkipping)
+	//				break; // if game isn't set, we can't verify *state
+	//		}
 
-			if (surface && _surfaceFunction)
-			{
-				_surfaceFunction();
-			}
-			_start = slowTick();
-			if (_start > _frameSkipStart)
-				_frameSkipStart = _start; // don't play animations in ffwd to catch up :P
-		}
-	}
+	//		if (surface && _surfaceFunction)
+	//		{
+	//			_surfaceFunction();
+	//		}
+	//		_start = slowTick();
+	//		if (_start > _frameSkipStart)
+	//			_frameSkipStart = _start; // don't play animations in ffwd to catch up :P
+	//	}
+	//}
 }
 
 /**
  * Changes the timer's interval to a new value.
  * @param interval Interval in milliseconds.
  */
-void Timer::setInterval(Uint32 interval)
+void Timer::setInterval(uint32_t interval)
 {
 	_interval = interval;
 }
@@ -210,7 +211,7 @@ void ProgressTimerSystem::update()
 
 			if (progress < 1.0)
 			{
-				callUpdate(entity, progressTimer, progress);
+				callUpdate(entity, progressTimer, (float)progress);
 			}
 
 			if (progressTimer._elapsed >= progressTimer._duration)

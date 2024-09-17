@@ -85,9 +85,10 @@ CraftArmorState::CraftArmorState(Base* base, size_t craft) : State("CraftArmorSt
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&CraftArmorState::btnOkClick);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftArmorState::btnOkClick, Options::keyCancel);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftArmorState::btnDeequipAllArmorClick, Options::keyRemoveArmorFromAllCrafts);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftArmorState::btnDeequipCraftArmorClick, Options::keyRemoveArmorFromCraft);
+// OPTIONSHACK
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftArmorState::btnOkClick, Options::keyCancel);
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftArmorState::btnDeequipAllArmorClick, Options::keyRemoveArmorFromAllCrafts);
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftArmorState::btnDeequipCraftArmorClick, Options::keyRemoveArmorFromCraft);
 
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_SELECT_ARMOR"));
@@ -280,7 +281,7 @@ void CraftArmorState::init()
  */
 void CraftArmorState::initList(size_t scrl)
 {
-	Uint8 otherCraftColor = getGame()->getMod()->getInterface("craftArmor")->getElement("otherCraft")->color;
+	uint8_t otherCraftColor = getGame()->getMod()->getInterface("craftArmor")->getElement("otherCraft")->color;
 	int row = 0;
 	_lstSoldiers->clearList();
 
@@ -312,7 +313,7 @@ void CraftArmorState::initList(size_t scrl)
 			_lstSoldiers->addRow(3, soldier->getName(true).c_str(), soldier->getCraftString(getGame()->getLanguage(), recovery).c_str(), tr(soldier->getArmor()->getType()).c_str());
 		}
 
-		Uint8 color;
+		uint8_t color;
 		if (soldier->getCraft() == c)
 		{
 			color = _lstSoldiers->getSecondaryColor();
@@ -342,14 +343,15 @@ void CraftArmorState::lstItemsLeftArrowClick(Action *action)
 	unsigned int row = _lstSoldiers->getSelectedRow();
 	if (row > 0)
 	{
-		if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
-		{
-			moveSoldierUp(action, row);
-		}
-		else if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
-		{
-			moveSoldierUp(action, row, true);
-		}
+// SDLHACK
+		//if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+		//{
+		//	moveSoldierUp(action, row);
+		//}
+		//else if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
+		//{
+		//	moveSoldierUp(action, row, true);
+		//}
 	}
 	_cbxSortBy->setText(tr("STR_SORT_BY"));
 	_cbxSortBy->setSelected(-1);
@@ -375,7 +377,8 @@ void CraftArmorState::moveSoldierUp(Action *action, unsigned int row, bool max)
 		_base->getSoldiers().at(row - 1) = s;
 		if (row != _lstSoldiers->getScroll())
 		{
-			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<Uint16>(8 * action->getYScale()));
+// SDLHACK
+			//SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<uint16_t>(8 * action->getYScale()));
 		}
 		else
 		{
@@ -395,14 +398,15 @@ void CraftArmorState::lstItemsRightArrowClick(Action *action)
 	size_t numSoldiers = _base->getSoldiers().size();
 	if (0 < numSoldiers && INT_MAX >= numSoldiers && row < numSoldiers - 1)
 	{
-		if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
-		{
-			moveSoldierDown(action, row);
-		}
-		else if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
-		{
-			moveSoldierDown(action, row, true);
-		}
+// SDLHACK
+		//if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+		//{
+		//	moveSoldierDown(action, row);
+		//}
+		//else if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
+		//{
+		//	moveSoldierDown(action, row, true);
+		//}
 	}
 	_cbxSortBy->setText(tr("STR_SORT_BY"));
 	_cbxSortBy->setSelected(-1);
@@ -428,7 +432,8 @@ void CraftArmorState::moveSoldierDown(Action *action, unsigned int row, bool max
 		_base->getSoldiers().at(row + 1) = s;
 		if (row != _lstSoldiers->getVisibleRows() - 1 + _lstSoldiers->getScroll())
 		{
-			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<Uint16>(8 * action->getYScale()));
+// SDLHACK
+			//SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<uint16_t>(8 * action->getYScale()));
 		}
 		else
 		{
@@ -462,99 +467,100 @@ void CraftArmorState::lstSoldiersClick(Action *action)
 	Soldier *s = _base->getSoldiers().at(_lstSoldiers->getSelectedRow());
 	if (!(s->getCraft() && s->getCraft()->getStatus() == "STR_OUT"))
 	{
-		if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
-		{
-			if (getGame()->isCtrlPressed())
-			{
-				Craft* c = _base->getCrafts().at(_craft);
-				if (s->getCraft() == c)
-				{
-					s->setCraftAndMoveEquipment(0, _base, getGame()->getSavedGame()->getMonthsPassed() == -1);
-					_lstSoldiers->setCellText(_lstSoldiers->getSelectedRow(), 1, tr("STR_NONE_UC"));
-					_lstSoldiers->setRowColor(_lstSoldiers->getSelectedRow(), _lstSoldiers->getColor());
-				}
-				else if (s->hasFullHealth())
-				{
-					int space = c->getSpaceAvailable();
-					CraftPlacementErrors err = c->validateAddingSoldier(space, s);
-					if (err == CPE_None)
-					{
-						s->setCraftAndMoveEquipment(c, _base, getGame()->getSavedGame()->getMonthsPassed() == -1, true);
-						_lstSoldiers->setCellText(_lstSoldiers->getSelectedRow(), 1, c->getName(getGame()->getLanguage()));
-						_lstSoldiers->setRowColor(_lstSoldiers->getSelectedRow(), _lstSoldiers->getSecondaryColor());
-					}
-					else if (err == CPE_SoldierGroupNotAllowed)
-					{
-						getGame()->pushState(new ErrorMessageState(tr("STR_SOLDIER_GROUP_NOT_ALLOWED"), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
-					}
-					else if (err == CPE_SoldierGroupNotSame)
-					{
-						getGame()->pushState(new ErrorMessageState(tr("STR_SOLDIER_GROUP_NOT_SAME"), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
-					}
-					else if (space > 0)
-					{
-						getGame()->pushState(new ErrorMessageState(tr("STR_NOT_ENOUGH_CRAFT_SPACE"), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
-					}
-				}
-			}
-			else
-			{
-				_savedScrollPosition = _lstSoldiers->getScroll();
-				getGame()->pushState(new SoldierArmorState(_base, _lstSoldiers->getSelectedRow(), SA_GEOSCAPE));
-			}
-		}
-		else if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
-		{
-			SavedGame *save;
-			save = getGame()->getSavedGame();
-			Armor *a = getGame()->getMod()->getArmor(save->getLastSelectedArmor());
-			bool armorUnlocked = true;
-			if (a && a->getRequiredResearch() && !getGame()->getSavedGame()->isResearched(a->getRequiredResearch()))
-			{
-				armorUnlocked = false;
-			}
-			if (armorUnlocked && a)
-			{
-				Craft* craft = s->getCraft();
-				if (craft && !craft->validateArmorChange(s->getArmor()->getSize(), a->getSize()))
-				{
-					armorUnlocked = false; // armor not valid due to craft constraints
-					getGame()->pushState(new ErrorMessageState(tr("STR_NOT_ENOUGH_CRAFT_SPACE"), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
-				}
-			}
-			if (armorUnlocked && a && a->getCanBeUsedBy(s->getRules()))
-			{
-				if (save->getMonthsPassed() != -1)
-				{
-					if (a->getStoreItem() == nullptr || _base->getStorageItems()->getItem(a->getStoreItem()) > 0)
-					{
-						if (s->getArmor()->getStoreItem())
-						{
-							_base->getStorageItems()->addItem(s->getArmor()->getStoreItem());
-						}
-						if (a->getStoreItem())
-						{
-							_base->getStorageItems()->removeItem(a->getStoreItem());
-						}
+// SDLHACK
+		// if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+		//{
+		//	if (getGame()->isCtrlPressed())
+		//	{
+		//		Craft* c = _base->getCrafts().at(_craft);
+		//		if (s->getCraft() == c)
+		//		{
+		//			s->setCraftAndMoveEquipment(0, _base, getGame()->getSavedGame()->getMonthsPassed() == -1);
+		//			_lstSoldiers->setCellText(_lstSoldiers->getSelectedRow(), 1, tr("STR_NONE_UC"));
+		//			_lstSoldiers->setRowColor(_lstSoldiers->getSelectedRow(), _lstSoldiers->getColor());
+		//		}
+		//		else if (s->hasFullHealth())
+		//		{
+		//			int space = c->getSpaceAvailable();
+		//			CraftPlacementErrors err = c->validateAddingSoldier(space, s);
+		//			if (err == CPE_None)
+		//			{
+		//				s->setCraftAndMoveEquipment(c, _base, getGame()->getSavedGame()->getMonthsPassed() == -1, true);
+		//				_lstSoldiers->setCellText(_lstSoldiers->getSelectedRow(), 1, c->getName(getGame()->getLanguage()));
+		//				_lstSoldiers->setRowColor(_lstSoldiers->getSelectedRow(), _lstSoldiers->getSecondaryColor());
+		//			}
+		//			else if (err == CPE_SoldierGroupNotAllowed)
+		//			{
+		//				getGame()->pushState(new ErrorMessageState(tr("STR_SOLDIER_GROUP_NOT_ALLOWED"), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
+		//			}
+		//			else if (err == CPE_SoldierGroupNotSame)
+		//			{
+		//				getGame()->pushState(new ErrorMessageState(tr("STR_SOLDIER_GROUP_NOT_SAME"), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
+		//			}
+		//			else if (space > 0)
+		//			{
+		//				getGame()->pushState(new ErrorMessageState(tr("STR_NOT_ENOUGH_CRAFT_SPACE"), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
+		//			}
+		//		}
+		//	}
+		//	else
+		//	{
+		//		_savedScrollPosition = _lstSoldiers->getScroll();
+		//		getGame()->pushState(new SoldierArmorState(_base, _lstSoldiers->getSelectedRow(), SA_GEOSCAPE));
+		//	}
+		//}
+		//else if (action->getDetails()->button.button == SDL_BUTTON_RIGHT)
+		//{
+		//	SavedGame *save;
+		//	save = getGame()->getSavedGame();
+		//	Armor *a = getGame()->getMod()->getArmor(save->getLastSelectedArmor());
+		//	bool armorUnlocked = true;
+		//	if (a && a->getRequiredResearch() && !getGame()->getSavedGame()->isResearched(a->getRequiredResearch()))
+		//	{
+		//		armorUnlocked = false;
+		//	}
+		//	if (armorUnlocked && a)
+		//	{
+		//		Craft* craft = s->getCraft();
+		//		if (craft && !craft->validateArmorChange(s->getArmor()->getSize(), a->getSize()))
+		//		{
+		//			armorUnlocked = false; // armor not valid due to craft constraints
+		//			getGame()->pushState(new ErrorMessageState(tr("STR_NOT_ENOUGH_CRAFT_SPACE"), _palette, getGame()->getMod()->getInterface("soldierInfo")->getElement("errorMessage")->color, "BACK01.SCR", getGame()->getMod()->getInterface("soldierInfo")->getElement("errorPalette")->color));
+		//		}
+		//	}
+		//	if (armorUnlocked && a && a->getCanBeUsedBy(s->getRules()))
+		//	{
+		//		if (save->getMonthsPassed() != -1)
+		//		{
+		//			if (a->getStoreItem() == nullptr || _base->getStorageItems()->getItem(a->getStoreItem()) > 0)
+		//			{
+		//				if (s->getArmor()->getStoreItem())
+		//				{
+		//					_base->getStorageItems()->addItem(s->getArmor()->getStoreItem());
+		//				}
+		//				if (a->getStoreItem())
+		//				{
+		//					_base->getStorageItems()->removeItem(a->getStoreItem());
+		//				}
 
-						s->setArmor(a, true);
-						s->prepareStatsWithBonuses(getGame()->getMod()); // refresh stats for sorting
-						_lstSoldiers->setCellText(_lstSoldiers->getSelectedRow(), 2, tr(a->getType()));
-					}
-				}
-				else
-				{
-					s->setArmor(a, true);
-					s->prepareStatsWithBonuses(getGame()->getMod()); // refresh stats for sorting
-					_lstSoldiers->setCellText(_lstSoldiers->getSelectedRow(), 2, tr(a->getType()));
-				}
-			}
-		}
-		else if (action->getDetails()->button.button == SDL_BUTTON_MIDDLE)
-		{
-			std::string articleId = s->getArmor()->getUfopediaType();
-			Ufopaedia::openArticle(getGame(), articleId);
-		}
+		//				s->setArmor(a, true);
+		//				s->prepareStatsWithBonuses(getGame()->getMod()); // refresh stats for sorting
+		//				_lstSoldiers->setCellText(_lstSoldiers->getSelectedRow(), 2, tr(a->getType()));
+		//			}
+		//		}
+		//		else
+		//		{
+		//			s->setArmor(a, true);
+		//			s->prepareStatsWithBonuses(getGame()->getMod()); // refresh stats for sorting
+		//			_lstSoldiers->setCellText(_lstSoldiers->getSelectedRow(), 2, tr(a->getType()));
+		//		}
+		//	}
+		//}
+		//else if (action->getDetails()->button.button == SDL_BUTTON_MIDDLE)
+		//{
+		//	std::string articleId = s->getArmor()->getUfopediaType();
+		//	Ufopaedia::openArticle(getGame(), articleId);
+		//}
 	}
 }
 
@@ -564,28 +570,31 @@ void CraftArmorState::lstSoldiersClick(Action *action)
  */
 void CraftArmorState::lstSoldiersMousePress(Action *action)
 {
-	if (Options::changeValueByMouseWheel == 0)
-		return;
-	unsigned int row = _lstSoldiers->getSelectedRow();
-	size_t numSoldiers = _base->getSoldiers().size();
-	if (action->getDetails()->button.button == SDL_BUTTON_WHEELUP &&
-		row > 0)
-	{
-		if (action->getAbsoluteXMouse() >= _lstSoldiers->getArrowsLeftEdge() &&
-			action->getAbsoluteXMouse() <= _lstSoldiers->getArrowsRightEdge())
-		{
-			moveSoldierUp(action, row);
-		}
-	}
-	else if (action->getDetails()->button.button == SDL_BUTTON_WHEELDOWN &&
-		0 < numSoldiers && INT_MAX >= numSoldiers && row < numSoldiers - 1)
-	{
-		if (action->getAbsoluteXMouse() >= _lstSoldiers->getArrowsLeftEdge() &&
-			action->getAbsoluteXMouse() <= _lstSoldiers->getArrowsRightEdge())
-		{
-			moveSoldierDown(action, row);
-		}
-	}
+// SDLHACK
+// OPTIONSHACK
+
+	//if (Options::changeValueByMouseWheel == 0)
+	//	return;
+	//unsigned int row = _lstSoldiers->getSelectedRow();
+	//size_t numSoldiers = _base->getSoldiers().size();
+	//if (action->getDetails()->button.button == SDL_BUTTON_WHEELUP &&
+	//	row > 0)
+	//{
+	//	if (action->getAbsoluteXMouse() >= _lstSoldiers->getArrowsLeftEdge() &&
+	//		action->getAbsoluteXMouse() <= _lstSoldiers->getArrowsRightEdge())
+	//	{
+	//		moveSoldierUp(action, row);
+	//	}
+	//}
+	//else if (action->getDetails()->button.button == SDL_BUTTON_WHEELDOWN &&
+	//	0 < numSoldiers && INT_MAX >= numSoldiers && row < numSoldiers - 1)
+	//{
+	//	if (action->getAbsoluteXMouse() >= _lstSoldiers->getArrowsLeftEdge() &&
+	//		action->getAbsoluteXMouse() <= _lstSoldiers->getArrowsRightEdge())
+	//	{
+	//		moveSoldierDown(action, row);
+	//	}
+	//}
 }
 
 /**

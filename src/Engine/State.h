@@ -19,7 +19,6 @@
  */
 #include <vector>
 #include <string>
-#include <SDL.h>
 #include "LocalizedText.h"
 
 #include <entt/entt.hpp>
@@ -53,16 +52,12 @@ class State
 	friend class Timer;
 
 protected:
-
-	// ECS Systems
-	ProgressTimerSystem& _progressTimerSystem;
-
 	std::string _name;
 
 	std::vector<entt::handle> _surfaces;
 	bool _screen;
 	bool _soundPlayed;
-	InteractiveSurface *_modal;
+	//InteractiveSurface *_modal;
 
 
 	std::string _interfaceCategory;
@@ -70,8 +65,8 @@ protected:
 	RuleInterface *_ruleInterfaceParent;
 	const Sound* _customSound;
 
-	SDL_Color _palette[256];
-	Uint8 _cursorColor;
+	//SDL_Color _palette[256];
+	uint8_t _cursorColor;
 public:
 	/// Creates a new state linked to a game.
 	State(const std::string& name, bool screen);
@@ -144,17 +139,17 @@ public:
 	void setModal(InteractiveSurface *surface);
 
 	/// Changes a set of colors on the state's 8bpp palette.
-	void setStatePalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256);
+//	void setStatePalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256);
 	/// Changes a set of colors on the state's 8bpp palette of helper surfaces.
 	void setModPalette();
 
 	/// Changes the state's 8bpp palette with certain resources.
 	void setStandardPalette(const std::string &palette, int backpals = -1);
 	/// Changes the state's 8bpp palette with certain resources.
-	void setCustomPalette(SDL_Color *colors, int cursorColor);
+//	void setCustomPalette(SDL_Color *colors, int cursorColor);
 
 	/// Gets the state's 8bpp palette.
-	SDL_Color *getPalette();
+//	SDL_Color *getPalette();
 
 	/// Let the state know the window has been resized.
 	virtual void resize(int &dX, int &dY);

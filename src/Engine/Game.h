@@ -20,7 +20,6 @@
 #include <list>
 #include <string>
 #include <memory>
-#include <SDL_events.h>
 
 #include "../Entity/Engine/ECS.h"
 
@@ -32,17 +31,7 @@ namespace OpenXcom
 {
 
 class State;
-class Screen;
-class Cursor;
-class Language;
-class SavedGame;
-class Mod;
-class ModInfo;
-class FpsCounter;
-class Action;
-class GeoscapeState;
-class ModFile;
-class TimeSystem;
+class Options;
 
 namespace Lua
 {
@@ -58,18 +47,8 @@ class LuaMod;
 class Game
 {
 private:
-	SDL_Event _event;
-	Screen *_screen;
-	Cursor *_cursor;
-	Language *_lang;
+
 	std::list<State*> _states, _deleted;
-	SavedGame *_save;
-
-	/// list of mods and their files
-	std::unique_ptr<ModFile> _modFiles;
-
-	/// rules, y-scripts and other data from mods
-	std::unique_ptr<Mod> _mod;
 
 	/// central entity component system
 	ECS _ecs;
@@ -78,36 +57,16 @@ private:
 	Inspector _inspector;
 	#endif
 
-	/// Lua mods
-	std::unique_ptr<Lua::LuaMod> _luaMod;
-
-	bool _quit, _init, _update;
-	FpsCounter *_fpsCounter;
-	bool _mouseActive;
-	unsigned int _timeOfLastFrame;
-	int _timeUntilNextFrame;
-	bool _ctrl, _alt, _shift, _rmb, _mmb;
-	static const double VOLUME_GRADIENT;
-
 public:
-	/// Creates a new game and initializes SDL.
-	Game(const std::string &title);
-	/// Cleans up all the game's resources and shuts down SDL.
+	/// Creates a new game.
+	Game(const std::string &title, Options* options);
+	/// Cleans up all the game's resources.
 	~Game();
+
 	/// Starts the game's state machine.
 	void run();
 	/// Quits the game.
 	void quit();
-	/// Sets the game's audio volume.
-	void setVolume(int sound, int music, int ui);
-	/// Adjusts a linear volume level to an exponential one.
-	static double volumeExponent(int volume);
-	/// Gets the game's display screen.
-	Screen *getScreen() const { return _screen; }
-	/// Gets the game's cursor.
-	Cursor *getCursor() const { return _cursor; }
-	/// Gets the FpsCounter.
-	FpsCounter *getFpsCounter() const { return _fpsCounter; }
 
 	/// Resets the state stack to a new state.
 	void setState(State *state);
@@ -120,93 +79,10 @@ public:
 	/// Gets the state stack
 	const std::list<State*>& getStates() const;
 
-
-	/// Gets the currently loaded language.
-	Language *getLanguage() const { return _lang; }
-
-	/// Gets the currently loaded saved game.
-	SavedGame *getSavedGame() const { return _save; }
-	/// Sets a new saved game for the game.
-	void setSavedGame(SavedGame *save);
-
 	/// Gets the registry container
 	const [[nodiscard]] ECS& getECS() const { return _ecs; }
 	/// Gets the registry container
 	[[nodiscard]] ECS& getECS() { return _ecs; }
-
-	/// Gets the currently loaded mod.
-	Mod *getMod() const { return _mod.get(); }
-	/// Gets the currently loaded Lua mod.
-	Lua::LuaMod& getLuaMod() const { return *_luaMod.get(); }
-	/// Loads the mods specified in the game options.
-	void loadMods();
-	/// Sets whether the mouse cursor is activated.
-	void setMouseActive(bool active);
-	/// Returns whether current state is the param state
-	bool isState(State *state) const;
-	/// Returns whether a UfopaediaStartState is in the background.
-	bool containsUfopaediaStartState() const;
-	/// Returns whether a NotesState is in the background.
-	bool containsNotesState() const;
-	/// Returns whether the game is shutting down.
-	bool isQuitting() const;
-	/// Loads the default and current language.
-	void loadLanguages();
-	/// Sets up the audio.
-	void initAudio();
-	/// Sets the update flag.
-	void setUpdateFlag(bool update) { _update = update; }
-	/// Returns the update flag.
-	bool getUpdateFlag() const { return _update; }
-
-	/// Is CTRL pressed?
-	bool isCtrlPressed(bool considerTouchButtons = false) const;
-	/// Is ALT pressed?
-	bool isAltPressed(bool considerTouchButtons = false) const;
-	/// Is SHIFT pressed?
-	bool isShiftPressed(bool considerTouchButtons = false) const;
-
-	/// Is LMB pressed?
-	bool isLeftClick(Action* action, bool considerTouchButtons = false) const;
-	/// Is RMB pressed?
-	bool isRightClick(Action* action, bool considerTouchButtons = false) const;
-	/// Is MMB pressed?
-	bool isMiddleClick(Action* action, bool considerTouchButtons = false) const;
-
-	/// Resets the touch button flags.
-	void resetTouchButtonFlags();
-
-	/// Sets the _ctrl flag.
-	void setCtrlPressedFlag(bool newValue) { _ctrl = newValue; }
-	void toggleCtrlPressedFlag() { _ctrl = !_ctrl; }
-	/// Sets the _alt flag.
-	void setAltPressedFlag(bool newValue) { _alt = newValue; }
-	void toggleAltPressedFlag() { _alt = !_alt; }
-	/// Sets the _shift flag.
-	void setShiftPressedFlag(bool newValue) { _shift = newValue; }
-	void toggleShiftPressedFlag() { _shift = !_shift; }
-
-	/// Gets the _ctrl flag.
-	bool getCtrlPressedFlag() const { return _ctrl; }
-	/// Gets the _alt flag.
-	bool getAltPressedFlag() const { return _alt; }
-	/// Gets the _shift flag.
-	bool getShiftPressedFlag() const { return _shift; }
-
-	/// Sets the _rmb flag.
-	void setRMBFlag(bool newValue) { _rmb = newValue; }
-	void toggleRMBFlag() { _rmb = !_rmb; }
-	/// Sets the _mmb flag.
-	void setMMBFlag(bool newValue) { _mmb = newValue; }
-	void toggleMMBFlag() { _mmb = !_mmb; }
-
-	/// Gets the _rmb flag.
-	bool getRMBFlag() const { return _rmb; }
-	/// Gets the _mmb flag.
-	bool getMMBFlag() const { return _mmb; }
-
-	/// Gets the geoScapeState
-	GeoscapeState *getGeoscapeState() const;
 };
 
 /// Global function that retrieve a thread local Game object.

@@ -23,7 +23,6 @@
 #include <string>
 #include <cstring>
 #include <yaml-cpp/yaml.h>
-#include <SDL_stdinc.h>
 #include <cassert>
 
 #include "HelperMeta.h"
@@ -53,8 +52,8 @@ template<typename, typename...> class ScriptWorker;
 template<typename, typename> struct ScriptTag;
 template<typename, typename> class ScriptValues;
 
-enum RegEnum : Uint16;
-enum RetEnum : Uint8;
+enum RegEnum : uint16_t;
+enum RetEnum : uint8_t;
 enum class ProgPos : size_t;
 
 //for ScriptBind.h
@@ -94,7 +93,7 @@ using ScriptNull = std::nullptr_t;
 /**
  * Script numeric type, alias to int.
  */
-using ScriptInt = Sint32;
+using ScriptInt = int32_t;
 
 /**
  * Script const text, always zero terminated.
@@ -114,7 +113,7 @@ struct ScriptText
 const inline ScriptText ScriptText::empty = { "" };
 
 
-using ScriptFunc = RetEnum (*)(ScriptWorkerBase&, const Uint8*, ProgPos&);
+using ScriptFunc = RetEnum (*)(ScriptWorkerBase&, const uint8_t*, ProgPos&);
 
 /**
  * Script execution counter.
@@ -156,7 +155,7 @@ class ScriptArgSeparator
 /**
  * Base type for Arg enum.
  */
-using ArgEnumBase = Uint16;
+using ArgEnumBase = uint16_t;
 
 /**
  * Args special types.
@@ -352,9 +351,9 @@ inline ArgEnum ArgRegisteType()
 /**
  * Available regs.
  */
-enum RegEnum : Uint16
+enum RegEnum : uint16_t
 {
-	RegInvalid = (Uint16)-1,
+	RegInvalid = (uint16_t)-1,
 
 	RegStartPos = 0,
 };
@@ -364,7 +363,7 @@ static_assert(ScriptMaxReg < RegInvalid, "RegInvalid could be interpreted as cor
 /**
  * Return value from script operation.
  */
-enum RetEnum : Uint8
+enum RetEnum : uint8_t
 {
 	RetContinue = 0,
 	RetEnd = 1,
@@ -414,7 +413,7 @@ struct TypeInfo
 class ScriptContainerBase
 {
 	friend struct ParserWriter;
-	std::vector<Uint8> _proc;
+	std::vector<uint8_t> _proc;
 
 public:
 	/// Constructor.
@@ -439,7 +438,7 @@ public:
 	}
 
 	/// Get pointer to proc data.
-	const Uint8* data() const
+	const uint8_t* data() const
 	{
 		return *this ? _proc.data() : nullptr;
 	}
@@ -481,7 +480,7 @@ public:
 	}
 
 	/// Get pointer to proc data.
-	const Uint8* data() const
+	const uint8_t* data() const
 	{
 		return _current.data();
 	}
@@ -741,7 +740,7 @@ protected:
 	}
 
 	/// Call script.
-	void executeBase(const Uint8* proc);
+	void executeBase(const uint8_t* proc);
 
 public:
 	/// Default constructor.
@@ -758,7 +757,7 @@ public:
 	}
 	/// Get value from proc vector.
 	template<typename T>
-	T const_val(const Uint8 *ptr, size_t off = 0)
+	T const_val(const uint8_t *ptr, size_t off = 0)
 	{
 		T ret;
 		std::memcpy(&ret, ptr + off, sizeof(T));
@@ -843,7 +842,7 @@ public:
 class ScriptWorkerBlit : public ScriptWorkerBase
 {
 	/// Current script set in worker.
-	const Uint8* _proc;
+	const uint8_t* _proc;
 	const ScriptContainerBase* _events;
 
 public:
@@ -1130,7 +1129,7 @@ struct ScriptValueData
 {
 	ScriptRawMemory<2*sizeof(void*)> data;
 	ArgEnum type = ArgInvalid;
-	Uint8 size = 0;
+	uint8_t size = 0;
 
 	/// Copy constructor.
 	template<typename T>
@@ -1238,7 +1237,7 @@ class ScriptParserBase
 	ScriptGlobal* _shared;
 	bool _emptyReturn;
 	size_t _regUsedSpace;
-	Uint8 _regOutSize;
+	uint8_t _regOutSize;
 	ScriptRef _regOutName[ScriptMaxOut];
 	std::string _name;
 	std::string _defaultScript;
@@ -1403,9 +1402,9 @@ public:
 	const std::string& getDefault() const { return _defaultScript; }
 
 	/// Get number of parameters.
-	Uint8 getParamSize() const { return _regOutSize; }
+	uint8_t getParamSize() const { return _regOutSize; }
 	/// Get parameter data.
-	const ScriptRefData* getParamData(Uint8 i) const { return getRef(_regOutName[i]); }
+	const ScriptRefData* getParamData(uint8_t i) const { return getRef(_regOutName[i]); }
 
 	/// Get name of type.
 	ScriptRef getTypeName(ArgEnum type) const;
@@ -1623,7 +1622,7 @@ public:
 /**
  * Strong typed tag.
  */
-template<typename T, typename I = Uint8>
+template<typename T, typename I = uint8_t>
 struct ScriptTag
 {
 	static_assert(!std::numeric_limits<I>::is_signed, "Type should be unsigned");
@@ -1838,7 +1837,7 @@ protected:
 /**
  * Strong typed collection of values for script.
  */
-template<typename T, typename I = Uint8>
+template<typename T, typename I = uint8_t>
 class ScriptValues : ScriptValuesBase
 {
 public:

@@ -81,14 +81,11 @@
 #include <dirent.h>
 #include "Unicode.h"
 #endif		/* #ifdef _WIN32 */
-#include <SDL.h>
-#include <SDL_syswm.h>
 #ifdef __HAIKU__
 #include <FindDirectory.h>
 #include <StorageDefs.h>
 #endif
 #include "FileMap.h"
-#include "SDL2Helpers.h"
 #include "../version.h"
 
 namespace OpenXcom
@@ -119,64 +116,6 @@ void getErrorDialog()
 #endif
 }
 
-
-#ifdef _WIN32
-/**
- * Takes a Windows multibyte filesystem path and converts it to a UTF-8 string.
- * Also converts the path separator.
- * @param pathW Filesystem path.
- * @return UTF-8 string.
- */
-static std::string pathFromWindows(const wchar_t *pathW) {
-	int sizeW = lstrlenW(pathW);
-	int sizeU8 = WideCharToMultiByte(CP_UTF8, 0, pathW, sizeW, NULL, 0, NULL, NULL);
-	std::string pathU8(sizeU8, 0);
-	WideCharToMultiByte(CP_UTF8, 0, pathW, sizeW, &pathU8[0], sizeU8, NULL, NULL);
-	std::replace(pathU8.begin(), pathU8.end(), '\\', '/');
-	return pathU8;
-}
-
-/**
- * Takes a UTF-8 string and converts it to a Windows
- * multibyte filesystem path.
- * Also converts the path separator.
- * @param path UTF-8 string.
- * @param reslash Convert forward slashes to back ones.
- * @return Filesystem path.
- */
-static std::wstring pathToWindows(const std::string& path, bool reslash = true) {
-	std::string src = path;
-	if (reslash) {
-		std::replace(src.begin(), src.end(), '/', '\\');
-	}
-	int sizeW = MultiByteToWideChar(CP_UTF8, 0, &src[0], (int)src.size(), NULL, 0);
-	std::wstring pathW(sizeW, 0);
-	MultiByteToWideChar(CP_UTF8, 0, &src[0], (int)src.size(), &pathW[0], sizeW);
-	return pathW;
-}
-#endif
-
-static std::vector<std::string> args;
-
-/**
- * Converts command-line args to UTF-8 on windows
- */
-void processArgs (int argc, char *argv[])
-{
-	args.clear();
-#ifdef _WIN32
-	auto cmdlineW = GetCommandLineW();
-	int numArgs;
-	auto argvW = CommandLineToArgvW(cmdlineW, &numArgs);
-	for (int i=0; i< numArgs; ++i) { args.push_back(pathFromWindows(argvW[i])); }
-#else
-	for (int i=0; i< argc; ++i) { args.push_back(argv[i]); }
-#endif
-}
-
-/// Returns the command-line arguments
-const std::vector<std::string>& getArgs() { return args; }
-
 /**
  * Displays a message box with an error message.
  * @param error Error message.
@@ -184,9 +123,10 @@ const std::vector<std::string>& getArgs() { return args; }
 void showError(const std::string &error)
 {
 #ifdef _WIN32
-	auto titleW = pathToWindows("OpenXcom Error", false);
-	auto errorW = pathToWindows(error, false);
-	MessageBoxW(NULL, errorW.c_str(), titleW.c_str(), MB_ICONERROR | MB_OK);
+	assert(!"Not implemented");
+	//auto titleW = pathToWindows("OpenXcom Error", false);
+	//auto errorW = pathToWindows(error, false);
+	//MessageBoxW(NULL, errorW.c_str(), titleW.c_str(), MB_ICONERROR | MB_OK);
 #else
 	if (errorDlg.empty())
 	{
@@ -211,7 +151,8 @@ void showError(const std::string &error)
  */
 static char const *getHome()
 {
-	char const *home = getenv("HOME");
+	assert(!"Not implemented");
+	char const* home = getenv("HOME");
 	if (!home)
 	{
 		struct passwd *const pwd = getpwuid(getuid());
@@ -228,113 +169,114 @@ static char const *getHome()
  */
 std::vector<std::string> findDataFolders()
 {
+	assert(!"Not implemented");
 	std::vector<std::string> list;
-#ifdef __MORPHOS__
-	list.push_back("PROGDIR:");
-	return list;
-#endif
-
-#ifdef _WIN32
-	std::unordered_set<std::string> seen; // avoid dups in case cwd = dirname(exe)
-	wchar_t pathW[MAX_PATH+1];
-	const std::wstring oxconst = pathToWindows("OpenXcom/");
-	// Get Documents folder
-	if (SHGetSpecialFolderPathW(NULL, pathW, CSIDL_PERSONAL, FALSE))
-	{
-		PathAppendW(pathW, oxconst.c_str());
-		auto path = pathFromWindows(pathW);
-		Log(LOG_DEBUG) << "findDataFolders(): SHGetSpecialFolderPathW: " << path;
-		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
-	}
-
-	// Get binary directory
-	if (GetModuleFileNameW(NULL, pathW, MAX_PATH) != 0)
-	{
-		PathRemoveFileSpecW(pathW);
-		auto path = pathFromWindows(pathW);
-		path.push_back('/');
-		Log(LOG_DEBUG) << "findDataFolders(): GetModuleFileNameW/PathRemoveFileSpecW: " << path;
-		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
-	}
-
-	// Get working directory
-	if (GetCurrentDirectoryW(MAX_PATH, pathW) != 0)
-	{
-		auto path = pathFromWindows(pathW);
-		path.push_back('/');
-		Log(LOG_DEBUG) << "findDataFolders(): GetCurrentDirectoryW: " << path;
-		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
-	}
-#else
-	char const *home = getHome();
-#ifdef __HAIKU__
-	char data_path[B_PATH_NAME_LENGTH];
-	find_directory(B_SYSTEM_SETTINGS_DIRECTORY, 0, true, data_path, sizeof(data_path)-strlen("/OpenXcom/"));
-	strcat(data_path,"/OpenXcom/");
-	list.push_back(data_path);
-#endif
-	char path[MAXPATHLEN];
-
-	// Get user-specific data folders
-	if (char const *const xdg_data_home = getenv("XDG_DATA_HOME"))
- 	{
-		snprintf(path, MAXPATHLEN, "%s/openxcom/", xdg_data_home);
- 	}
- 	else
- 	{
-#ifdef __APPLE__
-		snprintf(path, MAXPATHLEN, "%s/Library/Application Support/OpenXcom/", home);
-#else
-		snprintf(path, MAXPATHLEN, "%s/.local/share/openxcom/", home);
-#endif
- 	}
- 	list.push_back(path);
-
-	// Get global data folders
-	if (char const *const xdg_data_dirs = getenv("XDG_DATA_DIRS"))
-	{
-		char xdg_data_dirs_copy[strlen(xdg_data_dirs)+1];
-		strcpy(xdg_data_dirs_copy, xdg_data_dirs);
-		char *dir = strtok(xdg_data_dirs_copy, ":");
-		while (dir != 0)
-		{
-			snprintf(path, MAXPATHLEN, "%s/openxcom/", dir);
-			list.push_back(path);
-			dir = strtok(0, ":");
-		}
-	}
-#ifdef __APPLE__
-	list.push_back("/Users/Shared/OpenXcom/");
-#else
-	list.push_back("/usr/local/share/openxcom/");
-	list.push_back("/usr/share/openxcom/");
-#ifdef DATADIR
-	snprintf(path, MAXPATHLEN, "%s/", DATADIR);
-	list.push_back(path);
-#endif
-
-#endif
-
-#ifdef __linux
-	{
-		char buffer[PATH_MAX];
-		const ssize_t count = readlink("/proc/self/exe", buffer, PATH_MAX);
-		// Get absolute executable path
-		if (count != 0) {
-			const std::string exe_path = std::string(buffer, count);
-			// Get folder path
-			const size_t dir_pos = exe_path.find_last_of("/");
-			if (dir_pos != std::string::npos) {
-				std::string dir = exe_path.substr(0, dir_pos);
-				list.push_back( dir.append("/") );
-			}
-		}
-	}
-#endif
-	// Get working directory
-	list.push_back("./");
-#endif
-
+	//#ifdef __MORPHOS__
+//	list.push_back("PROGDIR:");
+//	return list;
+//#endif
+//
+//#ifdef _WIN32
+//	std::unordered_set<std::string> seen; // avoid dups in case cwd = dirname(exe)
+//	wchar_t pathW[MAX_PATH+1];
+//	const std::wstring oxconst = pathToWindows("OpenXcom/");
+//	// Get Documents folder
+//	if (SHGetSpecialFolderPathW(NULL, pathW, CSIDL_PERSONAL, FALSE))
+//	{
+//		PathAppendW(pathW, oxconst.c_str());
+//		auto path = pathFromWindows(pathW);
+//		Log(LOG_DEBUG) << "findDataFolders(): SHGetSpecialFolderPathW: " << path;
+//		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
+//	}
+//
+//	// Get binary directory
+//	if (GetModuleFileNameW(NULL, pathW, MAX_PATH) != 0)
+//	{
+//		PathRemoveFileSpecW(pathW);
+//		auto path = pathFromWindows(pathW);
+//		path.push_back('/');
+//		Log(LOG_DEBUG) << "findDataFolders(): GetModuleFileNameW/PathRemoveFileSpecW: " << path;
+//		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
+//	}
+//
+//	// Get working directory
+//	if (GetCurrentDirectoryW(MAX_PATH, pathW) != 0)
+//	{
+//		auto path = pathFromWindows(pathW);
+//		path.push_back('/');
+//		Log(LOG_DEBUG) << "findDataFolders(): GetCurrentDirectoryW: " << path;
+//		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
+//	}
+//#else
+//	char const *home = getHome();
+//#ifdef __HAIKU__
+//	char data_path[B_PATH_NAME_LENGTH];
+//	find_directory(B_SYSTEM_SETTINGS_DIRECTORY, 0, true, data_path, sizeof(data_path)-strlen("/OpenXcom/"));
+//	strcat(data_path,"/OpenXcom/");
+//	list.push_back(data_path);
+//#endif
+//	char path[MAXPATHLEN];
+//
+//	// Get user-specific data folders
+//	if (char const *const xdg_data_home = getenv("XDG_DATA_HOME"))
+// 	{
+//		snprintf(path, MAXPATHLEN, "%s/openxcom/", xdg_data_home);
+// 	}
+// 	else
+// 	{
+//#ifdef __APPLE__
+//		snprintf(path, MAXPATHLEN, "%s/Library/Application Support/OpenXcom/", home);
+//#else
+//		snprintf(path, MAXPATHLEN, "%s/.local/share/openxcom/", home);
+//#endif
+// 	}
+// 	list.push_back(path);
+//
+//	// Get global data folders
+//	if (char const *const xdg_data_dirs = getenv("XDG_DATA_DIRS"))
+//	{
+//		char xdg_data_dirs_copy[strlen(xdg_data_dirs)+1];
+//		strcpy(xdg_data_dirs_copy, xdg_data_dirs);
+//		char *dir = strtok(xdg_data_dirs_copy, ":");
+//		while (dir != 0)
+//		{
+//			snprintf(path, MAXPATHLEN, "%s/openxcom/", dir);
+//			list.push_back(path);
+//			dir = strtok(0, ":");
+//		}
+//	}
+//#ifdef __APPLE__
+//	list.push_back("/Users/Shared/OpenXcom/");
+//#else
+//	list.push_back("/usr/local/share/openxcom/");
+//	list.push_back("/usr/share/openxcom/");
+//#ifdef DATADIR
+//	snprintf(path, MAXPATHLEN, "%s/", DATADIR);
+//	list.push_back(path);
+//#endif
+//
+//#endif
+//
+//#ifdef __linux
+//	{
+//		char buffer[PATH_MAX];
+//		const ssize_t count = readlink("/proc/self/exe", buffer, PATH_MAX);
+//		// Get absolute executable path
+//		if (count != 0) {
+//			const std::string exe_path = std::string(buffer, count);
+//			// Get folder path
+//			const size_t dir_pos = exe_path.find_last_of("/");
+//			if (dir_pos != std::string::npos) {
+//				std::string dir = exe_path.substr(0, dir_pos);
+//				list.push_back( dir.append("/") );
+//			}
+//		}
+//	}
+//#endif
+//	// Get working directory
+//	list.push_back("./");
+//#endif
+//
 	return list;
 }
 
@@ -345,78 +287,79 @@ std::vector<std::string> findDataFolders()
  */
 std::vector<std::string> findUserFolders()
 {
+	assert(!"Not implemented");
 	std::vector<std::string> list;
-
-#ifdef __MORPHOS__
-	list.push_back("PROGDIR:");
-	return list;
-#endif
-
-#ifdef _WIN32
-	std::unordered_set<std::string> seen;
-	wchar_t pathW[MAX_PATH+1];
-	const std::wstring oxconst = pathToWindows("OpenXcom/");
-	const std::wstring usconst = pathToWindows("user/");
-
-	// Get Documents folder
-	if (SHGetSpecialFolderPathW(NULL, pathW, CSIDL_PERSONAL, FALSE))
-	{
-		PathAppendW(pathW, oxconst.c_str());
-		auto path = pathFromWindows(pathW);
-		Log(LOG_DEBUG) << "findUserFolders(): SHGetSpecialFolderPathW: " << path;
-		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
-	}
-
-	// Get binary directory
-	if (GetModuleFileNameW(NULL, pathW, MAX_PATH) != 0)
-	{
-		PathRemoveFileSpecW(pathW);
-		PathAppendW(pathW, usconst.c_str());
-		auto path = pathFromWindows(pathW);
-		Log(LOG_DEBUG) << "findUserFolders(): GetModuleFileNameW/PathRemoveFileSpecW: " << path;
-		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
-	}
-
-	// Get working directory
-	if (GetCurrentDirectoryW(MAX_PATH, pathW) != 0)
-	{
-		PathAppendW(pathW, usconst.c_str());
-		auto path = pathFromWindows(pathW);
-		Log(LOG_DEBUG) << "findUserFolders(): GetCurrentDirectoryW: " << path;
-		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
-	}
-#else
-#ifdef __HAIKU__
-	char user_path[B_PATH_NAME_LENGTH];
-	find_directory(B_USER_SETTINGS_DIRECTORY, 0, true, user_path, sizeof(user_path)-strlen("/OpenXcom/"));
-	strcat(user_path,"/OpenXcom/");
-	list.push_back(user_path);
-#endif
-	char const *home = getHome();
-	char path[MAXPATHLEN];
-
-	// Get user folders
-	if (char const *const xdg_data_home = getenv("XDG_DATA_HOME"))
- 	{
-		snprintf(path, MAXPATHLEN, "%s/openxcom/", xdg_data_home);
- 	}
- 	else
- 	{
-#ifdef __APPLE__
-		snprintf(path, MAXPATHLEN, "%s/Library/Application Support/OpenXcom/", home);
-#else
-		snprintf(path, MAXPATHLEN, "%s/.local/share/openxcom/", home);
-#endif
- 	}
-	list.push_back(path);
-
-	// Get old-style folder
-	snprintf(path, MAXPATHLEN, "%s/.openxcom/", home);
-	list.push_back(path);
-
-	// Get working directory
-	list.push_back("./user/");
-#endif
+	//
+//#ifdef __MORPHOS__
+//	list.push_back("PROGDIR:");
+//	return list;
+//#endif
+//
+//#ifdef _WIN32
+//	std::unordered_set<std::string> seen;
+//	wchar_t pathW[MAX_PATH+1];
+//	const std::wstring oxconst = pathToWindows("OpenXcom/");
+//	const std::wstring usconst = pathToWindows("user/");
+//
+//	// Get Documents folder
+//	if (SHGetSpecialFolderPathW(NULL, pathW, CSIDL_PERSONAL, FALSE))
+//	{
+//		PathAppendW(pathW, oxconst.c_str());
+//		auto path = pathFromWindows(pathW);
+//		Log(LOG_DEBUG) << "findUserFolders(): SHGetSpecialFolderPathW: " << path;
+//		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
+//	}
+//
+//	// Get binary directory
+//	if (GetModuleFileNameW(NULL, pathW, MAX_PATH) != 0)
+//	{
+//		PathRemoveFileSpecW(pathW);
+//		PathAppendW(pathW, usconst.c_str());
+//		auto path = pathFromWindows(pathW);
+//		Log(LOG_DEBUG) << "findUserFolders(): GetModuleFileNameW/PathRemoveFileSpecW: " << path;
+//		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
+//	}
+//
+//	// Get working directory
+//	if (GetCurrentDirectoryW(MAX_PATH, pathW) != 0)
+//	{
+//		PathAppendW(pathW, usconst.c_str());
+//		auto path = pathFromWindows(pathW);
+//		Log(LOG_DEBUG) << "findUserFolders(): GetCurrentDirectoryW: " << path;
+//		if (seen.end() == seen.find(path)) { seen.insert(path); list.push_back(path); }
+//	}
+//#else
+//#ifdef __HAIKU__
+//	char user_path[B_PATH_NAME_LENGTH];
+//	find_directory(B_USER_SETTINGS_DIRECTORY, 0, true, user_path, sizeof(user_path)-strlen("/OpenXcom/"));
+//	strcat(user_path,"/OpenXcom/");
+//	list.push_back(user_path);
+//#endif
+//	char const *home = getHome();
+//	char path[MAXPATHLEN];
+//
+//	// Get user folders
+//	if (char const *const xdg_data_home = getenv("XDG_DATA_HOME"))
+// 	{
+//		snprintf(path, MAXPATHLEN, "%s/openxcom/", xdg_data_home);
+// 	}
+// 	else
+// 	{
+//#ifdef __APPLE__
+//		snprintf(path, MAXPATHLEN, "%s/Library/Application Support/OpenXcom/", home);
+//#else
+//		snprintf(path, MAXPATHLEN, "%s/.local/share/openxcom/", home);
+//#endif
+// 	}
+//	list.push_back(path);
+//
+//	// Get old-style folder
+//	snprintf(path, MAXPATHLEN, "%s/.openxcom/", home);
+//	list.push_back(path);
+//
+//	// Get working directory
+//	list.push_back("./user/");
+//#endif
 
 	return list;
 }
@@ -427,55 +370,58 @@ std::vector<std::string> findUserFolders()
  */
 std::string findConfigFolder()
 {
-#ifdef __MORPHOS__
-	return "PROGDIR:";
-#endif
-
-#if defined(_WIN32) || defined(__APPLE__)
+	assert(!"Not implemented");
+// #ifdef __MORPHOS__
+//	return "PROGDIR:";
+//#endif
+//
+//#if defined(_WIN32) || defined(__APPLE__)
+//	return "";
+//#elif defined (__HAIKU__)
+//	char settings_path[B_PATH_NAME_LENGTH];
+//	find_directory(B_USER_SETTINGS_DIRECTORY, 0, true, settings_path, sizeof(settings_path)-strlen("/OpenXcom/"));
+//	strcat(settings_path,"/OpenXcom/");
+//	return settings_path;
+//#else
+//	char const *home = getHome();
+//	char path[MAXPATHLEN];
+//	// Get config folders
+//	if (char const *const xdg_config_home = getenv("XDG_CONFIG_HOME"))
+//	{
+//		snprintf(path, MAXPATHLEN, "%s/openxcom/", xdg_config_home);
+//		return path;
+//	}
+//	else
+//	{
+//		snprintf(path, MAXPATHLEN, "%s/.config/openxcom/", home);
+//		return path;
+//	}
+//#endif
 	return "";
-#elif defined (__HAIKU__)
-	char settings_path[B_PATH_NAME_LENGTH];
-	find_directory(B_USER_SETTINGS_DIRECTORY, 0, true, settings_path, sizeof(settings_path)-strlen("/OpenXcom/"));
-	strcat(settings_path,"/OpenXcom/");
-	return settings_path;
-#else
-	char const *home = getHome();
-	char path[MAXPATHLEN];
-	// Get config folders
-	if (char const *const xdg_config_home = getenv("XDG_CONFIG_HOME"))
-	{
-		snprintf(path, MAXPATHLEN, "%s/openxcom/", xdg_config_home);
-		return path;
-	}
-	else
-	{
-		snprintf(path, MAXPATHLEN, "%s/.config/openxcom/", home);
-		return path;
-	}
-#endif
 }
 
 std::string searchDataFile(const std::string &filename)
 {
-	// Correct folder separator
-	std::string name = filename;
+	assert(!"Not implemented");
+	//// Correct folder separator
+	//std::string name = filename;
 
-	// Check current data path
-	std::string path = Options::getDataFolder() + name;
-	if (fileExists(path))
-	{
-		return path;
-	}
+	//// Check current data path
+	//std::string path = Options::getDataFolder() + name;
+	//if (fileExists(path))
+	//{
+	//	return path;
+	//}
 
-	// Check every other path
-	for (auto& dataPath : Options::getDataList())
-	{
-		path = dataPath + name;
-		if (fileExists(path))
-		{
-			return path;
-		}
-	}
+	//// Check every other path
+	//for (auto& dataPath : Options::getDataList())
+	//{
+	//	path = dataPath + name;
+	//	if (fileExists(path))
+	//	{
+	//		return path;
+	//	}
+	//}
 
 	// Give up
 	return filename;
@@ -483,37 +429,38 @@ std::string searchDataFile(const std::string &filename)
 
 std::string searchDataFolder(const std::string &foldername)
 {
-	// Correct folder separator
-	std::string name = foldername;
-	std::string path;
+	assert(!"Not implemented");
+	//// Correct folder separator
+	//std::string name = foldername;
+	//std::string path;
 
-	// Set miminum possible of dirs
-	std::size_t minNumOfElementsInFolder = (
-		foldername == "TFTD" || foldername == "UFO" ? 9 : // At least 9 dictionaries with original data data
-		foldername == "common" ? 6 : // Files: "Language/", "Palettes/", "Resources/", "Shaders/", "SoldierName/", "openxcom.png"
-		foldername == "standard" ? 20 : // Now 48 mods, some buffer if some decide to drop some mods
-		0
-	);
+	//// Set miminum possible of dirs
+	//std::size_t minNumOfElementsInFolder = (
+	//	foldername == "TFTD" || foldername == "UFO" ? 9 : // At least 9 dictionaries with original data data
+	//	foldername == "common" ? 6 : // Files: "Language/", "Palettes/", "Resources/", "Shaders/", "SoldierName/", "openxcom.png"
+	//	foldername == "standard" ? 20 : // Now 48 mods, some buffer if some decide to drop some mods
+	//	0
+	//);
 
-	if (Options::getDataFolder() != "")
-	{
-		// Check current data path
-		path = Options::getDataFolder() + name;
-		if (folderExists(path) && (minNumOfElementsInFolder == 0 || getFolderContents(path).size() >= minNumOfElementsInFolder))
-		{
-			return path;
-		}
-	}
+	//if (Options::getDataFolder() != "")
+	//{
+	//	// Check current data path
+	//	path = Options::getDataFolder() + name;
+	//	if (folderExists(path) && (minNumOfElementsInFolder == 0 || getFolderContents(path).size() >= minNumOfElementsInFolder))
+	//	{
+	//		return path;
+	//	}
+	//}
 
-	// Check every other path
-	for (auto& dataPath : Options::getDataList())
-	{
-		path = dataPath + name;
-		if (folderExists(path) && (minNumOfElementsInFolder == 0 || getFolderContents(path).size() >= minNumOfElementsInFolder))
-		{
-			return path;
-		}
-	}
+	//// Check every other path
+	//for (auto& dataPath : Options::getDataList())
+	//{
+	//	path = dataPath + name;
+	//	if (folderExists(path) && (minNumOfElementsInFolder == 0 || getFolderContents(path).size() >= minNumOfElementsInFolder))
+	//	{
+	//		return path;
+	//	}
+	//}
 
 	// Give up
 	return foldername;
@@ -527,22 +474,24 @@ std::string searchDataFolder(const std::string &foldername)
  */
 bool createFolder(const std::string &path)
 {
-#ifdef _WIN32
-	auto pathW = pathToWindows(path);
-	int result = CreateDirectoryW(pathW.c_str(), 0);
-	if (result == 0)
-		return false;
-	else
-		return true;
-#else
-	mode_t process_mask = umask(0);
-	int result = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-	umask(process_mask);
-	if (result == 0)
-		return true;
-	else
-		return false;
-#endif
+	assert(!"Not implemented");
+	return false;
+// #ifdef _WIN32
+//	auto pathW = pathToWindows(path);
+//	int result = CreateDirectoryW(pathW.c_str(), 0);
+//	if (result == 0)
+//		return false;
+//	else
+//		return true;
+//#else
+//	mode_t process_mask = umask(0);
+//	int result = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+//	umask(process_mask);
+//	if (result == 0)
+//		return true;
+//	else
+//		return false;
+//#endif
 }
 
 /**
@@ -552,23 +501,24 @@ bool createFolder(const std::string &path)
  */
 std::string convertPath(const std::string &path)
 {
-	if (!path.empty() && path.at(path.size()-1) != '/')
-		return path + '/';
+	assert(!"Not implemented");
+	//if (!path.empty() && path.at(path.size() - 1) != '/')
+	//	return path + '/';
 	return path;
 }
-#ifdef _WIN32
-static time_t FILETIME2mtime(FILETIME& ft) {
-	const long long int TICKS_PER_SECOND = 10000000;
-	const long long int EPOCH_DIFFERENCE = 11644473600LL;
-	long long int input = 0, temp = 0;
-
-	input = ((long long int)ft.dwHighDateTime)<<32;
-	input += ft.dwLowDateTime;
-	temp = input / TICKS_PER_SECOND;
-	temp = temp - EPOCH_DIFFERENCE;
-	return (time_t) temp;
-}
-#endif
+//#ifdef _WIN32
+//static time_t FILETIME2mtime(FILETIME& ft) {
+//	const long long int TICKS_PER_SECOND = 10000000;
+//	const long long int EPOCH_DIFFERENCE = 11644473600LL;
+//	long long int input = 0, temp = 0;
+//
+//	input = ((long long int)ft.dwHighDateTime)<<32;
+//	input += ft.dwLowDateTime;
+//	temp = input / TICKS_PER_SECOND;
+//	temp = temp - EPOCH_DIFFERENCE;
+//	return (time_t) temp;
+//}
+//#endif
 /**
  * Gets the name of all the files
  * contained in a certain folder.
@@ -578,62 +528,63 @@ static time_t FILETIME2mtime(FILETIME& ft) {
  */
 FolderContents getFolderContents(const std::string &path, const std::string &ext)
 {
+	assert(!"Not implemented");
 	std::vector<std::tuple<std::string, bool, time_t>> files;
-#ifdef _WIN32
-	auto search_path = path + "/*";
-	if (!ext.empty()) { search_path += "." + ext; }
-	Log(LOG_VERBOSE) << "getFolderContents("<<path<<", "<<ext<<") -> " << search_path;
-	auto pathW = pathToWindows(search_path);
-	WIN32_FIND_DATAW ffd;
-	auto handle = FindFirstFileW(pathW.c_str(), &ffd);
-	if (handle == INVALID_HANDLE_VALUE) {
-		Log(LOG_VERBOSE) << "getFolderContents("<<path<<", "<<ext<<"): fail outright.";
-		return files;
-	}
-	do  {
-		auto filename = pathFromWindows(ffd.cFileName);
-		if ((filename == ".") || (filename == "..")) { continue; }
-		time_t mtime = FILETIME2mtime(ffd.ftLastWriteTime);
-		bool is_folder = ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
-		files.push_back(std::make_tuple(filename, is_folder, mtime));
-		Log(LOG_VERBOSE) << "getFolderContents("<<path<<", "<<ext<<"): got '"<<filename<<"'";
-	} while (FindNextFileW(handle, &ffd) != 0);
-	FindClose(handle);
-	Log(LOG_VERBOSE) << "getFolderContents("<<path<<", "<<ext<<"): total "<<files.size();
-#else
-	DIR *dp = opendir(path.c_str());
-
-	if (dp == 0)
-	{
-	#ifdef __MORPHOS__
-		return files;
-	#else
-		std::string errorMessage("Failed to open directory: " + path);
-		throw Exception(errorMessage);
-	#endif
-	}
-	struct dirent *dirp;
-	while ((dirp = readdir(dp)) != 0) {
-		std::string filename = dirp->d_name;
-		if (filename[0] == '.') //allowed by C++11 for empty string as it equal '\0'
-		{
-			//skip ".", "..", ".git", ".svn", ".bashrc", ".ssh" etc.
-			continue;
-		}
-		if (!compareExt(filename, ext))	{ continue; }
-		std::string fullpath = path + "/" + filename;
-		bool is_directory = folderExists(fullpath);
-		time_t mtime = getDateModified(fullpath);
-		files.push_back(std::make_tuple(filename, is_directory, mtime));
-	}
-	closedir(dp);
-#endif
-	std::sort(files.begin(), files.end(),
-		[](const std::tuple<std::string,bool,time_t>& a,
-           const std::tuple<std::string,bool,time_t>& b) -> bool
-       {
-         return std::get<0>(a) > std::get<0>(b);
-       });
+	//#ifdef _WIN32
+//	auto search_path = path + "/*";
+//	if (!ext.empty()) { search_path += "." + ext; }
+//	Log(LOG_VERBOSE) << "getFolderContents("<<path<<", "<<ext<<") -> " << search_path;
+//	auto pathW = pathToWindows(search_path);
+//	WIN32_FIND_DATAW ffd;
+//	auto handle = FindFirstFileW(pathW.c_str(), &ffd);
+//	if (handle == INVALID_HANDLE_VALUE) {
+//		Log(LOG_VERBOSE) << "getFolderContents("<<path<<", "<<ext<<"): fail outright.";
+//		return files;
+//	}
+//	do  {
+//		auto filename = pathFromWindows(ffd.cFileName);
+//		if ((filename == ".") || (filename == "..")) { continue; }
+//		time_t mtime = FILETIME2mtime(ffd.ftLastWriteTime);
+//		bool is_folder = ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+//		files.push_back(std::make_tuple(filename, is_folder, mtime));
+//		Log(LOG_VERBOSE) << "getFolderContents("<<path<<", "<<ext<<"): got '"<<filename<<"'";
+//	} while (FindNextFileW(handle, &ffd) != 0);
+//	FindClose(handle);
+//	Log(LOG_VERBOSE) << "getFolderContents("<<path<<", "<<ext<<"): total "<<files.size();
+//#else
+//	DIR *dp = opendir(path.c_str());
+//
+//	if (dp == 0)
+//	{
+//	#ifdef __MORPHOS__
+//		return files;
+//	#else
+//		std::string errorMessage("Failed to open directory: " + path);
+//		throw Exception(errorMessage);
+//	#endif
+//	}
+//	struct dirent *dirp;
+//	while ((dirp = readdir(dp)) != 0) {
+//		std::string filename = dirp->d_name;
+//		if (filename[0] == '.') //allowed by C++11 for empty string as it equal '\0'
+//		{
+//			//skip ".", "..", ".git", ".svn", ".bashrc", ".ssh" etc.
+//			continue;
+//		}
+//		if (!compareExt(filename, ext))	{ continue; }
+//		std::string fullpath = path + "/" + filename;
+//		bool is_directory = folderExists(fullpath);
+//		time_t mtime = getDateModified(fullpath);
+//		files.push_back(std::make_tuple(filename, is_directory, mtime));
+//	}
+//	closedir(dp);
+//#endif
+//	std::sort(files.begin(), files.end(),
+//		[](const std::tuple<std::string,bool,time_t>& a,
+//           const std::tuple<std::string,bool,time_t>& b) -> bool
+//       {
+//         return std::get<0>(a) > std::get<0>(b);
+//       });
 	return files;
 }
 
@@ -644,23 +595,25 @@ FolderContents getFolderContents(const std::string &path, const std::string &ext
  */
 bool folderExists(const std::string &path)
 {
-#ifdef _WIN32
-	auto pathW = pathToWindows(path);
-	bool rv = (PathIsDirectoryW(pathW.c_str()) != FALSE);
-	Log(LOG_VERBOSE) << "folderExists("<<path<<")? " << (rv ? "yeah" : "nope");
-	return rv;
-#elif __MORPHOS__
-	BPTR l = Lock( path.c_str(), SHARED_LOCK );
-	if ( l != NULL )
-	{
-		UnLock( l );
-		return 1;
-	}
-	return 0;
-#else
-	struct stat info;
-	return (stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode));
-#endif
+	assert(!"Not implemented");
+	return false;
+//#ifdef _WIN32
+//	auto pathW = pathToWindows(path);
+//	bool rv = (PathIsDirectoryW(pathW.c_str()) != FALSE);
+//	Log(LOG_VERBOSE) << "folderExists("<<path<<")? " << (rv ? "yeah" : "nope");
+//	return rv;
+//#elif __MORPHOS__
+//	BPTR l = Lock( path.c_str(), SHARED_LOCK );
+//	if ( l != NULL )
+//	{
+//		UnLock( l );
+//		return 1;
+//	}
+//	return 0;
+//#else
+//	struct stat info;
+//	return (stat(path.c_str(), &info) == 0 && S_ISDIR(info.st_mode));
+//#endif
 }
 
 /**
@@ -670,23 +623,25 @@ bool folderExists(const std::string &path)
  */
 bool fileExists(const std::string &path)
 {
-#ifdef _WIN32
-	auto pathW = pathToWindows(path);
-	bool rv = (PathFileExistsW(pathW.c_str()) != FALSE);
-	Log(LOG_VERBOSE) << "fileExists("<<path<<")? " << (rv?"yeah":"nope");
-	return rv;
-#elif __MORPHOS__
-	BPTR l = Lock( path.c_str(), SHARED_LOCK );
-	if ( l != NULL )
-	{
-		UnLock( l );
-		return 1;
-	}
-	return 0;
-#else
-	struct stat info;
-	return (stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode));
-#endif
+	assert(!"Not implemented");
+	return false;
+//#ifdef _WIN32
+//	auto pathW = pathToWindows(path);
+//	bool rv = (PathFileExistsW(pathW.c_str()) != FALSE);
+//	Log(LOG_VERBOSE) << "fileExists("<<path<<")? " << (rv?"yeah":"nope");
+//	return rv;
+//#elif __MORPHOS__
+//	BPTR l = Lock( path.c_str(), SHARED_LOCK );
+//	if ( l != NULL )
+//	{
+//		UnLock( l );
+//		return 1;
+//	}
+//	return 0;
+//#else
+//	struct stat info;
+//	return (stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode));
+//#endif
 }
 
 /**
@@ -696,12 +651,14 @@ bool fileExists(const std::string &path)
  */
 bool deleteFile(const std::string &path)
 {
-#ifdef _WIN32
-	auto pathW = pathToWindows(path);
-	return (DeleteFileW(pathW.c_str()) != 0);
-#else
-	return (remove(path.c_str()) == 0);
-#endif
+	assert(!"Not implemented");
+	return false;
+//#ifdef _WIN32
+//	auto pathW = pathToWindows(path);
+//	return (DeleteFileW(pathW.c_str()) != 0);
+//#else
+//	return (remove(path.c_str()) == 0);
+//#endif
 }
 
 /**
@@ -711,6 +668,7 @@ bool deleteFile(const std::string &path)
  */
 std::string baseFilename(const std::string &path)
 {
+	assert(!"Not implemented");
 	size_t sep = path.find_last_of('/');
 	std::string filename;
 	if (sep == std::string::npos)
@@ -735,6 +693,7 @@ std::string baseFilename(const std::string &path)
  */
 std::string dirFilename(const std::string &path)
 {
+	assert(!"Not implemented");
 	size_t sep = path.find_last_of('/');
 	std::string filename;
 	if (sep == std::string::npos)
@@ -759,6 +718,7 @@ std::string dirFilename(const std::string &path)
  */
 std::string sanitizeFilename(const std::string &filename)
 {
+	assert(!"Not implemented");
 	std::string newFilename = filename;
 	for (std::string::iterator i = newFilename.begin(); i != newFilename.end(); ++i)
 	{
@@ -788,6 +748,7 @@ std::string sanitizeFilename(const std::string &filename)
  */
 std::string noExt(const std::string &filename)
 {
+	assert(!"Not implemented");
 	size_t dot = filename.find_last_of('.');
 	if (dot == std::string::npos)
 	{
@@ -804,6 +765,7 @@ std::string noExt(const std::string &filename)
  */
 std::string getExt(const std::string &filename)
 {
+	assert(!"Not implemented");
 	size_t dot = filename.find_last_of('.');
 	if (dot == std::string::npos)
 	{
@@ -820,6 +782,7 @@ std::string getExt(const std::string &filename)
  */
 bool compareExt(const std::string &filename, const std::string &extension)
 {
+	assert(!"Not implemented");
 	if (extension.empty())
 		return true;
 	int j = (int)(filename.length() - extension.length());
@@ -841,44 +804,47 @@ bool compareExt(const std::string &filename, const std::string &extension)
  */
 std::string getLocale()
 {
-#ifdef _WIN32
-	char language[9], country[9];
+	assert(!"Not implemented");
+	return "en-en";
 
-	GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, language, 9);
-	GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO3166CTRYNAME, country, 9);
-
-	std::ostringstream locale;
-	locale << language << "-" << country;
-	return locale.str();
-#else
-	std::locale l;
-	try
-	{
-		l = std::locale("");
-	}
-	catch (const std::runtime_error &)
-	{
-		return "x-";
-	}
-	std::string name = l.name();
-	size_t dash = name.find_first_of('_'), dot = name.find_first_of('.');
-	if (dot != std::string::npos)
-	{
-		name = name.substr(0, dot - 1);
-	}
-	if (dash != std::string::npos)
-	{
-		std::string language = name.substr(0, dash - 1);
-		std::string country = name.substr(dash - 1);
-		std::ostringstream locale;
-		locale << language << "-" << country;
-		return locale.str();
-	}
-	else
-	{
-		return name + "-";
-	}
-#endif
+//#ifdef _WIN32
+//	char language[9], country[9];
+//
+//	GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, language, 9);
+//	GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO3166CTRYNAME, country, 9);
+//
+//	std::ostringstream locale;
+//	locale << language << "-" << country;
+//	return locale.str();
+//#else
+//	std::locale l;
+//	try
+//	{
+//		l = std::locale("");
+//	}
+//	catch (const std::runtime_error &)
+//	{
+//		return "x-";
+//	}
+//	std::string name = l.name();
+//	size_t dash = name.find_first_of('_'), dot = name.find_first_of('.');
+//	if (dot != std::string::npos)
+//	{
+//		name = name.substr(0, dot - 1);
+//	}
+//	if (dash != std::string::npos)
+//	{
+//		std::string language = name.substr(0, dash - 1);
+//		std::string country = name.substr(dash - 1);
+//		std::ostringstream locale;
+//		locale << language << "-" << country;
+//		return locale.str();
+//	}
+//	else
+//	{
+//		return name + "-";
+//	}
+//#endif
 }
 
 /**
@@ -888,17 +854,20 @@ std::string getLocale()
  */
 bool isQuitShortcut(const SDL_Event &ev)
 {
-#ifdef _WIN32
-	// Alt + F4
-	return (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_F4 && ev.key.keysym.mod & KMOD_ALT);
-#elif __APPLE__
-	// Command + Q
-	return (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_q && ev.key.keysym.mod & KMOD_LMETA);
-#else
-	//TODO add other OSs shortcuts.
-    (void)ev;
+	assert(!"Not implemented");
+// SDLHACK
+//#ifdef _WIN32
+//	// Alt + F4
+//	return (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_F4 && ev.key.keysym.mod & KMOD_ALT);
+//#elif __APPLE__
+//	// Command + Q
+//	return (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_q && ev.key.keysym.mod & KMOD_LMETA);
+//#else
+//	//TODO add other OSs shortcuts.
+//    (void)ev;
+//	return false;
+//#endif
 	return false;
-#endif
 }
 /**
  * Gets the last modified date of a file.
@@ -907,30 +876,32 @@ bool isQuitShortcut(const SDL_Event &ev)
  */
 time_t getDateModified(const std::string &path)
 {
-#ifdef _WIN32
-	time_t rv = 0;
-	auto pathW = pathToWindows(path);
-	auto fh = CreateFileW(pathW.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-	if (fh == INVALID_HANDLE_VALUE) {
-		return 0;
-	}
-	FILETIME ftCreate, ftAccess, ftWrite;
-	if (GetFileTime(fh, &ftCreate, &ftAccess, &ftWrite)) {
-		rv = FILETIME2mtime(ftWrite);
-	}
-	CloseHandle(fh);
-	return rv;
-#else
-	struct stat info;
-	if (stat(path.c_str(), &info) == 0)
-	{
-		return info.st_mtime;
-	}
-	else
-	{
-		return 0;
-	}
-#endif
+	assert(!"Not implemented");
+	return 0;
+//#ifdef _WIN32
+//	time_t rv = 0;
+//	auto pathW = pathToWindows(path);
+//	auto fh = CreateFileW(pathW.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+//	if (fh == INVALID_HANDLE_VALUE) {
+//		return 0;
+//	}
+//	FILETIME ftCreate, ftAccess, ftWrite;
+//	if (GetFileTime(fh, &ftCreate, &ftAccess, &ftWrite)) {
+//		rv = FILETIME2mtime(ftWrite);
+//	}
+//	CloseHandle(fh);
+//	return rv;
+//#else
+//	struct stat info;
+//	if (stat(path.c_str(), &info) == 0)
+//	{
+//		return info.st_mtime;
+//	}
+//	else
+//	{
+//		return 0;
+//	}
+//#endif
 }
 
 /**
@@ -941,6 +912,7 @@ time_t getDateModified(const std::string &path)
  */
 std::pair<std::string, std::string> timeToString(time_t time)
 {
+	assert(!"Not implemented");
 	char localDate[25], localTime[25];
 
 /*#ifdef _WIN32
@@ -957,9 +929,9 @@ std::pair<std::string, std::string> timeToString(time_t time)
 	GetTimeFormatW(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, NULL, localTime, 25);
 #endif*/
 
-	struct tm *timeinfo = localtime(&(time));
-	strftime(localDate, 25, "%Y-%m-%d", timeinfo);
-	strftime(localTime, 25, "%H:%M", timeinfo);
+	//struct tm *timeinfo = localtime(&(time));
+	//strftime(localDate, 25, "%Y-%m-%d", timeinfo);
+	//strftime(localTime, 25, "%H:%M", timeinfo);
 
 	return std::make_pair(localDate, localTime);
 }
@@ -973,32 +945,34 @@ std::pair<std::string, std::string> timeToString(time_t time)
  */
 bool moveFile(const std::string &src, const std::string &dest)
 {
-#ifdef _WIN32
-	auto srcW = pathToWindows(src);
-	auto dstW = pathToWindows(dest);
-	return (MoveFileExW(srcW.c_str(), dstW.c_str(), MOVEFILE_REPLACE_EXISTING) != 0);
-#else
-	// TODO In fact all remaining uses of this are renaming files inside a single directory
-	// so we may as well uncomment the rename() and drop the rest.
-	//return (rename(src.c_str(), dest.c_str()) == 0);
-	std::ifstream srcStream;
-	std::ofstream destStream;
-	srcStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	destStream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
-	try
-	{
-		srcStream.open(src.c_str(), std::ios::binary);
-		destStream.open(dest.c_str(), std::ios::binary);
-		destStream << srcStream.rdbuf();
-		srcStream.close();
-		destStream.close();
-	}
-	catch (const std::fstream::failure &)
-	{
-		return false;
-	}
-	return deleteFile(src);
-#endif
+	assert(!"Not implemented");
+	return false;
+//#ifdef _WIN32
+//	auto srcW = pathToWindows(src);
+//	auto dstW = pathToWindows(dest);
+//	return (MoveFileExW(srcW.c_str(), dstW.c_str(), MOVEFILE_REPLACE_EXISTING) != 0);
+//#else
+//	// TODO In fact all remaining uses of this are renaming files inside a single directory
+//	// so we may as well uncomment the rename() and drop the rest.
+//	//return (rename(src.c_str(), dest.c_str()) == 0);
+//	std::ifstream srcStream;
+//	std::ofstream destStream;
+//	srcStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+//	destStream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+//	try
+//	{
+//		srcStream.open(src.c_str(), std::ios::binary);
+//		destStream.open(dest.c_str(), std::ios::binary);
+//		destStream << srcStream.rdbuf();
+//		srcStream.close();
+//		destStream.close();
+//	}
+//	catch (const std::fstream::failure &)
+//	{
+//		return false;
+//	}
+//	return deleteFile(src);
+//#endif
 }
 
 /**
@@ -1010,11 +984,12 @@ bool moveFile(const std::string &src, const std::string &dest)
  */
 bool copyFile(const std::string& src, const std::string& dest)
 {
-#ifdef _WIN32
-	auto srcW = pathToWindows(src);
-	auto dstW = pathToWindows(dest);
-	return (CopyFileW(srcW.c_str(), dstW.c_str(), false) != 0);
-#endif
+	assert(!"Not implemented");
+//#ifdef _WIN32
+//	auto srcW = pathToWindows(src);
+//	auto dstW = pathToWindows(dest);
+//	return (CopyFileW(srcW.c_str(), dstW.c_str(), false) != 0);
+//#endif
 	return false;
 }
 
@@ -1025,18 +1000,20 @@ bool copyFile(const std::string& src, const std::string& dest)
  * @return if we did write it.
  */
 bool writeFile(const std::string& filename, const std::string& data) {
-	// Even SDL1 file IO accepts UTF-8 file names on windows.
-	SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "w");
-	if (!rwops) {
-		Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
-		return false;
-	}
-	if (1 != SDL_RWwrite(rwops, data.c_str(), (int)data.size(), 1)) {
-		Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
-		SDL_RWclose(rwops);
-		return false;
-	}
-	SDL_RWclose(rwops);
+	assert(!"Not implemented");
+// SDLHACK
+	//// Even SDL1 file IO accepts UTF-8 file names on windows.
+	//SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "w");
+	//if (!rwops) {
+	//	Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
+	//	return false;
+	//}
+	//if (1 != SDL_RWwrite(rwops, data.c_str(), (int)data.size(), 1)) {
+	//	Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
+	//	SDL_RWclose(rwops);
+	//	return false;
+	//}
+	//SDL_RWclose(rwops);
 	return true;
 }
 
@@ -1047,18 +1024,20 @@ bool writeFile(const std::string& filename, const std::string& data) {
  * @return if we did write it.
  */
 bool writeFile(const std::string& filename, const std::vector<unsigned char>& data) {
-	// Even SDL1 file IO accepts UTF-8 file names on windows.
-	SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "wb");
-	if (!rwops) {
-		Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
-		return false;
-	}
-	if (1 != SDL_RWwrite(rwops, data.data(), (int)data.size(), 1)) {
-		Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
-		SDL_RWclose(rwops);
-		return false;
-	}
-	SDL_RWclose(rwops);
+	assert(!"Not implemented");
+// SDLHACK
+	//// Even SDL1 file IO accepts UTF-8 file names on windows.
+	//SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "wb");
+	//if (!rwops) {
+	//	Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
+	//	return false;
+	//}
+	//if (1 != SDL_RWwrite(rwops, data.data(), (int)data.size(), 1)) {
+	//	Log(LOG_ERROR) << "Failed to write " << filename << ": " << SDL_GetError();
+	//	SDL_RWclose(rwops);
+	//	return false;
+	//}
+	//SDL_RWclose(rwops);
 	return true;
 }
 
@@ -1067,22 +1046,24 @@ bool writeFile(const std::string& filename, const std::vector<unsigned char>& da
  * @param filename - what to readFile
  * @return the istream
  */
-std::unique_ptr<std::istream> readFile(const std::string& filename) {
-	SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "r");
-	if (!rwops) {
-		std::string err = "Failed to read " + filename + ": " + SDL_GetError();
-		Log(LOG_ERROR) << err;
-		throw Exception(err);
-	}
-	size_t size;
-	char *data = (char *)SDL_LoadFile_RW(rwops, &size, SDL_TRUE);
-	if (data == NULL) {
-		std::string err = "Failed to read " + filename + ": " + SDL_GetError();
-		Log(LOG_ERROR) << err;
-		throw Exception(err);
-	}
-	return std::unique_ptr<std::istream>(new StreamData(RawData{data, size, SDL_free}));
-}
+// SDLHACK
+//std::unique_ptr<std::istream> readFile(const std::string& filename)
+//{
+	// SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "r");
+	//if (!rwops) {
+	//	std::string err = "Failed to read " + filename + ": " + SDL_GetError();
+	//	Log(LOG_ERROR) << err;
+	//	throw Exception(err);
+	//}
+	//size_t size;
+	//char *data = (char *)SDL_LoadFile_RW(rwops, &size, SDL_TRUE);
+	//if (data == NULL) {
+	//	std::string err = "Failed to read " + filename + ": " + SDL_GetError();
+	//	Log(LOG_ERROR) << err;
+	//	throw Exception(err);
+	//}
+	//return std::unique_ptr<std::istream>(new StreamData(RawData{data, size, SDL_free}));
+//}
 
 /**
  * Gets an istream to a file's bytes at least up to and including first "\n---" sequence.
@@ -1090,59 +1071,62 @@ std::unique_ptr<std::istream> readFile(const std::string& filename) {
  * @param filename - what to read
  * @return the istream
  */
-std::unique_ptr<std::istream> getYamlSaveHeader(const std::string& filename) {
-	SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "r");
-	if (!rwops) {
-		std::string err = "Failed to read " + filename + ": " + SDL_GetError();
-		Log(LOG_ERROR) << err;
-		throw Exception(err);
-	}
-	const size_t chunksize = 4096;
-	size_t size = 0;
-	size_t offs = 0;
-	char *data = (char *)SDL_malloc(chunksize + 1);
-	if (data == NULL) {
-		std::string err(SDL_GetError());
-		Log(LOG_ERROR) << err;
-		throw Exception(err);
-	}
-	while(true) {
-		auto actually_read = SDL_RWread(rwops, data + offs, 1, chunksize);
-		if (actually_read == 0 || actually_read == -1) {
-			break;
-		}
-		size += actually_read;
-		data[size] = 0;
-		size_t search_from = offs > 4 ? offs - 4 : 0;
-		if (NULL != strstr(data+search_from, "\n---")) {
-			break;
-		}
-		char *newdata = (char *)SDL_realloc(data, size+chunksize+1);
-		if (newdata == NULL) {
-			std::string err(SDL_GetError());
-			Log(LOG_ERROR) << err;
-			throw Exception(err);
-		}
-		data = newdata;
-		offs = size;
-	}
-	SDL_RWclose(rwops);
-	return std::unique_ptr<std::istream>(new StreamData(RawData{data, size, SDL_free}));
-}
+// SDLHACK
+// std::unique_ptr<std::istream> getYamlSaveHeader(const std::string& filename) {
+//	SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "r");
+//	if (!rwops) {
+//		std::string err = "Failed to read " + filename + ": " + SDL_GetError();
+//		Log(LOG_ERROR) << err;
+//		throw Exception(err);
+//	}
+//	const size_t chunksize = 4096;
+//	size_t size = 0;
+//	size_t offs = 0;
+//	char *data = (char *)SDL_malloc(chunksize + 1);
+//	if (data == NULL) {
+//		std::string err(SDL_GetError());
+//		Log(LOG_ERROR) << err;
+//		throw Exception(err);
+//	}
+//	while(true) {
+//		auto actually_read = SDL_RWread(rwops, data + offs, 1, chunksize);
+//		if (actually_read == 0 || actually_read == -1) {
+//			break;
+//		}
+//		size += actually_read;
+//		data[size] = 0;
+//		size_t search_from = offs > 4 ? offs - 4 : 0;
+//		if (NULL != strstr(data+search_from, "\n---")) {
+//			break;
+//		}
+//		char *newdata = (char *)SDL_realloc(data, size+chunksize+1);
+//		if (newdata == NULL) {
+//			std::string err(SDL_GetError());
+//			Log(LOG_ERROR) << err;
+//			throw Exception(err);
+//		}
+//		data = newdata;
+//		offs = size;
+//	}
+//	SDL_RWclose(rwops);
+//	return std::unique_ptr<std::istream>(new StreamData(RawData{data, size, SDL_free}));
+//}
 
 /**
  * Notifies the user that maybe he should have a look.
  */
 void flashWindow()
 {
+assert(!"Not implemented");
 #ifdef _WIN32
-	SDL_SysWMinfo wminfo;
-	SDL_VERSION(&wminfo.version)
-	if (SDL_GetWMInfo(&wminfo))
-	{
-		HWND hwnd = wminfo.window;
-		FlashWindow(hwnd, true);
-	}
+// SDLHACK
+	//SDL_SysWMinfo wminfo;
+	//SDL_VERSION(&wminfo.version)
+	//if (SDL_GetWMInfo(&wminfo))
+	//{
+	//	HWND hwnd = wminfo.window;
+	//	FlashWindow(hwnd, true);
+	//}
 #endif
 }
 
@@ -1153,6 +1137,7 @@ void flashWindow()
  */
 std::string getDosPath()
 {
+assert(!"Not implemented");
 #ifdef _WIN32
 	std::string path, bufstr;
 	char buf[MAX_PATH];
@@ -1202,16 +1187,18 @@ std::string getDosPath()
 #ifdef _WIN32
 void setWindowIcon(int winResource, const std::string &)
 {
-	HINSTANCE handle = GetModuleHandle(NULL);
-	HICON icon = LoadIcon(handle, MAKEINTRESOURCE(winResource));
+	assert(!"Not implemented");
+// SDLHACK
+	//HINSTANCE handle = GetModuleHandle(NULL);
+	//HICON icon = LoadIcon(handle, MAKEINTRESOURCE(winResource));
 
-	SDL_SysWMinfo wminfo;
-	SDL_VERSION(&wminfo.version)
-	if (SDL_GetWMInfo(&wminfo))
-	{
-		HWND hwnd = wminfo.window;
-		SetClassLongPtr(hwnd, GCLP_HICON, (LONG_PTR)icon);
-	}
+	//SDL_SysWMinfo wminfo;
+	//SDL_VERSION(&wminfo.version)
+	//if (SDL_GetWMInfo(&wminfo))
+	//{
+	//	HWND hwnd = wminfo.window;
+	//	SetClassLongPtr(hwnd, GCLP_HICON, (LONG_PTR)icon);
+	//}
 }
 #else
 void setWindowIcon(int, const std::string &unixPath)
@@ -1397,107 +1384,81 @@ void stackTrace(void *ctx)
 }
 
 /**
- * Generates a timestamp of the current time.
- * @return String in Y-M-D_H-M-S format.
- */
-std::string now()
-{
-	const int MAX_LEN = 25, MAX_RESULT = 80;
-	char result[MAX_RESULT] = { 0 };
-#ifdef _WIN32
-	char date[MAX_LEN], time[MAX_LEN];
-	if (GetDateFormatA(LOCALE_INVARIANT, 0, 0, "yyyy'-'MM'-'dd", date, MAX_LEN) == 0)
-		return "0000-00-00";
-	if (GetTimeFormatA(LOCALE_INVARIANT, TIME_FORCE24HOURFORMAT, 0, "HH'-'mm'-'ss", time, MAX_LEN) == 0)
-		return "00-00-00";
-	sprintf(result, "%s_%s", date, time);
-#else
-	char buffer[MAX_LEN];
-	time_t rawtime;
-	struct tm *timeinfo;
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	strftime(buffer, MAX_LEN, "%Y-%m-%d_%H-%M-%S", timeinfo);
-	sprintf(result, "%s", buffer);
-#endif
-	return result;
-}
-
-/**
  * Logs the details of this crash and shows an error.
  * @param ex Pointer to exception data (PEXCEPTION_POINTERS on Windows, signal int on Unix)
  * @param err Exception message, if any.
  */
 void crashDump(void *ex, const std::string &err)
 {
-	std::ostringstream error;
-#ifdef _MSC_VER
-	PEXCEPTION_POINTERS exception = (PEXCEPTION_POINTERS)ex;
-	std::exception *cppException = 0;
-	switch (exception->ExceptionRecord->ExceptionCode)
-	{
-	case EXCEPTION_CODE_CXX:
-		cppException = (std::exception *)exception->ExceptionRecord->ExceptionInformation[1];
-		error << cppException->what();
-		break;
-	case EXCEPTION_ACCESS_VIOLATION:
-		error << "Memory access violation.";
-		break;
-	default:
-		error << "code 0x" << std::hex << exception->ExceptionRecord->ExceptionCode;
-		break;
-	}
-	Log(LOG_FATAL) << "A fatal error has occurred: " << error.str();
-	if (ex)
-	{
-		stackTrace(exception->ContextRecord);
-	}
-	std::string dumpName = Options::getUserFolder();
-	dumpName += now() + ".dmp";
-	HANDLE dumpFile = CreateFileA(dumpName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	MINIDUMP_EXCEPTION_INFORMATION exceptionInformation;
-	exceptionInformation.ThreadId = GetCurrentThreadId();
-	exceptionInformation.ExceptionPointers = exception;
-	exceptionInformation.ClientPointers = FALSE;
-	if (MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, MiniDumpNormal, exception ? &exceptionInformation : NULL, NULL, NULL))
-	{
-		Log(LOG_FATAL) << "Crash dump generated at " << dumpName;
-	}
-	else
-	{
-		Log(LOG_FATAL) << "No crash dump generated: " << GetLastError();
-	}
-#else
-	if (ex == 0)
-	{
-		error << err;
-	}
-	else
-	{
-		int signal = *((int*)ex);
-		switch (signal)
-		{
-		case SIGSEGV:
-			error << "Segmentation fault.";
-			break;
-		default:
-			error << "signal " << signal;
-			break;
-		}
-	}
-	Log(LOG_FATAL) << "A fatal error has occurred: " << error.str();
-	stackTrace(0);
-#endif
-	std::ostringstream msg;
-	msg << "OpenXcom has crashed: " << error.str() << std::endl;
-	msg << "Log file: " << getLogFileName() << std::endl;
-	msg << "If this error was unexpected, please report it on the OpenXcom forum (OXCE board)." << std::endl;
-	msg << "The following can help us solve the problem:" << std::endl;
-	msg << "1. a saved game from just before the crash (helps 98%)" << std::endl;
-	msg << "2. a detailed description how to reproduce the crash (helps 80%)" << std::endl;
-	msg << "3. a log file (helps 10%)" << std::endl;
-	msg << "4. a screenshot of this error message (helps 5%)";
-	showError(msg.str());
+	assert(!"Not implemented");
+//	std::ostringstream error;
+//#ifdef _MSC_VER
+//	PEXCEPTION_POINTERS exception = (PEXCEPTION_POINTERS)ex;
+//	std::exception *cppException = 0;
+//	switch (exception->ExceptionRecord->ExceptionCode)
+//	{
+//	case EXCEPTION_CODE_CXX:
+//		cppException = (std::exception *)exception->ExceptionRecord->ExceptionInformation[1];
+//		error << cppException->what();
+//		break;
+//	case EXCEPTION_ACCESS_VIOLATION:
+//		error << "Memory access violation.";
+//		break;
+//	default:
+//		error << "code 0x" << std::hex << exception->ExceptionRecord->ExceptionCode;
+//		break;
+//	}
+//	Log(LOG_FATAL) << "A fatal error has occurred: " << error.str();
+//	if (ex)
+//	{
+//		stackTrace(exception->ContextRecord);
+//	}
+//	std::string dumpName = Options::getUserFolder();
+//	dumpName += now() + ".dmp";
+//	HANDLE dumpFile = CreateFileA(dumpName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+//	MINIDUMP_EXCEPTION_INFORMATION exceptionInformation;
+//	exceptionInformation.ThreadId = GetCurrentThreadId();
+//	exceptionInformation.ExceptionPointers = exception;
+//	exceptionInformation.ClientPointers = FALSE;
+//	if (MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, MiniDumpNormal, exception ? &exceptionInformation : NULL, NULL, NULL))
+//	{
+//		Log(LOG_FATAL) << "Crash dump generated at " << dumpName;
+//	}
+//	else
+//	{
+//		Log(LOG_FATAL) << "No crash dump generated: " << GetLastError();
+//	}
+//#else
+//	if (ex == 0)
+//	{
+//		error << err;
+//	}
+//	else
+//	{
+//		int signal = *((int*)ex);
+//		switch (signal)
+//		{
+//		case SIGSEGV:
+//			error << "Segmentation fault.";
+//			break;
+//		default:
+//			error << "signal " << signal;
+//			break;
+//		}
+//	}
+//	Log(LOG_FATAL) << "A fatal error has occurred: " << error.str();
+//	stackTrace(0);
+//#endif
+//	std::ostringstream msg;
+//	msg << "OpenXcom has crashed: " << error.str() << std::endl;
+//	msg << "Log file: " << getLogFileName() << std::endl;
+//	msg << "If this error was unexpected, please report it on the OpenXcom forum (OXCE board)." << std::endl;
+//	msg << "The following can help us solve the problem:" << std::endl;
+//	msg << "1. a saved game from just before the crash (helps 98%)" << std::endl;
+//	msg << "2. a detailed description how to reproduce the crash (helps 80%)" << std::endl;
+//	msg << "3. a log file (helps 10%)" << std::endl;
+//	msg << "4. a screenshot of this error message (helps 5%)";
+//	showError(msg.str());
 }
 
 /**
@@ -1520,83 +1481,6 @@ bool openExplorer(const std::string &url)
 #endif
 }
 
-
-/**
- * Appends a file, logs nothing to avoid recursion.
- * @param filename - where to writeFile
- * @param data - what to writeFile
- * @return if we did write it.
- */
-static bool logToFile(const std::string& filename, const std::string& data) {
-	// Even SDL1 file IO accepts UTF-8 file names on windows.
-	SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "a+");
-	if (rwops) {
-		auto rv = SDL_RWwrite(rwops, data.c_str(), (int)data.size(), 1);
-		SDL_RWclose(rwops);
-		return rv == 1;
-	}
-	return false;
-}
-
-static const size_t LOG_BUFFER_LIMIT = 1<<10;
-static std::list<std::pair<int, std::string>> logBuffer;
-static std::string logFileName;
-const std::string& getLogFileName() { return logFileName; }
-
-/**
- * Setting the log file name and setting the effective reportingLevel
- * to not LOG_UNCENSORED turns off buffering of the log messages,
- * and turns on writing them to the actual log (and flushes the buffer).
- */
-void setLogFileName(const std::string& name) {
-	deleteFile(name);
-	size_t sz = logBuffer.size();
-	Log(LOG_DEBUG) << "setLogFileName("<<name<<") was '"<<logFileName<<"'; "<<sz<<" in buffer";
-	logFileName = name;
-}
-void log(int level, const std::ostringstream& baremsgstream) {
-	std::ostringstream msgstream;
-	msgstream << "[" << CrossPlatform::now() << "]" << "\t"
-			  << "[" << Logger::toString(level) << "]" << "\t"
-			  << baremsgstream.str() << std::endl;
-	auto msg = msgstream.str();
-
-	int effectiveLevel = Logger::reportingLevel();
-	if (effectiveLevel >= LOG_DEBUG) {
-		fwrite(msg.c_str(), msg.size(), 1, stderr);
-		fflush(stderr);
-	}
-	if (logBuffer.size() > LOG_BUFFER_LIMIT) { // drop earliest message so as to not eat all memory
-		logBuffer.pop_front();
-	}
-	if (logFileName.empty() || effectiveLevel == LOG_UNCENSORED) { // no log file; accumulate.
-		logBuffer.push_back(std::make_pair(level, msg));
-		return;
-	}
-	// attempt to flush the buffer
-	bool failed = false;
-	while (!logBuffer.empty()) {
-		if (effectiveLevel >= logBuffer.front().first) {
-			if (!logToFile(logFileName, logBuffer.front().second)) {
-				std::string err = "Failed to append to '" + logFileName + "': " + SDL_GetError();
-				logBuffer.push_back(std::make_pair(LOG_ERROR, err));
-				failed = true;
-				break;
-			}
-		}
-		logBuffer.pop_front();
-	}
-	// retain the current message if write fails.
-	if (failed || !logToFile(logFileName, msg)) {
-		logBuffer.push_back(std::make_pair(level, msg));
-	}
-
-	#ifdef _WIN32
-	//output to visual studio
-	OutputDebugStringA(msg.c_str());
-	#endif
-
-}
 
 #if defined(EMBED_ASSETS)
 # if defined(_WIN32)
@@ -1676,13 +1560,15 @@ SDL_RWops *getEmbeddedAsset(const std::string& assetName) {
  */
 bool testInternetConnection(const std::string& url)
 {
-#ifdef _WIN32
-	auto urlW = pathToWindows(url, false);
-	bool bConnect = InternetCheckConnectionW(urlW.c_str(), FLAG_ICC_FORCE_CONNECTION, 0);
-	return bConnect;
-#else
+	assert(!"Not implemented");
 	return false;
-#endif
+//#ifdef _WIN32
+//	auto urlW = pathToWindows(url, false);
+//	bool bConnect = InternetCheckConnectionW(urlW.c_str(), FLAG_ICC_FORCE_CONNECTION, 0);
+//	return bConnect;
+//#else
+//	return false;
+//#endif
 }
 
 /**
@@ -1693,15 +1579,17 @@ bool testInternetConnection(const std::string& url)
  */
 bool downloadFile(const std::string& url, const std::string& filename)
 {
-#ifdef _WIN32
-	auto urlW = pathToWindows(url, false);
-	auto filenameW = pathToWindows(filename, true);
-	DeleteUrlCacheEntryW(urlW.c_str());
-	HRESULT hr = URLDownloadToFileW(NULL, urlW.c_str(), filenameW.c_str(), 0, NULL);
-	return SUCCEEDED(hr);
-#else
+	assert(!"Not implemented");
 	return false;
-#endif
+//#ifdef _WIN32
+//	auto urlW = pathToWindows(url, false);
+//	auto filenameW = pathToWindows(filename, true);
+//	DeleteUrlCacheEntryW(urlW.c_str());
+//	HRESULT hr = URLDownloadToFileW(NULL, urlW.c_str(), filenameW.c_str(), 0, NULL);
+//	return SUCCEEDED(hr);
+//#else
+//	return false;
+//#endif
 }
 
 /**
@@ -1709,28 +1597,31 @@ bool downloadFile(const std::string& url, const std::string& filename)
  */
 std::array<int, 4> parseVersion(const std::string& newVersion)
 {
+	assert(!"Not implemented");
+
 	std::array<int, 4> newOxceVersion = {};
-
-	std::string each;
-	char split_char = '.';
-	std::istringstream ss(newVersion);
-	std::size_t j = 0;
-	while (std::getline(ss, each, split_char)) {
-		if (j == newOxceVersion.size())
-		{
-			break;
-		}
-
-		try {
-			int i = std::stoi(each);
-			newOxceVersion[j] = i;
-		}
-		catch (...) {
-
-		}
-		++j;
-	}
 	return newOxceVersion;
+
+	//std::string each;
+	//char split_char = '.';
+	//std::istringstream ss(newVersion);
+	//std::size_t j = 0;
+	//while (std::getline(ss, each, split_char)) {
+	//	if (j == newOxceVersion.size())
+	//	{
+	//		break;
+	//	}
+
+	//	try {
+	//		int i = std::stoi(each);
+	//		newOxceVersion[j] = i;
+	//	}
+	//	catch (...) {
+
+	//	}
+	//	++j;
+	//}
+	//return newOxceVersion;
 }
 
 /**
@@ -1740,7 +1631,9 @@ std::array<int, 4> parseVersion(const std::string& newVersion)
  */
 bool isHigherThanCurrentVersion(const std::string& newVersion)
 {
-	return isHigherThanCurrentVersion(parseVersion(newVersion), { OPENXCOM_VERSION_NUMBER });
+	assert(!"Not implemented");
+	return false;
+	//return isHigherThanCurrentVersion(parseVersion(newVersion), {OPENXCOM_VERSION_NUMBER});
 }
 
 /**
@@ -1751,22 +1644,24 @@ bool isHigherThanCurrentVersion(const std::string& newVersion)
  */
 bool isHigherThanCurrentVersion(const std::array<int, 4>& newOxceVersion, const int (&ver)[4])
 {
-	bool isHigher = false;
+	assert(!"Not implemented");
+	return false;
+	//bool isHigher = false;
 
-	for (size_t k = 0; k < std::size(ver); ++k)
-	{
-		if (newOxceVersion[k] > ver[k])
-		{
-			isHigher = true;
-			break;
-		}
-		else if (newOxceVersion[k] < ver[k])
-		{
-			break;
-		}
-	}
+	//for (size_t k = 0; k < std::size(ver); ++k)
+	//{
+	//	if (newOxceVersion[k] > ver[k])
+	//	{
+	//		isHigher = true;
+	//		break;
+	//	}
+	//	else if (newOxceVersion[k] < ver[k])
+	//	{
+	//		break;
+	//	}
+	//}
 
-	return isHigher;
+	//return isHigher;
 }
 
 /**
@@ -1775,16 +1670,18 @@ bool isHigherThanCurrentVersion(const std::array<int, 4>& newOxceVersion, const 
  */
 std::string getExeFolder()
 {
-#ifdef _WIN32
-	wchar_t dest[MAX_PATH + 1];
-	if (GetModuleFileNameW(NULL, dest, MAX_PATH) != 0)
-	{
-		PathRemoveFileSpecW(dest);
-		auto ret = pathFromWindows(dest) + "/";
-		return ret;
-	}
-#endif
-	return std::string();
+	assert(!"Not implemented");
+	return "";
+//#ifdef _WIN32
+//	wchar_t dest[MAX_PATH + 1];
+//	if (GetModuleFileNameW(NULL, dest, MAX_PATH) != 0)
+//	{
+//		PathRemoveFileSpecW(dest);
+//		auto ret = pathFromWindows(dest) + "/";
+//		return ret;
+//	}
+//#endif
+//	return std::string();
 }
 
 /**
@@ -1794,23 +1691,24 @@ std::string getExeFolder()
  */
 std::string getExeFilename(bool includingPath)
 {
-#ifdef _WIN32
-	wchar_t dest[MAX_PATH + 1];
-	if (GetModuleFileNameW(NULL, dest, MAX_PATH) != 0)
-	{
-		if (includingPath)
-		{
-			auto ret = pathFromWindows(dest);
-			return ret;
-		}
-		else
-		{
-			auto filename = PathFindFileNameW(dest);
-			auto ret = pathFromWindows(filename);
-			return ret;
-		}
-	}
-#endif
+	assert(!"Not implemented");
+// #ifdef _WIN32
+//	wchar_t dest[MAX_PATH + 1];
+//	if (GetModuleFileNameW(NULL, dest, MAX_PATH) != 0)
+//	{
+//		if (includingPath)
+//		{
+//			auto ret = pathFromWindows(dest);
+//			return ret;
+//		}
+//		else
+//		{
+//			auto filename = PathFindFileNameW(dest);
+//			auto ret = pathFromWindows(filename);
+//			return ret;
+//		}
+//	}
+//#endif
 	return std::string();
 }
 
@@ -1819,186 +1717,13 @@ std::string getExeFilename(bool includingPath)
  */
 void startUpdateProcess()
 {
-#ifdef _WIN32
-	auto operationW = pathToWindows("open", false);
-	auto fileW = pathToWindows("oxce-upd.bat", false);
-	ShellExecuteW(NULL, operationW.c_str(), fileW.c_str(), NULL, NULL, SW_SHOWNORMAL);
-#endif
+	assert(!"Not implemented");
+//#ifdef _WIN32
+//	auto operationW = pathToWindows("open", false);
+//	auto fileW = pathToWindows("oxce-upd.bat", false);
+//	ShellExecuteW(NULL, operationW.c_str(), fileW.c_str(), NULL, NULL, SW_SHOWNORMAL);
+//#endif
 }
-
-
-
-#ifdef OXCE_AUTO_TEST
-
-static auto dummy = ([]
-{
-	auto create = [](int i, int j, int k, int l)
-	{
-		return std::array<int, 4>{{i, j, k, l}};
-	};
-
-	assert(parseVersion("0.0.0.0") == create(0, 0, 0, 0));
-	assert(parseVersion("1.0.0.0") == create(1, 0, 0, 0));
-	assert(parseVersion("1.2.0.0") == create(1, 2, 0, 0));
-	assert(parseVersion("1.2.3.4") == create(1, 2, 3, 4));
-	assert(parseVersion("1.2.3.4.5") == create(1, 2, 3, 4));
-	assert(parseVersion("1.2.3") == create(1, 2, 3, 0));
-	assert(parseVersion("1.2") == create(1, 2, 0, 0));
-	assert(parseVersion("1.A.2") == create(1, 0, 2, 0));
-	assert(parseVersion(".2") == create(0, 2, 0, 0));
-
-
-	assert(isHigherThanCurrentVersion(create(1, 2, 0, 0), {1, 1, 0, 0}));
-	assert(isHigherThanCurrentVersion(create(1, 2, 1, 3), {1, 2, 0, 4}));
-	assert(isHigherThanCurrentVersion(create(1, 2, 1, 3), {1, 2, 1, 2}));
-	assert(!isHigherThanCurrentVersion(create(1, 2, 1, 3), {1, 2, 1, 3}));
-	assert(!isHigherThanCurrentVersion(create(1, 2, 1, 3), {1, 2, 1, 4}));
-	assert(!isHigherThanCurrentVersion(create(1, 2, 1, 3), {1, 2, 2, 2}));
-	assert(!isHigherThanCurrentVersion(create(1, 2, 1, 3), {1, 3, 1, 2}));
-
-	return 0;
-})();
-
-static auto dummyPaths = ([]
-{
-	assert(CrossPlatform::baseFilename("aaa/bbb/ccc") == "ccc");
-	assert(CrossPlatform::baseFilename("aaa/bbb/ccc/") == "ccc");
-	assert(CrossPlatform::baseFilename("aaa/bbb/ccc//") == "ccc");
-	assert(CrossPlatform::baseFilename("/ccc") == "ccc");
-	assert(CrossPlatform::baseFilename("ccc") == "ccc");
-
-	assert(CrossPlatform::dirFilename("aaa/bbb/ccc") == "aaa/bbb/");
-	assert(CrossPlatform::dirFilename("aaa/bbb/ccc/") == "aaa/bbb/");
-	assert(CrossPlatform::dirFilename("aaa/bbb/ccc//") == "aaa/bbb/");
-	assert(CrossPlatform::dirFilename("/ccc") == "/");
-	assert(CrossPlatform::dirFilename("ccc") == "");
-	return 0;
-})();
-
-static auto dummyRawFile = ([]
-{
-	{
-		char text[] = "test";
-		StreamData raw(RawData{text, std::strlen(text), +[](void*){}});
-
-		assert(raw.get() == 't');
-		assert(raw.get() == 'e');
-		assert(raw.get() == 's');
-		assert(raw.get() == 't');
-		assert(raw.get() == std::char_traits<char>::eof());
-	}
-
-	{
-		char text[] = "test123";
-		StreamData raw(RawData{text, std::strlen(text), +[](void*){}});
-
-		char dummy1[10] = { };
-		assert(raw.read(dummy1, 4) && std::strcmp(dummy1, "test") == 0);
-
-		char dummy2[10] = { };
-		assert(raw.read(dummy2, 3) && std::strcmp(dummy2, "123") == 0);
-
-	}
-
-	{
-		char text[] = "test123";
-		StreamData raw(RawData{text, std::strlen(text), +[](void*){}});
-
-		char dummy1[10] = { };
-		assert(!raw.read(dummy1, 10) && std::strcmp(dummy1, "test123") == 0);
-	}
-
-	{
-		char text[] = "test123";
-		StreamData raw(RawData{text, std::strlen(text), +[](void*){}});
-
-		raw.seekg(0, std::ios::end);
-		std::streamoff end = raw.tellg();
-		raw.seekg(0, std::ios::beg);
-		std::streamoff begin = raw.tellg();
-
-		assert(end-begin == (int)std::strlen(text));
-	}
-
-	{
-		char text[] = "test123\0ErrorErrorErrorErrorErrorError";
-		StreamData raw(RawData{text, std::strlen(text), +[](void*){}});
-
-		char dummy1[11] = { };
-
-		raw.clear();
-		raw.seekg(std::strlen(text), std::ios::beg);
-		assert(!!raw);
-		assert(!raw.read(dummy1, 10));
-
-		raw.clear();
-		raw.seekg(20, std::ios::beg);
-		assert(!raw);
-		assert(!raw.read(dummy1, 10));
-
-		raw.clear();
-		raw.seekg(-5, std::ios::beg);
-		assert(!raw);
-		assert(!raw.read(dummy1, 10));
-
-		raw.clear();
-		raw.seekg(0, std::ios::beg);
-		assert(!!raw);
-		assert(raw.read(dummy1, 5));
-	}
-
-	{
-		static int calledDelete = 0;
-		char text[] = "test123";
-		StreamData raw(RawData{text, std::strlen(text), +[](void*){ ++calledDelete; }});
-
-		assert(raw.get() == 't');
-
-		raw.extractRawData();
-
-		assert(raw.get() == std::char_traits<char>::eof());
-		assert(calledDelete == 1);
-	}
-
-	{
-		static int calledDelete = 0;
-		char text[] = "0123";
-		StreamData raw(RawData{text, std::strlen(text), +[](void*){ ++calledDelete; }});
-
-
-		assert(raw.get() == '0');
-
-		StreamData raw2 = std::move(raw);
-
-		assert(raw.get() ==  std::char_traits<char>::eof());
-		assert(!!raw2);
-		assert(raw2.get() == '1');
-
-		raw = std::move(raw2);
-
-		assert(raw.get() == '2');
-		assert(raw2.get() == std::char_traits<char>::eof());
-
-		assert(raw.get() == '3');
-		assert(!!raw);
-		assert(raw.get() == std::char_traits<char>::eof());
-		assert(!raw);
-
-		{
-			StreamData raw3 = std::move(raw);
-			assert(!raw3);
-
-			assert(calledDelete == 0);
-		}
-
-		assert(calledDelete == 1);
-	}
-
-	return 0;
-})();
-#endif
-
-
 
 }
 }

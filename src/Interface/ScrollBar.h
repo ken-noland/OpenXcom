@@ -31,7 +31,7 @@ class ScrollBar : public InteractiveSurface
 {
 private:
 	TextList *_list;
-	Uint8 _color;
+	uint8_t _color;
 	bool _pressed, _contrast;
 	Surface *_track, *_thumb;
 	SDL_Rect _thumbRect;
@@ -53,9 +53,9 @@ public:
 	/// Sets the height of the surface.
 	void setHeight(int height) override;
 	/// Sets the scrollbar's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the scrollbar's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the scrollbar's high contrast color setting.
 	void setHighContrast(bool contrast) override;
 	/// Sets the scrollbar's list.

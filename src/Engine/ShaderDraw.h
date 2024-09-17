@@ -124,8 +124,8 @@ static inline void ShaderDrawFunc(Func&& f, const SrcType&... src_frame)
 namespace helper
 {
 
-const Uint8 ColorGroup = 0xF0;
-const Uint8 ColorShade = 0x0F;
+const uint8_t ColorGroup = 0xF0;
+const uint8_t ColorShade = 0x0F;
 
 /**
  * help class used for Surface::blitNShade
@@ -140,14 +140,14 @@ struct ColorReplace
 	* @param shade value of shade of this surface
 	* @param newColor new color to set (it should be offset by 4)
 	*/
-	static inline void func(Uint8& dest, const Uint8& src, const int& shade, const int& newColor)
+	static inline void func(uint8_t& dest, const uint8_t& src, const int& shade, const int& newColor)
 	{
 #ifdef OXCE_VECTORIZATION_FRIENDLY
 		//more vectorization friendly code
 		auto n = dest;
 		if (src)
 		{
-			const Uint8 newShade = (src & ColorShade) + shade;
+			const uint8_t newShade = (src & ColorShade) + shade;
 			if (newShade & ColorGroup)
 				// so dark it would flip over to another color - make it black instead
 				n = ColorShade;
@@ -158,7 +158,7 @@ struct ColorReplace
 #else
 		if (src)
 		{
-			const Uint8 newShade = (src & ColorShade) + shade;
+			const uint8_t newShade = (src & ColorShade) + shade;
 			if (newShade & ColorGroup)
 				// so dark it would flip over to another color - make it black instead
 				dest = ColorShade;
@@ -184,14 +184,14 @@ struct StandardShade
 	* @param not used
 	* @param not used
 	*/
-	static inline void func(Uint8& dest, const Uint8& src, const int& shade)
+	static inline void func(uint8_t& dest, const uint8_t& src, const int& shade)
 	{
 #ifdef OXCE_VECTORIZATION_FRIENDLY
 		//more vectorization friendly code
 		auto n = dest;
 		if (src)
 		{
-			const Uint8 newShade = src + shade;
+			const uint8_t newShade = src + shade;
 			if ((newShade ^ src) & ColorGroup)
 				// so dark it would flip over to another color - make it black instead
 				n = ColorShade;
@@ -202,7 +202,7 @@ struct StandardShade
 #else
 		if (src)
 		{
-			const Uint8 newShade = src + shade;
+			const uint8_t newShade = src + shade;
 			if ((newShade ^ src) & ColorGroup)
 				// so dark it would flip over to another color - make it black instead
 				dest = ColorShade;
@@ -218,14 +218,14 @@ struct StandardShade
  */
 struct BurnShade
 {
-	static inline void func(Uint8& dest, const Uint8& src, const int& burn, const int& shade)
+	static inline void func(uint8_t& dest, const uint8_t& src, const int& burn, const int& shade)
 	{
 		auto n = dest;
 		if (src)
 		{
 			if (burn)
 			{
-				const Uint8 tempBurn = (src & ColorShade) + burn;
+				const uint8_t tempBurn = (src & ColorShade) + burn;
 				if (tempBurn > 26)
 				{
 					//nothing

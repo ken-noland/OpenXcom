@@ -2402,7 +2402,7 @@ void BattlescapeState::blinkVisibleUnitButtons()
  */
 void BattlescapeState::blinkHealthBar()
 {
-	static Uint8 color = 0, maxcolor = 3, step = 0;
+	static uint8_t color = 0, maxcolor = 3, step = 0;
 
 	step = 1 - step;	// 1, 0, 1, 0, ...
 	BattleUnit *bu = _save->getSelectedUnit();
@@ -2478,7 +2478,7 @@ void BattlescapeState::handleState()
  * Sets the timer interval for think() calls of the state.
  * @param interval An interval in ms.
  */
-void BattlescapeState::setStateInterval(Uint32 interval)
+void BattlescapeState::setStateInterval(uint32_t interval)
 {
 	_gameTimer->setInterval(interval);
 }
@@ -2950,7 +2950,7 @@ inline void BattlescapeState::handle(Action *action)
  */
 void BattlescapeState::saveAIMap()
 {
-	Uint32 start = SDL_GetTicks();
+	uint32_t start = SDL_GetTicks();
 	BattleUnit *unit = _save->getSelectedUnit();
 	if (!unit) return;
 

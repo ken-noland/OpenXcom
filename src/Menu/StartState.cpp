@@ -35,8 +35,6 @@
 #include "../Interface/Text.h"
 #include "MainMenuState.h"
 #include "CutsceneState.h"
-#include <SDL_mixer.h>
-#include <SDL_thread.h>
 
 #include "../Entity/Engine/Palette.h"
 #include "../Engine/Palette.h"
@@ -55,66 +53,70 @@ StartState::StartState()
 	: State("StartState", true), _anim(0)
 {
 	//updateScale() uses newDisplayWidth/Height and needs to be set ahead of time
-	Options::newDisplayWidth = Options::displayWidth;
-	Options::newDisplayHeight = Options::displayHeight;
-	Screen::updateScale(Options::geoscapeScale, Options::baseXGeoscape, Options::baseYGeoscape, false);
-	Screen::updateScale(Options::battlescapeScale, Options::baseXBattlescape, Options::baseYBattlescape, false);
-	Options::baseXResolution = Options::displayWidth;
-	Options::baseYResolution = Options::displayHeight;
-	getGame()->getScreen()->resetDisplay(false, true);
 
-	// Create objects
-	_thread = 0;
-	loading = LOADING_STARTED;
-	error = "";
-	_oldMaster = Options::getActiveMaster();
+// OPTIONSHACK
+	//Options::newDisplayWidth = Options::displayWidth;
+	//Options::newDisplayHeight = Options::displayHeight;
+	//Screen::updateScale(Options::geoscapeScale, Options::baseXGeoscape, Options::baseYGeoscape, false);
+	//Screen::updateScale(Options::battlescapeScale, Options::baseXBattlescape, Options::baseYBattlescape, false);
+	//Options::baseXResolution = Options::displayWidth;
+	//Options::baseYResolution = Options::displayHeight;
+	//getGame()->getScreen()->resetDisplay(false, true);
 
-	_font = new Font();
-	_font->loadTerminal();
-	_lang = new Language();
+//KN NOTE: Going to replace all of this with ECS
+	//// Create objects
+	//_thread = 0;
+	//loading = LOADING_STARTED;
+	//error = "";
+	//_oldMaster = Options::getActiveMaster();
 
-	_text = new Text(Options::baseXResolution, Options::baseYResolution, 0, 0, _font, _font, _lang);
-	_cursor = new Text(_font->getWidth(), _font->getHeight(), 0, 0, _font, _font, _lang);
-	_timer = new Timer(150);
+	//_font = new Font();
+	//_font->loadTerminal();
+	//_lang = new Language();
 
-	// Set up palette
-	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
-	PaletteHandle paletteHandle = paletteSystem.addPalette("Terminal", Font::TerminalColors, 0, (int)std::size(Font::TerminalColors));
-	Palette* palette = paletteSystem.getPalette(paletteHandle);
-	setStatePalette(palette->getColors(), 0, palette->getColorCount());
+	//_text = new Text(Options::baseXResolution, Options::baseYResolution, 0, 0, _font, _font, _lang);
+	//_cursor = new Text(_font->getWidth(), _font->getHeight(), 0, 0, _font, _font, _lang);
+	//_timer = new Timer(150);
 
-	add(_text);
-	add(_cursor);
+	//// Set up palette
+	//PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
+	//PaletteHandle paletteHandle = paletteSystem.addPalette("Terminal", Font::TerminalColors, 0, (int)std::size(Font::TerminalColors));
+	//Palette* palette = paletteSystem.getPalette(paletteHandle);
+	//setStatePalette(palette->getColors(), 0, palette->getColorCount());
 
-	// Set up objects
-	_text->setColor(0);
-	_text->setWordWrap(true);
+	//add(_text);
+	//add(_cursor);
 
-	_cursor->setColor(0);
-	_cursor->setText("_");
+	//// Set up objects
+	//_text->setColor(0);
+	//_text->setWordWrap(true);
 
-	_timer->onState(std::bind(&StartState::animate, this));
-	_timer->start();
+	//_cursor->setColor(0);
+	//_cursor->setText("_");
 
-	// Hide UI
-	getGame()->getCursor()->setVisible(false);
-	getGame()->getFpsCounter()->setVisible(false);
+	//_timer->onState(std::bind(&StartState::animate, this));
+	//_timer->start();
 
-	if (Options::reload)
-	{
-		if (Options::oxceStartUpTextMode < 2)
-		{
-			addLine("Restarting...");
-			addLine("");
-		}
-	}
-	else
-	{
-		if (Options::oxceStartUpTextMode < 2)
-		{
-			addLine(CrossPlatform::getDosPath() + ">openxcom");
-		}
-	}
+	//// Hide UI
+	//getGame()->getCursor()->setVisible(false);
+	//getGame()->getFpsCounter()->setVisible(false);
+
+// OPTIONSHACK
+	// if (Options::reload)
+	//{
+	//	if (Options::oxceStartUpTextMode < 2)
+	//	{
+	//		addLine("Restarting...");
+	//		addLine("");
+	//	}
+	//}
+	//else
+	//{
+	//	if (Options::oxceStartUpTextMode < 2)
+	//	{
+	//		addLine(CrossPlatform::getDosPath() + ">openxcom");
+	//	}
+	//}
 }
 
 /**
@@ -122,13 +124,13 @@ StartState::StartState()
  */
 StartState::~StartState()
 {
-	if (_thread != 0)
-	{
-		SDL_KillThread(_thread);
-	}
-	delete _font;
-	delete _timer;
-	delete _lang;
+	//if (_thread != 0)
+	//{
+	//	SDL_KillThread(_thread);
+	//}
+	//delete _font;
+	//delete _timer;
+	//delete _lang;
 }
 
 /**
@@ -136,24 +138,24 @@ StartState::~StartState()
  */
 void StartState::init()
 {
-	State::init();
+	//State::init();
 
-	// Silence!
-	Sound::stop();
-	Music::stop();
-	if (!Options::mute && Options::reload)
-	{
-		Mix_CloseAudio();
-		getGame()->initAudio();
-	}
+	//// Silence!
+	//Sound::stop();
+	//Music::stop();
+	//if (!Options::mute && Options::reload)
+	//{
+	//	Mix_CloseAudio();
+	//	getGame()->initAudio();
+	//}
 
-	// Load the game data in a separate thread
-	_thread = SDL_CreateThread(load, (void*)getGame());
-	if (_thread == 0)
-	{
-		// If we can't create the thread, just load it as usual
-		load((void*)getGame());
-	}
+	//// Load the game data in a separate thread
+	//_thread = SDL_CreateThread(load, (void*)getGame());
+	//if (_thread == 0)
+	//{
+	//	// If we can't create the thread, just load it as usual
+	//	load((void*)getGame());
+	//}
 }
 
 /**
@@ -161,40 +163,40 @@ void StartState::init()
  */
 void StartState::update()
 {
-	State::update();
-	_timer->think(true, false);
+	//State::update();
+	//_timer->think(true, false);
 
-	switch (loading)
-	{
-	case LOADING_FAILED:
-		CrossPlatform::flashWindow();
-		addLine("");
-		addLine("ERROR: " + error);
-		addLine("");
-		addLine("More details here: " + CrossPlatform::getLogFileName());
-		addLine("Make sure OpenXcom and any mods are installed correctly.");
-		addLine("");
-		addLine("Press any key to continue.");
-		loading = LOADING_DONE;
-		break;
-	case LOADING_SUCCESSFUL:
-		CrossPlatform::flashWindow();
-		Log(LOG_INFO) << "OpenXcom started successfully!";
-		getGame()->setState(new GoToMainMenuState(true));
-		if (_oldMaster != Options::getActiveMaster() && Options::playIntro)
-		{
-			getGame()->pushState(new CutsceneState("intro"));
-		}
-		if (Options::reload)
-		{
-			Options::reload = false;
-		}
-		getGame()->getCursor()->setVisible(true);
-		getGame()->getFpsCounter()->setVisible(Options::fpsCounter);
-		break;
-	default:
-		break;
-	}
+	//switch (loading)
+	//{
+	//case LOADING_FAILED:
+	//	CrossPlatform::flashWindow();
+	//	addLine("");
+	//	addLine("ERROR: " + error);
+	//	addLine("");
+	//	addLine("More details here: " + CrossPlatform::getLogFileName());
+	//	addLine("Make sure OpenXcom and any mods are installed correctly.");
+	//	addLine("");
+	//	addLine("Press any key to continue.");
+	//	loading = LOADING_DONE;
+	//	break;
+	//case LOADING_SUCCESSFUL:
+	//	CrossPlatform::flashWindow();
+	//	Log(LOG_INFO) << "OpenXcom started successfully!";
+	//	getGame()->setState(new GoToMainMenuState(true));
+	//	if (_oldMaster != Options::getActiveMaster() && Options::playIntro)
+	//	{
+	//		getGame()->pushState(new CutsceneState("intro"));
+	//	}
+	//	if (Options::reload)
+	//	{
+	//		Options::reload = false;
+	//	}
+	//	getGame()->getCursor()->setVisible(true);
+	//	getGame()->getFpsCounter()->setVisible(Options::fpsCounter);
+	//	break;
+	//default:
+	//	break;
+	//}
 }
 
 /**
@@ -204,14 +206,14 @@ void StartState::update()
  */
 void StartState::handle(Action *action)
 {
-	State::handle(action);
-	if (loading == LOADING_DONE)
-	{
-		if (action->getDetails()->type == SDL_KEYDOWN)
-		{
-			getGame()->quit();
-		}
-	}
+	//State::handle(action);
+	//if (loading == LOADING_DONE)
+	//{
+	//	if (action->getDetails()->type == SDL_KEYDOWN)
+	//	{
+	//		getGame()->quit();
+	//	}
+	//}
 }
 
 /**
@@ -219,71 +221,71 @@ void StartState::handle(Action *action)
  */
 void StartState::animate()
 {
-	_cursor->setVisible(!_cursor->getVisible());
-	_anim++;
+	//_cursor->setVisible(!_cursor->getVisible());
+	//_anim++;
 
-	if (loading == LOADING_STARTED)
-	{
-		std::ostringstream ss;
-		ss << "Loading OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT << "...";
-		if (Options::reload)
-		{
-			if (Options::oxceStartUpTextMode < 2)
-			{
-				if (_anim == 2)
-					addLine(ss.str());
-			}
-		}
-		else
-		{
-			switch (_anim)
-			{
-			case 1:
-				if (Options::oxceStartUpTextMode < 1)
-				{
-					addLine("DOS/4GW Protected Mode Run-time  Version 1.9");
-					addLine("Copyright (c) Rational Systems, Inc. 1990-1993");
-				}
-				break;
-			case 6:
-				if (Options::oxceStartUpTextMode < 2)
-				{
-					addLine("");
-					addLine("OpenXcom initialisation");
-				}
-				break;
-			case 7:
-				if (Options::oxceStartUpTextMode < 1)
-				{
-					addLine("");
-					if (Options::mute)
-					{
-						addLine("No Sound Detected");
-					}
-					else
-					{
-						addLine("SoundBlaster Sound Effects");
-						if (Options::preferredMusic == MUSIC_MIDI)
-							addLine("General MIDI Music");
-						else
-							addLine("SoundBlaster Music");
-						addLine("Base Port 220  Irq 7  Dma 1");
-					}
-				}
-				if (Options::oxceStartUpTextMode < 2)
-				{
-					addLine("");
-				}
-				break;
-			case 9:
-				if (Options::oxceStartUpTextMode < 2)
-				{
-					addLine(ss.str());
-				}
-				break;
-			}
-		}
-	}
+	//if (loading == LOADING_STARTED)
+	//{
+	//	std::ostringstream ss;
+	//	ss << "Loading OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT << "...";
+	//	if (Options::reload)
+	//	{
+	//		if (Options::oxceStartUpTextMode < 2)
+	//		{
+	//			if (_anim == 2)
+	//				addLine(ss.str());
+	//		}
+	//	}
+	//	else
+	//	{
+	//		switch (_anim)
+	//		{
+	//		case 1:
+	//			if (Options::oxceStartUpTextMode < 1)
+	//			{
+	//				addLine("DOS/4GW Protected Mode Run-time  Version 1.9");
+	//				addLine("Copyright (c) Rational Systems, Inc. 1990-1993");
+	//			}
+	//			break;
+	//		case 6:
+	//			if (Options::oxceStartUpTextMode < 2)
+	//			{
+	//				addLine("");
+	//				addLine("OpenXcom initialisation");
+	//			}
+	//			break;
+	//		case 7:
+	//			if (Options::oxceStartUpTextMode < 1)
+	//			{
+	//				addLine("");
+	//				if (Options::mute)
+	//				{
+	//					addLine("No Sound Detected");
+	//				}
+	//				else
+	//				{
+	//					addLine("SoundBlaster Sound Effects");
+	//					if (Options::preferredMusic == MUSIC_MIDI)
+	//						addLine("General MIDI Music");
+	//					else
+	//						addLine("SoundBlaster Music");
+	//					addLine("Base Port 220  Irq 7  Dma 1");
+	//				}
+	//			}
+	//			if (Options::oxceStartUpTextMode < 2)
+	//			{
+	//				addLine("");
+	//			}
+	//			break;
+	//		case 9:
+	//			if (Options::oxceStartUpTextMode < 2)
+	//			{
+	//				addLine(ss.str());
+	//			}
+	//			break;
+	//		}
+	//	}
+	//}
 }
 
 /**
@@ -293,12 +295,12 @@ void StartState::animate()
  */
 void StartState::addLine(const std::string &str)
 {
-	_output << "\n" << str;
-	_text->setText(_output.str());
-	int y = _text->getTextHeight() - _font->getHeight();
-	int x = _text->getTextWidth(y / _font->getHeight());
-	_cursor->setX(x);
-	_cursor->setY(y);
+	//_output << "\n" << str;
+	//_text->setText(_output.str());
+	//int y = _text->getTextHeight() - _font->getHeight();
+	//int x = _text->getTextWidth(y / _font->getHeight());
+	//_cursor->setX(x);
+	//_cursor->setY(y);
 }
 
 /**
@@ -311,26 +313,26 @@ extern void setThreadLocalGame(Game* gameInstance);
 
 int StartState::load(void *game_ptr)
 {
-	Game *game = (Game*)game_ptr;
-	setThreadLocalGame(game);
+	//Game *game = (Game*)game_ptr;
+	//setThreadLocalGame(game);
 
-	try
-	{
-		Log(LOG_INFO) << "Loading data...";
-		Options::updateMods();
-		game->loadMods();
-		Log(LOG_INFO) << "Data loaded successfully.";
-		Log(LOG_INFO) << "Loading language...";
-		game->loadLanguages();
-		Log(LOG_INFO) << "Language loaded successfully.";
-		loading = LOADING_SUCCESSFUL;
-	}
-	catch (std::exception &e)
-	{
-		error = e.what();
-		Log(LOG_ERROR) << error;
-		loading = LOADING_FAILED;
-	}
+	//try
+	//{
+	//	Log(LOG_INFO) << "Loading data...";
+	//	Options::updateMods();
+	//	game->loadMods();
+	//	Log(LOG_INFO) << "Data loaded successfully.";
+	//	Log(LOG_INFO) << "Loading language...";
+	//	game->loadLanguages();
+	//	Log(LOG_INFO) << "Language loaded successfully.";
+	//	loading = LOADING_SUCCESSFUL;
+	//}
+	//catch (std::exception &e)
+	//{
+	//	error = e.what();
+	//	Log(LOG_ERROR) << error;
+	//	loading = LOADING_FAILED;
+	//}
 
 	return 0;
 }

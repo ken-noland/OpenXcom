@@ -90,7 +90,7 @@ void SurfaceSet::loadPck(const std::string &pck, const std::string &tab)
 	}
 
 	auto imgFile = FileMap::getIStream(pck);
-	Uint8 value;
+	uint8_t value;
 
 	for (int frame = 0; frame < nframes; ++frame)
 	{
@@ -154,7 +154,7 @@ void SurfaceSet::loadDat(const std::string &filename)
 		_frames[i] = Surface(_width, _height);
 	}
 
-	Uint8 value;
+	uint8_t value;
 	int x = 0, y = 0, frame = 0;
 
 	// Lock the surface

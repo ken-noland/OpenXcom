@@ -38,15 +38,15 @@ class ComboBox;
 class TextButton : public InteractiveSurface
 {
 private:
-	Uint8 _color;
+	uint8_t _color;
 	Text *_text;
 	TextButton **_group;
 	bool _contrast, _geoscapeButton;
 	ComboBox *_comboBox;
 	// for use by RuleInterface
-	void setSecondaryColor(Uint8 color)  override { setTextColor(color); }
+	void setSecondaryColor(uint8_t color)  override { setTextColor(color); }
 protected:
-	bool isButtonHandled(Uint8 button = 0) override;
+	bool isButtonHandled(uint8_t button = 0) override;
 public:
 	static Sound *soundPress;
 	/// Creates a new text button with the specified size and position.
@@ -54,11 +54,11 @@ public:
 	/// Cleans up the text button.
 	~TextButton();
 	/// Sets the text button's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the text button's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the text button's text color.
-	void setTextColor(Uint8 color);
+	void setTextColor(uint8_t color);
 	/// Sets the text size to big.
 	void setBig();
 	/// Sets the text size to small.

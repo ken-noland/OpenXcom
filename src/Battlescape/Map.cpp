@@ -137,7 +137,7 @@ Map::Map(Game *game, int width, int height, int x, int y, int visibleMapHeight) 
 	}
 	else
 	{
-		const static std::vector<Uint8> dummy;
+		const static std::vector<uint8_t> dummy;
 		_transparencies = &dummy;
 	}
 
@@ -305,12 +305,12 @@ void Map::draw()
 	// Note: un-hardcoded the color from 15 to ruleset value, default 15
 	_redraw = false;
 	ShaderDrawFunc(
-		[](Uint8& dest, Uint8 color)
+		[](uint8_t& dest, uint8_t color)
 		{
 			dest = color;
 		},
 		ShaderSurface(this),
-		ShaderScalar<Uint8>(Palette::blockOffset(0) + _bgColor)
+		ShaderScalar<uint8_t>(Palette::blockOffset(0) + _bgColor)
 	);
 
 	Tile *t;
@@ -725,7 +725,7 @@ void Map::drawTerrain(Surface *surface)
 
 	_isAltPressed = _game->isAltPressed(true);
 	int frameNumber = 0;
-	SurfaceRaw<const Uint8> tmpSurface;
+	SurfaceRaw<const uint8_t> tmpSurface;
 	Tile *tile;
 	int beginX = 0, endX = _save->getMapSizeX() - 1;
 	int beginY = 0, endY = _save->getMapSizeY() - 1;
@@ -1213,7 +1213,7 @@ void Map::drawTerrain(Surface *surface)
 					SurfaceRaw<int> pixelMask(pixelMaskArray, 2, 2);
 					const int vaporScreenOriginX = screenPosition.x + _spriteWidth / 2;
 					const int vaporScreenOriginY = screenPosition.y + _spriteHeight - _spriteWidth / 2 + tile->getPosition().toVoxel().z;
-					const Uint8* const transparetPtr = _transparencies->data();
+					const uint8_t* const transparetPtr = _transparencies->data();
 
 					//draw particle clouds behind solder
 					for (const Particle& p : getVaporParticle(tile, 0))
@@ -1225,7 +1225,7 @@ void Map::drawTerrain(Surface *surface)
 							+ (p.getOpacity() * Mod::TransparenciesPaletteColors);
 
 						ShaderDrawFunc(
-							[&](Uint8& dest, int size)
+							[&](uint8_t& dest, int size)
 							{
 								if (p.getSize() <= size)
 								{
@@ -1300,7 +1300,7 @@ void Map::drawTerrain(Surface *surface)
 							+ (p.getOpacity() * Mod::TransparenciesPaletteColors);
 
 						ShaderDrawFunc(
-							[&](Uint8& dest, int size)
+							[&](uint8_t& dest, int size)
 							{
 								if (p.getSize() <= size)
 								{
@@ -2086,7 +2086,7 @@ void Map::drawTerrain(Surface *surface)
 		{
 			for (int x = 0, y = 0; x < surface->getWidth() && y < surface->getHeight();)
 			{
-				Uint8 pixel = surface->getPixel(x, y);
+				uint8_t pixel = surface->getPixel(x, y);
 				if (pixel)
 				{
 					pixel = (pixel & 0xF0) + 1; //avoid 0 pixel
@@ -2740,7 +2740,7 @@ std::vector<Position> *Map::getWaypoints()
  * @param button Index of the button.
  * @param pressed The state of the button.
  */
-void Map::setButtonsPressed(Uint8 button, bool pressed)
+void Map::setButtonsPressed(uint8_t button, bool pressed)
 {
 	setButtonPressed(button, pressed);
 }

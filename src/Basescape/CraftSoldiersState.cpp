@@ -356,7 +356,7 @@ void CraftSoldiersState::initList(size_t scrl)
 			_lstSoldiers->addRow(3, soldier->getName(true, 19).c_str(), tr(soldier->getRankString()).c_str(), soldier->getCraftString(getGame()->getLanguage(), recovery).c_str());
 		}
 
-		Uint8 color;
+		uint8_t color;
 		if (soldier->getCraft() == c)
 		{
 			color = _lstSoldiers->getSecondaryColor();
@@ -439,7 +439,7 @@ void CraftSoldiersState::moveSoldierUp(Action *action, unsigned int row, bool ma
 		_base->getSoldiers().at(row - 1) = s;
 		if (row != _lstSoldiers->getScroll())
 		{
-			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<Uint16>(8 * action->getYScale()));
+			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<uint16_t>(8 * action->getYScale()));
 		}
 		else
 		{
@@ -492,7 +492,7 @@ void CraftSoldiersState::moveSoldierDown(Action *action, unsigned int row, bool 
 		_base->getSoldiers().at(row + 1) = s;
 		if (row != _lstSoldiers->getVisibleRows() - 1 + _lstSoldiers->getScroll())
 		{
-			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<Uint16>(8 * action->getYScale()));
+			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<uint16_t>(8 * action->getYScale()));
 		}
 		else
 		{

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <SDL.h>
+
 #include <chrono>
 #include "State.h"
 #include "Surface.h"
@@ -37,11 +37,11 @@ class Timer	//KN NOTE: this should be split into two timers. One for state and o
 {
 public:
 	static int maxFrameSkip;
-	static Uint32 gameSlowSpeed;
+	static uint32_t gameSlowSpeed;
 
 private:
-	Uint32 _start;
-	Uint32 _frameSkipStart;
+	uint32_t _start;
+	uint32_t _frameSkipStart;
 	int _interval;
 	bool _running;
 	bool _frameSkipping;
@@ -50,7 +50,7 @@ private:
 
 public:
 	/// Creates a stopped timer.
-	[[deprecated]] Timer(Uint32 interval, bool frameSkipping = false);
+	[[deprecated]] Timer(uint32_t interval, bool frameSkipping = false);
 	/// Cleans up the timer.
 	~Timer();
 	/// Starts the timer.
@@ -58,13 +58,13 @@ public:
 	/// Stops the timer.
 	void stop();
 	/// Gets the current time interval.
-	Uint32 getTime() const;
+	uint32_t getTime() const;
 	/// Gets if the timer's running.
 	bool isRunning() const;
 	/// Advances the timer.
 	void think(bool state, bool surface);
 	/// Sets the timer's interval.
-	void setInterval(Uint32 interval);
+	void setInterval(uint32_t interval);
 	/// Hooks a state action handler to the timer interval.
 	void onState(StateHandler handler);
 	/// Hooks a surface action handler to the timer interval.
@@ -180,10 +180,10 @@ public:
  */
 struct IntervalTimerComponent
 {
-	Uint32 interval;
-	Uint32 duration;
-	Uint32 elapsed;
-	Uint32 remaining;
+	uint32_t interval;
+	uint32_t duration;
+	uint32_t elapsed;
+	uint32_t remaining;
 
 	std::function<void(entt::handle)> onInterval;
 	std::function<void(entt::handle)> onEnd;

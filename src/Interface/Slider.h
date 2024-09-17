@@ -59,9 +59,9 @@ public:
 	/// Sets the slider's high contrast color setting.
 	void setHighContrast(bool contrast) override;
 	/// Sets the slider's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the slider's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the slider's palette.
 	void setPalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256) override;
 	/// Sets the slider's range.

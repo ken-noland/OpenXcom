@@ -55,16 +55,16 @@ TickableSystem::~TickableSystem()
 
 void TickableSystem::tick(entt::entity& entity)
 {
-	if (getRegistry().raw().any_of<WindowComponent>(entity))
-	{
-		TickableComponent& tickableComponent = getRegistry().raw().get<TickableComponent>(entity);
-		tickableComponent.tick();
-	}
-	else
-	{
-		Surface* surface = getRegistry().raw().get<SurfaceComponent>(entity).getSurface();
-		surface->think();
-	}
+	//if (getRegistry().raw().any_of<WindowComponent>(entity))
+	//{
+	//	TickableComponent& tickableComponent = getRegistry().raw().get<TickableComponent>(entity);
+	//	tickableComponent.tick();
+	//}
+	//else
+	//{
+	//	Surface* surface = getRegistry().raw().get<SurfaceComponent>(entity).getSurface();
+	//	surface->think();
+	//}
 }
 
 void TickableSystem::update()

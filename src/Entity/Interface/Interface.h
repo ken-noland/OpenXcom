@@ -62,7 +62,7 @@ protected:
 	//cache the surface factory since we will be using it a lot
 	SurfaceFactory& _surfaceFactory;
 
-	Element getElementFromRule(const std::string& ruleCategory, const std::string& ruleID, int x, int y, int width, int height, entt::handle parent);
+	//Element getElementFromRule(const std::string& ruleCategory, const std::string& ruleID, int x, int y, int width, int height, entt::handle parent);
 
 public:
 	InterfaceFactory(ECS& ecs, Mod* mod = nullptr);

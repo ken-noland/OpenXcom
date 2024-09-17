@@ -9,13 +9,15 @@
  */
 #pragma once
 
+// SDLHACK
+#define __NO_OPENGL
+
 #ifndef __NO_OPENGL
 
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
 
-#include <SDL_opengl.h>
 #include <string>
 
 #include "Surface.h"

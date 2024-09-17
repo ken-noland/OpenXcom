@@ -577,7 +577,7 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 
 		// Draw range (1 km = 1 pixel)
 		// Only relevant for weapons and tractor beams.
-		Uint8 color = _colors[RANGE_METER];
+		uint8_t color = _colors[RANGE_METER];
 		range->lock();
 
 		int rangeY = range->getHeight() - w->getRules()->getRange();
@@ -685,7 +685,7 @@ DogfightState::DogfightState(GeoscapeState *state, Craft *craft, Ufo *ufo, bool 
 	{
 		for (int x = 0; x < _craftSprite->getWidth(); ++x)
 		{
-			Uint8 pixelColor = _craftSprite->getPixel(x, y);
+			uint8_t pixelColor = _craftSprite->getPixel(x, y);
 			if (pixelColor >= _colors[CRAFT_MIN] && pixelColor < _colors[CRAFT_MAX])
 			{
 				++_craftHeight;
@@ -859,7 +859,7 @@ void DogfightState::drawCraftShield()
 			}
 			if (y >= maxRow && craftPixel != 0)
 			{
-				Uint8 shieldColor = std::min(_colors[SHIELD_MAX], _colors[SHIELD_MIN] + (craftPixel - _colors[CRAFT_MIN]));
+				uint8_t shieldColor = std::min(_colors[SHIELD_MAX], _colors[SHIELD_MIN] + (craftPixel - _colors[CRAFT_MIN]));
 				_craftShield->setPixel(x, y, shieldColor);
 			}
 		}
@@ -876,7 +876,7 @@ void DogfightState::animate()
 	{
 		for (int y = 0; y < _window->getHeight(); ++y)
 		{
-			Uint8 radarPixelColor = _window->getPixel(x, y);
+			uint8_t radarPixelColor = _window->getPixel(x, y);
 			if (radarPixelColor >= _colors[RADAR_MIN] && radarPixelColor < _colors[RADAR_MAX])
 			{
 				++radarPixelColor;
@@ -2117,7 +2117,7 @@ void DogfightState::drawUfo()
 	{
 		for (int x = 0; x < 13; ++x)
 		{
-			Uint8 pixelOffset = _ufoBlobs[_ufoSize + _ufo->getHitFrame()][y][x];
+			uint8_t pixelOffset = _ufoBlobs[_ufoSize + _ufo->getHitFrame()][y][x];
 			if (pixelOffset == 0)
 			{
 				continue;
@@ -2129,8 +2129,8 @@ void DogfightState::drawUfo()
 					pixelOffset *= 2;
 				}
 
-				Uint8 radarPixelColor = _window->getPixel(currentUfoXposition + x + 3, currentUfoYposition + y + 3); // + 3 cause of the window frame
-				Uint8 color = radarPixelColor - pixelOffset;
+				uint8_t radarPixelColor = _window->getPixel(currentUfoXposition + x + 3, currentUfoYposition + y + 3); // + 3 cause of the window frame
+				uint8_t color = radarPixelColor - pixelOffset;
 				if (color < _colors[BLOB_MIN])
 				{
 					color = _colors[BLOB_MIN];
@@ -2138,7 +2138,7 @@ void DogfightState::drawUfo()
 
 				if (_ufo->getShield() != 0 && _ufo->getCraftStats().shieldCapacity != 0)
 				{
-					Uint8 shieldColor =
+					uint8_t shieldColor =
 						_colors[SHIELD_MAX]
 						- ((_colors[SHIELD_MAX] - _colors[SHIELD_MIN]) * _ufo->getShield() / _ufo->getCraftStats().shieldCapacity)
 						+ (color - _colors[BLOB_MIN]);
@@ -2183,8 +2183,8 @@ void DogfightState::drawProjectile(const CraftWeaponProjectile* p)
 				}
 				else
 				{
-					Uint8 radarPixelColor = _window->getPixel(xPos + x + 3, yPos + y + 3); // + 3 cause of the window frame
-					Uint8 color = radarPixelColor - pixelOffset;
+					uint8_t radarPixelColor = _window->getPixel(xPos + x + 3, yPos + y + 3); // + 3 cause of the window frame
+					uint8_t color = radarPixelColor - pixelOffset;
 					if (color < _colors[BLOB_MIN])
 					{
 						color = _colors[BLOB_MIN];
@@ -2199,10 +2199,10 @@ void DogfightState::drawProjectile(const CraftWeaponProjectile* p)
 	{
 		int yStart = _battle->getHeight() - 2;
 		int yEnd = _battle->getHeight() - (_currentDist / 8);
-		Uint8 pixelOffset = p->getState();
+		uint8_t pixelOffset = p->getState();
 		for (int y = yStart; y > yEnd; --y)
 		{
-			Uint8 radarPixelColor = _window->getPixel(xPos + 3, y + 3);
+			uint8_t radarPixelColor = _window->getPixel(xPos + 3, y + 3);
 
 			int beamPower = 0;
 			if (p->getType() == CWPT_PLASMA_BEAM)
@@ -2212,7 +2212,7 @@ void DogfightState::drawProjectile(const CraftWeaponProjectile* p)
 
 			for (int x = 0; x <= std::min(beamPower, 3); x++)
 			{
-				Uint8 color = radarPixelColor - pixelOffset - beamPower + 2 * x;
+				uint8_t color = radarPixelColor - pixelOffset - beamPower + 2 * x;
 				if (color < _colors[BLOB_MIN])
 				{
 					color = _colors[BLOB_MIN];

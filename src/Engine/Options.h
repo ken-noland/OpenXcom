@@ -19,128 +19,277 @@
  */
 #include <string>
 #include <vector>
-#include "OptionInfo.h"
-#include "ModInfo.h"
-#include "Language.h"
+#include <array>
+#include <optional>
+#include <map>
+#include <functional>
+#include <filesystem>
 
 namespace OpenXcom
 {
 
-/// Battlescape drag scrolling types.
-enum ScrollType { SCROLL_NONE, SCROLL_TRIGGER, SCROLL_AUTO };
-/// Keyboard input modes.
-enum KeyboardType { KEYBOARD_OFF, KEYBOARD_ON, KEYBOARD_VIRTUAL };
-/// Savegame sorting modes.
-enum SaveSort { SORT_NAME_ASC, SORT_NAME_DESC, SORT_DATE_ASC, SORT_DATE_DESC };
-/// Music format preferences.
-enum MusicFormat { MUSIC_AUTO, MUSIC_FLAC, MUSIC_OGG, MUSIC_MP3, MUSIC_MOD, MUSIC_WAV, MUSIC_ADLIB, MUSIC_GM, MUSIC_MIDI };
-/// Sound format preferences.
-enum SoundFormat { SOUND_AUTO, SOUND_14, SOUND_10 };
-/// Video format preferences.
-enum VideoFormat { VIDEO_FMV, VIDEO_SLIDE };
-/// Path preview modes (can be OR'd together).
-enum PathPreview {
-	PATH_NONE         = 0x00, // 0000 (must always be zero)
-	PATH_ARROWS       = 0x01, // 0001
-	PATH_TU_COST      = 0x02, // 0010
-	PATH_ARROW_TU     = 0x03, // 0011
-	PATH_ENERGY_COST  = 0x04, // 0100
-	PATH_ARROW_ENERGY = 0x05, // 0101
-	PATH_TU_ENERGY    = 0x06, // 0110
-	PATH_FULL         = 0x07  // 0111 (must always be all values combined)
+// helper struct that contains the information for a command line options and
+// the function to execute if the option is found
+struct CommandLineOption
+{
+	// If the option has a parameter
+	bool hasParameter;
+
+	// The name of the parameter(only used if hasParameter is true)
+	std::string parameterName;
+
+	// The description of the option. Used for -help
+	std::string description;
+
+	// The function to execute if the option is found
+	std::function<bool(const std::string&)> parser;
 };
 
-enum ScaleType
+
+enum class OptionLevel
 {
-	SCALE_ORIGINAL,
-	SCALE_15X,
-	SCALE_2X,
-	SCALE_SCREEN_DIV_3,
-	SCALE_SCREEN_DIV_2,
-	SCALE_SCREEN,
-	SCALE_SCREEN_DIV_4,
-	SCALE_SCREEN_DIV_5,
-	SCALE_SCREEN_DIV_6
+	COMMAND, // command line
+	CONFIG,  // config file
+	DEFAULT, // default values
+	MAX
 };
-/**
- * Container for all the various global game options
- * and customizable settings.
- */
-namespace Options
+
+constexpr size_t OPTION_LEVEL_COUNT = static_cast<size_t>(OptionLevel::MAX);
+
+// helper struct for all game options to allow us to check if an option has
+// been set or not
+template<typename Type>
+struct Option
 {
-	struct ModSettings
+	using ValueType = Type;
+
+	std::array<std::optional<ValueType>, OPTION_LEVEL_COUNT> values;
+
+	
+    // Default constructor
+	Option() = default;
+
+	// Constructor that accepts a ValueType
+	Option(const ValueType& val) { set(OptionLevel::DEFAULT, val); }
+
+	void set(OptionLevel level, const ValueType& value)
 	{
-		std::string name;
-		bool active;
-	};
+		values[static_cast<size_t>(level)] = value;
+	}
 
-	using ModsList = std::vector<ModSettings>;
-	using ModInfoMap = std::map<std::string, ModInfo>;
-	using ModInfoList = std::vector<const ModInfo*>;
+	ValueType get() const
+	{
+		for (int i = 0; i < OPTION_LEVEL_COUNT; i++)
+		{
+			if (values[i].has_value())
+			{
+				return values[i].value();
+			}
+		}
+		throw std::runtime_error("Option not set at any level");
+	}
 
-#define OPT extern
-#include "Options.inc.h"
-#undef OPT
+	ValueType getAt(OptionLevel level) const
+	{
+		return values[(int)level].value();
+	}
 
-	/// Creates the options info.
-	void create();
-	void createOptionsOXC();
-	void createAdvancedOptionsOXC();
-	void createControlsOXC();
-	void createOptionsOXCE();
-	void createAdvancedOptionsOXCE();
-	void createControlsOXCE();
-	void createOptionsOTHER();
-	void createAdvancedOptionsOTHER();
-	void createControlsOTHER();
-	/// Restores default options.
-	void resetDefault(bool includeMods);
-	/// Initializes the options settings.
-	bool init();
-	/// Loads options from YAML.
-	bool load(const std::string &filename = "options");
-	/// Saves options to YAML.
-	bool save(const std::string &filename = "options");
-	/// Gets the game's data folder.
-	std::string getDataFolder();
-	/// Sets the game's data folder.
-	void setDataFolder(const std::string &folder);
-	/// Gets the game's data list.
-	const std::vector<std::string> &getDataList();
-	/// Gets the game's user folder.
-	std::string getUserFolder();
-	/// Gets the game's config folder.
-	std::string getConfigFolder();
-	/// Gets the game's master mod user folder.
-	std::string getMasterUserFolder();
-	/// Gets the game's options.
-	const std::vector<OptionInfo> &getOptionInfo();
-	/// Sets the game's data, user and config folders.
-	void setFolders();
-	/// Update game options from config file and command line.
-	void updateOptions();
-	/// Backup display options.
-	void backupDisplay();
-	/// Switches display options.
-	void switchDisplay();
-	/// Is the password correct?
-	bool isPasswordCorrect();
-	/// returns the id of the active master mod
-	std::string getActiveMaster();
-	/// Gets the master mod info.
-	const ModInfo* getActiveMasterInfo();
-	/// Gets the map of mod ids to mod infos
-	const ModInfoMap& getModInfos();
-	/// Refreshes the mods.
-	void refreshMods();
-	/// Refreshes the mods and filemaps.
-	void updateMods();
-	/// Gets the list of currently active mods.
-	ModInfoList getActiveMods();
-	/// If we should skip the main menu and just load the last save
-	bool getLoadLastSave();
-	/// And do it only at startup
-	void expendLoadLastSave();
-}
+	bool isSet() const
+	{
+		for (int i = 0; i < OPTION_LEVEL_COUNT; i++)
+		{
+			if (values[i].has_value())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+};
+
+
+// Helper template to extract ClassType and OptionType from MemberPtrType
+template <typename MemberPtrType>
+struct MemberPtrClass;
+
+template <typename ClsType, typename OptType>
+struct MemberPtrClass<OptType ClsType::*>
+{
+	using ClassType = ClsType;
+	using OptionType = OptType;
+};
+
+// Helper template to extract the Class and Type from member pointer provided
+template <auto MemberPtr>
+struct OptionMemberPointerTraits;
+
+template <auto MemberPtr>
+struct OptionMemberPointerTraits
+{
+	// MemberPtrType is of type 'Option<ValueType> ClassType::*'
+	using MemberPtrType = decltype(MemberPtr);
+
+	// Helper struct to extract ClassType and OptionType from MemberPtrType
+	using ClassType = typename MemberPtrClass<MemberPtrType>::ClassType;
+	using OptionType = typename MemberPtrClass<MemberPtrType>::OptionType;
+	using ValueType = typename OptionType::ValueType;
+};
+
+// Container for the options
+template <typename OptionsStruct>
+class OptionCategory
+{
+public:
+	OptionsStruct optionsStruct;
+};
+
+// Game options
+struct GameOptions
+{
+	Option<bool> _shouldRun = true;
+
+	Option<std::vector<std::filesystem::path>> _dataPath = {};
+	Option<std::filesystem::path> _userPath = std::filesystem::path("./user");
+	Option<std::filesystem::path> _cfgPath = std::filesystem::path("./user");
+
+	Option<std::string> _language = "en";
+
+	Option<bool> _continueSave = false;
+	Option<std::filesystem::path> _savePath = std::filesystem::path();
+
+	Option<std::filesystem::path> _logPath = std::filesystem::path("log.txt");
+};
+
+// Graphics options
+struct GraphicsOptions
+{
+	Option<bool> _fullscreen;
+
+	Option<int> _screenWidth;
+	Option<int> _screenHeight;
+};
+
+/**
+ * Class to handle options for the game.
+ *
+ * The default use of this class is to load options from the command line and
+ * an options file. The command line options will override the options file.
+ *
+ * 
+ */
+class Options
+{
+private:
+	using OptionsMapKey = std::vector<std::string>;
+	using OptionsMapValue = CommandLineOption;
+	using OptionsMap = std::vector<std::pair<OptionsMapKey, OptionsMapValue>>;
+
+	OptionsMap _commandLineOptions;
+
+	void showVersion();
+	void showHelp();
+
+	bool loadCommandLine(const std::vector<std::string>& argv);
+
+public:
+	/// Constructor.
+	Options();
+	/// Destructor.
+	~Options();
+
+	/// Load options from file.
+	bool load(const std::vector<std::string>& argv);
+	/// Save options to file.
+	void save();
+	/// Reset options to default values.
+	void reset();
+
+    // Set the value of an option at a specific level
+	template <auto MemberPtr>
+	void set(OptionLevel level, const typename OptionMemberPointerTraits<MemberPtr>::ValueType& value)
+	{
+		using ClassType = typename OptionMemberPointerTraits<MemberPtr>::ClassType;
+		auto& category = getOptionCategory<ClassType>();
+		auto& optionMember = category.optionsStruct.*MemberPtr;
+		optionMember.set(level, value);
+	}
+
+	// Get the value of an option
+	template <auto MemberPtr>
+	typename OptionMemberPointerTraits<MemberPtr>::ValueType get() const
+	{
+		using ClassType = typename OptionMemberPointerTraits<MemberPtr>::ClassType;
+		const auto& category = getOptionCategory<ClassType>();
+		const auto& optionMember = category.optionsStruct.*MemberPtr;
+		return optionMember.get();
+	}
+
+	// Get the value of an option
+	template <auto MemberPtr>
+	typename OptionMemberPointerTraits<MemberPtr>::ValueType getAt(OptionLevel level) const
+	{
+		using ClassType = typename OptionMemberPointerTraits<MemberPtr>::ClassType;
+		const auto& category = getOptionCategory<ClassType>();
+		const auto& optionMember = category.optionsStruct.*MemberPtr;
+		return optionMember.getAt();
+	}
+
+
+	// Check if an option is set(note: if a defualt value is provided, then this will always return true)
+	template <auto MemberPtr>
+	bool isSet() const
+	{
+		using ClassType = typename OptionMemberPointerTraits<MemberPtr>::ClassType;
+		const auto& category = getOptionCategory<ClassType>();
+		const auto& optionMember = category.optionsStruct.*MemberPtr;
+		return optionMember.isSet();
+	}
+
+	// Get where the option was set(commandline, options, or default). If it hasn't been set, then it will return OPTION_LEVELS::MAX
+	template <auto MemberPtr>
+	OptionLevel getSetLevel() const
+	{
+		using ClassType = typename OptionMemberPointerTraits<MemberPtr>::ClassType;
+		const auto& category = getOptionCategory<ClassType>();
+		const auto& optionMember = category.optionsStruct.*MemberPtr;
+		for (int i = 0; i < OPTION_LEVEL_COUNT; i++)
+		{
+			if (optionMember.values[i].has_value())
+			{
+				return static_cast<OptionLevel>(i);
+			}
+		}
+		return OptionLevel::MAX;
+	}
+
+	// Check if an option is set to the default value
+	template <auto MemberPtr>
+	bool isDefault() const
+	{
+		return getSetLevel<MemberPtr>() == OptionLevel::DEFAULT;
+	}
+
+
+private:
+	// Helper methods to get the OptionCategory instance
+	template <typename OptionsStructType>
+	OptionCategory<OptionsStructType>& getOptionCategory()
+	{
+		return std::get<OptionCategory<OptionsStructType>>(optionCategories);
+	}
+
+	template <typename OptionsStructType>
+	const OptionCategory<OptionsStructType>& getOptionCategory() const
+	{
+		return std::get<OptionCategory<OptionsStructType>>(optionCategories);
+	}
+
+	// Store OptionCategory instances in a tuple
+	std::tuple<
+		OptionCategory<GameOptions>,
+		OptionCategory<GraphicsOptions>
+		>
+		optionCategories;
+};
 
 }

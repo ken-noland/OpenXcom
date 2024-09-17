@@ -68,9 +68,9 @@ public:
 	/// Special handling for setting the height of the battlescape message.
 	void setHeight(int height) override;
 	/// Sets the text color of the battlescape message.
-	void setTextColor(Uint8 color);
+	void setTextColor(uint8_t color);
 	/// Sets the colors of the progress bar.
-	void setProgressBarColor(Uint8 color, Uint8 borderColor);
+	void setProgressBarColor(uint8_t color, uint8_t borderColor);
 };
 
 }

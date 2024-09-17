@@ -216,7 +216,7 @@ TextVAlign Text::getVerticalAlign() const
  * in the palette to be displayed.
  * @param color Color value.
  */
-void Text::setColor(Uint8 color)
+void Text::setColor(uint8_t color)
 {
 	_color = color;
 	_color2 = color;
@@ -227,7 +227,7 @@ void Text::setColor(Uint8 color)
  * Returns the color used to render the text.
  * @return Color value.
  */
-Uint8 Text::getColor() const
+uint8_t Text::getColor() const
 {
 	return _color;
 }
@@ -238,7 +238,7 @@ Uint8 Text::getColor() const
  * a 0x01 in the string.
  * @param color Color value.
  */
-void Text::setSecondaryColor(Uint8 color)
+void Text::setSecondaryColor(uint8_t color)
 {
 	_color2 = color;
 	_redraw = true;
@@ -248,7 +248,7 @@ void Text::setSecondaryColor(Uint8 color)
  * Returns the secondary color used to render the text.
  * @return Color value.
  */
-Uint8 Text::getSecondaryColor() const
+uint8_t Text::getSecondaryColor() const
 {
 	return _color2;
 }
@@ -430,7 +430,7 @@ namespace
 
 struct PaletteShift
 {
-	static inline void func(Uint8& dest, const Uint8& src, int off, int mul, int mid)
+	static inline void func(uint8_t& dest, const uint8_t& src, int off, int mul, int mid)
 	{
 		if(src)
 		{

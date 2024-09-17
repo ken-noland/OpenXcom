@@ -42,7 +42,7 @@ InteractiveSurface::~InteractiveSurface()
 {
 }
 
-bool InteractiveSurface::isButtonHandled(Uint8 button)
+bool InteractiveSurface::isButtonHandled(uint8_t button)
 {
 	bool handled = (_click.find(0) != _click.end() ||
 					_press.find(0) != _press.end() ||
@@ -56,7 +56,7 @@ bool InteractiveSurface::isButtonHandled(Uint8 button)
 	return handled;
 }
 
-bool InteractiveSurface::isButtonPressed(Uint8 button) const
+bool InteractiveSurface::isButtonPressed(uint8_t button) const
 {
 	if (button == 0)
 	{
@@ -68,7 +68,7 @@ bool InteractiveSurface::isButtonPressed(Uint8 button) const
 	}
 }
 
-void InteractiveSurface::setButtonPressed(Uint8 button, bool pressed)
+void InteractiveSurface::setButtonPressed(uint8_t button, bool pressed)
 {
 	if (pressed)
 	{
@@ -132,7 +132,7 @@ void InteractiveSurface::handle(Action *action, State *state)
 			if (_listButton && action->getDetails()->type == SDL_MOUSEMOTION)
 			{
 				_buttonsPressed = SDL_GetMouseState(0, 0);
-				for (Uint8 i = 1; i <= NUM_BUTTONS; ++i)
+				for (uint8_t i = 1; i <= NUM_BUTTONS; ++i)
 				{
 					if (isButtonPressed(i))
 					{
@@ -151,7 +151,7 @@ void InteractiveSurface::handle(Action *action, State *state)
 				mouseOut(action, state);
 				if (_listButton && action->getDetails()->type == SDL_MOUSEMOTION)
 				{
-					for (Uint8 i = 1; i <= NUM_BUTTONS; ++i)
+					for (uint8_t i = 1; i <= NUM_BUTTONS; ++i)
 					{
 						if (isButtonPressed(i))
 						{
@@ -406,7 +406,7 @@ void InteractiveSurface::keyboardRelease(Action *action, State *state)
  * @param handler Action handler.
  * @param button Mouse button to check for. Set to 0 for any button.
  */
-void InteractiveSurface::onMouseClick(ActionHandler handler, Uint8 button)
+void InteractiveSurface::onMouseClick(ActionHandler handler, uint8_t button)
 {
 	if (handler != 0)
 	{
@@ -423,7 +423,7 @@ void InteractiveSurface::onMouseClick(ActionHandler handler, Uint8 button)
  * @param handler Action handler.
  * @param button Mouse button to check for. Set to 0 for any button.
  */
-void InteractiveSurface::onMousePress(ActionHandler handler, Uint8 button)
+void InteractiveSurface::onMousePress(ActionHandler handler, uint8_t button)
 {
 	if (handler != 0)
 	{
@@ -440,7 +440,7 @@ void InteractiveSurface::onMousePress(ActionHandler handler, Uint8 button)
  * @param handler Action handler.
  * @param button Mouse button to check for. Set to 0 for any button.
  */
-void InteractiveSurface::onMouseRelease(ActionHandler handler, Uint8 button)
+void InteractiveSurface::onMouseRelease(ActionHandler handler, uint8_t button)
 {
 	if (handler != 0)
 	{

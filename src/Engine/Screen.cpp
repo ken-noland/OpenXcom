@@ -33,7 +33,7 @@
 #include "FileMap.h"
 #include "Zoom.h"
 #include "Timer.h"
-#include <SDL.h>
+
 #include <algorithm>
 
 namespace OpenXcom
@@ -325,7 +325,7 @@ void Screen::resetDisplay(bool resetVideo, bool noShaders)
 	int width = Options::displayWidth;
 	int height = Options::displayHeight;
 #ifdef __linux__
-	Uint32 oldFlags = _flags;
+	uint32_t oldFlags = _flags;
 #endif
 	makeVideoFlags();
 
@@ -355,7 +355,7 @@ void Screen::resetDisplay(bool resetVideo, bool noShaders)
 		// Workaround for segfault when switching to opengl
 		if (!(oldFlags & SDL_OPENGL) && (_flags & SDL_OPENGL))
 		{
-			Uint8 cursor = 0;
+			uint8_t cursor = 0;
 			char *_oldtitle = 0;
 			SDL_WM_GetCaption(&_oldtitle, NULL);
 			std::string title(_oldtitle);
@@ -545,7 +545,7 @@ void Screen::screenshot(const std::string &filename) const
 
 		for (int y = 0; y < getHeight(); ++y)
 		{
-			glReadPixels(0, getHeight()-(y+1), getWidth() - getWidth()%4, 1, format, GL_UNSIGNED_BYTE, ((Uint8*)screenshot->pixels) + y*screenshot->pitch);
+			glReadPixels(0, getHeight()-(y+1), getWidth() - getWidth()%4, 1, format, GL_UNSIGNED_BYTE, ((uint8_t*)screenshot->pixels) + y*screenshot->pitch);
 		}
 		glErrorCheck();
 #endif

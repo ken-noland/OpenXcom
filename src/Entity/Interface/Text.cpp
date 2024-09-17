@@ -136,22 +136,22 @@ TextVAlign TextSystem::getVerticalAlign(entt::handle textHandle) const
 	return TextVAlign();
 }
 
-void TextSystem::setColor(entt::handle textHandle, Uint8 color)
+void TextSystem::setColor(entt::handle textHandle, uint8_t color)
 {
 }
 
-Uint8 TextSystem::getColor(entt::handle textHandle) const
+uint8_t TextSystem::getColor(entt::handle textHandle) const
 {
-	return Uint8();
+	return uint8_t();
 }
 
-void TextSystem::setSecondaryColor(entt::handle textHandle, Uint8 color)
+void TextSystem::setSecondaryColor(entt::handle textHandle, uint8_t color)
 {
 }
 
-Uint8 TextSystem::getSecondaryColor(entt::handle textHandle) const
+uint8_t TextSystem::getSecondaryColor(entt::handle textHandle) const
 {
-	return Uint8();
+	return uint8_t();
 }
 
 int TextSystem::getNumLines(entt::handle textHandle) const
@@ -189,150 +189,150 @@ int TextSystem::getTextHeight(entt::handle textHandle, int line) const
 
 void TextSystem::processText(ScreenRectComponent& screenRectComponent, TextComponent& textComponent, TextFontComponent& textFontComponent, Language* textLang) const
 {
-	if (textFontComponent._font == nullptr || textLang == nullptr)
-	{
-		return;
-	}
+	//if (textFontComponent._font == nullptr || textLang == nullptr)
+	//{
+	//	return;
+	//}
 
-	UString& str = textComponent._processedText = Unicode::convUtf8ToUtf32(textComponent._text);
+	//UString& str = textComponent._processedText = Unicode::convUtf8ToUtf32(textComponent._text);
 
-	textComponent._lineWidth.clear();
-	textComponent._lineHeight.clear();
-	textComponent._scrollY = 0;
+	//textComponent._lineWidth.clear();
+	//textComponent._lineHeight.clear();
+	//textComponent._scrollY = 0;
 
-	int width = 0, word = 0;
-	size_t space = 0, textIndentation = 0;
-	bool start = true;
-	Font* font = textFontComponent._font;
+	//int width = 0, word = 0;
+	//size_t space = 0, textIndentation = 0;
+	//bool start = true;
+	//Font* font = textFontComponent._font;
 
-	// Go through the text character by character
-	for (size_t c = 0; c <= str.size(); ++c)
-	{
-		// End of the line
-		if (c == str.size() || Unicode::isLinebreak(str[c]))
-		{
-			// Add line measurements for alignment later
-			textComponent._lineWidth.push_back(width);
-			textComponent._lineHeight.push_back(font->getCharSize('\n').h);
-			width = 0;
-			word = 0;
-			start = true;
+	//// Go through the text character by character
+	//for (size_t c = 0; c <= str.size(); ++c)
+	//{
+	//	// End of the line
+	//	if (c == str.size() || Unicode::isLinebreak(str[c]))
+	//	{
+	//		// Add line measurements for alignment later
+	//		textComponent._lineWidth.push_back(width);
+	//		textComponent._lineHeight.push_back(font->getCharSize('\n').h);
+	//		width = 0;
+	//		word = 0;
+	//		start = true;
 
-			if (c == str.size())
-				break;
-			else if (str[c] == Unicode::TOK_NL_SMALL)
-				font = textFontComponent._small;
-		}
-		// Keep track of spaces for wordwrapping
-		else if (Unicode::isSpace(str[c]) || (!textComponent._ignoreSeparators && Unicode::isSeparator(str[c])))
-		{
-			// Store existing indentation
-			if (c == textIndentation)
-			{
-				textIndentation++;
-			}
-			space = c;
-			width += font->getCharSize(str[c]).w;
-			word = 0;
-			start = false;
-		}
-		// Keep track of the width of the last line and word
-		else if (str[c] != Unicode::TOK_COLOR_FLIP)
-		{
-			int charWidth = font->getCharSize(str[c]).w;
+	//		if (c == str.size())
+	//			break;
+	//		else if (str[c] == Unicode::TOK_NL_SMALL)
+	//			font = textFontComponent._small;
+	//	}
+	//	// Keep track of spaces for wordwrapping
+	//	else if (Unicode::isSpace(str[c]) || (!textComponent._ignoreSeparators && Unicode::isSeparator(str[c])))
+	//	{
+	//		// Store existing indentation
+	//		if (c == textIndentation)
+	//		{
+	//			textIndentation++;
+	//		}
+	//		space = c;
+	//		width += font->getCharSize(str[c]).w;
+	//		word = 0;
+	//		start = false;
+	//	}
+	//	// Keep track of the width of the last line and word
+	//	else if (str[c] != Unicode::TOK_COLOR_FLIP)
+	//	{
+	//		int charWidth = font->getCharSize(str[c]).w;
 
-			width += charWidth;
-			word += charWidth;
+	//		width += charWidth;
+	//		word += charWidth;
 
-			// Wordwrap if the last word doesn't fit the line
-			if (textComponent._wrap && width >= screenRectComponent.width && (!start || textLang->getTextWrapping() == WRAP_LETTERS))
-			{
-				size_t indentLocation = c;
-				if (textLang->getTextWrapping() == WRAP_WORDS || Unicode::isSpace(str[c]))
-				{
-					// Go back to the last space and put a linebreak there
-					width -= word;
-					indentLocation = space;
-					if (Unicode::isSpace(str[space]))
-					{
-						width -= font->getCharSize(str[space]).w;
-						str[space] = '\n';
-					}
-					else
-					{
-						str.insert(space + 1, 1, '\n');
-						indentLocation++;
-					}
-				}
-				else if (textLang->getTextWrapping() == WRAP_LETTERS)
-				{
-					// Go back to the last letter and put a linebreak there
-					str.insert(c, 1, '\n');
-					width -= charWidth;
-				}
+	//		// Wordwrap if the last word doesn't fit the line
+	//		if (textComponent._wrap && width >= screenRectComponent.width && (!start || textLang->getTextWrapping() == WRAP_LETTERS))
+	//		{
+	//			size_t indentLocation = c;
+	//			if (textLang->getTextWrapping() == WRAP_WORDS || Unicode::isSpace(str[c]))
+	//			{
+	//				// Go back to the last space and put a linebreak there
+	//				width -= word;
+	//				indentLocation = space;
+	//				if (Unicode::isSpace(str[space]))
+	//				{
+	//					width -= font->getCharSize(str[space]).w;
+	//					str[space] = '\n';
+	//				}
+	//				else
+	//				{
+	//					str.insert(space + 1, 1, '\n');
+	//					indentLocation++;
+	//				}
+	//			}
+	//			else if (textLang->getTextWrapping() == WRAP_LETTERS)
+	//			{
+	//				// Go back to the last letter and put a linebreak there
+	//				str.insert(c, 1, '\n');
+	//				width -= charWidth;
+	//			}
 
-				// Keep initial indentation of text
-				if (textIndentation > 0)
-				{
-					str.insert(indentLocation + 1, textIndentation, '\t');
-					indentLocation += textIndentation;
-				}
-				// Indent due to word wrap.
-				if (textComponent._indent)
-				{
-					str.insert(indentLocation + 1, 1, '\t');
-					width += font->getCharSize('\t').w;
-				}
+	//			// Keep initial indentation of text
+	//			if (textIndentation > 0)
+	//			{
+	//				str.insert(indentLocation + 1, textIndentation, '\t');
+	//				indentLocation += textIndentation;
+	//			}
+	//			// Indent due to word wrap.
+	//			if (textComponent._indent)
+	//			{
+	//				str.insert(indentLocation + 1, 1, '\t');
+	//				width += font->getCharSize('\t').w;
+	//			}
 
-				textComponent._lineWidth.push_back(width);
-				textComponent._lineHeight.push_back(font->getCharSize('\n').h);
-				if (textLang->getTextWrapping() == WRAP_WORDS)
-				{
-					width = word;
-				}
-				else if (textLang->getTextWrapping() == WRAP_LETTERS)
-				{
-					width = 0;
-				}
-				start = true;
-			}
-		}
-	}
+	//			textComponent._lineWidth.push_back(width);
+	//			textComponent._lineHeight.push_back(font->getCharSize('\n').h);
+	//			if (textLang->getTextWrapping() == WRAP_WORDS)
+	//			{
+	//				width = word;
+	//			}
+	//			else if (textLang->getTextWrapping() == WRAP_LETTERS)
+	//			{
+	//				width = 0;
+	//			}
+	//			start = true;
+	//		}
+	//	}
+	//}
 }
 
 int TextSystem::getLineX(int line, ScreenRectComponent& screenRectComponent, TextComponent& textComponent, TextAlignmentComponent& textAlignComponent, TextFontComponent& textFontComponent, Language* textLang) const
 {
 	int x = 0;
-	switch (textLang->getTextDirection())
-	{
-	case DIRECTION_LTR:
-		switch (textAlignComponent._align)
-		{
-		case TextHAlign::ALIGN_LEFT:
-			break;
-		case TextHAlign::ALIGN_CENTER:
-			x = (int)ceil((screenRectComponent.width + textFontComponent._font->getSpacing() - textComponent._lineWidth[line]) / 2.0);
-			break;
-		case TextHAlign::ALIGN_RIGHT:
-			x = screenRectComponent.width - 1 - textComponent._lineWidth[line];
-			break;
-		}
-		break;
-	case DIRECTION_RTL:
-		switch (textAlignComponent._align)
-		{
-		case TextHAlign::ALIGN_LEFT:
-			x = screenRectComponent.width - 1;
-			break;
-		case TextHAlign::ALIGN_CENTER:
-			x = screenRectComponent.width - (int)ceil((screenRectComponent.width + textFontComponent._font->getSpacing() - textComponent._lineWidth[line]) / 2.0);
-			break;
-		case TextHAlign::ALIGN_RIGHT:
-			x = textComponent._lineWidth[line];
-			break;
-		}
-		break;
-	}
+	//switch (textLang->getTextDirection())
+	//{
+	//case DIRECTION_LTR:
+	//	switch (textAlignComponent._align)
+	//	{
+	//	case TextHAlign::ALIGN_LEFT:
+	//		break;
+	//	case TextHAlign::ALIGN_CENTER:
+	//		x = (int)ceil((screenRectComponent.width + textFontComponent._font->getSpacing() - textComponent._lineWidth[line]) / 2.0);
+	//		break;
+	//	case TextHAlign::ALIGN_RIGHT:
+	//		x = screenRectComponent.width - 1 - textComponent._lineWidth[line];
+	//		break;
+	//	}
+	//	break;
+	//case DIRECTION_RTL:
+	//	switch (textAlignComponent._align)
+	//	{
+	//	case TextHAlign::ALIGN_LEFT:
+	//		x = screenRectComponent.width - 1;
+	//		break;
+	//	case TextHAlign::ALIGN_CENTER:
+	//		x = screenRectComponent.width - (int)ceil((screenRectComponent.width + textFontComponent._font->getSpacing() - textComponent._lineWidth[line]) / 2.0);
+	//		break;
+	//	case TextHAlign::ALIGN_RIGHT:
+	//		x = textComponent._lineWidth[line];
+	//		break;
+	//	}
+	//	break;
+	//}
 	return x;
 }
 
@@ -341,7 +341,7 @@ namespace
 
 struct PaletteShift
 {
-	static inline void func(Uint8& dest, const Uint8& src, int off, int mul, int mid)
+	static inline void func(uint8_t& dest, const uint8_t& src, int off, int mul, int mid)
 	{
 		if (src)
 		{
@@ -355,126 +355,126 @@ struct PaletteShift
 
 void TextSystem::draw(entt::handle textHandle)
 {
-	SurfaceComponent& surfaceComponent = textHandle.get<SurfaceComponent>();
-	ScreenRectComponent& screenRectComponent = textHandle.get<ScreenRectComponent>();
-	TextComponent& textComponent = textHandle.get<TextComponent>();
-	TextFontComponent& textFontComponent = textHandle.get<TextFontComponent>();
-	TextLangComponent* textLangComponent = textHandle.try_get<TextLangComponent>();
-	TextAlignmentComponent& textAlignComponent = textHandle.get<TextAlignmentComponent>();
+	//SurfaceComponent& surfaceComponent = textHandle.get<SurfaceComponent>();
+	//ScreenRectComponent& screenRectComponent = textHandle.get<ScreenRectComponent>();
+	//TextComponent& textComponent = textHandle.get<TextComponent>();
+	//TextFontComponent& textFontComponent = textHandle.get<TextFontComponent>();
+	//TextLangComponent* textLangComponent = textHandle.try_get<TextLangComponent>();
+	//TextAlignmentComponent& textAlignComponent = textHandle.get<TextAlignmentComponent>();
 
-	Surface* textSurface = surfaceComponent.getSurface();
-	textSurface->draw();
+	//Surface* textSurface = surfaceComponent.getSurface();
+	//textSurface->draw();
 
-	Language* lang = textLangComponent != nullptr ? textLangComponent->_lang : getGame()->getLanguage();
+	//Language* lang = textLangComponent != nullptr ? textLangComponent->_lang : getGame()->getLanguage();
 
-	// early out
-	if (textComponent._text.empty() || textFontComponent._font == 0)
-	{
-		return;
-	}
-
-	processText(screenRectComponent, textComponent, textFontComponent, lang);
-	
-	//// Show text borders for debugging
-	//if (Options::debugUi)
+	//// early out
+	//if (textComponent._text.empty() || textFontComponent._font == 0)
 	//{
-	//	SDL_Rect r;
-	//	r.w = getWidth();
-	//	r.h = getHeight();
-	//	r.x = 0;
-	//	r.y = 0;
-	//	this->drawRect(&r, 5);
-	//	r.w -= 2;
-	//	r.h -= 2;
-	//	r.x++;
-	//	r.y++;
-	//	this->drawRect(&r, 0);
+	//	return;
 	//}
-	
-	int x = 0, y = 0, line = 0, height = 0;
-	Font* font = textFontComponent._font;
-	int color = textComponent._color;
-	const UString& s = textComponent._processedText;
-	
-	height = getTextHeight(textComponent, -1);
-	
-	if (textComponent._scroll && (screenRectComponent.height - height < 0))
-	{
-		y = textComponent._scrollY;
-	}
-	else
-	{
-		switch (textAlignComponent._valign)
-		{
-		case TextVAlign::ALIGN_TOP:
-			y = 0;
-			break;
-		case TextVAlign::ALIGN_MIDDLE:
-			y = (int)ceil((screenRectComponent.height - height) / 2.0);
-			break;
-		case TextVAlign::ALIGN_BOTTOM:
-			y = screenRectComponent.height - height;
-			break;
-		}
-	}
-	
-	x = getLineX(line, screenRectComponent, textComponent, textAlignComponent, textFontComponent, lang);
-	
-	// Set up text color
-	int mul = 1;
-	if (textComponent._contrast)
-	{
-		mul = 3;
-	}
-	
-	// Set up text direction
-	int dir = 1;
-	if (lang->getTextDirection() == DIRECTION_RTL)
-	{
-		dir = -1;
-	}
-	
-	// Invert text by inverting the font palette on index 3 (font palettes use indices 1-5)
-	int mid = textComponent._invert ? 3 : 0;
-	
-	// Draw each letter one by one
-	for (UString::const_iterator c = s.begin(); c != s.end(); ++c)
-	{
-		if (Unicode::isSpace(*c) || *c == '\t')
-		{
-			x += dir * font->getCharSize(*c).w;
-		}
-		else if (Unicode::isLinebreak(*c))
-		{
-			line++;
-			y += font->getCharSize(*c).h;
-			x = getLineX(line, screenRectComponent, textComponent, textAlignComponent, textFontComponent, lang);
-			if (*c == Unicode::TOK_NL_SMALL)
-			{
-				font = textFontComponent._small;
-			}
-		}
-		else if (*c == Unicode::TOK_COLOR_FLIP)
-		{
-			color = (color == textComponent._color ? textComponent._color2 : textComponent._color);
-		}
-		else
-		{
-			if (dir < 0)
-				x += dir * font->getCharSize(*c).w;
-			SurfaceCrop chr = font->getChar(*c);
-			chr.setX(x);
-			chr.setY(y);
-			ShaderDraw<PaletteShift>(ShaderSurface(textSurface, 0, 0), ShaderCrop(chr), ShaderScalar(color), ShaderScalar(mul), ShaderScalar(mid));
-			if (dir > 0)
-				x += dir * font->getCharSize(*c).w;
-		}
-	}
 
-	SDL_Rect target{};
-	target.x = screenRectComponent.x;
-	target.y = screenRectComponent.y;
-	SDL_BlitSurface(textSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
+	//processText(screenRectComponent, textComponent, textFontComponent, lang);
+	//
+	////// Show text borders for debugging
+	////if (Options::debugUi)
+	////{
+	////	SDL_Rect r;
+	////	r.w = getWidth();
+	////	r.h = getHeight();
+	////	r.x = 0;
+	////	r.y = 0;
+	////	this->drawRect(&r, 5);
+	////	r.w -= 2;
+	////	r.h -= 2;
+	////	r.x++;
+	////	r.y++;
+	////	this->drawRect(&r, 0);
+	////}
+	//
+	//int x = 0, y = 0, line = 0, height = 0;
+	//Font* font = textFontComponent._font;
+	//int color = textComponent._color;
+	//const UString& s = textComponent._processedText;
+	//
+	//height = getTextHeight(textComponent, -1);
+	//
+	//if (textComponent._scroll && (screenRectComponent.height - height < 0))
+	//{
+	//	y = textComponent._scrollY;
+	//}
+	//else
+	//{
+	//	switch (textAlignComponent._valign)
+	//	{
+	//	case TextVAlign::ALIGN_TOP:
+	//		y = 0;
+	//		break;
+	//	case TextVAlign::ALIGN_MIDDLE:
+	//		y = (int)ceil((screenRectComponent.height - height) / 2.0);
+	//		break;
+	//	case TextVAlign::ALIGN_BOTTOM:
+	//		y = screenRectComponent.height - height;
+	//		break;
+	//	}
+	//}
+	//
+	//x = getLineX(line, screenRectComponent, textComponent, textAlignComponent, textFontComponent, lang);
+	//
+	//// Set up text color
+	//int mul = 1;
+	//if (textComponent._contrast)
+	//{
+	//	mul = 3;
+	//}
+	//
+	//// Set up text direction
+	//int dir = 1;
+	//if (lang->getTextDirection() == DIRECTION_RTL)
+	//{
+	//	dir = -1;
+	//}
+	//
+	//// Invert text by inverting the font palette on index 3 (font palettes use indices 1-5)
+	//int mid = textComponent._invert ? 3 : 0;
+	//
+	//// Draw each letter one by one
+	//for (UString::const_iterator c = s.begin(); c != s.end(); ++c)
+	//{
+	//	if (Unicode::isSpace(*c) || *c == '\t')
+	//	{
+	//		x += dir * font->getCharSize(*c).w;
+	//	}
+	//	else if (Unicode::isLinebreak(*c))
+	//	{
+	//		line++;
+	//		y += font->getCharSize(*c).h;
+	//		x = getLineX(line, screenRectComponent, textComponent, textAlignComponent, textFontComponent, lang);
+	//		if (*c == Unicode::TOK_NL_SMALL)
+	//		{
+	//			font = textFontComponent._small;
+	//		}
+	//	}
+	//	else if (*c == Unicode::TOK_COLOR_FLIP)
+	//	{
+	//		color = (color == textComponent._color ? textComponent._color2 : textComponent._color);
+	//	}
+	//	else
+	//	{
+	//		if (dir < 0)
+	//			x += dir * font->getCharSize(*c).w;
+	//		SurfaceCrop chr = font->getChar(*c);
+	//		chr.setX(x);
+	//		chr.setY(y);
+	//		ShaderDraw<PaletteShift>(ShaderSurface(textSurface, 0, 0), ShaderCrop(chr), ShaderScalar(color), ShaderScalar(mul), ShaderScalar(mid));
+	//		if (dir > 0)
+	//			x += dir * font->getCharSize(*c).w;
+	//	}
+	//}
+
+	//SDL_Rect target{};
+	//target.x = screenRectComponent.x;
+	//target.y = screenRectComponent.y;
+	//SDL_BlitSurface(textSurface->getSDLSurface(), nullptr, getGame()->getScreen()->getSurface(), &target);
 }
 
 void TextSystem::setScrollable(entt::handle textHandle, bool scroll)
@@ -773,7 +773,7 @@ void TextSystem::setScrollable(entt::handle textHandle, bool scroll)
 // * in the palette to be displayed.
 // * @param color Color value.
 // */
-//void TextComponent::setColor(Uint8 color)
+//void TextComponent::setColor(uint8_t color)
 //{
 //	_color = color;
 //	_color2 = color;
@@ -784,7 +784,7 @@ void TextSystem::setScrollable(entt::handle textHandle, bool scroll)
 // * Returns the color used to render the text.
 // * @return Color value.
 // */
-//Uint8 TextComponent::getColor() const
+//uint8_t TextComponent::getColor() const
 //{
 //	return _color;
 //}
@@ -795,7 +795,7 @@ void TextSystem::setScrollable(entt::handle textHandle, bool scroll)
 // * a 0x01 in the string.
 // * @param color Color value.
 // */
-//void TextComponent::setSecondaryColor(Uint8 color)
+//void TextComponent::setSecondaryColor(uint8_t color)
 //{
 //	_color2 = color;
 //	_surfaceComponent->getSurface()->setRedraw(true);
@@ -805,7 +805,7 @@ void TextSystem::setScrollable(entt::handle textHandle, bool scroll)
 // * Returns the secondary color used to render the text.
 // * @return Color value.
 // */
-//Uint8 TextComponent::getSecondaryColor() const
+//uint8_t TextComponent::getSecondaryColor() const
 //{
 //	return _color2;
 //}

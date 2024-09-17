@@ -60,7 +60,7 @@ private:
 	int64_t _total;
 	double _spaceChange;
 	Timer *_timerInc, *_timerDec;
-	Uint8 _ammoColor;
+	uint8_t _ammoColor;
 	OptionsOrigin _origin;
 	bool _reset;
 	bool _sellAllButOne;
