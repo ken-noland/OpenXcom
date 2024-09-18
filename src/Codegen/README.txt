@@ -27,13 +27,17 @@ The first thing it does is load the template definition file. This file is a jso
 has a list of templates. Each template has a name, and a file. The two core templates are
 "main_template" and "header_template", and the rest of the templates are in the
 "specializations" object. The "main_template" is used for the main source file, and the
-"header_template" should be used for the header file.
+"header_template" should be used to generate the list of includes at the top of the main
+source file.
 
-The "specializations" object is a map of type names to template names. Most types will use
-the "object_template", but there is built in support for std::vector through the
-"vector_template" and std::map through the "map_template". Furthermore, there are some types
-in the game that require special handling, such as the OpenXcom::Option<> type, which contain
-many layers and, during serialization, we only want to affect one of them. You can add any
-specialization you want to the "specializations" object, and if the "Codegen-Override-Template"
-metadata is set to that specialization, it will use that template instead of the default.
+The "specializations" object in the template definition json is a map of type names to
+template names. Most types will use the "object_template", but there is built in support for
+std::vector through the "vector_template" and std::map through the "map_template".
+Furthermore, there are some types in the game that require special handling, such as the
+OpenXcom::Option<> type, which contain many layers and, during serialization, we only want to
+affect one of them. You can add any specialization you want to the "specializations" object,
+and if the "Codegen-Override-Template" metadata is set to that specialization, it will use
+that template instead of the default.
+
+Once the templates are loaded, it then goes through each type and generates the code.
 

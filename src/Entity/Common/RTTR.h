@@ -52,5 +52,4 @@ enum class PropertySerialize
 	IF_SET
 };
 
-
 } // OpenXcom

@@ -4,5 +4,6 @@
 {% endfor %}
 
 #include <nlohmann/json.hpp>
+#include <cassert>
 
 // END JsonHeader.cpp.inja

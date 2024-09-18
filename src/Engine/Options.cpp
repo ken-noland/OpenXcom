@@ -1,3 +1,4 @@
+#include "Options.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -18,10 +19,12 @@
  */
 #include "Options.h"
 #include "Logger.h"
+#include "Json.h"
 #include "../version.h"
 
 #include <sstream>
 #include <iostream>
+#include <fstream>
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -225,6 +228,7 @@ void Options::showVersion()
 {
 }
 
+
 void Options::showHelp()
 {
 	std::ostringstream help;
@@ -305,12 +309,67 @@ bool Options::loadCommandLine(const std::vector<std::string>& argv)
 
 bool Options::loadFile()
 {
-	// read the options from the config file
+	//read in the config file
+	std::filesystem::path configFile = getConfigFile();
+	std::ifstream file(configFile);
+	if (!file.is_open())
+	{
+		std::cerr << "Failed to open configuration file: " << configFile << std::endl;
+		return false;
+	}
 
-//	fromJson<>
+	//parse out the json
+	nlohmann::json json;
+	file >> json;
+
+	file.close();
+
+	// read the options from the config file
+	GameOptions& gameOptions = std::get<OptionCategory<GameOptions>>(_optionCategories).optionsStruct;
+	if (!fromJson(json["gameOptions"], gameOptions))
+	{
+		Log(LOG_ERROR) << "Failed to load options from file.";
+		return false;
+	}
+
 	return true;
 }
 
+
+bool OpenXcom::Options::saveFile()
+{
+	nlohmann::json json;
+
+	const GameOptions& gameOptions = std::get<OptionCategory<GameOptions>>(_optionCategories).optionsStruct;
+	toJson(gameOptions, json["gameOptions"]);
+
+	std::filesystem::path configFile = getConfigFile();
+
+	// ensure the path to the config file exists, and create it if it doesn't
+	std::filesystem::path configPath = configFile.parent_path();
+	if (!std::filesystem::exists(configPath))
+	{
+		if (!std::filesystem::create_directories(configPath))
+		{
+			std::cerr << "Failed to create configuration directory: " << configPath << std::endl;
+			return false;
+		}
+	}
+
+	// write out the config file
+	std::ofstream file(configFile);
+	if (!file.is_open())
+	{
+		std::cerr << "Failed to open configuration file: " << configFile << std::endl;
+		return false;
+	}
+
+	file << json.dump(0, '\t', true);
+
+	file.close();
+
+	return true;
+}
 
 std::filesystem::path getUserDocumentsDirectory()
 {
@@ -394,6 +453,24 @@ bool Options::loadDefaults()
 		set<&GameOptions::_locale>(OptionLevel::DEFAULT, getDefaultLocale());
 	}
 
+	if (!isSet<&GameOptions::_logPath>())
+	{
+		// No log path specified, so use the platform options to find it.
+		set<&GameOptions::_logPath>(OptionLevel::DEFAULT, getXcomDocumentsDirectory() / "log.txt");
+	}
+
+	if (!isSet<&GameOptions::_mods>())
+	{
+		// No mods specified, so default to no mods
+		set<&GameOptions::_mods>(OptionLevel::DEFAULT, {});
+	}
+
+	if (!isSet<&GameOptions::_master>())
+	{
+		// No master game specified, so default to xcom1
+		set<&GameOptions::_master>(OptionLevel::DEFAULT, "xcom1");
+	}
+
 	return true;
 }
 
@@ -409,21 +486,29 @@ bool Options::load(const std::vector<std::string>& argv)
 	if (!loadDefaults()) { return false; }
 
 	// Then, load up the options from the config file
-	if (!loadFile()) { return false; }
+	loadFile();	//We honestly don't care if it succeeds or fails. We just want it to try!
 
 	return true;
 }
 
 /// Save options to file.
-void Options::save()
+bool Options::save()
 {
-	// we ignore command line options for saving the config file
-
+	return saveFile();
 }
 
 /// Reset options to default values.
 void Options::reset()
 {
+}
+
+std::filesystem::path OpenXcom::Options::getConfigFile() const
+{
+	assert(isSet<&GameOptions::_cfgPath>());
+
+	std::filesystem::path configPath = get<&GameOptions::_cfgPath>();
+	std::filesystem::path configFile = configPath / "options.json";
+	return configFile;
 }
 
 }

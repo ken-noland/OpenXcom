@@ -1,5 +1,35 @@
 // BEGIN JsonVector.cpp.inja
 
+template<>
+bool OpenXcom::fromJson<{{type.fullName}}>(const nlohmann::json& json, {{type.fullName}}& object)
+{
+	object.reserve(json.size());
+	for (const auto& element : json)
+	{
+		{{type.fullName}}::value_type value;
+		if (!fromJson(element, value))
+		{
+			return false;
+		}
+		object.push_back(value);
+	}
+	return true;
+}
 
+template<>
+bool OpenXcom::toJson<{{type.fullName}}>(const {{type.fullName}}& object, nlohmann::json& json)
+{
+	json = nlohmann::json::array();
+	for (const auto& element : object)
+	{
+		nlohmann::json value;
+		if (!toJson(element, value))
+		{
+			return false;
+		}
+		json.push_back(value);
+	}
+	return true;
+}
 
 // END JsonVector.cpp.inja

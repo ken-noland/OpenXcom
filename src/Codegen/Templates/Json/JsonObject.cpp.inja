@@ -3,15 +3,15 @@
 // {{type.name}}
 
 template<>
-bool fromJson<{{type.fullName}}>(const nlohmann::json& json, {{type.fullName}}& object)
+bool OpenXcom::fromJson<{{type.fullName}}>(const nlohmann::json& json, {{type.fullName}}& object)
 {
-	{% for property in type.properties %}if(!fromJson<{{property.fulltype}}>(json["{{property.name}}"], object.{{property.name}})) { return false; }
+	{% for property in type.properties %}if(!(json.contains("{{property.name}}") && fromJson<{{property.fulltype}}>(json["{{property.name}}"], object.{{property.name}}))) { return false; }
 	{% endfor %}
 	return true;
 }
 
 template<>
-bool toJson<{{type.fullName}}>(const {{type.fullName}}& object, nlohmann::json& json)
+bool OpenXcom::toJson<{{type.fullName}}>(const {{type.fullName}}& object, nlohmann::json& json)
 {
 	json = nlohmann::json::object();
 

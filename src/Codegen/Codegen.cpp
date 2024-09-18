@@ -20,6 +20,7 @@
 #include <iosfwd>
 #include <filesystem>
 #include <fstream>
+#include <list>
 
 #include <nlohmann/json.hpp>
 
@@ -73,7 +74,6 @@ inline std::string trim_copy(std::string s)
 	return s;
 }
 
-
 struct TypeComparator
 {
 	bool operator()(const SimpleRTTR::Type& lhs, const SimpleRTTR::Type& rhs) const
@@ -88,7 +88,7 @@ struct CommandLineArguments
 	std::filesystem::path outputPath;
 };
 
-using TypeSet = std::set<SimpleRTTR::Type, TypeComparator>;
+using TypeSet = std::list<SimpleRTTR::Type>;
 
 void collectTemplateTypes(TypeSet& types, const SimpleRTTR::Type& type, const std::vector<std::function<bool(const SimpleRTTR::Type&)>>& filters)
 {
@@ -114,7 +114,7 @@ void collectTemplateTypes(TypeSet& types, const SimpleRTTR::Type& type, const st
 
 			if (passesAllFilters)
 			{
-				types.insert(templateArg);
+				types.push_front(templateArg);
 				// Recursively collect template types
 				collectTemplateTypes(types, templateArg, filters);
 			}
@@ -139,7 +139,7 @@ void collectProperties(TypeSet& types, const SimpleRTTR::Type& type, const std::
 		}
 		if (passesAllFilters)
 		{
-			types.insert(propType);
+			types.push_front(propType);
 		}
 	}
 }
@@ -163,7 +163,7 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 
 		if (passesAllFilters)
 		{
-			types.insert(type);
+			types.push_back(type);
 		}
 	}
 
@@ -221,7 +221,20 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 		collectTemplateTypes(types, type, otherFilters);
 	}
 
-	//CollectParameters(types, paramFilters);
+	// remove duplicates from unsorted list
+	std::set<SimpleRTTR::Type, TypeComparator> found;
+	for (TypeSet::iterator it = types.begin(); it != types.end();)
+	{
+		if (found.find(*it) != found.end())
+		{
+			it = types.erase(it);
+		}
+		else
+		{
+			found.insert(*it);
+			++it;
+		}
+	}
 }
 
 // Run a template given a metaKey that contains a ObjectSerialize value which is used to determine if the type should be serialized

@@ -22,6 +22,24 @@
 
 using namespace OpenXcom;
 
+TEST(OptionsTest, TestOptionsLoad)
+{
+	Options options;
+
+	std::vector<std::string> argv;
+	EXPECT_TRUE(options.load(argv));
+}
+
+TEST(OptionsTest, TestOptionsSave)
+{
+	Options options;
+
+	std::vector<std::string> argv;
+	options.load(argv);//ignore the output of load
+
+	EXPECT_TRUE(options.save());
+}
+
 TEST(OptionsTest, TestOptionsVersion)
 {
 	Options options;

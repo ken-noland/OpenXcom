@@ -25,6 +25,9 @@
 #include <functional>
 #include <filesystem>
 
+
+#include "Logger.h"
+
 namespace OpenXcom
 {
 
@@ -89,14 +92,26 @@ struct Option
 		throw std::runtime_error("Option not set at any level");
 	}
 
-	ValueType getAt(OptionLevel level) const
+    // getAt with a parameter pack
+	template <typename... OptionLevels>
+	ValueType getAt(OptionLevels... levels) const
 	{
-		return values[(int)level].value();
+		static_assert((std::is_same_v<OptionLevels, OptionLevel> && ...),
+					  "All arguments must be of type OptionLevel");
+
+		for (OptionLevel level : {levels...})
+		{
+			if (values[static_cast<size_t>(level)].has_value())
+			{
+				return values[static_cast<size_t>(level)].value();
+			}
+		}
+		throw std::runtime_error("Option not set at any of the specified levels");
 	}
 
 	bool isSet() const
 	{
-		for (int i = 0; i < OPTION_LEVEL_COUNT - 1; i++) // ignore default by subtracting 1 from OPTION_LEVEL_COUNT
+		for (int i = 0; i < OPTION_LEVEL_COUNT; i++)
 		{
 			if (values[i].has_value())
 			{
@@ -148,16 +163,17 @@ struct GameOptions
 {
 	Option<bool> _shouldRun = true;
 
-	Option<std::vector<std::filesystem::path>> _dataPath	= {};
-	Option<std::filesystem::path> _userPath					= std::filesystem::path("./user");
-	Option<std::filesystem::path> _cfgPath					= std::filesystem::path("./user");
+	Option<std::vector<std::filesystem::path>> _dataPath;
+	Option<std::filesystem::path> _userPath;
+	Option<std::filesystem::path> _cfgPath;
 
-	Option<std::string> _locale								= "en-US";
+	Option<std::string> _locale;
 
 	Option<bool> _continueSave								= false;
 	Option<std::filesystem::path> _lastSave					= std::filesystem::path();
 
-	Option<std::filesystem::path> _logPath					= std::filesystem::path("log.txt");
+	Option<std::filesystem::path> _logPath;
+	Option<SeverityLevel> _logLevel							= SeverityLevel::LOG_INFO;
 
 	Option<std::vector<std::string>> _mods					= {};
 
@@ -196,7 +212,10 @@ private:
 	bool loadCommandLine(const std::vector<std::string>& argv);
 
 	bool loadFile();
+	bool saveFile();
+
 	bool loadDefaults();
+
 
 public:
 	/// Constructor.
@@ -207,9 +226,11 @@ public:
 	/// Load options from file.
 	bool load(const std::vector<std::string>& argv);
 	/// Save options to file.
-	void save();
+	bool save();
 	/// Reset options to default values.
 	void reset();
+
+	std::filesystem::path getConfigFile() const;
 
     // Set the value of an option at a specific level
 	template <auto MemberPtr>
@@ -282,13 +303,13 @@ private:
 	template <typename OptionsStructType>
 	OptionCategory<OptionsStructType>& getOptionCategory()
 	{
-		return std::get<OptionCategory<OptionsStructType>>(optionCategories);
+		return std::get<OptionCategory<OptionsStructType>>(_optionCategories);
 	}
 
 	template <typename OptionsStructType>
 	const OptionCategory<OptionsStructType>& getOptionCategory() const
 	{
-		return std::get<OptionCategory<OptionsStructType>>(optionCategories);
+		return std::get<OptionCategory<OptionsStructType>>(_optionCategories);
 	}
 
 	// Store OptionCategory instances in a tuple
@@ -296,7 +317,7 @@ private:
 		OptionCategory<GameOptions>,
 		OptionCategory<GraphicsOptions>
 		>
-		optionCategories;
+		_optionCategories;
 };
 
 }
