@@ -35,7 +35,8 @@ namespace OpenXcom
 
 SIMPLERTTR
 {
-	SimpleRTTR::Registration().Type<GameOptions>().Meta("Serialize", ObjectSerialize::ALWAYS) // special case for options, since we only want to serialize a particular layer of the options to disk.
+	SimpleRTTR::Registration().Type<GameOptions>()
+		.Meta("Serialize", ObjectSerialize::ALWAYS) // special case for options, since we only want to serialize a particular layer of the options to disk.
 		.Property(REGISTER_PROPERTY(GameOptions, _shouldRun))
 		.Meta("FriendlyName", "shouldRun")
 		.Meta("Description", "Determines if the game will run. Only for internal use.")

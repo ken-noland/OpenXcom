@@ -1,5 +1,20 @@
 // BEGIN JsonOption.cpp.inja
 
+template<>
+bool fromJson<{{type.fullName}}>(const nlohmann::json& json, {{type.fullName}}& object)
+{
+	{{type.template_params.0.fulltype}} value;
+	if (!fromJson<{{type.template_params.0.fulltype}}>(json, value)) return false;
 
+	object.set(OpenXcom::OptionLevel::CONFIG, value);
+	return true;
+}
+
+template<>
+bool toJson<{{type.fullName}}>(const {{type.fullName}}& object, nlohmann::json& json)
+{
+	{{type.template_params.0.fulltype}} value = object.getAt(OpenXcom::OptionLevel::CONFIG);
+	return toJson<{{type.template_params.0.fulltype}}>(value, json);
+}
 
 // END JsonOption.cpp.inja

@@ -698,17 +698,27 @@ endif()
 
 # Define the generated source files
 set(generated_sources
-    "${CMAKE_BINARY_DIR}/generated/generated1.cpp"
+    "${CMAKE_BINARY_DIR}/generated/json.cpp"
     # Add more generated files as needed
+)
+
+set(codegen_templates
+    "Codegen/Templates/Json/Json.cpp.inja"
+    "Codegen/Templates/Json/JsonHeader.cpp.inja"
+    "Codegen/Templates/Json/JsonMap.cpp.inja"
+    "Codegen/Templates/Json/JsonObject.cpp.inja"
+    "Codegen/Templates/Json/JsonOption.cpp.inja"
+    "Codegen/Templates/Json/JsonVector.cpp.inja"
+    "Codegen/Templates/Json/JsonTemplate.json"
 )
 
 # Custom command to generate the source files using codegen
 add_custom_command(
-    OUTPUT ${generated_sources}
+    OUTPUT "${CMAKE_BINARY_DIR}/generated/json.cpp"
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/generated
-    COMMAND $<TARGET_FILE:codegen>
+    COMMAND $<TARGET_FILE:codegen> -template "${CMAKE_CURRENT_SOURCE_DIR}/Codegen/Templates/Json/JsonTemplate.json" -output "${CMAKE_BINARY_DIR}/generated/json.cpp"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated
-    DEPENDS codegen
+    DEPENDS codegen ${codegen_templates}
     COMMENT "Generating source files with codegen"
 )
 

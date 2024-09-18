@@ -7,7 +7,15 @@
 
 {% include "header_template" %}
 
-{% for type in types %}{{ render_type(type) }}
+//forward declarations
+template<typename ClassType>
+bool fromJson(const nlohmann::json& json, ClassType& type);
+
+template<typename ClassType>
+bool toJson(const ClassType& type, nlohmann::json& json);
+
+{% for type in types %}// -- {{ type.fullName }} --
+{{ render_type(type) }}
 {% endfor %}
 
 // END Json.cpp.inja

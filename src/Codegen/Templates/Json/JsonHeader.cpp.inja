@@ -3,4 +3,6 @@
 {% for header in headers %}{{ header }}
 {% endfor %}
 
+#include <nlohmann/json.hpp>
+
 // END JsonHeader.cpp.inja

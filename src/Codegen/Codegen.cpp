@@ -440,7 +440,60 @@ std::string getTemplateForType(const SimpleRTTR::Type& type)
 	{
 		return type.Meta().Get("Codegen-Override-Template").Value().GetAs<const char*>();
 	}
-	return "";
+	else if (type.Namespaces().size() == 1 && type.Namespaces()[0] == "std")
+	{
+		if (type.Name() == "vector")
+		{
+			return "vector_template";
+		}
+		else if (type.Name() == "map" || type.Name() == "unordered_map")
+		{
+			return "map_template";
+		}
+		else if (type.Name() == "array")
+		{
+			return "array_template";
+		}
+		else
+		{
+			std::cerr << "No template for std type: " << type.FullyQualifiedName() << std::endl;
+		}
+	}
+
+	return "object_template";
+}
+
+std::string getFullNameForType(const SimpleRTTR::Type& type)
+{
+	std::string fullName;
+
+	// add namespace
+	if (type.Namespaces().size() > 0)
+	{
+		for (const std::string& ns : type.Namespaces())
+		{
+			fullName += ns + "::";
+		}
+	}
+
+	fullName += type.Name();
+
+	// add template parameters
+	if (type.TemplateParams().size() > 0)
+	{
+		fullName += "<";
+		for (size_t i = 0; i < type.TemplateParams().size(); ++i)
+		{
+			if (i > 0)
+			{
+				fullName += ", ";
+			}
+
+			fullName += getFullNameForType(type.TemplateParams()[i].Type());
+		}
+		fullName += ">";
+	}
+	return fullName;
 }
 
 bool convertTypesToJson(nlohmann::json::reference typesJson, const TypeSet& types)
@@ -450,17 +503,37 @@ bool convertTypesToJson(nlohmann::json::reference typesJson, const TypeSet& type
 	{
 		nlohmann::json typeJson;
 		typeJson["name"] = type.Name();
-		typeJson["template"] = "JsonType.cpp.inja";
-		//typeJson["namespace"] = type.Namespaces();
-		//typeJson["fully_qualified_name"] = type.FullyQualifiedName();
-		//typeJson["properties"] = nlohmann::json::array();
-		//for (const SimpleRTTR::Property& prop : type.Properties())
-		//{
-		//	nlohmann::json propJson;
-		//	propJson["name"] = prop.Name();
-		//	propJson["type"] = prop.Type().FullyQualifiedName();
-		//	typeJson["properties"].push_back(propJson);
-		//}
+		typeJson["codegen_template"] = getTemplateForType(type);
+		typeJson["fullName"] = getFullNameForType(type);
+		typeJson["namespace"] = type.Namespaces();
+		typeJson["fully_qualified_name"] = type.FullyQualifiedName();
+
+		typeJson["properties"] = nlohmann::json::array();
+		for (const SimpleRTTR::Property& prop : type.Properties())
+		{
+			nlohmann::json propJson;
+
+			propJson["name"] = prop.Name();
+			propJson["fulltype"] = getFullNameForType(prop.Type());
+			propJson["type"] = prop.Type().Name();
+
+			typeJson["properties"].push_back(propJson);
+		}
+
+		if (type.TemplateParams().size() > 0)
+		{
+			typeJson["template_params"] = nlohmann::json::array();
+			for (const SimpleRTTR::TypeReference& templateRefArg : type.TemplateParams())
+			{
+				const SimpleRTTR::Type& templateArg = templateRefArg.Type();
+				nlohmann::json templateArgJson;
+				templateArgJson["name"] = templateArg.Name();
+				templateArgJson["fulltype"] = getFullNameForType(templateArg);
+				templateArgJson["type"] = templateArg.Name();
+				typeJson["template_params"].push_back(templateArgJson);
+			}
+		}
+
 		typesJson.push_back(typeJson);
 	}
 	return true;
@@ -472,10 +545,10 @@ bool generateCode(const CommandLineArguments& args)
 	collectTypeInfo(types, "Serialize"); // collect all types that are serializable, as well as any dependant types
 
 	// for debugging purposes only
-	for (const SimpleRTTR::Type& type : types)
-	{
-		std::cout << type.FullyQualifiedName() << std::endl;
-	}
+	//for (const SimpleRTTR::Type& type : types)
+	//{
+	//	std::cout << type.FullyQualifiedName() << std::endl;
+	//}
 
 	std::vector<std::string> headers;
 	if (!collectHeaders(headers, types))
@@ -498,13 +571,27 @@ bool generateCode(const CommandLineArguments& args)
 	file.close();
 
 	inja::Environment env;
-
+	std::map<std::string, inja::Template> typeTemplates;
 	
 	// add callback which selectively renderers the correct template for each type
-	env.add_callback("render_type", 1, [](inja::Arguments& args) {
+	env.add_callback("render_type", 1, [&env, &typeTemplates](inja::Arguments& args) {
 		nlohmann::json type = args.at(0)->get<nlohmann::json>();
 
-		return "test";
+		// get the template for the type
+		std::string templateName = type["codegen_template"];
+
+		// check if the template exists in the map, and if not, fail
+		std::map<std::string, inja::Template>::iterator it = typeTemplates.find(templateName);
+		if (it == typeTemplates.end())
+		{
+			throw new inja::RenderError("Template not found: " + templateName, inja::SourceLocation(0, 0));
+		}
+
+		nlohmann::json data;
+		data["type"] = type;
+
+		// render the template
+		return env.render(it->second, data);
 	});
 
 	// load up the header template
@@ -528,7 +615,7 @@ bool generateCode(const CommandLineArguments& args)
 		{
 			return false;
 		}
-		env.include_template(it.key(), specializationTemplate);
+		typeTemplates[it.key()] = specializationTemplate;
 	}
 
 	// add headers to the environment

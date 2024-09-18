@@ -1,5 +1,23 @@
 // BEGIN JsonObject.cpp.inja
 
+// {{type.name}}
 
+template<>
+bool fromJson<{{type.fullName}}>(const nlohmann::json& json, {{type.fullName}}& object)
+{
+	{% for property in type.properties %}if(!fromJson<{{property.fulltype}}>(json["{{property.name}}"], object.{{property.name}})) { return false; }
+	{% endfor %}
+	return true;
+}
+
+template<>
+bool toJson<{{type.fullName}}>(const {{type.fullName}}& object, nlohmann::json& json)
+{
+	json = nlohmann::json::object();
+
+	{% for property in type.properties %}if(!toJson<{{property.fulltype}}>(object.{{property.name}}, json["{{property.name}}"])) { return false; }
+	{% endfor %}
+	return true;
+}
 
 // END JsonObject.cpp.inja
