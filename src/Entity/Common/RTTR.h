@@ -37,5 +37,20 @@ void* GetComponentRawPointer(entt::handle handle)
 	return &handle.get<ComponentType>();
 }
 
+// Enum class used to specify how to serialize an object
+enum class ObjectSerialize
+{
+	NEVER,	//default
+	ALWAYS
+};
+
+// Enum class used to specify how to serialize a property
+enum class PropertySerialize
+{
+	NEVER, // default
+	ALWAYS,
+	IF_SET
+};
+
 
 } // OpenXcom

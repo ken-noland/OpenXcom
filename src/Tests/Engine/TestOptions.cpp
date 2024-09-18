@@ -39,7 +39,7 @@ TEST(OptionsTest, TestOptionsCommandLineArgumentNotValid)
 	Options options;
 
 	std::vector<std::string> argv;
-	argv.push_back("-thisIsNotValid");
+	argv.push_back("-thisIsNotAValidArgument");
 
 	EXPECT_FALSE(options.load(argv));
 }

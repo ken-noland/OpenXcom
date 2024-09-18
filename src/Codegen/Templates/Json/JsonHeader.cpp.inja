@@ -1,0 +1,6 @@
+// BEGIN JsonHeader.cpp.inja
+
+{% for header in headers %}{{ header }}
+{% endfor %}
+
+// END JsonHeader.cpp.inja

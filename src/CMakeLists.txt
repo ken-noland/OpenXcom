@@ -492,9 +492,18 @@ set ( cxx_src
     ${entity_interface_src}
 )
 
+set ( c_src
+  ../libs/miniz/miniz.c
+)
+set_property ( SOURCE ${c_src} APPEND PROPERTY COMPILE_DEFINITIONS MINIZ_NO_STDIO )
+
 if(ENABLE_ENTITY_INSPECTOR)
   list(APPEND cxx_src ${inspector_src})
 endif()
+
+# All the source files that are necessary to build the project, excluding the main.cpp file
+set ( openxcom_src ${c_src} ${cxx_src} ${embed_src} )
+
 
 set ( c_src
   ../libs/miniz/miniz.c
@@ -593,6 +602,24 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SimpleRTTR)
 
+# Fetch nlohmann/json
+#  nlohmann/json is used for JSON serialization which is used all over the place
+FetchContent_Declare(
+  nlohmann_json
+  GIT_REPOSITORY https://github.com/nlohmann/json
+  GIT_TAG "v3.11.3"
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
+# Fetch inja
+#  inja is used for templating for the code generation
+FetchContent_Declare(
+  inja
+  URL https://github.com/pantor/inja/releases/download/v3.4.0/inja.hpp
+  DOWNLOAD_NO_EXTRACT TRUE
+)
+FetchContent_MakeAvailable(inja)
+
 # Fetch wxWidgets
 #  wxWidgets is used for the entity inspector
 if(ENABLE_ENTITY_INSPECTOR)
@@ -616,141 +643,6 @@ if(ENABLE_ENTITY_INSPECTOR)
     
 endif() # ENABLE_ENTITY_INSPECTOR
 
-set ( data_install_dir bin )
-if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
-  set_property ( SOURCE Engine/Options.cpp APPEND PROPERTY COMPILE_DEFINITIONS _DEBUG )
-  set_property ( SOURCE OpenXcom.rc APPEND PROPERTY COMPILE_DEFINITIONS _DEBUG )
-endif ()
-if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" )
-  # attempt to limit the executable size
-  set_property ( SOURCE ${cxx_src} APPEND_STRING PROPERTY COMPILE_FLAGS -femit-struct-debug-reduced\ )
-endif ()
-if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-  # C++ - only warnings
-  # C and C++ warnings
-  set_property ( SOURCE Engine/Scalers/xbrz.cpp APPEND_STRING PROPERTY COMPILE_FLAGS -Wno-unused\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wall\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wextra\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Winit-self\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wmissing-include-dirs\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wunknown-pragmas\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wmissing-format-attribute\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wredundant-decls\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wformat-security\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wtype-limits\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wempty-body\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wuninitialized\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wignored-qualifiers\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wno-unused-parameter\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wno-inline\ )
-  if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" )
-    # apple clang 11.0 goes crazy with -Wshadow on the yaml-cpp source code
-    set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wshadow\ )
-    # add warning flags recognized by g++ but not by clang
-    set_property ( SOURCE ${cxx_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wsuggest-override\ )
-    set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wclobbered\ )
-    set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Wlogical-op\ )
-  elseif ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-    # add warning flags recognized by clang but not by g++
-  endif ()
-  if ( FATAL_WARNING )
-    set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Werror\ )
-  endif ()
-endif ()
-
-if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -Qunused-arguments\ )
-  set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS -pipe\ )
-  if ( ENABLE_CLANG_ANALYSIS )
-    set_property ( SOURCE ${cxx_src} ${c_src} APPEND_STRING PROPERTY COMPILE_FLAGS --analyze\ )
-  endif ()
-endif ()
-
-if ( MSVC )
-  # Set warning levels for Debug and Release with debug info
-  set ( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W${MSVC_WARNING_LEVEL}" )
-  set ( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /W${MSVC_WARNING_LEVEL}" )
-  if ( FATAL_WARNING )
-    add_compile_options ( /WX )
-  endif ( FATAL_WARNING )
-  set ( CMAKE_EXE_LINKER_FLAGS "/manifest:no" )
-  set ( CMAKE_MODULE_LINKER_FLAGS "/manifest:no" )
-  set ( CMAKE_SHARED_LINKER_FLAGS="/manifest:no" )
-endif ()
-
-if ( DUMP_CORE )
-  set_property ( SOURCE main.cpp APPEND PROPERTY COMPILE_DEFINITIONS DUMP_CORE )
-endif ()
-
-if ( EMBED_ASSETS )
-  set_property ( SOURCE OpenXcom.rc APPEND PROPERTY COMPILE_DEFINITIONS EMBED_ASSETS )
-  set_property ( SOURCE Engine/CrossPlatform.cpp APPEND PROPERTY COMPILE_DEFINITIONS EMBED_ASSETS )
-  set_property ( SOURCE Engine/Options.cpp APPEND PROPERTY COMPILE_DEFINITIONS EMBED_ASSETS )
-  add_custom_command ( OUTPUT "${CMAKE_BINARY_DIR}/common.zip" COMMAND zip -r -FS "${CMAKE_BINARY_DIR}/common.zip" .
-                        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/common" )
-  add_custom_command ( OUTPUT "${CMAKE_BINARY_DIR}/standard.zip" COMMAND zip -r -FS "${CMAKE_BINARY_DIR}/standard.zip" .
-                        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/standard" )
-  add_custom_target ( zips DEPENDS "${CMAKE_BINARY_DIR}/common.zip" "${CMAKE_BINARY_DIR}/standard.zip" )
-endif ()
-
-if ( WIN32 )
-  set ( application_type WIN32 )
-  set ( openxcom_icon OpenXcom.rc )
-endif ()
-
-if ( UNIX AND EMBED_ASSETS )
-  enable_language(ASM)
-  set ( embed_src OpenXcom.s )
-  set_property ( SOURCE OpenXcom.s PROPERTY COMPILE_FLAGS -I${CMAKE_BINARY_DIR} )
-endif ()
-
-set ( openxcom_src ${c_src} ${cxx_src} ${embed_src} )
-set ( install_dest RUNTIME )
-set ( set_exec_path ON )
-set ( install_dest_dir bin )
-if ( UNIX AND NOT APPLE )
-  set ( data_install_dir "${CMAKE_INSTALL_FULL_DATADIR}/openxcom" )
-  set_property ( SOURCE main.cpp APPEND PROPERTY COMPILE_DEFINITIONS DATADIR="${data_install_dir}/" )
-endif ()
-if ( APPLE )
-  set ( openxcom_src ${openxcom_src} )
-  set ( openxcom_icon "${PROJECT_SOURCE_DIR}/res/mac/AppIcon.icns" )
-  if ( CREATE_BUNDLE )
-    set ( application_type MACOSX_BUNDLE )
-    set_source_files_properties( ${openxcom_icon} PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
-    set ( MACOSX_BUNDLE_ICON_FILE "AppIcon.icns" )
-    set ( MACOSX_BUNDLE_INFO_STRING ${CPACK_PACKAGE_VENDOR} )
-    set ( MACOSX_BUNDLE_GUI_IDENTIFIER "SupSuper.openxcom" )
-    set ( MACOSX_BUNDLE_LONG_VERSION_STRING ${CPACK_PACKAGE_VERSION} )
-    set ( MACOSX_BUNDLE_SHORT_VERSION_STRING "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}" )
-    set ( MACOSX_BUNDLE_COPYRIGHT "Copyright © 2018 OpenXcom Developers. All rights reserved." )
-    set ( EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR} )
-    set ( install_dest BUNDLE )
-    set ( set_exec_path OFF )
-    set ( install_dest_dir "" )
-    set ( data_install_dir bin )
-    if ( "${CMAKE_GENERATOR}" STREQUAL "Xcode" )
-      set ( bundle_path "${EXECUTABLE_OUTPUT_PATH}/${CMAKE_BUILD_TYPE}/openxcom.app" )
-    else ()
-      set ( bundle_path "${EXECUTABLE_OUTPUT_PATH}/openxcom.app" )
-    endif ()
-  else ()
-    set ( data_install_dir "${CMAKE_INSTALL_FULL_DATADIR}/openxcom" )
-    add_definitions( -DDATADIR="${data_install_dir}/" )
-  endif ()
-endif ()
-if ( set_exec_path )
-  set ( EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
-endif ()
-
-if ( FORCE_INSTALL_DATA_TO_BIN )
-  set ( data_install_dir bin )
-endif ()
-
-if (( APPLE AND CREATE_BUNDLE ) OR CPACK_GENERATOR STREQUAL "7Z" )
-  set ( CMAKE_INSTALL_BINDIR "." )
-endif ()
-
 set(openxcom_defines
   YAML_CPP_STATIC_DEFINE
 )
@@ -760,6 +652,8 @@ set(openxcom_includes
   ${lua_SOURCE_DIR}
   ${EnTT_SOURCE_DIR}/single_include
   ${SimpleRTTR_SOURCE_DIR}/include
+  ${nlohmann_json_SOURCE_DIR}/include
+  ${inja_SOURCE_DIR}
 )
 
 set(openxcom_libs
@@ -773,88 +667,58 @@ if(ENABLE_ENTITY_INSPECTOR)
   list(APPEND openxcom_libs wxbase wxcore)
 endif()
 
-add_library(openxcom_lib STATIC ${openxcom_src})
-target_include_directories(openxcom_lib PUBLIC ${openxcom_includes})
-target_compile_definitions(openxcom_lib PUBLIC ${openxcom_defines})
-target_link_libraries(openxcom_lib PUBLIC wxbase wxcore wxpropgrid)
-
-add_executable ( openxcom  ${application_type} main.cpp ${openxcom_icon})
+# openxcom base library targets
+add_library(openxcom_base_lib STATIC ${openxcom_src})
+target_include_directories(openxcom_base_lib PUBLIC ${openxcom_includes})
+target_compile_definitions(openxcom_base_lib PUBLIC ${openxcom_defines})
+target_link_libraries(openxcom_base_lib PUBLIC ${openxcom_libs})
 
 if (MSVC)
-    target_compile_options(openxcom_lib PRIVATE /bigobj)
+    #mod.cpp is so massive that MSVC has trouble keeping it all in a single object, so we need to split it up with this command
+    target_compile_options(openxcom_base_lib PRIVATE /bigobj)
 endif()
 
-if ( EMBED_ASSETS )
-  add_dependencies(openxcom zips)
-endif ()
+# Codegen: Executable that generates additional source files, depends on openxcom_base_lib
+add_executable(codegen "Codegen/Codegen.cpp")
+target_link_libraries(codegen PRIVATE openxcom_base_lib)
 
-install ( TARGETS openxcom ${install_dest} DESTINATION ${CMAKE_INSTALL_BINDIR} )
-# Extra link flags for Windows. They need to be set before the YAML link flags, otherwise you will get strange link errors ('Undefined reference to WinMain@16')
-if ( WIN32 )
-  set ( basic_windows_libs advapi32.lib shell32.lib shlwapi.lib wininet.lib urlmon.lib )
-  if ( MINGW )
-    set ( basic_windows_libs ${basic_windows_libs} mingw32 -mwindows )
-    set ( static_flags  -static )
-  endif ()
-  set ( system_libs ${basic_windows_libs})
-endif ()
+# Force inclusion of all object files from openxcom_base_lib
+if(MSVC)
+    # For MSVC, use /WHOLEARCHIVE
+    target_link_options(codegen PRIVATE "/WHOLEARCHIVE:openxcom_base_lib.lib")
+elseif(APPLE)
+    # For macOS, use -Wl,-all_load
+    target_link_options(codegen PRIVATE "-Wl,-all_load")
+elseif(UNIX)
+    # For GNU/Linux, use -Wl,--whole-archive and -Wl,--no-whole-archive
+    target_link_options(codegen PRIVATE
+        "-Wl,--whole-archive" openxcom_base_lib "-Wl,--no-whole-archive")
+endif()
 
-# backtrace(3) requires libexecinfo on some *BSD systems
-if (${CMAKE_SYSTEM_NAME} MATCHES FreeBSD OR ${CMAKE_SYSTEM_NAME} MATCHES NetBSD OR ${CMAKE_SYSTEM_NAME} MATCHES OpenBSD)
-  set ( system_libs -lexecinfo )
-endif ()
 
-if (WIN32)
-  set(WIN32_LIBS imagehlp dbghelp)
-endif(WIN32)
+# Define the generated source files
+set(generated_sources
+    "${CMAKE_BINARY_DIR}/generated/generated1.cpp"
+    # Add more generated files as needed
+)
 
-target_link_libraries ( openxcom_lib PUBLIC ${system_libs} ${PKG_DEPS_LDFLAGS} ${WIN32_LIBS} ${openxcom_libs} )
-target_link_libraries ( openxcom PUBLIC openxcom_lib )
+# Custom command to generate the source files using codegen
+add_custom_command(
+    OUTPUT ${generated_sources}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/generated
+    COMMAND $<TARGET_FILE:codegen>
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated
+    DEPENDS codegen
+    COMMENT "Generating source files with codegen"
+)
 
-# Pack libraries into bundle and link executable appropriately
-if ( APPLE AND CREATE_BUNDLE )
-  include ( PostprocessBundle )
-  postprocess_bundle ( openxcom ${bundle_path} )
-endif ()
+# openxcom_lib: Library compiled from generated source files, depends on openxcom_base_lib
+add_library(openxcom_lib STATIC ${generated_sources})
+add_dependencies(openxcom_lib codegen) # Ensure codegen runs before compiling openxcom_lib
+target_link_libraries(openxcom_lib PUBLIC openxcom_base_lib)
 
-if ( NOT EMBED_ASSETS )
-  set ( bin_data_dirs TFTD UFO common standard )
-  foreach ( binpath ${bin_data_dirs} )
-    if ( APPLE AND CREATE_BUNDLE )
-      add_custom_command ( TARGET openxcom
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/${binpath} ${bundle_path}/Contents/Resources/${binpath}
-	    VERBATIM )
-    else ()
-      add_custom_command ( TARGET openxcom
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/${binpath} ${EXECUTABLE_OUTPUT_PATH}/${binpath}
-	    VERBATIM )
-      install ( DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${binpath} DESTINATION ${data_install_dir} )
-    endif ()
-  endforeach ()
-endif ()
+add_executable(openxcom ${application_type} main.cpp ${openxcom_icon})
+target_link_libraries(openxcom PUBLIC openxcom_lib)
 
 # Add the tests subdirectory
 add_subdirectory(Tests)
-
-# Copy Windows DLLs to bin folder
-if ( WIN32 )
-  if ( CMAKE_CL_64 )
-    file ( GLOB Windows_dll "${DEPS_DIR}/lib/x64/*.dll" )
-  else ( )
-    file ( GLOB Windows_dll "${DEPS_DIR}/lib/Win32/*.dll" )
-  endif()
-  foreach ( dll ${Windows_dll} )
-    add_custom_command ( TARGET openxcom
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${dll} ${EXECUTABLE_OUTPUT_PATH}
-	  VERBATIM )
-    install ( FILES ${dll} DESTINATION bin)
-  endforeach()
-endif ()
-
-#Setup source groups for IDE
-if ( MSVC OR "${CMAKE_GENERATOR}" STREQUAL "Xcode" )
-  source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${cxx_src})
-endif ()

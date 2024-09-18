@@ -18,7 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define OPENXCOM_VERSION_ENGINE "Lua"
+#define OPENXCOM_VERSION_ENGINE "OX-L"
 #define OPENXCOM_VERSION_SHORT "Lua 0.01"
 #define OPENXCOM_VERSION_LONG "0.0.1.0"
 #define OPENXCOM_VERSION_NUMBER 0,0,1,0

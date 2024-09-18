@@ -1,0 +1,9 @@
+{
+  "main_template": "Json.cpp.inja",
+  "header_template": "JsonHeader.cpp.inja",
+
+  "specializations": {
+    "object_template": "JsonObject.cpp.inja",
+    "option_template": "JsonOption.cpp.inja"
+  }
+}

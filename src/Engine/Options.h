@@ -96,7 +96,7 @@ struct Option
 
 	bool isSet() const
 	{
-		for (int i = 0; i < OPTION_LEVEL_COUNT; i++)
+		for (int i = 0; i < OPTION_LEVEL_COUNT - 1; i++) // ignore default by subtracting 1 from OPTION_LEVEL_COUNT
 		{
 			if (values[i].has_value())
 			{
@@ -148,25 +148,29 @@ struct GameOptions
 {
 	Option<bool> _shouldRun = true;
 
-	Option<std::vector<std::filesystem::path>> _dataPath = {};
-	Option<std::filesystem::path> _userPath = std::filesystem::path("./user");
-	Option<std::filesystem::path> _cfgPath = std::filesystem::path("./user");
+	Option<std::vector<std::filesystem::path>> _dataPath	= {};
+	Option<std::filesystem::path> _userPath					= std::filesystem::path("./user");
+	Option<std::filesystem::path> _cfgPath					= std::filesystem::path("./user");
 
-	Option<std::string> _language = "en";
+	Option<std::string> _locale								= "en-US";
 
-	Option<bool> _continueSave = false;
-	Option<std::filesystem::path> _savePath = std::filesystem::path();
+	Option<bool> _continueSave								= false;
+	Option<std::filesystem::path> _lastSave					= std::filesystem::path();
 
-	Option<std::filesystem::path> _logPath = std::filesystem::path("log.txt");
+	Option<std::filesystem::path> _logPath					= std::filesystem::path("log.txt");
+
+	Option<std::vector<std::string>> _mods					= {};
+
+	Option<std::string> _master								= "xcom1";
 };
 
 // Graphics options
 struct GraphicsOptions
 {
-	Option<bool> _fullscreen;
+	Option<bool> _fullscreen								= false;
 
-	Option<int> _screenWidth;
-	Option<int> _screenHeight;
+	Option<int> _screenWidth								= 640;
+	Option<int> _screenHeight								= 480;
 };
 
 /**
@@ -190,6 +194,9 @@ private:
 	void showHelp();
 
 	bool loadCommandLine(const std::vector<std::string>& argv);
+
+	bool loadFile();
+	bool loadDefaults();
 
 public:
 	/// Constructor.
