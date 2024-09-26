@@ -26,7 +26,7 @@ struct PropertyTypeHelper
 {
 	static wxWindow* createProperty(wxWindow* parent, entt::handle entityHandle, const SimpleRTTR::Type& componentType, const SimpleRTTR::Property& componentProperty)
 	{
-		return new wxStaticText(parent, wxID_ANY, "Unable to create property sheet for type \"" + componentProperty.Type().Name() + "\"");
+		return new wxStaticText(parent, wxID_ANY, "Unable to create property sheet for type \"" + componentProperty.type().name() + "\"");
 	}
 };
 
@@ -36,28 +36,28 @@ struct PropertyTypeHelper<int>
 	static wxWindow* createProperty(wxWindow* parent, entt::handle entityHandle, const SimpleRTTR::Type& componentType, const SimpleRTTR::Property& componentProperty)
 	{
 		//example
-		GetComponentFunc getComponentFunc = componentType.Meta().Get(GetComponentFuncName).Value().GetAs<GetComponentFunc>();
+		GetComponentFunc getComponentFunc = componentType.meta().get(GetComponentFuncName).value().get_as<GetComponentFunc>();
 		if (getComponentFunc == nullptr)
 		{
-			std::string message = "Unable to create integer property sheet for component type \"" + componentType.Name() + "\"";
+			std::string message = "Unable to create integer property sheet for component type \"" + componentType.name() + "\"";
 			return new wxStaticText(parent, wxID_ANY, message);
 		}
 
-		int initialValue = componentProperty.Get<int>(getComponentFunc(entityHandle));
+		int initialValue = componentProperty.get<int>(getComponentFunc(entityHandle));
 		wxTextCtrl* textCtrl = new wxTextCtrl(parent, wxID_ANY, std::to_string(initialValue), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER | wxNO_BORDER);
 		textCtrl->SetValidator(*createValidator());
 
 		// Bind the event to update the entity's property when the text is changed
 		textCtrl->Bind(wxEVT_TEXT_ENTER, [entityHandle, componentType, componentProperty, textCtrl](wxCommandEvent& event)
 		{
-			GetComponentFunc getComponentFunc = componentType.Meta().Get(GetComponentFuncName).Value().GetAs<GetComponentFunc>();
+			GetComponentFunc getComponentFunc = componentType.meta().get(GetComponentFuncName).value().get_as<GetComponentFunc>();
 			if (getComponentFunc != nullptr)
 			{
 				wxString valueStr = textCtrl->GetValue();
 				long newValue;
 				if (valueStr.ToLong(&newValue)) // Validate the conversion
 				{
-					componentProperty.Set(getComponentFunc(entityHandle), static_cast<int>(newValue));
+					componentProperty.set(getComponentFunc(entityHandle), static_cast<int>(newValue));
 				}
 			}
 		});
@@ -79,21 +79,21 @@ struct PropertyTypeHelper<std::string>
 	static wxWindow* createProperty(wxWindow* parent, entt::handle entityHandle, const SimpleRTTR::Type& componentType, const SimpleRTTR::Property& componentProperty)
 	{
 		// example
-		GetComponentFunc getComponentFunc = componentType.Meta().Get(GetComponentFuncName).Value().GetAs<GetComponentFunc>();
+		GetComponentFunc getComponentFunc = componentType.meta().get(GetComponentFuncName).value().get_as<GetComponentFunc>();
 		if (getComponentFunc == nullptr) {
-			std::string message = "Unable to create integer property sheet for component type \"" + componentType.Name() + "\"";
+			std::string message = "Unable to create integer property sheet for component type \"" + componentType.name() + "\"";
 			return new wxStaticText(parent, wxID_ANY, message);
 		}
 
-		std::string initialValue = componentProperty.Get<std::string>(getComponentFunc(entityHandle));
+		std::string initialValue = componentProperty.get<std::string>(getComponentFunc(entityHandle));
 		wxTextCtrl* textCtrl = new wxTextCtrl(parent, wxID_ANY, initialValue, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER | wxNO_BORDER);
 
 		// Bind the event to update the entity's property when the text is changed
 		textCtrl->Bind(wxEVT_TEXT_ENTER, [entityHandle, componentType, componentProperty, textCtrl](wxCommandEvent& event) {
-			GetComponentFunc getComponentFunc = componentType.Meta().Get(GetComponentFuncName).Value().GetAs<GetComponentFunc>();
+			GetComponentFunc getComponentFunc = componentType.meta().get(GetComponentFuncName).value().get_as<GetComponentFunc>();
 			if (getComponentFunc != nullptr) {
 				wxString valueStr = textCtrl->GetValue();
-				componentProperty.Set(getComponentFunc(entityHandle), std::string(valueStr));
+				componentProperty.set(getComponentFunc(entityHandle), std::string(valueStr));
 			}
 		});
 
@@ -108,15 +108,15 @@ struct PropertyTypeHelper<bool>
 	static wxWindow* createProperty(wxWindow* parent, entt::handle entityHandle, const SimpleRTTR::Type& componentType, const SimpleRTTR::Property& componentProperty)
 	{
 		// Retrieve the component instance from the entity
-		GetComponentFunc getComponentFunc = componentType.Meta().Get(GetComponentFuncName).Value().GetAs<GetComponentFunc>();
+		GetComponentFunc getComponentFunc = componentType.meta().get(GetComponentFuncName).value().get_as<GetComponentFunc>();
 		if (getComponentFunc == nullptr)
 		{
-			std::string message = "Unable to create boolean property sheet for component type \"" + componentType.Name() + "\"";
+			std::string message = "Unable to create boolean property sheet for component type \"" + componentType.name() + "\"";
 			return new wxStaticText(parent, wxID_ANY, message);
 		}
 
 		// Get the initial value of the boolean property
-		bool initialValue = componentProperty.Get<bool>(getComponentFunc(entityHandle));
+		bool initialValue = componentProperty.get<bool>(getComponentFunc(entityHandle));
 
 		// Create a checkbox with the initial value
 		wxCheckBox* checkBox = new wxCheckBox(parent, wxID_ANY, wxEmptyString);
@@ -125,11 +125,11 @@ struct PropertyTypeHelper<bool>
 		// Bind the checkbox to the property
 		checkBox->Bind(wxEVT_CHECKBOX, [entityHandle, componentType, componentProperty, checkBox](wxCommandEvent& event)
 		{
-			GetComponentFunc getComponentFunc = componentType.Meta().Get(GetComponentFuncName).Value().GetAs<GetComponentFunc>();
+			GetComponentFunc getComponentFunc = componentType.meta().get(GetComponentFuncName).value().get_as<GetComponentFunc>();
 			if (getComponentFunc != nullptr)
 			{
 				bool newValue = checkBox->GetValue();
-				componentProperty.Set(getComponentFunc(entityHandle), newValue);
+				componentProperty.set(getComponentFunc(entityHandle), newValue);
 			}
 		});
 
@@ -149,15 +149,15 @@ TypePropertyMapping::~TypePropertyMapping()
 
 void TypePropertyMapping::createTypeMapping()
 {
-	_typeMapping[SimpleRTTR::Types().GetType<int>().Hash()] = PropertyTypeHelper<int>::createProperty;
-	_typeMapping[SimpleRTTR::Types().GetType<bool>().Hash()] = PropertyTypeHelper<bool>::createProperty;
-	_typeMapping[SimpleRTTR::Types().GetType<std::string>().Hash()] = PropertyTypeHelper<std::string>::createProperty;
+	_typeMapping[SimpleRTTR::types().get_type<int>().type_index()] = PropertyTypeHelper<int>::createProperty;
+	_typeMapping[SimpleRTTR::types().get_type<bool>().type_index()] = PropertyTypeHelper<bool>::createProperty;
+	_typeMapping[SimpleRTTR::types().get_type<std::string>().type_index()] = PropertyTypeHelper<std::string>::createProperty;
 }
 
 wxWindow* TypePropertyMapping::createProperty(wxWindow* parent, entt::handle entityHandle, const SimpleRTTR::Type& componentType, const SimpleRTTR::Property& componentProperty)
 {
-	SimpleRTTR::Type propertyType = componentProperty.Type();
-	TypeMap::iterator it = _typeMapping.find(propertyType.Hash());
+	SimpleRTTR::Type propertyType = componentProperty.type();
+	TypeMap::iterator it = _typeMapping.find(propertyType.type_index());
 
 	if (it != _typeMapping.end())
 	{
@@ -167,7 +167,7 @@ wxWindow* TypePropertyMapping::createProperty(wxWindow* parent, entt::handle ent
 	else
 	{
 		// Fallback if no handler is registered for this type
-		std::string message = "Unable to create property sheet for type \"" + propertyType.Name() + "\"";
+		std::string message = "Unable to create property sheet for type \"" + propertyType.name() + "\"";
 		return new wxStaticText(parent, wxID_ANY, message);
 	}
 }

@@ -35,11 +35,11 @@ namespace OpenXcom
 SIMPLERTTR
 {
 	/// RTTR Registration for ButtonComponent
-	SimpleRTTR::Registration().Type<ButtonComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<ButtonComponent>)
-		.Property(&ButtonComponent::_color, "color")
-		.Property(&ButtonComponent::_contrast, "contrast")
-		.Property(&ButtonComponent::_geoscapeButton, "geoscapeButton");
+	SimpleRTTR::registration().type<ButtonComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<ButtonComponent>)
+		.property(&ButtonComponent::_color, "color")
+		.property(&ButtonComponent::_contrast, "contrast")
+		.property(&ButtonComponent::_geoscapeButton, "geoscapeButton");
 }
 
 void ButtonSystem::setColor(entt::handle entity, uint8_t color)

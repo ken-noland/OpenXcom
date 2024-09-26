@@ -175,6 +175,7 @@ set ( engine_src
 #  "Engine/SurfaceSet.cpp"
   "Engine/Timer.cpp"
   "Engine/Unicode.cpp"
+  "Engine/VirtualFileSystem.cpp"
 #  "Engine/Zoom.cpp
 )
 
@@ -702,6 +703,7 @@ set(generated_sources
 
 set(codegen_templates
     "Codegen/Templates/Json/Json.cpp.inja"
+    "Codegen/Templates/Json/JsonEnum.cpp.inja"
     "Codegen/Templates/Json/JsonHeader.cpp.inja"
     "Codegen/Templates/Json/JsonMap.cpp.inja"
     "Codegen/Templates/Json/JsonObject.cpp.inja"

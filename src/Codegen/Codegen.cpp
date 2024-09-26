@@ -24,7 +24,12 @@
 
 #include <nlohmann/json.hpp>
 
-#include <inja.hpp>
+#pragma warning(push)           // Save the current warning state
+#pragma warning(disable : 4244) // Disable warning C4244 (warning C4244: 'initializing': conversion from 'ValueType' to 'int', possible loss of data)
+
+#include "inja.hpp"
+
+#pragma warning(pop)            // Restore the previous warning state
 
 #include "../Entity/Common/RTTR.h"
 
@@ -78,7 +83,7 @@ struct TypeComparator
 {
 	bool operator()(const SimpleRTTR::Type& lhs, const SimpleRTTR::Type& rhs) const
 	{
-		return lhs.FullyQualifiedName() < rhs.FullyQualifiedName();
+		return lhs.fully_qualified_name() < rhs.fully_qualified_name();
 	}
 };
 
@@ -90,15 +95,36 @@ struct CommandLineArguments
 
 using TypeSet = std::list<SimpleRTTR::Type>;
 
+bool isTypeSerializable(const SimpleRTTR::Type& type)
+{
+	if (type.meta().has("Serialize"))
+	{
+		OpenXcom::ObjectSerialize serialize = type.meta().get("Serialize").value().get_as<OpenXcom::ObjectSerialize>();
+		return serialize == OpenXcom::ObjectSerialize::ALWAYS;
+	}
+	return false;
+}
+
+bool isPropertySerializable(const SimpleRTTR::Property& property)
+{
+	if (property.meta().has("Serialize"))
+	{
+		OpenXcom::PropertySerialize serialize = property.meta().get("Serialize").value().get_as<OpenXcom::PropertySerialize>();
+		return serialize == OpenXcom::PropertySerialize::ALWAYS;
+	}
+	return false;
+}
+
+
 void collectTemplateTypes(TypeSet& types, const SimpleRTTR::Type& type, const std::vector<std::function<bool(const SimpleRTTR::Type&)>>& filters)
 {
 	// Check if the type is a template type
-	if (type.TemplateParams().size() > 0)
+	if (type.template_params().size() > 0)
 	{
 		// Get the template arguments
-		for (const SimpleRTTR::TypeReference& templateRefArg : type.TemplateParams())
+		for (const SimpleRTTR::TypeReference& templateRefArg : type.template_params())
 		{
-			const SimpleRTTR::Type& templateArg = templateRefArg.Type();
+			const SimpleRTTR::Type& templateArg = templateRefArg.type();
 
 			bool passesAllFilters = true;
 
@@ -124,9 +150,14 @@ void collectTemplateTypes(TypeSet& types, const SimpleRTTR::Type& type, const st
 
 void collectProperties(TypeSet& types, const SimpleRTTR::Type& type, const std::vector<std::function<bool(const SimpleRTTR::Type&)>>& filters)
 {
-	for (const SimpleRTTR::Property& prop : type.Properties())
+	for (const SimpleRTTR::Property& prop : type.properties())
 	{
-		const SimpleRTTR::Type& propType = prop.Type();
+		if(!isPropertySerializable(prop))
+		{
+			continue;
+		}
+
+		const SimpleRTTR::Type& propType = prop.type();
 		bool passesAllFilters = true;
 		// Apply all filters
 		for (const auto& filter : filters)
@@ -147,8 +178,13 @@ void collectProperties(TypeSet& types, const SimpleRTTR::Type& type, const std::
 void collectTypes(TypeSet& types, const std::vector<std::function<bool(const SimpleRTTR::Type&)>>& filters)
 {
 	// go through the types
-	for (const SimpleRTTR::Type& type : SimpleRTTR::Types())
+	for (const SimpleRTTR::Type& type : SimpleRTTR::types())
 	{
+		if (!isTypeSerializable(type))
+		{
+			continue;
+		}
+
 		bool passesAllFilters = true;
 
 		// Apply all filters
@@ -167,21 +203,21 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 		}
 	}
 
-	std::vector<std::function<bool(const SimpleRTTR::Type&)>> otherFilters;
+	std::vector<std::function<bool(const SimpleRTTR::Type&)>> typeFilters;
 
 	//exclude std::string, std::filesystem::path, and others that we will be implicitly handling
-	otherFilters.push_back([](const SimpleRTTR::Type& type) {
+	typeFilters.push_back([](const SimpleRTTR::Type& type) {
 		static std::vector<SimpleRTTR::Type> typesToExclude = {
-			SimpleRTTR::Types().GetType<std::string>(),
-			SimpleRTTR::Types().GetType<std::filesystem::path>(),
-			SimpleRTTR::Types().GetType<bool>(),
-			SimpleRTTR::Types().GetType<int>(),
-			SimpleRTTR::Types().GetType<short>(),
-			SimpleRTTR::Types().GetType<char>(),
-			SimpleRTTR::Types().GetType<unsigned int>(),
-			SimpleRTTR::Types().GetType<unsigned short>(),
-			SimpleRTTR::Types().GetType<unsigned char>(),
-			SimpleRTTR::Types().GetType<char*>()
+			SimpleRTTR::types().get_type<std::string>(),
+			SimpleRTTR::types().get_type<std::filesystem::path>(),
+			SimpleRTTR::types().get_type<bool>(),
+			SimpleRTTR::types().get_type<int>(),
+			SimpleRTTR::types().get_type<short>(),
+			SimpleRTTR::types().get_type<char>(),
+			SimpleRTTR::types().get_type<unsigned int>(),
+			SimpleRTTR::types().get_type<unsigned short>(),
+			SimpleRTTR::types().get_type<unsigned char>(),
+			SimpleRTTR::types().get_type<char*>()
 		};
 
 		for (const SimpleRTTR::Type& excludeType : typesToExclude)
@@ -196,12 +232,12 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 	});
 
 	//exclude std::allocator
-	otherFilters.push_back([](const SimpleRTTR::Type& type) {
-		if (type.Namespaces().size() > 0)
+	typeFilters.push_back([](const SimpleRTTR::Type& type) {
+		if (type.namespaces().size() > 0)
 		{
-			if (type.Namespaces().back() == "std")
+			if (type.namespaces().back() == "std")
 			{
-				if (type.Name() == "allocator")
+				if (type.name() == "allocator")
 				{
 					return false;
 				}
@@ -213,12 +249,12 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 
 	for (const SimpleRTTR::Type& type : types)
 	{
-		collectProperties(types, type, otherFilters);
+		collectProperties(types, type, typeFilters);
 	}
 
 	for (const SimpleRTTR::Type& type : types)
 	{
-		collectTemplateTypes(types, type, otherFilters);
+		collectTemplateTypes(types, type, typeFilters);
 	}
 
 	// remove duplicates from unsorted list
@@ -245,9 +281,9 @@ bool collectTypeInfo(TypeSet& types, const std::string& metaKey)
 
 	// Add a filter to check if the type is in the "OpenXcom" namespace
 	filters.push_back([](const SimpleRTTR::Type& type) {
-		if (type.Namespaces().size() > 0)
+		if (type.namespaces().size() > 0)
 		{
-			for (const std::string& ns : type.Namespaces())
+			for (const std::string& ns : type.namespaces())
 			{
 				if (ns == "OpenXcom")
 				{
@@ -260,7 +296,7 @@ bool collectTypeInfo(TypeSet& types, const std::string& metaKey)
 
 	// Add a filter to check if the type has any properties
 	filters.push_back([](const SimpleRTTR::Type& type) {
-		if (type.Properties().Size() > 0)
+		if (type.properties().size() > 0)
 		{
 			return true;
 		}
@@ -269,9 +305,9 @@ bool collectTypeInfo(TypeSet& types, const std::string& metaKey)
 
 	// Add a filter to see if the type is serializable
 	filters.push_back([&metaKey](const SimpleRTTR::Type& type) {
-		if (type.Meta().Has(metaKey.c_str()))	// need to have the key as a "const char*", otherwise it doesn't recognize the type
+		if (type.meta().has(metaKey.c_str()))	// need to have the key as a "const char*", otherwise it doesn't recognize the type
 		{
-			OpenXcom::ObjectSerialize serialize = type.Meta().Get(metaKey.c_str()).Value().GetAs<OpenXcom::ObjectSerialize>();
+			OpenXcom::ObjectSerialize serialize = type.meta().get(metaKey.c_str()).value().get_as<OpenXcom::ObjectSerialize>();
 			return serialize == OpenXcom::ObjectSerialize::ALWAYS;
 		}
 		return false;
@@ -282,64 +318,15 @@ bool collectTypeInfo(TypeSet& types, const std::string& metaKey)
 	return 0;
 }
 
-
-std::vector<std::string> removeEmptyPreprocessorBlocksRecursive(const std::vector<std::string>& directives, size_t& index)
-{
-	std::vector<std::string> result;
-	while (index < directives.size())
-	{
-		const std::string& line = directives[index];
-		if (line.starts_with("#if"))
-		{
-			size_t nestedIndex = index + 1;
-			std::vector<std::string> nestedResult = removeEmptyPreprocessorBlocksRecursive(directives, nestedIndex);
-			if (!nestedResult.empty())
-			{
-				result.push_back(line);
-				result.insert(result.end(), nestedResult.begin(), nestedResult.end());
-				result.push_back(directives[nestedIndex]);
-			}
-			index = nestedIndex;
-		}
-		else if (line.starts_with("#else"))
-		{
-			size_t nestedIndex = index + 1;
-			std::vector<std::string> nestedResult = removeEmptyPreprocessorBlocksRecursive(directives, nestedIndex);
-			if (!nestedResult.empty())
-			{
-				result.push_back(line);
-				result.insert(result.end(), nestedResult.begin(), nestedResult.end());
-			}
-			index = nestedIndex;
-		}
-		else if (line.starts_with("#endif"))
-		{
-			return result;
-		}
-		else
-		{
-			result.push_back(line);
-		}
-		++index;
-	}
-	return result;
-}
-
-std::vector<std::string> removeEmptyPreprocessorBlocks(const std::vector<std::string>& directives)
-{
-	size_t index = 0;
-	return removeEmptyPreprocessorBlocksRecursive(directives, index);
-}
-
 bool collectHeaders(std::vector<std::string>& headers, const TypeSet& types)
 {
 	//collect all the cpp files where the type information was registered
 	std::set<std::filesystem::path> sourceFiles;
 	for (const SimpleRTTR::Type& type : types)
 	{
-		if (type.Meta().Has("source_filename"))
+		if (type.meta().has("source_filename"))
 		{
-			std::filesystem::path source = type.Meta().Get("source_filename").Value().GetAs<const char*>();
+			std::filesystem::path source = type.meta().get("source_filename").value().get_as<const char*>();
 			sourceFiles.insert(source);
 		}
 	}
@@ -371,6 +358,17 @@ bool collectHeaders(std::vector<std::string>& headers, const TypeSet& types)
 			//if trimmed line starts with a "#", then it is a preprocessor directive
 			if (line.starts_with('#'))
 			{
+				//gather all lines that terminate with \ and concatinate them
+				while (line.ends_with('\\'))
+				{
+					std::string nextLine;
+
+					std::getline(file, nextLine);
+					trim(nextLine);
+
+					line += nextLine;
+				}
+
 				//check to see if the proceprocessor directive is an include
 				if (line.starts_with("#include"))
 				{
@@ -406,7 +404,7 @@ bool collectHeaders(std::vector<std::string>& headers, const TypeSet& types)
 		}
 	}
 
-	headers = removeEmptyPreprocessorBlocks(preprocessorDirectives);
+	headers = std::move(preprocessorDirectives);
 
 	// for debugging purposes only
 	//for (const std::string& preprocessorDirective : preprocessorDirectives)
@@ -449,27 +447,36 @@ bool loadTemplate(inja::Template& templ, std::filesystem::path path, inja::Envir
 
 std::string getTemplateForType(const SimpleRTTR::Type& type)
 {
-	if (type.Meta().Has("Codegen-Override-Template"))
+	if (type.meta().has("Codegen-Override-Template"))
 	{
-		return type.Meta().Get("Codegen-Override-Template").Value().GetAs<const char*>();
+		return type.meta().get("Codegen-Override-Template").value().get_as<const char*>();
 	}
-	else if (type.Namespaces().size() == 1 && type.Namespaces()[0] == "std")
+	else if (type.has_flag(SimpleRTTR::TypeFlag::IsEnum))
 	{
-		if (type.Name() == "vector")
+		//check to see if enum type has values registered, and if not, display a warning
+		if (type.values().size() == 0)
+		{
+			std::cerr << "Warning: Enum type has no values: " << type.fully_qualified_name() << std::endl;
+		}
+		return "enum_template";
+	}
+	else if (type.namespaces().size() == 1 && type.namespaces()[0] == "std")
+	{
+		if (type.name() == "vector")
 		{
 			return "vector_template";
 		}
-		else if (type.Name() == "map" || type.Name() == "unordered_map")
+		else if (type.name() == "map" || type.name() == "unordered_map")
 		{
 			return "map_template";
 		}
-		else if (type.Name() == "array")
+		else if (type.name() == "array")
 		{
 			return "array_template";
 		}
 		else
 		{
-			std::cerr << "No template for std type: " << type.FullyQualifiedName() << std::endl;
+			std::cerr << "No template for std type: " << type.fully_qualified_name() << std::endl;
 		}
 	}
 
@@ -481,28 +488,28 @@ std::string getFullNameForType(const SimpleRTTR::Type& type)
 	std::string fullName;
 
 	// add namespace
-	if (type.Namespaces().size() > 0)
+	if (type.namespaces().size() > 0)
 	{
-		for (const std::string& ns : type.Namespaces())
+		for (const std::string& ns : type.namespaces())
 		{
 			fullName += ns + "::";
 		}
 	}
 
-	fullName += type.Name();
+	fullName += type.name();
 
 	// add template parameters
-	if (type.TemplateParams().size() > 0)
+	if (type.template_params().size() > 0)
 	{
 		fullName += "<";
-		for (size_t i = 0; i < type.TemplateParams().size(); ++i)
+		for (size_t i = 0; i < type.template_params().size(); ++i)
 		{
 			if (i > 0)
 			{
 				fullName += ", ";
 			}
 
-			fullName += getFullNameForType(type.TemplateParams()[i].Type());
+			fullName += getFullNameForType(type.template_params()[i].type());
 		}
 		fullName += ">";
 	}
@@ -515,34 +522,48 @@ bool convertTypesToJson(nlohmann::json::reference typesJson, const TypeSet& type
 	for (const SimpleRTTR::Type& type : types)
 	{
 		nlohmann::json typeJson;
-		typeJson["name"] = type.Name();
+		typeJson["name"] = type.name();
 		typeJson["codegen_template"] = getTemplateForType(type);
 		typeJson["fullName"] = getFullNameForType(type);
-		typeJson["namespace"] = type.Namespaces();
-		typeJson["fully_qualified_name"] = type.FullyQualifiedName();
+		typeJson["namespace"] = type.namespaces();
+		typeJson["fully_qualified_name"] = type.fully_qualified_name();
 
 		typeJson["properties"] = nlohmann::json::array();
-		for (const SimpleRTTR::Property& prop : type.Properties())
+		for (const SimpleRTTR::Property& prop : type.properties())
 		{
+			if (!isPropertySerializable(prop))
+			{
+				continue;
+			}
+
 			nlohmann::json propJson;
 
-			propJson["name"] = prop.Name();
-			propJson["fulltype"] = getFullNameForType(prop.Type());
-			propJson["type"] = prop.Type().Name();
+			propJson["name"] = prop.name();
+			propJson["fulltype"] = getFullNameForType(prop.type());
+			propJson["type"] = prop.type().name();
 
 			typeJson["properties"].push_back(propJson);
 		}
 
-		if (type.TemplateParams().size() > 0)
+		typeJson["values"] = nlohmann::json::array();
+		for (const SimpleRTTR::Value& value : type.values())
+		{
+			nlohmann::json valueJson;
+			valueJson["name"] = value.name();
+			valueJson["value"] = value.value().get_as<int>();
+			typeJson["values"].push_back(valueJson);
+		}
+
+		if (type.template_params().size() > 0)
 		{
 			typeJson["template_params"] = nlohmann::json::array();
-			for (const SimpleRTTR::TypeReference& templateRefArg : type.TemplateParams())
+			for (const SimpleRTTR::TypeReference& templateRefArg : type.template_params())
 			{
-				const SimpleRTTR::Type& templateArg = templateRefArg.Type();
+				const SimpleRTTR::Type& templateArg = templateRefArg.type();
 				nlohmann::json templateArgJson;
-				templateArgJson["name"] = templateArg.Name();
+				templateArgJson["name"] = templateArg.name();
 				templateArgJson["fulltype"] = getFullNameForType(templateArg);
-				templateArgJson["type"] = templateArg.Name();
+				templateArgJson["type"] = templateArg.name();
 				typeJson["template_params"].push_back(templateArgJson);
 			}
 		}

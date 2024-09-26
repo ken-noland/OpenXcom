@@ -44,7 +44,7 @@ public:
 	SimpleRTTR::Type _componentType;
 	GetComponentFunc _getComponentFunc;
 
-	EntityComponentData(entt::handle entityHandle, const SimpleRTTR::Type& componentType = SimpleRTTR::Type::InvalidType(), GetComponentFunc getComponentFunc = nullptr)
+	EntityComponentData(entt::handle entityHandle, const SimpleRTTR::Type& componentType = SimpleRTTR::Type::invalid_type(), GetComponentFunc getComponentFunc = nullptr)
 		: _entityHandle(entityHandle), _componentType(componentType), _getComponentFunc(getComponentFunc) {}
 };
 
@@ -137,7 +137,7 @@ void EntityPanel::showEntityDetails(EntityComponentData* data)
 	std::string entityName = "<unnamed>";
 	if (nameComponent)
 	{
-		std::string entityName = data->_componentType.Name();
+		std::string entityName = data->_componentType.name();
 	}
 
 //	_entityDetailGrid->Append(new wxStringProperty("Entity", wxPG_LABEL, entityName));
@@ -147,21 +147,21 @@ void EntityPanel::showComponentDetails(EntityComponentData* data)
 {
 	_entityDetailGrid->Clear();
 
-	std::string componentName = data->_componentType.Name();
+	std::string componentName = data->_componentType.name();
 
 	_entityDetailGrid->Add("Component", [&componentName](wxWindow* parent) { return new wxStaticText(parent, wxID_ANY, componentName); });
 
-	if (data->_componentType != SimpleRTTR::Type::InvalidType())
+	if (data->_componentType != SimpleRTTR::Type::invalid_type())
 	{
 		// loop through the properties
-		for (const SimpleRTTR::Property& property : data->_componentType.Properties())
+		for (const SimpleRTTR::Property& property : data->_componentType.properties())
 		{
 			// get the property type
-			SimpleRTTR::Type propertyType = property.Type();
-			std::string propertyName = property.Name();
+			SimpleRTTR::Type propertyType = property.type();
+			std::string propertyName = property.name();
 
 			//TEST
-			std::string message = "Unable to create property sheet for type \"" + propertyType.Name() + "\"";
+			std::string message = "Unable to create property sheet for type \"" + propertyType.name() + "\"";
 			_entityDetailGrid->Add(propertyName, [&](wxWindow* parent)
 				{ return _typePropertyMapping.createProperty(parent, data->_entityHandle, data->_componentType, property); });
 			//	{ return new wxStaticText(parent, wxID_ANY, message); });
@@ -229,12 +229,12 @@ void EntityPanel::populateEntityTree()
 			{
 				// get the type information
 				std::string typeName = std::string(entities.type().name());
-				SimpleRTTR::Type type = SimpleRTTR::Types().GetType(typeName);
+				SimpleRTTR::Type type = SimpleRTTR::types().get_type(typeName);
 
 				wxTreeItemId componentItem;
-				if (type != SimpleRTTR::Type::InvalidType())
+				if (type != SimpleRTTR::Type::invalid_type())
 				{
-					componentItem = _entityTree->AppendItem(entityItem, type.Name());
+					componentItem = _entityTree->AppendItem(entityItem, type.name());
 
 					// This may look a bit funny, but basically since there is no way to get a reference or pointer to a component
 					// without knowing the component type, we have to work around this by pre-registering a function which strips
@@ -242,10 +242,10 @@ void EntityPanel::populateEntityTree()
 					// pages. This means that each type we want to have property pages for, we need to register a Meta key/value pair
 					// which uses GetComponentFuncName as the key and a pointer to a function with the signature of GetComponentFunc.
 					// From there, we can extract the properties and display them in the property grid.
-					if (type.Meta().Has(GetComponentFuncName))
+					if (type.meta().has(GetComponentFuncName))
 					{
-						const SimpleRTTR::Meta& getComponentMeta = type.Meta().Get(GetComponentFuncName);
-						GetComponentFunc getComponentFunc = getComponentMeta.Value().GetAs<GetComponentFunc>();
+						const SimpleRTTR::Meta& getComponentMeta = type.meta().get(GetComponentFuncName);
+						GetComponentFunc getComponentFunc = getComponentMeta.value().get_as<GetComponentFunc>();
 
 						_entityTree->SetItemData(componentItem, new EntityComponentData(entt::handle(_registry, entity), type, getComponentFunc));
 					}
@@ -299,7 +299,7 @@ void EntityPanel::onEntitySelected(wxTreeEvent& event)
 		EntityComponentData* data = dynamic_cast<EntityComponentData*>(_entityTree->GetItemData(selectedItem));
 		if (data)
 		{
-			if (data->_componentType != SimpleRTTR::Type::InvalidType())
+			if (data->_componentType != SimpleRTTR::Type::invalid_type())
 			{
 				if (data->_getComponentFunc)
 				{
@@ -309,7 +309,7 @@ void EntityPanel::onEntitySelected(wxTreeEvent& event)
 				else
 				{
 					// we have a component, but it isn't properly registered(likely missing GetComponentFuncName Metadata)
-					showMessage("Unable to get component data for component type \"" + data->_componentType.Name() + "\"");
+					showMessage("Unable to get component data for component type \"" + data->_componentType.name() + "\"");
 				}
 			}
 			else

@@ -22,8 +22,22 @@
 #include <Windows.h>
 #endif
 
+#include "../Entity/Common/RTTR.h"
+
 namespace OpenXcom
 {
+
+SIMPLERTTR
+{
+	SimpleRTTR::registration().type<SeverityLevel>()
+		.value(ENUM_VALUE_REGISTRATION(SeverityLevel, LOG_FATAL))
+		.value(ENUM_VALUE_REGISTRATION(SeverityLevel, LOG_ERROR))
+		.value(ENUM_VALUE_REGISTRATION(SeverityLevel, LOG_WARNING))
+		.value(ENUM_VALUE_REGISTRATION(SeverityLevel, LOG_INFO))
+		.value(ENUM_VALUE_REGISTRATION(SeverityLevel, LOG_DEBUG))
+		.value(ENUM_VALUE_REGISTRATION(SeverityLevel, LOG_VERBOSE))
+		.value(ENUM_VALUE_REGISTRATION(SeverityLevel, LOG_UNCENSORED));
+}
 
 /**
  * Generates a timestamp of the current time.

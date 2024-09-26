@@ -27,7 +27,7 @@
 #include <simplerttr.h>
 SIMPLERTTR
 {
-	SimpleRTTR::Registration().Type<OpenXcom::DrawableComponent>();
+	SimpleRTTR::registration().type<OpenXcom::DrawableComponent>();
 }
 
 namespace OpenXcom

@@ -1,7 +1,5 @@
 // BEGIN JsonObject.cpp.inja
 
-// {{type.name}}
-
 template<>
 bool OpenXcom::fromJson<{{type.fullName}}>(const nlohmann::json& json, {{type.fullName}}& object)
 {

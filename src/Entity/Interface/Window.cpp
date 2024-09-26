@@ -36,27 +36,27 @@ namespace OpenXcom
 
 SIMPLERTTR
 {
-	SimpleRTTR::Registration().Type<WindowPopup>()
-		.Value(WindowPopup::POPUP_NONE, "POPUP_NONE")
-		.Value(WindowPopup::POPUP_HORIZONTAL, "POPUP_HORIZONTAL")
-		.Value(WindowPopup::POPUP_VERTICAL, "POPUP_VERTICAL")
-		.Value(WindowPopup::POPUP_BOTH, "POPUP_BOTH");
+	SimpleRTTR::registration().type<WindowPopup>()
+		.value(WindowPopup::POPUP_NONE, "POPUP_NONE")
+		.value(WindowPopup::POPUP_HORIZONTAL, "POPUP_HORIZONTAL")
+		.value(WindowPopup::POPUP_VERTICAL, "POPUP_VERTICAL")
+		.value(WindowPopup::POPUP_BOTH, "POPUP_BOTH");
 
-	SimpleRTTR::Registration().Type<OpenXcom::WindowComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<WindowComponent>)
-		.Property(&WindowComponent::_popup, "popup")
-		.Property(&WindowComponent::_popupStep, "popupStep")
-		.Property(&WindowComponent::_color, "color")
-		.Property(&WindowComponent::_contrast, "contrast")
-		.Property(&WindowComponent::_thinBorder, "thinBorder")
-		.Property(&WindowComponent::_innerColor, "innerColor")
-		.Property(&WindowComponent::_mute, "mute");
+	SimpleRTTR::registration().type<OpenXcom::WindowComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<WindowComponent>)
+		.property(&WindowComponent::_popup, "popup")
+		.property(&WindowComponent::_popupStep, "popupStep")
+		.property(&WindowComponent::_color, "color")
+		.property(&WindowComponent::_contrast, "contrast")
+		.property(&WindowComponent::_thinBorder, "thinBorder")
+		.property(&WindowComponent::_innerColor, "innerColor")
+		.property(&WindowComponent::_mute, "mute");
 
-	SimpleRTTR::Registration().Type<BackgroundComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<BackgroundComponent>)
-		.Property(&BackgroundComponent::_bg, "bg")
-		.Property(&BackgroundComponent::_dx, "dx")
-		.Property(&BackgroundComponent::_dy, "dy");
+	SimpleRTTR::registration().type<BackgroundComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<BackgroundComponent>)
+		.property(&BackgroundComponent::_bg, "bg")
+		.property(&BackgroundComponent::_dx, "dx")
+		.property(&BackgroundComponent::_dy, "dy");
 }
 
 

@@ -21,7 +21,7 @@
 #include <simplerttr.h>
 SIMPLERTTR
 {
-	SimpleRTTR::Registration().Type<OpenXcom::HierarchyComponent>();
+	SimpleRTTR::registration().type<OpenXcom::HierarchyComponent>();
 		//.Property(&OpenXcom::HierarchyComponent::_children, "children");
 }
 

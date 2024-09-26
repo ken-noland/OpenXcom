@@ -48,8 +48,10 @@ enum class ObjectSerialize
 enum class PropertySerialize
 {
 	NEVER, // default
-	ALWAYS,
-	IF_SET
+	ALWAYS
 };
+
+#define ENUM_VALUE_REGISTRATION(type, value) type::value, #value
+
 
 } // OpenXcom

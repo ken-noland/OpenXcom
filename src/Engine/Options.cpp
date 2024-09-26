@@ -38,66 +38,72 @@ namespace OpenXcom
 
 SIMPLERTTR
 {
-	SimpleRTTR::Registration().Type<GameOptions>()
-		.Meta("Serialize", ObjectSerialize::ALWAYS) // special case for options, since we only want to serialize a particular layer of the options to disk.
-		.Property(REGISTER_PROPERTY(GameOptions, _shouldRun))
-		.Meta("FriendlyName", "shouldRun")
-		.Meta("Description", "Determines if the game will run. Only for internal use.")
-		.Property(REGISTER_PROPERTY(GameOptions, _dataPath))
-		.Meta("FriendlyName", "dataPath")
-		.Meta("Description", "A list of all the paths to search for data and mods.")
-		.Property(REGISTER_PROPERTY(GameOptions, _userPath))
-		.Meta("FriendlyName", "userPath")
-		.Meta("Description", "The path to the user folder where save games will be stored.")
-		.Property(REGISTER_PROPERTY(GameOptions, _cfgPath))
-		.Meta("FriendlyName", "cfgPath")
-		.Meta("Description", "The path to the config folder where the config files will be loaded from. Typically the same as \"userPath\".")
-		.Property(REGISTER_PROPERTY(GameOptions, _locale))
-		.Meta("FriendlyName", "locale")
-		.Meta("Serialize", PropertySerialize::IF_SET) // serialize this option if the user sets it
-		.Meta("Description", "The locale used for translations.")
-		.Property(REGISTER_PROPERTY(GameOptions, _continueSave))
-		.Meta("FriendlyName", "continueSave")
-		.Meta("Description", "If the game should load the last save")
-		.Property(REGISTER_PROPERTY(GameOptions, _lastSave))
-		.Meta("FriendlyName", "lastSave")
-		.Meta("Description", "The full path to the last save game.")
-		.Property(REGISTER_PROPERTY(GameOptions, _logPath))
-		.Meta("FriendlyName", "logPath")
-		.Meta("Description", "The full path to the log file.")
-		.Property(REGISTER_PROPERTY(GameOptions, _mods))
-		.Meta("FriendlyName", "mods")
-		.Meta("Description", "List of mods to load.")
-		.Property(REGISTER_PROPERTY(GameOptions, _master))
-		.Meta("FriendlyName", "master")
-		.Meta("Serialize", PropertySerialize::ALWAYS) // always serialize this
-		.Meta("Description", "Master game to use. Can be either xcom1 or xcom2");
+	SimpleRTTR::registration().type<GameOptions>()
+		.meta("Serialize", ObjectSerialize::ALWAYS) // always serialize this
+		.property(REGISTER_PROPERTY(GameOptions, _shouldRun))
+			.meta("FriendlyName", "shouldRun")
+			.meta("Description", "Determines if the game will run. Only for internal use.")
+		.property(REGISTER_PROPERTY(GameOptions, _dataPath))
+			.meta("FriendlyName", "dataPath")
+			.meta("Description", "A list of all the paths to search for data and mods.")
+		.property(REGISTER_PROPERTY(GameOptions, _userPath))
+			.meta("FriendlyName", "userPath")
+			.meta("Description", "The path to the user folder where save games will be stored.")
+		.property(REGISTER_PROPERTY(GameOptions, _cfgPath))
+			.meta("FriendlyName", "cfgPath")
+			.meta("Description", "The path to the config folder where the config files will be loaded from. Typically the same as \"userPath\".")
+		.property(REGISTER_PROPERTY(GameOptions, _locale))
+			.meta("FriendlyName", "locale")
+			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this
+			.meta("Description", "The locale used for translations.")
+		.property(REGISTER_PROPERTY(GameOptions, _continueSave))
+			.meta("FriendlyName", "continueSave")
+			.meta("Description", "If the game should load the last save")
+		.property(REGISTER_PROPERTY(GameOptions, _lastSave))
+			.meta("FriendlyName", "lastSave")
+			.meta("Description", "The full path to the last save game.")
+		.property(REGISTER_PROPERTY(GameOptions, _logPath))
+			.meta("FriendlyName", "logPath")
+			.meta("Description", "The full path to the log file.")
+		.property(REGISTER_PROPERTY(GameOptions, _logLevel))
+			.meta("FriendlyName", "logLevel")
+			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this
+			.meta("Description", "Minimum level of messages to be output to the log")
+		.property(REGISTER_PROPERTY(GameOptions, _mods))
+			.meta("FriendlyName", "mods")
+			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this
+			.meta("Description", "List of mods to load.")
+		.property(REGISTER_PROPERTY(GameOptions, _master))
+			.meta("FriendlyName", "master")
+			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this
+			.meta("Description", "Master game to use. Can be either xcom1 or xcom2");
 
-	SimpleRTTR::Registration().Type<GraphicsOptions>().Meta("Serialize", ObjectSerialize::ALWAYS) // special case for options, since we only want to serialize a particular layer of the options to disk.
-		.Property(REGISTER_PROPERTY(GraphicsOptions, _fullscreen))
-		.Meta("FriendlyName", "fullscreen")
-		.Meta("Serialize", PropertySerialize::ALWAYS) // always serialize this option
-		.Meta("Description", "Should the game be fullscreen or not")
-		.Property(REGISTER_PROPERTY(GraphicsOptions, _screenWidth))
-		.Meta("FriendlyName", "screenWidth")
-		.Meta("Serialize", PropertySerialize::ALWAYS) // always serialize this option
-		.Meta("Description", "Width of the screen in pixels")
-		.Property(REGISTER_PROPERTY(GraphicsOptions, _screenHeight))
-		.Meta("FriendlyName", "screenHeight")
-		.Meta("Serialize", PropertySerialize::ALWAYS) // always serialize this option
-		.Meta("Description", "Height of the screen in pixels");
+	SimpleRTTR::registration().type<GraphicsOptions>()
+		.meta("Serialize", ObjectSerialize::ALWAYS) // special case for options, since we only want to serialize a particular layer of the options to disk.
+		.property(REGISTER_PROPERTY(GraphicsOptions, _fullscreen))
+			.meta("FriendlyName", "fullscreen")
+			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this option
+			.meta("Description", "Should the game be fullscreen or not")
+		.property(REGISTER_PROPERTY(GraphicsOptions, _screenWidth))
+			.meta("FriendlyName", "screenWidth")
+			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this option
+			.meta("Description", "Width of the screen in pixels")
+		.property(REGISTER_PROPERTY(GraphicsOptions, _screenHeight))
+			.meta("FriendlyName", "screenHeight")
+			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this option
+			.meta("Description", "Height of the screen in pixels");
 
 	// okay, this is going to look a bit strange, but since Options is a template class, and I don't want to have to go through
 	//  and define each possible combination, I simply iterate on all types(they should have been pre-registered by inclusion
 	//  as a parameter) and add in special metadata which signals the codegen to handle these types in a unique way
-	for (const SimpleRTTR::Type& type : SimpleRTTR::Types())
+	for (const SimpleRTTR::Type& type : SimpleRTTR::types())
 	{
-		if (type.Name() == "Option")
+		if (type.name() == "Option")
 		{
-			SimpleRTTR::Registration().Type(type)
-				.Meta("Serialize", ObjectSerialize::ALWAYS) // always serialize this option
-				.Meta("Description", "A generic option type. This should not be used directly.")
-				.Meta("Codegen-Override-Template", "option_template");	// this tag tells the codegen that this is a special case for
+			SimpleRTTR::registration().type(type)
+				.meta("Serialize", ObjectSerialize::ALWAYS) // always serialize this option
+				.meta("Description", "A generic option type. This should not be used directly.")
+				.meta("Codegen-Override-Template", "option_template");	// this tag tells the codegen that this is a special case for
 																		//  serialization and to use the override template specified
 																		//  in the template definition file
 		}
@@ -133,6 +139,12 @@ Options::Options()
 			true, "GAME",
 			"Choose the game you wish to play. Can be either \"xcom1\" or \"xcom2\"",
 			[this](const std::string& master) -> bool {
+				if (master != "xcom1" && master != "xcom2")
+				{
+					Log(LOG_ERROR) << "Invalid master game \"" + master + "\".";
+					return false;
+				}
+				set<&GameOptions::_master>(OptionLevel::COMMAND, master);
 				return false;
 			}
 		}},
@@ -185,35 +197,97 @@ Options::Options()
 		{{"-log"}, {
 			true, "FILE",
 			"Use FILE to output the log information",
-			[this](const std::string&) -> bool {
-				return false;
+			[this](const std::string& path) -> bool {
+				std::filesystem::path cfgPath(path);
+				if (!std::filesystem::exists(cfgPath.parent_path()))
+				{
+					Log(LOG_ERROR) << "Invalid log path \"" + path + "\".";
+				}
+				set<&GameOptions::_logPath>(OptionLevel::COMMAND, cfgPath);
+
+				return true;
 			}
 		}},
 		{{"-logLevel"}, {
 			true, "LEVEL",
 			"Set the log output level. Level can be FATAL, ERROR, WARN, INFO, DEBUG, VERB, or ALL",
-			[this](const std::string&) -> bool {
-				return false;
+			[this](const std::string& level) -> bool {
+				if (level == "FATAL")
+				{
+					set<&GameOptions::_logLevel>(OptionLevel::COMMAND, SeverityLevel::LOG_FATAL);
+				}
+				else if (level == "ERROR")
+				{
+					set<&GameOptions::_logLevel>(OptionLevel::COMMAND, SeverityLevel::LOG_ERROR);
+				}
+				else if (level == "WARN")
+				{
+					set<&GameOptions::_logLevel>(OptionLevel::COMMAND, SeverityLevel::LOG_WARNING);
+				}
+				else if (level == "INFO")
+				{
+					set<&GameOptions::_logLevel>(OptionLevel::COMMAND, SeverityLevel::LOG_INFO);
+				}
+				else if (level == "DEBUG")
+				{
+					set<&GameOptions::_logLevel>(OptionLevel::COMMAND, SeverityLevel::LOG_DEBUG);
+				}
+				else if (level == "VERB")
+				{
+					set<&GameOptions::_logLevel>(OptionLevel::COMMAND, SeverityLevel::LOG_VERBOSE);
+				}
+				else if (level == "ALL")
+				{
+					set<&GameOptions::_logLevel>(OptionLevel::COMMAND, SeverityLevel::LOG_UNCENSORED);
+				}
+				else
+				{
+					Log(LOG_ERROR) << "Invalid log level \"" + level + "\".";
+					return false;
+				}
+
+				return true;
 			}
 		}},
 		{{"-continue"}, {
 			false, "",
 			"Load last saved game",
 			[this](const std::string&) -> bool {
+				set<&GameOptions::_continueSave>(OptionLevel::COMMAND, true);
 				return false;
 			}
 		}},
 		{{"-save"}, {
 			true, "FILE",
 			"Load the save file specified. This will load the file specified regardless if -continue is specified.",
-			[this](const std::string&) -> bool {
-				return false;
+			[this](const std::string& path) -> bool {
+				std::filesystem::path savePath(path);
+				if (!std::filesystem::exists(savePath) || !std::filesystem::is_regular_file(savePath))
+				{
+					Log(LOG_ERROR) << "Invalid save path \"" + path + "\".";
+					return false;
+				}
+
+				set<&GameOptions::_lastSave>(OptionLevel::COMMAND, path);
+				set<&GameOptions::_continueSave>(OptionLevel::COMMAND, true);
+				return true;
 			}
 		}},
 		{{"-locale"}, {
 			true, "LOCALE",
 			"Override the default locale settings. Use LIST as a parameter to this option to see all available locale options.",
-			[this](const std::string&) -> bool {
+			[this](const std::string& locale) -> bool {
+				if(locale=="LIST")
+				{
+					std::cout << "Available locales:" << std::endl;
+					std::cout << " ... TODO" << std::endl;
+				}
+
+				else
+				{
+					set<&GameOptions::_locale>(OptionLevel::COMMAND, locale);
+				}
+
 				return false;
 			}
 		}}
