@@ -46,9 +46,13 @@ Game* getGame()
  * also creates the base game lua state.
  * @param title Title of the game window.
  */
-Game::Game(const std::string& title, Options* options)
+Game::Game(const std::string& title, Options& options)
+	: _options(options), _vfs(options)
 {
 	setThreadLocalGame(this);
+
+	// gmae owns vitual filesystem
+
 
 	//Options::reload = false;
 	//Options::mute = false;

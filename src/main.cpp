@@ -189,8 +189,7 @@ int main(int argc, char *argv[])
 // OPTIONSHACK
 	// if (!Options::init())
 	//	return EXIT_SUCCESS;
-	std::ostringstream title;
-	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
+
 // OPTIONSHACK
 	//Options::baseXResolution = Options::displayWidth;
 	//Options::baseYResolution = Options::displayHeight;
@@ -208,8 +207,11 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 
+	std::ostringstream title;
+	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
+
 	// With the options loaded, we can now create the game
-	Game* game = new Game(title.str(), &options);
+	Game* game = new Game(title.str(), options);
 
 	game->setState(new StartState);
 	game->run();

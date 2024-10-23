@@ -21,6 +21,7 @@
 #include <string>
 #include <memory>
 
+#include "Filesystem/VirtualFileSystem.h"
 #include "../Entity/Engine/ECS.h"
 
 #if defined(ENABLE_ENTITY_INSPECTOR)
@@ -40,18 +41,24 @@ class LuaMod;
 
 /**
  * The core of the game engine, manages the game's entire contents and structure.
- * Takes care of encapsulating all the core SDL commands, provides access to all
+ * Takes care of encapsulating all the core game systems, provides access to all
  * the game's resources and contains a stack state machine to handle all the
  * initializations, events and blits of each state, as well as transitions.
  */
 class Game
 {
 private:
-
-	std::list<State*> _states, _deleted;
-
 	/// central entity component system
 	ECS _ecs;
+
+	/// The game's options.
+	Options& _options;
+
+	/// The virtual filesystem
+	VirtualFileSystem _vfs;
+
+	/// The game's state stack.
+	std::list<State*> _states, _deleted;
 
 	#if defined(ENABLE_ENTITY_INSPECTOR)
 	Inspector _inspector;
@@ -59,7 +66,7 @@ private:
 
 public:
 	/// Creates a new game.
-	Game(const std::string &title, Options* options);
+	Game(const std::string &title, Options& options);
 	/// Cleans up all the game's resources.
 	~Game();
 

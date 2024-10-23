@@ -19,32 +19,38 @@ enable_testing()
 
 # Add the test executable
 add_executable(
-  OpenXcomTests
+  openxcom_tests
   "Engine/TestECS.cpp"
   "Engine/TestOptions.cpp"
   "Engine/TestTimer.cpp"
   "Engine/TestTypeErasedPtr.cpp"
   "Entity/Interface/WindowTest.cpp"
   "Entity/Interface/ButtonTest.cpp"
+  "Engine/TestVirtualFileSystem.cpp")
+
+# Define the source root and add it as a compile definition
+target_compile_definitions(openxcom_tests PRIVATE 
+    TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/src/Tests/Data"
 )
 
+
 # Link Google Test libraries with your test executable
-target_link_libraries(OpenXcomTests PUBLIC openxcom_lib GTest::gtest_main)
+target_link_libraries(openxcom_tests PUBLIC openxcom_lib GTest::gtest_main)
 
 # Discover tests
 include(GoogleTest)
-gtest_discover_tests(OpenXcomTests)
+gtest_discover_tests(openxcom_tests)
 
 # Optionally, register the test with CMake
-add_test(NAME OpenXcomTests COMMAND ${CMAKE_BINARY_DIR}/bin/OpenXcomTests)
+add_test(NAME openxcom_tests COMMAND ${CMAKE_BINARY_DIR}/bin/OpenXcomTests)
 
 # Pass an environment variable to `ctest`
-set_tests_properties(OpenXcomTests PROPERTIES ENVIRONMENT "SKIP_SLOW_TESTS=1")
+set_tests_properties(openxcom_tests PROPERTIES ENVIRONMENT "SKIP_SLOW_TESTS=1")
 
 # Create a custom target to run tests after building the main executable
 add_custom_target(run_tests_after_build ALL
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
-    DEPENDS openxcom OpenXcomTests
+    DEPENDS openxcom openxcom_tests
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src/Tests
 )
 

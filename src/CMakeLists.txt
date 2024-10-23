@@ -175,7 +175,10 @@ set ( engine_src
 #  "Engine/SurfaceSet.cpp"
   "Engine/Timer.cpp"
   "Engine/Unicode.cpp"
-  "Engine/VirtualFileSystem.cpp"
+  "Engine/Filesystem/CompositeFileSystem.cpp"
+  "Engine/Filesystem/EmbeddedFileSystem.cpp"
+  "Engine/Filesystem/PhysicalFileSystem.cpp"
+  "Engine/Filesystem/VirtualFileSystem.cpp"
 #  "Engine/Zoom.cpp
 )
 
