@@ -1,3 +1,4 @@
+#include "VirtualFileSystem.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -54,7 +55,7 @@ FileSystemIterator ZipFileSystem::end()
 }
 
 
-VirtualFileSystem::VirtualFileSystem(Options& options)
+VirtualFileSystem::VirtualFileSystem(const Options& options)
 	: _data(), _mods()
 {
 	// use the paths provided by the game options to set up the initial file systems

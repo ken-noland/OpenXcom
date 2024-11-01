@@ -17,8 +17,11 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Game.h"
-#include "Options.h"
+#include "Engine.h"
 #include "State.h"
+
+#include "Platform/WindowSystem.h"
+#include "Platform/Window.h"
 
 namespace OpenXcom
 {
@@ -41,70 +44,27 @@ Game* getGame()
 }
 
 /**
- * Starts up all the SDL subsystems,
- * creates the display screen and sets up the cursor.
- * also creates the base game lua state.
+ * Constructor for the game class.
  * @param title Title of the game window.
+ * @param options Reference to the game options.
  */
-Game::Game(const std::string& title, Options& options)
-	: _options(options), _vfs(options)
+Game::Game(const std::string& title)
 {
-	setThreadLocalGame(this);
+	_window = getEngine().getPlatformWindowSystem().createWindow(title, 1024, 768);
+	std::shared_ptr<PlatformWindow> window = _window.lock();
 
-	// gmae owns vitual filesystem
+	//window.onExit()
 
 
-	//Options::reload = false;
-	//Options::mute = false;
 
-	//// Initialize SDL
-	//if (SDL_Init(SDL_INIT_VIDEO) < 0)
-	//{
-	//	Log(LOG_ERROR) << SDL_GetError();
-	//	Log(LOG_WARNING) << "No video detected, quit.";
-	//	throw Exception(SDL_GetError());
-	//}
-	//Log(LOG_INFO) << "SDL initialized successfully.";
+	//setThreadLocalGame(this);
 
-	//// Initialize SDL_mixer
-	//initAudio();
-
-	//// trap the mouse inside the window
-	//SDL_WM_GrabInput(Options::captureMouse);
-
-	//// Set the window icon
-	//CrossPlatform::setWindowIcon(IDI_ICON1, "openxcom.png");
-
-	//// Set the window caption
-	//SDL_WM_SetCaption(title.c_str(), 0);
-
-	//// Set up unicode
-	//SDL_EnableUNICODE(1);
-	//Unicode::getUtf8Locale();
-
-	//// Create display
-	//_screen = new Screen();
-
-	//// Create cursor
-	//_cursor = new Cursor(9, 13);
-
-	//// Create invisible hardware cursor to workaround bug with absolute positioning pointing devices
-	//SDL_ShowCursor(SDL_ENABLE);
-	//uint8_t cursor = 0;
-	//SDL_SetCursor(SDL_CreateCursor(&cursor, &cursor, 1,1,0,0));
-
-	//// Create fps counter
-	//_fpsCounter = new FpsCounter(15, 5, 0, 0);
-
-	//// Create blank language
-	//_lang = new Language();
-
-	//_timeOfLastFrame = 0;
-
-	
-	#if defined(ENABLE_ENTITY_INSPECTOR)
-	_inspector.create();
-	#endif
+	//// spin up the game window with graphics, audio, and input
+	//_window.createWindow(title, 1024, 768);
+	//
+	//#if defined(ENABLE_ENTITY_INSPECTOR)
+	//_inspector.create();
+	//#endif
 }
 
 /**
@@ -115,27 +75,6 @@ Game::~Game()
 	#if defined(ENABLE_ENTITY_INSPECTOR)
 	_inspector.destroy();
 	#endif
-
-	//Sound::stop();
-	//Music::stop();
-
-	//for (auto* state : _states)
-	//{
-	//	delete state;
-	//}
-
-	//SDL_FreeCursor(SDL_GetCursor());
-
-	//delete _cursor;
-	//delete _lang;
-	//delete _save;
-	//_mod.reset();
-	//delete _screen;
-	//delete _fpsCounter;
-
-	//Mix_CloseAudio();
-
-	//SDL_Quit();
 }
 
 /**
@@ -143,8 +82,22 @@ Game::~Game()
  * active state, running any code within and blitting all the states and
  * cursor to the screen. This is run indefinitely until the game quits.
  */
-void Game::run()
+void Game::update()
 {
+	//while (_window.isRunning())
+	//{
+	//	_window.processEvents();
+	//	//for (State* state : _states)
+	//	//{
+	//	//	state->update();
+	//	//}
+	//	//// clear the deleted states
+	//	//_deleted.clear();
+
+	//	#if defined(ENABLE_ENTITY_INSPECTOR)
+	//	_inspector.update();
+	//	#endif
+	//}
 }
 
 /**
@@ -152,16 +105,6 @@ void Game::run()
  */
 void Game::quit()
 {
-	// Hard-learned lesson: there's a billion+ situations, where this causes a corrupted save and subsequent crashes. It's not worth it!
-#if 0
-	// Always save ironman
-	if (_save != 0 && _save->isIronman() && !_save->getName().empty())
-	{
-		std::string filename = CrossPlatform::sanitizeFilename(_save->getName()) + ".sav";
-		_save->save(filename, _mod);
-	}
-#endif
-//	_quit = true;
 }
 
 /**

@@ -1,0 +1,74 @@
+#pragma once
+/*
+ * Copyright 2010-2016 OpenXcom Developers.
+ *
+ * This file is part of OpenXcom.
+ *
+ * OpenXcom is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenXcom is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
+ */
+#include <memory>
+#include <vector>
+#include <string>
+
+namespace OpenXcom
+{
+
+class Game;
+class Options;
+class VirtualFileSystem;
+class PlatformProcessSystem;
+class PlatformWindowSystem;
+
+// Engine is used for process wide initialization and cleanup. In theory, it
+// provides a way to separate and isolate the game from the rest of the
+// systems, allowing for easier testing and debugging. In practice, a lot
+// of the underlying systems and classes are still tightly coupled due to the
+// way the game was originally written.
+class Engine
+{
+	// Options
+	std::unique_ptr<Options> _options;
+
+	// Virtual File System
+	std::unique_ptr<VirtualFileSystem> _virtualFileSystem;
+
+	// Platform Process System
+	std::unique_ptr<PlatformProcessSystem> _platformProcessSystem;
+
+	// Platform Window System
+	std::unique_ptr<PlatformWindowSystem> _platformWindowSystem;
+
+	std::unique_ptr<Game> _game;
+
+private:
+	friend int run(const std::vector<std::string>& args);
+
+	Engine(const std::vector<std::string>& args);
+	~Engine();
+
+public:
+
+	int run();
+
+	// call this to exit the application
+	void exit();
+
+	Options& getOptions() { return *_options; }
+	VirtualFileSystem& getVirtualFileSystem() { return *_virtualFileSystem; }
+	PlatformWindowSystem& getPlatformWindowSystem() { return *_platformWindowSystem; }
+};
+
+Engine& getEngine();
+
+} // namespace OpenXcom

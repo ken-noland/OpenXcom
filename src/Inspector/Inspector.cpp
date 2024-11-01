@@ -21,7 +21,7 @@
 #include "InspectorApp.h"
 #include "InspectorFrame.h"
 
-#include "../Engine/Game.h"
+#include "../Engine/Logger.h"
 
 namespace OpenXcom
 {
@@ -38,43 +38,14 @@ Inspector::~Inspector()
 
 void Inspector::create()
 {
-	if (!wxTheApp)
-	{
-		_app = new InspectorApp(); // Create a new wxApp instance
-		wxApp::SetInstance(_app);  // Create a new wxApp instance
-		wxEntryStart(0, nullptr);  // Initialize wxWidgets
-		wxTheApp->CallOnInit();    // Initialize the app
-	}
-	_frame = new InspectorFrame("OpenXcom Inspector", getGame()->getECS()); // Create the inspector window
-	show();
 }
 
 void Inspector::destroy()
 {
-	if (_frame)
-	{
-		_frame->Destroy();
-		_frame = nullptr;
-	}
-	wxEntryCleanup(); // Clean up wxWidgets
 }
-
-void Inspector::show()
+void Inspector::update()
 {
-	if (!_isShown)
-	{
-		_frame->Show(true); // Show the window
-		_isShown = true;
-	}
-}
-
-void Inspector::hide()
-{
-	if (_isShown)
-	{
-		_frame->Show(false); // Hide the window
-		_isShown = false;
-	}
 }
 
 } // namespace OpenXcom
+

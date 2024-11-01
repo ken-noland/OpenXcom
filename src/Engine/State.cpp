@@ -17,36 +17,21 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "State.h"
-#include <climits>
-#include "InteractiveSurface.h"
-#include "Game.h"
-#include "Screen.h"
-#include "Surface.h"
-#include "Timer.h"
-#include "Language.h"
-#include "LocalizedText.h"
-#include "Palette.h"
-#include "../Engine/Sound.h"
-#include "../Mod/Mod.h"
-#include "../Interface/Window.h"
+//#include "InteractiveSurface.h"
+//#include "Game.h"
+//#include "Surface.h"
+//#include "LocalizedText.h"
+//#include "../Mod/Mod.h"
 #include "../Interface/TextButton.h"
-#include "../Interface/TextEdit.h"
-#include "../Interface/TextList.h"
-#include "../Interface/BattlescapeButton.h"
-#include "../Interface/ComboBox.h"
-#include "../Interface/Cursor.h"
-#include "../Interface/FpsCounter.h"
-#include "../Savegame/SavedBattleGame.h"
-#include "../Mod/RuleInterface.h"
-
-#include "../Entity/Engine/Surface.h"
-#include "../Entity/Engine/Input.h"
-#include "../Entity/Engine/Palette.h"
-#include "../Entity/Engine/Drawable.h"
-#include "../Entity/Engine/Hierarchical.h"
-#include "../Entity/Interface/Window.h"
-#include "../Entity/Interface/Text.h"
-#include "../Entity/Interface/Button.h"
+//#include "../Interface/TextEdit.h"
+//#include "../Interface/TextList.h"
+//#include "../Savegame/SavedBattleGame.h"
+//
+//#include "../Entity/Engine/Surface.h"
+//#include "../Entity/Engine/Input.h"
+//#include "../Entity/Engine/Drawable.h"
+//#include "../Entity/Engine/Hierarchical.h"
+//#include "../Entity/Interface/Window.h"
 
 namespace OpenXcom
 {
@@ -70,13 +55,13 @@ State::State(const std::string& name, bool screen)
  */
 State::~State()
 {
-	HierarchySystem& hierarchySystem = getGame()->getECS().getSystem<HierarchySystem>();
-	for (const entt::handle& surfaceEnt : _surfaces)
-	{
-		hierarchySystem.visitRecursive(surfaceEnt, [this](entt::handle entity) { entity.destroy(); });
+	//HierarchySystem& hierarchySystem = getGame()->getECS().getSystem<HierarchySystem>();
+	//for (const entt::handle& surfaceEnt : _surfaces)
+	//{
+	//	hierarchySystem.visitRecursive(surfaceEnt, [this](entt::handle entity) { entity.destroy(); });
 
-		getRegistry().raw().destroy(surfaceEnt);
-	}
+	//	getRegistry().raw().destroy(surfaceEnt);
+	//}
 }
 
 /**
@@ -401,11 +386,11 @@ void State::handle(Action *action)
  */
 void State::blit()
 {
-	DrawableSystem& drawable = getSystem<DrawableSystem>();
-	for (entt::handle& surfaceEnt : _surfaces)
-	{
-		drawable.draw(surfaceEnt);
-	}
+	//DrawableSystem& drawable = getSystem<DrawableSystem>();
+	//for (entt::handle& surfaceEnt : _surfaces)
+	//{
+	//	drawable.draw(surfaceEnt);
+	//}
 }
 
 /**
@@ -579,18 +564,18 @@ void State::applyBattlescapeTheme(const std::string& category)
  */
 void State::redrawText()
 {
-	for (entt::handle surfaceEnt : _surfaces)
-	{
-		Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
-		Text* text = dynamic_cast<Text*>(surface);
-		TextButton* button = dynamic_cast<TextButton*>(surface);
-		TextEdit* edit = dynamic_cast<TextEdit*>(surface);
-		TextList* list = dynamic_cast<TextList*>(surface);
-		if (text || button || edit || list)
-		{
-			surface->draw();
-		}
-	}
+	//for (entt::handle surfaceEnt : _surfaces)
+	//{
+	//	Surface* surface = surfaceEnt.get<SurfaceComponent>().getSurface();
+	//	Text* text = dynamic_cast<Text*>(surface);
+	//	TextButton* button = dynamic_cast<TextButton*>(surface);
+	//	TextEdit* edit = dynamic_cast<TextEdit*>(surface);
+	//	TextList* list = dynamic_cast<TextList*>(surface);
+	//	if (text || button || edit || list)
+	//	{
+	//		surface->draw();
+	//	}
+	//}
 }
 
 /**

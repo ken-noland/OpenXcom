@@ -18,23 +18,21 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
+
+// Clean up the preprocessor directives left behind by FLTK
+#undef min
+#undef max
+#undef small
+#undef big
+
 namespace OpenXcom
 {
 
 class InspectorApp;
-class InspectorFrame;
 
 class Inspector
 {
-	// Manually managed app
-	InspectorApp* _app;
-
-	// The main inspector window
-	InspectorFrame* _frame;
-
-	// Whether the inspector is currently shown
-	bool _isShown = false;
-
 public:
 	Inspector();
 	~Inspector();
@@ -42,8 +40,7 @@ public:
 	void create();
 	void destroy();
 
-	void show();
-	void hide();
+	void update();
 };
 
 } // namespace OpenXcom

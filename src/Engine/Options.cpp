@@ -294,12 +294,19 @@ Options::Options()
 	};
 }
 
+Options::Options(const std::vector<std::string>& argv)
+{
+	Options();
+	load(argv);
+}
+
 Options::~Options()
 {
 }
 
 void Options::showVersion()
 {
+	std::cout << "OpenXcom " << OPENXCOM_VERSION_SHORT << std::endl;
 }
 
 

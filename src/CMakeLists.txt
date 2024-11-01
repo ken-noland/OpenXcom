@@ -137,6 +137,7 @@ set ( engine_src
 #  "Engine/AdlibMusic.cpp"
 #  "Engine/CatFile.cpp"
   "Engine/CrossPlatform.cpp"
+  "Engine/Engine.cpp"
   "Engine/Exception.cpp"
 #  "Engine/FastLineClip.cpp"
 #  "Engine/FileMap.cpp"
@@ -179,6 +180,11 @@ set ( engine_src
   "Engine/Filesystem/EmbeddedFileSystem.cpp"
   "Engine/Filesystem/PhysicalFileSystem.cpp"
   "Engine/Filesystem/VirtualFileSystem.cpp"
+  "Engine/Platform/ProcessSystem.cpp"
+  "Engine/Platform/Window.cpp"
+  "Engine/Platform/WindowSystem.cpp"
+  "Engine/Platform/Win32/Win32Process.cpp"
+  "Engine/Platform/Win32/Win32Window.cpp"
 #  "Engine/Zoom.cpp
 )
 
@@ -625,29 +631,30 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(inja)
 
-# Fetch wxWidgets
-#  wxWidgets is used for the entity inspector
-if(ENABLE_ENTITY_INSPECTOR)
+# Fetch Dear ImGui
+#  Dear ImGui is used for the entity inspector
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG        v1.91.4
+    GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(imgui)
 
-    # ------------------ wxWidgets ------------------
-    set(wxBUILD_SHARED OFF CACHE BOOL "Build wx libraries as shared libs")
-    set(wxBUILD_PRECOMP OFF CACHE BOOL "Use precompiled headers")
-    set(wxBUILD_MONOLITHIC OFF CACHE BOOL "Build a single library")
+# Define ImGui sources
+set(IMGUI_SOURCES
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+)
 
-    set(wxWidgets_USE_STATIC 1)
+# Add ImGui library
+add_library(ImGui STATIC ${IMGUI_SOURCES})
+target_include_directories(ImGui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
 
-    FetchContent_Declare(
-        wxWidgets 
-        GIT_REPOSITORY https://github.com/wxWidgets/wxWidgets.git
-        GIT_TAG        v3.2.1
-        GIT_SHALLOW     TRUE
-    )
-    
-    FetchContent_GetProperties(wxWidgets)
-    FetchContent_MakeAvailable(wxWidgets)
-    
-endif() # ENABLE_ENTITY_INSPECTOR
-
+# Fetch YAML
 set(openxcom_defines
   YAML_CPP_STATIC_DEFINE
 )
@@ -661,16 +668,23 @@ set(openxcom_includes
   ${inja_SOURCE_DIR}
 )
 
+# Fetch Vulkan-Headers
+FetchContent_Declare(
+    vulkan_headers
+    GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers.git
+    GIT_TAG        v1.3.300  # Update to the desired version
+)
+FetchContent_MakeAvailable(vulkan_headers)
+
+# Add Vulkan-Headers include directory
+include_directories(${vulkan_headers_SOURCE_DIR}/include)
+
+
 set(openxcom_libs
   yaml-cpp::yaml-cpp
   lua
+  ImGui
 )
-
-if(ENABLE_ENTITY_INSPECTOR)
-  list(APPEND openxcom_defines ENABLE_ENTITY_INSPECTOR)
-  list(APPEND openxcom_includes ${wxWidgets_INCLUDE_DIRS})
-  list(APPEND openxcom_libs wxbase wxcore)
-endif()
 
 # openxcom base library targets
 add_library(openxcom_base_lib OBJECT ${openxcom_src})

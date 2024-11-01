@@ -22,6 +22,7 @@
 #include <memory>
 
 #include "Filesystem/VirtualFileSystem.h"
+#include "Platform/Window.h"
 #include "../Entity/Engine/ECS.h"
 
 #if defined(ENABLE_ENTITY_INSPECTOR)
@@ -51,11 +52,7 @@ private:
 	/// central entity component system
 	ECS _ecs;
 
-	/// The game's options.
-	Options& _options;
-
-	/// The virtual filesystem
-	VirtualFileSystem _vfs;
+	std::weak_ptr<PlatformWindow> _window;
 
 	/// The game's state stack.
 	std::list<State*> _states, _deleted;
@@ -66,12 +63,12 @@ private:
 
 public:
 	/// Creates a new game.
-	Game(const std::string &title, Options& options);
+	Game(const std::string &title);
 	/// Cleans up all the game's resources.
 	~Game();
 
-	/// Starts the game's state machine.
-	void run();
+	/// Update the game.
+	void update();
 	/// Quits the game.
 	void quit();
 
@@ -94,6 +91,5 @@ public:
 
 /// Global function that retrieve a thread local Game object.
 Game* getGame();
-
 
 }

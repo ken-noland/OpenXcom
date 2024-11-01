@@ -92,7 +92,7 @@ namespace OpenXcom
 {
 namespace CrossPlatform
 {
-	std::string errorDlg;
+//	std::string errorDlg;
 
 /**
  * Determines the available Linux error dialogs.

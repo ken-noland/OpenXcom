@@ -277,7 +277,7 @@ private:
 class VirtualFileSystem
 {
 public:
-	VirtualFileSystem(Options& options);
+	VirtualFileSystem(const Options& options);
 	~VirtualFileSystem();
 
 	FileSystem& getDataFileSystem();

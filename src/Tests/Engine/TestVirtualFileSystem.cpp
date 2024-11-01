@@ -23,7 +23,7 @@
 
 using namespace OpenXcom;
 
-TEST(VirtualFileSystemTest, TestFileEntry)
+TEST(VirtualFileSystemTest, TestPhysicalFileEntry)
 {
 	std::filesystem::path path = TEST_DATA_DIR;
 
@@ -54,9 +54,9 @@ TEST(VirtualFileSystemTest, TestFileEntry)
 }
 
 
-TEST(VirtualFileSystemTest, TestPhyiscalFilesystemIterator)
+TEST(VirtualFileSystemTest, TestPhysicalFilesystemIterator)
 {
-	_crtBreakAlloc = 25546;
+	//_crtBreakAlloc = 25546;
 
 	std::filesystem::path path = TEST_DATA_DIR;
 

@@ -31,6 +31,20 @@
 namespace OpenXcom
 {
 
+// Options for the game. It's worth noting that options are multi-layered. What
+// this means is that an option can be set at different levels. The levels, and
+// their order of precedence are as follows:
+// 
+// 1. Command line
+// 2. Config file
+// 3. Default value
+//
+// The command line options will override the config file options, which will
+// override the default values. This allows us to set default values for the
+// options, but also allows the user to override them with command line options
+// or a config file. This also makes it possible to restore the default values.
+
+
 // helper struct that contains the information for a command line options and
 // the function to execute if the option is found
 struct CommandLineOption
@@ -89,7 +103,7 @@ struct Option
 				return values[i].value();
 			}
 		}
-		throw std::runtime_error("Option not set at any level");
+		throw std::runtime_error("Option not set");
 	}
 
     // getAt with a parameter pack
@@ -218,9 +232,8 @@ private:
 
 
 public:
-	/// Constructor.
 	Options();
-	/// Destructor.
+	Options(const std::vector<std::string>& argv);
 	~Options();
 
 	/// Load options from file.

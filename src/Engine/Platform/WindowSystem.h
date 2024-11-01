@@ -17,19 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <memory>
+#include <string>
+#include <vector>
 
-// we need to wrap all wxWidgets includes in this file to avoid conflicts with other systems
-//#pragma push_macro("Log")
-//#undef Log
-//
-//#include <wx/wx.h>
-//#include <wx/notebook.h>
-//#include <wx/treectrl.h>
-//#include <wx/timer.h>
-//#include <wx/splitter.h>
-//#include <wx/srchctrl.h>
-//#include <wx/statline.h>
-//#include <wx/valnum.h>
-//#include <wx/propgrid/propgrid.h>
-//
-//#pragma pop_macro("Log")
+namespace OpenXcom
+{
+
+class PlatformWindow;
+
+class PlatformWindowSystem
+{
+	std::vector<std::shared_ptr<PlatformWindow>> _windows;
+
+public:
+	PlatformWindowSystem();
+	~PlatformWindowSystem();
+
+	// Create a new platform window
+	std::weak_ptr<PlatformWindow> createWindow(const std::string& title, int width, int height);
+
+	// Destroy a platform window
+	void destroyWindow(std::weak_ptr<PlatformWindow> window);
+
+	// Update all platform windows
+	void update();
+
+};
+
+} // namespace OpenXcom

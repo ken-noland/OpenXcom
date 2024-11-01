@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -18,18 +17,30 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// we need to wrap all wxWidgets includes in this file to avoid conflicts with other systems
-//#pragma push_macro("Log")
-//#undef Log
-//
-//#include <wx/wx.h>
-//#include <wx/notebook.h>
-//#include <wx/treectrl.h>
-//#include <wx/timer.h>
-//#include <wx/splitter.h>
-//#include <wx/srchctrl.h>
-//#include <wx/statline.h>
-//#include <wx/valnum.h>
-//#include <wx/propgrid/propgrid.h>
-//
-//#pragma pop_macro("Log")
+#include "Window.h"
+
+namespace OpenXcom
+{
+
+PlatformWindow::PlatformWindow(const std::string& title, int width, int height)
+{
+	platformSpecificCreateWindow(title, width, height);
+}
+
+PlatformWindow::~PlatformWindow()
+{
+	platformSpecificClose();
+}
+
+bool PlatformWindow::isRunning() const
+{
+	return _running;
+}
+
+void PlatformWindow::close()
+{
+	_running = false;
+	platformSpecificClose();
+}
+
+} // namespace OpenXcom

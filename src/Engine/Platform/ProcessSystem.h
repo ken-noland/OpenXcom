@@ -18,18 +18,22 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// we need to wrap all wxWidgets includes in this file to avoid conflicts with other systems
-//#pragma push_macro("Log")
-//#undef Log
-//
-//#include <wx/wx.h>
-//#include <wx/notebook.h>
-//#include <wx/treectrl.h>
-//#include <wx/timer.h>
-//#include <wx/splitter.h>
-//#include <wx/srchctrl.h>
-//#include <wx/statline.h>
-//#include <wx/valnum.h>
-//#include <wx/propgrid/propgrid.h>
-//
-//#pragma pop_macro("Log")
+namespace OpenXcom
+{
+
+class PlatformProcessSystem
+{
+	bool _isRunning;
+
+	void platformSpecificUpdate();
+
+public:
+	PlatformProcessSystem();
+	~PlatformProcessSystem();
+
+	void update();
+
+	bool isRunning() const { return _isRunning; };
+};
+
+} // namespace OpenXcom

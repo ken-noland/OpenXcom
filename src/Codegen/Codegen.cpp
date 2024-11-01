@@ -207,22 +207,22 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 
 	//exclude std::string, std::filesystem::path, and others that we will be implicitly handling
 	typeFilters.push_back([](const SimpleRTTR::Type& type) {
-		static std::vector<SimpleRTTR::Type> typesToExclude = {
-			SimpleRTTR::types().get_type<std::string>(),
-			SimpleRTTR::types().get_type<std::filesystem::path>(),
-			SimpleRTTR::types().get_type<bool>(),
-			SimpleRTTR::types().get_type<int>(),
-			SimpleRTTR::types().get_type<short>(),
-			SimpleRTTR::types().get_type<char>(),
-			SimpleRTTR::types().get_type<unsigned int>(),
-			SimpleRTTR::types().get_type<unsigned short>(),
-			SimpleRTTR::types().get_type<unsigned char>(),
-			SimpleRTTR::types().get_type<char*>()
+		static std::vector<std::type_index> typesToExclude = {
+			typeid(std::string),			
+			typeid(std::filesystem::path),
+			typeid(bool),
+			typeid(int),
+			typeid(short),
+			typeid(char),
+			typeid(unsigned int),
+			typeid(unsigned short),
+			typeid(unsigned char),
+			typeid(char*)
 		};
 
-		for (const SimpleRTTR::Type& excludeType : typesToExclude)
+		for (const std::type_index& excludeType : typesToExclude)
 		{
-			if (type == excludeType)
+			if (type.type_index() == excludeType)
 			{
 				return false;
 			}

@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -18,18 +17,29 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// we need to wrap all wxWidgets includes in this file to avoid conflicts with other systems
-//#pragma push_macro("Log")
-//#undef Log
-//
-//#include <wx/wx.h>
-//#include <wx/notebook.h>
-//#include <wx/treectrl.h>
-//#include <wx/timer.h>
-//#include <wx/splitter.h>
-//#include <wx/srchctrl.h>
-//#include <wx/statline.h>
-//#include <wx/valnum.h>
-//#include <wx/propgrid/propgrid.h>
-//
-//#pragma pop_macro("Log")
+#if defined(_WIN32) || defined(_WIN64)
+
+#include "../ProcessSystem.h"
+#include <windows.h>
+
+namespace OpenXcom
+{
+
+void PlatformProcessSystem::platformSpecificUpdate()
+{
+	MSG msg;
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		if (msg.message == WM_QUIT)
+		{
+			_isRunning = false; // Signal to Engine that the application should stop
+			return;      // Exit processing after handling WM_QUIT
+		}
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+}
+
+} // namespace OpenXcom
+
+#endif // defined(_WIN32) || defined(_WIN64)
