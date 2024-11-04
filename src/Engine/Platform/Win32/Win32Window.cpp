@@ -18,6 +18,7 @@
  */
 #if defined(_WIN32)
 #include "../Window.h"
+#include "../../Engine.h"
 
 #include <windows.h>
 
@@ -31,7 +32,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_CLOSE:
-		PostQuitMessage(0); // Post a WM_QUIT message to terminate the message loop
+		//KN TODO: need to send this message to the owning window to handle it
+		getEngine().exit();
 		return 0;
 	case WM_KEYDOWN:
 		// Handle key down events if needed

@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -18,26 +17,16 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GraphicsSystem.h"
+#include "Vulkan/VulkanSystem.h"
+
 namespace OpenXcom
 {
 
-class PlatformProcessSystem
+std::unique_ptr<GraphicsSystem> createGraphicsSystem(const Options& options)
 {
-	bool _isRunning;
-
-	void platformSpecificUpdate();
-	void platformSpecificExit();
-
-public:
-	PlatformProcessSystem();
-	~PlatformProcessSystem();
-
-	void update();
-
-	bool isRunning() const { return _isRunning; };
-
-	// post a quit message to the system which shuts down the application safely
-	void exit();
-};
+	// right now we only have one type of graphics system(Vulkan) so ignore whatever is set in the config and use it for now
+	return std::make_unique<VulkanSystem>(options);
+}
 
 } // namespace OpenXcom

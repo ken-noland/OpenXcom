@@ -180,6 +180,8 @@ set ( engine_src
   "Engine/Filesystem/EmbeddedFileSystem.cpp"
   "Engine/Filesystem/PhysicalFileSystem.cpp"
   "Engine/Filesystem/VirtualFileSystem.cpp"
+  "Engine/Graphics/GraphicsSystem.cpp"
+  "Engine/Graphics/Vulkan/VulkanSystem.cpp"
   "Engine/Platform/ProcessSystem.cpp"
   "Engine/Platform/Window.cpp"
   "Engine/Platform/WindowSystem.cpp"

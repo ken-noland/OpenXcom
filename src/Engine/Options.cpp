@@ -413,6 +413,14 @@ bool Options::loadFile()
 		return false;
 	}
 
+	// read graphics options
+	GraphicsOptions& graphicsOptions = std::get<OptionCategory<GraphicsOptions>>(_optionCategories).optionsStruct;
+	if (!fromJson(json["graphicsOptions"], graphicsOptions))
+	{
+		Log(LOG_ERROR) << "Failed to load graphics options from file.";
+		return false;
+	}
+
 	return true;
 }
 
@@ -422,7 +430,10 @@ bool OpenXcom::Options::saveFile()
 	nlohmann::json json;
 
 	const GameOptions& gameOptions = std::get<OptionCategory<GameOptions>>(_optionCategories).optionsStruct;
+	const GraphicsOptions& graphicsOptions = std::get<OptionCategory<GraphicsOptions>>(_optionCategories).optionsStruct;
+
 	toJson(gameOptions, json["gameOptions"]);
+	toJson(gameOptions, json["graphicsOptions"]);
 
 	std::filesystem::path configFile = getConfigFile();
 

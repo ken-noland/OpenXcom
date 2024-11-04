@@ -51,6 +51,12 @@ void PlatformProcessSystem::platformSpecificUpdate()
 	//}
 }
 
+void PlatformProcessSystem::platformSpecificExit()
+{
+	_isRunning = false; // Signal to Engine that the application should stop
+}
+
+
 } // namespace OpenXcom
 
 #endif // __linux__

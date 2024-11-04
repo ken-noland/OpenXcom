@@ -23,6 +23,7 @@
 #include "Filesystem/VirtualFileSystem.h"
 #include "Platform/WindowSystem.h"
 #include "Platform/ProcessSystem.h"
+#include "Graphics/GraphicsSystem.h"
 #include "../version.h"
 
 #include <simplerttr.h>
@@ -53,6 +54,9 @@ Engine::Engine(const std::vector<std::string>& args)
 
 	// Initialize the window system
 	_platformWindowSystem = std::make_unique<PlatformWindowSystem>();
+
+	// Initialize the graphics system
+	_graphicsSystem = createGraphicsSystem(getOptions());
 
 	std::ostringstream title;
 	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
@@ -88,6 +92,7 @@ int Engine::run()
 
 void Engine::exit()
 {
+	_platformProcessSystem->exit();
 }
 
 Engine& getEngine()

@@ -29,6 +29,7 @@ class Options;
 class VirtualFileSystem;
 class PlatformProcessSystem;
 class PlatformWindowSystem;
+class GraphicsSystem;
 
 // Engine is used for process wide initialization and cleanup. In theory, it
 // provides a way to separate and isolate the game from the rest of the
@@ -48,6 +49,9 @@ class Engine
 
 	// Platform Window System
 	std::unique_ptr<PlatformWindowSystem> _platformWindowSystem;
+
+	// Graphics system
+	std::unique_ptr<GraphicsSystem> _graphicsSystem;
 
 	std::unique_ptr<Game> _game;
 

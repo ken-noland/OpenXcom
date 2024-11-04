@@ -19,6 +19,8 @@
 #ifdef __linux__
 
 #include "../Window.h"
+#include "../../Engine.h"
+
 #include <X11/Xlib.h>
 #include <stdexcept>
 
@@ -80,6 +82,7 @@ void PlatformWindow::platformSpecificUpdateWindow()
 				if (event.xclient.data.l[0] == _handle.wmDeleteMessage)
 				{
 					//this->isRunning = false; // Set flag to indicate window close
+					getEngine().exit();
 				}
 				break;
 			// Add other event handling cases as needed

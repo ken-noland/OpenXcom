@@ -40,6 +40,12 @@ void PlatformProcessSystem::platformSpecificUpdate()
 	}
 }
 
+void PlatformProcessSystem::platformSpecificExit()
+{
+	// Post a quit message to the message queue which will get picked up by the main loop(see above)
+	PostQuitMessage(0);
+}
+
 } // namespace OpenXcom
 
 #endif // defined(_WIN32) || defined(_WIN64)
