@@ -24,6 +24,8 @@
  // Forward declarations for Windows types
 typedef struct HWND__* HWND;
 typedef struct HINSTANCE__* HINSTANCE;
+#elif defined(__linux__)
+typedef unsigned long Atom;
 #endif
 
 namespace OpenXcom
@@ -39,6 +41,9 @@ struct PlatformWindowHandle
 #elif defined(__linux__)
 	void* display;        // Could be a pointer to X11 Display or Wayland connection.
 	unsigned long window; // Window handle (X11) or equivalent (Wayland).
+
+	// X11 specific
+	Atom wmDeleteMessage;
 #elif defined(__APPLE__)
 	void* window; // NSWindow* equivalent
 #elif defined(__ANDROID__)
@@ -49,12 +54,10 @@ struct PlatformWindowHandle
 class PlatformWindow
 {
 private:
-	void processEvents();
-
 	// These are defined here, but implemented in the platform-specific files
 	void platformSpecificCreateWindow(const std::string& title, int width, int height);
-	void platformSpecificProcessEvents();
-	void platformSpecificClose();
+	void platformSpecificDestroyWindow();
+	void platformSpecificUpdateWindow();
 
 	bool _running;
 
@@ -63,6 +66,8 @@ private:
 public:
 	PlatformWindow(const std::string& title, int width, int height);
 	~PlatformWindow();
+
+	void update();
 
 	bool isRunning() const;
 	void close();

@@ -71,7 +71,7 @@ void PlatformWindow::platformSpecificCreateWindow(const std::string& title, int 
 	ShowWindow(_handle.hWnd, SW_SHOW);
 }
 
-void PlatformWindow::platformSpecificClose()
+void PlatformWindow::platformSpecificDestroyWindow()
 {
 	if (_handle.hWnd != NULL)
 	{
@@ -80,6 +80,50 @@ void PlatformWindow::platformSpecificClose()
 	}
 }
 
+void PlatformWindow::platformSpecificUpdateWindow()
+{
+	// nothing to see here since the window message loop is in the process system
+}
+
 } // namespace OpenXcom
 
 #endif // defined(_WIN32) || defined(_WIN64)
+
+
+/////////////////////////////////////////////////////
+
+//
+///**
+// * Sets the window titlebar icon.
+// * For Windows, use the embedded resource icon.
+// * For other systems, use a PNG icon.
+// * @param winResource ID for Windows icon.
+// * @param unixPath Path to PNG icon for Unix.
+// */
+//#ifdef _WIN32
+//void setWindowIcon(int winResource, const std::string&)
+//{
+//	assert(!"Not implemented");
+//	// SDLHACK
+//	// HINSTANCE handle = GetModuleHandle(NULL);
+//	// HICON icon = LoadIcon(handle, MAKEINTRESOURCE(winResource));
+//
+//	// SDL_SysWMinfo wminfo;
+//	// SDL_VERSION(&wminfo.version)
+//	// if (SDL_GetWMInfo(&wminfo))
+//	//{
+//	//	HWND hwnd = wminfo.window;
+//	//	SetClassLongPtr(hwnd, GCLP_HICON, (LONG_PTR)icon);
+//	// }
+//}
+//#else
+//void setWindowIcon(int, const std::string& unixPath)
+//{
+//	SDL_Surface* icon = IMG_Load_RW(FileMap::getRWops(unixPath), SDL_TRUE);
+//	if (icon != 0)
+//	{
+//		SDL_WM_SetIcon(icon, NULL);
+//		SDL_FreeSurface(icon);
+//	}
+//}
+//#endif

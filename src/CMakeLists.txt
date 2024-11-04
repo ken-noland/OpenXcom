@@ -183,6 +183,8 @@ set ( engine_src
   "Engine/Platform/ProcessSystem.cpp"
   "Engine/Platform/Window.cpp"
   "Engine/Platform/WindowSystem.cpp"
+  "Engine/Platform/Linux/LinuxProcess.cpp"
+  "Engine/Platform/Linux/LinuxWindow.cpp"
   "Engine/Platform/Win32/Win32Process.cpp"
   "Engine/Platform/Win32/Win32Window.cpp"
 #  "Engine/Zoom.cpp
@@ -515,11 +517,13 @@ endif()
 # All the source files that are necessary to build the project, excluding the main.cpp file
 set ( openxcom_src ${c_src} ${cxx_src} ${embed_src} )
 
-
 set ( c_src
   ../libs/miniz/miniz.c
 )
 set_property ( SOURCE ${c_src} APPEND PROPERTY COMPILE_DEFINITIONS MINIZ_NO_STDIO )
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 
 # External libraries
 include(FetchContent)
@@ -654,7 +658,16 @@ set(IMGUI_SOURCES
 add_library(ImGui STATIC ${IMGUI_SOURCES})
 target_include_directories(ImGui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
 
-# Fetch YAML
+# Fetch Vulkan-Headers
+FetchContent_Declare(
+    vulkan_headers
+    GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers.git
+    GIT_TAG        v1.3.300  # Update to the desired version
+)
+FetchContent_MakeAvailable(vulkan_headers)
+
+
+# set up the defines and includes
 set(openxcom_defines
   YAML_CPP_STATIC_DEFINE
 )
@@ -666,25 +679,25 @@ set(openxcom_includes
   ${SimpleRTTR_SOURCE_DIR}/include
   ${nlohmann_json_SOURCE_DIR}/include
   ${inja_SOURCE_DIR}
+  ${vulkan_headers_SOURCE_DIR}/include
 )
-
-# Fetch Vulkan-Headers
-FetchContent_Declare(
-    vulkan_headers
-    GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers.git
-    GIT_TAG        v1.3.300  # Update to the desired version
-)
-FetchContent_MakeAvailable(vulkan_headers)
-
-# Add Vulkan-Headers include directory
-include_directories(${vulkan_headers_SOURCE_DIR}/include)
-
 
 set(openxcom_libs
   yaml-cpp::yaml-cpp
   lua
   ImGui
 )
+
+if(UNIX)
+  # Find the X11 package
+  find_package(X11 REQUIRED)
+
+  # Link the X11 libraries to your target
+  if(X11_FOUND)
+    list(APPEND openxcom_includes ${X11_INCLUDE_DIR})
+    list(APPEND openxcom_libs ${X11_LIBRARIES})
+  endif() #X11_FOUND
+endif() #UNIX
 
 # openxcom base library targets
 add_library(openxcom_base_lib OBJECT ${openxcom_src})
@@ -705,11 +718,13 @@ target_link_libraries(codegen PUBLIC ${openxcom_libs})
 
 # Allow undefined symbols for codegen
 if(MSVC)
-    target_link_options(codegen PRIVATE "/FORCE")
+  target_link_options(codegen PRIVATE "/FORCE")
 elseif(APPLE)
-    target_link_options(codegen PRIVATE "-undefined dynamic_lookup")
+  target_link_options(codegen PRIVATE "-undefined dynamic_lookup")
 elseif(UNIX)
-    target_link_options(codegen PRIVATE "-Wl,--unresolved-symbols=ignore-in-object-files")
+  target_link_options(codegen PRIVATE "-Wl,--unresolved-symbols=ignore-in-object-files")
+  target_link_options(codegen PRIVATE "-no-pie")
+  target_compile_options(codegen PRIVATE -fPIC)
 endif()
 
 # Define the generated source files
@@ -729,13 +744,17 @@ set(codegen_templates
     "Codegen/Templates/Json/JsonTemplate.json"
 )
 
+add_custom_target(create_generated_dir ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/generated"
+    COMMENT "Creating generated directory"
+)
+
 # Custom command to generate the source files using codegen
 add_custom_command(
     OUTPUT "${CMAKE_BINARY_DIR}/generated/json.cpp"
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/generated
     COMMAND $<TARGET_FILE:codegen> -template "${CMAKE_CURRENT_SOURCE_DIR}/Codegen/Templates/Json/JsonTemplate.json" -output "${CMAKE_BINARY_DIR}/generated/json.cpp"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated
-    DEPENDS codegen ${codegen_templates}
+    DEPENDS create_generated_dir codegen ${codegen_templates}
     COMMENT "Generating source files with codegen"
 )
 

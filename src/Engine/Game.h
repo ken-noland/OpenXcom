@@ -83,10 +83,12 @@ public:
 	/// Gets the state stack
 	const std::list<State*>& getStates() const;
 
+	// the following will be moved to GameContext
+
 	/// Gets the registry container
-	const [[nodiscard]] ECS& getECS() const { return _ecs; }
+	const ECS& getECS() const { return _ecs; }
 	/// Gets the registry container
-	[[nodiscard]] ECS& getECS() { return _ecs; }
+	ECS& getECS() { return _ecs; }
 };
 
 /// Global function that retrieve a thread local Game object.

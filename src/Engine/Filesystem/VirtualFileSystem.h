@@ -21,6 +21,7 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <vector>
 
 namespace OpenXcom
 {

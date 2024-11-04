@@ -46,9 +46,9 @@ PaletteComponent::~PaletteComponent()
 
 void PaletteComponent::setPalette(PaletteHandle palette)
 {
-	//KN Note: This function is temporary until we move Surface to it's own system
-	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
-	paletteSystem.setSurfacePalette(_surface, palette);
+	////KN Note: This function is temporary until we move Surface to it's own system
+	//PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
+	//paletteSystem.setSurfacePalette(_surface, palette);
 }
 
 PaletteSystem::PaletteSystem()

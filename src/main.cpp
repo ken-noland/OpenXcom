@@ -31,7 +31,7 @@ public:
 	DbgBreakAlloc()
 	{
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF /*| _CRTDBG_CHECK_EVERY_16_DF*/);
-		_crtBreakAlloc = 11269;
+		_crtBreakAlloc = 11530;
 	}
 };
 
@@ -96,6 +96,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		std::vector<std::string> args = CommandLineToArgvA();
 #else
 
+std::vector<std::string> CommandLineToArgvA(int argc, char* argv[])
+{
+	// Create a vector and populate it with the arguments
+	std::vector<std::string> args;
+	for (int i = 1; i < argc; i++)
+	{
+		args.push_back(std::string(argv[i]));
+	}
+
+	return args;
+}
+
 // If you can't tell what the main() is for you should have your
 // programming license revoked...
 int main(int argc, char *argv[])
@@ -104,7 +116,7 @@ int main(int argc, char *argv[])
 
 	// using a scope operator here to ensure that the args are cleaned up before the memory check
 	{
-		std::vector<std::string> args = CommandLineToArgvA();
+		std::vector<std::string> args = CommandLineToArgvA(argc, argv);
 
 #endif
 		ret = OpenXcom::run(args);

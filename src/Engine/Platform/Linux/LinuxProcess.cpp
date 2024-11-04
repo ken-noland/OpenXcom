@@ -16,38 +16,41 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifdef __linux__
 
-#include "WindowSystem.h"
-#include "Window.h"
+#include "../ProcessSystem.h"
+#include <X11/Xlib.h>
+#include <stdexcept>
 
 namespace OpenXcom
 {
 
-PlatformWindowSystem::PlatformWindowSystem()
+void PlatformProcessSystem::platformSpecificUpdate()
 {
-}
+	//if (this->displayHandle)
+	//{
+	//	XEvent event;
+	//	while (XPending(static_cast<Display*>(this->displayHandle)))
+	//	{
+	//		XNextEvent(static_cast<Display*>(this->displayHandle), &event);
 
-PlatformWindowSystem::~PlatformWindowSystem()
-{
-}
-
-std::weak_ptr<PlatformWindow> PlatformWindowSystem::createWindow(const std::string& title, int width, int height)
-{
-	std::shared_ptr<PlatformWindow> window = std::make_shared<PlatformWindow>(title, width, height);
-	_windows.push_back(window);
-	return window;
-}
-
-void PlatformWindowSystem::destroyWindow(std::weak_ptr<PlatformWindow> window)
-{
-}
-
-void PlatformWindowSystem::update()
-{
-	for (std::shared_ptr<PlatformWindow>& window : _windows)
-	{
-		window->update();
-	}
+	//		switch (event.type)
+	//		{
+	//		case ClientMessage:
+	//			// Handle window close event (e.g., "WM_DELETE_WINDOW")
+	//			if (event.xclient.data.l[0] == this->wmDeleteMessage)
+	//			{
+	//				_isRunning = false; // Set flag to indicate window close
+	//			}
+	//			break;
+	//		// Add other event handling cases as needed
+	//		default:
+	//			break;
+	//		}
+	//	}
+	//}
 }
 
 } // namespace OpenXcom
+
+#endif // __linux__

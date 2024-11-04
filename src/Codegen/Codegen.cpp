@@ -618,7 +618,7 @@ bool generateCode(const CommandLineArguments& args)
 		std::map<std::string, inja::Template>::iterator it = typeTemplates.find(templateName);
 		if (it == typeTemplates.end())
 		{
-			throw new inja::RenderError("Template not found: " + templateName, inja::SourceLocation(0, 0));
+			throw new inja::RenderError("Template not found: " + templateName, inja::SourceLocation{0, 0});
 		}
 
 		nlohmann::json data;

@@ -50,10 +50,11 @@ Game* getGame()
  */
 Game::Game(const std::string& title)
 {
-	_window = getEngine().getPlatformWindowSystem().createWindow(title, 1024, 768);
+	Engine& engine = getEngine();
+	_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768);
 	std::shared_ptr<PlatformWindow> window = _window.lock();
 
-	//window.onExit()
+	// when the game window closes, send the application termination message
 
 
 

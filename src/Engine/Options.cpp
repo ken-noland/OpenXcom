@@ -463,6 +463,23 @@ std::filesystem::path getUserDocumentsDirectory()
 	std::filesystem::path documentsPath(path);
 	CoTaskMemFree(path);
 	return documentsPath;
+#elif defined(__linux__)
+	// Check if XDG_DATA_HOME is set
+	const char* xdgDataHome = std::getenv("XDG_DATA_HOME");
+	if (xdgDataHome)
+	{
+		return std::filesystem::path(xdgDataHome);
+	}
+
+	// Fallback to ~/.local/share if XDG_DATA_HOME is not set
+	const char* homeDir = std::getenv("HOME");
+	if (homeDir)
+	{
+		return std::filesystem::path(homeDir) / ".local" / "share";
+	}
+
+	// If HOME is not set, return an empty path or throw an exception
+	throw std::runtime_error("Failed to locate the user's data directory");
 #else
 	assert(!"Not yet implemented");
 	return std::filesystem::path();
@@ -476,9 +493,20 @@ std::filesystem::path getXcomDocumentsDirectory()
 
 std::filesystem::path getExecutableDirectory()
 {
-#ifdef _WIN32
+#if defined(_WIN32)
 	wchar_t buffer[MAX_PATH];
 	GetModuleFileNameW(NULL, buffer, MAX_PATH);
+	std::filesystem::path executablePath(buffer);
+	return executablePath.parent_path();
+#elif defined(__linux__)
+	char buffer[PATH_MAX];
+	ssize_t count = readlink("/proc/self/exe", buffer, PATH_MAX);
+	if (count == -1)
+	{
+		// Handle error if readlink fails
+		throw std::runtime_error("Failed to get the executable path");
+	}
+	buffer[count] = '\0'; // Null-terminate the string
 	std::filesystem::path executablePath(buffer);
 	return executablePath.parent_path();
 #else
@@ -513,19 +541,53 @@ bool Options::loadDefaults()
 		// add the documents directory to the search paths
 		dataPaths.push_back(getXcomDocumentsDirectory());
 
+		Log(LOG_VERBOSE) << "Setting data path to:";
+		for (const std::filesystem::path& path : dataPaths)
+		{
+			Log(LOG_VERBOSE) << "  " << path;
+		}
+
 		set<&GameOptions::_dataPath>(OptionLevel::DEFAULT, dataPaths);
 	}
-
-	if (!isSet<&GameOptions::_userPath>())
+	else
 	{
-		// No user path specified, so use the platform options to find it.
-		set<&GameOptions::_userPath>(OptionLevel::DEFAULT, getXcomDocumentsDirectory());
+		Log(LOG_VERBOSE) << "Data path is set to:";
+		for (const std::filesystem::path& path : get<&GameOptions::_dataPath>())
+		{
+			Log(LOG_VERBOSE) << "  " << path;
+		}
 	}
 
+	// load the user path
+	if (!isSet<&GameOptions::_userPath>())
+	{
+		std::filesystem::path userPath = getXcomDocumentsDirectory();
+		Log(LOG_VERBOSE) << "Setting user path to:";
+		Log(LOG_VERBOSE) << "  " << userPath;
+
+		// No user path specified, so use the platform options to find it.
+		set<&GameOptions::_userPath>(OptionLevel::DEFAULT, userPath);
+	}
+	else
+	{
+		Log(LOG_VERBOSE) << "User path is set to:";
+		Log(LOG_VERBOSE) << "  " << get<&GameOptions::_userPath>();
+	}
+
+	// load the config path
 	if (!isSet<&GameOptions::_cfgPath>())
 	{
+		std::filesystem::path cfgPath = getXcomDocumentsDirectory();
+		Log(LOG_VERBOSE) << "Setting config path to:";
+		Log(LOG_VERBOSE) << "  " << cfgPath;
+
 		// No config path specified, so use the platform options to find it.
-		set<&GameOptions::_cfgPath>(OptionLevel::DEFAULT, getXcomDocumentsDirectory());
+		set<&GameOptions::_cfgPath>(OptionLevel::DEFAULT, cfgPath);
+	}
+	else
+	{
+		Log(LOG_VERBOSE) << "Config path is set to:";
+		Log(LOG_VERBOSE) << "  " << get<&GameOptions::_cfgPath>();
 	}
 
 	if (!isSet<&GameOptions::_locale>())

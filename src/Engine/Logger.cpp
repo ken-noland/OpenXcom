@@ -23,6 +23,7 @@
 #endif
 
 #include "../Entity/Common/RTTR.h"
+#include <iostream>
 
 namespace OpenXcom
 {
@@ -75,6 +76,9 @@ void log(int level, const std::ostringstream& baremsgstream)
 			  << "\t"
 			  << baremsgstream.str() << std::endl;
 	std::string msg = msgstream.str();
+
+	// log out to stdout
+	std::cout << msg;
 
 	//int effectiveLevel = Logger::reportingLevel();
 	//if (effectiveLevel >= LOG_DEBUG)

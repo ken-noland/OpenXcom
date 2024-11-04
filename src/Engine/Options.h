@@ -25,8 +25,9 @@
 #include <functional>
 #include <filesystem>
 
-
 #include "Logger.h"
+
+#include <simplerttr.h>
 
 namespace OpenXcom
 {
@@ -148,6 +149,13 @@ struct MemberPtrClass<OptType ClsType::*>
 	using OptionType = OptType;
 };
 
+// Helper function to get the offset of a member pointer
+template <typename ClassType, typename MemberType>
+size_t getMemberOffset(MemberType ClassType::*memberPtr)
+{
+	return reinterpret_cast<size_t>(&(reinterpret_cast<ClassType*>(0)->*memberPtr));
+}
+
 // Helper template to extract the Class and Type from member pointer provided
 template <auto MemberPtr>
 struct OptionMemberPointerTraits;
@@ -191,7 +199,7 @@ struct GameOptions
 
 	Option<std::vector<std::string>> _mods					= {};
 
-	Option<std::string> _master								= "xcom1";
+	Option<std::string> _master								= std::string("xcom1");
 };
 
 // Graphics options
@@ -262,7 +270,29 @@ public:
 		using ClassType = typename OptionMemberPointerTraits<MemberPtr>::ClassType;
 		const auto& category = getOptionCategory<ClassType>();
 		const auto& optionMember = category.optionsStruct.*MemberPtr;
-		return optionMember.get();
+		try
+		{
+			return optionMember.get();
+		}
+		catch (const std::runtime_error&)
+		{
+			SimpleRTTR::Type optionsType = SimpleRTTR::types().get_type<ClassType>().value();
+			std::string className = optionsType.name();
+			std::string optionName = "<unknown>";
+
+			// find the member name from the member offset
+			for (const SimpleRTTR::Property& property : optionsType.properties())
+			{
+				if (property.offset() == getMemberOffset(MemberPtr))
+				{
+					optionName = property.name();
+					break;
+				}
+			}
+
+			std::string message = "Option not set: " + className + "::" + optionName;
+			throw std::runtime_error(message);
+		}
 	}
 
 	// Get the value of an option

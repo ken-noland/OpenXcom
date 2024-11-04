@@ -29,7 +29,12 @@ PlatformWindow::PlatformWindow(const std::string& title, int width, int height)
 
 PlatformWindow::~PlatformWindow()
 {
-	platformSpecificClose();
+	platformSpecificDestroyWindow();
+}
+
+void PlatformWindow::update()
+{
+	platformSpecificUpdateWindow();
 }
 
 bool PlatformWindow::isRunning() const
@@ -40,7 +45,7 @@ bool PlatformWindow::isRunning() const
 void PlatformWindow::close()
 {
 	_running = false;
-	platformSpecificClose();
+	platformSpecificDestroyWindow();
 }
 
 } // namespace OpenXcom

@@ -59,8 +59,8 @@ public:
 		static SeverityLevel reportingLevel = LOG_UNCENSORED;
 		return reportingLevel;
 	};
-	static const std::string& toString(int level) {
-		static const std::string buffer[] = { "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB", "ALL" };
+	static const char* toString(int level) {
+		static const char* buffer[] = { "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB", "ALL" };
 		return buffer[level];
 	};
 private:
