@@ -67,6 +67,12 @@ Engine::Engine(const std::vector<std::string>& args)
 
 Engine::~Engine()
 {
+	//shut down window
+	_platformWindowSystem.reset();
+
+	//shut down graphics
+	_graphicsSystem.reset();
+
 	SimpleRTTR::shutdown();
 }
 

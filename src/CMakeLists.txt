@@ -181,6 +181,7 @@ set ( engine_src
   "Engine/Filesystem/PhysicalFileSystem.cpp"
   "Engine/Filesystem/VirtualFileSystem.cpp"
   "Engine/Graphics/GraphicsSystem.cpp"
+  "Engine/Graphics/Vulkan/VulkanSurface.cpp"
   "Engine/Graphics/Vulkan/VulkanSystem.cpp"
   "Engine/Platform/ProcessSystem.cpp"
   "Engine/Platform/Window.cpp"

@@ -18,6 +18,9 @@
  */
 
 #include "Window.h"
+#include "../Engine.h"
+#include "../Graphics/GraphicsSystem.h"
+#include "../Graphics/GraphicsSurface.h"
 
 namespace OpenXcom
 {
@@ -25,6 +28,10 @@ namespace OpenXcom
 PlatformWindow::PlatformWindow(const std::string& title, int width, int height)
 {
 	platformSpecificCreateWindow(title, width, height);
+
+	_running = true;
+
+	_surface = getEngine().getGraphicsSystem().createSurface(_handle);
 }
 
 PlatformWindow::~PlatformWindow()

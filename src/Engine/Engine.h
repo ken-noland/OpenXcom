@@ -71,6 +71,7 @@ public:
 	Options& getOptions() { return *_options; }
 	VirtualFileSystem& getVirtualFileSystem() { return *_virtualFileSystem; }
 	PlatformWindowSystem& getPlatformWindowSystem() { return *_platformWindowSystem; }
+	GraphicsSystem& getGraphicsSystem() { return *_graphicsSystem; }
 };
 
 Engine& getEngine();

@@ -19,6 +19,7 @@
  */
 
 #include <string>
+#include <memory>
 
 #if defined(_WIN32)
  // Forward declarations for Windows types
@@ -32,6 +33,7 @@ namespace OpenXcom
 {
 
 class PlatformWindowSystem;
+class GraphicsSurface;
 
 struct PlatformWindowHandle
 {
@@ -62,6 +64,7 @@ private:
 	bool _running;
 
 	PlatformWindowHandle _handle;
+	std::unique_ptr<GraphicsSurface> _surface;
 
 public:
 	PlatformWindow(const std::string& title, int width, int height);

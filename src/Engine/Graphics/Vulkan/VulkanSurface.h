@@ -17,25 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <memory>
-
+#include "../GraphicsSurface.h"
+#include "VulkanInclude.h"
 
 namespace OpenXcom
 {
 
-class Options;
-class GraphicsSurface;
 struct PlatformWindowHandle;
 
-class GraphicsSystem
+class VulkanSurface : public GraphicsSurface
 {
+	vk::Instance _instance;
+	vk::SurfaceKHR _surface;
+		
+	vk::SwapchainKHR _swapChain;
+	vk::Device* _device;
+		
+	vk::Format _swapChainImageFormat;
+	vk::Extent2D _swapChainExtent;
+
+	friend class VulkanSystem;
+	void initializeSwapChain(const PlatformWindowHandle& handle, const vk::PhysicalDevice& physicalDevice, vk::Device* device);
+
 public:
-	GraphicsSystem() = default;
-	virtual ~GraphicsSystem() = default;
+	VulkanSurface(vk::Instance instance, const PlatformWindowHandle& window);
+	virtual ~VulkanSurface();
 
-	virtual std::unique_ptr<GraphicsSurface> createSurface(const PlatformWindowHandle& handle) = 0;
+	const vk::SurfaceKHR& getVKSurface() const { return _surface; }
+	const vk::Format& getVKFormat() const { return _swapChainImageFormat; }
+	const vk::Extent2D& getVKExtent() const { return _swapChainExtent; }
 };
-
-std::unique_ptr<GraphicsSystem> createGraphicsSystem(const Options& options);
 
 } // namespace OpenXcom
