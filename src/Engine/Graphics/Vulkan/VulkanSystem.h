@@ -48,11 +48,15 @@ class VulkanSystem : public GraphicsSystem
 
 	vk::RenderPass _renderPass;
 
+	std::unique_ptr<shaderc::Compiler> _shaderCompiler;
+
+
 	void selectPhysicalDevice(const vk::SurfaceKHR& surface);
 	void initializeDevice(const vk::SurfaceKHR& surface);
 
-	void initializeSwapChain(std::unique_ptr<VulkanSurface>& surface, const PlatformWindowHandle& handle);
+	void initializeSwapChain(std::unique_ptr<VulkanSurface>& surface);
 	void initializeRenderPass();
+	void initializeFrames(std::unique_ptr<VulkanSurface>& surface);
 
 public:
 	VulkanSystem(const Options& options);

@@ -662,13 +662,76 @@ add_library(ImGui STATIC ${IMGUI_SOURCES})
 target_include_directories(ImGui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
 
 # Fetch Vulkan-Headers
+#  Vulkan-Headers is used for Vulkan API headers
 FetchContent_Declare(
     vulkan_headers
     GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers.git
-    GIT_TAG        v1.3.300  # Update to the desired version
+    GIT_TAG        v1.3.296  # Update to the desired version(which is dependent on SPIRV-headers and SPIRV-tools below)
 )
 FetchContent_MakeAvailable(vulkan_headers)
 
+# Fetch SPIRV-Headers first
+#  SPIRV-Headers is a dependency of SPIRV-Tools
+FetchContent_Declare(
+    spirv-headers
+    GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Headers.git
+    GIT_TAG vulkan-sdk-1.3.296.0
+)
+
+FetchContent_MakeAvailable(spirv-headers)
+
+# Fetch SPIRV-Tools
+#  SPIRV-Tools is used for compiling SPIR-V shaders
+set(SPIRV_SKIP_TESTS ON CACHE BOOL "" FORCE)
+set(SPIRV_HEADERS_SKIP_INSTALL ON CACHE BOOL "" FORCE)
+set(SPIRV_WERROR OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    spirv-tools
+    GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Tools.git
+    GIT_TAG vulkan-sdk-1.3.296.0
+)
+
+# Enable building of SPIRV-Tools as Shaderc requires it
+FetchContent_MakeAvailable(spirv-tools)
+
+# Fetch glslang
+set(ENABLE_GLSLANG_BINARIES OFF CACHE BOOL "" FORCE) # Skip building glslangValidator, etc.
+set(ENABLE_SPVREMAPPER OFF CACHE BOOL "" FORCE)
+set(ENABLE_HLSL ON CACHE BOOL "" FORCE) # Optional, depending on if you need HLSL support
+
+FetchContent_Declare(
+    glslang
+    GIT_REPOSITORY https://github.com/KhronosGroup/glslang.git
+    GIT_TAG main
+)
+
+FetchContent_MakeAvailable(glslang)
+
+
+# Fetch Shaderc
+#  Shaderc is used for compiling GLSL shaders
+set(SHADERC_SKIP_INSTALL ON CACHE BOOL "Skip building ShaderC install")
+set(SHADERC_SKIP_TESTS ON CACHE BOOL "Skip building ShaderC tests")
+set(SHADERC_SKIP_EXAMPLES ON CACHE BOOL "Skip building ShaderC examples")
+set(SHADERC_SKIP_COPYRIGHT_CHECK ON CACHE BOOL "Skip building ShaderC copyright check")
+
+FetchContent_Declare(
+    shaderc
+    GIT_REPOSITORY https://github.com/google/shaderc.git
+    GIT_TAG v2024.3
+)
+
+FetchContent_MakeAvailable(shaderc)
+
+# Fetch GLM
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG 1.0.1
+)
+
+FetchContent_MakeAvailable(glm)
 
 # set up the defines and includes
 set(openxcom_defines
@@ -683,12 +746,15 @@ set(openxcom_includes
   ${nlohmann_json_SOURCE_DIR}/include
   ${inja_SOURCE_DIR}
   ${vulkan_headers_SOURCE_DIR}/include
+  ${glslang_SOURCE_DIR}
 )
 
 set(openxcom_libs
   yaml-cpp::yaml-cpp
   lua
   ImGui
+  shaderc
+  glm
 )
 
 if(UNIX)

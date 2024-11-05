@@ -31,7 +31,7 @@ public:
 	DbgBreakAlloc()
 	{
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF /*| _CRTDBG_CHECK_EVERY_16_DF*/);
-		_crtBreakAlloc = 11530;
+		_crtBreakAlloc = -1;
 	}
 };
 
@@ -89,6 +89,12 @@ std::vector<std::string> CommandLineToArgvA()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+#if defined(_DEBUG)
+    // Initialize CRT memory leak checking
+	_CrtMemState initialState, finalState, diffState;
+	_CrtMemCheckpoint(&initialState); // Take a snapshot of memory state at start of main
+#endif
+
 	int ret = 0;
 
 	// using a scope operator here to ensure that the args are cleaned up before the memory check
@@ -123,7 +129,14 @@ int main(int argc, char *argv[])
 	}
 
 #if defined(_DEBUG) && defined(_MSC_VER)
-	_CrtDumpMemoryLeaks();
+	// Take a snapshot of memory state at the end of main
+	_CrtMemCheckpoint(&finalState);
+
+	// Compare the memory state at the beginning and end of main
+	if (_CrtMemDifference(&diffState, &initialState, &finalState))
+	{
+		_CrtMemDumpStatistics(&diffState); // Dump only the leaks that occurred after main
+	}
 #endif
 	return ret;
 }

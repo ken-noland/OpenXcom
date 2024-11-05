@@ -26,6 +26,8 @@ class GraphicsSurface
 public:
 	GraphicsSurface() = default;
 	virtual ~GraphicsSurface() = default;
+
+	virtual void update() = 0;
 };
 
 } // namespace OpenXcom

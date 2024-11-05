@@ -42,6 +42,8 @@ PlatformWindow::~PlatformWindow()
 void PlatformWindow::update()
 {
 	platformSpecificUpdateWindow();
+
+	_surface->update();
 }
 
 bool PlatformWindow::isRunning() const
@@ -52,6 +54,10 @@ bool PlatformWindow::isRunning() const
 void PlatformWindow::close()
 {
 	_running = false;
+
+	// Destroy the surface before the window
+	_surface.reset();
+
 	platformSpecificDestroyWindow();
 }
 

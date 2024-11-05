@@ -22,6 +22,8 @@
 #include "../../Platform/Window.h"
 #include "../../Logger.h"
 #include "../../../version.h"
+#include <glslang/Public/ShaderLang.h>
+#include <shaderc/shaderc.hpp>
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
 
@@ -47,6 +49,23 @@ VulkanSystem::VulkanSystem(const Options& options) :
 {
 	try
 	{
+		glslang::InitializeProcess();
+
+		// Initialize the shader compiler
+
+#if defined(_DEBUG) && defined(_WIN32)
+		// annoyingly, the shader compiler leaks a single std::mutex, so to avoid that being reported in Crt, I have
+		// to disable memory checking for just this one part
+		int oldFlags = _CrtSetDbgFlag(0);
+#endif
+
+		_shaderCompiler = std::make_unique<shaderc::Compiler>();
+
+#if defined(_DEBUG) && defined(_WIN32)
+		// and re-enable memory checking
+		_CrtSetDbgFlag(oldFlags);
+#endif
+
 		// Load the Vulkan function loader
 		PFN_vkGetInstanceProcAddr getInstanceProcAddr = _loader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
 		if (!getInstanceProcAddr)
@@ -163,6 +182,9 @@ VulkanSystem::~VulkanSystem()
 	{
 		_instance.destroy();
 	}
+
+	_shaderCompiler.reset();
+	glslang::FinalizeProcess();
 }
 
 std::unique_ptr<GraphicsSurface> VulkanSystem::createSurface(const PlatformWindowHandle& handle)
@@ -178,12 +200,17 @@ std::unique_ptr<GraphicsSurface> VulkanSystem::createSurface(const PlatformWindo
 
 	//because the swap chain relies on the device being set up, and the device needs the surface
 	// to query the capabilities, we have to initialize the swap chain in a roundabout way.
-	initializeSwapChain(surface, handle);
+	initializeSwapChain(surface);
 
 	if(!_renderPass)
 	{
 		initializeRenderPass();
 	}
+
+	initializeFrames(surface);
+
+
+
 
 	return surface;
 }
@@ -327,13 +354,13 @@ void VulkanSystem::initializeDevice(const vk::SurfaceKHR& surface)
 	// Retrieve the graphics and presentation queues
 	_graphicsQueue = _device.getQueue(_graphicsQueueFamilyIndex, 0);
 	_presentQueue = _device.getQueue(_presentQueueFamilyIndex, 0);
-
 }
 
 
-void VulkanSystem::initializeSwapChain(std::unique_ptr<VulkanSurface>& surface, const PlatformWindowHandle& handle)
+void VulkanSystem::initializeSwapChain(std::unique_ptr<VulkanSurface>& surface)
 {
-	surface->initializeSwapChain(handle, _physicalDevice, &_device);
+	surface->initializeDevice(_device, _graphicsQueueFamilyIndex, _graphicsQueue, _presentQueue);
+	surface->initializeSwapChain(_physicalDevice);
 	_swapChainImageFormat = surface->getVKFormat();
 }
 
@@ -366,6 +393,13 @@ void VulkanSystem::initializeRenderPass()
 	renderPassInfo.pSubpasses = &subpass;
 
 	_renderPass = _device.createRenderPass(renderPassInfo);
+}
+
+void VulkanSystem::initializeFrames(std::unique_ptr<VulkanSurface>& surface)
+{
+	surface->initializeFrames(_renderPass);
+	surface->initializeShaders(*_shaderCompiler);
+	surface->initializePipeline();
 }
 
 } // namespace OpenXcom

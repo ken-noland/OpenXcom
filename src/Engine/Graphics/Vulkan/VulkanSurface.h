@@ -19,25 +19,68 @@
  */
 #include "../GraphicsSurface.h"
 #include "VulkanInclude.h"
+#include "../../Platform/Window.h"
 
 namespace OpenXcom
 {
 
 struct PlatformWindowHandle;
 
+struct FrameData
+{
+	vk::Semaphore imageAvailableSemaphore;
+	vk::Semaphore renderFinishedSemaphore;
+	vk::Fence inFlightFence;
+	vk::ImageView imageView; // For swap chain images
+	vk::Framebuffer framebuffer;
+	vk::CommandBuffer commandBuffer;
+};
+
 class VulkanSurface : public GraphicsSurface
 {
-	vk::Instance _instance;
+	vk::Instance _instance;		// reference to instance in VulkanSystem
+	vk::Device _device;			// reference to device in VulkanSystem
+	vk::PhysicalDevice _physicalDevice; // reference to physical device in VulkanSystem
+
+	vk::Queue _graphicsQueue;	// reference to graphics queue in VulkanSystem
+	vk::Queue _presentQueue;	// reference to present queue in VulkanSystem
+
+	vk::CommandPool _commandPool;
+
 	vk::SurfaceKHR _surface;
-		
-	vk::SwapchainKHR _swapChain;
-	vk::Device* _device;
-		
+
+	vk::SwapchainKHR _swapChain;		
 	vk::Format _swapChainImageFormat;
 	vk::Extent2D _swapChainExtent;
 
+	std::vector<FrameData> _frames;
+
+	vk::RenderPass _renderPass; // reference to render pass in VulkanSystem
+
+	vk::PipelineLayout _pipelineLayout;
+	vk::Pipeline _pipeline;
+
+	uint32_t _currentFrame;
+
+	PlatformWindowHandle _windowHandle;
+
+	// TEMP
+	vk::ShaderModule _vertexShaderModule;
+	vk::ShaderModule _fragmentShaderModule;
+
 	friend class VulkanSystem;
-	void initializeSwapChain(const PlatformWindowHandle& handle, const vk::PhysicalDevice& physicalDevice, vk::Device* device);
+	void initializeDevice(vk::Device& device, uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue);
+	void initializeSwapChain(const vk::PhysicalDevice& physicalDevice);
+	void initializeFrames(const vk::RenderPass& renderPass);
+	void initializeShaders(shaderc::Compiler& compiler);
+	void initializePipeline();
+
+
+	void destroySwapChain();
+
+	void handleResize();
+
+	void recordCommandBuffer(FrameData& frame, uint32_t imageIndex);
 
 public:
 	VulkanSurface(vk::Instance instance, const PlatformWindowHandle& window);
@@ -46,6 +89,8 @@ public:
 	const vk::SurfaceKHR& getVKSurface() const { return _surface; }
 	const vk::Format& getVKFormat() const { return _swapChainImageFormat; }
 	const vk::Extent2D& getVKExtent() const { return _swapChainExtent; }
+
+	virtual void update() override;
 };
 
 } // namespace OpenXcom

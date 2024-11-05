@@ -29,3 +29,6 @@
 #endif
 
 #include <vulkan/vulkan.hpp>
+
+// forward declaration
+namespace shaderc { class Compiler; }
