@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -18,14 +17,32 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ResourceSystem.h"
+
+#include "Font/FontManager.h"
+#include "Palette/PaletteManager.h"
+
 namespace OpenXcom
 {
 
-class State
+ResourceSystem::ResourceSystem()
 {
-public:
-	State() = default;
-	virtual ~State() = default;
-};
-
+	_fontManager = std::make_unique<FontManager>();
+	_paletteManager = std::make_unique<PaletteManager>();
 }
+
+ResourceSystem::~ResourceSystem()
+{
+}
+
+FontManager& ResourceSystem::getFontManager()
+{
+	return *_fontManager;
+}
+
+PaletteManager& ResourceSystem::getPaletteManager()
+{
+	return *_paletteManager;
+}
+
+} // namespace OpenXcom

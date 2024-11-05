@@ -56,7 +56,7 @@ private:
 	std::vector<ArrowButton*> _arrowLeft, _arrowRight;
 	int _arrowPos, _scrollPos;
 	ArrowOrientation _arrowType;
-	ActionHandler _leftClick, _leftPress, _leftRelease, _rightClick, _rightPress, _rightRelease;
+//	ActionHandler _leftClick, _leftPress, _leftRelease, _rightClick, _rightPress, _rightRelease;
 	int _arrowsLeftEdge, _arrowsRightEdge;
 	int _noScrollLeftEdge, _noScrollRightEdge;
 	ComboBox *_comboBox;
@@ -79,7 +79,7 @@ public:
 	/// Gets the arrowsRightEdge.
 	int getArrowsRightEdge();
 	/// Unpresses the surface.
-	void unpress(State *state) override;
+//	void unpress(State *state) override;
 	/// Sets the text color of a certain cell.
 	void setCellColor(size_t row, size_t column, uint8_t color);
 	/// Sets the text color of a certain row.
@@ -161,17 +161,17 @@ public:
 	/// Sets the arrow column of the text list.
 	void setArrowColumn(int pos, ArrowOrientation type);
 	/// Hooks an action handler to a mouse click on the left arrows.
-	void onLeftArrowClick(ActionHandler handler);
+//	void onLeftArrowClick(ActionHandler handler);
 	/// Hooks an action handler to a mouse press over the left arrows.
-	void onLeftArrowPress(ActionHandler handler);
+//	void onLeftArrowPress(ActionHandler handler);
 	/// Hooks an action handler to a mouse release over the left arrows.
-	void onLeftArrowRelease(ActionHandler handler);
+//	void onLeftArrowRelease(ActionHandler handler);
 	/// Hooks an action handler to a mouse click on the right arrows.
-	void onRightArrowClick(ActionHandler handler);
+//	void onRightArrowClick(ActionHandler handler);
 	/// Hooks an action handler to a mouse press over the right arrows.
-	void onRightArrowPress(ActionHandler handler);
+//	void onRightArrowPress(ActionHandler handler);
 	/// Hooks an action handler to a mouse release over the right arrows.
-	void onRightArrowRelease(ActionHandler handler);
+//	void onRightArrowRelease(ActionHandler handler);
 	/// Clears the list.
 	void clearList();
 	/// Scrolls the list up.
@@ -187,17 +187,17 @@ public:
 	/// Thinks arrow buttons.
 	void think() override;
 	/// Handles arrow buttons.
-	void handle(Action *action, State *state) override;
+//	void handle(Action *action, State *state) override;
 	/// Special handling for mouse presses.
-	void mousePress(Action *action, State *state) override;
+//	void mousePress(Action *action, State *state) override;
 	/// Special handling for mouse releases.
-	void mouseRelease(Action *action, State *state) override;
+//	void mouseRelease(Action *action, State *state) override;
 	/// Special handling for mouse clicks.
-	void mouseClick(Action *action, State *state) override;
+//	void mouseClick(Action *action, State *state) override;
 	/// Special handling for mouse hovering.
-	void mouseOver(Action *action, State *state) override;
+//	void mouseOver(Action *action, State *state) override;
 	/// Special handling for mouse hovering out.
-	void mouseOut(Action *action, State *state) override;
+//	void mouseOut(Action *action, State *state) override;
 	/// get the scroll depth
 	size_t getScroll();
 	/// set the scroll depth

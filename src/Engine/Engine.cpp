@@ -24,6 +24,7 @@
 #include "Platform/WindowSystem.h"
 #include "Platform/ProcessSystem.h"
 #include "Graphics/GraphicsSystem.h"
+#include "Resource/ResourceSystem.h"
 #include "../version.h"
 
 #include <simplerttr.h>
@@ -51,6 +52,9 @@ Engine::Engine(const std::vector<std::string>& args)
 
 	// Initialize the process system
 	_platformProcessSystem = std::make_unique<PlatformProcessSystem>();
+
+	// Initialize the resource system
+	_resourceSystem = std::make_unique<ResourceSystem>();
 
 	// Initialize the window system
 	_platformWindowSystem = std::make_unique<PlatformWindowSystem>();

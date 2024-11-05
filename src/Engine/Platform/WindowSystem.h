@@ -38,7 +38,7 @@ public:
 	std::weak_ptr<PlatformWindow> createWindow(const std::string& title, int width, int height);
 
 	// Destroy a platform window
-	void destroyWindow(std::weak_ptr<PlatformWindow> window);
+	void destroyWindow(const std::weak_ptr<PlatformWindow>& window);
 
 	// Update all platform windows
 	void update();

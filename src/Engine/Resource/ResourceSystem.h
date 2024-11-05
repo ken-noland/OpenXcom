@@ -17,15 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <memory>
 
 namespace OpenXcom
 {
 
-class State
+class FontManager;
+class PaletteManager;
+
+class ResourceSystem
 {
+	std::unique_ptr<FontManager> _fontManager;
+	std::unique_ptr<PaletteManager> _paletteManager;
+
 public:
-	State() = default;
-	virtual ~State() = default;
+	ResourceSystem();
+	virtual ~ResourceSystem();
+
+	FontManager& getFontManager();
+	PaletteManager& getPaletteManager();
 };
 
-}
+} // namespace OpenXcom

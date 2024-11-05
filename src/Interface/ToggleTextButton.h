@@ -37,7 +37,7 @@ public:
 	~ToggleTextButton(void);
 
 	void draw() override;
-	void mousePress(Action *action, State *state) override;
+//	void mousePress(Action *action, State *state) override;
 	void setPressed(bool pressed);
 	bool getPressed() const { return _isPressed; }
 	void setColor(uint8_t color) override;

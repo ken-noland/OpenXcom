@@ -17,41 +17,35 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "StartState.h"
-#include "../version.h"
-#include "../Engine/Logger.h"
-#include "../Engine/Game.h"
-#include "../Engine/Screen.h"
-#include "../Engine/Action.h"
-#include "../Engine/Surface.h"
-#include "../Engine/Options.h"
-#include "../Engine/Language.h"
-#include "../Engine/Sound.h"
-#include "../Engine/Music.h"
-#include "../Engine/Font.h"
-#include "../Engine/Timer.h"
-#include "../Engine/CrossPlatform.h"
-#include "../Interface/FpsCounter.h"
-#include "../Interface/Cursor.h"
-#include "../Interface/Text.h"
-#include "MainMenuState.h"
-#include "CutsceneState.h"
+#include "../Engine/Engine.h"
+#include "../Engine/Resource/ResourceSystem.h"
+#include "../Engine/Resource/Font/FontManager.h"
+#include "../Engine/Resource/Font/DosFont.h"
+#include "../Engine/Resource/Palette/PaletteManager.h"
 
-#include "../Entity/Engine/Palette.h"
-#include "../Engine/Palette.h"
+#include <glm/vec4.hpp>
 
 namespace OpenXcom
 {
 
-LoadingPhase StartState::loading;
-std::string StartState::error;
+const glm::ivec4 terminalColors[2] = {{0, 0, 0, 0}, {185, 185, 185, 255}};
 
 /**
  * Initializes all the elements in the Loading screen.
  * @param game Pointer to the core game.
  */
 StartState::StartState()
-	: State("StartState", true), _anim(0)
+	//: State("StartState", true), _anim(0)
 {
+	Engine& engine = getEngine();
+	ResourceSystem& resourceSystem = engine.getResourceSystem();
+
+	// load the DOS font
+	_terminalFontHandle = resourceSystem.getFontManager().loadFont("Terminal", dosFont, DOSFONT_SIZE);
+	_terminalPaletteHandle = resourceSystem.getPaletteManager().loadPalette("Terminal", terminalColors, sizeof(terminalColors));
+
+
+
 	//updateScale() uses newDisplayWidth/Height and needs to be set ahead of time
 
 // OPTIONSHACK
@@ -133,208 +127,208 @@ StartState::~StartState()
 	//delete _lang;
 }
 
-/**
- * Reset and reload data.
- */
-void StartState::init()
-{
-	//State::init();
+///**
+// * Reset and reload data.
+// */
+//void StartState::init()
+//{
+//	//State::init();
+//
+//	//// Silence!
+//	//Sound::stop();
+//	//Music::stop();
+//	//if (!Options::mute && Options::reload)
+//	//{
+//	//	Mix_CloseAudio();
+//	//	getGame()->initAudio();
+//	//}
+//
+//	//// Load the game data in a separate thread
+//	//_thread = SDL_CreateThread(load, (void*)getGame());
+//	//if (_thread == 0)
+//	//{
+//	//	// If we can't create the thread, just load it as usual
+//	//	load((void*)getGame());
+//	//}
+//}
+//
+///**
+// * If the loading fails, it shows an error, otherwise moves on to the game.
+// */
+//void StartState::update()
+//{
+//	//State::update();
+//	//_timer->think(true, false);
+//
+//	//switch (loading)
+//	//{
+//	//case LOADING_FAILED:
+//	//	CrossPlatform::flashWindow();
+//	//	addLine("");
+//	//	addLine("ERROR: " + error);
+//	//	addLine("");
+//	//	addLine("More details here: " + CrossPlatform::getLogFileName());
+//	//	addLine("Make sure OpenXcom and any mods are installed correctly.");
+//	//	addLine("");
+//	//	addLine("Press any key to continue.");
+//	//	loading = LOADING_DONE;
+//	//	break;
+//	//case LOADING_SUCCESSFUL:
+//	//	CrossPlatform::flashWindow();
+//	//	Log(LOG_INFO) << "OpenXcom started successfully!";
+//	//	getGame()->setState(new GoToMainMenuState(true));
+//	//	if (_oldMaster != Options::getActiveMaster() && Options::playIntro)
+//	//	{
+//	//		getGame()->pushState(new CutsceneState("intro"));
+//	//	}
+//	//	if (Options::reload)
+//	//	{
+//	//		Options::reload = false;
+//	//	}
+//	//	getGame()->getCursor()->setVisible(true);
+//	//	getGame()->getFpsCounter()->setVisible(Options::fpsCounter);
+//	//	break;
+//	//default:
+//	//	break;
+//	//}
+//}
+//
+///**
+// * The game quits if the player presses any key when an error
+// * message is on display.
+// * @param action Pointer to an action.
+// */
+//void StartState::handle(Action *action)
+//{
+//	//State::handle(action);
+//	//if (loading == LOADING_DONE)
+//	//{
+//	//	if (action->getDetails()->type == SDL_KEYDOWN)
+//	//	{
+//	//		getGame()->quit();
+//	//	}
+//	//}
+//}
+//
+///**
+// * Blinks the cursor and spreads out terminal output.
+// */
+//void StartState::animate()
+//{
+//	//_cursor->setVisible(!_cursor->getVisible());
+//	//_anim++;
+//
+//	//if (loading == LOADING_STARTED)
+//	//{
+//	//	std::ostringstream ss;
+//	//	ss << "Loading OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT << "...";
+//	//	if (Options::reload)
+//	//	{
+//	//		if (Options::oxceStartUpTextMode < 2)
+//	//		{
+//	//			if (_anim == 2)
+//	//				addLine(ss.str());
+//	//		}
+//	//	}
+//	//	else
+//	//	{
+//	//		switch (_anim)
+//	//		{
+//	//		case 1:
+//	//			if (Options::oxceStartUpTextMode < 1)
+//	//			{
+//	//				addLine("DOS/4GW Protected Mode Run-time  Version 1.9");
+//	//				addLine("Copyright (c) Rational Systems, Inc. 1990-1993");
+//	//			}
+//	//			break;
+//	//		case 6:
+//	//			if (Options::oxceStartUpTextMode < 2)
+//	//			{
+//	//				addLine("");
+//	//				addLine("OpenXcom initialisation");
+//	//			}
+//	//			break;
+//	//		case 7:
+//	//			if (Options::oxceStartUpTextMode < 1)
+//	//			{
+//	//				addLine("");
+//	//				if (Options::mute)
+//	//				{
+//	//					addLine("No Sound Detected");
+//	//				}
+//	//				else
+//	//				{
+//	//					addLine("SoundBlaster Sound Effects");
+//	//					if (Options::preferredMusic == MUSIC_MIDI)
+//	//						addLine("General MIDI Music");
+//	//					else
+//	//						addLine("SoundBlaster Music");
+//	//					addLine("Base Port 220  Irq 7  Dma 1");
+//	//				}
+//	//			}
+//	//			if (Options::oxceStartUpTextMode < 2)
+//	//			{
+//	//				addLine("");
+//	//			}
+//	//			break;
+//	//		case 9:
+//	//			if (Options::oxceStartUpTextMode < 2)
+//	//			{
+//	//				addLine(ss.str());
+//	//			}
+//	//			break;
+//	//		}
+//	//	}
+//	//}
+//}
+//
+///**
+// * Adds a line of text to the terminal and moves
+// * the cursor appropriately.
+// * @param str Text line to add.
+// */
+//void StartState::addLine(const std::string &str)
+//{
+//	//_output << "\n" << str;
+//	//_text->setText(_output.str());
+//	//int y = _text->getTextHeight() - _font->getHeight();
+//	//int x = _text->getTextWidth(y / _font->getHeight());
+//	//_cursor->setX(x);
+//	//_cursor->setY(y);
+//}
+//
+///**
+// * Loads game data and updates status accordingly.
+// * @param game_ptr Pointer to the game.
+// * @return Thread status, 0 = ok
+// */
+//
+//extern void setThreadLocalGame(Game* gameInstance);
+//
+//int StartState::load(void *game_ptr)
+//{
+//	//Game *game = (Game*)game_ptr;
+//	//setThreadLocalGame(game);
+//
+//	//try
+//	//{
+//	//	Log(LOG_INFO) << "Loading data...";
+//	//	Options::updateMods();
+//	//	game->loadMods();
+//	//	Log(LOG_INFO) << "Data loaded successfully.";
+//	//	Log(LOG_INFO) << "Loading language...";
+//	//	game->loadLanguages();
+//	//	Log(LOG_INFO) << "Language loaded successfully.";
+//	//	loading = LOADING_SUCCESSFUL;
+//	//}
+//	//catch (std::exception &e)
+//	//{
+//	//	error = e.what();
+//	//	Log(LOG_ERROR) << error;
+//	//	loading = LOADING_FAILED;
+//	//}
+//
+//	return 0;
+//}
 
-	//// Silence!
-	//Sound::stop();
-	//Music::stop();
-	//if (!Options::mute && Options::reload)
-	//{
-	//	Mix_CloseAudio();
-	//	getGame()->initAudio();
-	//}
-
-	//// Load the game data in a separate thread
-	//_thread = SDL_CreateThread(load, (void*)getGame());
-	//if (_thread == 0)
-	//{
-	//	// If we can't create the thread, just load it as usual
-	//	load((void*)getGame());
-	//}
-}
-
-/**
- * If the loading fails, it shows an error, otherwise moves on to the game.
- */
-void StartState::update()
-{
-	//State::update();
-	//_timer->think(true, false);
-
-	//switch (loading)
-	//{
-	//case LOADING_FAILED:
-	//	CrossPlatform::flashWindow();
-	//	addLine("");
-	//	addLine("ERROR: " + error);
-	//	addLine("");
-	//	addLine("More details here: " + CrossPlatform::getLogFileName());
-	//	addLine("Make sure OpenXcom and any mods are installed correctly.");
-	//	addLine("");
-	//	addLine("Press any key to continue.");
-	//	loading = LOADING_DONE;
-	//	break;
-	//case LOADING_SUCCESSFUL:
-	//	CrossPlatform::flashWindow();
-	//	Log(LOG_INFO) << "OpenXcom started successfully!";
-	//	getGame()->setState(new GoToMainMenuState(true));
-	//	if (_oldMaster != Options::getActiveMaster() && Options::playIntro)
-	//	{
-	//		getGame()->pushState(new CutsceneState("intro"));
-	//	}
-	//	if (Options::reload)
-	//	{
-	//		Options::reload = false;
-	//	}
-	//	getGame()->getCursor()->setVisible(true);
-	//	getGame()->getFpsCounter()->setVisible(Options::fpsCounter);
-	//	break;
-	//default:
-	//	break;
-	//}
-}
-
-/**
- * The game quits if the player presses any key when an error
- * message is on display.
- * @param action Pointer to an action.
- */
-void StartState::handle(Action *action)
-{
-	//State::handle(action);
-	//if (loading == LOADING_DONE)
-	//{
-	//	if (action->getDetails()->type == SDL_KEYDOWN)
-	//	{
-	//		getGame()->quit();
-	//	}
-	//}
-}
-
-/**
- * Blinks the cursor and spreads out terminal output.
- */
-void StartState::animate()
-{
-	//_cursor->setVisible(!_cursor->getVisible());
-	//_anim++;
-
-	//if (loading == LOADING_STARTED)
-	//{
-	//	std::ostringstream ss;
-	//	ss << "Loading OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT << "...";
-	//	if (Options::reload)
-	//	{
-	//		if (Options::oxceStartUpTextMode < 2)
-	//		{
-	//			if (_anim == 2)
-	//				addLine(ss.str());
-	//		}
-	//	}
-	//	else
-	//	{
-	//		switch (_anim)
-	//		{
-	//		case 1:
-	//			if (Options::oxceStartUpTextMode < 1)
-	//			{
-	//				addLine("DOS/4GW Protected Mode Run-time  Version 1.9");
-	//				addLine("Copyright (c) Rational Systems, Inc. 1990-1993");
-	//			}
-	//			break;
-	//		case 6:
-	//			if (Options::oxceStartUpTextMode < 2)
-	//			{
-	//				addLine("");
-	//				addLine("OpenXcom initialisation");
-	//			}
-	//			break;
-	//		case 7:
-	//			if (Options::oxceStartUpTextMode < 1)
-	//			{
-	//				addLine("");
-	//				if (Options::mute)
-	//				{
-	//					addLine("No Sound Detected");
-	//				}
-	//				else
-	//				{
-	//					addLine("SoundBlaster Sound Effects");
-	//					if (Options::preferredMusic == MUSIC_MIDI)
-	//						addLine("General MIDI Music");
-	//					else
-	//						addLine("SoundBlaster Music");
-	//					addLine("Base Port 220  Irq 7  Dma 1");
-	//				}
-	//			}
-	//			if (Options::oxceStartUpTextMode < 2)
-	//			{
-	//				addLine("");
-	//			}
-	//			break;
-	//		case 9:
-	//			if (Options::oxceStartUpTextMode < 2)
-	//			{
-	//				addLine(ss.str());
-	//			}
-	//			break;
-	//		}
-	//	}
-	//}
-}
-
-/**
- * Adds a line of text to the terminal and moves
- * the cursor appropriately.
- * @param str Text line to add.
- */
-void StartState::addLine(const std::string &str)
-{
-	//_output << "\n" << str;
-	//_text->setText(_output.str());
-	//int y = _text->getTextHeight() - _font->getHeight();
-	//int x = _text->getTextWidth(y / _font->getHeight());
-	//_cursor->setX(x);
-	//_cursor->setY(y);
-}
-
-/**
- * Loads game data and updates status accordingly.
- * @param game_ptr Pointer to the game.
- * @return Thread status, 0 = ok
- */
-
-extern void setThreadLocalGame(Game* gameInstance);
-
-int StartState::load(void *game_ptr)
-{
-	//Game *game = (Game*)game_ptr;
-	//setThreadLocalGame(game);
-
-	//try
-	//{
-	//	Log(LOG_INFO) << "Loading data...";
-	//	Options::updateMods();
-	//	game->loadMods();
-	//	Log(LOG_INFO) << "Data loaded successfully.";
-	//	Log(LOG_INFO) << "Loading language...";
-	//	game->loadLanguages();
-	//	Log(LOG_INFO) << "Language loaded successfully.";
-	//	loading = LOADING_SUCCESSFUL;
-	//}
-	//catch (std::exception &e)
-	//{
-	//	error = e.what();
-	//	Log(LOG_ERROR) << error;
-	//	loading = LOADING_FAILED;
-	//}
-
-	return 0;
-}
-
-}
+} // namespace OpenXcom

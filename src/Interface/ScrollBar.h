@@ -69,11 +69,11 @@ public:
 	/// Blits the scrollbar onto another surface.
 	void blit(SDL_Surface *surface) override;
 	/// Moves the scrollbar.
-	void handle(Action *action, State *state) override;
+//	void handle(Action *action, State *state) override;
 	/// Special handling for mouse presses.
-	void mousePress(Action *action, State *state) override;
+//	void mousePress(Action *action, State *state) override;
 	/// Special handling for mouse releases.
-	void mouseRelease(Action *action, State *state) override;
+//	void mouseRelease(Action *action, State *state) override;
 	/// Draws the scrollbar contents.
 	void draw() override;
 };

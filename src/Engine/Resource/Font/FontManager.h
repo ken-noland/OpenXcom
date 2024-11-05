@@ -17,15 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "../ResourceManager.h"
+#include "Font.h"
+
+#include <filesystem>
 
 namespace OpenXcom
 {
 
-class State
+class FontManager : public ResourceManager<Font>
 {
 public:
-	State() = default;
-	virtual ~State() = default;
+	FontManager();
+	virtual ~FontManager();
+
+	// load font from memory
+	Handle loadFont(const std::string& name, const unsigned char* data, size_t size);
+
+	// load font from file
+	Handle loadFont(const std::string& name, const std::filesystem::path& filename);
 };
 
-}
+} // namespace OpenXcom

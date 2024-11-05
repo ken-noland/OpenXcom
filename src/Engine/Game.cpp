@@ -23,6 +23,8 @@
 #include "Platform/WindowSystem.h"
 #include "Platform/Window.h"
 
+#include "../Menu/StartState.h"
+
 namespace OpenXcom
 {
 
@@ -54,18 +56,10 @@ Game::Game(const std::string& title)
 	_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768);
 	std::shared_ptr<PlatformWindow> window = _window.lock();
 
-	// when the game window closes, send the application termination message
+	// TODO: when the game window closes, send the application termination message
 
-
-
-	//setThreadLocalGame(this);
-
-	//// spin up the game window with graphics, audio, and input
-	//_window.createWindow(title, 1024, 768);
-	//
-	//#if defined(ENABLE_ENTITY_INSPECTOR)
-	//_inspector.create();
-	//#endif
+	// set the initial game state
+	setState(std::make_unique<StartState>());
 }
 
 /**
@@ -73,9 +67,6 @@ Game::Game(const std::string& title)
  */
 Game::~Game()
 {
-	#if defined(ENABLE_ENTITY_INSPECTOR)
-	_inspector.destroy();
-	#endif
 }
 
 /**
@@ -114,13 +105,13 @@ void Game::quit()
  * like in one-way transitions.
  * @param state Pointer to the new state.
  */
-void Game::setState(State *state)
+void Game::setState(std::unique_ptr<State> state)
 {
 	while (!_states.empty())
 	{
 		popState();
 	}
-	pushState(state);
+	pushState(std::move(state));
 }
 
 /**
@@ -128,9 +119,9 @@ void Game::setState(State *state)
  * The new state will be used once the next game cycle starts.
  * @param state Pointer to the new state.
  */
-void Game::pushState(State *state)
+void Game::pushState(std::unique_ptr<State> state)
 {
-	_states.push_back(state);
+	_states.push_back(std::move(state));
 }
 
 /**
@@ -141,18 +132,13 @@ void Game::pushState(State *state)
  */
 void Game::popState()
 {
-	_deleted.push_back(_states.back());
+	_deleted.push_back(std::move(_states.back()));
 	_states.pop_back();
 }
 
 State* Game::getState()
 {
-	return _states.back();
-}
-
-const std::list<State*>& Game::getStates() const
-{
-	return _states;
+	return _states.back().get();
 }
 
 }

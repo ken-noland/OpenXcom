@@ -32,7 +32,7 @@ enum
 namespace OpenXcom
 {
 
-typedef void (State::* ActionHandler)(Action*);
+//typedef void (State::* ActionHandler)(Action*);
 
 /**
  * Surface that the user can interact with.
@@ -50,9 +50,9 @@ private:
 	std::string _tooltip;
 
 protected:
-	std::map<uint8_t, ActionHandler> _click, _press, _release;
-	ActionHandler _in, _over, _out;
-	std::map<SDLKey, ActionHandler> _keyPress, _keyRelease;
+//	std::map<uint8_t, ActionHandler> _click, _press, _release;
+//	ActionHandler _in, _over, _out;
+//	std::map<SDLKey, ActionHandler> _keyPress, _keyRelease;
 	bool _isHovered, _isFocused, _listButton, _tftdMode;
 
 	/// Is this mouse button pressed?
@@ -69,51 +69,51 @@ public:
 	/// Sets the surface's visibility.
 	void setVisible(bool visible) override;
 	/// Processes any pending events.
-	virtual void handle(Action *action, State *state);
+//	virtual void handle(Action *action, State *state);
 	/// Sets the focus of this surface.
 	virtual void setFocus(bool focus, bool modal = false);
 	/// Gets the focus of this surface.
 	bool isFocused() const;
 	/// Unpresses the surface.
-	virtual void unpress(State *state);
+//	virtual void unpress(State *state);
 	/// Hooks an action handler to a mouse click on the surface.
-	void onMouseClick(ActionHandler handler, uint8_t button = SDL_BUTTON_LEFT);
+//	void onMouseClick(ActionHandler handler, uint8_t button = SDL_BUTTON_LEFT);
 	/// Hooks an action handler to a mouse press over the surface.
-	void onMousePress(ActionHandler handler, uint8_t button = 0);
+//	void onMousePress(ActionHandler handler, uint8_t button = 0);
 	/// Hooks an action handler to a mouse release over the surface.
-	void onMouseRelease(ActionHandler handler, uint8_t button = 0);
+//	void onMouseRelease(ActionHandler handler, uint8_t button = 0);
 	/// Hooks an action handler to moving the mouse into the surface.
-	void onMouseIn(ActionHandler handler);
+//	void onMouseIn(ActionHandler handler);
 	/// Hooks an action handler to moving the mouse over the surface.
-	void onMouseOver(ActionHandler handler);
+//	void onMouseOver(ActionHandler handler);
 	/// Hooks an action handler to moving the mouse out of the surface.
-	void onMouseOut(ActionHandler handler);
+//	void onMouseOut(ActionHandler handler);
 	/// Hooks an action handler to pressing a key when the surface is focused.
-	void onKeyboardPress(ActionHandler handler, SDLKey key = SDLK_ANY);
+//	void onKeyboardPress(ActionHandler handler, SDLKey key = SDLK_ANY);
 	/// Hooks an action handler to releasing a key when the surface is focused.
-	void onKeyboardRelease(ActionHandler handler, SDLKey key = SDLK_ANY);
+//	void onKeyboardRelease(ActionHandler handler, SDLKey key = SDLK_ANY);
 	/// Processes a mouse button press event.
-	virtual void mousePress(Action *action, State *state);
+//	virtual void mousePress(Action *action, State *state);
 	/// Processes a mouse button release event.
-	virtual void mouseRelease(Action *action, State *state);
+//	virtual void mouseRelease(Action *action, State *state);
 	/// Processes a mouse click event.
-	virtual void mouseClick(Action *action, State *state);
+//	virtual void mouseClick(Action *action, State *state);
 	/// Processes a mouse hover in event.
-	virtual void mouseIn(Action *action, State *state);
+//	virtual void mouseIn(Action *action, State *state);
 	/// Processes a mouse hover event.
-	virtual void mouseOver(Action *action, State *state);
+//	virtual void mouseOver(Action *action, State *state);
 	/// Processes a mouse hover out event.
-	virtual void mouseOut(Action *action, State *state);
+//	virtual void mouseOut(Action *action, State *state);
 	/// Processes a keyboard key press event.
-	virtual void keyboardPress(Action *action, State *state);
+//	virtual void keyboardPress(Action *action, State *state);
 	/// Processes a keyboard key release event.
-	virtual void keyboardRelease(Action *action, State *state);
+//	virtual void keyboardRelease(Action *action, State *state);
 	/// Check this surface to see if it's a textlist button.
-	void setListButton();
+//	void setListButton();
 	/// Gets the tooltip of the surface.
-	std::string getTooltip() const;
+//	std::string getTooltip() const;
 	/// Sets the tooltip of the surface.
-	void setTooltip(const std::string &tooltip);
+//	void setTooltip(const std::string &tooltip);
 	/// Sets this button to use a colour lookup table instead of inversion for its alternate form.
 	void setTFTDMode(bool mode);
 	/// checks if this is a TFTD mode surface.

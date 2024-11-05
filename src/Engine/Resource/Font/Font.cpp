@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -21,11 +20,5 @@
 namespace OpenXcom
 {
 
-class State
-{
-public:
-	State() = default;
-	virtual ~State() = default;
-};
 
-}
+} // namespace OpenXcom

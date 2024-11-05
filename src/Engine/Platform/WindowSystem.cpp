@@ -38,8 +38,14 @@ std::weak_ptr<PlatformWindow> PlatformWindowSystem::createWindow(const std::stri
 	return window;
 }
 
-void PlatformWindowSystem::destroyWindow(std::weak_ptr<PlatformWindow> window)
+void PlatformWindowSystem::destroyWindow(const std::weak_ptr<PlatformWindow>& window)
 {
+	std::shared_ptr<PlatformWindow> windowPtr = window.lock();
+	auto it = std::find_if(_windows.begin(), _windows.end(), [&](const std::shared_ptr<PlatformWindow>& w) { return w == windowPtr; });
+	if (it != _windows.end())
+	{
+		_windows.erase(it);
+	}
 }
 
 void PlatformWindowSystem::update()

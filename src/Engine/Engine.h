@@ -30,6 +30,7 @@ class VirtualFileSystem;
 class PlatformProcessSystem;
 class PlatformWindowSystem;
 class GraphicsSystem;
+class ResourceSystem;
 
 // Engine is used for process wide initialization and cleanup. In theory, it
 // provides a way to separate and isolate the game from the rest of the
@@ -53,6 +54,9 @@ class Engine
 	// Graphics system
 	std::unique_ptr<GraphicsSystem> _graphicsSystem;
 
+	// Resource system
+	std::unique_ptr<ResourceSystem> _resourceSystem;
+
 	std::unique_ptr<Game> _game;
 
 private:
@@ -72,6 +76,7 @@ public:
 	VirtualFileSystem& getVirtualFileSystem() { return *_virtualFileSystem; }
 	PlatformWindowSystem& getPlatformWindowSystem() { return *_platformWindowSystem; }
 	GraphicsSystem& getGraphicsSystem() { return *_graphicsSystem; }
+	ResourceSystem& getResourceSystem() { return *_resourceSystem; }
 };
 
 Engine& getEngine();

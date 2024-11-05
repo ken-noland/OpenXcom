@@ -17,15 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <string>
+
+#include <glm/vec4.hpp>
 
 namespace OpenXcom
 {
 
-class State
+class Palette
 {
+private:
+	std::string _name;
+	std::vector<glm::vec4> _colors;
+
 public:
-	State() = default;
-	virtual ~State() = default;
+
 };
+
 
 }

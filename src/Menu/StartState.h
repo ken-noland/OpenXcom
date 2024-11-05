@@ -37,35 +37,12 @@ enum LoadingPhase { LOADING_STARTED, LOADING_FAILED, LOADING_SUCCESSFUL, LOADING
 class StartState : public State
 {
 private:
-	Text *_text, *_cursor;
-	Font *_font;
-	Timer *_timer;
-	Language *_lang;
-	int _anim;
-	std::string _oldMaster;
+	uint32_t _terminalFontHandle;
+	uint32_t _terminalPaletteHandle;
 
-//	SDL_Thread *_thread;
-	std::ostringstream _output;
 public:
-	static LoadingPhase loading;
-	static std::string error;
-
-	/// Creates the Start state.
 	StartState();
-	/// Cleans up the Start state.
 	virtual ~StartState();
-	/// Reset everything.
-	void init() override;
-	/// Displays messages.
-	void update() override;
-	/// Handles key clicks.
-	void handle(Action *action) override;
-	/// Animates the terminal.
-	void animate();
-	/// Adds a line of text.
-	void addLine(const std::string &str);
-	/// Loads the game resources.
-	static int load(void *game_ptr);
 };
 
 }

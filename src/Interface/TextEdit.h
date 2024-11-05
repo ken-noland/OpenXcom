@@ -43,8 +43,8 @@ private:
 	UCode _char;
 	size_t _caretPos;
 	TextEditConstraint _textEditConstraint;
-	ActionHandler _change;
-	ActionHandler _enter;
+//	ActionHandler _change;
+//	ActionHandler _enter;
 	State *_state;
 	/// Checks if a character will exceed the maximum width.
 	bool exceedsMaxWidth(UCode c) const;
@@ -56,7 +56,7 @@ public:
 	/// Cleans up the text edit.
 	~TextEdit();
 	/// Handle focus.
-	void handle(Action *action, State *state) override;
+//	void handle(Action *action, State *state) override;
 	/// Sets focus on this text edit.
 	void setFocus(bool focus, bool modal = true) override;
 	/// Sets the text size to big.
@@ -98,13 +98,13 @@ public:
 	/// Draws the text edit.
 	void draw() override;
 	/// Special handling for mouse presses.
-	void mousePress(Action *action, State *state) override;
+//	void mousePress(Action *action, State *state) override;
 	/// Special handling for keyboard presses.
-	void keyboardPress(Action *action, State *state) override;
+//	void keyboardPress(Action *action, State *state) override;
 	/// Hooks an action handler to when the text changes.
-	void onChange(ActionHandler handler);
+//	void onChange(ActionHandler handler);
 	/// Sets a function to be called every time ENTER is pressed.
-	void onEnter(ActionHandler handler);
+//	void onEnter(ActionHandler handler);
 	/// Sets the text edit's background drawing setting.
 	void setDrawBackground(bool drawBackground) { _drawBackground = drawBackground; }
 };

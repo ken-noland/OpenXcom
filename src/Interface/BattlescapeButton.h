@@ -51,9 +51,9 @@ public:
 	/// Sets the image button's group.
 	void setGroup(BattlescapeButton **group);
 	/// Special handling for mouse presses.
-	void mousePress(Action *action, State *state) override;
+//	void mousePress(Action *action, State *state) override;
 	/// Special handling for mouse releases.
-	void mouseRelease(Action *action, State *state) override;
+//	void mouseRelease(Action *action, State *state) override;
 	/// Invert a button explicitly either ON or OFF.
 	void toggle(bool invert);
 	/// Allows this button to be toggled on/off with a click.

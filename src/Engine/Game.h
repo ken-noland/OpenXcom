@@ -55,7 +55,7 @@ private:
 	std::weak_ptr<PlatformWindow> _window;
 
 	/// The game's state stack.
-	std::list<State*> _states, _deleted;
+	std::list<std::unique_ptr<State>> _states, _deleted;
 
 	#if defined(ENABLE_ENTITY_INSPECTOR)
 	Inspector _inspector;
@@ -73,15 +73,13 @@ public:
 	void quit();
 
 	/// Resets the state stack to a new state.
-	void setState(State *state);
+	void setState(std::unique_ptr<State> state);
 	/// Pushes a new state into the state stack.
-	void pushState(State *state);
+	void pushState(std::unique_ptr<State> state);
 	/// Pops the last state from the state stack.
 	void popState();
 	/// Gets the last state from the state stack
 	State* getState();
-	/// Gets the state stack
-	const std::list<State*>& getStates() const;
 
 	// the following will be moved to GameContext
 

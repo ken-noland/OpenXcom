@@ -40,7 +40,7 @@ private:
 	double _pos;
 	int _min, _max, _value;
 	bool _pressed;
-	ActionHandler _change;
+//	ActionHandler _change;
 	int _thickness, _textness, _minX, _maxX, _offsetX;
 
 	/// Sets the slider's position.
@@ -73,13 +73,13 @@ public:
 	/// Blits the slider onto another surface.
 	void blit(SDL_Surface *surface) override;
 	/// Moves the slider.
-	void handle(Action *action, State *state) override;
+//	void handle(Action *action, State *state) override;
 	/// Special handling for mouse presses.
-	void mousePress(Action *action, State *state) override;
+//	void mousePress(Action *action, State *state) override;
 	/// Special handling for mouse releases.
-	void mouseRelease(Action *action, State *state) override;
+//	void mouseRelease(Action *action, State *state) override;
 	/// Hooks an action handler to when the slider changes.
-	void onChange(ActionHandler handler);
+//	void onChange(ActionHandler handler);
 };
 
 }

@@ -190,6 +190,11 @@ set ( engine_src
   "Engine/Platform/Linux/LinuxWindow.cpp"
   "Engine/Platform/Win32/Win32Process.cpp"
   "Engine/Platform/Win32/Win32Window.cpp"
+  "Engine/Resource/ResourceSystem.cpp"
+  #"Engine/Resource/Font/Font.cpp"
+  "Engine/Resource/Font/FontManager.cpp"
+  #"Engine/Resource/Palette/Palette.cpp"
+  "Engine/Resource/Palette/PaletteManager.cpp"
 #  "Engine/Zoom.cpp
 )
 

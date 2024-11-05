@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -18,14 +17,32 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "PaletteManager.h"
+
 namespace OpenXcom
 {
 
-class State
+PaletteManager::PaletteManager()
 {
-public:
-	State() = default;
-	virtual ~State() = default;
-};
-
 }
+
+PaletteManager::~PaletteManager()
+{
+}
+
+PaletteManager::Handle PaletteManager::loadPalette(const std::string& name, const glm::ivec4* data, size_t size)
+{
+	return Handle();
+}
+
+PaletteManager::Handle PaletteManager::loadPalette(const std::string& name, std::initializer_list<glm::ivec4> data)
+{
+	return Handle();
+}
+
+PaletteManager::Handle PaletteManager::loadPalette(const std::string& name, const std::filesystem::path& path)
+{
+	return Handle();
+}
+
+} // namespace OpenXcom
