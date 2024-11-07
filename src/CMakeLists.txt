@@ -131,9 +131,32 @@ set ( battlescape_src
 )
 
 set ( engine_src
-#  "Engine/Action.cpp"
 #  "Engine/Adlib/adlplayer.cpp"
 #  "Engine/Adlib/fmopl.cpp"
+  "Engine/Filesystem/CompositeFileSystem.cpp"
+  "Engine/Filesystem/EmbeddedFileSystem.cpp"
+  "Engine/Filesystem/PhysicalFileSystem.cpp"
+  "Engine/Filesystem/VirtualFileSystem.cpp"
+  "Engine/Graphics/Vulkan/Shader/VulkanShader.cpp"
+  "Engine/Graphics/Vulkan/Shader/VulkanShaderManager.cpp"
+  "Engine/Graphics/Vulkan/VulkanSurface.cpp"
+  "Engine/Graphics/Vulkan/VulkanPipeline.cpp"
+  "Engine/Graphics/Vulkan/VulkanSystem.cpp"
+  "Engine/Graphics/GraphicsSystem.cpp"
+  "Engine/Platform/Linux/LinuxProcess.cpp"
+  "Engine/Platform/Linux/LinuxWindow.cpp"
+  "Engine/Platform/Win32/Win32Process.cpp"
+  "Engine/Platform/Win32/Win32Window.cpp"
+  "Engine/Platform/ProcessSystem.cpp"
+  "Engine/Platform/Window.cpp"
+  "Engine/Platform/WindowSystem.cpp"
+  "Engine/Resource/ResourceSystem.cpp"
+  #"Engine/Resource/Font/Font.cpp"
+  "Engine/Resource/Font/FontManager.cpp"
+  #"Engine/Resource/Palette/Palette.cpp"
+  "Engine/Resource/Palette/PaletteManager.cpp"
+  "Engine/Resource/Shader/ShaderManager.cpp"
+#  "Engine/Action.cpp"
 #  "Engine/AdlibMusic.cpp"
 #  "Engine/CatFile.cpp"
   "Engine/CrossPlatform.cpp"
@@ -176,25 +199,6 @@ set ( engine_src
 #  "Engine/SurfaceSet.cpp"
   "Engine/Timer.cpp"
   "Engine/Unicode.cpp"
-  "Engine/Filesystem/CompositeFileSystem.cpp"
-  "Engine/Filesystem/EmbeddedFileSystem.cpp"
-  "Engine/Filesystem/PhysicalFileSystem.cpp"
-  "Engine/Filesystem/VirtualFileSystem.cpp"
-  "Engine/Graphics/GraphicsSystem.cpp"
-  "Engine/Graphics/Vulkan/VulkanSurface.cpp"
-  "Engine/Graphics/Vulkan/VulkanSystem.cpp"
-  "Engine/Platform/ProcessSystem.cpp"
-  "Engine/Platform/Window.cpp"
-  "Engine/Platform/WindowSystem.cpp"
-  "Engine/Platform/Linux/LinuxProcess.cpp"
-  "Engine/Platform/Linux/LinuxWindow.cpp"
-  "Engine/Platform/Win32/Win32Process.cpp"
-  "Engine/Platform/Win32/Win32Window.cpp"
-  "Engine/Resource/ResourceSystem.cpp"
-  #"Engine/Resource/Font/Font.cpp"
-  "Engine/Resource/Font/FontManager.cpp"
-  #"Engine/Resource/Palette/Palette.cpp"
-  "Engine/Resource/Palette/PaletteManager.cpp"
 #  "Engine/Zoom.cpp
 )
 
@@ -741,6 +745,7 @@ FetchContent_MakeAvailable(glm)
 # set up the defines and includes
 set(openxcom_defines
   YAML_CPP_STATIC_DEFINE
+  NOMINMAX
 )
 
 set(openxcom_includes

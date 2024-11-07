@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,27 +18,6 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "FontManager.h"
-
 namespace OpenXcom
 {
-
-FontManager::FontManager()
-{
-}
-
-FontManager::~FontManager()
-{
-}
-
-FontManager::Handle FontManager::loadFont(const std::string& name, const unsigned char* data, size_t size)
-{
-	return INVALID_HANDLE;
-}
-
-FontManager::Handle FontManager::loadFont(const std::string& name, const std::filesystem::path& filename)
-{
-	return INVALID_HANDLE;
-}
-
 } // namespace OpenXcom

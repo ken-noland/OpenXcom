@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,28 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "../ResourceManager.h"
+#include "Shader.h"
 
-#include "FontManager.h"
+#include <filesystem>
 
 namespace OpenXcom
 {
 
-FontManager::FontManager()
+class ShaderManager : public ResourceManager<ShaderType>
 {
-}
+public:
+	ShaderManager();
+	virtual ~ShaderManager();
 
-FontManager::~FontManager()
-{
-}
+	// load shader from memory
+	virtual Handle loadShader(const std::string& name, const std::string shader, ShaderType type = ShaderType::InferFromSource) = 0;
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const unsigned char* data, size_t size)
-{
-	return INVALID_HANDLE;
-}
-
-FontManager::Handle FontManager::loadFont(const std::string& name, const std::filesystem::path& filename)
-{
-	return INVALID_HANDLE;
-}
+	// load shader from file
+	virtual Handle loadShader(const std::string& name, const std::filesystem::path& path) = 0;
+};
 
 } // namespace OpenXcom

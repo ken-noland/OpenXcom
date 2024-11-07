@@ -63,6 +63,8 @@ public:
 	virtual ~VulkanSystem();
 
 	virtual std::unique_ptr<GraphicsSurface> createSurface(const PlatformWindowHandle& handle) override;
+
+	virtual std::unique_ptr<ShaderManager> createShaderManager() override;
 };
 
 } // namespace OpenXcom

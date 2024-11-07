@@ -33,66 +33,38 @@ public:
 	static const Handle INVALID_HANDLE = static_cast<Handle>(-1);
 
 protected:
-	using ResourceTypePtr = std::unique_ptr<ResourceType>;
-	using ResourceTypeRef = std::reference_wrapper<ResourceType>;
-	using ResourceTypeRefOptional = std::optional<ResourceTypeRef>;
-	using ResourceContainer = std::vector<ResourceTypePtr>;
-	using HandleToIndexMap = std::unordered_map<Handle, std::size_t>;
-	using IndexToHandleMap = std::vector<Handle>;
-
-	ResourceContainer _resources;
-	HandleToIndexMap _handleToIndex;
-	IndexToHandleMap _indexToHandle;
-
+	std::unordered_map<Handle, std::unique_ptr<ResourceType>> _resources;
 	Handle nextHandle = 0;
 
 public:
 	ResourceManager() = default;
 	virtual ~ResourceManager() = default;
 
-	Handle add(ResourceTypePtr resource)
+	Handle add(std::unique_ptr<ResourceType> resource)
 	{
 		Handle handle = nextHandle++;
-		size_t index = _resources.size();
-		_resources.push_back(std::move(resource));
-		_handleToIndex[handle] = index;
-		_indexToHandle.push_back(handle); // Store handle for reverse lookup
+		_resources.emplace(handle, std::move(resource));
 		return handle;
 	}
 
-	ResourceTypeRefOptional get(Handle handle)
+	std::optional<std::reference_wrapper<ResourceType>> get(Handle handle)
 	{
-		auto it = _handleToIndex.find(handle);
-		if (it != _handleToIndex.end())
+		auto it = _resources.find(handle);
+		if (it != _resources.end())
 		{
-			return _resources[it->second].get();
+			return *it->second;
 		}
-		return std::nullopt; // Handle not found
+		return std::nullopt;
+	}
+
+	bool exists(Handle handle)
+	{
+		return _resources.find(handle) != _resources.end();
 	}
 
 	void remove(Handle handle)
 	{
-		auto it = _handleToIndex.find(handle);
-		if (it != _handleToIndex.end())
-		{
-			size_t index = it->second;
-
-			// Move the last element to the 'index' position to keep vector compact
-			_resources[index] = std::move(_resources.back());
-			_resources.pop_back();
-
-			// Update index tracking
-			if (index < _resources.size())
-			{
-				Handle movedHandle = _indexToHandle.back();
-				_handleToIndex[movedHandle] = index;
-				_indexToHandle[index] = movedHandle;
-			}
-
-			// Remove the handle mapping
-			_handleToIndex.erase(it);
-			_indexToHandle.pop_back();
-		}
+		_resources.erase(handle);
 	}
 };
 

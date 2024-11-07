@@ -27,6 +27,8 @@ class Options;
 class GraphicsSurface;
 struct PlatformWindowHandle;
 
+class ShaderManager;
+
 class GraphicsSystem
 {
 public:
@@ -34,6 +36,9 @@ public:
 	virtual ~GraphicsSystem() = default;
 
 	virtual std::unique_ptr<GraphicsSurface> createSurface(const PlatformWindowHandle& handle) = 0;
+
+	// resource managers
+	virtual std::unique_ptr<ShaderManager> createShaderManager() = 0;
 };
 
 std::unique_ptr<GraphicsSystem> createGraphicsSystem(const Options& options);

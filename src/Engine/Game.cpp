@@ -57,6 +57,7 @@ Game::Game(const std::string& title)
 	std::shared_ptr<PlatformWindow> window = _window.lock();
 
 	// TODO: when the game window closes, send the application termination message
+	// window->setCloseCallback([this]() { getEngine->exit() });
 
 	// set the initial game state
 	setState(std::make_unique<StartState>());

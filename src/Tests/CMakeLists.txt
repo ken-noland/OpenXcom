@@ -24,9 +24,11 @@ add_executable(
   "Engine/TestOptions.cpp"
   "Engine/TestTimer.cpp"
   "Engine/TestTypeErasedPtr.cpp"
+  "Engine/TestVirtualFileSystem.cpp"
   "Entity/Interface/WindowTest.cpp"
   "Entity/Interface/ButtonTest.cpp"
-  "Engine/TestVirtualFileSystem.cpp")
+  "Resource/TestResourceManager.cpp"
+)
 
 # Define the source root and add it as a compile definition
 target_compile_definitions(openxcom_tests PRIVATE 

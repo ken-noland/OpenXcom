@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,27 +18,23 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "FontManager.h"
-
 namespace OpenXcom
 {
 
-FontManager::FontManager()
+// the graphics surface is the window that the graphics system will render to
+class GraphicsSurface
 {
-}
+public:
+	GraphicsSurface() = default;
+	virtual ~GraphicsSurface() = default;
 
-FontManager::~FontManager()
-{
-}
+	virtual void update() = 0;
+};
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const unsigned char* data, size_t size)
+class GraphicsShader
 {
-	return INVALID_HANDLE;
-}
+};
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const std::filesystem::path& filename)
-{
-	return INVALID_HANDLE;
-}
+
 
 } // namespace OpenXcom

@@ -16,28 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "FontManager.h"
+#include "VulkanShaderManager.h"
 
 namespace OpenXcom
 {
-
-FontManager::FontManager()
+VulkanShaderManager::VulkanShaderManager()
 {
 }
 
-FontManager::~FontManager()
+VulkanShaderManager::~VulkanShaderManager()
 {
 }
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const unsigned char* data, size_t size)
+VulkanShaderManager::Handle VulkanShaderManager::loadShader(const std::string& name, const std::string shader, ShaderType type)
 {
-	return INVALID_HANDLE;
+	return Handle();
 }
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const std::filesystem::path& filename)
+VulkanShaderManager::Handle VulkanShaderManager::loadShader(const std::string& name, const std::filesystem::path& path)
 {
-	return INVALID_HANDLE;
+	return Handle();
 }
+
 
 } // namespace OpenXcom

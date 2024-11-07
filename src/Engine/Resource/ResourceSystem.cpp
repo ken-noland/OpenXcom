@@ -19,16 +19,20 @@
 
 #include "ResourceSystem.h"
 
+#include "../Graphics/GraphicsSystem.h"
+
 #include "Font/FontManager.h"
 #include "Palette/PaletteManager.h"
+#include "Shader/ShaderManager.h"
 
 namespace OpenXcom
 {
 
-ResourceSystem::ResourceSystem()
+ResourceSystem::ResourceSystem(VirtualFileSystem& virtualFileSystem, GraphicsSystem& graphicsSystem, Options& options)
 {
 	_fontManager = std::make_unique<FontManager>();
 	_paletteManager = std::make_unique<PaletteManager>();
+	_shaderManager = graphicsSystem.createShaderManager();
 }
 
 ResourceSystem::~ResourceSystem()
@@ -43,6 +47,11 @@ FontManager& ResourceSystem::getFontManager()
 PaletteManager& ResourceSystem::getPaletteManager()
 {
 	return *_paletteManager;
+}
+
+ShaderManager& ResourceSystem::getShaderManager()
+{
+	return *_shaderManager;
 }
 
 } // namespace OpenXcom

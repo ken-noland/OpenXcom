@@ -53,14 +53,15 @@ Engine::Engine(const std::vector<std::string>& args)
 	// Initialize the process system
 	_platformProcessSystem = std::make_unique<PlatformProcessSystem>();
 
-	// Initialize the resource system
-	_resourceSystem = std::make_unique<ResourceSystem>();
-
 	// Initialize the window system
 	_platformWindowSystem = std::make_unique<PlatformWindowSystem>();
 
 	// Initialize the graphics system
-	_graphicsSystem = createGraphicsSystem(getOptions());
+	_graphicsSystem = createGraphicsSystem(*_options);
+		
+	// Initialize the resource system
+	_resourceSystem = std::make_unique<ResourceSystem>(*_virtualFileSystem, *_graphicsSystem, *_options);
+
 
 	std::ostringstream title;
 	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;

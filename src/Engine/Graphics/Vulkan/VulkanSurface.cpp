@@ -19,12 +19,16 @@
 
 #include "VulkanSurface.h"
 #include "../../Platform/Window.h"
+#include "../../Engine.h"
+#include "../../Resource/ResourceSystem.h"
+#include "../../Resource/Shader/ShaderManager.h"
 #include "../../Logger.h"
 
 // BEGIN TEMP
 #include <shaderc/shaderc.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <limits>
 
 namespace OpenXcom
 {
@@ -128,17 +132,20 @@ VulkanSurface::VulkanSurface(vk::Instance instance, const PlatformWindowHandle& 
 #endif
 }
 
-void VulkanSurface::initializeDevice(vk::Device& device, uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue)
+void VulkanSurface::initializeDevice(vk::Device& device, const vk::PhysicalDevice& physicalDevice, uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue)
 {
 	_device = device;
 	_graphicsQueue = graphicsQueue;
 	_presentQueue = presentQueue;
+	_physicalDevice = physicalDevice;
 
 	// Create the command queue
 	vk::CommandPoolCreateInfo poolInfo{};
 	poolInfo.queueFamilyIndex = graphicsQueueFamilyIndex;
 	poolInfo.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
 	_commandPool = _device.createCommandPool(poolInfo);
+
+	initializeGameSurface();
 }
 
 // Function to get the client area dimensions
@@ -166,10 +173,8 @@ vk::Extent2D getClientAreaSize(const PlatformWindowHandle& handle)
 #endif
 }
 
-void VulkanSurface::initializeSwapChain(const vk::PhysicalDevice& physicalDevice)
+void VulkanSurface::initializeSwapChain()
 {
-	_physicalDevice = physicalDevice;
-
 	vk::SurfaceCapabilitiesKHR surfaceCapabilities = _physicalDevice.getSurfaceCapabilitiesKHR(_surface);
 	std::vector<vk::SurfaceFormatKHR> surfaceFormats = _physicalDevice.getSurfaceFormatsKHR(_surface);
 	std::vector<vk::PresentModeKHR> presentModes = _physicalDevice.getSurfacePresentModesKHR(_surface);
@@ -290,6 +295,11 @@ void VulkanSurface::initializeShaders(shaderc::Compiler& compiler)
 {
 	_vertexShaderModule = createShaderModule(compiler, vertexShaderSource, shaderc_glsl_vertex_shader, _device);
 	_fragmentShaderModule = createShaderModule(compiler, fragmentShaderSource, shaderc_glsl_fragment_shader, _device);
+
+	Engine& engine = getEngine();
+	ShaderManager& shaderManager = engine.getResourceSystem().getShaderManager();
+	_vertexShader = shaderManager.loadShader("WindowSurfaceVertex", vertexShaderSource, ShaderType::Vertex);
+	_fragmentShader = shaderManager.loadShader("WindowSurfaceFragment", fragmentShaderSource, ShaderType::Fragment);
 }
 
 void VulkanSurface::initializePipeline()
@@ -395,6 +405,91 @@ void VulkanSurface::initializePipeline()
 	_pipeline = _device.createGraphicsPipeline(nullptr, pipelineInfo).value;
 }
 
+void VulkanSurface::initializeGameSurface()
+{
+	vk::ImageCreateInfo imageInfo{};
+	imageInfo.imageType = vk::ImageType::e2D;
+	imageInfo.extent = vk::Extent3D{320, 200, 1}; // 320x200 resolution
+	imageInfo.mipLevels = 1;
+	imageInfo.arrayLayers = 1;
+	imageInfo.format = vk::Format::eR8G8B8A8Unorm; // 8-bit color with alpha
+	imageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled;
+
+	_gameImage = _device.createImage(imageInfo);
+
+	vk::MemoryRequirements memRequirements = _device.getImageMemoryRequirements(_gameImage);
+
+
+	uint32_t memoryType = std::numeric_limits<uint32_t>::max();
+	vk::PhysicalDeviceMemoryProperties memProperties = _physicalDevice.getMemoryProperties();
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+	{
+		if ((memRequirements.memoryTypeBits & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & vk::MemoryPropertyFlagBits::eDeviceLocal) == vk::MemoryPropertyFlagBits::eDeviceLocal)
+		{
+			memoryType = i;
+			break;
+		}
+	}
+
+	if (memoryType == std::numeric_limits<uint32_t>::max())
+	{
+		throw std::runtime_error("Failed to find suitable memory type for game image!");
+	}
+
+	vk::MemoryAllocateInfo allocInfo{};
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = memoryType;
+
+	vk::DeviceMemory gameImageMemory = _device.allocateMemory(allocInfo);
+
+	_device.bindImageMemory(_gameImage, gameImageMemory, 0);
+
+	vk::ImageViewCreateInfo imageViewInfo{};
+	imageViewInfo.image = _gameImage;
+	imageViewInfo.viewType = vk::ImageViewType::e2D;
+	imageViewInfo.format = vk::Format::eR8G8B8A8Unorm;
+	imageViewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+	imageViewInfo.subresourceRange.levelCount = 1;
+	imageViewInfo.subresourceRange.layerCount = 1;
+
+	_gameImageView = _device.createImageView(imageViewInfo);
+
+	vk::AttachmentDescription colorAttachment{};
+	colorAttachment.format = vk::Format::eR8G8B8A8Unorm;
+	colorAttachment.samples = vk::SampleCountFlagBits::e1;
+	colorAttachment.loadOp = vk::AttachmentLoadOp::eClear;
+	colorAttachment.storeOp = vk::AttachmentStoreOp::eStore;
+	colorAttachment.initialLayout = vk::ImageLayout::eUndefined;
+	colorAttachment.finalLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+	vk::AttachmentReference colorAttachmentRef{};
+	colorAttachmentRef.attachment = 0; // Index of the attachment in the render pass (color attachment)
+	colorAttachmentRef.layout = vk::ImageLayout::eColorAttachmentOptimal;
+
+	vk::SubpassDescription subpass{};
+	subpass.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+
+	vk::RenderPassCreateInfo renderPassInfo{};
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+
+	_gameRenderPass = _device.createRenderPass(renderPassInfo);
+
+	vk::FramebufferCreateInfo framebufferInfo{};
+	framebufferInfo.renderPass = _gameRenderPass;
+	framebufferInfo.attachmentCount = 1;
+	framebufferInfo.pAttachments = &_gameImageView;
+	framebufferInfo.width = 320;
+	framebufferInfo.height = 200;
+	framebufferInfo.layers = 1;
+
+	_gameFramebuffer = _device.createFramebuffer(framebufferInfo);
+}
+
 void VulkanSurface::destroySwapChain()
 {
 	_device.waitIdle();
@@ -435,7 +530,7 @@ void VulkanSurface::destroySwapChain()
 void VulkanSurface::handleResize()
 {
 	destroySwapChain();
-	initializeSwapChain(_physicalDevice);
+	initializeSwapChain();
 	initializeFrames(_renderPass);
 	initializePipeline();
 
@@ -445,6 +540,30 @@ void VulkanSurface::handleResize()
 VulkanSurface::~VulkanSurface()
 {
 	destroySwapChain();
+
+	if (_gameFramebuffer)
+	{
+		_device.destroyFramebuffer(_gameFramebuffer);
+		_gameFramebuffer = nullptr;
+	}
+
+	if (_gameImageView)
+	{
+		_device.destroyImageView(_gameImageView);
+		_gameImageView = nullptr;
+	}
+
+	if (_gameImage)
+	{
+		_device.destroyImage(_gameImage);
+		_gameImage = nullptr;
+	}
+
+	if (_gameRenderPass)
+	{
+		_device.destroyRenderPass(_gameRenderPass);
+		_gameRenderPass = nullptr;
+	}
 
 	if(_commandPool)
 	{
@@ -535,26 +654,48 @@ void VulkanSurface::update()
 
 void VulkanSurface::recordCommandBuffer(FrameData& frame, uint32_t imageIndex)
 {
+
 	vk::CommandBufferBeginInfo beginInfo{};
 	frame.commandBuffer.begin(beginInfo);
 
-	vk::RenderPassBeginInfo renderPassInfo{};
-	renderPassInfo.renderPass = _renderPass;
-	renderPassInfo.framebuffer = frame.framebuffer;
-	renderPassInfo.renderArea.offset = vk::Offset2D{0, 0};
-	renderPassInfo.renderArea.extent = _swapChainExtent;
+	// render the game surface
+	{
+		vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.5f, 0.5f, 0.5f, 1.0f}); // Gray
 
-	vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f});
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues = &clearColor;
+		vk::RenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.renderPass = _gameRenderPass;
+		renderPassInfo.framebuffer = _gameFramebuffer;
+		renderPassInfo.renderArea.extent = vk::Extent2D{320, 200};
+		renderPassInfo.clearValueCount = 1;
+		renderPassInfo.pClearValues = &clearColor;
 
-	frame.commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+		frame.commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+
+		// ... any other draw commands for the game content
+
+		frame.commandBuffer.endRenderPass();
+	}
+
+	// render the window surface
+	{
+		vk::RenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.renderPass = _renderPass;
+		renderPassInfo.framebuffer = frame.framebuffer;
+		renderPassInfo.renderArea.offset = vk::Offset2D{0, 0};
+		renderPassInfo.renderArea.extent = _swapChainExtent;
+
+		vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f});
+		renderPassInfo.clearValueCount = 1;
+		renderPassInfo.pClearValues = &clearColor;
+
+		frame.commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
 
-	// !!!! TODO !!!!
+		// !!!! TODO !!!!
 
 
-	frame.commandBuffer.endRenderPass();
+		frame.commandBuffer.endRenderPass();
+	}
 
 	frame.commandBuffer.end();
 

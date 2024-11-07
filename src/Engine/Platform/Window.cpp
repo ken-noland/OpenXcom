@@ -20,7 +20,7 @@
 #include "Window.h"
 #include "../Engine.h"
 #include "../Graphics/GraphicsSystem.h"
-#include "../Graphics/GraphicsSurface.h"
+#include "../Graphics/GraphicsInterfaces.h"
 
 namespace OpenXcom
 {

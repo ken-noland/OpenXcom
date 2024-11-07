@@ -17,25 +17,25 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "FontManager.h"
+#include "ShaderManager.h"
 
 namespace OpenXcom
 {
 
-FontManager::FontManager()
+ShaderManager::ShaderManager()
 {
 }
 
-FontManager::~FontManager()
+ShaderManager::~ShaderManager()
 {
 }
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const unsigned char* data, size_t size)
+ShaderManager::Handle ShaderManager::loadShader(const std::string& name, const std::string shader, ShaderType type)
 {
 	return INVALID_HANDLE;
 }
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const std::filesystem::path& filename)
+ShaderManager::Handle ShaderManager::loadShader(const std::string& name, const std::filesystem::path& path)
 {
 	return INVALID_HANDLE;
 }

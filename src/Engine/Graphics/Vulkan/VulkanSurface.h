@@ -17,9 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../GraphicsSurface.h"
+#include "../GraphicsInterfaces.h"
 #include "VulkanInclude.h"
 #include "../../Platform/Window.h"
+
+#include "../../Resource/Shader/ShaderManager.h"
 
 namespace OpenXcom
 {
@@ -64,17 +66,28 @@ class VulkanSurface : public GraphicsSurface
 
 	PlatformWindowHandle _windowHandle;
 
+	// The main game surface
+	vk::Image _gameImage;
+	vk::ImageView _gameImageView;
+	vk::RenderPass _gameRenderPass;
+	vk::Framebuffer _gameFramebuffer;
+
+
 	// TEMP
+	ShaderManager::Handle _vertexShader;
+	ShaderManager::Handle _fragmentShader;
+
 	vk::ShaderModule _vertexShaderModule;
 	vk::ShaderModule _fragmentShaderModule;
 
 	friend class VulkanSystem;
-	void initializeDevice(vk::Device& device, uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue);
-	void initializeSwapChain(const vk::PhysicalDevice& physicalDevice);
+	void initializeDevice(vk::Device& device, const vk::PhysicalDevice& physicalDevice, uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue);
+	void initializeSwapChain();
 	void initializeFrames(const vk::RenderPass& renderPass);
 	void initializeShaders(shaderc::Compiler& compiler);
 	void initializePipeline();
 
+	void initializeGameSurface();
 
 	void destroySwapChain();
 

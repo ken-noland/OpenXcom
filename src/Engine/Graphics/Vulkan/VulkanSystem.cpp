@@ -19,6 +19,8 @@
 
 #include "VulkanSystem.h"
 #include "VulkanSurface.h"
+#include "Shader/VulkanShaderManager.h"
+
 #include "../../Platform/Window.h"
 #include "../../Logger.h"
 #include "../../../version.h"
@@ -209,10 +211,12 @@ std::unique_ptr<GraphicsSurface> VulkanSystem::createSurface(const PlatformWindo
 
 	initializeFrames(surface);
 
-
-
-
 	return surface;
+}
+
+std::unique_ptr<ShaderManager> VulkanSystem::createShaderManager()
+{
+	return std::make_unique<VulkanShaderManager>();
 }
 
 void VulkanSystem::selectPhysicalDevice(const vk::SurfaceKHR& surface)
@@ -359,8 +363,8 @@ void VulkanSystem::initializeDevice(const vk::SurfaceKHR& surface)
 
 void VulkanSystem::initializeSwapChain(std::unique_ptr<VulkanSurface>& surface)
 {
-	surface->initializeDevice(_device, _graphicsQueueFamilyIndex, _graphicsQueue, _presentQueue);
-	surface->initializeSwapChain(_physicalDevice);
+	surface->initializeDevice(_device, _physicalDevice, _graphicsQueueFamilyIndex, _graphicsQueue, _presentQueue);
+	surface->initializeSwapChain();
 	_swapChainImageFormat = surface->getVKFormat();
 }
 

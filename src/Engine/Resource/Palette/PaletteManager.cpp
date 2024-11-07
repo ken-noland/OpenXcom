@@ -32,17 +32,17 @@ PaletteManager::~PaletteManager()
 
 PaletteManager::Handle PaletteManager::loadPalette(const std::string& name, const glm::ivec4* data, size_t size)
 {
-	return Handle();
+	return INVALID_HANDLE;
 }
 
 PaletteManager::Handle PaletteManager::loadPalette(const std::string& name, std::initializer_list<glm::ivec4> data)
 {
-	return Handle();
+	return INVALID_HANDLE;
 }
 
 PaletteManager::Handle PaletteManager::loadPalette(const std::string& name, const std::filesystem::path& path)
 {
-	return Handle();
+	return INVALID_HANDLE;
 }
 
 } // namespace OpenXcom

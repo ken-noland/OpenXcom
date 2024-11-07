@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,28 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <string>
 
-#include "FontManager.h"
+#include <glm/vec4.hpp>
 
 namespace OpenXcom
 {
 
-FontManager::FontManager()
+enum class ShaderType
 {
-}
+	Vertex,
+	Fragment,
+	Geometry,
+	Compute,
+	TessControl,
+	TessEvaluation,
 
-FontManager::~FontManager()
+	InferFromSource
+};
+
+class Shader
 {
-}
+private:
+	std::string _name;
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const unsigned char* data, size_t size)
-{
-	return INVALID_HANDLE;
-}
+public:
+};
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const std::filesystem::path& filename)
-{
-	return INVALID_HANDLE;
 }
-
-} // namespace OpenXcom
