@@ -33,21 +33,21 @@ namespace OpenXcom
 SIMPLERTTR
 {
 	/// RTTR Registration for SurfaceComponent
-	SimpleRTTR::Registration().Type<SurfaceComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<SurfaceComponent>);
+	SimpleRTTR::registration().type<SurfaceComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<SurfaceComponent>);
 
 	/// RTTR Registration for ScreenRectComponent
-	SimpleRTTR::Registration().Type<ScreenRectComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<ScreenRectComponent>)
-		.Property(&ScreenRectComponent::x, "x")
-		.Property(&ScreenRectComponent::y, "y")
-		.Property(&ScreenRectComponent::width, "width")
-		.Property(&ScreenRectComponent::height, "height");
+	SimpleRTTR::registration().type<ScreenRectComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<ScreenRectComponent>)
+		.property(&ScreenRectComponent::x, "x")
+		.property(&ScreenRectComponent::y, "y")
+		.property(&ScreenRectComponent::width, "width")
+		.property(&ScreenRectComponent::height, "height");
 
 	// putting this here for now because it's been optimized out by the linker when it is in Name.cpp
-	SimpleRTTR::Registration().Type<NameComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<NameComponent>)
-		.Property(&NameComponent::name, "name");
+	SimpleRTTR::registration().type<NameComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<NameComponent>)
+		.property(&NameComponent::name, "name");
 }
 
 

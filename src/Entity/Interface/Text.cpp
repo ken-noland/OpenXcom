@@ -35,45 +35,45 @@ namespace OpenXcom
 
 SIMPLERTTR
 {
-	SimpleRTTR::Registration().Type<TextHAlign>()
-		.Value(TextHAlign::ALIGN_LEFT, "ALIGN_LEFT")
-		.Value(TextHAlign::ALIGN_CENTER, "ALIGN_CENTER")
-		.Value(TextHAlign::ALIGN_RIGHT, "ALIGN_RIGHT");
+	SimpleRTTR::registration().type<TextHAlign>()
+		.value(TextHAlign::ALIGN_LEFT, "ALIGN_LEFT")
+		.value(TextHAlign::ALIGN_CENTER, "ALIGN_CENTER")
+		.value(TextHAlign::ALIGN_RIGHT, "ALIGN_RIGHT");
 
-	SimpleRTTR::Registration().Type<TextVAlign>()
-		.Value(TextVAlign::ALIGN_TOP, "ALIGN_TOP")
-		.Value(TextVAlign::ALIGN_MIDDLE, "ALIGN_MIDDLE")
-		.Value(TextVAlign::ALIGN_BOTTOM, "ALIGN_BOTTOM");
+	SimpleRTTR::registration().type<TextVAlign>()
+		.value(TextVAlign::ALIGN_TOP, "ALIGN_TOP")
+		.value(TextVAlign::ALIGN_MIDDLE, "ALIGN_MIDDLE")
+		.value(TextVAlign::ALIGN_BOTTOM, "ALIGN_BOTTOM");
 
 	/// RTTR Registration for TextComponent
-	SimpleRTTR::Registration().Type<TextComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
-		.Property(&TextComponent::_text, "text")
-		.Property(&TextComponent::_wrap, "wrap")
-		.Property(&TextComponent::_invert, "invert")
-		.Property(&TextComponent::_contrast, "contrast")
-		.Property(&TextComponent::_indent, "indent")
-		.Property(&TextComponent::_scroll, "scroll")
-		.Property(&TextComponent::_scrollY, "scrollY")
-		.Property(&TextComponent::_ignoreSeparators, "ignoreSeparators")
-		.Property(&TextComponent::_color, "color")
-		.Property(&TextComponent::_color2, "color2");
+	SimpleRTTR::registration().type<TextComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+		.property(&TextComponent::_text, "text")
+		.property(&TextComponent::_wrap, "wrap")
+		.property(&TextComponent::_invert, "invert")
+		.property(&TextComponent::_contrast, "contrast")
+		.property(&TextComponent::_indent, "indent")
+		.property(&TextComponent::_scroll, "scroll")
+		.property(&TextComponent::_scrollY, "scrollY")
+		.property(&TextComponent::_ignoreSeparators, "ignoreSeparators")
+		.property(&TextComponent::_color, "color")
+		.property(&TextComponent::_color2, "color2");
 
 	/// RTTR Registration for TextFontComponent
-	SimpleRTTR::Registration().Type<TextFontComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
-		.Property(&TextFontComponent::_font, "font");
+	SimpleRTTR::registration().type<TextFontComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+		.property(&TextFontComponent::_font, "font");
 
 	/// RTTR Registration for TextAlignmentComponentt
-	SimpleRTTR::Registration().Type<TextAlignmentComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
-		.Property(&TextAlignmentComponent::_align, "align")
-		.Property(&TextAlignmentComponent::_valign, "valign");
+	SimpleRTTR::registration().type<TextAlignmentComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+		.property(&TextAlignmentComponent::_align, "align")
+		.property(&TextAlignmentComponent::_valign, "valign");
 
 	/// RTTR Registration for TextLangComponent
-	SimpleRTTR::Registration().Type<TextLangComponent>()
-		.Meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
-		.Property(&TextLangComponent::_lang, "lang");
+	SimpleRTTR::registration().type<TextLangComponent>()
+		.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+		.property(&TextLangComponent::_lang, "lang");
 }
 
 TextSystem::TextSystem()

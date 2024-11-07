@@ -1,5 +1,5 @@
 # Define option to enable or disable the EntityInspector
-option(ENABLE_ENTITY_INSPECTOR "Enable the EntityInspector for debugging and editing entities." ON)
+option(ENABLE_ENTITY_INSPECTOR "Enable the EntityInspector for debugging and editing entities." OFF)
 
 set ( root_src
   lodepng.cpp
@@ -776,7 +776,10 @@ endif()
 add_library(openxcom_lib STATIC ${openxcom_src})
 target_include_directories(openxcom_lib PUBLIC ${openxcom_includes})
 target_compile_definitions(openxcom_lib PUBLIC ${openxcom_defines})
-target_link_libraries(openxcom_lib PUBLIC wxbase wxcore wxpropgrid)
+
+if(ENABLE_ENTITY_INSPECTOR)
+  target_link_libraries(openxcom_lib PUBLIC wxbase wxcore wxpropgrid)
+endif()
 
 add_executable ( openxcom  ${application_type} main.cpp ${openxcom_icon})
 

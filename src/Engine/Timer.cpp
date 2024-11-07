@@ -24,10 +24,10 @@
 #include <simplerttr.h>
 SIMPLERTTR
 {
-	SimpleRTTR::Registration().Type<OpenXcom::ProgressTimerComponent>()
-		.Property(&OpenXcom::ProgressTimerComponent::_duration, "duration")
-		.Property(&OpenXcom::ProgressTimerComponent::_elapsed, "elapsed")
-		.Property(&OpenXcom::ProgressTimerComponent::_active, "active");
+	SimpleRTTR::registration().type<OpenXcom::ProgressTimerComponent>()
+		.property(&OpenXcom::ProgressTimerComponent::_duration, "duration")
+		.property(&OpenXcom::ProgressTimerComponent::_elapsed, "elapsed")
+		.property(&OpenXcom::ProgressTimerComponent::_active, "active");
 }
 
 namespace OpenXcom
