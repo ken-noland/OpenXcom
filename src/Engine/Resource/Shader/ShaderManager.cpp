@@ -30,14 +30,4 @@ ShaderManager::~ShaderManager()
 {
 }
 
-ShaderManager::Handle ShaderManager::loadShader(const std::string& name, const std::string shader, ShaderType type)
-{
-	return INVALID_HANDLE;
-}
-
-ShaderManager::Handle ShaderManager::loadShader(const std::string& name, const std::filesystem::path& path)
-{
-	return INVALID_HANDLE;
-}
-
 } // namespace OpenXcom

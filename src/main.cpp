@@ -61,6 +61,53 @@ int run(const std::vector<std::string>& args)
 #ifdef _MSC_VER
 #include <Windows.h>
 
+
+// some string helpers
+//   trim from start (in place)
+inline void ltrim(std::string& s)
+{
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+				return !std::isspace(ch) && ch != 0;
+			}));
+}
+
+// trim from end (in place)
+inline void rtrim(std::string& s)
+{
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+				return !std::isspace(ch) && ch != 0;
+			}).base(),
+			s.end());
+}
+
+//  trim from both ends (in place)
+inline void trim(std::string& s)
+{
+	rtrim(s);
+	ltrim(s);
+}
+
+// trim from start (copying)
+inline std::string ltrim_copy(std::string s)
+{
+	ltrim(s);
+	return s;
+}
+
+// trim from end (copying)
+inline std::string rtrim_copy(std::string s)
+{
+	rtrim(s);
+	return s;
+}
+
+// trim from both ends (copying)
+inline std::string trim_copy(std::string s)
+{
+	trim(s);
+	return s;
+}
+
 std::string WideStringToString(const std::wstring& wstr)
 {
 	int bufferSize = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
@@ -79,7 +126,7 @@ std::vector<std::string> CommandLineToArgvA()
 
 	std::vector<std::string> args;
 	for (int i = 1; i < argc; i++) {
-		args.push_back(WideStringToString(argv[i]));
+		args.push_back(trim_copy(WideStringToString(argv[i])));
 	}
 
 	LocalFree(argv);

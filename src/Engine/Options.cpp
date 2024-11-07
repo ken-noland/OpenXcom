@@ -110,7 +110,7 @@ SIMPLERTTR
 	}
 }
 
-Options::Options()
+Options::Options(const std::vector<std::string>& argv)
 {
 	_commandLineOptions = {
 		{{"-version"}, {
@@ -145,7 +145,7 @@ Options::Options()
 					return false;
 				}
 				set<&GameOptions::_master>(OptionLevel::COMMAND, master);
-				return false;
+				return true;
 			}
 		}},
 		{{"-data"}, {
@@ -292,11 +292,6 @@ Options::Options()
 			}
 		}}
 	};
-}
-
-Options::Options(const std::vector<std::string>& argv)
-{
-	Options();
 	load(argv);
 }
 
@@ -353,7 +348,7 @@ bool Options::loadCommandLine(const std::vector<std::string>& argv)
 		if (optionsIterator == _commandLineOptions.end())
 		{
 			Log(LOG_ERROR) << "Unknown command line argument \"" + argument + "\".";
-			return false;
+			throw std::runtime_error("Unknown command line argument \"" + argument + "\".");
 		}
 
 		const CommandLineOption& option = optionsIterator->second;
@@ -363,14 +358,14 @@ bool Options::loadCommandLine(const std::vector<std::string>& argv)
 			if (argumentsIter == argv.end())
 			{
 				Log(LOG_ERROR) << "Missing parameter for command line argument \"" + argument + "\".";
-				return false;
+				throw std::runtime_error("Missing parameter for command line argument \"" + argument + "\".");
 			}
 
 			const std::string& parameter = *argumentsIter;
 			if (!option.parser(parameter))
 			{
 				Log(LOG_ERROR) << "Invalid parameter for command line argument \"" + argument + "\".";
-				return false;
+				throw std::runtime_error("Invalid parameter for command line argument \"" + argument + "\".");
 			}
 		}
 		else
@@ -378,7 +373,7 @@ bool Options::loadCommandLine(const std::vector<std::string>& argv)
 			if (!option.parser(""))
 			{
 				Log(LOG_ERROR) << "Unknown error with \"" + argument + "\".";
-				return false;
+				throw std::runtime_error("Unknown error with \"" + argument + "\".");
 			}
 		}
 

@@ -22,178 +22,108 @@
 
 using namespace OpenXcom;
 
+std::vector<std::string> getTestArgv()
+{
+	std::vector<std::string> argv;
+
+	std::filesystem::path test_path = std::filesystem::path(TEST_DATA_DIR) / "Config";
+	argv.push_back("-config");
+	argv.push_back(test_path.string());
+
+	return argv;
+}
+
 TEST(OptionsTest, TestOptionsLoad)
 {
-	Options options;
-
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	std::vector<std::string> argv;
-	EXPECT_TRUE(options.load(argv));
+	std::vector<std::string> argv = getTestArgv();
+	Options options(argv);
 }
 
 TEST(OptionsTest, TestOptionsSave)
 {
-	Options options;
+	std::vector<std::string> argv = getTestArgv();
 
-	//set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	std::vector<std::string> argv;
-	options.load(argv);//ignore the output of load
+	Options options(argv);
 
 	EXPECT_TRUE(options.save());
 }
 
 TEST(OptionsTest, TestOptionsVersion)
 {
-	Options options;
-
-	std::vector<std::string> argv;
+	std::vector<std::string> argv = getTestArgv();
 	argv.push_back("-version");
 
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	EXPECT_TRUE(options.load(argv));
+	Options options(argv);
 
 	EXPECT_FALSE(options.get<&GameOptions::_shouldRun>());
 }
 
 TEST(OptionsTest, TestOptionsCommandLineArgumentNotValid)
 {
-	Options options;
-
-	std::vector<std::string> argv;
+	std::vector<std::string> argv = getTestArgv();
 	argv.push_back("-thisIsNotAValidArgument");
 
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	EXPECT_FALSE(options.load(argv));
+	EXPECT_ANY_THROW(Options options(argv));
 }
 
 TEST(OptionsTest, TestOptionsHelp)
 {
-	Options options;
-
-	std::vector<std::string> argv;
+	std::vector<std::string> argv = getTestArgv();
 	argv.push_back("-help");
 
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	EXPECT_TRUE(options.load(argv));
+	Options options(argv);
 
 	EXPECT_FALSE(options.get<&GameOptions::_shouldRun>());
 }
 
 TEST(OptionsTest, TestOptionsData)
 {
-	Options options;
-
-	std::vector<std::string> argv;
+	std::vector<std::string> argv = getTestArgv();
 	argv.push_back("-data");
 	argv.push_back(".");
-		
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
 
+	Options options(argv);
 
-	EXPECT_TRUE(options.load(argv));
+	EXPECT_EQ(options.get<&GameOptions::_dataPath>().size(), 1);
+	EXPECT_EQ(options.get<&GameOptions::_dataPath>()[0], ".");
 }
 
 TEST(OptionsTest, TestOptionsUser)
 {
-	Options options;
+	std::vector<std::string> argv = getTestArgv();
 
-	std::vector<std::string> argv;
 	argv.push_back("-user");
 	argv.push_back(".");
 
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
+	Options options(argv);
 
-	EXPECT_TRUE(options.load(argv));
-}
-
-TEST(OptionsTest, TestOptionsCfg)
-{
-	Options options;
-
-	std::vector<std::string> argv;
-	argv.push_back("-cfg");
-	argv.push_back(".");
-
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	EXPECT_TRUE(options.load(argv));
+	EXPECT_EQ(options.get<&GameOptions::_userPath>(), ".");
 }
 
 TEST(OptionsTest, TestOptionsMaster)
 {
-	Options options;
+	std::vector<std::string> argv = getTestArgv();
 
-	std::vector<std::string> argv;
 	argv.push_back("-master");
 	argv.push_back("xcom1");
 
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	EXPECT_TRUE(options.load(argv));
+	Options options(argv);
 }
 
 TEST(OptionsTest, TestOptionsMasterNotValid)
 {
-	Options options;
+	std::vector<std::string> argv = getTestArgv();
 
-	std::vector<std::string> argv;
 	argv.push_back("-master");
 	argv.push_back("not_xcom1_or_xcom2");
-
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	EXPECT_FALSE(options.load(argv));
+		
+	EXPECT_ANY_THROW(Options options(argv));
 }
 
 TEST(OptionsTest, TestOptionsMasterNotPresent)
 {
-	Options options;
-
-	std::vector<std::string> argv;
+	std::vector<std::string> argv = getTestArgv();
 	argv.push_back("-master");
 
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	EXPECT_FALSE(options.load(argv));
-}
-
-TEST(OptionsTest, TestOptionsContinue)
-{
-	Options options;
-
-	std::vector<std::string> argv;
-	argv.push_back("-continue");
-
-	// set the user config folder to point to the unit tests directory
-	std::filesystem::path test_path = TEST_DATA_DIR;
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, test_path / "Config");
-
-	EXPECT_TRUE(options.load(argv));
+	EXPECT_ANY_THROW(Options options(argv));
 }

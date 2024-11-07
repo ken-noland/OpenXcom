@@ -27,7 +27,7 @@ TEST(VirtualFileSystemTest, TestPhysicalFileEntry)
 {
 	std::filesystem::path path = TEST_DATA_DIR;
 
-	Options options;
+	Options options({});
 
 	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, path / "Config");
 	options.set<&GameOptions::_dataPath>(OptionLevel::CONFIG, { path / "Data", path / "Data.zip" });
@@ -60,7 +60,7 @@ TEST(VirtualFileSystemTest, TestPhysicalFilesystemIterator)
 
 	std::filesystem::path path = TEST_DATA_DIR;
 
-	Options options;
+	Options options({});
 
 	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, path / "Config");
 	options.set<&GameOptions::_dataPath>(OptionLevel::CONFIG, { path / "Data" });

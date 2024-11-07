@@ -240,7 +240,6 @@ private:
 
 
 public:
-	Options();
 	Options(const std::vector<std::string>& argv);
 	~Options();
 
