@@ -33,7 +33,9 @@ public:
 	static const Handle INVALID_HANDLE = static_cast<Handle>(-1);
 
 protected:
-	std::unordered_map<Handle, std::unique_ptr<ResourceType>> _resources;
+	using ResourceMap = std::unordered_map<Handle, std::unique_ptr<ResourceType>>;
+
+	ResourceMap _resources;
 	Handle nextHandle = 0;
 
 public:
@@ -55,6 +57,12 @@ public:
 			return *it->second;
 		}
 		return std::nullopt;
+	}
+
+	template<typename Type>
+	Type& get(Handle handle)
+	{
+		return *static_cast<Type*>(_resources[handle].get());
 	}
 
 	bool exists(Handle handle)

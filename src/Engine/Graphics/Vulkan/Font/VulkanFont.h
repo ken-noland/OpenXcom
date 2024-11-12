@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,24 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "VulkanShader.h"
+
+#include "../../../Resource/Font/Font.h"
+#include "../VulkanInclude.h"
 
 namespace OpenXcom
 {
 
-VulkanShader::VulkanShader(const std::string& name, vk::Device& device, const std::vector<uint32_t>& spirvCode)
-	: Shader(name), _device(device), _module()
+class VulkanFont : public Font
 {
-	vk::ShaderModuleCreateInfo createInfo{};
-	createInfo.codeSize = spirvCode.size() * sizeof(uint32_t);
-	createInfo.pCode = spirvCode.data();
-
-	_module = _device.createShaderModule(createInfo);
-}
-
-VulkanShader::~VulkanShader()
-{
-	_device.destroyShaderModule(_module);
-}
+};
 
 } // namespace OpenXcom

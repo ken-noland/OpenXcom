@@ -19,6 +19,9 @@
 
 #include "VulkanSystem.h"
 #include "VulkanSurface.h"
+
+#include "Font/VulkanFontManager.h"
+#include "Palette/VulkanPaletteManager.h"
 #include "Shader/VulkanShaderManager.h"
 
 #include "../../Platform/Window.h"
@@ -26,6 +29,8 @@
 #include "../../../version.h"
 #include <glslang/Public/ShaderLang.h>
 #include <shaderc/shaderc.hpp>
+
+
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
 
@@ -45,28 +50,16 @@ VkBool32 debugCallback(
 	return VK_FALSE;
 }
 
-VulkanSystem::VulkanSystem(const Options& options) :
+VulkanSystem::VulkanSystem(const Options& options)
+	:
 	GraphicsSystem(), _loader(), _instance(), _debugMessenger(), _physicalDevice(nullptr), _device(nullptr),
-	_graphicsQueueFamilyIndex(UINT32_MAX), _presentQueueFamilyIndex(UINT32_MAX)
+	_graphicsQueueFamilyIndex(UINT32_MAX), _presentQueueFamilyIndex(UINT32_MAX), _transferQueueFamilyIndex(UINT32_MAX),
+	_graphicsQueue(nullptr), _presentQueue(nullptr), _swapChainImageFormat(vk::Format::eUndefined), _renderPass(nullptr),
+	_shaderManager(nullptr)
 {
 	try
 	{
 		glslang::InitializeProcess();
-
-		// Initialize the shader compiler
-
-#if defined(_DEBUG) && defined(_WIN32)
-		// annoyingly, the shader compiler leaks a single std::mutex, so to avoid that being reported in Crt, I have
-		// to disable memory checking for just this one part
-		int oldFlags = _CrtSetDbgFlag(0);
-#endif
-
-		_shaderCompiler = std::make_unique<shaderc::Compiler>();
-
-#if defined(_DEBUG) && defined(_WIN32)
-		// and re-enable memory checking
-		_CrtSetDbgFlag(oldFlags);
-#endif
 
 		// Load the Vulkan function loader
 		PFN_vkGetInstanceProcAddr getInstanceProcAddr = _loader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
@@ -171,6 +164,22 @@ VulkanSystem::~VulkanSystem()
 		_device.destroyRenderPass(_renderPass);
 	}
 
+	// destroy all resources
+	if (_shaderManager)
+	{
+		_shaderManager->clear();
+		_shaderManager = nullptr;
+	}
+
+	// destroy the buffer factory
+	_bufferFactory.reset();
+
+	// Destroy the Vulkan Memory Allocator
+	if (_allocator)
+	{
+		vmaDestroyAllocator(_allocator);
+	}
+
 	if(_device)
 	{
 		_device.destroy();
@@ -185,7 +194,6 @@ VulkanSystem::~VulkanSystem()
 		_instance.destroy();
 	}
 
-	_shaderCompiler.reset();
 	glslang::FinalizeProcess();
 }
 
@@ -214,9 +222,22 @@ std::unique_ptr<GraphicsSurface> VulkanSystem::createSurface(const PlatformWindo
 	return surface;
 }
 
+std::unique_ptr<FontManager> VulkanSystem::createFontManager()
+{
+	return std::unique_ptr<VulkanFontManager>();
+}
+
+std::unique_ptr<PaletteManager> VulkanSystem::createPaletteManager()
+{
+	return std::unique_ptr<VulkanPaletteManager>();
+}
+
 std::unique_ptr<ShaderManager> VulkanSystem::createShaderManager()
 {
-	return std::make_unique<VulkanShaderManager>();
+	assert(_shaderManager == nullptr); // make sure we haven't already created a shader manager
+	std::unique_ptr<VulkanShaderManager> shaderManager = std::make_unique<VulkanShaderManager>(_device);
+	_shaderManager = shaderManager.get();
+	return shaderManager;
 }
 
 void VulkanSystem::selectPhysicalDevice(const vk::SurfaceKHR& surface)
@@ -300,12 +321,17 @@ void VulkanSystem::initializeDevice(const vk::SurfaceKHR& surface)
 			_graphicsQueueFamilyIndex = i;
 		}
 
+		if (queueFamilies[i].queueFlags & vk::QueueFlagBits::eTransfer)
+		{
+			_transferQueueFamilyIndex = i;
+		}
+
 		if (_physicalDevice.getSurfaceSupportKHR(i, surface))
 		{
 			_presentQueueFamilyIndex = i;
 		}
 
-		if (_graphicsQueueFamilyIndex != UINT32_MAX && _presentQueueFamilyIndex != UINT32_MAX)
+		if (_graphicsQueueFamilyIndex != UINT32_MAX && _transferQueueFamilyIndex != UINT32_MAX && _presentQueueFamilyIndex != UINT32_MAX)
 		{
 			break; // Found suitable queue families
 		}
@@ -314,6 +340,11 @@ void VulkanSystem::initializeDevice(const vk::SurfaceKHR& surface)
 	if (_graphicsQueueFamilyIndex == UINT32_MAX || _presentQueueFamilyIndex == UINT32_MAX)
 	{
 		throw std::runtime_error("Failed to find suitable queue families.");
+	}
+
+	if (_transferQueueFamilyIndex == UINT32_MAX)
+	{
+		_transferQueueFamilyIndex = _graphicsQueueFamilyIndex;
 	}
 
 	// Specify Device Queues
@@ -358,12 +389,49 @@ void VulkanSystem::initializeDevice(const vk::SurfaceKHR& surface)
 	// Retrieve the graphics and presentation queues
 	_graphicsQueue = _device.getQueue(_graphicsQueueFamilyIndex, 0);
 	_presentQueue = _device.getQueue(_presentQueueFamilyIndex, 0);
+
+	// Create the Vulkan Memory Allocator
+	VmaVulkanFunctions vulkanFunctions = {};
+	vulkanFunctions.vkGetInstanceProcAddr = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetInstanceProcAddr;
+	vulkanFunctions.vkGetDeviceProcAddr = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetDeviceProcAddr;
+	vulkanFunctions.vkGetPhysicalDeviceProperties = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties;
+	vulkanFunctions.vkGetPhysicalDeviceMemoryProperties = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceMemoryProperties;
+	vulkanFunctions.vkAllocateMemory = VULKAN_HPP_DEFAULT_DISPATCHER.vkAllocateMemory;
+	vulkanFunctions.vkFreeMemory = VULKAN_HPP_DEFAULT_DISPATCHER.vkFreeMemory;
+	vulkanFunctions.vkMapMemory = VULKAN_HPP_DEFAULT_DISPATCHER.vkMapMemory;
+	vulkanFunctions.vkUnmapMemory = VULKAN_HPP_DEFAULT_DISPATCHER.vkUnmapMemory;
+	vulkanFunctions.vkFlushMappedMemoryRanges = VULKAN_HPP_DEFAULT_DISPATCHER.vkFlushMappedMemoryRanges;
+	vulkanFunctions.vkInvalidateMappedMemoryRanges = VULKAN_HPP_DEFAULT_DISPATCHER.vkInvalidateMappedMemoryRanges;
+	vulkanFunctions.vkBindBufferMemory = VULKAN_HPP_DEFAULT_DISPATCHER.vkBindBufferMemory;
+	vulkanFunctions.vkBindImageMemory = VULKAN_HPP_DEFAULT_DISPATCHER.vkBindImageMemory;
+	vulkanFunctions.vkGetBufferMemoryRequirements = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetBufferMemoryRequirements;
+	vulkanFunctions.vkGetImageMemoryRequirements = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetImageMemoryRequirements;
+	vulkanFunctions.vkCreateBuffer = VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateBuffer;
+	vulkanFunctions.vkDestroyBuffer = VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroyBuffer;
+	vulkanFunctions.vkCreateImage = VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateImage;
+	vulkanFunctions.vkDestroyImage = VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroyImage;
+	vulkanFunctions.vkCmdCopyBuffer = VULKAN_HPP_DEFAULT_DISPATCHER.vkCmdCopyBuffer;
+
+	VmaAllocatorCreateInfo allocatorInfo{};
+	allocatorInfo.physicalDevice = _physicalDevice;
+	allocatorInfo.device = _device;
+	allocatorInfo.instance = _instance;
+	allocatorInfo.pVulkanFunctions = &vulkanFunctions;
+
+	VkResult result = vmaCreateAllocator(&allocatorInfo, &_allocator);
+	if (result != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create Vulkan Memory Allocator.");
+	}
+
+	// create buffer factory
+	_bufferFactory = std::make_unique<VulkanBufferFactory>(_allocator, _device, _transferQueueFamilyIndex);
 }
 
 
 void VulkanSystem::initializeSwapChain(std::unique_ptr<VulkanSurface>& surface)
 {
-	surface->initializeDevice(_device, _physicalDevice, _graphicsQueueFamilyIndex, _graphicsQueue, _presentQueue);
+	surface->initializeDevice(_device, _physicalDevice, _allocator, _graphicsQueueFamilyIndex, _graphicsQueue, _presentQueue);
 	surface->initializeSwapChain();
 	_swapChainImageFormat = surface->getVKFormat();
 }
@@ -402,8 +470,12 @@ void VulkanSystem::initializeRenderPass()
 void VulkanSystem::initializeFrames(std::unique_ptr<VulkanSurface>& surface)
 {
 	surface->initializeFrames(_renderPass);
-	surface->initializeShaders(*_shaderCompiler);
+	surface->initializeShaders(*_shaderManager);
+	surface->initializeDescriptorSet();
 	surface->initializePipeline();
+
+	// temporarily initialize the game surface here
+	surface->initializeGameSurface(*_bufferFactory);
 }
 
 } // namespace OpenXcom

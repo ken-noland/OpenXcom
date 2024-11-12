@@ -18,7 +18,10 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../GraphicsSystem.h"
-#include "VulkanInclude.h"
+
+#include <vulkan/vulkan.hpp>
+#include <vk_mem_alloc.h> // VMA
+
 #include <iostream>
 #include <vector>
 
@@ -26,6 +29,8 @@ namespace OpenXcom
 {
 
 class VulkanSurface;
+class VulkanShaderManager;
+class VulkanBufferFactory;
 
 class VulkanSystem : public GraphicsSystem
 {
@@ -37,8 +42,11 @@ class VulkanSystem : public GraphicsSystem
 	vk::PhysicalDevice _physicalDevice;
 	vk::Device _device;
 
+	VmaAllocator _allocator;
+
 	uint32_t _graphicsQueueFamilyIndex;
 	uint32_t _presentQueueFamilyIndex;
+	uint32_t _transferQueueFamilyIndex;
 
 	vk::Queue _graphicsQueue;
 	vk::Queue _presentQueue;
@@ -48,8 +56,11 @@ class VulkanSystem : public GraphicsSystem
 
 	vk::RenderPass _renderPass;
 
-	std::unique_ptr<shaderc::Compiler> _shaderCompiler;
+	// the factory for creating buffers
+	std::unique_ptr<VulkanBufferFactory> _bufferFactory;
 
+	// hold on to device specific manager pointers for cleanup
+	VulkanShaderManager* _shaderManager;
 
 	void selectPhysicalDevice(const vk::SurfaceKHR& surface);
 	void initializeDevice(const vk::SurfaceKHR& surface);
@@ -64,6 +75,8 @@ public:
 
 	virtual std::unique_ptr<GraphicsSurface> createSurface(const PlatformWindowHandle& handle) override;
 
+	virtual std::unique_ptr<FontManager> createFontManager() override;
+	virtual std::unique_ptr<PaletteManager> createPaletteManager() override;
 	virtual std::unique_ptr<ShaderManager> createShaderManager() override;
 };
 

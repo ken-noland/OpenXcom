@@ -18,16 +18,6 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-
-#if defined(_WIN32)
-#define VK_USE_PLATFORM_WIN32_KHR
-#elif defined(__linux__)
-#define VK_USE_PLATFORM_XLIB_KHR // Or VK_USE_PLATFORM_XCB_KHR, depending on your windowing system
-#elif defined(__APPLE__)
-#define VK_USE_PLATFORM_METAL_EXT
-#endif
-
 #include <vulkan/vulkan.hpp>
 
 // forward declaration

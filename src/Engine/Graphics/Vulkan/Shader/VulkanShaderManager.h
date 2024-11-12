@@ -26,16 +26,24 @@ namespace OpenXcom
 class VulkanShaderManager : public ShaderManager
 {
 protected:
+	vk::Device& _device;
+
+	std::unique_ptr<shaderc::Compiler> _compiler;
+
+	std::vector<uint32_t> compileGLSL(const std::string& source, ShaderType type);
 
 public:
-	VulkanShaderManager();
+	VulkanShaderManager(vk::Device& device);
 	virtual ~VulkanShaderManager();
 
 	// load shader from memory
-	virtual Handle loadShader(const std::string& name, const std::string shader, ShaderType type = ShaderType::InferFromSource) override;
+	virtual Handle loadShaderFromMemory(const std::string& name, const std::string shader, ShaderType type = ShaderType::InferFromSource) override;
 
 	// load shader from file
-	virtual Handle loadShader(const std::string& name, const std::filesystem::path& path) override;
+	virtual Handle loadShaderFromFile(const std::string& name, const std::filesystem::path& path, ShaderType type = ShaderType::InferFromSource) override;
+
+	// clear all resources and their device objects
+	void clear();
 };
 
 } // namespace OpenXcom

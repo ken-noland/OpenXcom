@@ -18,6 +18,7 @@
  */
 
 #include "VulkanSurface.h"
+#include "Shader/VulkanShader.h"
 #include "../../Platform/Window.h"
 #include "../../Engine.h"
 #include "../../Resource/ResourceSystem.h"
@@ -25,78 +26,91 @@
 #include "../../Logger.h"
 
 // BEGIN TEMP
-#include <shaderc/shaderc.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <limits>
+
+#include "../../../Entity/Common/RTTR.h"
+
 
 namespace OpenXcom
 {
 
 const char* vertexShaderSource = R"(
-    #version 450
-    layout(location = 0) in vec2 inPosition;
-    layout(location = 1) in vec3 inColor;
-    layout(location = 0) out vec3 fragColor;
-    void main() {
-        fragColor = inColor;
-        gl_Position = vec4(inPosition, 0.0, 1.0);
-    }
+	#version 450
+	layout(location = 0) in vec2 inPosition;   // Position attribute
+	layout(location = 1) in vec2 inTexCoord;   // Texture coordinate attribute
+	layout(location = 2) in vec3 inColor;      // Color attribute
+
+	layout(location = 0) out vec3 fragColor;   // Output color to fragment shader
+	layout(location = 1) out vec2 fragTexCoord; // Output texture coordinates to fragment shader
+
+	void main() {
+		fragColor = inColor;
+		fragTexCoord = inTexCoord;
+		gl_Position = vec4(inPosition, 0.0, 1.0);
+	}
 )";
 
 const char* fragmentShaderSource = R"(
-    #version 450
-    layout(location = 0) in vec3 fragColor;
-    layout(location = 0) out vec4 outColor;
-    void main() {
-        outColor = vec4(fragColor, 1.0);
-    }
+	#version 450
+	layout(location = 0) in vec3 fragColor;        // Input color from vertex shader
+	layout(location = 1) in vec2 fragTexCoord;     // Input texture coordinates from vertex shader
+
+	layout(binding = 0) uniform sampler2D uTexture; // Texture sampler, bound to descriptor set
+
+	layout(location = 0) out vec4 outColor;        // Output color
+
+	void main() {
+		vec4 texColor = texture(uTexture, fragTexCoord);
+		outColor = texColor * vec4(fragColor, 1.0); // Combine texture color and vertex color
+	}
 )";
 
 struct Vertex
 {
 	glm::vec2 pos;
+	glm::vec2 texCoord;
 	glm::vec3 color;
 };
 
 Vertex vertices[] = {
-	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}}, // Bottom-left, red
-	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},  // Bottom-right, green
-	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},   // Top-right, blue
-	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}   // Top-left, white
+	{{-0.5f, -0.5f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}, // Bottom-left, red
+	{{0.5f, -0.5f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},  // Bottom-right, green
+	{{0.5f, 0.5f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},   // Top-right, blue
+	{{-0.5f, 0.5f}, {0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}}   // Top-left, white
 };
 
 // Indices for two triangles forming a rectangle
 uint16_t indices[] = {0, 1, 2, 2, 3, 0};
 
-
-std::vector<uint32_t> compileGLSL(shaderc::Compiler& compiler, const std::string& source, shaderc_shader_kind kind)
-{
-	shaderc::CompileOptions options;
-	options.SetOptimizationLevel(shaderc_optimization_level_size);
-
-	shaderc::SpvCompilationResult result = compiler.CompileGlslToSpv(source, kind, "shader", options);
-
-	if (result.GetCompilationStatus() != shaderc_compilation_status_success)
-	{
-		Log(LOG_ERROR) << "Failed to compile GLSL shader: " << result.GetErrorMessage();
-		return {};
-	}
-	return {result.cbegin(), result.cend()};
-}
-
-vk::ShaderModule createShaderModule(shaderc::Compiler& compiler, const std::string& source, shaderc_shader_kind kind, vk::Device device)
-{
-	std::vector<uint32_t> spirvCode = compileGLSL(compiler, source, kind);
-
-	vk::ShaderModuleCreateInfo createInfo{};
-	createInfo.codeSize = spirvCode.size() * sizeof(uint32_t);
-	createInfo.pCode = spirvCode.data();
-
-	return device.createShaderModule(createInfo);
-}
-
 } // namespace OpenXcom
+
+// Run time type information
+SIMPLERTTR
+{
+	SimpleRTTR::registration().type<vk::Format>()
+		.value(vk::Format::eR8G8B8A8Unorm, "R8G8B8A8Unorm")
+		.value(vk::Format::eR32G32Sfloat, "R32G32Sfloat")
+		.value(vk::Format::eR32G32B32Sfloat, "R32G32B32Sfloat");
+
+	SimpleRTTR::registration().type<glm::vec2>()
+		.meta("format", vk::Format::eR32G32Sfloat)
+		.property(&glm::vec2::x, "x")
+		.property(&glm::vec2::y, "y");
+
+	SimpleRTTR::registration().type<glm::vec3>()
+		.meta("format", vk::Format::eR32G32B32Sfloat)
+		.property(&glm::vec3::x, "x")
+		.property(&glm::vec3::y, "y")
+		.property(&glm::vec3::z, "z");
+
+	SimpleRTTR::registration().type<OpenXcom::Vertex>()
+		.property(&OpenXcom::Vertex::pos, "pos")
+		.property(&OpenXcom::Vertex::texCoord, "texCoord")
+		.property(&OpenXcom::Vertex::color, "color");
+}
+
 // END TEMP
 
 namespace OpenXcom
@@ -106,7 +120,7 @@ VulkanSurface::VulkanSurface(vk::Instance instance, const PlatformWindowHandle& 
 	: _instance(instance), _surface(nullptr), _device(nullptr), _commandPool(nullptr),
 	  _swapChain(nullptr), _swapChainImageFormat(vk::Format::eUndefined), _swapChainExtent{}, _frames(),
 	  _renderPass(nullptr), _pipelineLayout(nullptr), _pipeline(nullptr), _currentFrame(0), _windowHandle(window),
-	  _vertexShaderModule(nullptr), _fragmentShaderModule(nullptr)
+	  _vertexShader(ShaderManager::INVALID_HANDLE), _fragmentShader(ShaderManager::INVALID_HANDLE)
 {
 #if defined(_WIN32)
 	vk::Win32SurfaceCreateInfoKHR surfaceCreateInfo{};
@@ -132,20 +146,20 @@ VulkanSurface::VulkanSurface(vk::Instance instance, const PlatformWindowHandle& 
 #endif
 }
 
-void VulkanSurface::initializeDevice(vk::Device& device, const vk::PhysicalDevice& physicalDevice, uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue)
+void VulkanSurface::initializeDevice(vk::Device& device, const vk::PhysicalDevice& physicalDevice, VmaAllocator allocator, uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue)
 {
 	_device = device;
 	_graphicsQueue = graphicsQueue;
 	_presentQueue = presentQueue;
 	_physicalDevice = physicalDevice;
 
+	_allocator = allocator;
+
 	// Create the command queue
 	vk::CommandPoolCreateInfo poolInfo{};
 	poolInfo.queueFamilyIndex = graphicsQueueFamilyIndex;
 	poolInfo.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
 	_commandPool = _device.createCommandPool(poolInfo);
-
-	initializeGameSurface();
 }
 
 // Function to get the client area dimensions
@@ -291,46 +305,99 @@ void VulkanSurface::initializeFrames(const vk::RenderPass& renderPass)
 	}
 }
 
-void VulkanSurface::initializeShaders(shaderc::Compiler& compiler)
+void VulkanSurface::initializeShaders(ShaderManager& shaderManager)
 {
-	_vertexShaderModule = createShaderModule(compiler, vertexShaderSource, shaderc_glsl_vertex_shader, _device);
-	_fragmentShaderModule = createShaderModule(compiler, fragmentShaderSource, shaderc_glsl_fragment_shader, _device);
+	_vertexShader = shaderManager.loadShaderFromMemory("WindowSurfaceVertex", vertexShaderSource, ShaderType::Vertex);
+	assert(_vertexShader != ShaderManager::INVALID_HANDLE);
 
-	Engine& engine = getEngine();
-	ShaderManager& shaderManager = engine.getResourceSystem().getShaderManager();
-	_vertexShader = shaderManager.loadShader("WindowSurfaceVertex", vertexShaderSource, ShaderType::Vertex);
-	_fragmentShader = shaderManager.loadShader("WindowSurfaceFragment", fragmentShaderSource, ShaderType::Fragment);
+	_fragmentShader = shaderManager.loadShaderFromMemory("WindowSurfaceFragment", fragmentShaderSource, ShaderType::Fragment);
+	assert(_fragmentShader != ShaderManager::INVALID_HANDLE);
+}
+
+void VulkanSurface::initializeDescriptorSet()
+{
+	// Create descriptor set layout
+	vk::DescriptorSetLayoutBinding samplerLayoutBinding{};
+	samplerLayoutBinding.binding = 0;
+	samplerLayoutBinding.descriptorType = vk::DescriptorType::eCombinedImageSampler;
+	samplerLayoutBinding.descriptorCount = 1;
+	samplerLayoutBinding.stageFlags = vk::ShaderStageFlagBits::eFragment;
+
+	vk::DescriptorSetLayoutCreateInfo layoutInfo{};
+	layoutInfo.bindingCount = 1;
+	layoutInfo.pBindings = &samplerLayoutBinding;
+
+	_descriptorSetLayout = _device.createDescriptorSetLayout(layoutInfo);
+
+	// Create descriptor pool
+	vk::DescriptorPoolSize poolSize{};
+
+	poolSize.type = vk::DescriptorType::eCombinedImageSampler;
+	poolSize.descriptorCount = 1;
+
+	vk::DescriptorPoolCreateInfo poolInfo{};
+
+	poolInfo.poolSizeCount = 1;
+	poolInfo.pPoolSizes = &poolSize;
+	poolInfo.maxSets = 1;
+
+	_descriptorPool = _device.createDescriptorPool(poolInfo);
+
+	// Create descriptor set
+	vk::DescriptorSetAllocateInfo allocInfo{};
+
+	allocInfo.descriptorPool = _descriptorPool;
+	allocInfo.descriptorSetCount = 1;
+	allocInfo.pSetLayouts = &_descriptorSetLayout;
+
+	_descriptorSet = _device.allocateDescriptorSets(allocInfo)[0];
 }
 
 void VulkanSurface::initializePipeline()
 {
+	Engine& engine = getEngine();
+	ShaderManager& shaderManager = engine.getResourceSystem().getShaderManager();
+
+	const vk::ShaderModule& vertexShaderModule = shaderManager.get<VulkanShader>(_vertexShader).module();
+	const vk::ShaderModule& fragmentShaderModule = shaderManager.get<VulkanShader>(_fragmentShader).module();
+
 	vk::PipelineShaderStageCreateInfo vertShaderStageInfo{};
 	vertShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;
-	vertShaderStageInfo.module = _vertexShaderModule;
+	vertShaderStageInfo.module = vertexShaderModule;
 	vertShaderStageInfo.pName = "main"; // Entry point in the shader
 
 	vk::PipelineShaderStageCreateInfo fragShaderStageInfo{};
 	fragShaderStageInfo.stage = vk::ShaderStageFlagBits::eFragment;
-	fragShaderStageInfo.module = _fragmentShaderModule;
+	fragShaderStageInfo.module = fragmentShaderModule;
 	fragShaderStageInfo.pName = "main";
 
 	vk::PipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
+
+	// Vertex definitions
+	SimpleRTTR::Type vertexType = SimpleRTTR::types().get_type<Vertex>().value();
 
 	vk::VertexInputBindingDescription bindingDescription{};
 	bindingDescription.binding = 0;
 	bindingDescription.stride = sizeof(Vertex);
 	bindingDescription.inputRate = vk::VertexInputRate::eVertex;
 
-	std::array<vk::VertexInputAttributeDescription, 2> attributeDescriptions{};
-	attributeDescriptions[0].binding = 0;
-	attributeDescriptions[0].location = 0;
-	attributeDescriptions[0].format = vk::Format::eR32G32Sfloat; // vec2 for position
-	attributeDescriptions[0].offset = offsetof(Vertex, pos);
+	std::vector<vk::VertexInputAttributeDescription> attributeDescriptions;
+	attributeDescriptions.resize(vertexType.properties().size());
 
-	attributeDescriptions[1].binding = 0;
-	attributeDescriptions[1].location = 1;
-	attributeDescriptions[1].format = vk::Format::eR32G32B32Sfloat; // vec3 for color
-	attributeDescriptions[1].offset = offsetof(Vertex, color);
+	int location = 0;
+	for (const SimpleRTTR::Property& property : vertexType.properties())
+	{
+		const SimpleRTTR::Type& propertyType = property.type();
+		const vk::Format& format = propertyType.meta().get("format").value().get_as<vk::Format>();
+
+		vk::VertexInputAttributeDescription attributeDescription{};
+		attributeDescription.binding = 0;
+		attributeDescription.location = location;
+		attributeDescription.format = format;
+		attributeDescription.offset = (uint32_t)property.offset();
+		attributeDescriptions[location] = attributeDescription;
+		location++;
+	}
 
 	vk::PipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.vertexBindingDescriptionCount = 1;
@@ -387,6 +454,12 @@ void VulkanSurface::initializePipeline()
 	colorBlending.pAttachments = &colorBlendAttachment;
 
 	vk::PipelineLayoutCreateInfo pipelineLayoutInfo{};
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &_descriptorSetLayout;
+
+	pipelineLayoutInfo.pushConstantRangeCount = 0;
+	pipelineLayoutInfo.pPushConstantRanges = nullptr;
+
 	_pipelineLayout = _device.createPipelineLayout(pipelineLayoutInfo);
 
 	vk::GraphicsPipelineCreateInfo pipelineInfo{};
@@ -405,7 +478,7 @@ void VulkanSurface::initializePipeline()
 	_pipeline = _device.createGraphicsPipeline(nullptr, pipelineInfo).value;
 }
 
-void VulkanSurface::initializeGameSurface()
+void VulkanSurface::initializeGameSurface(VulkanBufferFactory& bufferFactory)
 {
 	vk::ImageCreateInfo imageInfo{};
 	imageInfo.imageType = vk::ImageType::e2D;
@@ -440,9 +513,9 @@ void VulkanSurface::initializeGameSurface()
 	allocInfo.allocationSize = memRequirements.size;
 	allocInfo.memoryTypeIndex = memoryType;
 
-	vk::DeviceMemory gameImageMemory = _device.allocateMemory(allocInfo);
+	_gameImageMemory = _device.allocateMemory(allocInfo);
 
-	_device.bindImageMemory(_gameImage, gameImageMemory, 0);
+	_device.bindImageMemory(_gameImage, _gameImageMemory, 0);
 
 	vk::ImageViewCreateInfo imageViewInfo{};
 	imageViewInfo.image = _gameImage;
@@ -488,6 +561,48 @@ void VulkanSurface::initializeGameSurface()
 	framebufferInfo.layers = 1;
 
 	_gameFramebuffer = _device.createFramebuffer(framebufferInfo);
+
+	// create the texture sampler
+	vk::SamplerCreateInfo samplerInfo{};
+	samplerInfo.magFilter = vk::Filter::eNearest;                    // Nearest-neighbor filtering for magnification (no blending)
+	samplerInfo.minFilter = vk::Filter::eNearest;                    // Nearest-neighbor filtering for minification (no blending)
+	samplerInfo.addressModeU = vk::SamplerAddressMode::eClampToEdge; // Clamp edges, no tiling
+	samplerInfo.addressModeV = vk::SamplerAddressMode::eClampToEdge; // Clamp edges, no tiling
+	samplerInfo.addressModeW = vk::SamplerAddressMode::eClampToEdge; // Only relevant for 3D textures
+	samplerInfo.anisotropyEnable = VK_FALSE;                         // Disable anisotropic filtering
+	samplerInfo.maxAnisotropy = 1.0f;                                // No anisotropy
+	samplerInfo.borderColor = vk::BorderColor::eIntOpaqueBlack;      // Border color if clamping beyond edge
+	samplerInfo.unnormalizedCoordinates = VK_FALSE;                  // Use normalized coordinates (0 to 1)
+	samplerInfo.mipmapMode = vk::SamplerMipmapMode::eNearest;        // No mipmap blending (uses base level only)
+	samplerInfo.compareEnable = VK_FALSE;                            // No depth comparison
+	samplerInfo.compareOp = vk::CompareOp::eAlways;                  // Not relevant since compare is disabled
+
+	_textureSampler = _device.createSampler(samplerInfo);
+
+	// Update descriptor set
+	vk::DescriptorImageInfo descImageInfo{};
+
+	descImageInfo.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+	descImageInfo.imageView = _gameImageView;
+	descImageInfo.sampler = _textureSampler;
+
+	vk::WriteDescriptorSet descriptorWrite{};
+
+	descriptorWrite.dstSet = _descriptorSet;
+	descriptorWrite.dstBinding = 0;
+	descriptorWrite.dstArrayElement = 0;
+	descriptorWrite.descriptorType = vk::DescriptorType::eCombinedImageSampler;
+	descriptorWrite.descriptorCount = 1;
+	descriptorWrite.pImageInfo = &descImageInfo;
+
+	_device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
+
+	//create the vertex and index buffer to present the game surface to the window surface
+	//_vertexBuffer = std::make_unique<VulkanBuffer>(_allocator, _device, (sizeof(vertices) * sizeof(Vertex)), vk::BufferUsageFlagBits::eVertexBuffer, VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE);
+	//_indexBuffer = std::make_unique<VulkanBuffer>(_allocator, _device, (sizeof(indices) * sizeof(uint16_t)), vk::BufferUsageFlagBits::eIndexBuffer, VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE);
+
+	_vertexBuffer = bufferFactory.createDeviceBuffer<Vertex>(vertices, 4, vk::BufferUsageFlagBits::eVertexBuffer);
+	_indexBuffer = bufferFactory.createDeviceBuffer<uint16_t>(indices, 6, vk::BufferUsageFlagBits::eIndexBuffer);
 }
 
 void VulkanSurface::destroySwapChain()
@@ -559,10 +674,34 @@ VulkanSurface::~VulkanSurface()
 		_gameImage = nullptr;
 	}
 
+	if(_gameImageMemory)
+	{
+		_device.freeMemory(_gameImageMemory);
+		_gameImageMemory = nullptr;
+	}
+
 	if (_gameRenderPass)
 	{
 		_device.destroyRenderPass(_gameRenderPass);
 		_gameRenderPass = nullptr;
+	}
+
+	if (_descriptorPool)
+	{
+		_device.destroyDescriptorPool(_descriptorPool);
+		_descriptorPool = nullptr;
+	}
+
+	if(_descriptorSetLayout)
+	{
+		_device.destroyDescriptorSetLayout(_descriptorSetLayout);
+		_descriptorSetLayout = nullptr;
+	}
+
+	if (_textureSampler)
+	{
+		_device.destroySampler(_textureSampler);
+		_textureSampler = nullptr;
 	}
 
 	if(_commandPool)
@@ -571,18 +710,6 @@ VulkanSurface::~VulkanSurface()
 		_commandPool = nullptr;
 	}
 	
-	if (_vertexShaderModule)
-	{
-		_device.destroyShaderModule(_vertexShaderModule);
-		_vertexShaderModule = nullptr;
-	}
-
-	if (_fragmentShaderModule)
-	{
-		_device.destroyShaderModule(_fragmentShaderModule);
-		_fragmentShaderModule = nullptr;
-	}
-
 	if (_surface)
 	{
 		_instance.destroySurfaceKHR(_surface);
@@ -654,9 +781,13 @@ void VulkanSurface::update()
 
 void VulkanSurface::recordCommandBuffer(FrameData& frame, uint32_t imageIndex)
 {
+	vk::CommandBuffer& commandBuffer = frame.commandBuffer;
 
 	vk::CommandBufferBeginInfo beginInfo{};
-	frame.commandBuffer.begin(beginInfo);
+	commandBuffer.begin(beginInfo);
+
+	commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline);
+	commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, _pipelineLayout, 0, _descriptorSet, {});
 
 	// render the game surface
 	{
@@ -669,11 +800,11 @@ void VulkanSurface::recordCommandBuffer(FrameData& frame, uint32_t imageIndex)
 		renderPassInfo.clearValueCount = 1;
 		renderPassInfo.pClearValues = &clearColor;
 
-		frame.commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+		commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
 		// ... any other draw commands for the game content
 
-		frame.commandBuffer.endRenderPass();
+		commandBuffer.endRenderPass();
 	}
 
 	// render the window surface
@@ -688,16 +819,22 @@ void VulkanSurface::recordCommandBuffer(FrameData& frame, uint32_t imageIndex)
 		renderPassInfo.clearValueCount = 1;
 		renderPassInfo.pClearValues = &clearColor;
 
-		frame.commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+		commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+
+		
+	    // Bind vertex and index buffers
+		vk::DeviceSize offsets[] = {0};
+		commandBuffer.bindVertexBuffers(0, _vertexBuffer->getBuffer(), offsets);
+		commandBuffer.bindIndexBuffer(_indexBuffer->getBuffer(), 0, vk::IndexType::eUint16);
+
+		// Issue the draw call
+		commandBuffer.drawIndexed(static_cast<uint32_t>(std::size(indices)), 1, 0, 0, 0);
 
 
-		// !!!! TODO !!!!
-
-
-		frame.commandBuffer.endRenderPass();
+		commandBuffer.endRenderPass();
 	}
 
-	frame.commandBuffer.end();
+	commandBuffer.end();
 
 }
 

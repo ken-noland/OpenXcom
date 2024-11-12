@@ -137,10 +137,18 @@ set ( engine_src
   "Engine/Filesystem/EmbeddedFileSystem.cpp"
   "Engine/Filesystem/PhysicalFileSystem.cpp"
   "Engine/Filesystem/VirtualFileSystem.cpp"
+  "Engine/Graphics/Vulkan/Font/VulkanFont.cpp"
+  "Engine/Graphics/Vulkan/Font/VulkanFontManager.cpp"
+  "Engine/Graphics/Vulkan/Palette/VulkanPalette.cpp"
+  "Engine/Graphics/Vulkan/Palette/VulkanPaletteManager.cpp"
   "Engine/Graphics/Vulkan/Shader/VulkanShader.cpp"
   "Engine/Graphics/Vulkan/Shader/VulkanShaderManager.cpp"
-  "Engine/Graphics/Vulkan/VulkanSurface.cpp"
+  "Engine/Graphics/Vulkan/VMAImplementation.cpp"
+  "Engine/Graphics/Vulkan/VulkanBuffer.cpp"
+  "Engine/Graphics/Vulkan/VulkanImage.cpp"
   "Engine/Graphics/Vulkan/VulkanPipeline.cpp"
+  "Engine/Graphics/Vulkan/VulkanResource.cpp"
+  "Engine/Graphics/Vulkan/VulkanSurface.cpp"
   "Engine/Graphics/Vulkan/VulkanSystem.cpp"
   "Engine/Graphics/GraphicsSystem.cpp"
   "Engine/Platform/Linux/LinuxProcess.cpp"
@@ -155,6 +163,7 @@ set ( engine_src
   "Engine/Resource/Font/FontManager.cpp"
   #"Engine/Resource/Palette/Palette.cpp"
   "Engine/Resource/Palette/PaletteManager.cpp"
+  "Engine/Resource/Shader/Shader.cpp"
   "Engine/Resource/Shader/ShaderManager.cpp"
 #  "Engine/Action.cpp"
 #  "Engine/AdlibMusic.cpp"
@@ -742,11 +751,36 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glm)
 
+# Fetch VulkanMemoryAllocator
+#  VulkanMemoryAllocator is used for managing Vulkan memory
+FetchContent_Declare(
+    VulkanMemoryAllocator
+    GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
+    GIT_TAG v3.1.0
+)
+
+FetchContent_MakeAvailable(VulkanMemoryAllocator)
+
 # set up the defines and includes
 set(openxcom_defines
   YAML_CPP_STATIC_DEFINE
   NOMINMAX
+  VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
+  VMA_STATIC_VULKAN_FUNCTIONS=0
 )
+
+if(MSVC)
+  # Add a define which instructs Vulkan to use the Win32 KHR
+  list(APPEND openxcom_defines VK_USE_PLATFORM_WIN32_KHR)
+elseif(APPLE)
+  # Add a define which instructs Vulkan to use the Metal Extensions
+  list(APPEND openxcom_defines VK_USE_PLATFORM_METAL_EXT)
+elseif(UNIX)
+  # Add a define which instructs Vulkan to use the XLIB KHR
+  list(APPEND openxcom_defines VK_USE_PLATFORM_XLIB_KHR)
+endif()
+
+message(STATUS "VulkanMemoryAllocator_SOURCE_DIR: ${VulkanMemoryAllocator_SOURCE_DIR}")
 
 set(openxcom_includes
   ${yaml-cpp_SOURCE_DIR}/include
@@ -765,6 +799,7 @@ set(openxcom_libs
   ImGui
   shaderc
   glm
+  GPUOpen::VulkanMemoryAllocator
 )
 
 if(UNIX)

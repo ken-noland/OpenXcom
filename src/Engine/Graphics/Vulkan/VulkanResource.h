@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,24 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "VulkanShader.h"
+
+#include <vk_mem_alloc.h> // VMA
 
 namespace OpenXcom
 {
 
-VulkanShader::VulkanShader(const std::string& name, vk::Device& device, const std::vector<uint32_t>& spirvCode)
-	: Shader(name), _device(device), _module()
+class VulkanResource
 {
-	vk::ShaderModuleCreateInfo createInfo{};
-	createInfo.codeSize = spirvCode.size() * sizeof(uint32_t);
-	createInfo.pCode = spirvCode.data();
+public:
+	VulkanResource(VmaAllocator allocator) : _allocator(allocator) {}
+	virtual ~VulkanResource() = default;
 
-	_module = _device.createShaderModule(createInfo);
-}
+	// Virtual methods for resource-specific operations
+	virtual void destroy() = 0;
 
-VulkanShader::~VulkanShader()
-{
-	_device.destroyShaderModule(_module);
-}
+protected:
+	VmaAllocator _allocator;
+};
 
 } // namespace OpenXcom

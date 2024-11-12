@@ -25,17 +25,17 @@
 namespace OpenXcom
 {
 
-class ShaderManager : public ResourceManager<ShaderType>
+class ShaderManager : public ResourceManager<Shader>
 {
 public:
 	ShaderManager();
 	virtual ~ShaderManager();
 
 	// load shader from memory
-	virtual Handle loadShader(const std::string& name, const std::string shader, ShaderType type = ShaderType::InferFromSource) = 0;
+	virtual Handle loadShaderFromMemory(const std::string& name, const std::string shader, ShaderType type = ShaderType::InferFromSource) = 0;
 
 	// load shader from file
-	virtual Handle loadShader(const std::string& name, const std::filesystem::path& path) = 0;
+	virtual Handle loadShaderFromFile(const std::string& name, const std::filesystem::path& path, ShaderType type = ShaderType::InferFromSource) = 0;
 };
 
 } // namespace OpenXcom

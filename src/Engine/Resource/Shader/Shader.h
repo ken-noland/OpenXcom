@@ -42,6 +42,8 @@ private:
 	std::string _name;
 
 public:
+	Shader(const std::string& name);
+	virtual ~Shader();
 };
 
 }

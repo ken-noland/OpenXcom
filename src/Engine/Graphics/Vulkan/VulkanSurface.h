@@ -19,14 +19,18 @@
  */
 #include "../GraphicsInterfaces.h"
 #include "VulkanInclude.h"
+#include "VulkanBuffer.h"
 #include "../../Platform/Window.h"
 
 #include "../../Resource/Shader/ShaderManager.h"
+
 
 namespace OpenXcom
 {
 
 struct PlatformWindowHandle;
+
+class VulkanBufferFactory;
 
 struct FrameData
 {
@@ -59,6 +63,11 @@ class VulkanSurface : public GraphicsSurface
 
 	vk::RenderPass _renderPass; // reference to render pass in VulkanSystem
 
+	//descriptor set
+	vk::DescriptorSetLayout _descriptorSetLayout;
+	vk::DescriptorPool _descriptorPool;
+	vk::DescriptorSet _descriptorSet;
+
 	vk::PipelineLayout _pipelineLayout;
 	vk::Pipeline _pipeline;
 
@@ -67,6 +76,7 @@ class VulkanSurface : public GraphicsSurface
 	PlatformWindowHandle _windowHandle;
 
 	// The main game surface
+	vk::DeviceMemory _gameImageMemory;
 	vk::Image _gameImage;
 	vk::ImageView _gameImageView;
 	vk::RenderPass _gameRenderPass;
@@ -74,20 +84,28 @@ class VulkanSurface : public GraphicsSurface
 
 
 	// TEMP
-	ShaderManager::Handle _vertexShader;
-	ShaderManager::Handle _fragmentShader;
+	ShaderManager::Handle _vertexShader;		// KN Note: when we move to a pipeline registry, this won't be needed here anymore
+	ShaderManager::Handle _fragmentShader;		// KN Note: when we move to a pipeline registry, this won't be needed here anymore
 
-	vk::ShaderModule _vertexShaderModule;
-	vk::ShaderModule _fragmentShaderModule;
+	// not sure if this'll be needed here once we have resource managers in place to automate the creation and destruction of buffer elements
+	VmaAllocator _allocator;
+
+
+	vk::Sampler _textureSampler;	// KN Note: this should be moved to a sampler manager/registry of some kind
+
+	std::unique_ptr<VulkanBuffer> _vertexBuffer;
+	std::unique_ptr<VulkanBuffer> _indexBuffer;
 
 	friend class VulkanSystem;
-	void initializeDevice(vk::Device& device, const vk::PhysicalDevice& physicalDevice, uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue);
+	void initializeDevice(vk::Device& device, const vk::PhysicalDevice& physicalDevice, VmaAllocator allocator,
+		uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue);
 	void initializeSwapChain();
 	void initializeFrames(const vk::RenderPass& renderPass);
-	void initializeShaders(shaderc::Compiler& compiler);
+	void initializeShaders(ShaderManager& shaderManager);
+	void initializeDescriptorSet();
 	void initializePipeline();
 
-	void initializeGameSurface();
+	void initializeGameSurface(VulkanBufferFactory& bufferFactory);
 
 	void destroySwapChain();
 

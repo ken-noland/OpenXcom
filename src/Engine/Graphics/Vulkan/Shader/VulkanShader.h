@@ -18,13 +18,22 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../../../Resource/Shader/Shader.h"
+#include "../VulkanInclude.h"
+
 namespace OpenXcom
 {
 
-class VulkanShader
+class VulkanShader : public Shader
 {
-public:
+	vk::ShaderModule _module;
+	vk::Device& _device;
 
+public:
+	VulkanShader(const std::string& name, vk::Device& device, const std::vector<uint32_t>& spirvCode);
+	virtual ~VulkanShader();
+
+	const vk::ShaderModule& module() { return _module; }
 };
 
 } // namespace OpenXcom
