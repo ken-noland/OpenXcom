@@ -44,7 +44,7 @@ include(GoogleTest)
 gtest_discover_tests(openxcom_tests)
 
 # Optionally, register the test with CMake
-add_test(NAME openxcom_tests COMMAND ${CMAKE_BINARY_DIR}/bin/OpenXcomTests)
+add_test(NAME openxcom_tests COMMAND ${CMAKE_BINARY_DIR}/bin/openxcom_tests)
 
 # Pass an environment variable to `ctest`
 set_tests_properties(openxcom_tests PROPERTIES ENVIRONMENT "SKIP_SLOW_TESTS=1")

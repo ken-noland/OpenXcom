@@ -48,14 +48,7 @@ public:
 
 	// create a host buffer and copy data into it
 	template <typename T>
-	std::unique_ptr<VulkanHostBuffer> createHostBuffer(const T* data, size_t quantity, vk::BufferUsageFlags usage)
-	{
-		size_t size = quantity * sizeof(T);
-		std::unique_ptr<VulkanHostBuffer> hostBuffer = createHostBuffer(size, usage);
-		hostBuffer->copyTo(data, 0, size);
-		return hostBuffer;
-	}
-
+	inline std::unique_ptr<VulkanHostBuffer> createHostBuffer(const T* data, size_t quantity, vk::BufferUsageFlags usage);
 
 	// create an empty device buffer
 	std::unique_ptr<VulkanDeviceBuffer> createDeviceBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage);
@@ -65,13 +58,7 @@ public:
 
 	// create a device buffer and copy data into it
 	template <typename T>
-	std::unique_ptr<VulkanDeviceBuffer> createDeviceBuffer(const T* data, size_t quantity, vk::BufferUsageFlags usage)
-	{
-		size_t size = quantity * sizeof(T);
-		std::unique_ptr<VulkanHostBuffer> hostBuffer = createHostBuffer<T>(data, quantity, usage);
-		std::unique_ptr<VulkanDeviceBuffer> deviceBuffer = createDeviceBuffer(*hostBuffer, usage);
-		return deviceBuffer;
-	}
+	inline std::unique_ptr<VulkanDeviceBuffer> createDeviceBuffer(const T* data, size_t quantity, vk::BufferUsageFlags usage);
 };
 
 class VulkanBuffer
@@ -120,5 +107,25 @@ public:
 	VulkanDeviceBuffer(VmaAllocator allocator, vk::Device device, vk::CommandPool commandPool, vk::Queue transferQueue, vk::BufferUsageFlags usage, vk::DeviceSize size); // create a blank device buffer
 	virtual ~VulkanDeviceBuffer();
 };
+
+
+template <typename T>
+std::unique_ptr<VulkanHostBuffer> VulkanBufferFactory::createHostBuffer(const T* data, size_t quantity, vk::BufferUsageFlags usage)
+{
+	size_t size = quantity * sizeof(T);
+	std::unique_ptr<VulkanHostBuffer> hostBuffer = createHostBuffer(size, usage);
+	hostBuffer->copyTo(data, 0, size);
+	return hostBuffer;
+}
+
+template <typename T>
+std::unique_ptr<VulkanDeviceBuffer> VulkanBufferFactory::createDeviceBuffer(const T* data, size_t quantity, vk::BufferUsageFlags usage)
+{
+	size_t size = quantity * sizeof(T);
+	std::unique_ptr<VulkanHostBuffer> hostBuffer = createHostBuffer<T>(data, quantity, usage);
+	std::unique_ptr<VulkanDeviceBuffer> deviceBuffer = createDeviceBuffer(*hostBuffer, usage);
+	return deviceBuffer;
+}
+
 
 } // namespace OpenXcom

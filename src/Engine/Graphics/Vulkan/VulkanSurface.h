@@ -24,6 +24,8 @@
 
 #include "../../Resource/Shader/ShaderManager.h"
 
+#include <glm/glm.hpp>
+
 
 namespace OpenXcom
 {
@@ -60,6 +62,8 @@ class VulkanSurface : public GraphicsSurface
 	vk::Extent2D _swapChainExtent;
 
 	std::vector<FrameData> _frames;
+
+	glm::mat4 _transform;
 
 	vk::RenderPass _renderPass; // reference to render pass in VulkanSystem
 

@@ -19,17 +19,21 @@
 
 #include "VulkanSurface.h"
 #include "Shader/VulkanShader.h"
+
 #include "../../Platform/Window.h"
 #include "../../Engine.h"
 #include "../../Resource/ResourceSystem.h"
 #include "../../Resource/Shader/ShaderManager.h"
 #include "../../Logger.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 // BEGIN TEMP
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <limits>
 
+#undef None
 #include "../../../Entity/Common/RTTR.h"
 
 
@@ -38,24 +42,24 @@ namespace OpenXcom
 
 const char* vertexShaderSource = R"(
 	#version 450
-	layout(location = 0) in vec2 inPosition;   // Position attribute
-	layout(location = 1) in vec2 inTexCoord;   // Texture coordinate attribute
-	layout(location = 2) in vec3 inColor;      // Color attribute
 
-	layout(location = 0) out vec3 fragColor;   // Output color to fragment shader
-	layout(location = 1) out vec2 fragTexCoord; // Output texture coordinates to fragment shader
+	layout(location = 0) in vec2 inPosition;
+	layout(location = 1) in vec2 inTexCoord;
+	layout(location = 0) out vec2 fragTexCoord;
+
+	layout(push_constant) uniform PushConstants {
+		mat4 transform;
+	} pushConstants;
 
 	void main() {
-		fragColor = inColor;
+		gl_Position = pushConstants.transform * vec4(inPosition, 0.0, 1.0);
 		fragTexCoord = inTexCoord;
-		gl_Position = vec4(inPosition, 0.0, 1.0);
 	}
 )";
 
 const char* fragmentShaderSource = R"(
 	#version 450
-	layout(location = 0) in vec3 fragColor;        // Input color from vertex shader
-	layout(location = 1) in vec2 fragTexCoord;     // Input texture coordinates from vertex shader
+	layout(location = 0) in vec2 fragTexCoord;     // Input texture coordinates from vertex shader
 
 	layout(binding = 0) uniform sampler2D uTexture; // Texture sampler, bound to descriptor set
 
@@ -63,7 +67,7 @@ const char* fragmentShaderSource = R"(
 
 	void main() {
 		vec4 texColor = texture(uTexture, fragTexCoord);
-		outColor = texColor * vec4(fragColor, 1.0); // Combine texture color and vertex color
+		outColor = texColor;
 	}
 )";
 
@@ -71,14 +75,27 @@ struct Vertex
 {
 	glm::vec2 pos;
 	glm::vec2 texCoord;
-	glm::vec3 color;
 };
 
+//Vertex vertices[] = {
+//	{{-0.5f, -0.5f}, {0.0f, 0.0f}}, // Bottom-left, red
+//	{{0.5f, -0.5f}, {1.0f, 0.0f}},  // Bottom-right, green
+//	{{0.5f, 0.5f}, {1.0f, 1.0f}},   // Top-right, blue
+//	{{-0.5f, 0.5f}, {0.0f, 1.0f}}   // Top-left, white
+//};
+
+//Vertex vertices[] = {
+//	{{0.0f, 0.0f}, {0.0f, 0.0f}},     // Bottom-left corner
+//	{{320.0f, 0.0f}, {1.0f, 0.0f}},   // Bottom-right corner
+//	{{320.0f, 200.0f}, {1.0f, 1.0f}}, // Top-right corner
+//	{{0.0f, 200.0f}, {0.0f, 1.0f}}    // Top-left corner
+//};
+
 Vertex vertices[] = {
-	{{-0.5f, -0.5f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}, // Bottom-left, red
-	{{0.5f, -0.5f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},  // Bottom-right, green
-	{{0.5f, 0.5f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},   // Top-right, blue
-	{{-0.5f, 0.5f}, {0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}}   // Top-left, white
+	{{-1.0f, -1.0f}, {0.0f, 0.0f}}, // Bottom-left
+	{{1.0f, -1.0f}, {1.0f, 0.0f}},  // Bottom-right
+	{{1.0f, 1.0f}, {1.0f, 1.0f}},   // Top-right
+	{{-1.0f, 1.0f}, {0.0f, 1.0f}}   // Top-left
 };
 
 // Indices for two triangles forming a rectangle
@@ -107,8 +124,7 @@ SIMPLERTTR
 
 	SimpleRTTR::registration().type<OpenXcom::Vertex>()
 		.property(&OpenXcom::Vertex::pos, "pos")
-		.property(&OpenXcom::Vertex::texCoord, "texCoord")
-		.property(&OpenXcom::Vertex::color, "color");
+		.property(&OpenXcom::Vertex::texCoord, "texCoord");
 }
 
 // END TEMP
@@ -189,6 +205,7 @@ vk::Extent2D getClientAreaSize(const PlatformWindowHandle& handle)
 
 void VulkanSurface::initializeSwapChain()
 {
+	// Get the surface capabilities, formats, and present modes
 	vk::SurfaceCapabilitiesKHR surfaceCapabilities = _physicalDevice.getSurfaceCapabilitiesKHR(_surface);
 	std::vector<vk::SurfaceFormatKHR> surfaceFormats = _physicalDevice.getSurfaceFormatsKHR(_surface);
 	std::vector<vk::PresentModeKHR> presentModes = _physicalDevice.getSurfacePresentModesKHR(_surface);
@@ -243,6 +260,43 @@ void VulkanSurface::initializeSwapChain()
 	_swapChain = _device.createSwapchainKHR(swapChainCreateInfo);
 	_swapChainImageFormat = chosenFormat.format;
 	_swapChainExtent = swapChainExtent;
+
+	// Define game and window dimensions
+	float gameWidth = 320.0f;
+	float gameHeight = 200.0f;
+	float windowWidth = static_cast<float>(_swapChainExtent.width);
+	float windowHeight = static_cast<float>(_swapChainExtent.height);
+
+	// Calculate aspect ratios
+	float gameAspectRatio = gameWidth / gameHeight;
+	float windowAspectRatio = windowWidth / windowHeight;
+
+	float scaleX = 1.0f;
+	float scaleY = 1.0f;
+
+	if (windowAspectRatio > gameAspectRatio)
+	{
+		// Window is wider than game surface
+		scaleX = gameAspectRatio / windowAspectRatio;
+		// Centered horizontally in NDC, so no offset needed
+	}
+	else
+	{
+		// Window is taller than game surface
+		scaleY = windowAspectRatio / gameAspectRatio;
+		// Centered vertically in NDC, so no offset needed
+	}
+
+
+	//_transform = glm::mat4(1.0f);
+	_transform = glm::scale(glm::mat4(1.0f), glm::vec3(scaleX, scaleY, 1.0f));
+
+	//// Create the orthographic projection matrix
+	//glm::mat4 projection = glm::ortho(0.0f, windowWidth, windowHeight, 0.0f);
+
+	//// Apply scaling and centering to the transform matrix
+	//_transform = projection * glm::translate(glm::mat4(1.0f), glm::vec3(offsetX, offsetY, 0.0f));
+	//_transform = glm::scale(_transform, glm::vec3(scale, scale, 1.0f));
 }
 
 void VulkanSurface::initializeFrames(const vk::RenderPass& renderPass)
@@ -453,12 +507,17 @@ void VulkanSurface::initializePipeline()
 	colorBlending.attachmentCount = 1;
 	colorBlending.pAttachments = &colorBlendAttachment;
 
+	vk::PushConstantRange pushConstantRange{};
+	pushConstantRange.stageFlags = vk::ShaderStageFlagBits::eVertex;
+	pushConstantRange.offset = 0;
+	pushConstantRange.size = sizeof(glm::mat4);
+
 	vk::PipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.setLayoutCount = 1;
 	pipelineLayoutInfo.pSetLayouts = &_descriptorSetLayout;
 
-	pipelineLayoutInfo.pushConstantRangeCount = 0;
-	pipelineLayoutInfo.pPushConstantRanges = nullptr;
+	pipelineLayoutInfo.pushConstantRangeCount = 1;
+	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 
 	_pipelineLayout = _device.createPipelineLayout(pipelineLayoutInfo);
 
@@ -480,6 +539,7 @@ void VulkanSurface::initializePipeline()
 
 void VulkanSurface::initializeGameSurface(VulkanBufferFactory& bufferFactory)
 {
+	// Create the game image
 	vk::ImageCreateInfo imageInfo{};
 	imageInfo.imageType = vk::ImageType::e2D;
 	imageInfo.extent = vk::Extent3D{320, 200, 1}; // 320x200 resolution
@@ -821,11 +881,13 @@ void VulkanSurface::recordCommandBuffer(FrameData& frame, uint32_t imageIndex)
 
 		commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
-		
 	    // Bind vertex and index buffers
 		vk::DeviceSize offsets[] = {0};
 		commandBuffer.bindVertexBuffers(0, _vertexBuffer->getBuffer(), offsets);
 		commandBuffer.bindIndexBuffer(_indexBuffer->getBuffer(), 0, vk::IndexType::eUint16);
+
+		// Push up the window transformation matrix
+		commandBuffer.pushConstants(_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(glm::mat4), &_transform);
 
 		// Issue the draw call
 		commandBuffer.drawIndexed(static_cast<uint32_t>(std::size(indices)), 1, 0, 0, 0);
