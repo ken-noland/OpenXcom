@@ -19,7 +19,7 @@
 
 #include "Engine.h"
 #include "Options.h"
-#include "Game.h"
+#include "../Game/Game.h"
 #include "Filesystem/VirtualFileSystem.h"
 #include "Platform/WindowSystem.h"
 #include "Platform/ProcessSystem.h"
@@ -57,7 +57,7 @@ Engine::Engine(const std::vector<std::string>& args)
 	_platformWindowSystem = std::make_unique<PlatformWindowSystem>();
 
 	// Initialize the graphics system
-	_graphicsSystem = createGraphicsSystem(*_options);
+	_graphicsSystem = createGraphicsSystem(getOptions());
 		
 	// Initialize the resource system
 	_resourceSystem = std::make_unique<ResourceSystem>(*_virtualFileSystem, *_graphicsSystem, *_options);
@@ -72,10 +72,16 @@ Engine::Engine(const std::vector<std::string>& args)
 
 Engine::~Engine()
 {
-	//shut down window
+	// shut down the game
+	_game.reset();
+
+	// shut down the resource system
+	_resourceSystem.reset();
+
+	// shut down window
 	_platformWindowSystem.reset();
 
-	//shut down graphics
+	// shut down graphics
 	_graphicsSystem.reset();
 
 	SimpleRTTR::shutdown();

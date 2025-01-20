@@ -22,9 +22,11 @@
 namespace OpenXcom
 {
 
+class ShaderManager;
+class PipelineManager;
 class FontManager;
 class PaletteManager;
-class ShaderManager;
+class ImageManager;
 
 class VirtualFileSystem;
 class GraphicsSystem;
@@ -32,17 +34,23 @@ class Options;
 
 class ResourceSystem
 {
-	std::unique_ptr<FontManager> _fontManager;
-	std::unique_ptr<PaletteManager> _paletteManager;
 	std::unique_ptr<ShaderManager> _shaderManager;
+	std::unique_ptr<PipelineManager> _pipelineManager;
+	std::unique_ptr<PaletteManager> _paletteManager;
+
+	std::unique_ptr<FontManager> _fontManager;
+	std::unique_ptr<ImageManager> _imageManager;
 
 public:
 	ResourceSystem(VirtualFileSystem& virtualFileSystem, GraphicsSystem& graphicsSystem, Options& options);
 	virtual ~ResourceSystem();
 
-	FontManager& getFontManager();
-	PaletteManager& getPaletteManager();
-	ShaderManager& getShaderManager();
+	ShaderManager& getShaderManager() { return *_shaderManager; };
+	PipelineManager& getPipelineManager() { return *_pipelineManager; };
+	PaletteManager& getPaletteManager() { return *_paletteManager; };
+
+	FontManager& getFontManager() { return *_fontManager; };
+	ImageManager& getImageManager() { return *_imageManager; };
 };
 
 } // namespace OpenXcom

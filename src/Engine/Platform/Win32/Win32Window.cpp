@@ -69,15 +69,13 @@ void PlatformWindow::platformSpecificCreateWindow(const std::string& title, int 
 		0, wc.lpszClassName, title.c_str(),
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 		width, height, nullptr, nullptr, _handle.hInstance, nullptr);
-
-	ShowWindow(_handle.hWnd, SW_SHOW);
 }
 
 void PlatformWindow::platformSpecificDestroyWindow()
 {
 	if (_handle.hWnd != NULL)
 	{
-		DestroyWindow(static_cast<HWND>(_handle.hWnd));
+		DestroyWindow(_handle.hWnd);
 		_handle.hWnd = NULL;
 	}
 }
@@ -85,6 +83,16 @@ void PlatformWindow::platformSpecificDestroyWindow()
 void PlatformWindow::platformSpecificUpdateWindow()
 {
 	// nothing to see here since the window message loop is in the process system
+}
+
+void PlatformWindow::platformSpecificShowWindow()
+{
+	ShowWindow(_handle.hWnd, SW_SHOW);
+}
+
+void PlatformWindow::platformSpecificHideWindow()
+{
+	ShowWindow(_handle.hWnd, SW_HIDE);
 }
 
 } // namespace OpenXcom

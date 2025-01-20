@@ -139,14 +139,19 @@ set ( engine_src
   "Engine/Filesystem/VirtualFileSystem.cpp"
   "Engine/Graphics/Vulkan/Font/VulkanFont.cpp"
   "Engine/Graphics/Vulkan/Font/VulkanFontManager.cpp"
+  "Engine/Graphics/Vulkan/Image/VulkanImage.cpp"
+  "Engine/Graphics/Vulkan/Image/VulkanImageManager.cpp"
   "Engine/Graphics/Vulkan/Palette/VulkanPalette.cpp"
   "Engine/Graphics/Vulkan/Palette/VulkanPaletteManager.cpp"
+  "Engine/Graphics/Vulkan/Pipeline/VulkanPipeline.cpp"
+  "Engine/Graphics/Vulkan/Pipeline/VulkanPipelineFactory.cpp"
+  "Engine/Graphics/Vulkan/Pipeline/VulkanPipelineManager.cpp"
   "Engine/Graphics/Vulkan/Shader/VulkanShader.cpp"
   "Engine/Graphics/Vulkan/Shader/VulkanShaderManager.cpp"
   "Engine/Graphics/Vulkan/VMAImplementation.cpp"
   "Engine/Graphics/Vulkan/VulkanBuffer.cpp"
-  "Engine/Graphics/Vulkan/VulkanImage.cpp"
-  "Engine/Graphics/Vulkan/VulkanPipeline.cpp"
+  "Engine/Graphics/Vulkan/VulkanContext.cpp"
+  "Engine/Graphics/Vulkan/VulkanDescriptorSet.cpp"
   "Engine/Graphics/Vulkan/VulkanResource.cpp"
   "Engine/Graphics/Vulkan/VulkanSurface.cpp"
   "Engine/Graphics/Vulkan/VulkanSystem.cpp"
@@ -175,7 +180,6 @@ set ( engine_src
 #  "Engine/FileMap.cpp"
 #  "Engine/FlcPlayer.cpp"
 #  "Engine/Font.cpp"
-  "Engine/Game.cpp"
 #  "Engine/GMCat.cpp"
 #  "Engine/InteractiveSurface.cpp"
   "Engine/Json.cpp"
@@ -209,6 +213,11 @@ set ( engine_src
   "Engine/Timer.cpp"
   "Engine/Unicode.cpp"
 #  "Engine/Zoom.cpp
+)
+
+set( game_src
+  "Game/Game.cpp"
+  "Game/GameWindow.cpp"
 )
 
 set ( geoscape_src
@@ -513,6 +522,7 @@ set ( cxx_src
     ${basescape_src}
     ${battlescape_src}
     ${engine_src}
+    ${game_src}
     ${geoscape_src}
     ${interface_src}
     ${menu_src}
@@ -721,7 +731,7 @@ set(ENABLE_HLSL ON CACHE BOOL "" FORCE) # Optional, depending on if you need HLS
 FetchContent_Declare(
     glslang
     GIT_REPOSITORY https://github.com/KhronosGroup/glslang.git
-    GIT_TAG main
+    GIT_TAG vulkan-sdk-1.3.296.0
 )
 
 FetchContent_MakeAvailable(glslang)

@@ -17,7 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <memory>
 
 namespace OpenXcom
 {
+
+class VulkanContext;
+class Pipeline;
+class PipelineDefinition;
+
+class VulkanPipelineFactory
+{
+protected:
+	VulkanContext& _context;
+
+public:
+	VulkanPipelineFactory(VulkanContext& context);
+	~VulkanPipelineFactory();
+
+	std::unique_ptr<Pipeline> createPipeline(const PipelineDefinition& builder);
+};
+
 } // namespace OpenXcom

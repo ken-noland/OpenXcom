@@ -17,11 +17,10 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Game.h"
-#include "Engine.h"
-#include "State.h"
+#include "../Engine/Engine.h"
+#include "../Engine/State.h"
 
-#include "Platform/WindowSystem.h"
-#include "Platform/Window.h"
+#include "GameWindow.h"
 
 #include "../Menu/StartState.h"
 
@@ -45,16 +44,15 @@ Game* getGame()
 	return _GamePtr();
 }
 
-/**
- * Constructor for the game class.
- * @param title Title of the game window.
- * @param options Reference to the game options.
- */
 Game::Game(const std::string& title)
 {
-	Engine& engine = getEngine();
-	_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768);
-	std::shared_ptr<PlatformWindow> window = _window.lock();
+	_gameWindow = std::make_unique<GameWindow>(title);
+
+	//Engine& engine = getEngine();
+	//_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768);
+	//std::shared_ptr<PlatformWindow> window = _window.lock();
+
+
 
 	// TODO: when the game window closes, send the application termination message
 	// window->setCloseCallback([this]() { getEngine->exit() });
@@ -70,13 +68,10 @@ Game::~Game()
 {
 }
 
-/**
- * The state machine takes care of passing all the events from SDL to the
- * active state, running any code within and blitting all the states and
- * cursor to the screen. This is run indefinitely until the game quits.
- */
 void Game::update()
 {
+	_gameWindow->update();
+
 	//while (_window.isRunning())
 	//{
 	//	_window.processEvents();

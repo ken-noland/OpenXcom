@@ -18,20 +18,14 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../Resource/Font/FontManager.h"
-#include "../VulkanInclude.h"
-
 namespace OpenXcom
 {
 
-class VulkanContext;
-
-class VulkanFontManager : public FontManager
+class Pipeline
 {
 public:
-	VulkanFontManager(VulkanContext& context);
-	virtual ~VulkanFontManager();
+	Pipeline() = default;
+	virtual ~Pipeline() = default;
 };
-
 
 } // namespace OpenXcom

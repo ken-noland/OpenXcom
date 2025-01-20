@@ -26,9 +26,13 @@ class Options;
 class GraphicsSurface;
 struct PlatformWindowHandle;
 
+class ShaderManager;
+class PipelineManager;
+class ImageManager;
 class FontManager;
 class PaletteManager;
-class ShaderManager;
+
+class PipelineDefinition;
 
 class GraphicsSystem
 {
@@ -39,9 +43,12 @@ public:
 	virtual std::unique_ptr<GraphicsSurface> createSurface(const PlatformWindowHandle& handle) = 0;
 
 	// resource managers
-	virtual std::unique_ptr<FontManager> createFontManager() = 0;
-	virtual std::unique_ptr<PaletteManager> createPaletteManager() = 0;
 	virtual std::unique_ptr<ShaderManager> createShaderManager() = 0;
+	virtual std::unique_ptr<PipelineManager> createPipelineManager() = 0;
+	virtual std::unique_ptr<PaletteManager> createPaletteManager() = 0;
+
+	virtual std::unique_ptr<ImageManager> createImageManager() = 0;
+	virtual std::unique_ptr<FontManager> createFontManager() = 0;
 };
 
 std::unique_ptr<GraphicsSystem> createGraphicsSystem(const Options& options);

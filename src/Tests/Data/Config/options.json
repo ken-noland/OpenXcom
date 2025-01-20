@@ -4,5 +4,11 @@
 "_logLevel": "LOG_INFO",
 "_master": "xcom1",
 "_mods": []
+},
+"graphicsOptions": {
+"_locale": "",
+"_logLevel": "LOG_INFO",
+"_master": "xcom1",
+"_mods": []
 }
 }

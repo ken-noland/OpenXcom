@@ -23,7 +23,7 @@
 namespace OpenXcom
 {
 
-VulkanPaletteManager::VulkanPaletteManager()
+VulkanPaletteManager::VulkanPaletteManager(VulkanContext& context)
 {
 }
 

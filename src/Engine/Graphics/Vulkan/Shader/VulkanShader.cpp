@@ -24,6 +24,8 @@ namespace OpenXcom
 VulkanShader::VulkanShader(const std::string& name, vk::Device& device, const std::vector<uint32_t>& spirvCode)
 	: Shader(name), _device(device), _module()
 {
+	assert(_device != nullptr);
+
 	vk::ShaderModuleCreateInfo createInfo{};
 	createInfo.codeSize = spirvCode.size() * sizeof(uint32_t);
 	createInfo.pCode = spirvCode.data();

@@ -17,14 +17,12 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Text.h"
-#include "../../Engine/Game.h"
 #include "../../Mod/Mod.h"
 #include "../../Engine/Resource/Font/Font.h"
 
 //#include "../../Engine/ShaderDraw.h"
 //#include "../../Engine/ShaderMove.h"
 
-#include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
 
 #include "../Common/RTTR.h"

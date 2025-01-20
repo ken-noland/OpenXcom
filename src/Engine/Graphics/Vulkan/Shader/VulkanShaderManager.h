@@ -23,17 +23,19 @@
 namespace OpenXcom
 {
 
+class VulkanContext;
+
 class VulkanShaderManager : public ShaderManager
 {
 protected:
-	vk::Device& _device;
+	VulkanContext& _context;
 
 	std::unique_ptr<shaderc::Compiler> _compiler;
 
 	std::vector<uint32_t> compileGLSL(const std::string& source, ShaderType type);
 
 public:
-	VulkanShaderManager(vk::Device& device);
+	VulkanShaderManager(VulkanContext& context);
 	virtual ~VulkanShaderManager();
 
 	// load shader from memory

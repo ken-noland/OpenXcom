@@ -18,7 +18,6 @@
  */
 #include "Button.h"
 #include "Text.h"
-#include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
 
 #include "Interface.h"

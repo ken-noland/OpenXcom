@@ -18,20 +18,34 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../Resource/Font/FontManager.h"
-#include "../VulkanInclude.h"
+#include "../Engine/Resource/Shader/ShaderManager.h"
 
 namespace OpenXcom
 {
 
-class VulkanContext;
+class PlatformWindow;
+class GraphicsSurface;
+class Pipeline;
+class RenderTargetImage;
 
-class VulkanFontManager : public FontManager
+class GameWindow
 {
-public:
-	VulkanFontManager(VulkanContext& context);
-	virtual ~VulkanFontManager();
-};
+private:
+	std::shared_ptr<PlatformWindow> _window;
+	std::unique_ptr<GraphicsSurface> _graphicsSurface;
 
+	std::unique_ptr<Pipeline> _windowPipeline;
+
+	std::unique_ptr<RenderTargetImage> _renderTargetImage;
+
+	ShaderManager::Handle _vertexShader;
+	ShaderManager::Handle _fragmentShader;
+
+public:
+	GameWindow(const std::string& title);
+	~GameWindow();
+
+	void update();
+};
 
 } // namespace OpenXcom

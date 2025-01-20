@@ -26,21 +26,20 @@
 namespace OpenXcom
 {
 
+class VulkanContext;
 class VulkanHostBuffer;
 class VulkanDeviceBuffer;
 
 class VulkanBufferFactory
 {
 private:
-	VmaAllocator _allocator;
-	vk::Device _device;
+	VulkanContext& _context;
 
 	vk::CommandPool _commandPool;
 	vk::Queue _transferQueue;
 
-
 public:
-	VulkanBufferFactory(VmaAllocator allocator, vk::Device device, uint32_t transferQueueFamilyIndex);
+	VulkanBufferFactory(VulkanContext& context);
 	~VulkanBufferFactory();
 
 	// create an empty host buffer
@@ -64,14 +63,14 @@ public:
 class VulkanBuffer
 {
 protected:
-	VmaAllocator _allocator;
+	VulkanContext& _context;
 	VmaAllocation _allocation;
 
 	vk::Buffer _buffer;
 	vk::DeviceSize _size;
 
 public:
-	VulkanBuffer(VmaAllocator allocator, vk::DeviceSize size) : _allocator(allocator), _size(size) {}
+	VulkanBuffer(VulkanContext& context, vk::DeviceSize size) : _context(context), _allocation(0), _buffer(), _size(size) {}
 	virtual ~VulkanBuffer() = default;
 
 	vk::DeviceSize getSize() const { return _size; }
@@ -83,7 +82,7 @@ class VulkanHostBuffer : public VulkanBuffer
 private:
 
 public:
-	VulkanHostBuffer(VmaAllocator allocator, vk::BufferUsageFlags usage, vk::DeviceSize size);
+	VulkanHostBuffer(VulkanContext& context, vk::BufferUsageFlags usage, vk::DeviceSize size);
 	virtual ~VulkanHostBuffer();
 
 	void* map();
@@ -95,16 +94,12 @@ public:
 class VulkanDeviceBuffer : public VulkanBuffer
 {
 private:
-	vk::Device _device;
-	vk::CommandPool _commandPool;
-	vk::Queue _transferQueue;
-
 	void create(vk::BufferUsageFlags usage);
 	void update(VulkanHostBuffer& hostBuffer);
 
 public:
-	VulkanDeviceBuffer(VmaAllocator allocator, vk::Device device, vk::CommandPool commandPool, vk::Queue transferQueue, vk::BufferUsageFlags usage, VulkanHostBuffer& hostBuffer);
-	VulkanDeviceBuffer(VmaAllocator allocator, vk::Device device, vk::CommandPool commandPool, vk::Queue transferQueue, vk::BufferUsageFlags usage, vk::DeviceSize size); // create a blank device buffer
+	VulkanDeviceBuffer(VulkanContext& context, vk::BufferUsageFlags usage, VulkanHostBuffer& hostBuffer);
+	VulkanDeviceBuffer(VulkanContext& context, vk::BufferUsageFlags usage, vk::DeviceSize size); // create a blank device buffer
 	virtual ~VulkanDeviceBuffer();
 };
 

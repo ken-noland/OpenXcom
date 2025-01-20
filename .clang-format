@@ -20,10 +20,10 @@
 		SplitEmptyFunction: true,
 		SplitEmptyRecord: true,
 		SplitEmptyNamespace: true,
+		IndentBraces: false
 	},
 	AllowShortIfStatementsOnASingleLine: true,
 	FixNamespaceComments: false,
 	PointerAlignment: Left,
-	AccessModifierOffset: -4,
-#	EmptyLineAfterAccessModifier: Never,
+	AccessModifierOffset: -4
 }

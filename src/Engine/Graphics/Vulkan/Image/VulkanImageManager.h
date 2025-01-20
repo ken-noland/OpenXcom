@@ -18,20 +18,27 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../Resource/Font/FontManager.h"
-#include "../VulkanInclude.h"
+#include "../../../Resource/Image/ImageManager.h"
+#include <vulkan/vulkan.hpp>
+#include <vk_mem_alloc.h> // VMA
 
 namespace OpenXcom
 {
 
 class VulkanContext;
+class VulkanImageFactory;
 
-class VulkanFontManager : public FontManager
+class VulkanImageManager : public ImageManager
 {
-public:
-	VulkanFontManager(VulkanContext& context);
-	virtual ~VulkanFontManager();
-};
+protected:
+	std::unique_ptr<VulkanImageFactory> _imageFactory;
 
+
+public:
+	VulkanImageManager(VulkanContext& context);
+	virtual ~VulkanImageManager() = default;
+
+	virtual std::unique_ptr<RenderTargetImage> createRenderTarget(int width, int height, ImageFormat format) override;
+};
 
 } // namespace OpenXcom

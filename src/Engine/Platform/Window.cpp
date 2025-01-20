@@ -18,9 +18,6 @@
  */
 
 #include "Window.h"
-#include "../Engine.h"
-#include "../Graphics/GraphicsSystem.h"
-#include "../Graphics/GraphicsInterfaces.h"
 
 namespace OpenXcom
 {
@@ -30,8 +27,6 @@ PlatformWindow::PlatformWindow(const std::string& title, int width, int height)
 	platformSpecificCreateWindow(title, width, height);
 
 	_running = true;
-
-	_surface = getEngine().getGraphicsSystem().createSurface(_handle);
 }
 
 PlatformWindow::~PlatformWindow()
@@ -42,8 +37,6 @@ PlatformWindow::~PlatformWindow()
 void PlatformWindow::update()
 {
 	platformSpecificUpdateWindow();
-
-	_surface->update();
 }
 
 bool PlatformWindow::isRunning() const
@@ -54,10 +47,6 @@ bool PlatformWindow::isRunning() const
 void PlatformWindow::close()
 {
 	_running = false;
-
-	// Destroy the surface before the window
-	_surface.reset();
-
 	platformSpecificDestroyWindow();
 }
 

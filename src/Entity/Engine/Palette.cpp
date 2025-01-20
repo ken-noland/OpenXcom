@@ -20,7 +20,6 @@
 #include "Palette.h"
 //#include "../../Engine/Palette.h"
 
-#include "../../Engine/Game.h"
 #include "../../Mod/Mod.h"
 #include "../../Mod/RuleInterface.h"
 

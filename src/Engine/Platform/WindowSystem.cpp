@@ -50,6 +50,13 @@ void PlatformWindowSystem::destroyWindow(const std::weak_ptr<PlatformWindow>& wi
 
 void PlatformWindowSystem::update()
 {
+	if(_windows.size() == 0)
+	{
+		// signal the game loop that we have no windows open and we should shut down the game.
+		//assert(!"Not implemented yet");
+		return;
+	}
+
 	for (std::shared_ptr<PlatformWindow>& window : _windows)
 	{
 		window->update();

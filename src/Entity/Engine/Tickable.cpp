@@ -16,13 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../../Engine/Game.h"
-#include "../../Engine/Registry.h"
-#include "../../Engine/Screen.h"
-#include "../Interface/Window.h"
-#include "Surface.h"
 #include "Tickable.h"
-#include "ECS.h"
 
 namespace OpenXcom
 {

@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,7 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <memory>
 
 namespace OpenXcom
 {
+
+class Pipeline;
+class PipelineDefinition;
+
+class PipelineManager
+{
+public:
+	PipelineManager() = default;
+	virtual ~PipelineManager() = default;
+
+	virtual std::unique_ptr<Pipeline> createPipeline(const PipelineDefinition& pipelineDefinition) = 0;
+};
+
 } // namespace OpenXcom

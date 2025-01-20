@@ -18,20 +18,27 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../Resource/Font/FontManager.h"
-#include "../VulkanInclude.h"
+#include "../../../Resource/Pipeline/PipelineManager.h"
 
 namespace OpenXcom
 {
 
 class VulkanContext;
+class VulkanPipeline;
 
-class VulkanFontManager : public FontManager
+
+
+class VulkanPipelineManager : public PipelineManager
 {
-public:
-	VulkanFontManager(VulkanContext& context);
-	virtual ~VulkanFontManager();
-};
+protected:
+	VulkanContext& _context;
 
+
+public:
+	VulkanPipelineManager(VulkanContext& context);
+	virtual ~VulkanPipelineManager();
+
+	virtual std::unique_ptr<Pipeline> createPipeline(const PipelineDefinition& pipelineDefinition) override;
+};
 
 } // namespace OpenXcom

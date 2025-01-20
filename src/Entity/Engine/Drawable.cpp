@@ -20,7 +20,6 @@
 #include "../Interface/Window.h"
 #include "../Interface/Text.h"
 #include "../Interface/Button.h"
-#include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
 #include "ECS.h"
 

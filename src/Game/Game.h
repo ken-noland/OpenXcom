@@ -21,8 +21,8 @@
 #include <string>
 #include <memory>
 
-#include "Filesystem/VirtualFileSystem.h"
-#include "Platform/Window.h"
+#include "../Engine/Filesystem/VirtualFileSystem.h"
+#include "../Engine/Platform/Window.h"
 #include "../Entity/Engine/ECS.h"
 
 #if defined(ENABLE_ENTITY_INSPECTOR)
@@ -34,17 +34,13 @@ namespace OpenXcom
 
 class State;
 class Options;
-
-namespace Lua
-{
-class LuaMod;
-}
+class GameWindow;
 
 /**
  * The core of the game engine, manages the game's entire contents and structure.
  * Takes care of encapsulating all the core game systems, provides access to all
  * the game's resources and contains a stack state machine to handle all the
- * initializations, events and blits of each state, as well as transitions.
+ * initializations.
  */
 class Game
 {
@@ -52,10 +48,13 @@ private:
 	/// central entity component system
 	ECS _ecs;
 
-	std::weak_ptr<PlatformWindow> _window;
 
 	/// The game's state stack.
 	std::list<std::unique_ptr<State>> _states, _deleted;
+
+
+	/// The game's window.
+	std::unique_ptr<GameWindow> _gameWindow;
 
 	#if defined(ENABLE_ENTITY_INSPECTOR)
 	Inspector _inspector;

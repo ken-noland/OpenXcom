@@ -19,8 +19,7 @@
  */
 #include "../GraphicsSystem.h"
 
-#include <vulkan/vulkan.hpp>
-#include <vk_mem_alloc.h> // VMA
+#include "VulkanContext.h"
 
 #include <iostream>
 #include <vector>
@@ -28,46 +27,10 @@
 namespace OpenXcom
 {
 
-class VulkanSurface;
-class VulkanShaderManager;
-class VulkanBufferFactory;
-
 class VulkanSystem : public GraphicsSystem
 {
-	vk::DynamicLoader _loader;
-	vk::Instance _instance;
-
-	vk::DebugUtilsMessengerEXT _debugMessenger;
-
-	vk::PhysicalDevice _physicalDevice;
-	vk::Device _device;
-
-	VmaAllocator _allocator;
-
-	uint32_t _graphicsQueueFamilyIndex;
-	uint32_t _presentQueueFamilyIndex;
-	uint32_t _transferQueueFamilyIndex;
-
-	vk::Queue _graphicsQueue;
-	vk::Queue _presentQueue;
-
-	// we need to store this here so that _renderPass has access to the swap chain format
-	vk::Format _swapChainImageFormat;
-
-	vk::RenderPass _renderPass;
-
-	// the factory for creating buffers
-	std::unique_ptr<VulkanBufferFactory> _bufferFactory;
-
-	// hold on to device specific manager pointers for cleanup
-	VulkanShaderManager* _shaderManager;
-
-	void selectPhysicalDevice(const vk::SurfaceKHR& surface);
-	void initializeDevice(const vk::SurfaceKHR& surface);
-
-	void initializeSwapChain(std::unique_ptr<VulkanSurface>& surface);
-	void initializeRenderPass();
-	void initializeFrames(std::unique_ptr<VulkanSurface>& surface);
+protected:
+	VulkanContext _context;
 
 public:
 	VulkanSystem(const Options& options);
@@ -75,9 +38,11 @@ public:
 
 	virtual std::unique_ptr<GraphicsSurface> createSurface(const PlatformWindowHandle& handle) override;
 
-	virtual std::unique_ptr<FontManager> createFontManager() override;
-	virtual std::unique_ptr<PaletteManager> createPaletteManager() override;
 	virtual std::unique_ptr<ShaderManager> createShaderManager() override;
+	virtual std::unique_ptr<PipelineManager> createPipelineManager() override;
+	virtual std::unique_ptr<FontManager> createFontManager() override;
+	virtual std::unique_ptr<ImageManager> createImageManager() override;
+	virtual std::unique_ptr<PaletteManager> createPaletteManager() override;
 };
 
 } // namespace OpenXcom

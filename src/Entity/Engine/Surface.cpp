@@ -20,7 +20,6 @@
 #include "Palette.h"
 #include "Drawable.h"
 #include "../Common/Name.h"
-#include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
 
 

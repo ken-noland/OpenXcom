@@ -17,21 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "../../../Resource/Font/FontManager.h"
-#include "../VulkanInclude.h"
+#include <memory>
 
 namespace OpenXcom
 {
 
-class VulkanContext;
+enum class ImageFormat;
 
-class VulkanFontManager : public FontManager
+class RenderTargetImage;
+class Image;
+
+class ImageManager
 {
 public:
-	VulkanFontManager(VulkanContext& context);
-	virtual ~VulkanFontManager();
-};
+	ImageManager() = default;
+	virtual ~ImageManager() = default;
 
+	virtual std::unique_ptr<RenderTargetImage> createRenderTarget(int width, int height, ImageFormat format) = 0;
+};
 
 } // namespace OpenXcom

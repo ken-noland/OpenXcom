@@ -17,7 +17,6 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Timer.h"
-#include "Game.h"
 #include "Options.h"
 
 

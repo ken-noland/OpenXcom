@@ -17,6 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "VulkanShaderManager.h"
+#include "../VulkanContext.h"
 
 #include <shaderc/shaderc.hpp>
 #include "../../../Logger.h"
@@ -47,8 +48,8 @@ shaderc_shader_kind getShadercKind(ShaderType type)
 	return shaderc_shader_kind();
 }
 
-VulkanShaderManager::VulkanShaderManager(vk::Device& device)
-	: _device(device)
+VulkanShaderManager::VulkanShaderManager(VulkanContext& context)
+	: _context(context)
 {
 
 #if defined(_DEBUG) && defined(_WIN32)
@@ -91,7 +92,7 @@ std::vector<uint32_t> VulkanShaderManager::compileGLSL(const std::string& source
 VulkanShaderManager::Handle VulkanShaderManager::loadShaderFromMemory(const std::string& name, const std::string shader, ShaderType type)
 {
 	std::vector<uint32_t> spirv = compileGLSL(shader, type);
-	std::unique_ptr<VulkanShader> vulkanShader = std::make_unique<VulkanShader>(name, _device, spirv);
+	std::unique_ptr<VulkanShader> vulkanShader = std::make_unique<VulkanShader>(name, _context.getDevice(), spirv);
 	return add(std::move(vulkanShader));
 }
 

@@ -18,49 +18,37 @@
  */
 
 #include "VulkanBuffer.h"
+#include "VulkanContext.h"
 
 namespace OpenXcom
 {
 
-VulkanBufferFactory::VulkanBufferFactory(VmaAllocator allocator, vk::Device device, uint32_t transferQueueFamilyIndex)
-	: _allocator(allocator), _device(device)
+VulkanBufferFactory::VulkanBufferFactory(VulkanContext& context)
+	: _context(context)
 {
-	// Create a command pool for transfer operations
-	vk::CommandPoolCreateInfo poolInfo = {};
-	poolInfo.queueFamilyIndex = transferQueueFamilyIndex;
-	poolInfo.flags = vk::CommandPoolCreateFlagBits::eTransient | vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
-
-	vk::CommandPool transferCommandPool;
-	_commandPool = _device.createCommandPool(poolInfo);
-
-	// Retrieve the transfer queue
-	_transferQueue = _device.getQueue(transferQueueFamilyIndex, 0);
 }
 
 VulkanBufferFactory::~VulkanBufferFactory()
 {
-	_device.destroyCommandPool(_commandPool);
-	_commandPool = nullptr;
 }
 
 std::unique_ptr<VulkanHostBuffer> VulkanBufferFactory::createHostBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage)
 {
-	return std::make_unique<VulkanHostBuffer>(_allocator, usage, size);
+	return std::make_unique<VulkanHostBuffer>(_context, usage, size);
 }
 
 std::unique_ptr<VulkanDeviceBuffer> VulkanBufferFactory::createDeviceBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage)
 {
-	return std::make_unique<VulkanDeviceBuffer>(_allocator, _device, _commandPool, _transferQueue, usage, size);
+	return std::make_unique<VulkanDeviceBuffer>(_context, usage, size);
 }
 
 std::unique_ptr<VulkanDeviceBuffer> VulkanBufferFactory::createDeviceBuffer(VulkanHostBuffer& hostBuffer, vk::BufferUsageFlags usage)
 {
-	return std::make_unique<VulkanDeviceBuffer>(_allocator, _device, _commandPool, _transferQueue, usage, hostBuffer);
+	return std::make_unique<VulkanDeviceBuffer>(_context, usage, hostBuffer);
 }
 
-
-VulkanHostBuffer::VulkanHostBuffer(VmaAllocator allocator, vk::BufferUsageFlags usage, vk::DeviceSize size)
-	: VulkanBuffer(allocator, size)
+VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, vk::BufferUsageFlags usage, vk::DeviceSize size)
+	: VulkanBuffer(context, size)
 {
 	vk::BufferUsageFlags usageFlags = usage | vk::BufferUsageFlagBits::eTransferSrc;
 
@@ -75,26 +63,26 @@ VulkanHostBuffer::VulkanHostBuffer(VmaAllocator allocator, vk::BufferUsageFlags 
 
 	VkBuffer buffer = nullptr;
 	VkBufferCreateInfo createInfo = bufferInfo;
-	vmaCreateBuffer(_allocator, &createInfo, &allocInfo, &buffer, &_allocation, nullptr);
+	vmaCreateBuffer(context.getAllocator(), &createInfo, &allocInfo, &buffer, &_allocation, nullptr);
 
 	_buffer = buffer;
 }
 
 VulkanHostBuffer::~VulkanHostBuffer()
 {
-	vmaDestroyBuffer(_allocator, _buffer, _allocation);
+	vmaDestroyBuffer(_context.getAllocator(), _buffer, _allocation);
 }
 
 void* VulkanHostBuffer::map()
 {
 	void* mappedData = nullptr;
-	vmaMapMemory(_allocator, _allocation, &mappedData);
+	vmaMapMemory(_context.getAllocator(), _allocation, &mappedData);
 	return mappedData;
 }
 
 void VulkanHostBuffer::unmap()
 {
-	vmaUnmapMemory(_allocator, _allocation);
+	vmaUnmapMemory(_context.getAllocator(), _allocation);
 }
 
 void VulkanHostBuffer::copyTo(const void* data, size_t offset, size_t size)
@@ -104,8 +92,8 @@ void VulkanHostBuffer::copyTo(const void* data, size_t offset, size_t size)
 	unmap();
 }
 
-VulkanDeviceBuffer::VulkanDeviceBuffer(VmaAllocator allocator, vk::Device device, vk::CommandPool commandPool, vk::Queue transferQueue, vk::BufferUsageFlags usage, VulkanHostBuffer& hostBuffer)
-	: VulkanBuffer(allocator, hostBuffer.getSize()), _device(device), _commandPool(commandPool), _transferQueue(transferQueue)
+VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, vk::BufferUsageFlags usage, VulkanHostBuffer& hostBuffer)
+	: VulkanBuffer(context, hostBuffer.getSize())
 {
 	create(usage);
 
@@ -114,15 +102,15 @@ VulkanDeviceBuffer::VulkanDeviceBuffer(VmaAllocator allocator, vk::Device device
 
 }
 
-VulkanDeviceBuffer::VulkanDeviceBuffer(VmaAllocator allocator, vk::Device device, vk::CommandPool commandPool, vk::Queue transferQueue, vk::BufferUsageFlags usage, vk::DeviceSize size)
-	: VulkanBuffer(allocator, size), _device(device), _commandPool(commandPool), _transferQueue(transferQueue)
+VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, vk::BufferUsageFlags usage, vk::DeviceSize size)
+	: VulkanBuffer(context, size)
 {
 	create(usage);
 }
 
 VulkanDeviceBuffer::~VulkanDeviceBuffer()
 {
-	vmaDestroyBuffer(_allocator, _buffer, _allocation);
+	vmaDestroyBuffer(_context.getAllocator(), _buffer, _allocation);
 }
 
 /// Create a buffer that is accessible by the GPU
@@ -140,24 +128,20 @@ void VulkanDeviceBuffer::create(vk::BufferUsageFlags usage)
 
 	VkBuffer buffer = nullptr;
 	VkBufferCreateInfo createInfo = bufferInfo;
-	vmaCreateBuffer(_allocator, &createInfo, &allocInfo, &buffer, &_allocation, nullptr);
+	vmaCreateBuffer(_context.getAllocator(), &createInfo, &allocInfo, &buffer, &_allocation, nullptr);
 
 	_buffer = buffer;
 }
 
 void VulkanDeviceBuffer::update(VulkanHostBuffer& hostBuffer)
 {
+	throw new std::runtime_error("Not implemented");
+
 	//KN NOTE: It's possible that we could use a multithreaded version of this which allows us to push up the contents without
 	// having to wait for the previous command. This would reduce load times, but at the cost of adding complextiy.
 	vk::Result result = vk::Result::eSuccess;
 
-	vk::CommandBufferAllocateInfo allocInfo{};
-	allocInfo.level = vk::CommandBufferLevel::ePrimary;
-	allocInfo.commandPool = _commandPool;
-	allocInfo.commandBufferCount = 1;
-
-	std::vector<vk::CommandBuffer> commandBuffers = _device.allocateCommandBuffers(allocInfo);
-	vk::CommandBuffer& commandBuffer = commandBuffers[0];
+	vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
 
 	vk::CommandBufferBeginInfo beginInfo{};
 	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
@@ -176,13 +160,10 @@ void VulkanDeviceBuffer::update(VulkanHostBuffer& hostBuffer)
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
 
-	result = _transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+	vk::Queue& transferQueue = _context.getTransferQueue().getQueue();
+	result = transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
 
-	_transferQueue.waitIdle();
-
-	_device.freeCommandBuffers(_commandPool, commandBuffers);
+	transferQueue.waitIdle();
 }
-
-
 
 } // namespace OpenXcom

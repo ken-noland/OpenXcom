@@ -23,7 +23,7 @@
 namespace OpenXcom
 {
 
-VulkanFontManager::VulkanFontManager()
+VulkanFontManager::VulkanFontManager(VulkanContext& context)
 {
 }
 

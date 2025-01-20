@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Registry.h"
-#include "Game.h"
+#include "../Game/Game.h"
 
 namespace OpenXcom
 {

@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../GraphicsInterfaces.h"
-#include "VulkanInclude.h"
+#include <vulkan/vulkan.hpp>
+#include "../GraphicsSurface.h"
 #include "VulkanBuffer.h"
 #include "../../Platform/Window.h"
 
@@ -30,9 +30,12 @@
 namespace OpenXcom
 {
 
+class VulkanContext;
 struct PlatformWindowHandle;
-
 class VulkanBufferFactory;
+class VulkanPipelineFactory;
+class VulkanPipeline;
+class PipelineDefinition;
 
 struct FrameData
 {
@@ -44,14 +47,11 @@ struct FrameData
 	vk::CommandBuffer commandBuffer;
 };
 
+// 
 class VulkanSurface : public GraphicsSurface
 {
-	vk::Instance _instance;		// reference to instance in VulkanSystem
-	vk::Device _device;			// reference to device in VulkanSystem
-	vk::PhysicalDevice _physicalDevice; // reference to physical device in VulkanSystem
-
-	vk::Queue _graphicsQueue;	// reference to graphics queue in VulkanSystem
-	vk::Queue _presentQueue;	// reference to present queue in VulkanSystem
+protected:
+	VulkanContext& _context;
 
 	vk::CommandPool _commandPool;
 
@@ -63,17 +63,22 @@ class VulkanSurface : public GraphicsSurface
 
 	std::vector<FrameData> _frames;
 
-	glm::mat4 _transform;
+	vk::RenderPass _renderPass;
 
-	vk::RenderPass _renderPass; // reference to render pass in VulkanSystem
+	//std::unique_ptr<VulkanPipeline> _pipeline;
+
+
+	//-----
+	// the following is temporary(I think, not sure)
+	glm::mat4 _transform;
 
 	//descriptor set
 	vk::DescriptorSetLayout _descriptorSetLayout;
 	vk::DescriptorPool _descriptorPool;
 	vk::DescriptorSet _descriptorSet;
 
-	vk::PipelineLayout _pipelineLayout;
-	vk::Pipeline _pipeline;
+//	vk::PipelineLayout _pipelineLayout;
+//	vk::Pipeline _pipeline;
 
 	uint32_t _currentFrame;
 
@@ -87,12 +92,12 @@ class VulkanSurface : public GraphicsSurface
 	vk::Framebuffer _gameFramebuffer;
 
 
-	// TEMP
-	ShaderManager::Handle _vertexShader;		// KN Note: when we move to a pipeline registry, this won't be needed here anymore
-	ShaderManager::Handle _fragmentShader;		// KN Note: when we move to a pipeline registry, this won't be needed here anymore
+	//// TEMP
+	//ShaderManager::Handle _vertexShader;		// KN Note: when we move to a pipeline registry, this won't be needed here anymore
+	//ShaderManager::Handle _fragmentShader;		// KN Note: when we move to a pipeline registry, this won't be needed here anymore
 
-	// not sure if this'll be needed here once we have resource managers in place to automate the creation and destruction of buffer elements
-	VmaAllocator _allocator;
+	//// not sure if this'll be needed here once we have resource managers in place to automate the creation and destruction of buffer elements
+	//VmaAllocator _allocator;
 
 
 	vk::Sampler _textureSampler;	// KN Note: this should be moved to a sampler manager/registry of some kind
@@ -100,16 +105,13 @@ class VulkanSurface : public GraphicsSurface
 	std::unique_ptr<VulkanBuffer> _vertexBuffer;
 	std::unique_ptr<VulkanBuffer> _indexBuffer;
 
-	friend class VulkanSystem;
-	void initializeDevice(vk::Device& device, const vk::PhysicalDevice& physicalDevice, VmaAllocator allocator,
-		uint32_t graphicsQueueFamilyIndex, vk::Queue& graphicsQueue, vk::Queue& presentQueue);
-	void initializeSwapChain();
-	void initializeFrames(const vk::RenderPass& renderPass);
-	void initializeShaders(ShaderManager& shaderManager);
-	void initializeDescriptorSet();
-	void initializePipeline();
+	//-----
 
-	void initializeGameSurface(VulkanBufferFactory& bufferFactory);
+	void initializeSwapChain();
+	void initializeRenderPass();
+	void initializeFrames();
+
+	//void initializeGameSurface(VulkanBufferFactory& bufferFactory);
 
 	void destroySwapChain();
 
@@ -117,15 +119,22 @@ class VulkanSurface : public GraphicsSurface
 
 	void recordCommandBuffer(FrameData& frame, uint32_t imageIndex);
 
+	// this function is used to create the surface for the platform window, but equally, VulkanContext needs to
+	// create a surface to select a physical device, so rather than duplicate the code, we'll make it static and
+	// friendly.
+	friend class VulkanContext;
+	static vk::SurfaceKHR createSurface(vk::Instance& instance, const PlatformWindowHandle& window);
+	static void destroySurface(vk::Instance& instance, vk::SurfaceKHR& surface);
+
 public:
-	VulkanSurface(vk::Instance instance, const PlatformWindowHandle& window);
+	VulkanSurface(VulkanContext& context, const PlatformWindowHandle& window);
 	virtual ~VulkanSurface();
 
 	const vk::SurfaceKHR& getVKSurface() const { return _surface; }
 	const vk::Format& getVKFormat() const { return _swapChainImageFormat; }
 	const vk::Extent2D& getVKExtent() const { return _swapChainExtent; }
 
-	virtual void update() override;
+	virtual void draw() override;
 };
 
 } // namespace OpenXcom

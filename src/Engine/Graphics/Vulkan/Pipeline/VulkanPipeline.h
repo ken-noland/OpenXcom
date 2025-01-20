@@ -18,23 +18,32 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../../../Resource/Pipeline/Pipeline.h"
+#include <vulkan/vulkan.hpp>
+
 namespace OpenXcom
 {
 
-// the graphics surface is the window that the graphics system will render to
-class GraphicsSurface
+class VulkanContext;
+class VulkanDescriptorSetFactory;
+class PipelineDefinition;
+
+class VulkanPipeline : public Pipeline
 {
+protected:
+	VulkanContext& _context;
+
+	vk::Pipeline _pipeline;
+	vk::PipelineLayout _pipelineLayout;
+	vk::DescriptorSetLayout _descriptorSetLayout;
+
 public:
-	GraphicsSurface() = default;
-	virtual ~GraphicsSurface() = default;
+	VulkanPipeline(VulkanContext& context, const PipelineDefinition& pipelineDefinition);
+	virtual ~VulkanPipeline();
 
-	virtual void update() = 0;
+	vk::Pipeline& getPipeline() { return _pipeline; }
+	vk::PipelineLayout& getPipelineLayout() { return _pipelineLayout; }
+
 };
-
-class GraphicsShader
-{
-};
-
-
 
 } // namespace OpenXcom

@@ -18,19 +18,27 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../Resource/Font/FontManager.h"
-#include "../VulkanInclude.h"
-
 namespace OpenXcom
 {
 
-class VulkanContext;
+enum class ImageFormat
+{
+	UNKNOWN,
+	RGBA8,
+};
 
-class VulkanFontManager : public FontManager
+class Image
 {
 public:
-	VulkanFontManager(VulkanContext& context);
-	virtual ~VulkanFontManager();
+	Image() = default;
+	virtual ~Image() = default;
+};
+
+class RenderTargetImage : public Image
+{
+public:
+	RenderTargetImage() = default;
+	virtual ~RenderTargetImage() = default;
 };
 
 

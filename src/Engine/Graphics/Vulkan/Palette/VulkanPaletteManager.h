@@ -23,10 +23,12 @@
 namespace OpenXcom
 {
 
+class VulkanContext;
+
 class VulkanPaletteManager : public PaletteManager
 {
 public:
-	VulkanPaletteManager();
+	VulkanPaletteManager(VulkanContext& context);
 	virtual ~VulkanPaletteManager();
 };
 

@@ -61,10 +61,12 @@ private:
 	void platformSpecificDestroyWindow();
 	void platformSpecificUpdateWindow();
 
+	void platformSpecificShowWindow();
+	void platformSpecificHideWindow();
+
 	bool _running;
 
 	PlatformWindowHandle _handle;
-	std::unique_ptr<GraphicsSurface> _surface;
 
 public:
 	PlatformWindow(const std::string& title, int width, int height);
@@ -74,6 +76,11 @@ public:
 
 	bool isRunning() const;
 	void close();
+
+	void show() { platformSpecificShowWindow(); }
+	void hide() { platformSpecificHideWindow(); }
+
+	const PlatformWindowHandle& getHandle() { return _handle; }
 };
 
 
