@@ -81,7 +81,7 @@ VulkanImage::~VulkanImage()
 VulkanRenderTargetImage::VulkanRenderTargetImage(VulkanContext& context, uint32_t width, uint32_t height, ImageFormat format)
 	: _context(context)
 {
-	// Create the game image
+	// Create the render target image
 	vk::ImageCreateInfo imageInfo{};
 	imageInfo.imageType = vk::ImageType::e2D;
 	imageInfo.extent = vk::Extent3D{width, height, 1};
@@ -100,10 +100,59 @@ VulkanRenderTargetImage::VulkanRenderTargetImage(VulkanContext& context, uint32_
 
 	_image = image;
 	_allocation = allocation;
+
+	vk::ImageViewCreateInfo imageViewInfo{};
+	imageViewInfo.image = _image;
+	imageViewInfo.viewType = vk::ImageViewType::e2D;
+	imageViewInfo.format = vk::Format::eR8G8B8A8Unorm;
+	imageViewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+	imageViewInfo.subresourceRange.levelCount = 1;
+	imageViewInfo.subresourceRange.layerCount = 1;
+
+	_imageView = _context.getDevice().createImageView(imageViewInfo);
+
+	vk::AttachmentDescription colorAttachment{};
+	colorAttachment.format = vk::Format::eR8G8B8A8Unorm;
+	colorAttachment.samples = vk::SampleCountFlagBits::e1;
+	colorAttachment.loadOp = vk::AttachmentLoadOp::eClear;
+	colorAttachment.storeOp = vk::AttachmentStoreOp::eStore;
+	colorAttachment.initialLayout = vk::ImageLayout::eUndefined;
+	colorAttachment.finalLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+
+	vk::AttachmentReference colorAttachmentRef{};
+	colorAttachmentRef.attachment = 0; // Index of the attachment in the render pass (color attachment)
+	colorAttachmentRef.layout = vk::ImageLayout::eColorAttachmentOptimal;
+
+	vk::SubpassDescription subpass{};
+	subpass.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+
+	vk::RenderPassCreateInfo renderPassInfo{};
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+
+	_renderPass = _context.getDevice().createRenderPass(renderPassInfo);
+
+	vk::FramebufferCreateInfo framebufferInfo{};
+	framebufferInfo.renderPass = _renderPass;
+	framebufferInfo.attachmentCount = 1;
+	framebufferInfo.pAttachments = &_imageView;
+	framebufferInfo.width = 320;
+	framebufferInfo.height = 200;
+	framebufferInfo.layers = 1;
+
+	_framebuffer = _context.getDevice().createFramebuffer(framebufferInfo);
 }
 
 VulkanRenderTargetImage::~VulkanRenderTargetImage()
 {
+	_context.getDevice().destroyFramebuffer(_framebuffer);
+	_context.getDevice().destroyRenderPass(_renderPass);
+
+	_context.getDevice().destroyImageView(_imageView);
 	vmaDestroyImage(_context.getAllocator(), _image, _allocation);
 }
 

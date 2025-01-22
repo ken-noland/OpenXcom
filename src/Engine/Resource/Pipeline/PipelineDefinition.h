@@ -70,7 +70,7 @@ public:
 	~ResourceLayoutDefinition() = default;
 
 	void setVertexType(const SimpleRTTR::Type& type) { _vertexType = type; }
-	const SimpleRTTR::Type& getVertexType() const { return _vertexType.type(); }
+	SimpleRTTR::Type getVertexType() const { return _vertexType.type(); }
 
 	void addUniformBuffer(const UniformBufferDefinition& uniformBuffer) { _uniformBuffers.push_back(uniformBuffer); }
 	const std::vector<UniformBufferDefinition>& getUniformBuffers() const { return _uniformBuffers; }
@@ -179,7 +179,7 @@ public:
 	const ResourceLayoutDefinition& getResourceLayout() const { return _resourceLayout; }
 
 	void setSurface(GraphicsSurface& surface) { _surface = surface; }
-	const GraphicsSurface& getSurface() const { return _surface.value().get(); }
+	GraphicsSurface& getSurface() const { return _surface.value().get(); }
 };
 
 class PipelineBuilder

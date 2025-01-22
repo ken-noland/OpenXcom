@@ -19,23 +19,55 @@
  */
 
 #include "../../../Resource/Pipeline/Pipeline.h"
+#include "../../../Resource/Pipeline/PipelineDefinition.h"
 #include <vulkan/vulkan.hpp>
 
 namespace OpenXcom
 {
 
 class VulkanContext;
+class VulkanSurface;
 class VulkanDescriptorSetFactory;
-class PipelineDefinition;
 
 class VulkanPipeline : public Pipeline
 {
 protected:
 	VulkanContext& _context;
 
+	PipelineDefinition _pipelineDefinition;
+
 	vk::Pipeline _pipeline;
 	vk::PipelineLayout _pipelineLayout;
 	vk::DescriptorSetLayout _descriptorSetLayout;
+
+
+	//--
+	// helper functions
+	void createDescriptorSetLayout();
+	std::array<vk::PipelineShaderStageCreateInfo, 2> createShaderStages();
+
+	void createVertexInputInfo(vk::VertexInputBindingDescription& bindingDescription, std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions, vk::PipelineVertexInputStateCreateInfo& vertexInputInfo);
+	void createInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo& inputAssembly);
+	void createViewportState(vk::PipelineViewportStateCreateInfo& viewportState, vk::Viewport& viewport, vk::Rect2D& scissor);
+	void createRasterizerState(vk::PipelineRasterizationStateCreateInfo& rasterizer);
+	void createMultisampleState(vk::PipelineMultisampleStateCreateInfo& multisampling);
+	void createColorBlendState(vk::PipelineColorBlendStateCreateInfo& colorBlending, vk::PipelineColorBlendAttachmentState& colorBlendAttachment);
+
+	void createPipelineLayout();
+
+	void createPipeline(
+		const std::array<vk::PipelineShaderStageCreateInfo, 2>& shaderStages,
+		const vk::PipelineVertexInputStateCreateInfo& vertexInputInfo,
+		const vk::PipelineInputAssemblyStateCreateInfo& inputAssembly,
+		const vk::PipelineViewportStateCreateInfo& viewportState,
+		const vk::PipelineRasterizationStateCreateInfo& rasterizer,
+		const vk::PipelineMultisampleStateCreateInfo& multisampling,
+		const vk::PipelineColorBlendStateCreateInfo& colorBlending,
+		VulkanSurface& surface);
+
+	//TODO: This might be better in a helper class of some sort, maybe passed in as part of the context?
+	vk::Format determineFormat(const SimpleRTTR::Type& type);
+	vk::ShaderStageFlags determineStage(ShaderStage type);
 
 public:
 	VulkanPipeline(VulkanContext& context, const PipelineDefinition& pipelineDefinition);

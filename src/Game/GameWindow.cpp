@@ -25,8 +25,9 @@
 #include "../Engine/Resource/ResourceSystem.h"
 #include "../Engine/Resource/Shader/ShaderManager.h"
 #include "../Engine/Resource/Shader/Shader.h"
-#include "../Engine/Resource/Pipeline/PipelineDefinition.h"
 #include "../Engine/Resource/Pipeline/Pipeline.h"
+#include "../Engine/Resource/Pipeline/PipelineDefinition.h"
+#include "../Engine/Resource/Pipeline/PipelineManager.h"
 #include "../Engine/Resource/Image/ImageManager.h"
 #include "../Engine/Resource/Image/Image.h"
 
@@ -139,32 +140,7 @@ GameWindow::GameWindow(const std::string& title)
 		.setSurface(*_graphicsSurface)
 		.build();
 
-	//// define the pipeline
-	//ResourceLayoutBuilder resourceLayout;
-
-	//resourceLayout
-	//	.addBinding(UBOBuilder()
-	//		.setBinding(0)
-	//		.setStageFlags(Stage::Vertex)
-	//		.build())
-	//	.addBinding(SamplerBuilder()
-	//		.setBinding(1)
-	//		.setStageFlags(Stage::Fragment)
-	//		.build())
-	//	.addBinding(TextureBuilder()
-	//		.setBinding(2)
-	//		.setStageFlags(Stage::Fragment)
-	//		.build());
-
-//	PipelineDescriptionBuilder pipelineDescription;
-
-	//pipeline
-
-	//	.setVertexShader(_vertexShader)
-	//	.setFragmentShader(_fragmentShader)
-	//	.setResourceLayout(resourceLayout.build())
-	//	.setRenderTarget(_renderTargetImage)
-	//	.build();
+	_windowPipeline = engine.getResourceSystem().getPipelineManager().createPipeline(pipeline);
 
 
 	_window->show();

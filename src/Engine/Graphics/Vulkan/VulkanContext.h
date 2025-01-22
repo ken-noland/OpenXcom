@@ -27,7 +27,11 @@ namespace OpenXcom
 class Options;
 class VulkanBufferFactory;
 class VulkanDescriptorSetFactory;
+class VulkanSamplerFactory;
 class VulkanPipelineFactory;
+
+class VulkanShaderManager;
+class VulkanPipelineManager;
 
 class VulkanQueue
 {
@@ -82,8 +86,15 @@ protected:
 	// the factory for creating descriptor sets
 	std::unique_ptr<VulkanDescriptorSetFactory> _descriptorSetFactory; // not entirely sure this needs to be here, but keeping it here anyway
 
+	// the factory for creating the samplers
+	std::unique_ptr<VulkanSamplerFactory> _samplerFactory;
+
 	// the factory for creating pipelines
 	std::unique_ptr<VulkanPipelineFactory> _pipelineFactory;
+
+	// pointers ot the vulkan specific managers for the various resources
+	VulkanShaderManager* _shaderManager;
+	VulkanPipelineManager* _pipelineManager;
 
 	void initializeInstance();
 	void selectPhysicalDevice(const vk::SurfaceKHR& surface);

@@ -76,8 +76,13 @@ class VulkanRenderTargetImage : public RenderTargetImage
 private:
 	VulkanContext& _context;
 
-	vk::Image _image;
 	VmaAllocation _allocation;
+
+	vk::Image _image;
+	vk::ImageView _imageView;
+
+	vk::RenderPass _renderPass;
+	vk::Framebuffer _framebuffer;
 
 public:
 	VulkanRenderTargetImage(VulkanContext& context, uint32_t width, uint32_t height, ImageFormat format);

@@ -133,6 +133,7 @@ public:
 	const vk::SurfaceKHR& getVKSurface() const { return _surface; }
 	const vk::Format& getVKFormat() const { return _swapChainImageFormat; }
 	const vk::Extent2D& getVKExtent() const { return _swapChainExtent; }
+	const vk::RenderPass& getRenderPass() const { return _renderPass; }
 
 	virtual void draw() override;
 };

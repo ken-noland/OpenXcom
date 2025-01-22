@@ -35,7 +35,7 @@ VulkanPipelineManager::~VulkanPipelineManager()
 
 std::unique_ptr<Pipeline> VulkanPipelineManager::createPipeline(const PipelineDefinition& pipelineDefinition)
 {
-	return std::unique_ptr<Pipeline>();
+	return std::make_unique<VulkanPipeline>(_context, pipelineDefinition);
 }
 
 } // namespace OpenXcom

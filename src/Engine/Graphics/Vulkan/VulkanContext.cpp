@@ -24,6 +24,7 @@
 
 #include "VulkanBuffer.h"
 #include "VulkanDescriptorSet.h"
+#include "VulkanSampler.h"
 #include "Pipeline/VulkanPipelineFactory.h"
 
 #include "../../Engine.h"
@@ -151,6 +152,7 @@ VulkanContext::VulkanContext(const Options& options)
 
 	_bufferFactory = std::make_unique<VulkanBufferFactory>(*this);
 	_descriptorSetFactory = std::make_unique<VulkanDescriptorSetFactory>(*this);
+	_samplerFactory = std::make_unique<VulkanSamplerFactory>(*this);
 	_pipelineFactory = std::make_unique<VulkanPipelineFactory>(*this);
 }
 

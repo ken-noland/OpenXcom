@@ -17,29 +17,39 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "../../../Resource/Image/ImageManager.h"
 #include <vulkan/vulkan.hpp>
-#include <vk_mem_alloc.h> // VMA
 
 namespace OpenXcom
 {
 
 class VulkanContext;
-class VulkanImageFactory;
 
-class VulkanImageManager : public ImageManager
+class VulkanSampler
 {
 protected:
-	std::unique_ptr<VulkanImageFactory> _imageFactory;
-
+	VulkanContext& _context;
+	vk::Sampler _sampler;
 
 public:
-	VulkanImageManager(VulkanContext& context);
-	virtual ~VulkanImageManager() = default;
+	VulkanSampler(VulkanContext& context /* TODO: Add parameters */);
+	virtual ~VulkanSampler();
 
-	virtual std::unique_ptr<RenderTargetImage> createRenderTarget(int width, int height, ImageFormat format) override;
-	//virtual std::unique_ptr<RenderTargetImage> createRenderTarget(int width, int height, ImageFormat format);
+	vk::Sampler& getSampler() { return _sampler; }
 };
 
-} // namespace OpenXcom
+class VulkanSamplerFactory
+{
+protected:
+	VulkanContext& _context;
+
+	//there's actually only one sampler for now
+	std::unique_ptr<VulkanSampler> _sampler;
+
+public:
+	VulkanSamplerFactory(VulkanContext& context);
+	virtual ~VulkanSamplerFactory();
+
+	VulkanSampler& getSampler() { return *_sampler; }
+};
+
+};

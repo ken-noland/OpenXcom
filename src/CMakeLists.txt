@@ -153,6 +153,7 @@ set ( engine_src
   "Engine/Graphics/Vulkan/VulkanContext.cpp"
   "Engine/Graphics/Vulkan/VulkanDescriptorSet.cpp"
   "Engine/Graphics/Vulkan/VulkanResource.cpp"
+  "Engine/Graphics/Vulkan/VulkanSampler.cpp"
   "Engine/Graphics/Vulkan/VulkanSurface.cpp"
   "Engine/Graphics/Vulkan/VulkanSystem.cpp"
   "Engine/Graphics/GraphicsSystem.cpp"
