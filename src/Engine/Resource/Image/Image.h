@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <cstdint>
 
 namespace OpenXcom
 {
@@ -32,6 +33,9 @@ class Image
 public:
 	Image() = default;
 	virtual ~Image() = default;
+
+	virtual uint32_t getWidth() = 0;
+	virtual uint32_t getHeight() = 0;
 };
 
 

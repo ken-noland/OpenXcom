@@ -36,6 +36,9 @@ private:
 
 	VmaAllocation _allocation;
 
+	uint32_t _width;
+	uint32_t _height;
+
 	vk::Image _image;
 	vk::ImageView _imageView;
 
@@ -45,7 +48,10 @@ private:
 public:
 	VulkanRenderTarget(VulkanContext& context, uint32_t width, uint32_t height, ImageFormat format);
 	virtual ~VulkanRenderTarget();
-	
+
+	virtual uint32_t getWidth() override { return _width; }
+	virtual uint32_t getHeight() override { return _height; }
+
 	virtual void beginRenderPass(GraphicsCommand& commandContext) override;
 	virtual void endRenderPass(GraphicsCommand& commandContext) override;
 };

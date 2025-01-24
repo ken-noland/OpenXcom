@@ -19,6 +19,7 @@
  */
 #include <memory>
 #include <string>
+#include <glm/mat4x4.hpp>
 
 namespace OpenXcom
 {
@@ -35,10 +36,11 @@ class GameWindow
 {
 private:
 	std::shared_ptr<PlatformWindow> _window;
-	std::unique_ptr<GraphicsSurface> _graphicsSurface;
+	std::unique_ptr<GraphicsSurface> _windowSurface;
 
 	std::unique_ptr<Pipeline> _windowPipeline;
 	std::unique_ptr<PipelineBinding> _windowPipelineBinding;
+	glm::mat4 _windowProjection;
 
 	std::unique_ptr<DeviceBuffer> _vertexBuffer;
 	std::unique_ptr<DeviceBuffer> _indexBuffer;
@@ -47,6 +49,8 @@ private:
 
 	std::unique_ptr<Shader> _vertexShader;
 	std::unique_ptr<Shader> _fragmentShader;
+
+	void calculateProjection();
 
 public:
 	GameWindow(const std::string& title);

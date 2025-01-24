@@ -24,12 +24,12 @@ namespace OpenXcom
 {
 
 VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, uint32_t width, uint32_t height, ImageFormat format)
-	: _context(context)
+	: _context(context), _allocation(nullptr), _width(width), _height(height), _image(nullptr), _imageView(nullptr), _renderPass(nullptr), _framebuffer(nullptr)
 {
 	// Create the render target image
 	vk::ImageCreateInfo imageInfo{};
 	imageInfo.imageType = vk::ImageType::e2D;
-	imageInfo.extent = vk::Extent3D{width, height, 1};
+	imageInfo.extent = vk::Extent3D{_width, _height, 1};
 	imageInfo.mipLevels = 1;
 	imageInfo.arrayLayers = 1;
 	imageInfo.format = vk::Format::eR8G8B8A8Unorm; // 8-bit color with alpha

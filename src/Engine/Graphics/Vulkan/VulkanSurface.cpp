@@ -108,6 +108,16 @@ VulkanSurface::~VulkanSurface()
 	}
 }
 
+uint32_t VulkanSurface::getWidth()
+{
+	return _swapChainExtent.width;
+}
+
+uint32_t VulkanSurface::getHeight()
+{
+	return _swapChainExtent.height;
+}
+
 GraphicsCommand& VulkanSurface::beginCommandPass()
 {
 	// Acquire an image from the swap chain
