@@ -39,7 +39,10 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
+
+ #define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/transform.hpp>
+
 #include <limits>
 
 #include <SimpleRTTR.h>
@@ -125,7 +128,7 @@ GameWindow::GameWindow(const std::string& title)
 {
 	// create the window
 	Engine& engine = getEngine();
-	_window = engine.getPlatformWindowSystem().createWindow("Title", 1024, 768).lock();
+	_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768).lock();
 
 	// load the shaders
 	_vertexShader = engine.getResourceSystem().getShaderManager().loadShaderFromMemory("WindowSurfaceVertShader", vertexShaderSource, ShaderType::Vertex);
@@ -133,8 +136,7 @@ GameWindow::GameWindow(const std::string& title)
 
 	// create a graphics surface for the window
 	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
-	_graphicsSurface = graphicsSystem.createSurface(_window->getHandle());
-
+	_windowSurface = graphicsSystem.createSurface(_window->getHandle());
 
 	// create a render target for the game surface
 	_gameSurface = graphicsSystem.createRenderTarget(320, 200, ImageFormat::RGBA8);
@@ -146,6 +148,7 @@ GameWindow::GameWindow(const std::string& title)
 		.setResourceLayout(ResourceLayoutBuilder()
 			// vertex shader stage
 			.setVertexType<GameScreenVertex>()
+			.setIndexType<uint16_t>()
 			.addPushConstant<glm::mat4>(ShaderStage::Vertex)
 
 			// fragment shader stage
@@ -153,7 +156,7 @@ GameWindow::GameWindow(const std::string& title)
 			.addTexture(0, ShaderStage::Fragment)
 			.build())
 		.setFragmentShader(*_fragmentShader)
-		.setSurface(*_graphicsSurface)
+		.setSurface(*_windowSurface)
 		.build();
 
 	_windowPipeline = engine.getResourceSystem().getPipelineManager().createPipeline(pipeline);
@@ -162,8 +165,13 @@ GameWindow::GameWindow(const std::string& title)
 	_vertexBuffer = engine.getResourceSystem().getBufferManager().createDeviceBuffer<GameScreenVertex>(vertices, 4, BufferUsage::Vertex);
 	_indexBuffer = engine.getResourceSystem().getBufferManager().createDeviceBuffer<uint16_t>(indices, 6, BufferUsage::Index);
 
-	//_windowPipelineBinding->setVertexBuffer(*_vertexBuffer);
-	//_windowPipelineBinding->setIndexBuffer(*_indexBuffer);
+	_windowPipelineBinding->setVertexBuffer(*_vertexBuffer);
+	_windowPipelineBinding->setIndexBuffer(*_indexBuffer);
+
+	//_windowPipelineBinding->setTexture(0, ShaderStage::Fragment, _gameSurface);
+
+	// setup up the window projection
+
 
 	_window->show();
 }
@@ -177,10 +185,43 @@ GameWindow::~GameWindow()
 	_fragmentShader.reset();
 
 	// destroy the surface
-	_graphicsSurface.reset();
+	_windowSurface.reset();
 
 	// destroy the window
 	engine.getPlatformWindowSystem().destroyWindow(_window);
+}
+
+void OpenXcom::GameWindow::calculateProjection()
+{
+	;
+
+	// Define game and window dimensions
+	float gameWidth = static_cast<float>(_gameSurface->getWidth());
+	float gameHeight = static_cast<float>(_gameSurface->getHeight());
+	float windowWidth = static_cast<float>(_windowSurface->getWidth());
+	float windowHeight = static_cast<float>(_windowSurface->getHeight());
+
+	// Calculate aspect ratios
+	float gameAspectRatio = gameWidth / gameHeight;
+	float windowAspectRatio = windowWidth / windowHeight;
+
+	float scaleX = 1.0f;
+	float scaleY = 1.0f;
+
+	if (windowAspectRatio > gameAspectRatio)
+	{
+		// Window is wider than game surface
+		scaleX = gameAspectRatio / windowAspectRatio;
+		// Centered horizontally in NDC, so no offset needed
+	}
+	else
+	{
+		// Window is taller than game surface
+		scaleY = windowAspectRatio / gameAspectRatio;
+		// Centered vertically in NDC, so no offset needed
+	}
+
+	_windowProjection = glm::scale(glm::mat4(1.0f), glm::vec3(scaleX, scaleY, 1.0f));
 }
 
 void GameWindow::update()
@@ -190,7 +231,7 @@ void GameWindow::update()
 	// update the window
 	_window->update();
 
-    GraphicsCommand& command = _graphicsSurface->beginCommandPass();
+    GraphicsCommand& command = _windowSurface->beginCommandPass();
 
 	// Render the game surface
 	{
@@ -201,24 +242,19 @@ void GameWindow::update()
 
 	// Render the window surface
 	{
-		command.beginRenderPass(*_graphicsSurface);
+		command.beginRenderPass(*_windowSurface);
 
 		// most of this is for testing so we can validate the low level rendering
 		////////////////////////////////////////////
 		command.bindPipeline(*_windowPipeline);
 
-
-
-//		command.bindRenderObject();
-
-//		command.drawIndexed();
 		////////////////////////////////////////////
 
 
 		command.endRenderPass();
 	}
 
-	_graphicsSurface->endCommandPass(command);
+	_windowSurface->endCommandPass(command);
 }
 
 } // namespace OpenXcom

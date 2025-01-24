@@ -61,6 +61,8 @@ class ResourceLayoutDefinition
 {
 protected:
 	SimpleRTTR::TypeReference _vertexType;
+	SimpleRTTR::TypeReference _indexType;
+
 	std::vector<UniformBufferDefinition> _uniformBuffers;
 	std::vector<PushConstantDefinition> _pushConstants;
 	std::vector<TextureDefinition> _textures;
@@ -68,11 +70,18 @@ protected:
 	std::vector<CombinedImageSamplerDefinition> _combinedImageSamplers;
 
 public:
-	ResourceLayoutDefinition() : _vertexType(SimpleRTTR::types().get_type<void>().value()) {}
+	ResourceLayoutDefinition()
+		:
+		_vertexType(SimpleRTTR::types().get_type<void>().value()),
+		_indexType(SimpleRTTR::types().get_type<void>().value())
+	{ }
 	~ResourceLayoutDefinition() = default;
 
 	void setVertexType(const SimpleRTTR::Type& type) { _vertexType = type; }
 	SimpleRTTR::Type getVertexType() const { return _vertexType.type(); }
+
+	void setIndexType(const SimpleRTTR::Type& type) { _indexType = type; }
+	SimpleRTTR::Type getIndexType() const { return _indexType.type(); }
 
 	void addUniformBuffer(const UniformBufferDefinition& uniformBuffer) { _uniformBuffers.push_back(uniformBuffer); }
 	const std::vector<UniformBufferDefinition>& getUniformBuffers() const { return _uniformBuffers; }
@@ -104,6 +113,14 @@ public:
 	ResourceLayoutBuilder& setVertexType(const SimpleRTTR::Type& type)
 	{
 		_resourceLayout.setVertexType(type);
+		return *this;
+	}
+
+	template <typename IndexType>
+	ResourceLayoutBuilder& setIndexType();
+	ResourceLayoutBuilder& setIndexType(const SimpleRTTR::Type& type)
+	{
+		_resourceLayout.setIndexType(type);
 		return *this;
 	}
 
@@ -141,20 +158,29 @@ public:
 template <typename VertexType>
 ResourceLayoutBuilder& ResourceLayoutBuilder::setVertexType()
 {
+	assert(SimpleRTTR::types().has_type<VertexType>() && "IndexType not registered with SimpleRTTR");
 	return setVertexType(SimpleRTTR::types().get_type<VertexType>().value());
 }
 
-template <typename VertexType>
-ResourceLayoutBuilder& ResourceLayoutBuilder::addUniformBuffer(uint32_t binding, ShaderStage stage)
+template <typename IndexType>
+ResourceLayoutBuilder& ResourceLayoutBuilder::setIndexType()
 {
-	return addUniformBuffer(SimpleRTTR::types().get_type<VertexType>().value(), binding, stage);
+	assert(SimpleRTTR::types().has_type<IndexType>() && "IndexType not registered with SimpleRTTR");
+	return setIndexType(SimpleRTTR::types().get_type<IndexType>().value());
 }
 
-template <typename VertexType>
+template <typename UniformType>
+ResourceLayoutBuilder& ResourceLayoutBuilder::addUniformBuffer(uint32_t binding, ShaderStage stage)
+{
+	assert(SimpleRTTR::types().has_type<UniformType>() && "UniformType not registered with SimpleRTTR");
+	return addUniformBuffer(SimpleRTTR::types().get_type<UniformType>().value(), binding, stage);
+}
+
+template <typename PushConstantType>
 ResourceLayoutBuilder& ResourceLayoutBuilder::addPushConstant(ShaderStage stage)
 {
-	assert(SimpleRTTR::types().has_type<VertexType>() && "VertexType not registered with SimpleRTTR");
-	return addPushConstant(SimpleRTTR::types().get_type<VertexType>().value(), stage);
+	assert(SimpleRTTR::types().has_type<PushConstantType>() && "PushConstantType not registered with SimpleRTTR");
+	return addPushConstant(SimpleRTTR::types().get_type<PushConstantType>().value(), stage);
 }
 
 class PipelineDefinition

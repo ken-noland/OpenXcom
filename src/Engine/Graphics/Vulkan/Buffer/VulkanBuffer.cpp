@@ -56,9 +56,6 @@ VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, vk::DeviceSize size, 
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
 	allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
 
-	// Explicitly require VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and enforce coherent memory for easy mapping
-	//allocInfo.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-
 	VkBuffer buffer = nullptr;
 	VkBufferCreateInfo createInfo = bufferInfo;
 	vmaCreateBuffer(context.getAllocator(), &createInfo, &allocInfo, &buffer, &_allocation, nullptr);

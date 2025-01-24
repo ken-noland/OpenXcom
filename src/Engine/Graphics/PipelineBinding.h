@@ -21,11 +21,18 @@
 namespace OpenXcom
 {
 
+class DeviceBuffer;
+
 class PipelineBinding
 {
 public:
 	PipelineBinding() = default;
 	virtual ~PipelineBinding() = default;
+
+	virtual void setVertexBuffer(DeviceBuffer& buffer) = 0;
+	virtual void setIndexBuffer(DeviceBuffer& buffer) = 0;
+
+
 };
 
 

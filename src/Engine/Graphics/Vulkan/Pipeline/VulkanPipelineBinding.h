@@ -20,6 +20,7 @@
 
 #include "../../PipelineBinding.h"
 #include <vulkan/vulkan.hpp>
+#include <optional>
 
 namespace OpenXcom
 {
@@ -31,9 +32,15 @@ class VulkanPipelineBinding : public PipelineBinding
 protected:
 	VulkanContext& _context;
 
+	std::optional<std::reference_wrapper<DeviceBuffer>> _vertexBuffer;
+	std::optional<std::reference_wrapper<DeviceBuffer>> _indexBuffer;
+
 public:
 	VulkanPipelineBinding(VulkanContext& context);
 	virtual ~VulkanPipelineBinding();
+
+	virtual void setVertexBuffer(DeviceBuffer& buffer) override { _vertexBuffer = buffer; };
+	virtual void setIndexBuffer(DeviceBuffer& buffer) override { _indexBuffer = buffer; };
 };
 
 } // namespace OpenXcom
