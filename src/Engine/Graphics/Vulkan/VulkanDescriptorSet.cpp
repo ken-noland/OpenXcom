@@ -18,7 +18,7 @@
  */
 #include "VulkanDescriptorSet.h"
 #include "VulkanContext.h"
-#include "../../Resource/Pipeline/PipelineDefinition.h"
+#include "../PipelineDefinition.h"
 
 namespace OpenXcom
 {

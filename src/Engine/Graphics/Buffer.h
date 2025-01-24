@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,33 +18,31 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ResourceSystem.h"
-
-#include "../Graphics/GraphicsSystem.h"
-#include "../Graphics/ShaderManager.h"
-#include "../Graphics/PipelineManager.h"
-#include "../Graphics/BufferManager.h"
-
-#include "Palette/PaletteManager.h"
-#include "Font/FontManager.h"
-#include "Image/ImageManager.h"
-
 namespace OpenXcom
 {
 
-ResourceSystem::ResourceSystem(VirtualFileSystem& virtualFileSystem, GraphicsSystem& graphicsSystem, Options& options)
+enum class BufferUsage
 {
-	_shaderManager = graphicsSystem.createShaderManager();
-	_pipelineManager = graphicsSystem.createPipelineManager();
-	_bufferManager = graphicsSystem.createBufferManager();
+	Vertex,
+	Index,
+	Uniform,
+	Storage,
+};
 
-	_paletteManager = std::make_unique<PaletteManager>();
-	_fontManager = std::make_unique<FontManager>();
-	_imageManager = graphicsSystem.createImageManager();
-}
-
-ResourceSystem::~ResourceSystem()
+class HostBuffer
 {
-}
+public:
+	HostBuffer() = default;
+	virtual ~HostBuffer() = default;
+
+	virtual void copyTo(const void* data, size_t offset, size_t size) = 0;
+};
+
+class DeviceBuffer
+{
+public:
+	DeviceBuffer() = default;
+	virtual ~DeviceBuffer() = default;
+};
 
 } // namespace OpenXcom

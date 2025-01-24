@@ -38,9 +38,6 @@ public:
 	VulkanImageFactory(VulkanContext& context);
 	~VulkanImageFactory();
 
-	// create a render target image(note: this is different from a platform window render target image and doesn't contain a swapchain)
-	std::unique_ptr<VulkanRenderTargetImage> createRenderTarget(uint32_t width, uint32_t height, ImageFormat format);
-
 	// create an empty host image
 	std::unique_ptr<VulkanHostImage> createHostImage(uint32_t width, uint32_t height, ImageFormat format);
 };
@@ -71,22 +68,5 @@ class VulkanDeviceImage : public VulkanImage
 {
 };
 
-class VulkanRenderTargetImage : public RenderTargetImage
-{
-private:
-	VulkanContext& _context;
-
-	VmaAllocation _allocation;
-
-	vk::Image _image;
-	vk::ImageView _imageView;
-
-	vk::RenderPass _renderPass;
-	vk::Framebuffer _framebuffer;
-
-public:
-	VulkanRenderTargetImage(VulkanContext& context, uint32_t width, uint32_t height, ImageFormat format);
-	virtual ~VulkanRenderTargetImage();
-};
 
 } // namespace OpenXcom

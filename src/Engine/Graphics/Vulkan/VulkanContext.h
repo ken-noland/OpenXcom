@@ -80,9 +80,6 @@ protected:
 
 	VmaAllocator _allocator;
 
-	// the factory for creating vertex, index and other buffers
-	std::unique_ptr<VulkanBufferFactory> _bufferFactory;
-
 	// the factory for creating descriptor sets
 	std::unique_ptr<VulkanDescriptorSetFactory> _descriptorSetFactory; // not entirely sure this needs to be here, but keeping it here anyway
 
@@ -112,7 +109,6 @@ public:
 
 	vk::Format getSwapChainImageFormat() { return _swapChainImageFormat; }
 
-	VulkanBufferFactory& getBufferFactory() { return *_bufferFactory; }
 	VulkanDescriptorSetFactory& getDescriptorSetFactory() { return *_descriptorSetFactory; }
 	VulkanPipelineFactory& getPipelineFactory() { return *_pipelineFactory; }
 

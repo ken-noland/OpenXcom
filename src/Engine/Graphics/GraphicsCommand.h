@@ -17,25 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../ResourceManager.h"
-#include "Shader.h"
-
-#include <filesystem>
 
 namespace OpenXcom
 {
 
-class ShaderManager : public ResourceManager<Shader>
+class GraphicsSurface;
+class RenderTarget;
+class Pipeline;
+
+class GraphicsCommand
 {
 public:
-	ShaderManager();
-	virtual ~ShaderManager();
+	GraphicsCommand() = default;
+	virtual ~GraphicsCommand() = default;
 
-	// load shader from memory
-	virtual Handle loadShaderFromMemory(const std::string& name, const std::string shader, ShaderType type = ShaderType::InferFromSource) = 0;
+	virtual void beginRenderPass(RenderTarget& surface) = 0;
+	virtual void endRenderPass() = 0;
 
-	// load shader from file
-	virtual Handle loadShaderFromFile(const std::string& name, const std::filesystem::path& path, ShaderType type = ShaderType::InferFromSource) = 0;
+	virtual void bindPipeline(Pipeline& pipeline) = 0;
 };
 
 } // namespace OpenXcom

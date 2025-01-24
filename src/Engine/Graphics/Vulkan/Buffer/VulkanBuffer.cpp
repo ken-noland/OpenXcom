@@ -18,39 +18,33 @@
  */
 
 #include "VulkanBuffer.h"
-#include "VulkanContext.h"
+#include "../VulkanContext.h"
 
 namespace OpenXcom
 {
 
-VulkanBufferFactory::VulkanBufferFactory(VulkanContext& context)
-	: _context(context)
+vk::BufferUsageFlags VulkanBuffer::getUsageFlags(BufferUsage usage)
 {
+	switch(usage)
+	{
+	case BufferUsage::Vertex:
+		return vk::BufferUsageFlagBits::eVertexBuffer;
+	case BufferUsage::Index:
+		return vk::BufferUsageFlagBits::eIndexBuffer;
+	case BufferUsage::Uniform:
+		return vk::BufferUsageFlagBits::eUniformBuffer;
+	case BufferUsage::Storage:
+		return vk::BufferUsageFlagBits::eStorageBuffer;
+	}
+
+	return vk::BufferUsageFlags();
 }
 
-VulkanBufferFactory::~VulkanBufferFactory()
-{
-}
 
-std::unique_ptr<VulkanHostBuffer> VulkanBufferFactory::createHostBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage)
-{
-	return std::make_unique<VulkanHostBuffer>(_context, usage, size);
-}
-
-std::unique_ptr<VulkanDeviceBuffer> VulkanBufferFactory::createDeviceBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage)
-{
-	return std::make_unique<VulkanDeviceBuffer>(_context, usage, size);
-}
-
-std::unique_ptr<VulkanDeviceBuffer> VulkanBufferFactory::createDeviceBuffer(VulkanHostBuffer& hostBuffer, vk::BufferUsageFlags usage)
-{
-	return std::make_unique<VulkanDeviceBuffer>(_context, usage, hostBuffer);
-}
-
-VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, vk::BufferUsageFlags usage, vk::DeviceSize size)
+VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, vk::DeviceSize size, BufferUsage usage)
 	: VulkanBuffer(context, size)
 {
-	vk::BufferUsageFlags usageFlags = usage | vk::BufferUsageFlagBits::eTransferSrc;
+	vk::BufferUsageFlags usageFlags = getUsageFlags(usage) | vk::BufferUsageFlagBits::eTransferSrc;
 
 	// create a buffer that is only accessible by the CPU
 	vk::BufferCreateInfo bufferInfo{};
@@ -59,7 +53,11 @@ VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, vk::BufferUsageFlags 
 	bufferInfo.sharingMode = vk::SharingMode::eExclusive;
 
 	VmaAllocationCreateInfo allocInfo{};
-	allocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
+	allocInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
+	allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+
+	// Explicitly require VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and enforce coherent memory for easy mapping
+	//allocInfo.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
 	VkBuffer buffer = nullptr;
 	VkBufferCreateInfo createInfo = bufferInfo;
@@ -92,7 +90,7 @@ void VulkanHostBuffer::copyTo(const void* data, size_t offset, size_t size)
 	unmap();
 }
 
-VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, vk::BufferUsageFlags usage, VulkanHostBuffer& hostBuffer)
+VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, VulkanHostBuffer& hostBuffer, BufferUsage usage)
 	: VulkanBuffer(context, hostBuffer.getSize())
 {
 	create(usage);
@@ -102,7 +100,7 @@ VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, vk::BufferUsageFl
 
 }
 
-VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, vk::BufferUsageFlags usage, vk::DeviceSize size)
+VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, vk::DeviceSize size, BufferUsage usage)
 	: VulkanBuffer(context, size)
 {
 	create(usage);
@@ -114,9 +112,9 @@ VulkanDeviceBuffer::~VulkanDeviceBuffer()
 }
 
 /// Create a buffer that is accessible by the GPU
-void VulkanDeviceBuffer::create(vk::BufferUsageFlags usage)
+void VulkanDeviceBuffer::create(BufferUsage usage)
 {
-	vk::BufferUsageFlags usageFlags = usage | vk::BufferUsageFlagBits::eTransferDst;
+	vk::BufferUsageFlags usageFlags = getUsageFlags(usage) | vk::BufferUsageFlagBits::eTransferDst;
 
 	vk::BufferCreateInfo bufferInfo{};
 	bufferInfo.size = _size;
@@ -124,7 +122,7 @@ void VulkanDeviceBuffer::create(vk::BufferUsageFlags usage)
 	bufferInfo.sharingMode = vk::SharingMode::eExclusive;
 
 	VmaAllocationCreateInfo allocInfo{};
-	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+	allocInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 
 	VkBuffer buffer = nullptr;
 	VkBufferCreateInfo createInfo = bufferInfo;
@@ -135,10 +133,8 @@ void VulkanDeviceBuffer::create(vk::BufferUsageFlags usage)
 
 void VulkanDeviceBuffer::update(VulkanHostBuffer& hostBuffer)
 {
-	throw new std::runtime_error("Not implemented");
-
 	//KN NOTE: It's possible that we could use a multithreaded version of this which allows us to push up the contents without
-	// having to wait for the previous command. This would reduce load times, but at the cost of adding complextiy.
+	// having to wait for the previous command. This would reduce load times, but at the cost of adding complexity.
 	vk::Result result = vk::Result::eSuccess;
 
 	vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
@@ -165,5 +161,6 @@ void VulkanDeviceBuffer::update(VulkanHostBuffer& hostBuffer)
 
 	transferQueue.waitIdle();
 }
+
 
 } // namespace OpenXcom

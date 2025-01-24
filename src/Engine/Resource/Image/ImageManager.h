@@ -23,8 +23,6 @@ namespace OpenXcom
 {
 
 enum class ImageFormat;
-
-class RenderTargetImage;
 class Image;
 
 class ImageManager
@@ -32,8 +30,6 @@ class ImageManager
 public:
 	ImageManager() = default;
 	virtual ~ImageManager() = default;
-
-	virtual std::unique_ptr<RenderTargetImage> createRenderTarget(int width, int height, ImageFormat format) = 0;
 };
 
 } // namespace OpenXcom

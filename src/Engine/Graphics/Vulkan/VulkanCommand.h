@@ -17,23 +17,36 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include <vk_mem_alloc.h> // VMA
+#include "../GraphicsCommand.h"
+#include <vulkan/vulkan.hpp>
 
 namespace OpenXcom
 {
 
-class VulkanResource
+class VulkanContext;
+class RenderTarget;
+class Pipeline;
+
+class VulkanCommand : public GraphicsCommand
 {
-public:
-	VulkanResource(VmaAllocator allocator) : _allocator(allocator) {}
-	virtual ~VulkanResource() = default;
-
-	// Virtual methods for resource-specific operations
-	virtual void destroy() = 0;
-
 protected:
-	VmaAllocator _allocator;
+	VulkanContext& _context;
+	RenderTarget* _surface;
+
+	vk::CommandBuffer _commandBuffer;
+
+public:
+	VulkanCommand(VulkanContext& context);
+	virtual ~VulkanCommand();
+
+	virtual void beginRenderPass(RenderTarget& surface) override;
+	virtual void endRenderPass() override;
+
+	virtual void bindPipeline(Pipeline& pipeline) override;
+
+
+	void setCommandBuffer(const vk::CommandBuffer& commandBuffer) { _commandBuffer = commandBuffer; }
+	vk::CommandBuffer& getCommandBuffer() { return _commandBuffer; }
 };
 
 } // namespace OpenXcom

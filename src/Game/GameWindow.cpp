@@ -20,14 +20,20 @@
 #include "../Engine/Engine.h"
 #include "../Engine/Platform/WindowSystem.h"
 #include "../Engine/Platform/Window.h"
+
 #include "../Engine/Graphics/GraphicsSystem.h"
 #include "../Engine/Graphics/GraphicsSurface.h"
+#include "../Engine/Graphics/GraphicsCommand.h"
+#include "../Engine/Graphics/Buffer.h"
+#include "../Engine/Graphics/BufferManager.h"
+#include "../Engine/Graphics/Pipeline.h"
+#include "../Engine/Graphics/PipelineBinding.h"
+#include "../Engine/Graphics/PipelineDefinition.h"
+#include "../Engine/Graphics/PipelineManager.h"
+#include "../Engine/Graphics/ShaderManager.h"
+#include "../Engine/Graphics/Shader.h"
+
 #include "../Engine/Resource/ResourceSystem.h"
-#include "../Engine/Resource/Shader/ShaderManager.h"
-#include "../Engine/Resource/Shader/Shader.h"
-#include "../Engine/Resource/Pipeline/Pipeline.h"
-#include "../Engine/Resource/Pipeline/PipelineDefinition.h"
-#include "../Engine/Resource/Pipeline/PipelineManager.h"
 #include "../Engine/Resource/Image/ImageManager.h"
 #include "../Engine/Resource/Image/Image.h"
 
@@ -82,6 +88,17 @@ struct GameScreenVertex
 	glm::vec2 texCoord;
 };
 
+GameScreenVertex vertices[] = {
+	{{-1.0f, -1.0f}, {0.0f, 0.0f}}, // Bottom-left
+	{{1.0f, -1.0f}, {1.0f, 0.0f}},  // Bottom-right
+	{{1.0f, 1.0f}, {1.0f, 1.0f}},   // Top-right
+	{{-1.0f, 1.0f}, {0.0f, 1.0f}}   // Top-left
+};
+
+// Indices for two triangles forming a rectangle
+uint16_t indices[] = {0, 1, 2, 2, 3, 0};
+
+
 // Run time type information
 SIMPLERTTR
 {
@@ -120,13 +137,12 @@ GameWindow::GameWindow(const std::string& title)
 
 
 	// create a render target for the game surface
-	_renderTargetImage = engine.getResourceSystem().getImageManager().createRenderTarget(320, 200, ImageFormat::RGBA8);
+	_gameSurface = graphicsSystem.createRenderTarget(320, 200, ImageFormat::RGBA8);
 
-	// TODO: Move all of this into GraphicsSystem(api agnostic) so we don't see this stuff clogging up the game code
 	PipelineBuilder pipelineBuilder;
 
 	PipelineDefinition pipeline = pipelineBuilder
-		.setVertexShader(_vertexShader)
+		.setVertexShader(*_vertexShader)
 		.setResourceLayout(ResourceLayoutBuilder()
 			// vertex shader stage
 			.setVertexType<GameScreenVertex>()
@@ -136,12 +152,18 @@ GameWindow::GameWindow(const std::string& title)
 			.addCombinedImageSampler(0, ShaderStage::Fragment)
 			.addTexture(0, ShaderStage::Fragment)
 			.build())
-		.setFragmentShader(_fragmentShader)
+		.setFragmentShader(*_fragmentShader)
 		.setSurface(*_graphicsSurface)
 		.build();
 
 	_windowPipeline = engine.getResourceSystem().getPipelineManager().createPipeline(pipeline);
+	_windowPipelineBinding = _windowPipeline->createBinding();
 
+	_vertexBuffer = engine.getResourceSystem().getBufferManager().createDeviceBuffer<GameScreenVertex>(vertices, 4, BufferUsage::Vertex);
+	_indexBuffer = engine.getResourceSystem().getBufferManager().createDeviceBuffer<uint16_t>(indices, 6, BufferUsage::Index);
+
+	//_windowPipelineBinding->setVertexBuffer(*_vertexBuffer);
+	//_windowPipelineBinding->setIndexBuffer(*_indexBuffer);
 
 	_window->show();
 }
@@ -151,9 +173,8 @@ GameWindow::~GameWindow()
 	Engine& engine = getEngine();
 
 	// unload the shaders
-	ShaderManager& shaderManager = engine.getResourceSystem().getShaderManager();
-	shaderManager.remove(_vertexShader);
-	shaderManager.remove(_fragmentShader);
+	_vertexShader.reset();
+	_fragmentShader.reset();
 
 	// destroy the surface
 	_graphicsSurface.reset();
@@ -169,38 +190,35 @@ void GameWindow::update()
 	// update the window
 	_window->update();
 
-	// render the game surface to the window
-	_graphicsSurface->draw();
+    GraphicsCommand& command = _graphicsSurface->beginCommandPass();
 
-	//// update the game surface
-	//RenderTargetImage& renderTargetImage = *_renderTargetImage;
-	//renderTargetImage.clear(Color(0, 0, 0, 255));
+	// Render the game surface
+	{
+		command.beginRenderPass(*_gameSurface);
+		// Perform game-specific rendering
+		command.endRenderPass();
+	}
 
-	//// render the game surface
-	//{
-	//	// bind the render target
-	//	_graphicsSurface->bindRenderTarget(renderTargetImage);
-	//	// bind the shaders
-	//	ShaderManager& shaderManager = engine.getResourceSystem().getShaderManager();
-	//	Shader& vertexShader = shaderManager.get(_vertexShader);
-	//	Shader& fragmentShader = shaderManager.get(_fragmentShader);
-	//	// bind the shaders
-	//	_graphicsSurface->bindShader(vertexShader, fragmentShader);
-	//	// bind the game surface
-	//	_graphicsSurface->bindTexture(0, renderTargetImage);
-	//	// bind the push constants
-	//	_graphicsSurface->bindPushConstants(0, sizeof(glm::mat4), &_transform);
-	//	// draw the game surface
-	//	_graphicsSurface->draw();
-	//	// unbind the game surface
-	//	_graphicsSurface->unbindTexture(0);
-	//	// unbind the shaders
-	//	_graphicsSurface->unbindShader();
-	//	// unbind the render target
-	//	_graphicsSurface->unbindRenderTarget();
-	//}
-	//// present the game surface
-	//_graphicsSurface->present();
+	// Render the window surface
+	{
+		command.beginRenderPass(*_graphicsSurface);
+
+		// most of this is for testing so we can validate the low level rendering
+		////////////////////////////////////////////
+		command.bindPipeline(*_windowPipeline);
+
+
+
+//		command.bindRenderObject();
+
+//		command.drawIndexed();
+		////////////////////////////////////////////
+
+
+		command.endRenderPass();
+	}
+
+	_graphicsSurface->endCommandPass(command);
 }
 
 } // namespace OpenXcom

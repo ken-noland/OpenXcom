@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,33 +18,22 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ResourceSystem.h"
-
-#include "../Graphics/GraphicsSystem.h"
-#include "../Graphics/ShaderManager.h"
-#include "../Graphics/PipelineManager.h"
-#include "../Graphics/BufferManager.h"
-
-#include "Palette/PaletteManager.h"
-#include "Font/FontManager.h"
-#include "Image/ImageManager.h"
+#include "../../PipelineBinding.h"
+#include <vulkan/vulkan.hpp>
 
 namespace OpenXcom
 {
 
-ResourceSystem::ResourceSystem(VirtualFileSystem& virtualFileSystem, GraphicsSystem& graphicsSystem, Options& options)
-{
-	_shaderManager = graphicsSystem.createShaderManager();
-	_pipelineManager = graphicsSystem.createPipelineManager();
-	_bufferManager = graphicsSystem.createBufferManager();
+class VulkanContext;
 
-	_paletteManager = std::make_unique<PaletteManager>();
-	_fontManager = std::make_unique<FontManager>();
-	_imageManager = graphicsSystem.createImageManager();
-}
-
-ResourceSystem::~ResourceSystem()
+class VulkanPipelineBinding : public PipelineBinding
 {
-}
+protected:
+	VulkanContext& _context;
+
+public:
+	VulkanPipelineBinding(VulkanContext& context);
+	virtual ~VulkanPipelineBinding();
+};
 
 } // namespace OpenXcom

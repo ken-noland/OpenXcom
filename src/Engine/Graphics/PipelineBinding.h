@@ -17,42 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <memory>
-#include <string>
 
 namespace OpenXcom
 {
 
-class PlatformWindow;
-class GraphicsSurface;
-class Pipeline;
-class PipelineBinding;
-class DeviceBuffer;
-class RenderTarget;
-class Shader;
-
-class GameWindow
+class PipelineBinding
 {
-private:
-	std::shared_ptr<PlatformWindow> _window;
-	std::unique_ptr<GraphicsSurface> _graphicsSurface;
-
-	std::unique_ptr<Pipeline> _windowPipeline;
-	std::unique_ptr<PipelineBinding> _windowPipelineBinding;
-
-	std::unique_ptr<DeviceBuffer> _vertexBuffer;
-	std::unique_ptr<DeviceBuffer> _indexBuffer;
-
-	std::unique_ptr<RenderTarget> _gameSurface;
-
-	std::unique_ptr<Shader> _vertexShader;
-	std::unique_ptr<Shader> _fragmentShader;
-
 public:
-	GameWindow(const std::string& title);
-	~GameWindow();
-
-	void update();
+	PipelineBinding() = default;
+	virtual ~PipelineBinding() = default;
 };
+
 
 } // namespace OpenXcom

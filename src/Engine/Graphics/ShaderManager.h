@@ -17,15 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "Shader.h"
+#include <filesystem>
 
 namespace OpenXcom
 {
 
-class Pipeline
+class ShaderManager
 {
 public:
-	Pipeline() = default;
-	virtual ~Pipeline() = default;
+	ShaderManager();
+	virtual ~ShaderManager();
+
+	// load shader from memory
+	virtual std::unique_ptr<Shader> loadShaderFromMemory(const std::string& name, const std::string shader, ShaderType type = ShaderType::InferFromSource) = 0;
+
+	// load shader from file
+	virtual std::unique_ptr<Shader> loadShaderFromFile(const std::string& name, const std::filesystem::path& path, ShaderType type = ShaderType::InferFromSource) = 0;
 };
 
 } // namespace OpenXcom

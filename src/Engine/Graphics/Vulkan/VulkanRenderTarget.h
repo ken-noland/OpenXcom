@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,34 +17,37 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "../GraphicsSurface.h"
 
-#include "ResourceSystem.h"
+#include <vulkan/vulkan.hpp>
+#include <vk_mem_alloc.h> // VMA
 
-#include "../Graphics/GraphicsSystem.h"
-#include "../Graphics/ShaderManager.h"
-#include "../Graphics/PipelineManager.h"
-#include "../Graphics/BufferManager.h"
-
-#include "Palette/PaletteManager.h"
-#include "Font/FontManager.h"
-#include "Image/ImageManager.h"
 
 namespace OpenXcom
 {
 
-ResourceSystem::ResourceSystem(VirtualFileSystem& virtualFileSystem, GraphicsSystem& graphicsSystem, Options& options)
-{
-	_shaderManager = graphicsSystem.createShaderManager();
-	_pipelineManager = graphicsSystem.createPipelineManager();
-	_bufferManager = graphicsSystem.createBufferManager();
+enum class ImageFormat;
+class VulkanContext;
 
-	_paletteManager = std::make_unique<PaletteManager>();
-	_fontManager = std::make_unique<FontManager>();
-	_imageManager = graphicsSystem.createImageManager();
-}
-
-ResourceSystem::~ResourceSystem()
+class VulkanRenderTarget : public RenderTarget
 {
-}
+private:
+	VulkanContext& _context;
+
+	VmaAllocation _allocation;
+
+	vk::Image _image;
+	vk::ImageView _imageView;
+
+	vk::RenderPass _renderPass;
+	vk::Framebuffer _framebuffer;
+
+public:
+	VulkanRenderTarget(VulkanContext& context, uint32_t width, uint32_t height, ImageFormat format);
+	virtual ~VulkanRenderTarget();
+	
+	virtual void beginRenderPass(GraphicsCommand& commandContext) override;
+	virtual void endRenderPass(GraphicsCommand& commandContext) override;
+};
 
 } // namespace OpenXcom

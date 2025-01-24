@@ -37,9 +37,12 @@ public:
 	virtual ~VulkanSystem();
 
 	virtual std::unique_ptr<GraphicsSurface> createSurface(const PlatformWindowHandle& handle) override;
+	virtual std::unique_ptr<RenderTarget> createRenderTarget(int width, int height, ImageFormat format) override;
 
 	virtual std::unique_ptr<ShaderManager> createShaderManager() override;
 	virtual std::unique_ptr<PipelineManager> createPipelineManager() override;
+	virtual std::unique_ptr<BufferManager> createBufferManager() override;
+
 	virtual std::unique_ptr<FontManager> createFontManager() override;
 	virtual std::unique_ptr<ImageManager> createImageManager() override;
 	virtual std::unique_ptr<PaletteManager> createPaletteManager() override;

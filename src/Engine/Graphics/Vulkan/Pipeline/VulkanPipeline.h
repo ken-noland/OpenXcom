@@ -18,8 +18,8 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../Resource/Pipeline/Pipeline.h"
-#include "../../../Resource/Pipeline/PipelineDefinition.h"
+#include "../../Pipeline.h"
+#include "../../PipelineDefinition.h"
 #include <vulkan/vulkan.hpp>
 
 namespace OpenXcom
@@ -48,7 +48,7 @@ protected:
 
 	void createVertexInputInfo(vk::VertexInputBindingDescription& bindingDescription, std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions, vk::PipelineVertexInputStateCreateInfo& vertexInputInfo);
 	void createInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo& inputAssembly);
-	void createViewportState(vk::PipelineViewportStateCreateInfo& viewportState, vk::Viewport& viewport, vk::Rect2D& scissor);
+	void createViewportState(vk::PipelineViewportStateCreateInfo& viewportState, vk::Viewport& viewport, vk::Rect2D& scissor, VulkanSurface& surface);
 	void createRasterizerState(vk::PipelineRasterizationStateCreateInfo& rasterizer);
 	void createMultisampleState(vk::PipelineMultisampleStateCreateInfo& multisampling);
 	void createColorBlendState(vk::PipelineColorBlendStateCreateInfo& colorBlending, vk::PipelineColorBlendAttachmentState& colorBlendAttachment);
@@ -73,8 +73,12 @@ public:
 	VulkanPipeline(VulkanContext& context, const PipelineDefinition& pipelineDefinition);
 	virtual ~VulkanPipeline();
 
+	virtual std::unique_ptr<PipelineBinding> createBinding() override;
+
+
 	vk::Pipeline& getPipeline() { return _pipeline; }
 	vk::PipelineLayout& getPipelineLayout() { return _pipelineLayout; }
+
 
 };
 

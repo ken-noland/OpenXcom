@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,42 +16,41 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <memory>
-#include <string>
+#include "VulkanCommand.h"
+#include "VulkanSurface.h"
+#include "Pipeline/VulkanPipeline.h"
 
 namespace OpenXcom
 {
 
-class PlatformWindow;
-class GraphicsSurface;
-class Pipeline;
-class PipelineBinding;
-class DeviceBuffer;
-class RenderTarget;
-class Shader;
-
-class GameWindow
+VulkanCommand::VulkanCommand(VulkanContext& context)
+	: _context(context), _surface(nullptr)
 {
-private:
-	std::shared_ptr<PlatformWindow> _window;
-	std::unique_ptr<GraphicsSurface> _graphicsSurface;
+}
 
-	std::unique_ptr<Pipeline> _windowPipeline;
-	std::unique_ptr<PipelineBinding> _windowPipelineBinding;
+VulkanCommand::~VulkanCommand()
+{
+}
 
-	std::unique_ptr<DeviceBuffer> _vertexBuffer;
-	std::unique_ptr<DeviceBuffer> _indexBuffer;
+void VulkanCommand::beginRenderPass(RenderTarget& surface)
+{
+	assert(_surface == nullptr);
 
-	std::unique_ptr<RenderTarget> _gameSurface;
+	_surface = &surface;
+	_surface->beginRenderPass(*this);
+}
 
-	std::unique_ptr<Shader> _vertexShader;
-	std::unique_ptr<Shader> _fragmentShader;
+void VulkanCommand::endRenderPass()
+{
+	assert(_surface != nullptr);
 
-public:
-	GameWindow(const std::string& title);
-	~GameWindow();
+	_surface->endRenderPass(*this);
+	_surface = nullptr;
+}
 
-	void update();
-};
+void VulkanCommand::bindPipeline(Pipeline& pipeline)
+{
+	VulkanPipeline& vulkanPipeline = static_cast<VulkanPipeline&>(pipeline);
+}
 
 } // namespace OpenXcom

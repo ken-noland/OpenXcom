@@ -89,23 +89,16 @@ std::vector<uint32_t> VulkanShaderManager::compileGLSL(const std::string& source
 }
 
 
-VulkanShaderManager::Handle VulkanShaderManager::loadShaderFromMemory(const std::string& name, const std::string shader, ShaderType type)
+std::unique_ptr<Shader> VulkanShaderManager::loadShaderFromMemory(const std::string& name, const std::string shader, ShaderType type)
 {
 	std::vector<uint32_t> spirv = compileGLSL(shader, type);
 	std::unique_ptr<VulkanShader> vulkanShader = std::make_unique<VulkanShader>(name, _context.getDevice(), spirv);
-	return add(std::move(vulkanShader));
+	return std::move(vulkanShader);
 }
 
-VulkanShaderManager::Handle VulkanShaderManager::loadShaderFromFile(const std::string& name, const std::filesystem::path& path, ShaderType type)
+std::unique_ptr<Shader> VulkanShaderManager::loadShaderFromFile(const std::string& name, const std::filesystem::path& path, ShaderType type)
 {
-	return Handle();
+	return nullptr;
 }
-
-void VulkanShaderManager::clear()
-{
-	//just remove it all
-	_resources.clear();
-}
-
 
 } // namespace OpenXcom

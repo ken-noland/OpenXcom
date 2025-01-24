@@ -18,15 +18,13 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../Resource/Pipeline/PipelineManager.h"
+#include "../../PipelineManager.h"
 
 namespace OpenXcom
 {
 
 class VulkanContext;
 class VulkanPipeline;
-
-
 
 class VulkanPipelineManager : public PipelineManager
 {

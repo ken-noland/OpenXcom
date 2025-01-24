@@ -19,16 +19,14 @@
 
 #include "VulkanSystem.h"
 #include "VulkanSurface.h"
+#include "VulkanRenderTarget.h"
 
 #include "Font/VulkanFontManager.h"
 #include "Image/VulkanImageManager.h"
 #include "Palette/VulkanPaletteManager.h"
 #include "Shader/VulkanShaderManager.h"
 #include "Pipeline/VulkanPipelineManager.h"
-
-
-
-
+#include "Buffer/VulkanBufferManager.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
 
@@ -52,6 +50,11 @@ std::unique_ptr<GraphicsSurface> VulkanSystem::createSurface(const PlatformWindo
 	return std::make_unique<VulkanSurface>(_context, handle);
 }
 
+std::unique_ptr<RenderTarget> VulkanSystem::createRenderTarget(int width, int height, ImageFormat format)
+{
+	return std::make_unique<VulkanRenderTarget>(_context, width, height, format);
+}
+
 std::unique_ptr<ShaderManager> VulkanSystem::createShaderManager()
 {
 	return std::make_unique<VulkanShaderManager>(_context);
@@ -60,6 +63,11 @@ std::unique_ptr<ShaderManager> VulkanSystem::createShaderManager()
 std::unique_ptr<PipelineManager> VulkanSystem::createPipelineManager()
 {
 	return std::make_unique<VulkanPipelineManager>(_context);
+}
+
+std::unique_ptr<BufferManager> VulkanSystem::createBufferManager()
+{
+	return std::make_unique<VulkanBufferManager>(_context);
 }
 
 std::unique_ptr<FontManager> VulkanSystem::createFontManager()

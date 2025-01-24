@@ -34,12 +34,6 @@ public:
 	virtual ~Image() = default;
 };
 
-class RenderTargetImage : public Image
-{
-public:
-	RenderTargetImage() = default;
-	virtual ~RenderTargetImage() = default;
-};
 
 
 } // namespace OpenXcom

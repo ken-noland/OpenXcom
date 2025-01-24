@@ -38,7 +38,6 @@ public:
 	VulkanImageManager(VulkanContext& context);
 	virtual ~VulkanImageManager() = default;
 
-	virtual std::unique_ptr<RenderTargetImage> createRenderTarget(int width, int height, ImageFormat format) override;
 	//virtual std::unique_ptr<RenderTargetImage> createRenderTarget(int width, int height, ImageFormat format);
 };
 

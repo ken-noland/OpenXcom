@@ -19,6 +19,7 @@
 
 #include "VulkanSurface.h"
 #include "VulkanContext.h"
+#include "VulkanCommand.h"
 
 #include "Shader/VulkanShader.h"
 
@@ -27,7 +28,6 @@
 #include "../../Platform/Window.h"
 #include "../../Engine.h"
 #include "../../Resource/ResourceSystem.h"
-#include "../../Resource/Shader/ShaderManager.h"
 #include "../../Logger.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -79,67 +79,21 @@ namespace OpenXcom
 {
 
 VulkanSurface::VulkanSurface(VulkanContext& context, const PlatformWindowHandle& window)
-	: _context(context), _surface(nullptr), _swapChain(nullptr), _swapChainImageFormat(vk::Format::eUndefined), _swapChainExtent{}, _frames(),
-	  _renderPass(nullptr), _currentFrame(0), _windowHandle(window)
+	: _context(context), _surface(nullptr), _swapChain(nullptr), _swapChainImageFormat(vk::Format::eUndefined), _swapChainExtent{},
+	_frames(), _currentFrame(0), _renderPass(nullptr), _windowHandle(window)
 {
 	_surface = createSurface(_context.getInstance(), window);
 
 	initializeSwapChain();
 	initializeRenderPass();
 	initializeFrames();
+
+	_commandContext = std::make_unique<VulkanCommand>(_context);
 }
 
 VulkanSurface::~VulkanSurface()
 {
 	destroySwapChain();
-
-	if (_gameFramebuffer)
-	{
-		_context.getDevice().destroyFramebuffer(_gameFramebuffer);
-		_gameFramebuffer = nullptr;
-	}
-
-	if (_gameImageView)
-	{
-		_context.getDevice().destroyImageView(_gameImageView);
-		_gameImageView = nullptr;
-	}
-
-	if (_gameImage)
-	{
-		_context.getDevice().destroyImage(_gameImage);
-		_gameImage = nullptr;
-	}
-
-	if (_gameImageMemory)
-	{
-		_context.getDevice().freeMemory(_gameImageMemory);
-		_gameImageMemory = nullptr;
-	}
-
-	if (_gameRenderPass)
-	{
-		_context.getDevice().destroyRenderPass(_gameRenderPass);
-		_gameRenderPass = nullptr;
-	}
-
-	if (_descriptorPool)
-	{
-		_context.getDevice().destroyDescriptorPool(_descriptorPool);
-		_descriptorPool = nullptr;
-	}
-
-	if (_descriptorSetLayout)
-	{
-		_context.getDevice().destroyDescriptorSetLayout(_descriptorSetLayout);
-		_descriptorSetLayout = nullptr;
-	}
-
-	if (_textureSampler)
-	{
-		_context.getDevice().destroySampler(_textureSampler);
-		_textureSampler = nullptr;
-	}
 
 	if (_commandPool)
 	{
@@ -152,6 +106,122 @@ VulkanSurface::~VulkanSurface()
 		destroySurface(_context.getInstance(), _surface);
 		_surface = nullptr;
 	}
+}
+
+GraphicsCommand& VulkanSurface::beginCommandPass()
+{
+	// Acquire an image from the swap chain
+	vk::Result result = vk::Result::eErrorUnknown;
+
+    // Retry loop for acquireNextImageKHR
+	while (true)
+	{
+		result = _context.getDevice().acquireNextImageKHR(
+			_swapChain,
+			UINT64_MAX, // Timeout
+			_frames[_currentFrame].imageAvailableSemaphore,
+			nullptr,
+			&_imageIndex);
+
+		if (result == vk::Result::eSuccess || result == vk::Result::eSuboptimalKHR)
+		{
+			// Successfully acquired an image
+			break;
+		}
+		else if (result == vk::Result::eErrorOutOfDateKHR)
+		{
+			// Handle window resize (recreate swap chain)
+			handleResize();
+
+			// After handling the resize, try again
+			continue;
+		}
+		else
+		{
+			// Unrecoverable error
+			throw std::runtime_error("Failed to acquire swap chain image!");
+		}
+	}
+
+	result = _context.getDevice().waitForFences(1, &_frames[_currentFrame].inFlightFence, VK_TRUE, UINT64_MAX);
+	result = _context.getDevice().resetFences(1, &_frames[_currentFrame].inFlightFence);
+
+	vk::CommandBuffer& commandBuffer = _frames[_currentFrame].commandBuffer;
+
+	vk::CommandBufferBeginInfo beginInfo{};
+	commandBuffer.begin(beginInfo);
+
+	_commandContext->setCommandBuffer(commandBuffer);
+
+	return *_commandContext;
+}
+
+void VulkanSurface::endCommandPass(GraphicsCommand& command)
+{
+	(void)command; // not using this parameter
+	assert(&command == _commandContext.get());
+
+	vk::CommandBuffer& commandBuffer = _frames[_currentFrame].commandBuffer;
+	commandBuffer.end();
+
+	// Use the current frame's synchronization objects
+	vk::Semaphore waitSemaphores[] = {_frames[_currentFrame].imageAvailableSemaphore};
+	vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
+	vk::Semaphore signalSemaphores[] = {_frames[_currentFrame].renderFinishedSemaphore};
+
+	// Submit the command buffer for execution
+	vk::SubmitInfo submitInfo{};
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitDstStageMask = waitStages;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = signalSemaphores;
+
+	vk::Result result = _context.getGraphicsQueue().getQueue().submit(1, &submitInfo, _frames[_currentFrame].inFlightFence);
+
+	// Present the image
+	vk::PresentInfoKHR presentInfo{};
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = signalSemaphores; // Wait for rendering to finish
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = &_swapChain;
+	presentInfo.pImageIndices = &_imageIndex; // Present the acquired image index
+
+	result = _context.getPresentQueue().getQueue().presentKHR(&presentInfo);
+	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
+	{
+		handleResize(); // Handle window resize (recreate swapchain)
+		return;
+	}
+	else if (result != vk::Result::eSuccess)
+	{
+		throw std::runtime_error("Failed to present swapchain image!");
+	}
+		
+	// Increment the frame index, wrapping around the number of frames in flight
+	_currentFrame = (_currentFrame + 1) % _frames.size();
+}
+
+void VulkanSurface::beginRenderPass(GraphicsCommand& command)
+{
+	vk::RenderPassBeginInfo renderPassInfo{};
+	renderPassInfo.renderPass = _renderPass;
+	renderPassInfo.framebuffer = _frames[_currentFrame].framebuffer;
+	renderPassInfo.renderArea.offset = vk::Offset2D{0, 0};
+	renderPassInfo.renderArea.extent = _swapChainExtent;
+
+	vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.2f, 0.2f, 0.2f, 1.0f});
+	renderPassInfo.clearValueCount = 1;
+	renderPassInfo.pClearValues = &clearColor;
+
+	_commandContext->getCommandBuffer().beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+}
+
+void VulkanSurface::endRenderPass(GraphicsCommand& command)
+{
+	_commandContext->getCommandBuffer().endRenderPass();
 }
 
 // Function to get the client area dimensions
@@ -434,127 +504,127 @@ void VulkanSurface::handleResize()
 }
 
 
-void VulkanSurface::draw()
-{
-	uint32_t imageIndex = 0;
-
-	// Acquire an image from the swap chain
-	vk::Result result = _context.getDevice().acquireNextImageKHR(_swapChain, UINT64_MAX, _frames[_currentFrame].imageAvailableSemaphore, nullptr, &imageIndex);
-
-	if (result == vk::Result::eErrorOutOfDateKHR)
-	{
-		// Handle window resize (recreate swap chain)
-		handleResize();
-		return;
-	}
-	else if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR)
-	{
-		throw std::runtime_error("Failed to acquire swap chain image!");
-	}
-
-	result = _context.getDevice().waitForFences(1, &_frames[_currentFrame].inFlightFence, VK_TRUE, UINT64_MAX);
-	result = _context.getDevice().resetFences(1, &_frames[_currentFrame].inFlightFence);
-
-	recordCommandBuffer(_frames[_currentFrame], imageIndex);
-
-	vk::Semaphore waitSemaphores[] = {_frames[_currentFrame].imageAvailableSemaphore};
-	vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
-	vk::Semaphore signalSemaphores[] = {_frames[_currentFrame].renderFinishedSemaphore};
-
-	vk::SubmitInfo submitInfo{};
-	submitInfo.waitSemaphoreCount = 1;
-	submitInfo.pWaitSemaphores = waitSemaphores;
-	submitInfo.pWaitDstStageMask = waitStages;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &_frames[_currentFrame].commandBuffer;
-	submitInfo.signalSemaphoreCount = 1;
-	submitInfo.pSignalSemaphores = signalSemaphores;
-
-	result = _context.getGraphicsQueue().getQueue().submit(1, &submitInfo, _frames[_currentFrame].inFlightFence);
-
-	vk::PresentInfoKHR presentInfo{};
-	presentInfo.waitSemaphoreCount = 1;
-	presentInfo.pWaitSemaphores = signalSemaphores;
-	presentInfo.swapchainCount = 1;
-	presentInfo.pSwapchains = &_swapChain;
-	presentInfo.pImageIndices = &imageIndex;
-
-	result = _context.getPresentQueue().getQueue().presentKHR(&presentInfo);
-	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
-	{
-		// Handle window resize (recreate swap chain)
-		handleResize();
-		return;
-	}
-	else if (result != vk::Result::eSuccess)
-	{
-		throw std::runtime_error("Failed to present swap chain image!");
-	}
-
-	_currentFrame = (_currentFrame + 1) % _frames.size();
-}
-
-void VulkanSurface::recordCommandBuffer(FrameData& frame, uint32_t imageIndex)
-{
-	vk::CommandBuffer& commandBuffer = frame.commandBuffer;
-
-	vk::CommandBufferBeginInfo beginInfo{};
-	commandBuffer.begin(beginInfo);
-
-//	commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline->getPipeline());
-//	commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, _pipeline->getPipelineLayout(), 0, _descriptorSet, {});
+//void VulkanSurface::draw()
+//{
+//	uint32_t imageIndex = 0;
 //
-//	// render the game surface
+//	// Acquire an image from the swap chain
+//	vk::Result result = _context.getDevice().acquireNextImageKHR(_swapChain, UINT64_MAX, _frames[_currentFrame].imageAvailableSemaphore, nullptr, &imageIndex);
+//
+//	if (result == vk::Result::eErrorOutOfDateKHR)
 //	{
-//		vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.5f, 0.5f, 0.5f, 1.0f}); // Gray
+//		// Handle window resize (recreate swap chain)
+//		handleResize();
+//		return;
+//	}
+//	else if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR)
+//	{
+//		throw std::runtime_error("Failed to acquire swap chain image!");
+//	}
 //
+//	result = _context.getDevice().waitForFences(1, &_frames[_currentFrame].inFlightFence, VK_TRUE, UINT64_MAX);
+//	result = _context.getDevice().resetFences(1, &_frames[_currentFrame].inFlightFence);
+//
+//	recordCommandBuffer(_frames[_currentFrame], imageIndex);
+//
+//	vk::Semaphore waitSemaphores[] = {_frames[_currentFrame].imageAvailableSemaphore};
+//	vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
+//	vk::Semaphore signalSemaphores[] = {_frames[_currentFrame].renderFinishedSemaphore};
+//
+//	vk::SubmitInfo submitInfo{};
+//	submitInfo.waitSemaphoreCount = 1;
+//	submitInfo.pWaitSemaphores = waitSemaphores;
+//	submitInfo.pWaitDstStageMask = waitStages;
+//	submitInfo.commandBufferCount = 1;
+//	submitInfo.pCommandBuffers = &_frames[_currentFrame].commandBuffer;
+//	submitInfo.signalSemaphoreCount = 1;
+//	submitInfo.pSignalSemaphores = signalSemaphores;
+//
+//	result = _context.getGraphicsQueue().getQueue().submit(1, &submitInfo, _frames[_currentFrame].inFlightFence);
+//
+//	vk::PresentInfoKHR presentInfo{};
+//	presentInfo.waitSemaphoreCount = 1;
+//	presentInfo.pWaitSemaphores = signalSemaphores;
+//	presentInfo.swapchainCount = 1;
+//	presentInfo.pSwapchains = &_swapChain;
+//	presentInfo.pImageIndices = &imageIndex;
+//
+//	result = _context.getPresentQueue().getQueue().presentKHR(&presentInfo);
+//	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
+//	{
+//		// Handle window resize (recreate swap chain)
+//		handleResize();
+//		return;
+//	}
+//	else if (result != vk::Result::eSuccess)
+//	{
+//		throw std::runtime_error("Failed to present swap chain image!");
+//	}
+//
+//	_currentFrame = (_currentFrame + 1) % _frames.size();
+//}
+//
+//void VulkanSurface::recordCommandBuffer(FrameData& frame, uint32_t imageIndex)
+//{
+//	vk::CommandBuffer& commandBuffer = frame.commandBuffer;
+//
+//	vk::CommandBufferBeginInfo beginInfo{};
+//	commandBuffer.begin(beginInfo);
+//
+////	commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline->getPipeline());
+////	commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, _pipeline->getPipelineLayout(), 0, _descriptorSet, {});
+////
+////	// render the game surface
+////	{
+////		vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.5f, 0.5f, 0.5f, 1.0f}); // Gray
+////
+////		vk::RenderPassBeginInfo renderPassInfo{};
+////		renderPassInfo.renderPass = _gameRenderPass;
+////		renderPassInfo.framebuffer = _gameFramebuffer;
+////		renderPassInfo.renderArea.extent = vk::Extent2D{320, 200};
+////		renderPassInfo.clearValueCount = 1;
+////		renderPassInfo.pClearValues = &clearColor;
+////
+////		commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+////
+////		// ... any other draw commands for the game content
+////		//commandBuffer.draw
+////
+////		commandBuffer.endRenderPass();
+////	}
+////
+////	// render the window surface
+////	{
 //		vk::RenderPassBeginInfo renderPassInfo{};
-//		renderPassInfo.renderPass = _gameRenderPass;
-//		renderPassInfo.framebuffer = _gameFramebuffer;
-//		renderPassInfo.renderArea.extent = vk::Extent2D{320, 200};
+//		renderPassInfo.renderPass = _renderPass;
+//		renderPassInfo.framebuffer = frame.framebuffer;
+//		renderPassInfo.renderArea.offset = vk::Offset2D{0, 0};
+//		renderPassInfo.renderArea.extent = _swapChainExtent;
+//
+//		vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f});
 //		renderPassInfo.clearValueCount = 1;
 //		renderPassInfo.pClearValues = &clearColor;
 //
 //		commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-//
-//		// ... any other draw commands for the game content
-//		//commandBuffer.draw
-//
+////
+////	    // Bind vertex and index buffers
+////		vk::DeviceSize offsets[] = {0};
+////		commandBuffer.bindVertexBuffers(0, _vertexBuffer->getBuffer(), offsets);
+////		commandBuffer.bindIndexBuffer(_indexBuffer->getBuffer(), 0, vk::IndexType::eUint16);
+////
+////		// Push up the window transformation matrix
+////		commandBuffer.pushConstants(_pipeline->getPipelineLayout(), vk::ShaderStageFlagBits::eVertex, 0, sizeof(glm::mat4), &_transform);
+////
+////		// Issue the draw call
+//////		commandBuffer.drawIndexed(static_cast<uint32_t>(std::size(indices)), 1, 0, 0, 0);
+////
+////
 //		commandBuffer.endRenderPass();
-//	}
+////	}
+////
+//	commandBuffer.end();
 //
-//	// render the window surface
-//	{
-		vk::RenderPassBeginInfo renderPassInfo{};
-		renderPassInfo.renderPass = _renderPass;
-		renderPassInfo.framebuffer = frame.framebuffer;
-		renderPassInfo.renderArea.offset = vk::Offset2D{0, 0};
-		renderPassInfo.renderArea.extent = _swapChainExtent;
-
-		vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f});
-		renderPassInfo.clearValueCount = 1;
-		renderPassInfo.pClearValues = &clearColor;
-
-		commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-//
-//	    // Bind vertex and index buffers
-//		vk::DeviceSize offsets[] = {0};
-//		commandBuffer.bindVertexBuffers(0, _vertexBuffer->getBuffer(), offsets);
-//		commandBuffer.bindIndexBuffer(_indexBuffer->getBuffer(), 0, vk::IndexType::eUint16);
-//
-//		// Push up the window transformation matrix
-//		commandBuffer.pushConstants(_pipeline->getPipelineLayout(), vk::ShaderStageFlagBits::eVertex, 0, sizeof(glm::mat4), &_transform);
-//
-//		// Issue the draw call
-////		commandBuffer.drawIndexed(static_cast<uint32_t>(std::size(indices)), 1, 0, 0, 0);
-//
-//
-		commandBuffer.endRenderPass();
-//	}
-//
-	commandBuffer.end();
-
-}
+//}
 
 vk::SurfaceKHR VulkanSurface::createSurface(vk::Instance& instance, const PlatformWindowHandle& window)
 {

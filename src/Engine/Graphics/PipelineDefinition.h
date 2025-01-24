@@ -18,11 +18,13 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <simplerttr.h>
+#include <assert.h>
 
 namespace OpenXcom
 {
 
 class GraphicsSurface;
+class Shader;
 
 enum class ShaderStage
 {
@@ -158,22 +160,22 @@ ResourceLayoutBuilder& ResourceLayoutBuilder::addPushConstant(ShaderStage stage)
 class PipelineDefinition
 {
 protected:
-	uint32_t _vertexShaderHandle;
-	uint32_t _fragmentShaderHandle;
+	std::optional<std::reference_wrapper<const Shader>> _vertexShader;
+	std::optional<std::reference_wrapper<const Shader>> _fragmentShader;
 
 	std::optional<std::reference_wrapper<GraphicsSurface>> _surface;
 
 	ResourceLayoutDefinition _resourceLayout;
 
 public:
-	PipelineDefinition() : _vertexShaderHandle(-1), _fragmentShaderHandle(-1), _surface() { };
+	PipelineDefinition() = default;
 	~PipelineDefinition() = default;
 
-	void setVertexShader(uint32_t shaderHandle) { _vertexShaderHandle = shaderHandle; }
-	uint32_t getVertexShader() const { return _vertexShaderHandle; }
+	void setVertexShader(const Shader& shader) { _vertexShader = shader; }
+	const Shader& getVertexShader() const { return _vertexShader.value().get(); }
 
-	void setFragmentShader(uint32_t shaderHandle) { _fragmentShaderHandle = shaderHandle; }
-	uint32_t getFragmentShader() const { return _fragmentShaderHandle; }
+	void setFragmentShader(const Shader& shader) { _fragmentShader = shader; }
+	const Shader& getFragmentShader() const { return _fragmentShader.value().get(); }
 
 	void setResourceLayout(const ResourceLayoutDefinition& resourceLayout) { _resourceLayout = resourceLayout; }
 	const ResourceLayoutDefinition& getResourceLayout() const { return _resourceLayout; }
@@ -190,15 +192,15 @@ public:
 	PipelineBuilder() = default;
 	~PipelineBuilder() = default;
 
-	PipelineBuilder& setVertexShader(uint32_t shaderHandle)
+	PipelineBuilder& setVertexShader(const Shader& shader)
 	{
-		_pipelineDefinition.setVertexShader(shaderHandle);
+		_pipelineDefinition.setVertexShader(shader);
 		return *this;
 	}
 
-	PipelineBuilder& setFragmentShader(uint32_t shaderHandle)
+	PipelineBuilder& setFragmentShader(const Shader& shader)
 	{
-		_pipelineDefinition.setFragmentShader(shaderHandle);
+		_pipelineDefinition.setFragmentShader(shader);
 		return *this;
 	}
 

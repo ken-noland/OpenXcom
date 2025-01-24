@@ -17,42 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "../../BufferManager.h"
+#include <vulkan/vulkan.hpp>
 #include <memory>
-#include <string>
 
 namespace OpenXcom
 {
 
-class PlatformWindow;
-class GraphicsSurface;
-class Pipeline;
-class PipelineBinding;
-class DeviceBuffer;
-class RenderTarget;
-class Shader;
+class VulkanContext;
+class VulkanHostBuffer;
+class VulkanDeviceBuffer;
 
-class GameWindow
+class VulkanBufferManager : public BufferManager
 {
 private:
-	std::shared_ptr<PlatformWindow> _window;
-	std::unique_ptr<GraphicsSurface> _graphicsSurface;
-
-	std::unique_ptr<Pipeline> _windowPipeline;
-	std::unique_ptr<PipelineBinding> _windowPipelineBinding;
-
-	std::unique_ptr<DeviceBuffer> _vertexBuffer;
-	std::unique_ptr<DeviceBuffer> _indexBuffer;
-
-	std::unique_ptr<RenderTarget> _gameSurface;
-
-	std::unique_ptr<Shader> _vertexShader;
-	std::unique_ptr<Shader> _fragmentShader;
+	VulkanContext& _context;
 
 public:
-	GameWindow(const std::string& title);
-	~GameWindow();
+	VulkanBufferManager(VulkanContext& context);
+	~VulkanBufferManager();
 
-	void update();
+	// Create an empty host buffer
+	virtual std::unique_ptr<HostBuffer> createHostBuffer(std::size_t size, BufferUsage usage) override;
+
+	// Create an empty device buffer
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(std::size_t size, BufferUsage usage) override;
+
+	// Create a device buffer from a host buffer
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(HostBuffer& hostBuffer, BufferUsage usage) override;
 };
 
 } // namespace OpenXcom

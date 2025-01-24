@@ -17,18 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "../Resource/Image/Image.h"
 
 namespace OpenXcom
 {
 
+class GraphicsSurface;
+class GraphicsCommand;
 
-class GraphicsSurface
+class RenderTarget : public Image
+{
+public:
+	RenderTarget() = default;
+	virtual ~RenderTarget() = default;
+
+	virtual void beginRenderPass(GraphicsCommand& commandContext) = 0;
+	virtual void endRenderPass(GraphicsCommand& commandContext) = 0;
+};
+
+class GraphicsSurface : public RenderTarget
 {
 public:
 	GraphicsSurface() = default;
 	virtual ~GraphicsSurface() = default;
 		
-	virtual void draw() = 0;
+	virtual GraphicsCommand& beginCommandPass() = 0;
+	virtual void endCommandPass(GraphicsCommand& commandContext) = 0;
 };
 
 } // namespace OpenXcom

@@ -19,10 +19,10 @@
  */
 #include <vulkan/vulkan.hpp>
 #include "../GraphicsSurface.h"
-#include "VulkanBuffer.h"
+#include "../GraphicsCommand.h"
 #include "../../Platform/Window.h"
 
-#include "../../Resource/Shader/ShaderManager.h"
+#include "Buffer/VulkanBuffer.h"
 
 #include <glm/glm.hpp>
 
@@ -31,11 +31,13 @@ namespace OpenXcom
 {
 
 class VulkanContext;
-struct PlatformWindowHandle;
+class VulkanCommand;
 class VulkanBufferFactory;
 class VulkanPipelineFactory;
 class VulkanPipeline;
 class PipelineDefinition;
+
+
 
 struct FrameData
 {
@@ -62,62 +64,20 @@ protected:
 	vk::Extent2D _swapChainExtent;
 
 	std::vector<FrameData> _frames;
+	uint32_t _currentFrame;
+	uint32_t _imageIndex;
 
 	vk::RenderPass _renderPass;
 
-	//std::unique_ptr<VulkanPipeline> _pipeline;
-
-
-	//-----
-	// the following is temporary(I think, not sure)
-	glm::mat4 _transform;
-
-	//descriptor set
-	vk::DescriptorSetLayout _descriptorSetLayout;
-	vk::DescriptorPool _descriptorPool;
-	vk::DescriptorSet _descriptorSet;
-
-//	vk::PipelineLayout _pipelineLayout;
-//	vk::Pipeline _pipeline;
-
-	uint32_t _currentFrame;
-
 	PlatformWindowHandle _windowHandle;
-
-	// The main game surface
-	vk::DeviceMemory _gameImageMemory;
-	vk::Image _gameImage;
-	vk::ImageView _gameImageView;
-	vk::RenderPass _gameRenderPass;
-	vk::Framebuffer _gameFramebuffer;
-
-
-	//// TEMP
-	//ShaderManager::Handle _vertexShader;		// KN Note: when we move to a pipeline registry, this won't be needed here anymore
-	//ShaderManager::Handle _fragmentShader;		// KN Note: when we move to a pipeline registry, this won't be needed here anymore
-
-	//// not sure if this'll be needed here once we have resource managers in place to automate the creation and destruction of buffer elements
-	//VmaAllocator _allocator;
-
-
-	vk::Sampler _textureSampler;	// KN Note: this should be moved to a sampler manager/registry of some kind
-
-	std::unique_ptr<VulkanBuffer> _vertexBuffer;
-	std::unique_ptr<VulkanBuffer> _indexBuffer;
-
-	//-----
+	std::unique_ptr<VulkanCommand> _commandContext;
 
 	void initializeSwapChain();
 	void initializeRenderPass();
 	void initializeFrames();
 
-	//void initializeGameSurface(VulkanBufferFactory& bufferFactory);
-
 	void destroySwapChain();
-
 	void handleResize();
-
-	void recordCommandBuffer(FrameData& frame, uint32_t imageIndex);
 
 	// this function is used to create the surface for the platform window, but equally, VulkanContext needs to
 	// create a surface to select a physical device, so rather than duplicate the code, we'll make it static and
@@ -135,7 +95,11 @@ public:
 	const vk::Extent2D& getVKExtent() const { return _swapChainExtent; }
 	const vk::RenderPass& getRenderPass() const { return _renderPass; }
 
-	virtual void draw() override;
+	virtual GraphicsCommand& beginCommandPass() override;
+	virtual void endCommandPass(GraphicsCommand& commandContext) override;
+
+	virtual void beginRenderPass(GraphicsCommand& commandContext) override;
+	virtual void endRenderPass(GraphicsCommand& commandContext) override;
 };
 
 } // namespace OpenXcom
