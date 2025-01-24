@@ -168,7 +168,7 @@ GameWindow::GameWindow(const std::string& title)
 	_windowPipelineBinding->setVertexBuffer(*_vertexBuffer);
 	_windowPipelineBinding->setIndexBuffer(*_indexBuffer);
 
-	//_windowPipelineBinding->setTexture(0, ShaderStage::Fragment, _gameSurface);
+	_windowPipelineBinding->setTexture(ShaderStage::Fragment, 0, *_gameSurface);
 
 	// setup up the window projection
 
@@ -191,10 +191,8 @@ GameWindow::~GameWindow()
 	engine.getPlatformWindowSystem().destroyWindow(_window);
 }
 
-void OpenXcom::GameWindow::calculateProjection()
+void GameWindow::updateProjection()
 {
-	;
-
 	// Define game and window dimensions
 	float gameWidth = static_cast<float>(_gameSurface->getWidth());
 	float gameHeight = static_cast<float>(_gameSurface->getHeight());
@@ -222,6 +220,7 @@ void OpenXcom::GameWindow::calculateProjection()
 	}
 
 	_windowProjection = glm::scale(glm::mat4(1.0f), glm::vec3(scaleX, scaleY, 1.0f));
+//	_windowPipelineBinding->setPushConstant(0, _windowProjection);
 }
 
 void GameWindow::update()

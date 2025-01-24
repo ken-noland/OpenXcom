@@ -279,7 +279,7 @@ VulkanPipeline::~VulkanPipeline()
 
 std::unique_ptr<PipelineBinding> VulkanPipeline::createBinding()
 {
-	return std::make_unique<VulkanPipelineBinding>(_context);
+	return std::make_unique<VulkanPipelineBinding>(_context, *this);
 }
 
 } // namespace OpenXcom

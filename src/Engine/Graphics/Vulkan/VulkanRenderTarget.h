@@ -52,6 +52,9 @@ public:
 	virtual uint32_t getWidth() override { return _width; }
 	virtual uint32_t getHeight() override { return _height; }
 
+	vk::Image& getImage() { return _image; }
+	vk::ImageView& getImageView() { return _imageView; }
+
 	virtual void beginRenderPass(GraphicsCommand& commandContext) override;
 	virtual void endRenderPass(GraphicsCommand& commandContext) override;
 };

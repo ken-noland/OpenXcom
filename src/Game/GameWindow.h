@@ -50,7 +50,7 @@ private:
 	std::unique_ptr<Shader> _vertexShader;
 	std::unique_ptr<Shader> _fragmentShader;
 
-	void calculateProjection();
+	void updateProjection();
 
 public:
 	GameWindow(const std::string& title);

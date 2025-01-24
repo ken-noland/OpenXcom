@@ -26,21 +26,38 @@ namespace OpenXcom
 {
 
 class VulkanContext;
+class VulkanPipeline;
+class VulkanDescriptorSet;
+
+
+
 
 class VulkanPipelineBinding : public PipelineBinding
 {
 protected:
 	VulkanContext& _context;
+	VulkanPipeline& _pipeline;
+
+	std::unique_ptr<VulkanDescriptorSet> _descriptorSet;
 
 	std::optional<std::reference_wrapper<DeviceBuffer>> _vertexBuffer;
 	std::optional<std::reference_wrapper<DeviceBuffer>> _indexBuffer;
 
+	void create();
+	void destroy();
+	void recreate();
+
 public:
-	VulkanPipelineBinding(VulkanContext& context);
+	VulkanPipelineBinding(VulkanContext& context, VulkanPipeline& pipeline);
 	virtual ~VulkanPipelineBinding();
 
-	virtual void setVertexBuffer(DeviceBuffer& buffer) override { _vertexBuffer = buffer; };
-	virtual void setIndexBuffer(DeviceBuffer& buffer) override { _indexBuffer = buffer; };
+	virtual void setVertexBuffer(DeviceBuffer& buffer) override;
+	virtual void setIndexBuffer(DeviceBuffer& buffer) override;
+
+	virtual void setPushConstant(SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size) override;
+
+	virtual void setTexture(ShaderStage stage, uint32_t binding, Image& image);
+
 };
 
 } // namespace OpenXcom

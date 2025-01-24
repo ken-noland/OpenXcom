@@ -28,7 +28,7 @@ class GraphicsCommand;
 class RenderTarget : public Image
 {
 public:
-	RenderTarget() = default;
+	RenderTarget() : Image(ImageType::RenderTarget) { }
 	virtual ~RenderTarget() = default;
 
 	virtual void beginRenderPass(GraphicsCommand& commandContext) = 0;

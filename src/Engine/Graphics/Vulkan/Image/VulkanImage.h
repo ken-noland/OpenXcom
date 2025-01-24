@@ -50,6 +50,7 @@ protected:
 	VmaAllocation _allocation;
 
 	vk::Image _image;
+	vk::ImageView _imageView;
 
 	int _width;
 	int _height;
@@ -58,6 +59,9 @@ protected:
 public:
 	VulkanImage(VulkanContext& context, uint32_t width, uint32_t height, vk::ImageUsageFlags flags);
 	virtual ~VulkanImage();
+
+	vk::Image& getImage() { return _image; }
+	vk::ImageView& getImageView() { throw new std::runtime_error("Not implemented"); return _imageView; }
 };
 
 class VulkanHostImage : public VulkanImage

@@ -78,6 +78,7 @@ public:
 
 	vk::Pipeline& getPipeline() { return _pipeline; }
 	vk::PipelineLayout& getPipelineLayout() { return _pipelineLayout; }
+	vk::DescriptorSetLayout& getDescriptorSetLayout() { return _descriptorSetLayout; }
 
 
 };

@@ -160,6 +160,9 @@ VulkanContext::~VulkanContext()
 	// destroy the pipeline factory
 	_pipelineFactory.reset();
 
+	// destroy the sampler factory
+	_samplerFactory.reset();
+
 	// destroy the descriptor set factory
 	_descriptorSetFactory.reset();
 

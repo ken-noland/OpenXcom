@@ -110,6 +110,7 @@ public:
 	vk::Format getSwapChainImageFormat() { return _swapChainImageFormat; }
 
 	VulkanDescriptorSetFactory& getDescriptorSetFactory() { return *_descriptorSetFactory; }
+	VulkanSamplerFactory& getSamplerFactory() { return *_samplerFactory; }
 	VulkanPipelineFactory& getPipelineFactory() { return *_pipelineFactory; }
 
 	VulkanQueue& getGraphicsQueue() { return _graphicsQueue; }

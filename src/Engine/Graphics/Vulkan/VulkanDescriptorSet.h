@@ -37,7 +37,7 @@ public:
 	VulkanDescriptorSet(vk::DescriptorSet descriptorSet, VulkanDescriptorPoolInfo* poolInfo)
 		: _descriptorSet(descriptorSet), _poolInfo(poolInfo) {}
 
-	vk::DescriptorSet getVkDescriptorSet() const { return _descriptorSet; }
+	vk::DescriptorSet getDescriptorSet() const { return _descriptorSet; }
 
 	VulkanDescriptorPoolInfo* getPoolInfo() const { return _poolInfo; }
 };
@@ -104,7 +104,7 @@ public:
 		}
 	}
 
-	VulkanDescriptorSet allocateDescriptorSet(const vk::DescriptorSetLayout& layout)
+	std::unique_ptr<VulkanDescriptorSet> allocateDescriptorSet(const vk::DescriptorSetLayout& layout)
 	{
 		// Try to allocate from an existing pool
 		for (auto& poolInfo : _pools)
@@ -115,7 +115,7 @@ public:
 				if (result.first == vk::Result::eSuccess)
 				{
 					poolInfo->incrementAllocatedSets();
-					return VulkanDescriptorSet(result.second, poolInfo.get());
+					return std::make_unique<VulkanDescriptorSet>(result.second, poolInfo.get());
 				}
 			}
 		}
@@ -127,7 +127,7 @@ public:
 	void deallocateDescriptorSet(const VulkanDescriptorSet& descriptorSet)
 	{
 		VulkanDescriptorPoolInfo* poolInfo = descriptorSet.getPoolInfo();
-		vk::DescriptorSet vkSet = descriptorSet.getVkDescriptorSet();
+		vk::DescriptorSet vkSet = descriptorSet.getDescriptorSet();
 
 		vk::Result result = _device.freeDescriptorSets(poolInfo->getPool(), 1, &vkSet);
 		if (result == vk::Result::eSuccess)
@@ -152,7 +152,7 @@ private:
 		return {result, descriptorSet};
 	}
 
-	VulkanDescriptorSet createAndAllocateDescriptorSet(const vk::DescriptorSetLayout& layout)
+	std::unique_ptr<VulkanDescriptorSet> createAndAllocateDescriptorSet(const vk::DescriptorSetLayout& layout)
 	{
 		auto newPool = createDescriptorPool();
 		_pools.push_back(std::make_unique<VulkanDescriptorPoolInfo>(newPool.getPool(), newPool.getMaxSets()));
@@ -162,7 +162,7 @@ private:
 		{
 			auto& poolInfo = _pools.back();
 			poolInfo->incrementAllocatedSets();
-			return VulkanDescriptorSet(result.second, poolInfo.get());
+			return std::make_unique<VulkanDescriptorSet>(result.second, poolInfo.get());
 		}
 
 		throw std::runtime_error("Failed to allocate descriptor set from newly created pool");
@@ -199,7 +199,7 @@ public:
 	vk::DescriptorSetLayout createDescriptorSetLayout(const PipelineDefinition& pipelineDefinition);
 	void destroyDescriptorSetLayout(const vk::DescriptorSetLayout& layout);
 
-	VulkanDescriptorSet createDescriptorSet(const vk::DescriptorSetLayout& layout)
+	std::unique_ptr<VulkanDescriptorSet> createDescriptorSet(const vk::DescriptorSetLayout& layout)
 	{
 		return _poolManager.allocateDescriptorSet(layout);
 	}

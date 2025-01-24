@@ -28,14 +28,25 @@ enum class ImageFormat
 	RGBA8,
 };
 
+enum class ImageType
+{
+	Texture,
+	RenderTarget
+};
+
 class Image
 {
+protected:
+	ImageType _type;
+
 public:
-	Image() = default;
+	Image(ImageType type) : _type(type) { };
 	virtual ~Image() = default;
 
 	virtual uint32_t getWidth() = 0;
 	virtual uint32_t getHeight() = 0;
+
+	ImageType getType() const { return _type; }
 };
 
 

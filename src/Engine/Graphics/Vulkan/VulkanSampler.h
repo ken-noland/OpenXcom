@@ -22,6 +22,10 @@
 namespace OpenXcom
 {
 
+// This whole header is mostly placeholder for now. There is one, and only one sampler at the moment and
+//	I do want to have the ability to have future samplers, so I'm building out the manager and the
+//	mechanism to support that.
+
 class VulkanContext;
 
 class VulkanSampler
