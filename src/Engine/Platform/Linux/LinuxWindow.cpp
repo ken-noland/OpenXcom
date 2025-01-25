@@ -45,7 +45,6 @@ void PlatformWindow::platformSpecificCreateWindow(const std::string& windowTitle
 
 	XStoreName(display, window, windowTitle.c_str());
 	XSelectInput(display, window, ExposureMask | KeyPressMask);
-	XMapWindow(display, window);
 
 	Atom wmDeleteMessage = XInternAtom(display, "WM_DELETE_WINDOW", False);
 	XSetWMProtocols(display, window, &wmDeleteMessage, 1);
@@ -93,6 +92,25 @@ void PlatformWindow::platformSpecificUpdateWindow()
 	}
 }
 
+void PlatformWindow::platformSpecificShowWindow()
+{
+	if (_handle.display && _handle.window)
+	{
+		// Map (show) the window
+		XMapWindow(static_cast<Display*>(_handle.display), static_cast<Window>(_handle.window));
+		XFlush(static_cast<Display*>(_handle.display)); // Ensure the request is sent to the X server
+	}
+}
+
+void PlatformWindow::platformSpecificHideWindow()
+{
+	if (_handle.display && _handle.window)
+	{
+		// Unmap (hide) the window
+		XUnmapWindow(static_cast<Display*>(_handle.display), static_cast<Window>(_handle.window));
+		XFlush(static_cast<Display*>(_handle.display)); // Ensure the request is sent to the X server
+	}
+}
 
 } // namespace OpenXcom
 

@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "VulkanBuffer.h"
 #include "../VulkanContext.h"
 
@@ -80,7 +79,7 @@ void VulkanHostBuffer::unmap()
 	vmaUnmapMemory(_context.getAllocator(), _allocation);
 }
 
-void VulkanHostBuffer::copyTo(const void* data, size_t offset, size_t size)
+void VulkanHostBuffer::copyTo(const void* data, std::size_t offset, std::size_t size)
 {
 	void* mappedData = map();
 	memcpy(static_cast<char*>(mappedData) + offset, data, size);

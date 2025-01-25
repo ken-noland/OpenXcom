@@ -29,5 +29,9 @@ VulkanImageManager::VulkanImageManager(VulkanContext& context)
 	_imageFactory = std::make_unique<VulkanImageFactory>(context);
 }
 
+VulkanImageManager::~VulkanImageManager()
+{
+}
+
 
 } // namespace OpenXcom

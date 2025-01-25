@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <cstdint>
 
 namespace OpenXcom
 {
@@ -40,7 +41,7 @@ public:
 
 	const BufferUsage getUsage() const { return _usage; }
 
-	virtual void copyTo(const void* data, size_t offset, size_t size) = 0;
+	virtual void copyTo(const void* data, std::size_t offset, std::size_t size) = 0;
 };
 
 class DeviceBuffer

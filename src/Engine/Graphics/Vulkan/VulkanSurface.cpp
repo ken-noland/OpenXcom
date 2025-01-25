@@ -654,7 +654,7 @@ vk::SurfaceKHR VulkanSurface::createSurface(vk::Instance& instance, const Platfo
 	surfaceCreateInfo.dpy = (Display*)window.display;
 	surfaceCreateInfo.window = window.window;
 	surface = instance.createXlibSurfaceKHR(surfaceCreateInfo);
-	if (!_surface)
+	if (!surface)
 	{
 		throw std::runtime_error("Failed to create Vulkan surface.");
 	}

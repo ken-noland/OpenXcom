@@ -17,6 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifdef __linux__
+#undef None // Xlib.h defines None, which conflicts with Vulkan
+#endif
+
 #include <simplerttr.h>
 #include <assert.h>
 

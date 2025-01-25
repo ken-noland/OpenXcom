@@ -17,9 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#include <memory>
 #include <vulkan/vulkan.hpp>
 #include <vk_mem_alloc.h> // VMA
+#include <limits>
 
 namespace OpenXcom
 {

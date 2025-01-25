@@ -19,9 +19,13 @@
  */
 #include "../../Buffer.h"
 
+#ifdef __linux__
+#undef None // Xlib.h defines None, which conflicts with Vulkan
+#endif
+
+#include <simplerttr.h>
 #include <vulkan/vulkan.hpp>
 #include <vk_mem_alloc.h> // VMA
-#include <simplerttr.h>
 
 #include <memory>
 

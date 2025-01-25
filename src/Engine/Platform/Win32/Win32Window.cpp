@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(_WIN64)
 #include "../Window.h"
 #include "../../Engine.h"
 

@@ -795,8 +795,6 @@ elseif(UNIX)
   list(APPEND openxcom_defines VK_USE_PLATFORM_XLIB_KHR)
 endif()
 
-message(STATUS "VulkanMemoryAllocator_SOURCE_DIR: ${VulkanMemoryAllocator_SOURCE_DIR}")
-
 set(openxcom_includes
   ${yaml-cpp_SOURCE_DIR}/include
   ${lua_SOURCE_DIR}
@@ -826,6 +824,7 @@ if(UNIX)
     list(APPEND openxcom_includes ${X11_INCLUDE_DIR})
     list(APPEND openxcom_libs ${X11_LIBRARIES})
   endif() #X11_FOUND
+
 endif() #UNIX
 
 # openxcom base library targets
@@ -837,6 +836,10 @@ target_link_libraries(openxcom_base_lib PUBLIC ${openxcom_libs})
 if (MSVC)
     #mod.cpp is so massive that MSVC has trouble keeping it all in a single object, so we need to split it up with this command
     target_compile_options(openxcom_base_lib PRIVATE /bigobj)
+elseif (UNIX)
+    # Enable all warnings for the base library
+    # -Wno-nullability-completeness add a target compiler option to disable warnings for VMA
+    target_compile_options(openxcom_base_lib PRIVATE -Wno-nullability-completeness)
 endif()
 
 # Codegen: Executable that generates additional source files, depends on openxcom_base_lib
