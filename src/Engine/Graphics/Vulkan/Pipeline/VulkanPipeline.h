@@ -75,6 +75,7 @@ public:
 
 	virtual std::unique_ptr<PipelineBinding> createBinding() override;
 
+	PipelineDefinition& getPipelineDefinition() { return _pipelineDefinition; }
 
 	vk::Pipeline& getPipeline() { return _pipeline; }
 	vk::PipelineLayout& getPipelineLayout() { return _pipelineLayout; }

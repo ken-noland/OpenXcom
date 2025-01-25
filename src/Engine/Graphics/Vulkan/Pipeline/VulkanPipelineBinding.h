@@ -19,6 +19,7 @@
  */
 
 #include "../../PipelineBinding.h"
+#include "../../PipelineDefinition.h"
 #include <vulkan/vulkan.hpp>
 #include <optional>
 
@@ -28,9 +29,24 @@ namespace OpenXcom
 class VulkanContext;
 class VulkanPipeline;
 class VulkanDescriptorSet;
+class VulkanDeviceBuffer;
 
+// holder class for push constant data
+class VulkanPushConstant
+{
+public:
+	ShaderStage _stage;
+	std::vector<uint8_t> _data;
 
+public:
+	VulkanPushConstant(ShaderStage stage, std::size_t size);
+	~VulkanPushConstant();
 
+	void* data() { return _data.data(); }
+	std::size_t size() { return _data.size(); }
+
+	void copyTo(const void* data, std::size_t size);
+};
 
 class VulkanPipelineBinding : public PipelineBinding
 {
@@ -40,12 +56,15 @@ protected:
 
 	std::unique_ptr<VulkanDescriptorSet> _descriptorSet;
 
-	std::optional<std::reference_wrapper<DeviceBuffer>> _vertexBuffer;
-	std::optional<std::reference_wrapper<DeviceBuffer>> _indexBuffer;
+	std::array<std::unique_ptr<VulkanPushConstant>, (size_t)ShaderStage::Count> _pushConstants;
+
+	std::optional<std::reference_wrapper<VulkanDeviceBuffer>> _vertexBuffer;
+	std::optional<std::reference_wrapper<VulkanDeviceBuffer>> _indexBuffer;
 
 	void create();
 	void destroy();
-	void recreate();
+
+	vk::ShaderStageFlagBits getShaderStage(ShaderStage stage);
 
 public:
 	VulkanPipelineBinding(VulkanContext& context, VulkanPipeline& pipeline);
@@ -54,10 +73,11 @@ public:
 	virtual void setVertexBuffer(DeviceBuffer& buffer) override;
 	virtual void setIndexBuffer(DeviceBuffer& buffer) override;
 
-	virtual void setPushConstant(SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size) override;
+	virtual void setPushConstant(const SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size) override;
 
-	virtual void setTexture(ShaderStage stage, uint32_t binding, Image& image);
+	virtual void setTexture(ShaderStage stage, uint32_t binding, Image& image) override;
 
+	virtual void commit(GraphicsCommand& command) override;
 };
 
 } // namespace OpenXcom

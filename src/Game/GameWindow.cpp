@@ -167,11 +167,12 @@ GameWindow::GameWindow(const std::string& title)
 
 	_windowPipelineBinding->setVertexBuffer(*_vertexBuffer);
 	_windowPipelineBinding->setIndexBuffer(*_indexBuffer);
+	_windowPipelineBinding->setPushConstant(ShaderStage::Vertex, _windowProjection);
 
 	_windowPipelineBinding->setTexture(ShaderStage::Fragment, 0, *_gameSurface);
 
 	// setup up the window projection
-
+	updateProjection();
 
 	_window->show();
 }
@@ -220,7 +221,7 @@ void GameWindow::updateProjection()
 	}
 
 	_windowProjection = glm::scale(glm::mat4(1.0f), glm::vec3(scaleX, scaleY, 1.0f));
-//	_windowPipelineBinding->setPushConstant(0, _windowProjection);
+	_windowPipelineBinding->setPushConstant(ShaderStage::Vertex, _windowProjection);
 }
 
 void GameWindow::update()
@@ -245,7 +246,8 @@ void GameWindow::update()
 
 		// most of this is for testing so we can validate the low level rendering
 		////////////////////////////////////////////
-		command.bindPipeline(*_windowPipeline);
+
+		_windowPipelineBinding->commit(command);
 
 		////////////////////////////////////////////
 

@@ -48,9 +48,4 @@ void VulkanCommand::endRenderPass()
 	_surface = nullptr;
 }
 
-void VulkanCommand::bindPipeline(Pipeline& pipeline)
-{
-	VulkanPipeline& vulkanPipeline = static_cast<VulkanPipeline&>(pipeline);
-}
-
 } // namespace OpenXcom

@@ -31,18 +31,28 @@ enum class BufferUsage
 
 class HostBuffer
 {
+protected:
+	BufferUsage _usage;
+
 public:
-	HostBuffer() = default;
+	HostBuffer(BufferUsage usage) : _usage(usage) {}
 	virtual ~HostBuffer() = default;
+
+	const BufferUsage getUsage() const { return _usage; }
 
 	virtual void copyTo(const void* data, size_t offset, size_t size) = 0;
 };
 
 class DeviceBuffer
 {
+protected:
+	BufferUsage _usage;
+
 public:
-	DeviceBuffer() = default;
+	DeviceBuffer(BufferUsage usage) : _usage(usage) {}
 	virtual ~DeviceBuffer() = default;
+
+	const BufferUsage getUsage() const { return _usage; }
 };
 
 } // namespace OpenXcom

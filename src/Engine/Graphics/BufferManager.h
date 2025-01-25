@@ -19,6 +19,7 @@
  */
 #include <memory>
 #include "Buffer.h"
+#include <simplerttr.h>
 
 namespace OpenXcom
 {
@@ -30,43 +31,43 @@ class BufferManager
 public:
 	BufferManager() = default;
 	virtual ~BufferManager() = default;
-
+	
 	// Create an empty host buffer
-	virtual std::unique_ptr<HostBuffer> createHostBuffer(std::size_t size, BufferUsage usage) = 0;
+	virtual std::unique_ptr<HostBuffer> createHostBuffer(const SimpleRTTR::Type& type, std::size_t size, BufferUsage usage) = 0;
 
 	// Create a host buffer and copy data into it
-	template <typename T>
-	inline std::unique_ptr<HostBuffer> createHostBuffer(const T* data, size_t count, BufferUsage usage);
+	template <typename BufferType>
+	inline std::unique_ptr<HostBuffer> createHostBuffer(const BufferType* data, size_t count, BufferUsage usage);
 
 	// Create an empty device buffer
-	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(std::size_t size, BufferUsage usage) = 0;
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(const SimpleRTTR::Type& type, std::size_t size, BufferUsage usage) = 0;
 
 	// Create a device buffer from a host buffer
-	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(HostBuffer& hostBuffer, BufferUsage usage) = 0;
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(HostBuffer& hostBuffer) = 0;
 
 	// Create a device buffer and copy data into it
 	// WARNING: this function is not efficient for frequent updates. It creates a temporary host buffer to then upload the
 	// data to the GPU. Use createHostBuffer and createDeviceBuffer instead if you need to update the buffer frequently.
 	// Use this function to upload static data.
-	template <typename T>
-	inline std::unique_ptr<DeviceBuffer> createDeviceBuffer(const T* data, size_t count, BufferUsage usage);
+	template <typename BufferType>
+	inline std::unique_ptr<DeviceBuffer> createDeviceBuffer(const BufferType* data, size_t count, BufferUsage usage);
 };
 
-template <typename T>
-std::unique_ptr<HostBuffer> BufferManager::createHostBuffer(const T* data, size_t count, BufferUsage usage)
+template <typename BufferType>
+std::unique_ptr<HostBuffer> BufferManager::createHostBuffer(const BufferType* data, size_t count, BufferUsage usage)
 {
-	size_t size = count * sizeof(T);
-	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer(size, usage);
+	size_t size = count * sizeof(BufferType);
+	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer(SimpleRTTR::types().get_type<BufferType>().value(), size, usage);
 	hostBuffer->copyTo(data, 0, size);
 	return hostBuffer;
 }
 
-template <typename T>
-std::unique_ptr<DeviceBuffer> BufferManager::createDeviceBuffer(const T* data, size_t count, BufferUsage usage)
+template <typename BufferType>
+std::unique_ptr<DeviceBuffer> BufferManager::createDeviceBuffer(const BufferType* data, size_t count, BufferUsage usage)
 {
-	size_t size = count * sizeof(T);
-	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer<T>(data, count, usage);
-	std::unique_ptr<DeviceBuffer> deviceBuffer = createDeviceBuffer(*hostBuffer, usage);
+	size_t size = count * sizeof(BufferType);
+	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer<BufferType>(data, count, usage);
+	std::unique_ptr<DeviceBuffer> deviceBuffer = createDeviceBuffer(*hostBuffer);
 	return deviceBuffer;
 }
 

@@ -41,8 +41,8 @@ vk::BufferUsageFlags VulkanBuffer::getUsageFlags(BufferUsage usage)
 }
 
 
-VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, vk::DeviceSize size, BufferUsage usage)
-	: VulkanBuffer(context, size)
+VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage)
+	: VulkanBuffer(context, type, size), HostBuffer(usage)
 {
 	vk::BufferUsageFlags usageFlags = getUsageFlags(usage) | vk::BufferUsageFlagBits::eTransferSrc;
 
@@ -87,20 +87,20 @@ void VulkanHostBuffer::copyTo(const void* data, size_t offset, size_t size)
 	unmap();
 }
 
-VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, VulkanHostBuffer& hostBuffer, BufferUsage usage)
-	: VulkanBuffer(context, hostBuffer.getSize())
+VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, VulkanHostBuffer& hostBuffer)
+	: VulkanBuffer(context, hostBuffer.getType(), hostBuffer.getSize()), DeviceBuffer(hostBuffer.getUsage())
 {
-	create(usage);
+	create();
 
 	// copy the host buffer to the device buffer
 	update(hostBuffer);
 
 }
 
-VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, vk::DeviceSize size, BufferUsage usage)
-	: VulkanBuffer(context, size)
+VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage)
+	: VulkanBuffer(context, type, size), DeviceBuffer(usage)
 {
-	create(usage);
+	create();
 }
 
 VulkanDeviceBuffer::~VulkanDeviceBuffer()
@@ -109,9 +109,9 @@ VulkanDeviceBuffer::~VulkanDeviceBuffer()
 }
 
 /// Create a buffer that is accessible by the GPU
-void VulkanDeviceBuffer::create(BufferUsage usage)
+void VulkanDeviceBuffer::create()
 {
-	vk::BufferUsageFlags usageFlags = getUsageFlags(usage) | vk::BufferUsageFlagBits::eTransferDst;
+	vk::BufferUsageFlags usageFlags = getUsageFlags(getUsage()) | vk::BufferUsageFlagBits::eTransferDst;
 
 	vk::BufferCreateInfo bufferInfo{};
 	bufferInfo.size = _size;

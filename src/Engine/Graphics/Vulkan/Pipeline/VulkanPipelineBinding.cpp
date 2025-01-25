@@ -18,14 +18,37 @@
 // */
 #include "VulkanPipelineBinding.h"
 #include "VulkanPipeline.h"
+
 #include "../VulkanContext.h"
 #include "../VulkanDescriptorSet.h"
 #include "../VulkanSampler.h"
+#include "../VulkanCommand.h"
 #include "../Image/VulkanImage.h"
+#include "../Buffer/VulkanBuffer.h"
 #include "../VulkanRenderTarget.h"
 
 namespace OpenXcom
 {
+
+VulkanPushConstant::VulkanPushConstant(ShaderStage stage, std::size_t size)
+	: _stage(stage)
+{
+	_data.resize(size);
+}
+
+VulkanPushConstant::~VulkanPushConstant()
+{
+}
+
+void VulkanPushConstant::copyTo(const void* data, std::size_t size)
+{
+	if (size != _data.size())
+	{
+		throw new std::runtime_error("Invalid size");
+	}
+	std::memcpy(_data.data(), data, size);
+}
+
 
 VulkanPipelineBinding::VulkanPipelineBinding(VulkanContext& context, VulkanPipeline& pipeline)
 	: _context(context), _pipeline(pipeline)
@@ -42,30 +65,48 @@ void VulkanPipelineBinding::create()
 {
 	// create the descriptor set
 	_descriptorSet = _context.getDescriptorSetFactory().createDescriptorSet(_pipeline.getDescriptorSetLayout());
+
+	// create the push constants
+	for (const PushConstantDefinition& pushConstantDefinition : _pipeline.getPipelineDefinition().getResourceLayout().getPushConstants())
+	{
+		assert(!_pushConstants[(int)pushConstantDefinition.stage]);
+		_pushConstants[(int)pushConstantDefinition.stage] = std::make_unique<VulkanPushConstant>(pushConstantDefinition.stage, pushConstantDefinition.type.type().size());
+	}
 }
 
 void VulkanPipelineBinding::destroy()
 {
 }
 
-void VulkanPipelineBinding::recreate()
+vk::ShaderStageFlagBits VulkanPipelineBinding::getShaderStage(ShaderStage stage)
 {
-	destroy();
-	create();
+	switch (stage)
+	{
+	case ShaderStage::Vertex:
+		return vk::ShaderStageFlagBits::eVertex;
+	case ShaderStage::Fragment:
+		return vk::ShaderStageFlagBits::eFragment;
+	default:
+		throw new std::runtime_error("Invalid shader stage");
+	}
 }
 
 void VulkanPipelineBinding::setVertexBuffer(DeviceBuffer& buffer)
 {
-	_vertexBuffer = buffer;
+	_vertexBuffer = static_cast<VulkanDeviceBuffer&>(buffer);
 }
 
 void VulkanPipelineBinding::setIndexBuffer(DeviceBuffer& buffer)
 {
-	_indexBuffer = buffer;
+	_indexBuffer = static_cast<VulkanDeviceBuffer&>(buffer);
 }
 
-void VulkanPipelineBinding::setPushConstant(SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size)
+void VulkanPipelineBinding::setPushConstant(const SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size)
 {
+	// Get the push constant
+	VulkanPushConstant& pushConstant = *_pushConstants[(int)stage];
+	// Copy the data to the push constant
+	pushConstant.copyTo(data, size);
 }
 
 void VulkanPipelineBinding::setTexture(ShaderStage stage, uint32_t binding, Image& image)
@@ -114,6 +155,40 @@ void VulkanPipelineBinding::setTexture(ShaderStage stage, uint32_t binding, Imag
 
 	// TODO: Optionally, store the texture information for later use(recreating the pipeline binding if necessary)
 	//_textures[binding] = &image;
+}
+
+void VulkanPipelineBinding::commit(GraphicsCommand& command)
+{
+	vk::CommandBuffer& vkCommand = static_cast<VulkanCommand&>(command).getCommandBuffer();
+
+	//bind the pipeline
+	vkCommand.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline.getPipeline());
+
+	//bind the descriptor set
+	vk::DescriptorSet descriptorSets[] = {_descriptorSet->getDescriptorSet()};
+	vkCommand.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, _pipeline.getPipelineLayout(), 0, 1, descriptorSets, 0, nullptr);
+
+	// Bind vertex and index buffers
+	VulkanDeviceBuffer& vertexBuffer = _vertexBuffer.value().get();
+	VulkanDeviceBuffer& indexBuffer = _indexBuffer.value().get();
+
+	vk::DeviceSize offsets[] = {0};
+	vkCommand.bindVertexBuffers(0, vertexBuffer.getBuffer(), offsets);
+	vkCommand.bindIndexBuffer(indexBuffer.getBuffer(), 0, vk::IndexType::eUint16);
+
+
+	//push the push constants
+	for (const std::unique_ptr<VulkanPushConstant>& pushConstant : _pushConstants)
+	{
+		if (pushConstant)
+		{
+			vkCommand.pushConstants(_pipeline.getPipelineLayout(), getShaderStage(pushConstant->_stage), 0, (uint32_t)pushConstant->_data.size(), pushConstant->_data.data());
+		}
+	}
+
+	//finally, issue draw command
+	uint32_t count = (uint32_t)(indexBuffer.getSize() / indexBuffer.getType().size());
+	vkCommand.drawIndexed(count, 1, 0, 0, 0);
 }
 
 } // namespace OpenXcom

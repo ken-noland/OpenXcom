@@ -33,8 +33,6 @@ public:
 
 	virtual void beginRenderPass(RenderTarget& surface) = 0;
 	virtual void endRenderPass() = 0;
-
-	virtual void bindPipeline(Pipeline& pipeline) = 0;
 };
 
 } // namespace OpenXcom

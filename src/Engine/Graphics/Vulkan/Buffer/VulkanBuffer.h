@@ -21,6 +21,7 @@
 
 #include <vulkan/vulkan.hpp>
 #include <vk_mem_alloc.h> // VMA
+#include <simplerttr.h>
 
 #include <memory>
 
@@ -35,17 +36,21 @@ protected:
 	VulkanContext& _context;
 	VmaAllocation _allocation;
 
+	SimpleRTTR::TypeReference _type;
+
 	vk::Buffer _buffer;
 	vk::DeviceSize _size;
 
 	static vk::BufferUsageFlags getUsageFlags(BufferUsage usage);
 
 public:
-	VulkanBuffer(VulkanContext& context, vk::DeviceSize size) : _context(context), _allocation(0), _buffer(), _size(size) {}
+	VulkanBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size) : _context(context), _allocation(0), _type(type), _buffer(), _size(size) {}
 	virtual ~VulkanBuffer() = default;
 
 	vk::DeviceSize getSize() const { return _size; }
 	vk::Buffer getBuffer() const { return _buffer; }
+
+	SimpleRTTR::Type getType() { return _type.type(); }
 };
 
 class VulkanHostBuffer : public VulkanBuffer, public HostBuffer
@@ -53,7 +58,7 @@ class VulkanHostBuffer : public VulkanBuffer, public HostBuffer
 private:
 
 public:
-	VulkanHostBuffer(VulkanContext& context, vk::DeviceSize size, BufferUsage usage);
+	VulkanHostBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage);
 	virtual ~VulkanHostBuffer();
 
 	void* map();
@@ -65,12 +70,12 @@ public:
 class VulkanDeviceBuffer : public VulkanBuffer, public DeviceBuffer
 {
 private:
-	void create(BufferUsage usage);
+	void create();
 	void update(VulkanHostBuffer& hostBuffer);
 
 public:
-	VulkanDeviceBuffer(VulkanContext& context, VulkanHostBuffer& hostBuffer, BufferUsage usage);
-	VulkanDeviceBuffer(VulkanContext& context, vk::DeviceSize size, BufferUsage usage); // create a blank device buffer
+	VulkanDeviceBuffer(VulkanContext& context, VulkanHostBuffer& hostBuffer);
+	VulkanDeviceBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage); // create a blank device buffer
 	virtual ~VulkanDeviceBuffer();
 };
 

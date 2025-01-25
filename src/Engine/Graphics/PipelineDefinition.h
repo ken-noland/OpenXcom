@@ -26,10 +26,11 @@ namespace OpenXcom
 class GraphicsSurface;
 class Shader;
 
-enum class ShaderStage
+enum class ShaderStage : int
 {
 	Vertex,
 	Fragment,
+	Count
 };
 
 struct UniformBufferDefinition

@@ -25,6 +25,7 @@ namespace OpenXcom
 
 class DeviceBuffer;
 class Image;
+class GraphicsCommand;
 enum class ShaderStage;
 
 class PipelineBinding
@@ -38,16 +39,18 @@ public:
 
 	template <typename ConstantType>
 	void setPushConstant(ShaderStage stage, const ConstantType& data);
-	virtual void setPushConstant(SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size) = 0;
+	virtual void setPushConstant(const SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size) = 0;
 
 	virtual void setTexture(ShaderStage stage, uint32_t binding, Image& image) = 0;
+
+	virtual void commit(GraphicsCommand& command) = 0;
 };
 
 
 template <typename ConstantType>
 void PipelineBinding::setPushConstant(ShaderStage stage, const ConstantType& data)
 {
-	setPushConstant(SimpleRTTR::types().get_type<ConstantType>(), stage, &data, sizeof(data));
+	setPushConstant(SimpleRTTR::types().get_type<ConstantType>().value(), stage, &data, sizeof(data));
 }
 
 } // namespace OpenXcom

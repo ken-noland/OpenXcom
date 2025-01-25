@@ -103,12 +103,24 @@ VulkanRenderTarget::~VulkanRenderTarget()
 
 void VulkanRenderTarget::beginRenderPass(GraphicsCommand& command)
 {
-	VulkanCommand& vulkanCommand = static_cast<VulkanCommand&>(command);
+	vk::CommandBuffer& vkCommand = static_cast<VulkanCommand&>(command).getCommandBuffer();
+	vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.0f, 0.0f, 1.0f, 1.0f});
+
+	vk::RenderPassBeginInfo renderPassInfo{};
+	renderPassInfo.renderPass = _renderPass;
+	renderPassInfo.framebuffer = _framebuffer;
+	renderPassInfo.renderArea.extent = vk::Extent2D{getWidth(), getHeight()};
+	renderPassInfo.clearValueCount = 1;
+	renderPassInfo.pClearValues = &clearColor;
+
+	vkCommand.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+
 }
 
 void VulkanRenderTarget::endRenderPass(GraphicsCommand& command)
 {
-	VulkanCommand& vulkanCommand = static_cast<VulkanCommand&>(command);
+	vk::CommandBuffer& vkCommand = static_cast<VulkanCommand&>(command).getCommandBuffer();
+	vkCommand.endRenderPass();
 }
 
 } // namespace OpenXcom

@@ -42,9 +42,6 @@ public:
 	virtual void beginRenderPass(RenderTarget& surface) override;
 	virtual void endRenderPass() override;
 
-	virtual void bindPipeline(Pipeline& pipeline) override;
-
-
 	void setCommandBuffer(const vk::CommandBuffer& commandBuffer) { _commandBuffer = commandBuffer; }
 	vk::CommandBuffer& getCommandBuffer() { return _commandBuffer; }
 };
