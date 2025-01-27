@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,38 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <cstdint>
+#include "GameSurface.h"
+#include "../GraphicsSystem.h"
+#include "../GraphicsSurface.h"
+#include "../GraphicsCommand.h"
+#include "../../Engine.h"
+#include "../../Resource/Image/Image.h"
 
 namespace OpenXcom
 {
 
-enum class ImageFormat
+GameSurface::GameSurface(Options& options)
 {
-	UNKNOWN,
-	RGBA8,
-};
+	Engine& engine = getEngine();
+	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
 
-enum class ImageType
+	// create a render target for the game surface
+	_renderTarget = graphicsSystem.createRenderTarget(320, 200, ImageFormat::RGBA8); // TODO: use game options to define the game surface dimensions
+}
+
+GameSurface::~GameSurface()
 {
-	Texture,
-	RenderTarget
-};
+}
 
-class Image
+void GameSurface::render(GraphicsCommand& command)
 {
-protected:
-	ImageType _type;
+	// Render the game surface
+	command.beginRenderPass(*_renderTarget);
 
-public:
-	Image(ImageType type) : _type(type) { };
-	virtual ~Image() = default;
-
-	virtual uint32_t getWidth() const = 0;
-	virtual uint32_t getHeight() const = 0;
-
-	ImageType getType() const { return _type; }
-};
+	// dispatch any rendering commands here
 
 
+	command.endRenderPass();
+}
 
 } // namespace OpenXcom

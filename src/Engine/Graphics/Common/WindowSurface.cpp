@@ -1,0 +1,243 @@
+/*
+ * Copyright 2010-2016 OpenXcom Developers.
+ *
+ * This file is part of OpenXcom.
+ *
+ * OpenXcom is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenXcom is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
+ */
+#include "WindowSurface.h"
+#include "GameSurface.h"
+
+#include "../GraphicsSystem.h"
+#include "../GraphicsSurface.h"
+#include "../GraphicsCommand.h"
+#include "../BufferManager.h"
+#include "../Buffer.h"
+#include "../PipelineBinding.h"
+#include "../PipelineDefinition.h"
+#include "../PipelineManager.h"
+#include "../Pipeline.h"
+#include "../Shader.h"
+#include "../ShaderManager.h"
+#include "../../Engine.h"
+#include "../../Resource/ResourceSystem.h"
+#include "../../Resource/Image/ImageManager.h"
+#include "../../Resource/Image/Image.h"
+#include "../../Platform/Window.h"
+
+#include <simplerttr.h>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/gtx/transform.hpp>
+
+namespace OpenXcom
+{
+
+
+// Vertex shader used to render the game surface to the platform window screen
+const char* vertexShaderSource = R"(
+	#version 450
+
+	layout(location = 0) in vec2 inPosition;
+	layout(location = 1) in vec2 inTexCoord;
+	layout(location = 0) out vec2 fragTexCoord;
+
+	layout(push_constant) uniform PushConstants {
+		mat4 transform;
+	} pushConstants;
+
+	void main() {
+		gl_Position = pushConstants.transform * vec4(inPosition, 0.0, 1.0);
+		fragTexCoord = inTexCoord;
+	}
+)";
+
+// Fragment shader used to render the game surface to the platform window screen
+const char* fragmentShaderSource = R"(
+	#version 450
+	layout(location = 0) in vec2 fragTexCoord;     // Input texture coordinates from vertex shader
+
+	layout(binding = 0) uniform sampler2D uTexture; // Texture sampler, bound to descriptor set
+
+	layout(location = 0) out vec4 outColor;        // Output color
+
+	void main() {
+		vec4 texColor = texture(uTexture, fragTexCoord);
+		outColor = texColor;
+	}
+)";
+
+struct WindowScreenVertex
+{
+	glm::vec2 pos;
+	glm::vec2 texCoord;
+};
+
+WindowScreenVertex vertices[] = {
+	{{-1.0f, -1.0f}, {0.0f, 0.0f}}, // Bottom-left
+	{{1.0f, -1.0f}, {1.0f, 0.0f}},  // Bottom-right
+	{{1.0f, 1.0f}, {1.0f, 1.0f}},   // Top-right
+	{{-1.0f, 1.0f}, {0.0f, 1.0f}}   // Top-left
+};
+
+// Indices for two triangles forming a rectangle
+uint16_t indices[] = {0, 1, 2, 2, 3, 0};
+
+// Run time type information
+SIMPLERTTR
+{
+	SimpleRTTR::registration().type<glm::vec2>()
+		.property(&glm::vec2::x, "x")
+		.property(&glm::vec2::y, "y");
+
+	SimpleRTTR::registration().type<glm::vec3>()
+		.property(&glm::vec3::x, "x")
+		.property(&glm::vec3::y, "y")
+		.property(&glm::vec3::z, "z");
+
+	SimpleRTTR::registration().type<glm::mat4>();
+
+	SimpleRTTR::registration().type<OpenXcom::WindowScreenVertex>()
+		.property(&OpenXcom::WindowScreenVertex::pos, "pos")
+		.property(&OpenXcom::WindowScreenVertex::texCoord, "texCoord");
+
+}
+
+
+WindowSurface::WindowSurface(const std::string& title, Options& options, GameSurface& gameSurface)
+	: _gameSurface(gameSurface), _isRunning(true)
+{
+	// create the window
+	Engine& engine = getEngine();
+	_window = std::make_unique<PlatformWindow>(title, 1024, 768);	//TODO: use game options to set the window parameters
+
+	// load the shaders
+	_vertexShader = engine.getResourceSystem().getShaderManager().loadShaderFromMemory("WindowSurfaceVertShader", vertexShaderSource, ShaderType::Vertex);			//TODO: make vertex shader for windows surface configurable/scriptable
+	_fragmentShader = engine.getResourceSystem().getShaderManager().loadShaderFromMemory("WindowSurfaceFragShader", fragmentShaderSource, ShaderType::Fragment);	//TODO: make fragment shader for windows surface configurable/scriptable
+
+	// create a graphics surface for the window
+	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
+	_windowSurface = graphicsSystem.createSurface(*_window);
+	
+	PipelineBuilder pipelineBuilder;
+
+	PipelineDefinition pipeline = pipelineBuilder
+									  .setVertexShader(*_vertexShader)
+									  .setResourceLayout(ResourceLayoutBuilder()
+															 // vertex shader stage
+															 .setVertexType<WindowScreenVertex>()
+															 .setIndexType<uint16_t>()
+															 .addPushConstant<glm::mat4>(ShaderStage::Vertex)
+
+															 // fragment shader stage
+															 .addCombinedImageSampler(0, ShaderStage::Fragment)
+															 .addTexture(0, ShaderStage::Fragment)
+															 .build())
+									  .setFragmentShader(*_fragmentShader)
+									  .setSurface(*_windowSurface)
+									  .build();
+
+	_pipeline = engine.getResourceSystem().getPipelineManager().createPipeline(pipeline);
+	_pipelineBinding = _pipeline->createBinding();
+
+	_vertexBuffer = engine.getResourceSystem().getBufferManager().createDeviceBuffer<WindowScreenVertex>(vertices, 4, BufferUsage::Vertex);
+	_indexBuffer = engine.getResourceSystem().getBufferManager().createDeviceBuffer<uint16_t>(indices, 6, BufferUsage::Index);
+
+	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
+	_pipelineBinding->setIndexBuffer(*_indexBuffer);
+	_pipelineBinding->setPushConstant(ShaderStage::Vertex, _projection);
+
+	const Image& gameRenderTarget = gameSurface.getRenderTarget();
+	_pipelineBinding->setTexture(ShaderStage::Fragment, 0, gameRenderTarget);
+
+	// setup up the window projection
+	updateProjection();
+
+	// setup the callbacks
+	_window->onClose() << std::bind(&WindowSurface::onClose, this);
+	_window->onResize() << std::bind(&WindowSurface::onResize, this);
+
+	_window->show();
+}
+
+WindowSurface::~WindowSurface()
+{
+}
+
+void WindowSurface::update()
+{
+	if (!_isRunning)
+	{
+		_window.reset();
+		return;
+	}
+
+	// update the window
+	_window->update();
+
+	if (!_window->isMinimized())
+	{
+		// begin the command pass(the start of rendering)
+		GraphicsCommand& command = _windowSurface->beginCommandPass();
+
+		//render the game surface
+		_gameSurface.render(command);
+
+		// render the game surface to the window surface
+		command.beginRenderPass(*_windowSurface);
+		_pipelineBinding->commit(command);
+		command.endRenderPass();
+
+		// end the command pass(the end of rendering)
+		_windowSurface->endCommandPass(command);
+	}
+}
+
+void WindowSurface::onResize()
+{
+	updateProjection();
+}
+
+void WindowSurface::onClose()
+{
+	getEngine().exit();
+	_isRunning = false;
+}
+
+void WindowSurface::updateProjection()
+{
+	float gameWidth = static_cast<float>(_gameSurface.getRenderTarget().getWidth());
+	float gameHeight = static_cast<float>(_gameSurface.getRenderTarget().getHeight());
+	float windowWidth = static_cast<float>(_windowSurface->getWidth());
+	float windowHeight = static_cast<float>(_windowSurface->getHeight());
+
+	float scaleX = 1.0f, scaleY = 1.0f;
+	if (windowWidth / windowHeight > gameWidth / gameHeight)
+	{
+		scaleX = (gameWidth / gameHeight) / (windowWidth / windowHeight);
+	}
+	else
+	{
+		scaleY = (windowWidth / windowHeight) / (gameWidth / gameHeight);
+	}
+
+	_projection = glm::scale(glm::mat4(1.0f), glm::vec3(scaleX, scaleY, 1.0f));
+	_pipelineBinding->setPushConstant(ShaderStage::Vertex, _projection);
+}
+
+
+
+} // namespace OpenXcom

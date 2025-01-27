@@ -137,6 +137,8 @@ set ( engine_src
   "Engine/Filesystem/EmbeddedFileSystem.cpp"
   "Engine/Filesystem/PhysicalFileSystem.cpp"
   "Engine/Filesystem/VirtualFileSystem.cpp"
+  "Engine/Graphics/Common/GameSurface.cpp"
+  "Engine/Graphics/Common/WindowSurface.cpp"
   "Engine/Graphics/Vulkan/Buffer/VulkanBuffer.cpp"
   "Engine/Graphics/Vulkan/Buffer/VulkanBufferManager.cpp"
   "Engine/Graphics/Vulkan/Font/VulkanFont.cpp"

@@ -19,27 +19,53 @@
  */
 #include <memory>
 #include <string>
+#include <glm/mat4x4.hpp>
 
 namespace OpenXcom
 {
 
 class Options;
 class GameSurface;
-class WindowSurface;
+class PlatformWindow;
+class GraphicsSurface;
+class Shader;
+class DeviceBuffer;
+class Pipeline;
+class PipelineBinding;
 
-class GameWindow
+class WindowSurface
 {
-private:
-	std::unique_ptr<GameSurface> _gameSurface;
-	std::unique_ptr<WindowSurface> _windowSurface;
+protected:
+	GameSurface& _gameSurface;
+
+	std::unique_ptr<PlatformWindow> _window;
+	std::unique_ptr<GraphicsSurface> _windowSurface;
+
+	std::unique_ptr<Pipeline> _pipeline;
+	std::unique_ptr<PipelineBinding> _pipelineBinding;
+	glm::mat4 _projection;
+
+	std::unique_ptr<Shader> _vertexShader;
+	std::unique_ptr<Shader> _fragmentShader;
+
+	std::unique_ptr<DeviceBuffer> _vertexBuffer;
+	std::unique_ptr<DeviceBuffer> _indexBuffer;
+
+	bool _isRunning;
+
+	void updateProjection();
+	
+	void onResize();
+	void onClose();
 
 public:
-	GameWindow(const std::string& title, Options& options);
-	~GameWindow();
+	WindowSurface(const std::string& title, Options& options, GameSurface& gameSurface);
+	~WindowSurface();
 
 	void update();
 
-	bool isRunning() const;
+	bool isRunning() const { return _isRunning; }
+
 };
 
 } // namespace OpenXcom

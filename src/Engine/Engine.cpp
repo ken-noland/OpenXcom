@@ -63,7 +63,7 @@ Engine::Engine(const std::vector<std::string>& args)
 	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
 
 	// Initialize the game
-	_game = std::make_unique<Game>(title.str());
+	_game = std::make_unique<Game>(title.str(), *_options);
 }
 
 Engine::~Engine()

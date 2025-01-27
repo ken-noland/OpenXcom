@@ -62,7 +62,7 @@ private:
 
 public:
 	/// Creates a new game.
-	Game(const std::string &title);
+	Game(const std::string& title, Options& options);
 	/// Cleans up all the game's resources.
 	~Game();
 

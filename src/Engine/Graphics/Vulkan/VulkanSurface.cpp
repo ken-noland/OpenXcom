@@ -323,12 +323,12 @@ void VulkanSurface::destroySurface(vk::Instance& instance, vk::SurfaceKHR& surfa
 	instance.destroySurfaceKHR(surface);
 }
 
-uint32_t VulkanSurface::getWidth()
+uint32_t VulkanSurface::getWidth() const
 {
 	return _swapChainExtent.width;
 }
 
-uint32_t VulkanSurface::getHeight()
+uint32_t VulkanSurface::getHeight() const
 {
 	return _swapChainExtent.height;
 }

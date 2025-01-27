@@ -92,8 +92,8 @@ public:
 	const vk::Extent2D& getVKExtent() const { return _swapChainExtent; }
 	const vk::RenderPass& getRenderPass() const { return _renderPass; }
 
-	virtual uint32_t getWidth() override;
-	virtual uint32_t getHeight() override;
+	virtual uint32_t getWidth() const override;
+	virtual uint32_t getHeight() const override;
 
 	virtual GraphicsCommand& beginCommandPass() override;
 	virtual void endCommandPass(GraphicsCommand& commandContext) override;

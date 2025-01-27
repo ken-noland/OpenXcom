@@ -49,11 +49,11 @@ public:
 	VulkanRenderTarget(VulkanContext& context, uint32_t width, uint32_t height, ImageFormat format);
 	virtual ~VulkanRenderTarget();
 
-	virtual uint32_t getWidth() override { return _width; }
-	virtual uint32_t getHeight() override { return _height; }
+	virtual uint32_t getWidth() const override { return _width; }
+	virtual uint32_t getHeight() const override { return _height; }
 
 	vk::Image& getImage() { return _image; }
-	vk::ImageView& getImageView() { return _imageView; }
+	const vk::ImageView& getImageView() const { return _imageView; }
 
 	virtual void beginRenderPass(GraphicsCommand& commandContext) override;
 	virtual void endRenderPass(GraphicsCommand& commandContext) override;

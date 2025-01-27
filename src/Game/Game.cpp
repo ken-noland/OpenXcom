@@ -44,9 +44,9 @@ Game* getGame()
 	return _GamePtr();
 }
 
-Game::Game(const std::string& title)
+Game::Game(const std::string& title, Options& options)
 {
-	_gameWindow = std::make_unique<GameWindow>(title);
+	_gameWindow = std::make_unique<GameWindow>(title, options);
 
 	//Engine& engine = getEngine();
 	//_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768);

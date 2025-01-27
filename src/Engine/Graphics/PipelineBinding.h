@@ -41,7 +41,7 @@ public:
 	void setPushConstant(ShaderStage stage, const ConstantType& data);
 	virtual void setPushConstant(const SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size) = 0;
 
-	virtual void setTexture(ShaderStage stage, uint32_t binding, Image& image) = 0;
+	virtual void setTexture(ShaderStage stage, uint32_t binding, const Image& image) = 0;
 
 	virtual void commit(GraphicsCommand& command) = 0;
 };

@@ -17,38 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <cstdint>
+#include <memory>
 
 namespace OpenXcom
 {
 
-enum class ImageFormat
-{
-	UNKNOWN,
-	RGBA8,
-};
+class Options;
+class RenderTarget;
+class GraphicsCommand;
+class Buffer;
 
-enum class ImageType
-{
-	Texture,
-	RenderTarget
-};
-
-class Image
+class GameSurface
 {
 protected:
-	ImageType _type;
+	std::unique_ptr<RenderTarget> _renderTarget;
 
 public:
-	Image(ImageType type) : _type(type) { };
-	virtual ~Image() = default;
+	GameSurface(Options& options);
+	~GameSurface();
 
-	virtual uint32_t getWidth() const = 0;
-	virtual uint32_t getHeight() const = 0;
+	void render(GraphicsCommand& command);
 
-	ImageType getType() const { return _type; }
+	const RenderTarget& getRenderTarget() const { return *_renderTarget; }
 };
-
-
 
 } // namespace OpenXcom
