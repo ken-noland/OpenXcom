@@ -48,6 +48,20 @@ public:
 			(*it)(std::forward<Args>(args)...);
 		}
 	}
+
+	/// Add a function to the delegate using the `<<` operator.
+	MulticastDelegate& operator<<(const Function& function)
+	{
+		this->push_back(function);
+		return *this;
+	}
+
+	/// Add a function to the delegate using the `<<` operator (rvalue).
+	MulticastDelegate& operator<<(Function&& function)
+	{
+		this->push_back(std::move(function));
+		return *this;
+	}
 };
 
 } // namespace OpenXcom

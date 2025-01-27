@@ -18,8 +18,11 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../Utility/Delegate.h"
+
 #include <string>
 #include <memory>
+
 
 #if defined(_WIN32)
  // Forward declarations for Windows types
@@ -55,7 +58,7 @@ struct PlatformWindowHandle
 
 class PlatformWindow
 {
-private:
+protected:
 	// These are defined here, but implemented in the platform-specific files
 	void platformSpecificCreateWindow(const std::string& title, int width, int height);
 	void platformSpecificDestroyWindow();
@@ -68,6 +71,17 @@ private:
 
 	PlatformWindowHandle _handle;
 
+	void resize();
+
+	//message
+	MulticastDelegate<void(void)> _onClose;
+	MulticastDelegate<void(void)> _onResize;
+
+	// flags(maybe convert these to bit mask fields later?)
+	bool _minimized;
+	bool _maximized;
+	bool _restored;
+
 public:
 	PlatformWindow(const std::string& title, int width, int height);
 	~PlatformWindow();
@@ -75,12 +89,16 @@ public:
 	void update();
 
 	bool isRunning() const;
+	bool isMinimized() const;
 	void close();
 
 	void show() { platformSpecificShowWindow(); }
 	void hide() { platformSpecificHideWindow(); }
 
-	const PlatformWindowHandle& getHandle() { return _handle; }
+	const PlatformWindowHandle& getHandle() const { return _handle; }
+
+	MulticastDelegate<void(void)>& onClose() { return _onClose; }
+	MulticastDelegate<void(void)>& onResize() { return _onResize; }
 };
 
 

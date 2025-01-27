@@ -21,7 +21,6 @@
 #include "Options.h"
 #include "../Game/Game.h"
 #include "Filesystem/VirtualFileSystem.h"
-#include "Platform/WindowSystem.h"
 #include "Platform/ProcessSystem.h"
 #include "Graphics/GraphicsSystem.h"
 #include "Resource/ResourceSystem.h"
@@ -53,9 +52,6 @@ Engine::Engine(const std::vector<std::string>& args)
 	// Initialize the process system
 	_platformProcessSystem = std::make_unique<PlatformProcessSystem>();
 
-	// Initialize the window system
-	_platformWindowSystem = std::make_unique<PlatformWindowSystem>();
-
 	// Initialize the graphics system
 	_graphicsSystem = createGraphicsSystem(getOptions());
 		
@@ -78,9 +74,6 @@ Engine::~Engine()
 	// shut down the resource system
 	_resourceSystem.reset();
 
-	// shut down window
-	_platformWindowSystem.reset();
-
 	// shut down graphics
 	_graphicsSystem.reset();
 
@@ -96,10 +89,9 @@ int Engine::run()
 	}
 
 	// run until the game is done
-	while (_platformProcessSystem->isRunning() == true)
+	while (_platformProcessSystem->isRunning() == true && _game->isRunning())
 	{
 		_platformProcessSystem->update();
-		_platformWindowSystem->update();
 
 		_game->update();
 	}

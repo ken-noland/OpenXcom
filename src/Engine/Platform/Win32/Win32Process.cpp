@@ -40,10 +40,13 @@ void PlatformProcessSystem::platformSpecificUpdate()
 	}
 }
 
-void PlatformProcessSystem::platformSpecificExit()
+void PlatformProcessSystem::platformSpecificExit(int exitCode)
 {
+	// Signal to Engine that the application should stop
+	_isRunning = false; 
+
 	// Post a quit message to the message queue which will get picked up by the main loop(see above)
-	PostQuitMessage(0);
+	PostQuitMessage(exitCode);
 }
 
 } // namespace OpenXcom

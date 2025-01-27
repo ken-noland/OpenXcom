@@ -20,7 +20,6 @@
 #include <vulkan/vulkan.hpp>
 #include "../GraphicsSurface.h"
 #include "../GraphicsCommand.h"
-#include "../../Platform/Window.h"
 
 #include "Buffer/VulkanBuffer.h"
 
@@ -36,8 +35,7 @@ class VulkanBufferFactory;
 class VulkanPipelineFactory;
 class VulkanPipeline;
 class PipelineDefinition;
-
-
+class PlatformWindow;
 
 struct FrameData
 {
@@ -66,28 +64,27 @@ protected:
 	std::vector<FrameData> _frames;
 	uint32_t _currentFrame;
 	uint32_t _imageIndex;
+	bool _minimized;
 
 	vk::RenderPass _renderPass;
 
-	PlatformWindowHandle _windowHandle;
+	PlatformWindow& _window;
 	std::unique_ptr<VulkanCommand> _commandContext;
 
 	void initializeSwapChain();
-	void initializeRenderPass();
-	void initializeFrames();
-
 	void destroySwapChain();
+
 	void handleResize();
 
 	// this function is used to create the surface for the platform window, but equally, VulkanContext needs to
 	// create a surface to select a physical device, so rather than duplicate the code, we'll make it static and
 	// friendly.
 	friend class VulkanContext;
-	static vk::SurfaceKHR createSurface(vk::Instance& instance, const PlatformWindowHandle& window);
+	static vk::SurfaceKHR createSurface(vk::Instance& instance, const PlatformWindow& window);
 	static void destroySurface(vk::Instance& instance, vk::SurfaceKHR& surface);
 
 public:
-	VulkanSurface(VulkanContext& context, const PlatformWindowHandle& window);
+	VulkanSurface(VulkanContext& context, PlatformWindow& window);
 	virtual ~VulkanSurface();
 
 	const vk::SurfaceKHR& getVKSurface() const { return _surface; }

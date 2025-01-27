@@ -169,7 +169,6 @@ set ( engine_src
   "Engine/Platform/Win32/Win32Window.cpp"
   "Engine/Platform/ProcessSystem.cpp"
   "Engine/Platform/Window.cpp"
-  "Engine/Platform/WindowSystem.cpp"
   "Engine/Resource/ResourceSystem.cpp"
   #"Engine/Resource/Font/Font.cpp"
   "Engine/Resource/Font/FontManager.cpp"

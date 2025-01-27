@@ -28,7 +28,6 @@ class Game;
 class Options;
 class VirtualFileSystem;
 class PlatformProcessSystem;
-class PlatformWindowSystem;
 class GraphicsSystem;
 class ResourceSystem;
 
@@ -47,9 +46,6 @@ class Engine
 
 	// Platform Process System
 	std::unique_ptr<PlatformProcessSystem> _platformProcessSystem;
-
-	// Platform Window System
-	std::unique_ptr<PlatformWindowSystem> _platformWindowSystem;
 
 	// Graphics system
 	std::unique_ptr<GraphicsSystem> _graphicsSystem;
@@ -74,7 +70,6 @@ public:
 
 	Options& getOptions() { return *_options; }
 	VirtualFileSystem& getVirtualFileSystem() { return *_virtualFileSystem; }
-	PlatformWindowSystem& getPlatformWindowSystem() { return *_platformWindowSystem; }
 	GraphicsSystem& getGraphicsSystem() { return *_graphicsSystem; }
 	ResourceSystem& getResourceSystem() { return *_resourceSystem; }
 };

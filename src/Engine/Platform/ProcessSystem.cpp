@@ -34,9 +34,9 @@ void PlatformProcessSystem::update()
 	platformSpecificUpdate();
 }
 
-void PlatformProcessSystem::exit()
+void PlatformProcessSystem::exit(int exitCode)
 {
-	platformSpecificExit();
+	platformSpecificExit(exitCode);
 }
 
 } // namespace OpenXcom

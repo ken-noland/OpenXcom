@@ -29,7 +29,6 @@
 
 #include "../../Engine.h"
 #include "../../Platform/Window.h"
-#include "../../Platform/WindowSystem.h"
 #include "../../../version.h"
 
 #include <glslang/Public/ShaderLang.h>
@@ -281,17 +280,15 @@ void VulkanContext::initializeInstance()
 		Log(LOG_DEBUG) << "Vulkan instance created";
 
 		// Create a temporary platform window
-		PlatformWindowSystem& windowSystem = getEngine().getPlatformWindowSystem();
-		std::shared_ptr<PlatformWindow> window = windowSystem.createWindow("VulkanSurfaceCapWindow", 0, 0).lock();
+		std::unique_ptr<PlatformWindow> window = std::make_unique<PlatformWindow>("VulkanSurfaceCapWindow", 100, 100);
 
-		vk::SurfaceKHR surface = VulkanSurface::createSurface(_instance, window->getHandle());
+		vk::SurfaceKHR surface = VulkanSurface::createSurface(_instance, *window);
 
 		// Select a physical device and create the logical device
 		selectPhysicalDevice(surface);
 		initializeDevice(surface);
 
 		VulkanSurface::destroySurface(_instance, surface);
-		windowSystem.destroyWindow(window);
 		window.reset();
 
 	}

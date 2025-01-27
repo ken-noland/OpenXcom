@@ -45,9 +45,9 @@ VulkanSystem::~VulkanSystem()
 
 }
 
-std::unique_ptr<GraphicsSurface> VulkanSystem::createSurface(const PlatformWindowHandle& handle)
+std::unique_ptr<GraphicsSurface> VulkanSystem::createSurface(PlatformWindow& window)
 {
-	return std::make_unique<VulkanSurface>(_context, handle);
+	return std::make_unique<VulkanSurface>(_context, window);
 }
 
 std::unique_ptr<RenderTarget> VulkanSystem::createRenderTarget(int width, int height, ImageFormat format)

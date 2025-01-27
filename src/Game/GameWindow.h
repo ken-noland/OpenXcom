@@ -35,7 +35,7 @@ class Shader;
 class GameWindow
 {
 private:
-	std::shared_ptr<PlatformWindow> _window;
+	std::unique_ptr<PlatformWindow> _window;
 	std::unique_ptr<GraphicsSurface> _windowSurface;
 
 	std::unique_ptr<Pipeline> _windowPipeline;
@@ -50,13 +50,20 @@ private:
 	std::unique_ptr<Shader> _vertexShader;
 	std::unique_ptr<Shader> _fragmentShader;
 
+	bool _isRunning;
+
 	void updateProjection();
+
+	void onClose();
+	void onResize();
 
 public:
 	GameWindow(const std::string& title);
 	~GameWindow();
 
 	void update();
+
+	bool isRunning() const { return _isRunning; }
 };
 
 } // namespace OpenXcom

@@ -25,15 +25,26 @@
 namespace OpenXcom
 {
 
+class Win32PlatformWindow : public PlatformWindow
+{
+protected:
+	// little hack which allows access to protected members of PlatformWindow
+	friend LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+};
 
 // Custom window procedure
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	Win32PlatformWindow* window = reinterpret_cast<Win32PlatformWindow*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+	if (!window)
+	{
+		return DefWindowProc(hwnd, uMsg, wParam, lParam);
+	}
+
 	switch (uMsg)
 	{
 	case WM_CLOSE:
-		//KN TODO: need to send this message to the owning window to handle it
-		getEngine().exit();
+		window->close();
 		return 0;
 	case WM_KEYDOWN:
 		// Handle key down events if needed
@@ -48,6 +59,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONUP:
 		// Handle mouse button events if needed
 		break;
+
+	case WM_EXITSIZEMOVE:
+		// End of resizing
+		window->resize();
+		break;
+
+	case WM_SIZE:
+		if (wParam == SIZE_MINIMIZED)
+		{
+			window->_minimized = true;
+			window->resize();
+		}
+		else if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED)
+		{
+			window->_minimized = false;
+			window->resize();
+		}
+		break;
+
 	// Handle other messages as needed
 	default:
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -69,6 +99,8 @@ void PlatformWindow::platformSpecificCreateWindow(const std::string& title, int 
 		0, wc.lpszClassName, title.c_str(),
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 		width, height, nullptr, nullptr, _handle.hInstance, nullptr);
+
+	SetWindowLongPtr(_handle.hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 }
 
 void PlatformWindow::platformSpecificDestroyWindow()

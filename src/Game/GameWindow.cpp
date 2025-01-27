@@ -18,7 +18,6 @@
  */
 #include "GameWindow.h"
 #include "../Engine/Engine.h"
-#include "../Engine/Platform/WindowSystem.h"
 #include "../Engine/Platform/Window.h"
 
 #include "../Engine/Graphics/GraphicsSystem.h"
@@ -44,8 +43,9 @@
 #include <glm/gtx/transform.hpp>
 
 #include <limits>
+#include <functional>
 
-#include <SimpleRTTR.h>
+#include <simplerttr.h>
 
 namespace OpenXcom
 {
@@ -125,10 +125,11 @@ SIMPLERTTR
 }
 
 GameWindow::GameWindow(const std::string& title)
+	: _isRunning(true)
 {
 	// create the window
 	Engine& engine = getEngine();
-	_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768).lock();
+	_window = std::make_unique<PlatformWindow>(title, 1024, 768);
 
 	// load the shaders
 	_vertexShader = engine.getResourceSystem().getShaderManager().loadShaderFromMemory("WindowSurfaceVertShader", vertexShaderSource, ShaderType::Vertex);
@@ -136,7 +137,7 @@ GameWindow::GameWindow(const std::string& title)
 
 	// create a graphics surface for the window
 	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
-	_windowSurface = graphicsSystem.createSurface(_window->getHandle());
+	_windowSurface = graphicsSystem.createSurface(*_window);
 
 	// create a render target for the game surface
 	_gameSurface = graphicsSystem.createRenderTarget(320, 200, ImageFormat::RGBA8);
@@ -174,6 +175,10 @@ GameWindow::GameWindow(const std::string& title)
 	// setup up the window projection
 	updateProjection();
 
+	// setup the callbacks
+	_window->onClose() << std::bind(&GameWindow::onClose, this);
+	_window->onResize() << std::bind(&GameWindow::onResize, this);
+
 	_window->show();
 }
 
@@ -187,9 +192,7 @@ GameWindow::~GameWindow()
 
 	// destroy the surface
 	_windowSurface.reset();
-
-	// destroy the window
-	engine.getPlatformWindowSystem().destroyWindow(_window);
+	_window.reset();
 }
 
 void GameWindow::updateProjection()
@@ -224,38 +227,47 @@ void GameWindow::updateProjection()
 	_windowPipelineBinding->setPushConstant(ShaderStage::Vertex, _windowProjection);
 }
 
+void GameWindow::onClose()
+{
+	// when the game window closes, then the engine should exit
+	getEngine().exit();
+	_isRunning = false;
+}
+
+void GameWindow::onResize()
+{
+	updateProjection();
+}
+
 void GameWindow::update()
 {
-	//Engine& engine = getEngine();
+	if (!_isRunning)
+	{
+		_window.reset();
+		return;
+	}
 
 	// update the window
 	_window->update();
 
-    GraphicsCommand& command = _windowSurface->beginCommandPass();
-
-	// Render the game surface
+	if(!_window->isMinimized())
 	{
+
+		// begin the command pass(the start of rendering)
+		GraphicsCommand& command = _windowSurface->beginCommandPass();
+
+		// Render the game surface
 		command.beginRenderPass(*_gameSurface);
-		// Perform game-specific rendering
 		command.endRenderPass();
-	}
 
-	// Render the window surface
-	{
+		// render the game surface to the window surface
 		command.beginRenderPass(*_windowSurface);
-
-		// most of this is for testing so we can validate the low level rendering
-		////////////////////////////////////////////
-
 		_windowPipelineBinding->commit(command);
-
-		////////////////////////////////////////////
-
-
 		command.endRenderPass();
-	}
 
-	_windowSurface->endCommandPass(command);
+		// end the command pass(the end of rendering)
+		_windowSurface->endCommandPass(command);
+	}
 }
 
 } // namespace OpenXcom

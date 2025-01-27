@@ -28,7 +28,7 @@ enum class ImageFormat;
 class GraphicsSurface;
 class RenderTarget;
 
-struct PlatformWindowHandle;
+class PlatformWindow;
 
 class ShaderManager;
 class PipelineManager;
@@ -46,7 +46,7 @@ public:
 	GraphicsSystem() = default;
 	virtual ~GraphicsSystem() = default;
 
-	virtual std::unique_ptr<GraphicsSurface> createSurface(const PlatformWindowHandle& handle) = 0;
+	virtual std::unique_ptr<GraphicsSurface> createSurface(PlatformWindow& window) = 0;
 	virtual std::unique_ptr<RenderTarget> createRenderTarget(int width, int height, ImageFormat format) = 0;
 
 	// resource managers

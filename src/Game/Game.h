@@ -66,6 +66,8 @@ public:
 	/// Cleans up all the game's resources.
 	~Game();
 
+	bool isRunning() const;
+
 	/// Update the game.
 	void update();
 	/// Quits the game.

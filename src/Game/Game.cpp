@@ -68,6 +68,11 @@ Game::~Game()
 {
 }
 
+bool Game::isRunning() const
+{
+	return _gameWindow->isRunning();
+}
+
 void Game::update()
 {
 	_gameWindow->update();

@@ -21,7 +21,6 @@
 
 namespace OpenXcom
 {
-
 PlatformWindow::PlatformWindow(const std::string& title, int width, int height)
 {
 	platformSpecificCreateWindow(title, width, height);
@@ -44,10 +43,25 @@ bool PlatformWindow::isRunning() const
 	return _running;
 }
 
+bool PlatformWindow::isMinimized() const
+{
+	return _minimized;
+}
+
+
 void PlatformWindow::close()
 {
 	_running = false;
+
+	// run the callbacks before the platform window is called(in case the caller wants to override the close behavior)
+	_onClose.call();
+
 	platformSpecificDestroyWindow();
+}
+
+void PlatformWindow::resize()
+{
+	_onResize.call();
 }
 
 } // namespace OpenXcom

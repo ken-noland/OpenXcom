@@ -26,7 +26,7 @@ class PlatformProcessSystem
 	bool _isRunning;
 
 	void platformSpecificUpdate();
-	void platformSpecificExit();
+	void platformSpecificExit(int exitCode);
 
 public:
 	PlatformProcessSystem();
@@ -37,7 +37,7 @@ public:
 	bool isRunning() const { return _isRunning; };
 
 	// post a quit message to the system which shuts down the application safely
-	void exit();
+	void exit(int exitCode = 0);
 };
 
 } // namespace OpenXcom
