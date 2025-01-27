@@ -30,6 +30,7 @@
 #include "../Engine/Graphics/GraphicsSystem.h"
 #include "../Engine/Graphics/GraphicsSurface.h"
 #include "../Engine/Graphics/Buffer.h"
+#include "../Engine/Graphics/BufferManager.h"
 #include "../Engine/Graphics/Pipeline.h"
 #include "../Engine/Graphics/PipelineBinding.h"
 #include "../Engine/Graphics/PipelineDefinition.h"
@@ -102,6 +103,15 @@ SIMPLERTTR
 		.property(&OpenXcom::LineVertex::color, "texCoord");
 }
 
+//LineVertex lineVerticesTemp[] = {
+//	{{0, 0}, {0.0f, 0.0f, 0.0f, 0.5f}}, // Bottom-left
+//	{{320, 200}, {0.0f, 0.0f, 0.0f, 0.5f}},  // Bottom-right
+//};
+
+LineVertex lineVerticesTemp[] = {
+	{{0, 0}, {0.0f, 0.0f, 0.0f, 0.5f}},     // Bottom-left
+	{{320, 200}, {0.0f, 1.0f, 0.0f, 0.5f}}, // Bottom-right
+};
 
 /////////////////////////////////////////////
 
@@ -127,6 +137,7 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 	ResourceSystem& resourceSystem = engine.getResourceSystem();
 	ShaderManager& shaderManager = resourceSystem.getShaderManager();
 	PipelineManager& pipelineManager = resourceSystem.getPipelineManager();
+	BufferManager& bufferManager = resourceSystem.getBufferManager();
 
 	// load the shaders
 	_vertexShader = shaderManager.loadShaderFromMemory("WindowSurfaceVertShader", vertexLineDrawShaderSource, ShaderType::Vertex); // TODO: make vertex shader for windows surface configurable/scriptable
@@ -136,6 +147,9 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 	PipelineBuilder pipelineBuilder;
 	PipelineDefinition definition = pipelineBuilder
 										.setResourceLayout(ResourceLayoutBuilder()
+															   // topology
+															   .setTopology(PrimitiveTopology::LineList)
+
 															   // vertex shader stage
 															   .setVertexType<LineVertex>()
 															   .addPushConstant<glm::ivec2>(ShaderStage::Vertex) // push constant for screen width and height
@@ -149,6 +163,10 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 	_pipeline = pipelineManager.createPipeline(definition);
 
 	_pipelineBinding = _pipeline->createBinding();
+
+	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lineVerticesTemp, 2, BufferUsage::Vertex);
+	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
+	_pipelineBinding->setPushConstant(ShaderStage::Vertex, glm::ivec2(_gameSurface->getScreenSize()));
 
 	// even more temp temp stuff... this should be moved to a uniform buffer
 	glm::ivec2 screenSize = _gameSurface->getScreenSize();
@@ -177,6 +195,7 @@ void GameWindow::onWindowRender(GraphicsCommand& command)
 
 void GameWindow::onGameRender(GraphicsCommand& command)
 {
+	_pipelineBinding->commit(command);
 }
 
 

@@ -128,7 +128,29 @@ void VulkanPipeline::createVertexInputInfo(
 
 void VulkanPipeline::createInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo& inputAssembly)
 {
-	inputAssembly.topology = vk::PrimitiveTopology::eTriangleList;
+	PrimitiveTopology topology = _pipelineDefinition.getResourceLayout().getTopology();
+
+	switch(topology)
+	{
+	case PrimitiveTopology::TriangleList:
+		inputAssembly.topology = vk::PrimitiveTopology::eTriangleList;
+		break;
+	case PrimitiveTopology::TriangleStrip:
+		inputAssembly.topology = vk::PrimitiveTopology::eTriangleStrip;
+		break;
+	case PrimitiveTopology::LineList:
+		inputAssembly.topology = vk::PrimitiveTopology::eLineList;
+		break;
+	case PrimitiveTopology::LineStrip:
+		inputAssembly.topology = vk::PrimitiveTopology::eLineStrip;
+		break;
+	case PrimitiveTopology::PointList:
+		inputAssembly.topology = vk::PrimitiveTopology::ePointList;
+		break;
+	default:
+		throw std::runtime_error("Unsupported primitive topology");
+	}
+
 	inputAssembly.primitiveRestartEnable = VK_FALSE;
 }
 
@@ -242,7 +264,7 @@ void VulkanPipeline::createPipeline(
 	std::vector<vk::DynamicState> dynamicStates = {
 		vk::DynamicState::eViewport,
 		vk::DynamicState::eScissor
-	};
+	};	//TODO: Some pipelines need this, others do not. Need to find a way to signal if that is the case!
 
 	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
 	dynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());

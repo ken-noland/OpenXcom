@@ -63,8 +63,11 @@ VulkanPipelineBinding::~VulkanPipelineBinding()
 
 void VulkanPipelineBinding::create()
 {
-	// create the descriptor set
-	_descriptorSet = _context.getDescriptorSetFactory().createDescriptorSet(_pipeline.getDescriptorSetLayout());
+	if (_pipeline.getDescriptorSetLayout())
+	{
+		// create the descriptor set
+		_descriptorSet = _context.getDescriptorSetFactory().createDescriptorSet(_pipeline.getDescriptorSetLayout());
+	}
 
 	// create the push constants
 	for (const PushConstantDefinition& pushConstantDefinition : _pipeline.getPipelineDefinition().getResourceLayout().getPushConstants())
@@ -131,8 +134,6 @@ void VulkanPipelineBinding::setTexture(ShaderStage stage, uint32_t binding, cons
 		throw new std::runtime_error("Invalid image type");
 	}
 
-	vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal; // Adjust if needed
-
 	// Create descriptor image info
 	vk::DescriptorImageInfo descImageInfo{};
 
@@ -168,16 +169,7 @@ void VulkanPipelineBinding::commit(GraphicsCommand& command)
 	vk::DescriptorSet descriptorSets[] = {_descriptorSet->getDescriptorSet()};
 	vkCommand.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, _pipeline.getPipelineLayout(), 0, 1, descriptorSets, 0, nullptr);
 
-	// Bind vertex and index buffers
-	VulkanDeviceBuffer& vertexBuffer = _vertexBuffer.value().get();
-	VulkanDeviceBuffer& indexBuffer = _indexBuffer.value().get();
-
-	vk::DeviceSize offsets[] = {0};
-	vkCommand.bindVertexBuffers(0, vertexBuffer.getBuffer(), offsets);
-	vkCommand.bindIndexBuffer(indexBuffer.getBuffer(), 0, vk::IndexType::eUint16);
-
-
-	//push the push constants
+	// push the push constants
 	for (const std::unique_ptr<VulkanPushConstant>& pushConstant : _pushConstants)
 	{
 		if (pushConstant)
@@ -186,9 +178,31 @@ void VulkanPipelineBinding::commit(GraphicsCommand& command)
 		}
 	}
 
-	//finally, issue draw command
-	uint32_t count = (uint32_t)(indexBuffer.getSize() / indexBuffer.getType().size());
-	vkCommand.drawIndexed(count, 1, 0, 0, 0);
+	// Bind vertex and index buffers
+	assert(_vertexBuffer.has_value() && "You must bind a vertex buffer to the pipeline binding prior to calling commit()");
+	VulkanDeviceBuffer& vertexBuffer = _vertexBuffer.value().get();
+	bool isIndexed = true;
+	if (_indexBuffer.has_value())
+	{
+		VulkanDeviceBuffer& indexBuffer = _indexBuffer.value().get();
+		vk::DeviceSize offsets[] = {0};
+		vkCommand.bindVertexBuffers(0, vertexBuffer.getBuffer(), offsets);
+		vkCommand.bindIndexBuffer(indexBuffer.getBuffer(), 0, vk::IndexType::eUint16);
+
+		// finally, issue draw command
+		uint32_t count = (uint32_t)(indexBuffer.getSize() / indexBuffer.getType().size());
+		vkCommand.drawIndexed(count, 1, 0, 0, 0);
+	}
+	else
+	{
+		vk::DeviceSize offsets[] = {0};
+		vkCommand.bindVertexBuffers(0, vertexBuffer.getBuffer(), offsets);
+
+		// finally, issue draw command
+		uint32_t count = (uint32_t)(vertexBuffer.getSize() / vertexBuffer.getType().size());
+		vkCommand.draw(count, 1, 0, 0);
+		isIndexed = false;
+	}
 }
 
 } // namespace OpenXcom

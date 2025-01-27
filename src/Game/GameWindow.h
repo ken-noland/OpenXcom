@@ -58,7 +58,6 @@ protected:
 	std::unique_ptr<Shader> _fragmentShader;
 
 	std::unique_ptr<DeviceBuffer> _vertexBuffer;
-	std::unique_ptr<DeviceBuffer> _indexBuffer;
 
 	/////////////////////////////////////////////
 

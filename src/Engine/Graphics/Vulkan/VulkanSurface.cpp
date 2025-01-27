@@ -378,22 +378,6 @@ GraphicsCommand& VulkanSurface::beginCommandPass()
 	vk::CommandBufferBeginInfo beginInfo{};
 	commandBuffer.begin(beginInfo);
 
-	vk::Viewport viewport = {};
-	viewport.x = 0.0f;
-	viewport.y = 0.0f;
-	viewport.width = static_cast<float>(_swapChainExtent.width);
-	viewport.height = static_cast<float>(_swapChainExtent.height);
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-
-	commandBuffer.setViewport(0, 1, &viewport);
-
-	vk::Rect2D scissor = {};
-	scissor.offset = vk::Offset2D{0, 0};
-	scissor.extent = _swapChainExtent;
-
-	commandBuffer.setScissor(0, 1, &scissor);
-
 	_commandContext->setCommandBuffer(commandBuffer);
 
 	return *_commandContext;
@@ -449,6 +433,22 @@ void VulkanSurface::endCommandPass(GraphicsCommand& command)
 
 void VulkanSurface::beginRenderPass(GraphicsCommand& command)
 {
+	vk::Viewport viewport = {};
+	viewport.x = 0.0f;
+	viewport.y = 0.0f;
+	viewport.width = static_cast<float>(_swapChainExtent.width);
+	viewport.height = static_cast<float>(_swapChainExtent.height);
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+
+	_commandContext->getCommandBuffer().setViewport(0, 1, &viewport);
+
+	vk::Rect2D scissor = {};
+	scissor.offset = vk::Offset2D{0, 0};
+	scissor.extent = _swapChainExtent;
+
+	_commandContext->getCommandBuffer().setScissor(0, 1, &scissor);
+
 	vk::RenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.renderPass = _renderPass;
 	renderPassInfo.framebuffer = _frames[_currentFrame].framebuffer;

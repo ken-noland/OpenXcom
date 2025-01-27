@@ -37,6 +37,16 @@ enum class ShaderStage : int
 	Count
 };
 
+enum class PrimitiveTopology : int
+{
+	TriangleList,
+	TriangleStrip,
+	LineList,
+	LineStrip,
+	PointList,
+	Count
+};
+
 struct UniformBufferDefinition
 {
 	uint32_t binding;
@@ -72,13 +82,16 @@ protected:
 	std::vector<PushConstantDefinition> _pushConstants;
 	std::vector<TextureDefinition> _textures;
 
+	PrimitiveTopology _topology;
+
 	std::vector<CombinedImageSamplerDefinition> _combinedImageSamplers;
 
 public:
 	ResourceLayoutDefinition()
 		:
-		_vertexType(SimpleRTTR::types().get_type<void>().value()),
-		_indexType(SimpleRTTR::types().get_type<void>().value())
+		  _vertexType(SimpleRTTR::types().get_type<void>().value()),
+		  _indexType(SimpleRTTR::types().get_type<void>().value()),
+		  _topology(PrimitiveTopology::TriangleList)
 	{ }
 	~ResourceLayoutDefinition() = default;
 
@@ -96,6 +109,9 @@ public:
 
 	void addTexture(const TextureDefinition& texture) { _textures.push_back(texture); }
 	const std::vector<TextureDefinition>& getTextures() const { return _textures; }
+
+	void setTopology(PrimitiveTopology topology) { _topology = topology; }
+	PrimitiveTopology getTopology() const { return _topology; }
 
 	void addCombinedImageSampler(uint32_t binding, ShaderStage stage)
 	{
@@ -148,6 +164,12 @@ public:
 	ResourceLayoutBuilder& addTexture(uint32_t binding, ShaderStage stage)
 	{
 		_resourceLayout.addTexture({binding, stage});
+		return *this;
+	}
+
+	ResourceLayoutBuilder& setTopology(PrimitiveTopology topology)
+	{
+		_resourceLayout.setTopology(topology);
 		return *this;
 	}
 
