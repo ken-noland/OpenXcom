@@ -28,7 +28,7 @@ class GraphicsCommand;
 class RenderTarget : public Image
 {
 public:
-	RenderTarget() : Image(ImageType::RenderTarget) { }
+	RenderTarget(ImageType imageType = ImageType::RenderTarget) : Image(imageType) {}
 	virtual ~RenderTarget() = default;
 
 	virtual void beginRenderPass(GraphicsCommand& commandContext) = 0;
@@ -38,7 +38,7 @@ public:
 class GraphicsSurface : public RenderTarget
 {
 public:
-	GraphicsSurface() = default;
+	GraphicsSurface() : RenderTarget(ImageType::Surface) {};
 	virtual ~GraphicsSurface() = default;
 		
 	virtual GraphicsCommand& beginCommandPass() = 0;

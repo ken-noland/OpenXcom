@@ -51,9 +51,12 @@ public:
 
 	virtual uint32_t getWidth() const override { return _width; }
 	virtual uint32_t getHeight() const override { return _height; }
+	virtual glm::ivec2 getSize() const override { return glm::ivec2(_width, _height); }
 
 	vk::Image& getImage() { return _image; }
 	const vk::ImageView& getImageView() const { return _imageView; }
+
+	const vk::RenderPass& getRenderPass() const { return _renderPass; }
 
 	virtual void beginRenderPass(GraphicsCommand& commandContext) override;
 	virtual void endRenderPass(GraphicsCommand& commandContext) override;

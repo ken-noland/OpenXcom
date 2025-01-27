@@ -20,18 +20,50 @@
 #include <memory>
 #include <string>
 
+/////////////////////////////////////////////
+// TEMP
+
+/////////////////////////////////////////////
+
+
 namespace OpenXcom
 {
 
 class Options;
 class GameSurface;
 class WindowSurface;
+class GraphicsCommand;
+
+/////////////////////////////////////////////
+// TEMP
+class Pipeline;
+class PipelineBinding;
+class Shader;
+class DeviceBuffer;
+/////////////////////////////////////////////
+
 
 class GameWindow
 {
-private:
+protected:
 	std::unique_ptr<GameSurface> _gameSurface;
 	std::unique_ptr<WindowSurface> _windowSurface;
+
+	/////////////////////////////////////////////
+	// TEMP
+	std::unique_ptr<Pipeline> _pipeline;
+	std::unique_ptr<PipelineBinding> _pipelineBinding;
+
+	std::unique_ptr<Shader> _vertexShader;
+	std::unique_ptr<Shader> _fragmentShader;
+
+	std::unique_ptr<DeviceBuffer> _vertexBuffer;
+	std::unique_ptr<DeviceBuffer> _indexBuffer;
+
+	/////////////////////////////////////////////
+
+	void onWindowRender(GraphicsCommand& command);
+	void onGameRender(GraphicsCommand& command);
 
 public:
 	GameWindow(const std::string& title, Options& options);

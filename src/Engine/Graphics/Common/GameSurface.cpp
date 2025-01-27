@@ -45,9 +45,14 @@ void GameSurface::render(GraphicsCommand& command)
 	command.beginRenderPass(*_renderTarget);
 
 	// dispatch any rendering commands here
-
+	_onRender.call(command);
 
 	command.endRenderPass();
+}
+
+glm::ivec2 GameSurface::getScreenSize() const
+{
+	return _renderTarget->getSize();
 }
 
 } // namespace OpenXcom

@@ -18,6 +18,11 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <entt/entt.hpp>
+
+#if defined(None)
+#undef None
+#endif
+
 #include <simplerttr.h>
 
 namespace OpenXcom

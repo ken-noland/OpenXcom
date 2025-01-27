@@ -25,7 +25,7 @@
 #include "../Engine/Hierarchical.h"
 #include "../Engine/Drawable.h"
 
-#include "../Common/RTTR.h"
+#include "../../Engine/Utility/RTTR.h"
 
 
 namespace OpenXcom

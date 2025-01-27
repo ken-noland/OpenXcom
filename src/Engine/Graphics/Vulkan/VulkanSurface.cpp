@@ -37,8 +37,7 @@
 #include <glm/vec3.hpp>
 #include <limits>
 
-#undef None
-#include "../../../Entity/Common/RTTR.h"
+#include "../../Utility/RTTR.h"
 
 
 namespace OpenXcom
@@ -66,12 +65,6 @@ VulkanSurface::~VulkanSurface()
 	_context.getDevice().waitIdle();
 
 	destroySwapChain();
-
-	if (_commandPool)
-	{
-		_context.getDevice().destroyCommandPool(_commandPool);
-		_commandPool = nullptr;
-	}
 
 	if (_surface)
 	{
@@ -253,11 +246,12 @@ void VulkanSurface::destroySwapChain()
 		_context.getDevice().destroySemaphore(frame.imageAvailableSemaphore);
 		_context.getDevice().destroySemaphore(frame.renderFinishedSemaphore);
 		_context.getDevice().destroyFence(frame.inFlightFence);
+		_context.getDevice().freeCommandBuffers(_commandPool, 1, &frame.commandBuffer);
 	}
 	_frames.clear();
 
 	// reset the command pool
-	_context.getDevice().resetCommandPool(_commandPool, vk::CommandPoolResetFlags());
+	_context.getDevice().destroyCommandPool(_commandPool);
 
 	// destroy the render pass
 	if (_renderPass)
@@ -331,6 +325,11 @@ uint32_t VulkanSurface::getWidth() const
 uint32_t VulkanSurface::getHeight() const
 {
 	return _swapChainExtent.height;
+}
+
+glm::ivec2 VulkanSurface::getSize() const
+{
+	return glm::ivec2(_swapChainExtent.width, _swapChainExtent.height);
 }
 
 GraphicsCommand& VulkanSurface::beginCommandPass()

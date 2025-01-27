@@ -31,7 +31,7 @@
 #include <ShlObj_core.h>
 #endif
 
-#include "../Entity/Common/RTTR.h"
+#include "Utility/RTTR.h"
 
 namespace OpenXcom
 {

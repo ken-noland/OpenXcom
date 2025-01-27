@@ -18,6 +18,8 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <memory>
+#include "../../Utility/Delegate.h"
+#include <glm/vec2.hpp>
 
 namespace OpenXcom
 {
@@ -32,6 +34,9 @@ class GameSurface
 protected:
 	std::unique_ptr<RenderTarget> _renderTarget;
 
+	// events
+	MulticastDelegate<void(GraphicsCommand&)> _onRender;
+
 public:
 	GameSurface(Options& options);
 	~GameSurface();
@@ -39,6 +44,9 @@ public:
 	void render(GraphicsCommand& command);
 
 	const RenderTarget& getRenderTarget() const { return *_renderTarget; }
+	glm::ivec2 getScreenSize() const; 
+
+	MulticastDelegate<void(GraphicsCommand&)>& onRender() { return _onRender; }
 };
 
 } // namespace OpenXcom

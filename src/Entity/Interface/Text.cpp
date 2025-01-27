@@ -25,7 +25,7 @@
 
 #include "../../Engine/Screen.h"
 
-#include "../Common/RTTR.h"
+#include "../../Engine/Utility/RTTR.h"
 
 
 namespace OpenXcom

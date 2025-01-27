@@ -48,7 +48,7 @@ protected:
 
 	void createVertexInputInfo(vk::VertexInputBindingDescription& bindingDescription, std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions, vk::PipelineVertexInputStateCreateInfo& vertexInputInfo);
 	void createInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo& inputAssembly);
-	void createViewportState(vk::PipelineViewportStateCreateInfo& viewportState, vk::Viewport& viewport, vk::Rect2D& scissor, VulkanSurface& surface);
+	void createViewportState(vk::PipelineViewportStateCreateInfo& viewportState, vk::Viewport& viewport, vk::Rect2D& scissor, const RenderTarget& surface);
 	void createRasterizerState(vk::PipelineRasterizationStateCreateInfo& rasterizer);
 	void createMultisampleState(vk::PipelineMultisampleStateCreateInfo& multisampling);
 	void createColorBlendState(vk::PipelineColorBlendStateCreateInfo& colorBlending, vk::PipelineColorBlendAttachmentState& colorBlendAttachment);
@@ -63,7 +63,7 @@ protected:
 		const vk::PipelineRasterizationStateCreateInfo& rasterizer,
 		const vk::PipelineMultisampleStateCreateInfo& multisampling,
 		const vk::PipelineColorBlendStateCreateInfo& colorBlending,
-		VulkanSurface& surface);
+		const RenderTarget& surface);
 
 	//TODO: This might be better in a helper class of some sort, maybe passed in as part of the context?
 	vk::Format determineFormat(const SimpleRTTR::Type& type);

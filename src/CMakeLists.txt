@@ -176,6 +176,7 @@ set ( engine_src
   "Engine/Resource/Font/FontManager.cpp"
   #"Engine/Resource/Palette/Palette.cpp"
   "Engine/Resource/Palette/PaletteManager.cpp"
+  "Engine/Utility/RTTRGlm.cpp"
 #  "Engine/Action.cpp"
 #  "Engine/AdlibMusic.cpp"
 #  "Engine/CatFile.cpp"
@@ -829,7 +830,7 @@ if(UNIX)
 endif() #UNIX
 
 # openxcom base library targets
-add_library(openxcom_base_lib OBJECT ${openxcom_src})
+add_library(openxcom_base_lib STATIC ${openxcom_src})
 target_include_directories(openxcom_base_lib PUBLIC ${openxcom_includes})
 target_compile_definitions(openxcom_base_lib PUBLIC ${openxcom_defines})
 target_link_libraries(openxcom_base_lib PUBLIC ${openxcom_libs})

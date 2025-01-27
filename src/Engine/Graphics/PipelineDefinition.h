@@ -27,7 +27,7 @@
 namespace OpenXcom
 {
 
-class GraphicsSurface;
+class RenderTarget;
 class Shader;
 
 enum class ShaderStage : int
@@ -194,7 +194,7 @@ protected:
 	std::optional<std::reference_wrapper<const Shader>> _vertexShader;
 	std::optional<std::reference_wrapper<const Shader>> _fragmentShader;
 
-	std::optional<std::reference_wrapper<GraphicsSurface>> _surface;
+	std::optional<std::reference_wrapper<const RenderTarget>> _renderTarget;
 
 	ResourceLayoutDefinition _resourceLayout;
 
@@ -211,8 +211,13 @@ public:
 	void setResourceLayout(const ResourceLayoutDefinition& resourceLayout) { _resourceLayout = resourceLayout; }
 	const ResourceLayoutDefinition& getResourceLayout() const { return _resourceLayout; }
 
-	void setSurface(GraphicsSurface& surface) { _surface = surface; }
-	GraphicsSurface& getSurface() const { return _surface.value().get(); }
+	void setRenderTarget(const RenderTarget& renderTarget) { _renderTarget = renderTarget; }
+	bool hasRenderTarget() const { return _renderTarget.has_value(); }
+	const RenderTarget& getSurface() const
+	{
+		assert(_renderTarget.has_value() && "You must set the render target before calling this function.");
+		return _renderTarget.value().get();
+	}
 };
 
 class PipelineBuilder
@@ -241,9 +246,9 @@ public:
 		return *this;
 	}
 
-	PipelineBuilder& setSurface(GraphicsSurface& surface)
+	PipelineBuilder& setRenderTarget(const RenderTarget& surface)
 	{
-		_pipelineDefinition.setSurface(surface);
+		_pipelineDefinition.setRenderTarget(surface);
 		return *this;
 	}
 

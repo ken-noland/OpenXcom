@@ -104,6 +104,7 @@ VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, const SimpleRTTR:
 
 VulkanDeviceBuffer::~VulkanDeviceBuffer()
 {
+	_context.getDevice().waitIdle();
 	vmaDestroyBuffer(_context.getAllocator(), _buffer, _allocation);
 }
 

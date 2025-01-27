@@ -22,7 +22,7 @@
 #include <Windows.h>
 #endif
 
-#include "../Entity/Common/RTTR.h"
+#include "Utility/RTTR.h"
 #include <iostream>
 
 namespace OpenXcom

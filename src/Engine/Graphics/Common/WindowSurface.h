@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "../../Utility/Delegate.h"
+
 #include <memory>
 #include <string>
 #include <glm/mat4x4.hpp>
@@ -32,6 +34,7 @@ class Shader;
 class DeviceBuffer;
 class Pipeline;
 class PipelineBinding;
+class GraphicsCommand;
 
 class WindowSurface
 {
@@ -53,6 +56,9 @@ protected:
 
 	bool _isRunning;
 
+	// events
+	MulticastDelegate<void(GraphicsCommand&)> _onRender;
+
 	void updateProjection();
 	
 	void onResize();
@@ -66,6 +72,7 @@ public:
 
 	bool isRunning() const { return _isRunning; }
 
+	MulticastDelegate<void(GraphicsCommand&)>& onRender() { return _onRender; }
 };
 
 } // namespace OpenXcom

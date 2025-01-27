@@ -34,8 +34,14 @@ namespace OpenXcom
 // singleton access for the engine
 Engine* theEngine = nullptr;
 
+// annoyingly, I have to put this in somewhere so it correctly links the RTTR stuff
+extern int FORCE_LINK_RTTRGLM;
+
 Engine::Engine(const std::vector<std::string>& args)
 {
+	// hack to force the linker to include the RTTR stuff
+	FORCE_LINK_RTTRGLM = 42; 
+
 	if(theEngine != nullptr)
 	{
 		throw std::runtime_error("Engine already exists. Only one instance of Engine per process.");

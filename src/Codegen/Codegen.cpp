@@ -31,7 +31,7 @@
 
 #pragma warning(pop)            // Restore the previous warning state
 
-#include "../Entity/Common/RTTR.h"
+#include "../Engine/Utility/RTTR.h"
 
 //some string helpers
 //  trim from start (in place)

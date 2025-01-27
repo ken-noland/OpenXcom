@@ -20,6 +20,7 @@
 #include "VulkanPipelineBinding.h"
 #include "../VulkanContext.h"
 #include "../VulkanSurface.h"
+#include "../VulkanRenderTarget.h"
 #include "../VulkanDescriptorSet.h"
 #include "../Shader/VulkanShader.h"
 #include "../../PipelineDefinition.h"
@@ -36,7 +37,9 @@ namespace OpenXcom
 VulkanPipeline::VulkanPipeline(VulkanContext& context, const PipelineDefinition& pipelineDefinition)
 	: _context(context), _pipelineDefinition(pipelineDefinition)
 {
-	VulkanSurface& surface = static_cast<VulkanSurface&>(pipelineDefinition.getSurface());
+	assert(pipelineDefinition.hasRenderTarget() && "You must specify the render target or surface in the pipeline definition");
+
+	const RenderTarget& renderTarget = pipelineDefinition.getSurface();
 
 	createDescriptorSetLayout();
 
@@ -58,14 +61,14 @@ VulkanPipeline::VulkanPipeline(VulkanContext& context, const PipelineDefinition&
 
 	createVertexInputInfo(bindingDescription, attributeDescriptions, vertexInputInfo);
 	createInputAssemblyState(inputAssembly);
-	createViewportState(viewportState, viewport, scissor, surface);
+	createViewportState(viewportState, viewport, scissor, renderTarget);
 	createRasterizerState(rasterizer);
 	createMultisampleState(multisampling);
 	createColorBlendState(colorBlending, colorBlendAttachment);
 
 	createPipelineLayout();
 
-	createPipeline(shaderStages, vertexInputInfo, inputAssembly, viewportState, rasterizer, multisampling, colorBlending, surface);
+	createPipeline(shaderStages, vertexInputInfo, inputAssembly, viewportState, rasterizer, multisampling, colorBlending, renderTarget);
 }
 
 void VulkanPipeline::createDescriptorSetLayout()
@@ -129,19 +132,19 @@ void VulkanPipeline::createInputAssemblyState(vk::PipelineInputAssemblyStateCrea
 	inputAssembly.primitiveRestartEnable = VK_FALSE;
 }
 
-void VulkanPipeline::createViewportState(vk::PipelineViewportStateCreateInfo& viewportState, vk::Viewport& viewport, vk::Rect2D& scissor, VulkanSurface& surface)
+void VulkanPipeline::createViewportState(vk::PipelineViewportStateCreateInfo& viewportState, vk::Viewport& viewport, vk::Rect2D& scissor, const RenderTarget& surface)
 {
-	vk::Extent2D surfaceExtent = surface.getVKExtent();
+	glm::ivec2 surfaceExtent = surface.getSize();
 
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
-	viewport.width = (float)surfaceExtent.width;
-	viewport.height = (float)surfaceExtent.height;
+	viewport.width = (float)surfaceExtent.x;
+	viewport.height = (float)surfaceExtent.y;
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
 
-	scissor.offset = vk::Offset2D{0, 0};
-	scissor.extent = surfaceExtent;
+	scissor.offset = vk::Offset2D(0, 0);
+	scissor.extent = vk::Extent2D(surfaceExtent.x, surfaceExtent.y);
 
 	viewportState.viewportCount = 1;
 	viewportState.pViewports = &viewport;
@@ -208,8 +211,19 @@ void VulkanPipeline::createPipeline(
 	const vk::PipelineRasterizationStateCreateInfo& rasterizer,
 	const vk::PipelineMultisampleStateCreateInfo& multisampling,
 	const vk::PipelineColorBlendStateCreateInfo& colorBlending,
-	VulkanSurface& surface)
+	const RenderTarget& surface)
 {
+	vk::RenderPass renderPass;
+
+	switch(surface.getType())
+	{
+	case ImageType::Surface:
+		renderPass = static_cast<const VulkanSurface&>(surface).getRenderPass();
+		break;
+	case ImageType::RenderTarget:
+		renderPass = static_cast<const VulkanRenderTarget&>(surface).getRenderPass();
+		break;
+	}
 
 	vk::GraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
@@ -221,7 +235,7 @@ void VulkanPipeline::createPipeline(
 	pipelineInfo.pMultisampleState = &multisampling;
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.layout = _pipelineLayout;
-	pipelineInfo.renderPass = surface.getRenderPass();
+	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
 
 	// Declare the dynamic states
@@ -242,13 +256,22 @@ void VulkanPipeline::createPipeline(
 
 vk::Format VulkanPipeline::determineFormat(const SimpleRTTR::Type& type)
 {
+	//TODO: This needs to be moved to a map lookup. It could be part of _context so that we only have to do the type looksup once
 	if (type == SimpleRTTR::types().get_type<glm::vec2>())
 	{
 		return vk::Format::eR32G32Sfloat;
 	}
+	else if (type == SimpleRTTR::types().get_type<glm::ivec2>())
+	{
+		return vk::Format::eR32G32Sint;
+	}
 	else if (type == SimpleRTTR::types().get_type<glm::vec3>())
 	{
 		return vk::Format::eR32G32B32Sfloat;
+	}
+	else if (type == SimpleRTTR::types().get_type<glm::vec4>())
+	{
+		return vk::Format::eR32G32B32A32Sfloat;
 	}
 	else
 	{

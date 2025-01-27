@@ -99,21 +99,9 @@ uint16_t indices[] = {0, 1, 2, 2, 3, 0};
 // Run time type information
 SIMPLERTTR
 {
-	SimpleRTTR::registration().type<glm::vec2>()
-		.property(&glm::vec2::x, "x")
-		.property(&glm::vec2::y, "y");
-
-	SimpleRTTR::registration().type<glm::vec3>()
-		.property(&glm::vec3::x, "x")
-		.property(&glm::vec3::y, "y")
-		.property(&glm::vec3::z, "z");
-
-	SimpleRTTR::registration().type<glm::mat4>();
-
 	SimpleRTTR::registration().type<OpenXcom::WindowScreenVertex>()
 		.property(&OpenXcom::WindowScreenVertex::pos, "pos")
 		.property(&OpenXcom::WindowScreenVertex::texCoord, "texCoord");
-
 }
 
 
@@ -134,7 +122,7 @@ WindowSurface::WindowSurface(const std::string& title, Options& options, GameSur
 	
 	PipelineBuilder pipelineBuilder;
 
-	PipelineDefinition pipeline = pipelineBuilder
+	PipelineDefinition pipelineDefinition = pipelineBuilder
 									  .setVertexShader(*_vertexShader)
 									  .setResourceLayout(ResourceLayoutBuilder()
 															 // vertex shader stage
@@ -147,10 +135,10 @@ WindowSurface::WindowSurface(const std::string& title, Options& options, GameSur
 															 .addTexture(0, ShaderStage::Fragment)
 															 .build())
 									  .setFragmentShader(*_fragmentShader)
-									  .setSurface(*_windowSurface)
+									  .setRenderTarget(*_windowSurface)
 									  .build();
 
-	_pipeline = engine.getResourceSystem().getPipelineManager().createPipeline(pipeline);
+	_pipeline = engine.getResourceSystem().getPipelineManager().createPipeline(pipelineDefinition);
 	_pipelineBinding = _pipeline->createBinding();
 
 	_vertexBuffer = engine.getResourceSystem().getBufferManager().createDeviceBuffer<WindowScreenVertex>(vertices, 4, BufferUsage::Vertex);
@@ -199,6 +187,10 @@ void WindowSurface::update()
 		// render the game surface to the window surface
 		command.beginRenderPass(*_windowSurface);
 		_pipelineBinding->commit(command);
+
+		// render delegates after the game surface
+		_onRender.call(command);
+
 		command.endRenderPass();
 
 		// end the command pass(the end of rendering)

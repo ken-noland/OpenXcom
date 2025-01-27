@@ -95,6 +95,9 @@ public:
 	virtual uint32_t getWidth() const override;
 	virtual uint32_t getHeight() const override;
 
+	virtual glm::ivec2 getSize() const override;
+
+
 	virtual GraphicsCommand& beginCommandPass() override;
 	virtual void endCommandPass(GraphicsCommand& commandContext) override;
 

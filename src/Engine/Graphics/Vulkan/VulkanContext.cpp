@@ -46,6 +46,7 @@ VkBool32 debugCallback(
 	(void)messageTypes;
 	(void)pUserData;
 	Log(LOG_DEBUG) << "Validation layer: " << pCallbackData->pMessage;
+	assert(false);
 	return VK_FALSE;
 }
 
