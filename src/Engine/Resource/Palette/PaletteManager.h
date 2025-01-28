@@ -33,13 +33,13 @@ public:
 	virtual ~PaletteManager();
 
 	// load palette from memory
-	Handle loadPalette(const std::string& name, const glm::ivec4* data, size_t size);
+	ResourceManager<Palette>::OwningHandle loadPalette(const std::string& name, const glm::ivec4* data, size_t size);
 
 	// load palette from parameters
-	Handle loadPalette(const std::string& name, std::initializer_list<glm::ivec4> data);
+	ResourceManager<Palette>::OwningHandle loadPalette(const std::string& name, std::initializer_list<glm::ivec4> data);
 
 	// load palette from file
-	Handle loadPalette(const std::string& name, const std::filesystem::path& path);
+	ResourceManager<Palette>::OwningHandle loadPalette(const std::string& name, const std::filesystem::path& path);
 };
 
 } // namespace OpenXcom

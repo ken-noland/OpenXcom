@@ -105,7 +105,7 @@ public:
 	void addUniformBuffer(const BufferDefinition& uniformBuffer) { _uniformBuffers.push_back(uniformBuffer); }
 	const std::vector<BufferDefinition>& getUniformBuffers() const { return _uniformBuffers; }
 
-	void addStorageBuffer(const BufferDefinition& uniformBuffer) { _storageBuffers.push_back(uniformBuffer); }
+	void addStorageBuffer(const BufferDefinition& storageBuffer) { _storageBuffers.push_back(storageBuffer); }
 	const std::vector<BufferDefinition>& getStorageBuffers() const { return _storageBuffers; }
 
 	void addPushConstant(const PushConstantDefinition& pushConstant) { _pushConstants.push_back(pushConstant); }

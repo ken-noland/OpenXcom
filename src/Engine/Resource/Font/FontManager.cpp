@@ -30,14 +30,14 @@ FontManager::~FontManager()
 {
 }
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const unsigned char* data, size_t size)
+ResourceManager<Font>::OwningHandle FontManager::loadFont(const std::string& name, const unsigned char* data, size_t size)
 {
-	return INVALID_HANDLE;
+	return ResourceManager<Font>::OwningHandle(ResourceManager<Font>::Handle::Invalid_Handle, *this);
 }
 
-FontManager::Handle FontManager::loadFont(const std::string& name, const std::filesystem::path& filename)
+ResourceManager<Font>::OwningHandle FontManager::loadFont(const std::string& name, const std::filesystem::path& filename)
 {
-	return INVALID_HANDLE;
+	return ResourceManager<Font>::OwningHandle(ResourceManager<Font>::Handle::Invalid_Handle, *this);
 }
 
 } // namespace OpenXcom

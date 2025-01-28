@@ -17,10 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "Handle.h"
+
 #include <memory>
 #include <optional>
 #include <unordered_map>
 #include <vector>
+#include <limits>
 
 namespace OpenXcom
 {
@@ -29,23 +32,23 @@ template <typename ResourceType>
 class ResourceManager
 {
 public:
-	using Handle = uint32_t;
-	static const Handle INVALID_HANDLE = static_cast<Handle>(-1);
+	using Handle = ResourceHandle<ResourceType>;
+	using OwningHandle = OwningHandle<ResourceType>;
 
 protected:
 	using ResourceMap = std::unordered_map<Handle, std::unique_ptr<ResourceType>>;
 
 	ResourceMap _resources;
-	Handle nextHandle = 0;
+	std::uint32_t nextHandle = 0;
 
 public:
 	ResourceManager() = default;
 	virtual ~ResourceManager() = default;
 
-	Handle add(std::unique_ptr<ResourceType> resource)
+	OwningHandle add(std::unique_ptr<ResourceType> resource)
 	{
-		Handle handle = nextHandle++;
-		_resources.emplace(handle, std::move(resource));
+		OwningHandle handle(nextHandle++, *this);
+		_resources.emplace(handle.getHandle(), std::move(resource));
 		return handle;
 	}
 
@@ -60,9 +63,15 @@ public:
 	}
 
 	template<typename Type>
-	Type& get(Handle handle)
+	Type& get(const Handle& handle)
 	{
-		return *static_cast<Type*>(_resources[handle].get());
+		return *static_cast<Type*>(_resources[handle.getId()].get());
+	}
+		
+	template <typename Type>
+	Type& get(const OwningHandle& handle)
+	{
+		return *static_cast<Type*>(_resources[handle.getId()].get());
 	}
 
 	bool exists(Handle handle)

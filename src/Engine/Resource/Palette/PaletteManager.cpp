@@ -30,19 +30,19 @@ PaletteManager::~PaletteManager()
 {
 }
 
-PaletteManager::Handle PaletteManager::loadPalette(const std::string& name, const glm::ivec4* data, size_t size)
+ResourceManager<Palette>::OwningHandle PaletteManager::loadPalette(const std::string& name, const glm::ivec4* data, size_t size)
 {
-	return INVALID_HANDLE;
+	return ResourceManager<Palette>::OwningHandle(ResourceManager<Palette>::Handle::Invalid_Handle, *this);
 }
 
-PaletteManager::Handle PaletteManager::loadPalette(const std::string& name, std::initializer_list<glm::ivec4> data)
+ResourceManager<Palette>::OwningHandle PaletteManager::loadPalette(const std::string& name, std::initializer_list<glm::ivec4> data)
 {
-	return INVALID_HANDLE;
+	return ResourceManager<Palette>::OwningHandle(ResourceManager<Palette>::Handle::Invalid_Handle, *this);
 }
 
-PaletteManager::Handle PaletteManager::loadPalette(const std::string& name, const std::filesystem::path& path)
+ResourceManager<Palette>::OwningHandle PaletteManager::loadPalette(const std::string& name, const std::filesystem::path& path)
 {
-	return INVALID_HANDLE;
+	return ResourceManager<Palette>::OwningHandle(ResourceManager<Palette>::Handle::Invalid_Handle, *this);
 }
 
 } // namespace OpenXcom

@@ -32,10 +32,10 @@ public:
 	virtual ~FontManager();
 
 	// load font from memory
-	Handle loadFont(const std::string& name, const unsigned char* data, size_t size);
+	ResourceManager<Font>::OwningHandle loadFont(const std::string& name, const unsigned char* data, size_t size);
 
 	// load font from file
-	Handle loadFont(const std::string& name, const std::filesystem::path& filename);
+	ResourceManager<Font>::OwningHandle loadFont(const std::string& name, const std::filesystem::path& filename);
 };
 
 } // namespace OpenXcom

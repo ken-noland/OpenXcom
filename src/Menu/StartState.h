@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../Engine/State.h"
+#include "../Engine/Resource/Handle.h"
 #include <string>
 #include <sstream>
 
@@ -28,6 +29,7 @@ class Text;
 class Font;
 class Timer;
 class Language;
+class Palette;
 
 enum LoadingPhase { LOADING_STARTED, LOADING_FAILED, LOADING_SUCCESSFUL, LOADING_DONE };
 
@@ -37,8 +39,8 @@ enum LoadingPhase { LOADING_STARTED, LOADING_FAILED, LOADING_SUCCESSFUL, LOADING
 class StartState : public State
 {
 private:
-	uint32_t _terminalFontHandle;
-	uint32_t _terminalPaletteHandle;
+	OwningHandle<Font> _terminalFontHandle;
+	OwningHandle<Palette> _terminalPaletteHandle;
 
 public:
 	StartState();

@@ -152,7 +152,6 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 		this->onGameRender(command);
 	};
 
-
 	/////////////////////////////////////////////
 	// TEMP
 
@@ -161,6 +160,9 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 	ShaderManager& shaderManager = resourceSystem.getShaderManager();
 	PipelineManager& pipelineManager = resourceSystem.getPipelineManager();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
+	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
+
+	
 
 	// load the shaders
 	_vertexShader = shaderManager.loadShaderFromMemory("WindowSurfaceVertShader", vertexLineDrawShaderSource, ShaderType::Vertex); // TODO: make vertex shader for windows surface configurable/scriptable
@@ -194,7 +196,7 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 	_palette = bufferManager.createDeviceBuffer(&paletteData, 1, BufferUsage::Storage);
 	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, *_palette);
 
-	PushConstants pushConstants = {glm::ivec2(_gameSurface->getScreenSize()), 0};
+	PushConstants pushConstants = {glm::ivec2(_gameSurface->getScreenSize()), 1};
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
 
 	// even more temp temp stuff... this should be moved to a uniform buffer
