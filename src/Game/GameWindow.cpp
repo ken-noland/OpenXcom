@@ -54,23 +54,34 @@ const char* vertexLineDrawShaderSource = R"(
 	#version 450
 
 	layout(location = 0) in ivec2 inPosition;  // Input as signed integers
-	layout(location = 1) in vec4 inColor;     // Input color
 
 	layout(location = 0) out vec4 fragColor;  // Output color
 
 	layout(push_constant) uniform PushConstants {
-		int screenWidth;
-		int screenHeight;
+		int screenWidth;    //TODO: Move to uniform buffer
+		int screenHeight;   //TODO: Move to uniform buffer
+		int paletteColor;
 	} pushConstants;
+
+	layout(set = 0, binding = 0, std430) buffer Palette {
+		uint colors[];     // Dynamically sized palette
+	};
 
 	void main() {
 		// Convert screen coordinates to normalized device coordinates (NDC)
 		ivec2 snappedPosition = inPosition; // Already in integer format
 		vec2 ndc = (vec2(snappedPosition) + 0.5) / vec2(pushConstants.screenWidth, pushConstants.screenHeight) * 2.0 - 1.0;
-		ndc.y = -ndc.y; // Vulkan's NDC has Y flipped compared to screen-space
 
 		gl_Position = vec4(ndc, 0.0, 1.0);
-		fragColor = inColor;
+
+		uint packedColor = colors[pushConstants.paletteColor];
+
+		fragColor = vec4(
+			float((packedColor >> 0) & 0xFF) / 255.0,   // Red
+			float((packedColor >> 8) & 0xFF) / 255.0,   // Green
+			float((packedColor >> 16) & 0xFF) / 255.0,  // Blue
+			float((packedColor >> 24) & 0xFF) / 255.0   // Alpha
+		);
 	}
 )";
 
@@ -93,25 +104,37 @@ const char* fragmentLineDrawShaderSource = R"(
 struct LineVertex
 {
 	glm::ivec2 pos;
-	glm::vec4 color;	//technically, the color should be a push constant
+};
+
+struct Palette
+{
+	uint32_t colors[256];
+};
+
+struct PushConstants
+{
+	glm::ivec2 screenSize;
+	int paletteColor;
 };
 
 SIMPLERTTR
 {
 	SimpleRTTR::registration().type<LineVertex>()
-		.property(&OpenXcom::LineVertex::pos, "pos")
-		.property(&OpenXcom::LineVertex::color, "texCoord");
+		.property(&OpenXcom::LineVertex::pos, "pos");
+
+	SimpleRTTR::registration().type<Palette>();
+
+	SimpleRTTR::registration().type<PushConstants>()
+		.property(&OpenXcom::PushConstants::screenSize, "screenSize")
+		.property(&OpenXcom::PushConstants::paletteColor, "paletteColor");
 }
 
-//LineVertex lineVerticesTemp[] = {
-//	{{0, 0}, {0.0f, 0.0f, 0.0f, 0.5f}}, // Bottom-left
-//	{{320, 200}, {0.0f, 0.0f, 0.0f, 0.5f}},  // Bottom-right
-//};
-
 LineVertex lineVerticesTemp[] = {
-	{{0, 0}, {0.0f, 0.0f, 0.0f, 0.5f}},     // Bottom-left
-	{{320, 200}, {0.0f, 1.0f, 0.0f, 0.5f}}, // Bottom-right
+	{{0, 0}},     // Bottom-left
+	{{320, 200}}, // Bottom-right
 };
+
+
 
 /////////////////////////////////////////////
 
@@ -143,7 +166,6 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 	_vertexShader = shaderManager.loadShaderFromMemory("WindowSurfaceVertShader", vertexLineDrawShaderSource, ShaderType::Vertex); // TODO: make vertex shader for windows surface configurable/scriptable
 	_fragmentShader = shaderManager.loadShaderFromMemory("WindowSurfaceFragShader", fragmentLineDrawShaderSource, ShaderType::Fragment); // TODO: make fragment shader for windows surface configurable/scriptable
 
-
 	PipelineBuilder pipelineBuilder;
 	PipelineDefinition definition = pipelineBuilder
 										.setResourceLayout(ResourceLayoutBuilder()
@@ -152,7 +174,8 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 
 															   // vertex shader stage
 															   .setVertexType<LineVertex>()
-															   .addPushConstant<glm::ivec2>(ShaderStage::Vertex) // push constant for screen width and height
+															   .addStorageBuffer<Palette>(ShaderStage::Vertex, 0)
+															   .addPushConstant<PushConstants>(ShaderStage::Vertex) // push constant for screen width and height
 
 															   .build())
 										.setVertexShader(*_vertexShader)
@@ -166,7 +189,13 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 
 	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lineVerticesTemp, 2, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
-	_pipelineBinding->setPushConstant(ShaderStage::Vertex, glm::ivec2(_gameSurface->getScreenSize()));
+
+	Palette paletteData = {{0x00000000, 0xFFFFFFFF}};
+	_palette = bufferManager.createDeviceBuffer(&paletteData, 1, BufferUsage::Storage);
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, *_palette);
+
+	PushConstants pushConstants = {glm::ivec2(_gameSurface->getScreenSize()), 0};
+	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
 
 	// even more temp temp stuff... this should be moved to a uniform buffer
 	glm::ivec2 screenSize = _gameSurface->getScreenSize();

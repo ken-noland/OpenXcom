@@ -36,6 +36,7 @@ public:
 
 	virtual void setVertexBuffer(DeviceBuffer& buffer) = 0;
 	virtual void setIndexBuffer(DeviceBuffer& buffer) = 0;
+	virtual void setUniformBuffer(ShaderStage stage, uint32_t binding, DeviceBuffer& buffer) = 0;
 
 	template <typename ConstantType>
 	void setPushConstant(ShaderStage stage, const ConstantType& data);
@@ -50,7 +51,7 @@ public:
 template <typename ConstantType>
 void PipelineBinding::setPushConstant(ShaderStage stage, const ConstantType& data)
 {
-	setPushConstant(SimpleRTTR::types().get_type<ConstantType>().value(), stage, &data, sizeof(data));
+	setPushConstant(SimpleRTTR::types().get_type<ConstantType>().value(), stage, &data, sizeof(ConstantType));
 }
 
 } // namespace OpenXcom

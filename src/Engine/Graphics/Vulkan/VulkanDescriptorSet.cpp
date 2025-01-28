@@ -23,6 +23,20 @@
 namespace OpenXcom
 {
 
+//helper function
+vk::ShaderStageFlags getVKStage(ShaderStage stage)
+{
+	switch (stage)
+	{
+	case ShaderStage::Vertex:
+		return vk::ShaderStageFlagBits::eVertex;
+	case ShaderStage::Fragment:
+		return vk::ShaderStageFlagBits::eFragment;
+	default:
+		throw std::runtime_error("Invalid shader stage");
+	}
+}
+
 VulkanDescriptorSetFactory::VulkanDescriptorSetFactory(VulkanContext& context)
 	: _context(context), _poolManager(context.getDevice())
 {
@@ -49,13 +63,27 @@ vk::DescriptorSetLayout VulkanDescriptorSetFactory::createDescriptorSetLayout(co
 	}
 
 	// Uniform buffers
-	for (const UniformBufferDefinition& uniformBuffer : pipelineDefinition.getResourceLayout().getUniformBuffers())
+	for (const BufferDefinition& uniformBuffer : pipelineDefinition.getResourceLayout().getUniformBuffers())
 	{
+		vk::ShaderStageFlags stage = getVKStage(uniformBuffer.stage);
 		vk::DescriptorSetLayoutBinding binding = {
 			uniformBuffer.binding,
 			vk::DescriptorType::eUniformBuffer,
 			1,
-			vk::ShaderStageFlagBits::eVertex,
+			stage,
+			nullptr};
+		bindings.push_back(binding);
+	}
+
+	// Storage buffers
+	for (const BufferDefinition& storageBuffer : pipelineDefinition.getResourceLayout().getStorageBuffers())
+	{
+		vk::ShaderStageFlags stage = getVKStage(storageBuffer.stage);
+		vk::DescriptorSetLayoutBinding binding = {
+			storageBuffer.binding,
+			vk::DescriptorType::eStorageBuffer,
+			1,
+			stage,
 			nullptr};
 		bindings.push_back(binding);
 	}

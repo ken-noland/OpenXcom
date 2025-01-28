@@ -104,6 +104,34 @@ void VulkanPipelineBinding::setIndexBuffer(DeviceBuffer& buffer)
 	_indexBuffer = static_cast<VulkanDeviceBuffer&>(buffer);
 }
 
+void VulkanPipelineBinding::setUniformBuffer(ShaderStage stage, uint32_t binding, DeviceBuffer& buffer)
+{
+	std::vector<std::optional<std::reference_wrapper<VulkanDeviceBuffer>>>& uniformBuffers = _uniformBuffers[(int)stage];
+
+	if (binding >= uniformBuffers.size())
+	{
+		uniformBuffers.resize(binding + 1);
+	}
+
+	VulkanDeviceBuffer& vulkanBuffer = static_cast<VulkanDeviceBuffer&>(buffer);
+	uniformBuffers[binding] = vulkanBuffer;
+
+	vk::DescriptorBufferInfo bufferInfo{};
+	bufferInfo.buffer = vulkanBuffer.getBuffer();	// The buffer handle
+	bufferInfo.offset = 0;							// Offset within the buffer
+	bufferInfo.range = vulkanBuffer.getSize();		// Size of the buffer being used
+
+	vk::WriteDescriptorSet descriptorWrite{};
+	descriptorWrite.dstSet = _descriptorSet->getDescriptorSet();          // Target descriptor set
+	descriptorWrite.dstBinding = binding;                                 // Binding index in the shader
+	descriptorWrite.dstArrayElement = 0;                                  // First array element to update
+	descriptorWrite.descriptorType = vk::DescriptorType::eStorageBuffer;  // Uniform buffer
+	descriptorWrite.descriptorCount = 1;                                  // Number of descriptors to update
+	descriptorWrite.pBufferInfo = &bufferInfo;                            // Buffer info to bind
+
+	_context.getDevice().updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
+}
+
 void VulkanPipelineBinding::setPushConstant(const SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size)
 {
 	// Get the push constant
@@ -162,10 +190,10 @@ void VulkanPipelineBinding::commit(GraphicsCommand& command)
 {
 	vk::CommandBuffer& vkCommand = static_cast<VulkanCommand&>(command).getCommandBuffer();
 
-	//bind the pipeline
+	// bind the pipeline
 	vkCommand.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline.getPipeline());
 
-	//bind the descriptor set
+	// bind the descriptor set
 	vk::DescriptorSet descriptorSets[] = {_descriptorSet->getDescriptorSet()};
 	vkCommand.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, _pipeline.getPipelineLayout(), 0, 1, descriptorSets, 0, nullptr);
 

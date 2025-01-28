@@ -47,7 +47,7 @@ enum class PrimitiveTopology : int
 	Count
 };
 
-struct UniformBufferDefinition
+struct BufferDefinition
 {
 	uint32_t binding;
 	ShaderStage stage;
@@ -78,7 +78,8 @@ protected:
 	SimpleRTTR::TypeReference _vertexType;
 	SimpleRTTR::TypeReference _indexType;
 
-	std::vector<UniformBufferDefinition> _uniformBuffers;
+	std::vector<BufferDefinition> _uniformBuffers;
+	std::vector<BufferDefinition> _storageBuffers;
 	std::vector<PushConstantDefinition> _pushConstants;
 	std::vector<TextureDefinition> _textures;
 
@@ -101,8 +102,11 @@ public:
 	void setIndexType(const SimpleRTTR::Type& type) { _indexType = type; }
 	SimpleRTTR::Type getIndexType() const { return _indexType.type(); }
 
-	void addUniformBuffer(const UniformBufferDefinition& uniformBuffer) { _uniformBuffers.push_back(uniformBuffer); }
-	const std::vector<UniformBufferDefinition>& getUniformBuffers() const { return _uniformBuffers; }
+	void addUniformBuffer(const BufferDefinition& uniformBuffer) { _uniformBuffers.push_back(uniformBuffer); }
+	const std::vector<BufferDefinition>& getUniformBuffers() const { return _uniformBuffers; }
+
+	void addStorageBuffer(const BufferDefinition& uniformBuffer) { _storageBuffers.push_back(uniformBuffer); }
+	const std::vector<BufferDefinition>& getStorageBuffers() const { return _storageBuffers; }
 
 	void addPushConstant(const PushConstantDefinition& pushConstant) { _pushConstants.push_back(pushConstant); }
 	const std::vector<PushConstantDefinition>& getPushConstants() const { return _pushConstants; }
@@ -113,10 +117,7 @@ public:
 	void setTopology(PrimitiveTopology topology) { _topology = topology; }
 	PrimitiveTopology getTopology() const { return _topology; }
 
-	void addCombinedImageSampler(uint32_t binding, ShaderStage stage)
-	{
-		_combinedImageSamplers.push_back({binding, stage});
-	}
+	void addCombinedImageSampler(uint32_t binding, ShaderStage stage) { _combinedImageSamplers.push_back({binding, stage}); }
 	const std::vector<CombinedImageSamplerDefinition>& getCombinedImageSamplers() const { return _combinedImageSamplers; }
 };
 
@@ -146,10 +147,18 @@ public:
 	}
 
 	template <typename VertexType>
-	ResourceLayoutBuilder& addUniformBuffer(uint32_t binding, ShaderStage stage);
-	ResourceLayoutBuilder& addUniformBuffer(const SimpleRTTR::Type& type, uint32_t binding, ShaderStage stage)
+	ResourceLayoutBuilder& addUniformBuffer(ShaderStage stage, uint32_t binding);
+	ResourceLayoutBuilder& addUniformBuffer(const SimpleRTTR::Type& type, ShaderStage stage, uint32_t binding)
 	{
 		_resourceLayout.addUniformBuffer({binding, stage, type});
+		return *this;
+	}
+
+	template <typename VertexType>
+	ResourceLayoutBuilder& addStorageBuffer(ShaderStage stage, uint32_t binding);
+	ResourceLayoutBuilder& addStorageBuffer(const SimpleRTTR::Type& type, ShaderStage stage, uint32_t binding)
+	{
+		_resourceLayout.addStorageBuffer({binding, stage, type});
 		return *this;
 	}
 
@@ -197,10 +206,17 @@ ResourceLayoutBuilder& ResourceLayoutBuilder::setIndexType()
 }
 
 template <typename UniformType>
-ResourceLayoutBuilder& ResourceLayoutBuilder::addUniformBuffer(uint32_t binding, ShaderStage stage)
+ResourceLayoutBuilder& ResourceLayoutBuilder::addUniformBuffer(ShaderStage stage, uint32_t binding)
 {
 	assert(SimpleRTTR::types().has_type<UniformType>() && "UniformType not registered with SimpleRTTR");
-	return addUniformBuffer(SimpleRTTR::types().get_type<UniformType>().value(), binding, stage);
+	return addUniformBuffer(SimpleRTTR::types().get_type<UniformType>().value(), stage, binding);
+}
+
+template <typename StorageType>
+ResourceLayoutBuilder& ResourceLayoutBuilder::addStorageBuffer(ShaderStage stage, uint32_t binding)
+{
+	assert(SimpleRTTR::types().has_type<StorageType>() && "UniformType not registered with SimpleRTTR");
+	return addStorageBuffer(SimpleRTTR::types().get_type<StorageType>().value(), stage, binding);
 }
 
 template <typename PushConstantType>
