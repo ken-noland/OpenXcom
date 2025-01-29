@@ -6,9 +6,9 @@
 "_mods": []
 },
 "graphicsOptions": {
-"_locale": "",
-"_logLevel": "LOG_INFO",
-"_master": "xcom1",
-"_mods": []
+"_fullscreen": false,
+"_headless": true,
+"_screenHeight": 480,
+"_screenWidth": 640
 }
 }

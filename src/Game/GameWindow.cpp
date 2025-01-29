@@ -139,10 +139,12 @@ LineVertex lineVerticesTemp[] = {
 /////////////////////////////////////////////
 
 
-GameWindow::GameWindow(const std::string& title, Options& options)
+GameWindow::GameWindow(EngineContext& engine)
 {
-	_gameSurface = std::make_unique<GameSurface>(options);
-	_windowSurface = std::make_unique<WindowSurface>(title, options, *_gameSurface);
+	Options& options = engine.getOptions();
+
+	_gameSurface = std::make_unique<GameSurface>(engine);
+	_windowSurface = std::make_unique<WindowSurface>(engine, *_gameSurface);
 
 	_windowSurface->onRender() << [this](GraphicsCommand& command) {
 		this->onWindowRender(command);
@@ -155,14 +157,11 @@ GameWindow::GameWindow(const std::string& title, Options& options)
 	/////////////////////////////////////////////
 	// TEMP
 
-	Engine& engine = getEngine();
 	ResourceSystem& resourceSystem = engine.getResourceSystem();
 	ShaderManager& shaderManager = resourceSystem.getShaderManager();
 	PipelineManager& pipelineManager = resourceSystem.getPipelineManager();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
 	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
-
-	
 
 	// load the shaders
 	_vertexShader = shaderManager.loadShaderFromMemory("WindowSurfaceVertShader", vertexLineDrawShaderSource, ShaderType::Vertex); // TODO: make vertex shader for windows surface configurable/scriptable

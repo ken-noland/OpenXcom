@@ -20,15 +20,14 @@
 #include "../GraphicsSystem.h"
 #include "../GraphicsSurface.h"
 #include "../GraphicsCommand.h"
-#include "../../Engine.h"
+#include "../../EngineContext.h"
 #include "../../Resource/Image/Image.h"
 
 namespace OpenXcom
 {
 
-GameSurface::GameSurface(Options& options)
+GameSurface::GameSurface(EngineContext& engine)
 {
-	Engine& engine = getEngine();
 	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
 
 	// create a render target for the game surface

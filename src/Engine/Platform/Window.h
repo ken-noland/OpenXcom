@@ -35,7 +35,6 @@ typedef unsigned long Atom;
 namespace OpenXcom
 {
 
-class PlatformWindowSystem;
 class GraphicsSurface;
 
 struct PlatformWindowHandle

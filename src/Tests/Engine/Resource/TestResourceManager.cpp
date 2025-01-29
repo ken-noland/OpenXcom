@@ -18,7 +18,7 @@
  */
 #include <gtest/gtest.h>
 
-#include "../../Engine/Resource/ResourceManager.h"
+#include "../../../Engine/Resource/ResourceManager.h"
 
 using namespace OpenXcom;
 
@@ -38,30 +38,25 @@ public:
 	{
 	}
 
-	virtual Handle load(const std::string& name)
+	ResourceManager<MockData>::OwningHandle load(const std::string& name)
 	{
 		std::unique_ptr<MockData> data = std::make_unique<MockData>();
 		data->name = name;
 
-		Handle handle = add(std::move(data));
+		ResourceManager<MockData>::OwningHandle handle = add(std::move(data));
 		return handle;
-	}
-
-	virtual void unload(Handle handle)
-	{
-		remove(handle);
 	}
 };
 
 TEST(ResourceManagerTest, TestResourceManager)
 {
 	MockResourceManager manager;
-	MockResourceManager::Handle handle = manager.load("test");
+	MockResourceManager::OwningHandle handle = manager.load("test");
 	ASSERT_TRUE(manager.exists(handle));
 
-	MockData& data = manager.get(handle).value().get();
+	MockData& data = manager.get(handle);
 	ASSERT_EQ(data.name, "test");
 
-	manager.unload(handle);
+	manager.remove(std::move(handle));
 	ASSERT_FALSE(manager.exists(handle));
 }

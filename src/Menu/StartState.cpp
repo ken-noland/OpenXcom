@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "StartState.h"
-#include "../Engine/Engine.h"
+#include "../Engine/EngineContext.h"
 #include "../Engine/Resource/ResourceSystem.h"
 #include "../Engine/Resource/Font/FontManager.h"
 #include "../Engine/Resource/Font/DosFont.h"
@@ -34,10 +34,9 @@ const glm::ivec4 terminalColors[2] = {{0, 0, 0, 0}, {185, 185, 185, 255}};
  * Initializes all the elements in the Loading screen.
  * @param game Pointer to the core game.
  */
-StartState::StartState()
+StartState::StartState(EngineContext& engine)
 	//: State("StartState", true), _anim(0)
 {
-	Engine& engine = getEngine();
 	ResourceSystem& resourceSystem = engine.getResourceSystem();
 
 	// load the DOS font

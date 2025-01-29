@@ -31,6 +31,8 @@
 #include "../Shader.h"
 #include "../ShaderManager.h"
 #include "../../Engine.h"
+#include "../../EngineContext.h"
+#include "../../Options.h"
 #include "../../Resource/ResourceSystem.h"
 #include "../../Resource/Image/ImageManager.h"
 #include "../../Resource/Image/Image.h"
@@ -38,10 +40,9 @@
 
 #include <simplerttr.h>
 
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace OpenXcom
 {
@@ -105,44 +106,61 @@ SIMPLERTTR
 }
 
 
-WindowSurface::WindowSurface(const std::string& title, Options& options, GameSurface& gameSurface)
-	: _gameSurface(gameSurface), _isRunning(true)
+WindowSurface::WindowSurface(EngineContext& engine, GameSurface& gameSurface)
+	: _engine(engine), _gameSurface(gameSurface), _isRunning(true)
+{
+	Options& options = engine.getOptions();
+
+	if(options.get<&GraphicsOptions::_headless>() == false)
+	{
+		createWindowed(gameSurface);
+	}
+	else
+	{
+		createHeadless();
+	}
+}
+
+WindowSurface::~WindowSurface()
+{
+}
+
+void WindowSurface::createWindowed(GameSurface& gameSurface)
 {
 	// create the window
-	Engine& engine = getEngine();
-	_window = std::make_unique<PlatformWindow>(title, 1024, 768);	//TODO: use game options to set the window parameters
-
-	// load the shaders
-	_vertexShader = engine.getResourceSystem().getShaderManager().loadShaderFromMemory("WindowSurfaceVertShader", vertexShaderSource, ShaderType::Vertex);			//TODO: make vertex shader for windows surface configurable/scriptable
-	_fragmentShader = engine.getResourceSystem().getShaderManager().loadShaderFromMemory("WindowSurfaceFragShader", fragmentShaderSource, ShaderType::Fragment);	//TODO: make fragment shader for windows surface configurable/scriptable
+	_window = std::make_unique<PlatformWindow>(_engine.getTitle(), 1024, 768); // TODO: use game options to set the window parameters
 
 	// create a graphics surface for the window
-	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
-	_windowSurface = graphicsSystem.createSurface(*_window);
-	
+	GraphicsSystem& graphicsSystem = _engine.getGraphicsSystem();
+	_windowSurface = graphicsSystem.createWindowedSurface(*_window);
+
+	// load the shaders
+	_vertexShader = _engine.getResourceSystem().getShaderManager().loadShaderFromMemory("WindowSurfaceVertShader", vertexShaderSource, ShaderType::Vertex);       // TODO: make vertex shader for windows surface configurable/scriptable
+	_fragmentShader = _engine.getResourceSystem().getShaderManager().loadShaderFromMemory("WindowSurfaceFragShader", fragmentShaderSource, ShaderType::Fragment); // TODO: make fragment shader for windows surface configurable/scriptable
+
 	PipelineBuilder pipelineBuilder;
 
 	PipelineDefinition pipelineDefinition = pipelineBuilder
-									  .setVertexShader(*_vertexShader)
-									  .setResourceLayout(ResourceLayoutBuilder()
-															 // vertex shader stage
-															 .setVertexType<WindowScreenVertex>()
-															 .setIndexType<uint16_t>()
-															 .addPushConstant<glm::mat4>(ShaderStage::Vertex)
+												.setVertexShader(*_vertexShader)
+												.setResourceLayout(ResourceLayoutBuilder()
+																	   // vertex shader stage
+																	   .setVertexType<WindowScreenVertex>()
+																	   .setIndexType<uint16_t>()
+																	   .addPushConstant<glm::mat4>(ShaderStage::Vertex)
 
-															 // fragment shader stage
-															 .addCombinedImageSampler(0, ShaderStage::Fragment)
-															 .addTexture(0, ShaderStage::Fragment)
-															 .build())
-									  .setFragmentShader(*_fragmentShader)
-									  .setRenderTarget(*_windowSurface)
-									  .build();
+																	   // fragment shader stage
+																	   .addCombinedImageSampler(0, ShaderStage::Fragment)
+																	   .addTexture(0, ShaderStage::Fragment)
+																	   .build())
+												.setFragmentShader(*_fragmentShader)
+												.setRenderTarget(*_windowSurface)
+												.build();
 
-	_pipeline = engine.getResourceSystem().getPipelineManager().createPipeline(pipelineDefinition);
+	_pipeline = _engine.getResourceSystem().getPipelineManager().createPipeline(pipelineDefinition);
 	_pipelineBinding = _pipeline->createBinding();
 
-	_vertexBuffer = engine.getResourceSystem().getBufferManager().createDeviceBuffer<WindowScreenVertex>(vertices, 4, BufferUsage::Vertex);
-	_indexBuffer = engine.getResourceSystem().getBufferManager().createDeviceBuffer<uint16_t>(indices, 6, BufferUsage::Index);
+	_vertexBuffer = _engine.getResourceSystem().getBufferManager().createDeviceBuffer<WindowScreenVertex>(vertices, 4, BufferUsage::Vertex);
+	_indexBuffer = _engine.getResourceSystem().getBufferManager().createDeviceBuffer<uint16_t>(indices, 6, BufferUsage::Index);
 
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 	_pipelineBinding->setIndexBuffer(*_indexBuffer);
@@ -159,39 +177,66 @@ WindowSurface::WindowSurface(const std::string& title, Options& options, GameSur
 	_window->onResize() << std::bind(&WindowSurface::onResize, this);
 
 	_window->show();
+
+	_isHeadless = false;
 }
 
-WindowSurface::~WindowSurface()
+void WindowSurface::createHeadless()
 {
+	// create a graphics surface for the window
+	GraphicsSystem& graphicsSystem = _engine.getGraphicsSystem();
+	_windowSurface = graphicsSystem.createHeadlessSurface();
+
+	_isHeadless = true;
 }
+
 
 void WindowSurface::update()
 {
-	if (!_isRunning)
+	if (!_isHeadless)
 	{
-		_window.reset();
-		return;
+		//---
+		// Windowed rendering
+		if (!_isRunning)
+		{
+			_window.reset();
+			return;
+		}
+
+		// update the window
+		_window->update();
+
+		if (!_window->isMinimized())
+		{
+			// begin the command pass(the start of rendering)
+			GraphicsCommand& command = _windowSurface->beginCommandPass();
+
+			// render the game surface
+			_gameSurface.render(command);
+
+			// render the game surface to the window surface
+			command.beginRenderPass(*_windowSurface);
+			_pipelineBinding->commit(command);
+
+			// render delegates after the game surface
+			_onRender.call(command);
+
+			command.endRenderPass();
+
+			// end the command pass(the end of rendering)
+			_windowSurface->endCommandPass(command);
+		}
 	}
-
-	// update the window
-	_window->update();
-
-	if (!_window->isMinimized())
+	else
 	{
+		//---
+		// Headless rendering
+		
 		// begin the command pass(the start of rendering)
 		GraphicsCommand& command = _windowSurface->beginCommandPass();
 
-		//render the game surface
+		// render the game surface
 		_gameSurface.render(command);
-
-		// render the game surface to the window surface
-		command.beginRenderPass(*_windowSurface);
-		_pipelineBinding->commit(command);
-
-		// render delegates after the game surface
-		_onRender.call(command);
-
-		command.endRenderPass();
 
 		// end the command pass(the end of rendering)
 		_windowSurface->endCommandPass(command);
@@ -205,7 +250,7 @@ void WindowSurface::onResize()
 
 void WindowSurface::onClose()
 {
-	getEngine().exit();
+	_engine.getEngine().exit();
 	_isRunning = false;
 }
 
@@ -229,7 +274,5 @@ void WindowSurface::updateProjection()
 	_projection = glm::scale(glm::mat4(1.0f), glm::vec3(scaleX, scaleY, 1.0f));
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, _projection);
 }
-
-
 
 } // namespace OpenXcom

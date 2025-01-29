@@ -21,6 +21,7 @@
 #include <vulkan/vulkan.hpp>
 #include <vk_mem_alloc.h> // VMA
 #include <limits>
+#include <optional>
 
 namespace OpenXcom
 {
@@ -94,9 +95,9 @@ protected:
 	VulkanShaderManager* _shaderManager;
 	VulkanPipelineManager* _pipelineManager;
 
-	void initializeInstance();
-	void selectPhysicalDevice(const vk::SurfaceKHR& surface);
-	void initializeDevice(const vk::SurfaceKHR& surface);
+	void initializeInstance(bool isHeadless);
+	void selectPhysicalDevice(std::optional<vk::SurfaceKHR> surface);
+	void initializeDevice(std::optional<vk::SurfaceKHR> surface);
 
 public:
 	VulkanContext(const Options& options);

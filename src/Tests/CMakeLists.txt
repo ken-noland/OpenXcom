@@ -20,6 +20,8 @@ enable_testing()
 # Add the test executable
 add_executable(
   openxcom_tests
+  "Engine/Graphics/TestGraphics.cpp"
+  "Engine/Resource/TestResourceManager.cpp"
   "Engine/TestECS.cpp"
   "Engine/TestOptions.cpp"
   "Engine/TestTimer.cpp"
@@ -27,7 +29,6 @@ add_executable(
   "Engine/TestVirtualFileSystem.cpp"
   "Entity/Interface/WindowTest.cpp"
   "Entity/Interface/ButtonTest.cpp"
-  "Resource/TestResourceManager.cpp"
 )
 
 # Define the source root and add it as a compile definition
@@ -57,4 +58,4 @@ add_custom_target(run_tests_after_build ALL
 )
 
 # Ensure tests run after the main executable is built
-add_dependencies(run_tests_after_build openxcom)
+#add_dependencies(run_tests_after_build openxcom)

@@ -17,36 +17,42 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "VulkanSurface.h"
 #include <memory>
-#include "../../Utility/Delegate.h"
+
+#include <vulkan/vulkan.hpp>
 #include <glm/vec2.hpp>
 
 namespace OpenXcom
 {
 
-class EngineContext;
-class RenderTarget;
-class GraphicsCommand;
-class Buffer;
+class VulkanContext;
+class VulkanCommand;
 
-class GameSurface
+class VulkanHeadlessSurface : public VulkanSurface
 {
 protected:
-	std::unique_ptr<RenderTarget> _renderTarget;
+	VulkanContext& _context;
 
-	// events
-	MulticastDelegate<void(GraphicsCommand&)> _onRender;
+	vk::CommandPool _commandPool;
+	vk::CommandBuffer _commandBuffer;
+
+	std::unique_ptr<VulkanCommand> _commandContext;
 
 public:
-	GameSurface(EngineContext& options);
-	~GameSurface();
+	VulkanHeadlessSurface(VulkanContext& context);
+	virtual ~VulkanHeadlessSurface();
 
-	void render(GraphicsCommand& command);
+	virtual uint32_t getWidth() const override { return 0; }
+	virtual uint32_t getHeight() const override { return 0; }
 
-	const RenderTarget& getRenderTarget() const { return *_renderTarget; }
-	glm::ivec2 getScreenSize() const; 
+	virtual glm::ivec2 getSize() const override { return {0, 0}; }
+		
+	virtual GraphicsCommand& beginCommandPass() override;
+	virtual void endCommandPass(GraphicsCommand& commandContext) override;
 
-	MulticastDelegate<void(GraphicsCommand&)>& onRender() { return _onRender; }
+	virtual void beginRenderPass(GraphicsCommand& commandContext) override;
+	virtual void endRenderPass(GraphicsCommand& commandContext) override;
 };
 
 } // namespace OpenXcom

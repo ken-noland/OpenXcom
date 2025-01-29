@@ -25,6 +25,7 @@
 namespace OpenXcom
 {
 
+class EngineContext;
 class Text;
 class Font;
 class Timer;
@@ -43,7 +44,7 @@ private:
 	OwningHandle<Palette> _terminalPaletteHandle;
 
 public:
-	StartState();
+	StartState(EngineContext& engine);
 	virtual ~StartState();
 };
 

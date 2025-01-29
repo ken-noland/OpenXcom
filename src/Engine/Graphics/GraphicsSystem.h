@@ -46,7 +46,8 @@ public:
 	GraphicsSystem() = default;
 	virtual ~GraphicsSystem() = default;
 
-	virtual std::unique_ptr<GraphicsSurface> createSurface(PlatformWindow& window) = 0;
+	virtual std::unique_ptr<GraphicsSurface> createWindowedSurface(PlatformWindow& window) = 0;
+	virtual std::unique_ptr<GraphicsSurface> createHeadlessSurface() = 0;
 	virtual std::unique_ptr<RenderTarget> createRenderTarget(int width, int height, ImageFormat format) = 0;
 
 	// resource managers

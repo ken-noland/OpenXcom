@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,36 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "VulkanCommand.h"
-#include "Surface/VulkanSurface.h"
-#include "Pipeline/VulkanPipeline.h"
+#include "../../GraphicsSurface.h"
 
 namespace OpenXcom
 {
 
-VulkanCommand::VulkanCommand(VulkanContext& context)
-	: _context(context), _surface(nullptr)
+enum class VulkanSurfaceType
 {
-}
+	Windowed,
+	Headless
+};
 
-VulkanCommand::~VulkanCommand()
+class VulkanSurface : public GraphicsSurface
 {
-}
+protected:
+	VulkanSurfaceType _type;
+	VulkanSurface(VulkanSurfaceType type) : _type(type) {}
 
-void VulkanCommand::beginRenderPass(RenderTarget& surface)
-{
-	assert(_surface == nullptr);
+public:
+	virtual ~VulkanSurface() = default;
 
-	_surface = &surface;
-	_surface->beginRenderPass(*this);
-}
-
-void VulkanCommand::endRenderPass()
-{
-	assert(_surface != nullptr);
-
-	_surface->endRenderPass(*this);
-	_surface = nullptr;
-}
+	VulkanSurfaceType getVulkanSurfaceType() const { return _type; }
+};
 
 } // namespace OpenXcom

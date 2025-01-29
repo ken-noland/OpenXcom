@@ -84,6 +84,10 @@ SIMPLERTTR
 			.meta("FriendlyName", "fullscreen")
 			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this option
 			.meta("Description", "Should the game be fullscreen or not")
+		.property(REGISTER_PROPERTY(GraphicsOptions, _headless))
+			.meta("FriendlyName", "headless")
+			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this option
+			.meta("Description", "Should the game create a platform window to render out to")
 		.property(REGISTER_PROPERTY(GraphicsOptions, _screenWidth))
 			.meta("FriendlyName", "screenWidth")
 			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this option
@@ -290,6 +294,14 @@ Options::Options(const std::vector<std::string>& argv)
 
 				return false;
 			}
+		}},
+		{{"-headless"}, {
+			false, "",
+			"Runs the game without creating a window or swapchain, using an offscreen renderer for testing and validation.",
+			[this](const std::string&) -> bool {
+				set<&GraphicsOptions::_headless>(OptionLevel::COMMAND, true);
+				return true;
+			}
 		}}
 	};
 	load(argv);
@@ -428,7 +440,7 @@ bool OpenXcom::Options::saveFile()
 	const GraphicsOptions& graphicsOptions = std::get<OptionCategory<GraphicsOptions>>(_optionCategories).optionsStruct;
 
 	toJson(gameOptions, json["gameOptions"]);
-	toJson(gameOptions, json["graphicsOptions"]);
+	toJson(graphicsOptions, json["graphicsOptions"]);
 
 	std::filesystem::path configFile = getConfigFile();
 

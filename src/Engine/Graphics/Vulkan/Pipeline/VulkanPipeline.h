@@ -26,7 +26,7 @@ namespace OpenXcom
 {
 
 class VulkanContext;
-class VulkanSurface;
+class VulkanWindowedSurface;
 class VulkanDescriptorSetFactory;
 
 class VulkanPipeline : public Pipeline

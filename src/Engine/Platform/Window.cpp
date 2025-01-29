@@ -18,6 +18,10 @@
  */
 
 #include "Window.h"
+#include "../Engine.h"
+#include "../Options.h"
+
+#include <cassert>
 
 namespace OpenXcom
 {

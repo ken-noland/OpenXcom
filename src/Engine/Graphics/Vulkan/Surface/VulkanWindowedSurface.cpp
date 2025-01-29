@@ -17,36 +17,32 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "VulkanSurface.h"
-#include "VulkanContext.h"
-#include "VulkanCommand.h"
+#include "VulkanWindowedSurface.h"
+#include "../VulkanContext.h"
+#include "../VulkanCommand.h"
 
-#include "Shader/VulkanShader.h"
+#include "../Shader/VulkanShader.h"
 
-#include "Pipeline/VulkanPipeline.h"
+#include "../Pipeline/VulkanPipeline.h"
 
-#include "../../Platform/Window.h"
-#include "../../Engine.h"
-#include "../../Resource/ResourceSystem.h"
-#include "../../Logger.h"
+#include "../../../Platform/Window.h"
+#include "../../../Engine.h"
+#include "../../../Resource/ResourceSystem.h"
+#include "../../../Logger.h"
+#include "../../../Utility/RTTR.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
-// BEGIN TEMP
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <limits>
 
-#include "../../Utility/RTTR.h"
-
-
 namespace OpenXcom
 {
 
-//vk::Extent2D getClientAreaSize(const PlatformWindow& handle);
-
-VulkanSurface::VulkanSurface(VulkanContext& context, PlatformWindow& window)
-	: _context(context), _surface(nullptr), _swapChain(nullptr), _swapChainImageFormat(vk::Format::eUndefined), _swapChainExtent{},
+VulkanWindowedSurface::VulkanWindowedSurface(VulkanContext& context, PlatformWindow& window)
+	: VulkanSurface(VulkanSurfaceType::Windowed), _context(context), _surface(nullptr),
+	  _swapChain(nullptr), _swapChainImageFormat(vk::Format::eUndefined), _swapChainExtent{}, _commandPool(nullptr),
 	  _frames(), _currentFrame(0), _imageIndex(0), _minimized(false), _renderPass(nullptr), _window(window)
 {
 	_surface = createSurface(_context.getInstance(), window);
@@ -54,12 +50,12 @@ VulkanSurface::VulkanSurface(VulkanContext& context, PlatformWindow& window)
 	initializeSwapChain();
 
 	//register a callback with the window for resize events
-	window.onResize() << std::bind(&VulkanSurface::handleResize, this);
+	window.onResize() << std::bind(&VulkanWindowedSurface::handleResize, this);
 
 	_commandContext = std::make_unique<VulkanCommand>(_context);
 }
 
-VulkanSurface::~VulkanSurface()
+VulkanWindowedSurface::~VulkanWindowedSurface()
 {
 	// Wait for the device to finish
 	_context.getDevice().waitIdle();
@@ -74,7 +70,7 @@ VulkanSurface::~VulkanSurface()
 }
 
 
-void VulkanSurface::initializeSwapChain()
+void VulkanWindowedSurface::initializeSwapChain()
 {
 	// Get the surface capabilities, formats, and present modes
 	vk::SurfaceCapabilitiesKHR surfaceCapabilities = _context.getPhysicalDevice().getSurfaceCapabilitiesKHR(_surface);
@@ -235,7 +231,7 @@ void VulkanSurface::initializeSwapChain()
 	}
 }
 
-void VulkanSurface::destroySwapChain()
+void VulkanWindowedSurface::destroySwapChain()
 {
 	// clear frames
 	for (const FrameData& frame : _frames)
@@ -271,7 +267,7 @@ void VulkanSurface::destroySwapChain()
 	_imageIndex = 0;
 }
 
-void VulkanSurface::handleResize()
+void VulkanWindowedSurface::handleResize()
 {
 	// Wait for the device to finish
 	_context.getDevice().waitIdle();
@@ -283,7 +279,7 @@ void VulkanSurface::handleResize()
 	initializeSwapChain();
 }
 
-vk::SurfaceKHR VulkanSurface::createSurface(vk::Instance& instance, const PlatformWindow& window)
+vk::SurfaceKHR VulkanWindowedSurface::createSurface(vk::Instance& instance, const PlatformWindow& window)
 {
 	vk::SurfaceKHR surface;
 #if defined(_WIN32)
@@ -312,27 +308,27 @@ vk::SurfaceKHR VulkanSurface::createSurface(vk::Instance& instance, const Platfo
 	return surface;
 }
 
-void VulkanSurface::destroySurface(vk::Instance& instance, vk::SurfaceKHR& surface)
+void VulkanWindowedSurface::destroySurface(vk::Instance& instance, vk::SurfaceKHR& surface)
 {
 	instance.destroySurfaceKHR(surface);
 }
 
-uint32_t VulkanSurface::getWidth() const
+uint32_t VulkanWindowedSurface::getWidth() const
 {
 	return _swapChainExtent.width;
 }
 
-uint32_t VulkanSurface::getHeight() const
+uint32_t VulkanWindowedSurface::getHeight() const
 {
 	return _swapChainExtent.height;
 }
 
-glm::ivec2 VulkanSurface::getSize() const
+glm::ivec2 VulkanWindowedSurface::getSize() const
 {
 	return glm::ivec2(_swapChainExtent.width, _swapChainExtent.height);
 }
 
-GraphicsCommand& VulkanSurface::beginCommandPass()
+GraphicsCommand& VulkanWindowedSurface::beginCommandPass()
 {
 	// assert if the window is minimized(caller needs to check before calling this function)
 	assert(!_minimized);
@@ -383,7 +379,7 @@ GraphicsCommand& VulkanSurface::beginCommandPass()
 	return *_commandContext;
 }
 
-void VulkanSurface::endCommandPass(GraphicsCommand& command)
+void VulkanWindowedSurface::endCommandPass(GraphicsCommand& command)
 {
 	(void)command; // not using this parameter
 	assert(&command == _commandContext.get());
@@ -431,7 +427,7 @@ void VulkanSurface::endCommandPass(GraphicsCommand& command)
 	_currentFrame = (_currentFrame + 1) % _frames.size();
 }
 
-void VulkanSurface::beginRenderPass(GraphicsCommand& command)
+void VulkanWindowedSurface::beginRenderPass(GraphicsCommand& command)
 {
 	vk::Viewport viewport = {};
 	viewport.x = 0.0f;
@@ -462,7 +458,7 @@ void VulkanSurface::beginRenderPass(GraphicsCommand& command)
 	_commandContext->getCommandBuffer().beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 }
 
-void VulkanSurface::endRenderPass(GraphicsCommand& command)
+void VulkanWindowedSurface::endRenderPass(GraphicsCommand& command)
 {
 	_commandContext->getCommandBuffer().endRenderPass();
 }

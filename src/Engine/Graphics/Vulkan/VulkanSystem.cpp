@@ -18,8 +18,12 @@
  */
 
 #include "VulkanSystem.h"
-#include "VulkanSurface.h"
+#include "Surface/VulkanWindowedSurface.h"
+#include "Surface/VulkanHeadlessSurface.h"
 #include "VulkanRenderTarget.h"
+
+#include "../../Engine.h"
+#include "../../Options.h"
 
 #include "Font/VulkanFontManager.h"
 #include "Image/VulkanImageManager.h"
@@ -45,9 +49,18 @@ VulkanSystem::~VulkanSystem()
 
 }
 
-std::unique_ptr<GraphicsSurface> VulkanSystem::createSurface(PlatformWindow& window)
+std::unique_ptr<GraphicsSurface> VulkanSystem::createWindowedSurface(PlatformWindow& window)
 {
-	return std::make_unique<VulkanSurface>(_context, window);
+	std::unique_ptr<GraphicsSurface> surface;
+	surface = std::make_unique<VulkanWindowedSurface>(_context, window);
+	return surface;
+}
+
+std::unique_ptr<GraphicsSurface> VulkanSystem::createHeadlessSurface()
+{
+	std::unique_ptr<GraphicsSurface> surface;
+	surface = std::make_unique<VulkanHeadlessSurface>(_context);
+	return surface;
 }
 
 std::unique_ptr<RenderTarget> VulkanSystem::createRenderTarget(int width, int height, ImageFormat format)

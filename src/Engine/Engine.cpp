@@ -31,9 +31,6 @@
 namespace OpenXcom
 {
 
-// singleton access for the engine
-Engine* theEngine = nullptr;
-
 // annoyingly, I have to put this in somewhere so it correctly links the RTTR stuff
 extern int FORCE_LINK_RTTRGLM;
 
@@ -42,34 +39,30 @@ Engine::Engine(const std::vector<std::string>& args)
 	// hack to force the linker to include the RTTR stuff
 	FORCE_LINK_RTTRGLM = 42; 
 
-	if(theEngine != nullptr)
-	{
-		throw std::runtime_error("Engine already exists. Only one instance of Engine per process.");
-	}
-
-	theEngine = this;
-
 	// Initialize the options
 	_options = std::make_unique<Options>(args);
 
 	// Initialize the virtual file system
-	_virtualFileSystem = std::make_unique<VirtualFileSystem>(getOptions());
+	_virtualFileSystem = std::make_unique<VirtualFileSystem>(*_options);
 
 	// Initialize the process system
 	_platformProcessSystem = std::make_unique<PlatformProcessSystem>();
 
 	// Initialize the graphics system
-	_graphicsSystem = createGraphicsSystem(getOptions());
+	_graphicsSystem = createGraphicsSystem(*_options);
 		
 	// Initialize the resource system
 	_resourceSystem = std::make_unique<ResourceSystem>(*_virtualFileSystem, *_graphicsSystem, *_options);
 
+	//finally, now that the systems have all been initialized, let's make the engine context which is used to get access to the systems from within the game
+	_engineContext = std::make_unique<EngineContext>(*this, *_options, *_virtualFileSystem, *_platformProcessSystem, *_graphicsSystem, *_resourceSystem);
 
 	std::ostringstream title;
 	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
+	_engineContext->setTitle(title.str());
 
 	// Initialize the game
-	_game = std::make_unique<Game>(title.str(), *_options);
+	_game = std::make_unique<Game>(*_engineContext);
 }
 
 Engine::~Engine()
@@ -108,11 +101,6 @@ int Engine::run()
 void Engine::exit()
 {
 	_platformProcessSystem->exit();
-}
-
-Engine& getEngine()
-{
-	return *theEngine;
 }
 
 } // namespace OpenXcom

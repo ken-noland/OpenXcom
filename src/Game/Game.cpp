@@ -44,9 +44,9 @@ Game* getGame()
 	return _GamePtr();
 }
 
-Game::Game(const std::string& title, Options& options)
+Game::Game(EngineContext& engine)
 {
-	_gameWindow = std::make_unique<GameWindow>(title, options);
+	_gameWindow = std::make_unique<GameWindow>(engine);
 
 	//Engine& engine = getEngine();
 	//_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768);
@@ -58,7 +58,7 @@ Game::Game(const std::string& title, Options& options)
 	// window->setCloseCallback([this]() { getEngine->exit() });
 
 	// set the initial game state
-	setState(std::make_unique<StartState>());
+	setState(std::make_unique<StartState>(engine));
 }
 
 /**

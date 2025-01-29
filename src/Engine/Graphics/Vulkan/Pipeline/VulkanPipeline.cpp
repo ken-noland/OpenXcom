@@ -19,10 +19,10 @@
 #include "VulkanPipeline.h"
 #include "VulkanPipelineBinding.h"
 #include "../VulkanContext.h"
-#include "../VulkanSurface.h"
 #include "../VulkanRenderTarget.h"
 #include "../VulkanDescriptorSet.h"
 #include "../Shader/VulkanShader.h"
+#include "../Surface/VulkanWindowedSurface.h"
 #include "../../PipelineDefinition.h"
 #include "../../../Resource/ResourceSystem.h"
 #include "../../../Engine.h"
@@ -240,11 +240,25 @@ void VulkanPipeline::createPipeline(
 	switch(surface.getType())
 	{
 	case ImageType::Surface:
-		renderPass = static_cast<const VulkanSurface&>(surface).getRenderPass();
+	{
+		// check if the surface is windowed or headless
+		const VulkanSurface& vulkanSurface = static_cast<const VulkanSurface&>(surface);
+		if(vulkanSurface.getVulkanSurfaceType() == VulkanSurfaceType::Windowed)
+		{
+			renderPass = static_cast<const VulkanWindowedSurface&>(surface).getRenderPass();
+		}
+		else
+		{
+			assert(false && "Attempting to create renderpass on headless surface is not allowed");
+		}
 		break;
+
+	}
 	case ImageType::RenderTarget:
+	{
 		renderPass = static_cast<const VulkanRenderTarget&>(surface).getRenderPass();
 		break;
+	}
 	}
 
 	vk::GraphicsPipelineCreateInfo pipelineInfo{};

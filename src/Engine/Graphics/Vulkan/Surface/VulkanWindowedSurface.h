@@ -17,14 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "VulkanSurface.h"
+#include "../../GraphicsCommand.h"
+
 #include <vulkan/vulkan.hpp>
-#include "../GraphicsSurface.h"
-#include "../GraphicsCommand.h"
-
-#include "Buffer/VulkanBuffer.h"
-
-#include <glm/glm.hpp>
-
+#include <glm/vec2.hpp>
 
 namespace OpenXcom
 {
@@ -48,7 +45,7 @@ struct FrameData
 };
 
 // 
-class VulkanSurface : public GraphicsSurface
+class VulkanWindowedSurface : public VulkanSurface
 {
 protected:
 	VulkanContext& _context;
@@ -84,8 +81,8 @@ protected:
 	static void destroySurface(vk::Instance& instance, vk::SurfaceKHR& surface);
 
 public:
-	VulkanSurface(VulkanContext& context, PlatformWindow& window);
-	virtual ~VulkanSurface();
+	VulkanWindowedSurface(VulkanContext& context, PlatformWindow& window);
+	virtual ~VulkanWindowedSurface();
 
 	const vk::SurfaceKHR& getVKSurface() const { return _surface; }
 	const vk::Format& getVKFormat() const { return _swapChainImageFormat; }

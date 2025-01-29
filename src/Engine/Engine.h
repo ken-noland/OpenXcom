@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "EngineContext.h"
 #include <memory>
 #include <vector>
 #include <string>
@@ -24,6 +25,7 @@
 namespace OpenXcom
 {
 
+class EngineContext;
 class Game;
 class Options;
 class VirtualFileSystem;
@@ -53,15 +55,15 @@ class Engine
 	// Resource system
 	std::unique_ptr<ResourceSystem> _resourceSystem;
 
+	// Game
 	std::unique_ptr<Game> _game;
 
-private:
-	friend int run(const std::vector<std::string>& args);
-
-	Engine(const std::vector<std::string>& args);
-	~Engine();
+	// Engine context
+	std::unique_ptr<EngineContext> _engineContext;
 
 public:
+	Engine(const std::vector<std::string>& args = {});
+	~Engine();
 
 	int run();
 
@@ -70,10 +72,9 @@ public:
 
 	Options& getOptions() { return *_options; }
 	VirtualFileSystem& getVirtualFileSystem() { return *_virtualFileSystem; }
+	PlatformProcessSystem& getPlatformProcessSystem() { return *_platformProcessSystem; }
 	GraphicsSystem& getGraphicsSystem() { return *_graphicsSystem; }
 	ResourceSystem& getResourceSystem() { return *_resourceSystem; }
 };
-
-Engine& getEngine();
 
 } // namespace OpenXcom

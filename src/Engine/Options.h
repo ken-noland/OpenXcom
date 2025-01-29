@@ -206,6 +206,7 @@ struct GameOptions
 struct GraphicsOptions
 {
 	Option<bool> _fullscreen								= false;
+	Option<bool> _headless									= false;
 
 	Option<int> _screenWidth								= 640;
 	Option<int> _screenHeight								= 480;
@@ -240,7 +241,7 @@ private:
 
 
 public:
-	Options(const std::vector<std::string>& argv);
+	Options(const std::vector<std::string>& argv = {});
 	~Options();
 
 	/// Load options from file.

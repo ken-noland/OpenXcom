@@ -52,7 +52,7 @@ public:
 		return handle;
 	}
 
-	std::optional<std::reference_wrapper<ResourceType>> get(Handle handle)
+	std::optional<std::reference_wrapper<ResourceType>> try_get(Handle handle)
 	{
 		auto it = _resources.find(handle);
 		if (it != _resources.end())
@@ -62,26 +62,36 @@ public:
 		return std::nullopt;
 	}
 
-	template<typename Type>
+	template <typename Type = ResourceType>
 	Type& get(const Handle& handle)
 	{
 		return *static_cast<Type*>(_resources[handle.getId()].get());
 	}
 		
-	template <typename Type>
+	template <typename Type = ResourceType>
 	Type& get(const OwningHandle& handle)
 	{
-		return *static_cast<Type*>(_resources[handle.getId()].get());
+		return get<Type>(handle.getHandle());
 	}
 
-	bool exists(Handle handle)
+	bool exists(const Handle& handle)
 	{
 		return _resources.find(handle) != _resources.end();
+	}
+
+	bool exists(const OwningHandle& handle)
+	{
+		return exists(handle.getHandle());
 	}
 
 	void remove(Handle handle)
 	{
 		_resources.erase(handle);
+	}
+
+	void remove(OwningHandle handle)
+	{
+		remove(handle.getHandle());
 	}
 };
 

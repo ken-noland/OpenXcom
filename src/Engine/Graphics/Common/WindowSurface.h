@@ -26,7 +26,7 @@
 namespace OpenXcom
 {
 
-class Options;
+class EngineContext;
 class GameSurface;
 class PlatformWindow;
 class GraphicsSurface;
@@ -39,6 +39,8 @@ class GraphicsCommand;
 class WindowSurface
 {
 protected:
+	EngineContext& _engine;	//TODO: GameContext would be more appropriate here
+
 	GameSurface& _gameSurface;
 
 	std::unique_ptr<PlatformWindow> _window;
@@ -55,9 +57,13 @@ protected:
 	std::unique_ptr<DeviceBuffer> _indexBuffer;
 
 	bool _isRunning;
+	bool _isHeadless;
 
 	// events
 	MulticastDelegate<void(GraphicsCommand&)> _onRender;
+
+	void createWindowed(GameSurface& gameSurface);
+	void createHeadless();
 
 	void updateProjection();
 	
@@ -65,7 +71,7 @@ protected:
 	void onClose();
 
 public:
-	WindowSurface(const std::string& title, Options& options, GameSurface& gameSurface);
+	WindowSurface(EngineContext& engine, GameSurface& gameSurface);
 	~WindowSurface();
 
 	void update();

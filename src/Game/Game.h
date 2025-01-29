@@ -32,6 +32,7 @@
 namespace OpenXcom
 {
 
+class EngineContext;
 class State;
 class Options;
 class GameWindow;
@@ -62,7 +63,7 @@ private:
 
 public:
 	/// Creates a new game.
-	Game(const std::string& title, Options& options);
+	Game(EngineContext& engine);
 	/// Cleans up all the game's resources.
 	~Game();
 

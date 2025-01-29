@@ -29,7 +29,7 @@
 namespace OpenXcom
 {
 
-class Options;
+class EngineContext;
 class GameSurface;
 class WindowSurface;
 class GraphicsCommand;
@@ -66,7 +66,7 @@ protected:
 	void onGameRender(GraphicsCommand& command);
 
 public:
-	GameWindow(const std::string& title, Options& options);
+	GameWindow(EngineContext& engine);
 	~GameWindow();
 
 	void update();

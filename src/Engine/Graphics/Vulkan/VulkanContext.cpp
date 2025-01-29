@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "VulkanContext.h"
-#include "VulkanSurface.h"
+#include "Surface/VulkanWindowedSurface.h"
 
 #include "../../Logger.h"
 #include "../../Options.h"
@@ -113,7 +113,8 @@ VulkanContext::VulkanContext(const Options& options)
 	: _instance(nullptr), _device(nullptr), _physicalDevice(nullptr),
 	_swapChainImageFormat(vk::Format::eUndefined), _allocator()
 {
-	initializeInstance();
+	bool isHeadless = options.get<&GraphicsOptions::_headless>();
+	initializeInstance(isHeadless);
 
 	// Create the Vulkan Memory Allocator
 	VmaVulkanFunctions vulkanFunctions = {};
@@ -136,6 +137,8 @@ VulkanContext::VulkanContext(const Options& options)
 	vulkanFunctions.vkCreateImage = VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateImage;
 	vulkanFunctions.vkDestroyImage = VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroyImage;
 	vulkanFunctions.vkCmdCopyBuffer = VULKAN_HPP_DEFAULT_DISPATCHER.vkCmdCopyBuffer;
+	vulkanFunctions.vkGetDeviceBufferMemoryRequirements = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetDeviceBufferMemoryRequirements;
+	vulkanFunctions.vkGetDeviceImageMemoryRequirements = VULKAN_HPP_DEFAULT_DISPATCHER.vkGetDeviceImageMemoryRequirements;
 
 	VmaAllocatorCreateInfo allocatorInfo{};
 	allocatorInfo.physicalDevice = _physicalDevice;
@@ -194,198 +197,155 @@ VulkanContext::~VulkanContext()
 	glslang::FinalizeProcess();
 }
 
-void VulkanContext::initializeInstance()
+void VulkanContext::initializeInstance(bool isHeadless)
 {
-	try
+	glslang::InitializeProcess();
+
+	PFN_vkGetInstanceProcAddr getInstanceProcAddr = _loader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
+	if (!getInstanceProcAddr)
 	{
-		glslang::InitializeProcess();
+		Log(LOG_ERROR) << "Failed to load vkGetInstanceProcAddr.";
+		throw new std::runtime_error("Failed to load vkGetInstanceProcAddr.");
+	}
 
-		// Load the Vulkan function loader
-		PFN_vkGetInstanceProcAddr getInstanceProcAddr = _loader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
-		if (!getInstanceProcAddr)
-		{
-			throw std::runtime_error("Failed to load vkGetInstanceProcAddr.");
-		}
+	VULKAN_HPP_DEFAULT_DISPATCHER.init(getInstanceProcAddr);
 
-		VULKAN_HPP_DEFAULT_DISPATCHER.init(getInstanceProcAddr);
+	vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+	debugCreateInfo.messageSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+									  vk::DebugUtilsMessageSeverityFlagBitsEXT::eError;
+	debugCreateInfo.messageType = vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+								  vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+								  vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance;
+	debugCreateInfo.pfnUserCallback = debugCallback;
 
-		vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-		debugCreateInfo.messageSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-										  vk::DebugUtilsMessageSeverityFlagBitsEXT::eError;
-		debugCreateInfo.messageType = vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
-									  vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
-									  vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance;
-		debugCreateInfo.pfnUserCallback = debugCallback; // Pointer to your callback function
+	vk::ApplicationInfo appInfo("OpenXcom",
+								VK_MAKE_VERSION(OPENXCOM_VERSION_MAJOR, OPENXCOM_VERSION_MINOR, OPENXCOM_VERSION_PATCH),
+								"OpenXcom",
+								VK_MAKE_VERSION(OPENXCOM_VERSION_MAJOR, OPENXCOM_VERSION_MINOR, OPENXCOM_VERSION_PATCH),
+								VK_API_VERSION_1_0);
 
-		vk::ApplicationInfo appInfo("OpenXcom", VK_MAKE_VERSION(OPENXCOM_VERSION_MAJOR, OPENXCOM_VERSION_MINOR, OPENXCOM_VERSION_PATCH), "OpenXcom", VK_MAKE_VERSION(OPENXCOM_VERSION_MAJOR, OPENXCOM_VERSION_MINOR, OPENXCOM_VERSION_PATCH), VK_API_VERSION_1_0);
-		vk::InstanceCreateInfo createInfo{};
-		createInfo.pApplicationInfo = &appInfo;
-		createInfo.pNext = &debugCreateInfo;
+	vk::InstanceCreateInfo createInfo{};
+	createInfo.pApplicationInfo = &appInfo;
+	createInfo.pNext = &debugCreateInfo;
 
-		std::vector<vk::ExtensionProperties> availableExtensions = vk::enumerateInstanceExtensionProperties();
+	std::vector<const char*> extensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
 
-		Log(LOG_DEBUG) << "Available extensions:";
-		for (const vk::ExtensionProperties& ext : availableExtensions)
-		{
-			Log(LOG_DEBUG) << "  " << ext.extensionName;
-		}
-
-		// Specify validation layers (only in debug mode)
-#ifdef _DEBUG
-		const std::vector<const char*> validationLayers = {
-			"VK_LAYER_KHRONOS_validation"};
-		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-		createInfo.ppEnabledLayerNames = validationLayers.data();
-#else
-		createInfo.enabledLayerCount = 0;
-#endif
-
-		// Add instance extensions (e.g., for window surface support)
-		const std::vector<const char*> extensions = {
-			VK_KHR_SURFACE_EXTENSION_NAME,
-			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+	if (!isHeadless)
+	{
+		extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 #if defined(_WIN32)
-			VK_KHR_WIN32_SURFACE_EXTENSION_NAME // Platform-specific; adjust for other platforms
+		extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #elif defined(__linux__)
-			VK_KHR_XLIB_SURFACE_EXTENSION_NAME // Platform-specific; adjust for other platforms
+		extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
 #elif defined(__APPLE__)
-			VK_EXT_METAL_SURFACE_EXTENSION_NAME // Platform-specific; adjust for other platforms
+		extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
 #endif
-		};
+	}
 
-		// TODO: check that we have all the extensions available
-		Log(LOG_DEBUG) << "Required extensions:";
-		for (const char* const& ext : extensions)
+	std::vector<vk::ExtensionProperties> availableExtensions = vk::enumerateInstanceExtensionProperties();
+
+	for (const char* ext : extensions)
+	{
+		if (std::none_of(availableExtensions.begin(), availableExtensions.end(),
+						 [ext](const vk::ExtensionProperties& prop) { return strcmp(prop.extensionName, ext) == 0; }))
 		{
-			Log(LOG_DEBUG) << "  " << ext;
+			Log(LOG_ERROR) << "Required extension not available: " << ext;
+			throw new std::runtime_error("Required extension not available.");
 		}
+	}
 
-		for (const char* const& ext : extensions)
-		{
-			if (std::find_if(availableExtensions.begin(), availableExtensions.end(), [ext](const vk::ExtensionProperties& prop) { return strcmp(prop.extensionName, ext) == 0; }) == availableExtensions.end())
-			{
-				throw std::runtime_error("Required extension not available: " + std::string(ext));
-			}
-		}
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+	createInfo.ppEnabledExtensionNames = extensions.data();
 
-		createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-		createInfo.ppEnabledExtensionNames = extensions.data();
+	_instance = vk::createInstance(createInfo);
+	VULKAN_HPP_DEFAULT_DISPATCHER.init(_instance);
 
-		// Create the Vulkan instance
-		_instance = vk::createInstance(createInfo);
-		VULKAN_HPP_DEFAULT_DISPATCHER.init(_instance);
+	_debugMessenger = _instance.createDebugUtilsMessengerEXT(debugCreateInfo);
 
-		// Create the debug messenger
-		_debugMessenger = _instance.createDebugUtilsMessengerEXT(debugCreateInfo);
+	Log(LOG_DEBUG) << "Vulkan instance created";
 
-		Log(LOG_DEBUG) << "Vulkan instance created";
-
-		// Create a temporary platform window
+	vk::SurfaceKHR surface;
+	if (!isHeadless)
+	{
 		std::unique_ptr<PlatformWindow> window = std::make_unique<PlatformWindow>("VulkanSurfaceCapWindow", 100, 100);
+		surface = VulkanWindowedSurface::createSurface(_instance, *window);
 
-		vk::SurfaceKHR surface = VulkanSurface::createSurface(_instance, *window);
-
-		// Select a physical device and create the logical device
 		selectPhysicalDevice(surface);
 		initializeDevice(surface);
 
-		VulkanSurface::destroySurface(_instance, surface);
+		VulkanWindowedSurface::destroySurface(_instance, surface);
 		window.reset();
+	}
+	else
+	{
+		selectPhysicalDevice(std::nullopt);
+		initializeDevice(std::nullopt);
+	}
 
-	}
-	catch (const vk::SystemError& err)
-	{
-		(void)err;
-		throw std::runtime_error("Failed to create Vulkan instance: ");
-	}
-	catch (const std::exception& err)
-	{
-		(void)err;
-		throw std::runtime_error("Error creating Vulkan instance: ");
-	}
-	catch (...)
-	{
-		throw std::runtime_error("Unknown error occurred creating Vulkan instance");
-	}
 }
 
-void VulkanContext::selectPhysicalDevice(const vk::SurfaceKHR& surface)
+void VulkanContext::selectPhysicalDevice(std::optional<vk::SurfaceKHR> surface)
 {
 	std::vector<vk::PhysicalDevice> physicalDevices = _instance.enumeratePhysicalDevices();
 	if (physicalDevices.empty())
 	{
-		throw std::runtime_error("Failed to find GPUs with Vulkan support.");
+		Log(LOG_ERROR) << "Failed to find GPUs with Vulkan support.";
+		throw new std::runtime_error("Failed to find GPUs with Vulkan support.");
 	}
 
 	Log(LOG_DEBUG) << "Available physical devices:";
 	for (const vk::PhysicalDevice& device : physicalDevices)
 	{
-		vk::PhysicalDeviceProperties deviceProperties = device.getProperties();
-		vk::PhysicalDeviceFeatures deviceFeatures = device.getFeatures();
+		vk::PhysicalDeviceProperties properties = device.getProperties();
+		vk::PhysicalDeviceFeatures features = device.getFeatures();
+		std::vector<vk::QueueFamilyProperties> queueFamilies = device.getQueueFamilyProperties();
 
-		Log(LOG_DEBUG) << "  Device Name: " << deviceProperties.deviceName;
-		Log(LOG_DEBUG) << "  Device Type: " << vk::to_string(deviceProperties.deviceType);
+		Log(LOG_DEBUG) << "  Device Name: " << properties.deviceName;
+		Log(LOG_DEBUG) << "  Device Type: " << vk::to_string(properties.deviceType);
 
+		bool supportsGraphics = false;
+		bool supportsPresentation = false;
 		bool supportsSwapchain = false;
-		bool hasGraphicsQueue = false;
-		bool hasPresentationQueue = false;
 
-		// Check for swap chain support
-		std::vector<vk::ExtensionProperties> availableExtensions = device.enumerateDeviceExtensionProperties();
-		for (const vk::ExtensionProperties& ext : availableExtensions)
+		// Check for swap chain support (only needed if windowed)
+		if (surface)
 		{
-			if (std::string((const char*)ext.extensionName) == VK_KHR_SWAPCHAIN_EXTENSION_NAME)
-			{
-				supportsSwapchain = true;
-				break;
-			}
+			std::vector<vk::ExtensionProperties> availableExtensions = device.enumerateDeviceExtensionProperties();
+			supportsSwapchain = std::any_of(availableExtensions.begin(), availableExtensions.end(),
+											[](const vk::ExtensionProperties& ext) { return strcmp(ext.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0; });
 		}
 
-		// Check for suitable queue families
-		std::vector<vk::QueueFamilyProperties> queueFamilies = device.getQueueFamilyProperties();
 		for (uint32_t i = 0; i < queueFamilies.size(); ++i)
 		{
 			if (queueFamilies[i].queueFlags & vk::QueueFlagBits::eGraphics)
 			{
-				hasGraphicsQueue = true;
+				supportsGraphics = true;
 			}
-
-			// You need a surface created to check for presentation support
-			if (device.getSurfaceSupportKHR(i, surface)) // _surface should be defined earlier
+			if (surface && device.getSurfaceSupportKHR(i, *surface))
 			{
-				hasPresentationQueue = true;
-			}
-
-			if (hasGraphicsQueue && hasPresentationQueue)
-			{
-				break;
+				supportsPresentation = true;
 			}
 		}
 
-		// Check if the device meets all requirements
-		if (supportsSwapchain && hasGraphicsQueue && hasPresentationQueue &&
-			deviceFeatures.samplerAnisotropy) // Add more features as needed
+		if (supportsGraphics && (!surface || (supportsPresentation && supportsSwapchain)))
 		{
 			_physicalDevice = device;
-			Log(LOG_DEBUG) << "Selected Device: " << deviceProperties.deviceName;
-			break;
+			Log(LOG_DEBUG) << "Selected Device: " << properties.deviceName;
+			return;
 		}
 	}
 
-	if (!_physicalDevice)
-	{
-		throw std::runtime_error("Failed to find a suitable GPU.");
-	}
+	Log(LOG_ERROR) << "Failed to find a suitable GPU.";
+	throw new std::runtime_error("Failed to find a suitable GPU.");
 }
 
-void VulkanContext::initializeDevice(const vk::SurfaceKHR& surface)
+void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 {
 	uint32_t graphicsQueueFamilyIndex = std::numeric_limits<uint32_t>::max();
 	uint32_t transferQueueFamilyIndex = std::numeric_limits<uint32_t>::max();
 	uint32_t presentQueueFamilyIndex = std::numeric_limits<uint32_t>::max();
 
-	// Find queue families
-	std::vector<vk::QueueFamilyProperties> queueFamilies = _physicalDevice.getQueueFamilyProperties();
+	auto queueFamilies = _physicalDevice.getQueueFamilyProperties();
 
 	for (uint32_t i = 0; i < queueFamilies.size(); ++i)
 	{
@@ -399,68 +359,75 @@ void VulkanContext::initializeDevice(const vk::SurfaceKHR& surface)
 			transferQueueFamilyIndex = i;
 		}
 
-		if (_physicalDevice.getSurfaceSupportKHR(i, surface))
+		// Check surface support only if we are not in headless mode
+		if (surface && _physicalDevice.getSurfaceSupportKHR(i, *surface))
 		{
 			presentQueueFamilyIndex = i;
 		}
-
-		if (graphicsQueueFamilyIndex != std::numeric_limits<uint32_t>::max() &&
-			transferQueueFamilyIndex != std::numeric_limits<uint32_t>::max() &&
-			presentQueueFamilyIndex != std::numeric_limits<uint32_t>::max())
-		{
-			break; // Found suitable queue families
-		}
 	}
 
+	// Ensure that at least graphics and transfer queues are available
 	if (graphicsQueueFamilyIndex == std::numeric_limits<uint32_t>::max() ||
-		transferQueueFamilyIndex == std::numeric_limits<uint32_t>::max() ||
-		presentQueueFamilyIndex == std::numeric_limits<uint32_t>::max())
+		transferQueueFamilyIndex == std::numeric_limits<uint32_t>::max())
 	{
-		throw std::runtime_error("Failed to find suitable queue families.");
+		Log(LOG_ERROR) << "Failed to find suitable queue families.";
+		std::terminate();
 	}
+
+	bool isHeadless = !surface.has_value();
 
 	// Specify Device Queues
 	float queuePriority = 1.0f;
+	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
 
 	vk::DeviceQueueCreateInfo graphicsQueueCreateInfo{};
 	graphicsQueueCreateInfo.queueFamilyIndex = graphicsQueueFamilyIndex;
 	graphicsQueueCreateInfo.queueCount = 1;
 	graphicsQueueCreateInfo.pQueuePriorities = &queuePriority;
+	queueCreateInfos.push_back(graphicsQueueCreateInfo);
 
-	vk::DeviceQueueCreateInfo presentQueueCreateInfo{};
-	if (graphicsQueueFamilyIndex != presentQueueFamilyIndex)
+	vk::DeviceQueueCreateInfo transferQueueCreateInfo{};
+	transferQueueCreateInfo.queueFamilyIndex = transferQueueFamilyIndex;
+	transferQueueCreateInfo.queueCount = 1;
+	transferQueueCreateInfo.pQueuePriorities = &queuePriority;
+	queueCreateInfos.push_back(transferQueueCreateInfo);
+
+	if (!isHeadless && graphicsQueueFamilyIndex != presentQueueFamilyIndex)
 	{
+		vk::DeviceQueueCreateInfo presentQueueCreateInfo{};
 		presentQueueCreateInfo.queueFamilyIndex = presentQueueFamilyIndex;
 		presentQueueCreateInfo.queueCount = 1;
 		presentQueueCreateInfo.pQueuePriorities = &queuePriority;
-	}
-
-	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos = {graphicsQueueCreateInfo};
-	if (graphicsQueueFamilyIndex != presentQueueFamilyIndex)
-	{
 		queueCreateInfos.push_back(presentQueueCreateInfo);
 	}
 
 	// Specify Device Features
 	vk::PhysicalDeviceFeatures deviceFeatures{};
 
-	// Finally, create the device
+	// Specify device extensions
+	std::vector<const char*> deviceExtensions;
+	if (!isHeadless)
+	{
+		deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+	}
+
+	// Finally, create the logical device
 	vk::DeviceCreateInfo deviceCreateInfo{};
 	deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
 	deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
-
-	// Specify device extensions (e.g., VK_KHR_swapchain)
-	const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 	deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 	deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-	// Create the logical device
 	_device = _physicalDevice.createDevice(deviceCreateInfo);
 
 	_graphicsQueue.create(_device, graphicsQueueFamilyIndex, false);
 	_transferQueue.create(_device, transferQueueFamilyIndex, true);
-	_presentQueue.create(_device, presentQueueFamilyIndex, false);
+
+	if (!isHeadless)
+	{
+		_presentQueue.create(_device, presentQueueFamilyIndex, false);
+	}
 }
 
 
