@@ -19,7 +19,6 @@
 
 #include "Engine.h"
 #include "Options.h"
-#include "../Game/Game.h"
 #include "Filesystem/VirtualFileSystem.h"
 #include "Platform/ProcessSystem.h"
 #include "Graphics/GraphicsSystem.h"
@@ -60,16 +59,10 @@ Engine::Engine(const std::vector<std::string>& args)
 	std::ostringstream title;
 	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
 	_engineContext->setTitle(title.str());
-
-	// Initialize the game
-	_game = std::make_unique<Game>(*_engineContext);
 }
 
 Engine::~Engine()
 {
-	// shut down the game
-	_game.reset();
-
 	// shut down the resource system
 	_resourceSystem.reset();
 
@@ -79,23 +72,9 @@ Engine::~Engine()
 	SimpleRTTR::shutdown();
 }
 
-int Engine::run()
+void Engine::update()
 {
-	// some options (like -version or -help) don't need to run the game
-	if (getOptions().get<&GameOptions::_shouldRun>() == false)
-	{
-		return EXIT_SUCCESS;
-	}
-
-	// run until the game is done
-	while (_platformProcessSystem->isRunning() == true && _game->isRunning())
-	{
-		_platformProcessSystem->update();
-
-		_game->update();
-	}
-
-	return EXIT_SUCCESS;
+	_platformProcessSystem->update();
 }
 
 void Engine::exit()

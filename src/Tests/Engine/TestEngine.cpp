@@ -17,26 +17,13 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <gtest/gtest.h>
+#include <filesystem>
 
-#include "../../../Engine/Engine.h"
-#include "../../../Engine/Options.h"
-#include "../../../Engine/Graphics/GraphicsSystem.h"
-#include "../../../Engine/Graphics/GraphicsSurface.h"
-#include "../../../Engine/Graphics/Common/GameSurface.h"
-#include "../../../Engine/Graphics/Common/WindowSurface.h"
-#include "../../../Engine/Platform/Window.h"
+#include "../../Engine/Engine.h"
 
 using namespace OpenXcom;
 
-TEST(TestGraphics, TestGraphicsInitialization)
-{
-	Options options;
-
-	options.set<&GraphicsOptions::_headless>(OptionLevel::CONFIG, true);
-	std::unique_ptr<GraphicsSystem> graphicsSystem = createGraphicsSystem(options);
-}
-
-TEST(TestGraphics, TestGraphicsSurface)
+TEST(TestEngine, TestEngineStart)
 {
 	std::filesystem::path path = TEST_DATA_DIR;
 	std::filesystem::path dataPath = path / "Data";
@@ -46,4 +33,3 @@ TEST(TestGraphics, TestGraphicsSurface)
 	std::vector<std::string> args = {"-data", dataPath.string(), "-config", configPath.string(), "-user", userPath.string(), "-headless"};
 	Engine engine(args);
 }
-

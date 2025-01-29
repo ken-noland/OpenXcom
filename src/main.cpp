@@ -39,7 +39,7 @@ DbgBreakAlloc brk;
 #endif
 
 #include "Engine/Engine.h"
-
+#include "Game/Game.h"
 
 using namespace OpenXcom;
 
@@ -51,8 +51,11 @@ int run(const std::vector<std::string>& args)
 	// Create the engine
 	Engine engine(args);
 
-	// Run the engine
-	return engine.run();
+	// Create the game
+	Game game(engine);
+
+	// Run the game
+	return game.run();
 }
 
 } // namespace OpenXcom

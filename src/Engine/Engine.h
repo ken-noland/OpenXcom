@@ -26,7 +26,6 @@ namespace OpenXcom
 {
 
 class EngineContext;
-class Game;
 class Options;
 class VirtualFileSystem;
 class PlatformProcessSystem;
@@ -35,9 +34,7 @@ class ResourceSystem;
 
 // Engine is used for process wide initialization and cleanup. In theory, it
 // provides a way to separate and isolate the game from the rest of the
-// systems, allowing for easier testing and debugging. In practice, a lot
-// of the underlying systems and classes are still tightly coupled due to the
-// way the game was originally written.
+// systems, allowing for easier testing and debugging.
 class Engine
 {
 	// Options
@@ -55,9 +52,6 @@ class Engine
 	// Resource system
 	std::unique_ptr<ResourceSystem> _resourceSystem;
 
-	// Game
-	std::unique_ptr<Game> _game;
-
 	// Engine context
 	std::unique_ptr<EngineContext> _engineContext;
 
@@ -65,10 +59,12 @@ public:
 	Engine(const std::vector<std::string>& args = {});
 	~Engine();
 
-	int run();
+	void update();
 
 	// call this to exit the application
 	void exit();
+
+	EngineContext& getEngineContext() { return *_engineContext; }
 
 	Options& getOptions() { return *_options; }
 	VirtualFileSystem& getVirtualFileSystem() { return *_virtualFileSystem; }

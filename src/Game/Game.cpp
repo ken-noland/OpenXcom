@@ -18,6 +18,9 @@
  */
 #include "Game.h"
 #include "../Engine/Engine.h"
+#include "../Engine/Options.h"
+#include "../Engine/Platform/ProcessSystem.h"
+
 #include "../Engine/State.h"
 
 #include "GameWindow.h"
@@ -44,9 +47,10 @@ Game* getGame()
 	return _GamePtr();
 }
 
-Game::Game(EngineContext& engine)
+Game::Game(Engine& engine)
+	: _engine(engine)
 {
-	_gameWindow = std::make_unique<GameWindow>(engine);
+	_gameWindow = std::make_unique<GameWindow>(_engine.getEngineContext());
 
 	//Engine& engine = getEngine();
 	//_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768);
@@ -58,7 +62,7 @@ Game::Game(EngineContext& engine)
 	// window->setCloseCallback([this]() { getEngine->exit() });
 
 	// set the initial game state
-	setState(std::make_unique<StartState>(engine));
+	setState(std::make_unique<StartState>(_engine.getEngineContext()));
 }
 
 /**
@@ -66,6 +70,27 @@ Game::Game(EngineContext& engine)
  */
 Game::~Game()
 {
+}
+
+int Game::run()
+{
+	// some options (like -version or -help) don't need to run the game
+	if (_engine.getOptions().get<&GameOptions::_shouldRun>() == false)
+	{
+		return EXIT_SUCCESS;
+	}
+
+	
+	// run until the game is done
+	while (_engine.getPlatformProcessSystem().isRunning() == true && isRunning())
+	{
+		_engine.update();
+
+		update();
+	}
+
+	return EXIT_SUCCESS;
+
 }
 
 bool Game::isRunning() const

@@ -32,7 +32,7 @@
 namespace OpenXcom
 {
 
-class EngineContext;
+class Engine;
 class State;
 class Options;
 class GameWindow;
@@ -46,6 +46,10 @@ class GameWindow;
 class Game
 {
 private:
+	/// Game engine
+	Engine& _engine;
+
+
 	/// central entity component system
 	ECS _ecs;
 
@@ -63,9 +67,11 @@ private:
 
 public:
 	/// Creates a new game.
-	Game(EngineContext& engine);
+	Game(Engine& engine);
 	/// Cleans up all the game's resources.
 	~Game();
+
+	int run();
 
 	bool isRunning() const;
 

@@ -22,6 +22,7 @@ add_executable(
   openxcom_tests
   "Engine/Graphics/TestGraphics.cpp"
   "Engine/Resource/TestResourceManager.cpp"
+  "Engine/TestEngine.cpp"
   "Engine/TestECS.cpp"
   "Engine/TestOptions.cpp"
   "Engine/TestTimer.cpp"

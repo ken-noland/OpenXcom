@@ -23,7 +23,6 @@ namespace OpenXcom
 {
 
 class Engine;
-class Game;
 class Options;
 class VirtualFileSystem;
 class PlatformProcessSystem;
