@@ -166,7 +166,7 @@ void WindowSurface::createWindowed(GameSurface& gameSurface)
 	_pipelineBinding->setIndexBuffer(*_indexBuffer);
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, _projection);
 
-	const Image& gameRenderTarget = gameSurface.getRenderTarget();
+	const DeviceImage& gameRenderTarget = gameSurface.getRenderTarget();
 	_pipelineBinding->setTexture(ShaderStage::Fragment, 0, gameRenderTarget);
 
 	// setup up the window projection

@@ -32,7 +32,7 @@ VulkanImageFactory::~VulkanImageFactory()
 }
 
 VulkanImage::VulkanImage(VulkanContext& context, uint32_t width, uint32_t height, vk::ImageUsageFlags flags)
-	: Image(ImageType::Texture), _context(context)
+	: _context(context)
 {
 	throw new std::runtime_error("Not implemented");
 

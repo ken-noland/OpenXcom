@@ -45,5 +45,10 @@ TEST(TestGraphics, TestGraphicsSurface)
 
 	std::vector<std::string> args = {"-data", dataPath.string(), "-config", configPath.string(), "-user", userPath.string(), "-headless"};
 	Engine engine(args);
-}
 
+	GameSurface gameSurface(engine.getEngineContext());
+	WindowSurface windowSurface(engine.getEngineContext(), gameSurface);
+
+	// render one frame
+
+}

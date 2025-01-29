@@ -43,7 +43,7 @@ public:
 	std::unique_ptr<VulkanHostImage> createHostImage(uint32_t width, uint32_t height, ImageFormat format);
 };
 
-class VulkanImage : public Image
+class VulkanImage
 {
 protected:
 	VulkanContext& _context;
@@ -65,11 +65,11 @@ public:
 	const vk::ImageView& getImageView() const { return _imageView; }
 };
 
-class VulkanHostImage : public VulkanImage
+class VulkanHostImage : public VulkanImage, public HostImage
 {
 };
 
-class VulkanDeviceImage : public VulkanImage
+class VulkanDeviceImage : public VulkanImage, public DeviceImage
 {
 };
 

@@ -25,10 +25,10 @@ namespace OpenXcom
 class GraphicsSurface;
 class GraphicsCommand;
 
-class RenderTarget : public Image
+class RenderTarget : public DeviceImage
 {
 public:
-	RenderTarget(ImageType imageType = ImageType::RenderTarget) : Image(imageType) {}
+	RenderTarget(ImageType imageType = ImageType::RenderTarget) : DeviceImage(imageType) {}
 	virtual ~RenderTarget() = default;
 
 	virtual void beginRenderPass(GraphicsCommand& commandContext) = 0;

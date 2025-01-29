@@ -24,7 +24,7 @@ namespace OpenXcom
 {
 
 class DeviceBuffer;
-class Image;
+class DeviceImage;
 class GraphicsCommand;
 enum class ShaderStage;
 
@@ -42,7 +42,7 @@ public:
 	void setPushConstant(ShaderStage stage, const ConstantType& data);
 	virtual void setPushConstant(const SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size) = 0;
 
-	virtual void setTexture(ShaderStage stage, uint32_t binding, const Image& image) = 0;
+	virtual void setTexture(ShaderStage stage, uint32_t binding, const DeviceImage& image) = 0;
 
 	virtual void commit(GraphicsCommand& command) = 0;
 };

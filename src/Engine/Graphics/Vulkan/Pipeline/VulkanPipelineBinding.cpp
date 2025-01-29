@@ -140,7 +140,7 @@ void VulkanPipelineBinding::setPushConstant(const SimpleRTTR::Type& type, Shader
 	pushConstant.copyTo(data, size);
 }
 
-void VulkanPipelineBinding::setTexture(ShaderStage stage, uint32_t binding, const Image& image)
+void VulkanPipelineBinding::setTexture(ShaderStage stage, uint32_t binding, const DeviceImage& image)
 {
 	// Get the sampler
 	vk::Sampler sampler = _context.getSamplerFactory().getSampler().getSampler();
@@ -149,7 +149,7 @@ void VulkanPipelineBinding::setTexture(ShaderStage stage, uint32_t binding, cons
 	vk::ImageView imageView;
 	if(image.getType() == ImageType::Texture)
 	{
-		const VulkanImage& vulkanImage = static_cast<const VulkanImage&>(image);
+		const VulkanDeviceImage& vulkanImage = static_cast<const VulkanDeviceImage&>(image);
 		imageView = vulkanImage.getImageView();
 	}
 	else if (image.getType() == ImageType::RenderTarget)

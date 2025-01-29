@@ -36,14 +36,19 @@ enum class ImageType
 	Surface
 };
 
-class Image
+class HostImage
+{
+
+};
+
+class DeviceImage
 {
 protected:
 	ImageType _type;
 
 public:
-	Image(ImageType type) : _type(type) { };
-	virtual ~Image() = default;
+	DeviceImage(ImageType type) : _type(type) {};
+	virtual ~DeviceImage() = default;
 
 	virtual glm::ivec2 getSize() const = 0;
 
@@ -52,7 +57,5 @@ public:
 
 	ImageType getType() const { return _type; }
 };
-
-
 
 } // namespace OpenXcom

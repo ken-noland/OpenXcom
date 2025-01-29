@@ -22,9 +22,6 @@
 namespace OpenXcom
 {
 
-enum class ImageFormat;
-class Image;
-
 class ImageManager
 {
 public:
