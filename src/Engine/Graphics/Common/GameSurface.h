@@ -26,6 +26,7 @@ namespace OpenXcom
 
 class EngineContext;
 class RenderTarget;
+class HostImage;
 class GraphicsCommand;
 class Buffer;
 
@@ -43,8 +44,11 @@ public:
 
 	void render(GraphicsCommand& command);
 
+	void captureFrame(HostImage& image);
+
 	const RenderTarget& getRenderTarget() const { return *_renderTarget; }
-	glm::ivec2 getScreenSize() const; 
+	glm::ivec2 getScreenSize() const;
+
 
 	MulticastDelegate<void(GraphicsCommand&)>& onRender() { return _onRender; }
 };

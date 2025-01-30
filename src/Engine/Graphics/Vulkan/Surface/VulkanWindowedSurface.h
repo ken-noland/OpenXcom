@@ -89,10 +89,18 @@ public:
 	const vk::Extent2D& getVKExtent() const { return _swapChainExtent; }
 	const vk::RenderPass& getRenderPass() const { return _renderPass; }
 
+	virtual ImageFormat getFormat() const override;
+
 	virtual uint32_t getWidth() const override;
 	virtual uint32_t getHeight() const override;
 
 	virtual glm::ivec2 getSize() const override;
+
+	// copy the host image to this device image
+	virtual void copyFrom(HostImage& hostImage) override;
+
+	// copy this device image to the host image
+	virtual void copyTo(HostImage& hostImage) override;
 
 
 	virtual GraphicsCommand& beginCommandPass() override;

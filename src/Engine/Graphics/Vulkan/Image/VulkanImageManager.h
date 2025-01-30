@@ -26,19 +26,19 @@ namespace OpenXcom
 {
 
 class VulkanContext;
-class VulkanImageFactory;
 
 class VulkanImageManager : public ImageManager
 {
 protected:
-	std::unique_ptr<VulkanImageFactory> _imageFactory;
-
+	VulkanContext& _context;
 
 public:
 	VulkanImageManager(VulkanContext& context);
 	virtual ~VulkanImageManager();
 
-	//virtual std::unique_ptr<RenderTargetImage> createRenderTarget(int width, int height, ImageFormat format);
+	virtual std::unique_ptr<HostImage> createHostImage(ImageFormat format, uint32_t width, uint32_t height) override;
+	virtual std::unique_ptr<DeviceImage> createDeviceImage(ImageFormat format, uint32_t width, uint32_t height) override;
+	virtual std::unique_ptr<DeviceImage> createDeviceImage(HostImage& host) override;
 };
 
 } // namespace OpenXcom

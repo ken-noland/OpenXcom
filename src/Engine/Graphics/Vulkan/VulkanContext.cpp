@@ -421,7 +421,7 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 
 	_device = _physicalDevice.createDevice(deviceCreateInfo);
 
-	_graphicsQueue.create(_device, graphicsQueueFamilyIndex, false);
+	_graphicsQueue.create(_device, graphicsQueueFamilyIndex, true);
 	_transferQueue.create(_device, transferQueueFamilyIndex, true);
 
 	if (!isHeadless)

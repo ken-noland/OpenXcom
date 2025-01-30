@@ -2,7 +2,6 @@
 option(ENABLE_ENTITY_INSPECTOR "Enable the EntityInspector for debugging and editing entities." ON)
 
 set ( root_src
-  "lodepng.cpp"
   "md5.cpp"
 )
 set ( basescape_src
@@ -145,6 +144,7 @@ set ( engine_src
   "Engine/Graphics/Vulkan/Font/VulkanFontManager.cpp"
   "Engine/Graphics/Vulkan/Image/VulkanImage.cpp"
   "Engine/Graphics/Vulkan/Image/VulkanImageManager.cpp"
+  "Engine/Graphics/Vulkan/Image/VulkanRenderTarget.cpp"
   "Engine/Graphics/Vulkan/Palette/VulkanPalette.cpp"
   "Engine/Graphics/Vulkan/Palette/VulkanPaletteManager.cpp"
   "Engine/Graphics/Vulkan/Pipeline/VulkanPipeline.cpp"
@@ -159,7 +159,6 @@ set ( engine_src
   "Engine/Graphics/Vulkan/VulkanCommand.cpp"
   "Engine/Graphics/Vulkan/VulkanContext.cpp"
   "Engine/Graphics/Vulkan/VulkanDescriptorSet.cpp"
-  "Engine/Graphics/Vulkan/VulkanRenderTarget.cpp"
   "Engine/Graphics/Vulkan/VulkanResource.cpp"
   "Engine/Graphics/Vulkan/VulkanSampler.cpp"
   "Engine/Graphics/Vulkan/VulkanSystem.cpp"
@@ -563,7 +562,7 @@ set_property ( SOURCE ${c_src} APPEND PROPERTY COMPILE_DEFINITIONS MINIZ_NO_STDI
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-
+#--------------------------------
 # External libraries
 include(FetchContent)
 
@@ -776,9 +775,18 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
     GIT_TAG v3.1.0
 )
-
 FetchContent_MakeAvailable(VulkanMemoryAllocator)
 
+# Fetch lodepng
+FetchContent_Declare(
+    lodepng
+    GIT_REPOSITORY https://github.com/lvandeve/lodepng.git
+    GIT_TAG master  # You can replace this with a specific commit or release tag
+)
+FetchContent_MakeAvailable(lodepng)
+
+
+#--------------------------------
 # set up the defines and includes
 set(openxcom_defines
   YAML_CPP_STATIC_DEFINE

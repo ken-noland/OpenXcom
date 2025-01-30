@@ -20,7 +20,7 @@
 #include "VulkanSystem.h"
 #include "Surface/VulkanWindowedSurface.h"
 #include "Surface/VulkanHeadlessSurface.h"
-#include "VulkanRenderTarget.h"
+#include "Image/VulkanRenderTarget.h"
 
 #include "../../Engine.h"
 #include "../../Options.h"
@@ -63,9 +63,9 @@ std::unique_ptr<GraphicsSurface> VulkanSystem::createHeadlessSurface()
 	return surface;
 }
 
-std::unique_ptr<RenderTarget> VulkanSystem::createRenderTarget(int width, int height, ImageFormat format)
+std::unique_ptr<RenderTarget> VulkanSystem::createRenderTarget(glm::ivec2 size, ImageFormat format, glm::vec4 color)
 {
-	return std::make_unique<VulkanRenderTarget>(_context, width, height, format);
+	return std::make_unique<VulkanRenderTarget>(_context, size, format, color);
 }
 
 std::unique_ptr<ShaderManager> VulkanSystem::createShaderManager()

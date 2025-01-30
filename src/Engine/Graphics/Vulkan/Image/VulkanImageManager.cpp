@@ -25,13 +25,27 @@ namespace OpenXcom
 {
 
 VulkanImageManager::VulkanImageManager(VulkanContext& context)
+	: _context(context)
 {
-	_imageFactory = std::make_unique<VulkanImageFactory>(context);
 }
 
 VulkanImageManager::~VulkanImageManager()
 {
 }
 
+std::unique_ptr<HostImage> VulkanImageManager::createHostImage(ImageFormat format, uint32_t width, uint32_t height)
+{
+	return std::make_unique<VulkanHostImage>(_context, format, width, height);
+}
+
+std::unique_ptr<DeviceImage> VulkanImageManager::createDeviceImage(ImageFormat format, uint32_t width, uint32_t height)
+{
+	return std::make_unique<VulkanDeviceImage>(_context, format, width, height);
+}
+
+std::unique_ptr<DeviceImage> VulkanImageManager::createDeviceImage(HostImage& image)
+{
+	return std::make_unique<VulkanDeviceImage>(_context, static_cast<VulkanHostImage&>(image));
+}
 
 } // namespace OpenXcom

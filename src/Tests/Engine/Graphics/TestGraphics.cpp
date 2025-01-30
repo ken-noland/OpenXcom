@@ -20,6 +20,10 @@
 
 #include "../../../Engine/Engine.h"
 #include "../../../Engine/Options.h"
+#include "../../../Engine/Resource/ResourceSystem.h"
+#include "../../../Engine/Resource/ResourceManager.h"
+#include "../../../Engine/Resource/Image/Image.h"
+#include "../../../Engine/Resource/Image/ImageManager.h"
 #include "../../../Engine/Graphics/GraphicsSystem.h"
 #include "../../../Engine/Graphics/GraphicsSurface.h"
 #include "../../../Engine/Graphics/Common/GameSurface.h"
@@ -49,6 +53,16 @@ TEST(TestGraphics, TestGraphicsSurface)
 	GameSurface gameSurface(engine.getEngineContext());
 	WindowSurface windowSurface(engine.getEngineContext(), gameSurface);
 
-	// render one frame
+	//render once
+	windowSurface.update();
 
+	std::unique_ptr<HostImage> hostImage = engine.getResourceSystem().getImageManager().createHostImage(ImageFormat::RGBA8, 640, 480);
+	EXPECT_TRUE(hostImage);
+
+	gameSurface.captureFrame(*hostImage);
+
+	//with the game surface rendered, let's check against the expected results
+	void* pixels = hostImage->map();
+
+	hostImage->unmap();
 }

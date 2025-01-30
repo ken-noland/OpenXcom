@@ -313,6 +313,11 @@ void VulkanWindowedSurface::destroySurface(vk::Instance& instance, vk::SurfaceKH
 	instance.destroySurfaceKHR(surface);
 }
 
+ImageFormat VulkanWindowedSurface::getFormat() const
+{
+	return ImageFormat::UNKNOWN;
+}
+
 uint32_t VulkanWindowedSurface::getWidth() const
 {
 	return _swapChainExtent.width;
@@ -326,6 +331,16 @@ uint32_t VulkanWindowedSurface::getHeight() const
 glm::ivec2 VulkanWindowedSurface::getSize() const
 {
 	return glm::ivec2(_swapChainExtent.width, _swapChainExtent.height);
+}
+
+void VulkanWindowedSurface::copyFrom(HostImage& hostImage)
+{
+	throw new std::runtime_error("Not implemented");
+}
+
+void VulkanWindowedSurface::copyTo(HostImage& hostImage)
+{
+	throw new std::runtime_error("Not implemented");
 }
 
 GraphicsCommand& VulkanWindowedSurface::beginCommandPass()

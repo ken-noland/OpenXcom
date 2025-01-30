@@ -47,7 +47,11 @@ public:
 	virtual uint32_t getHeight() const override { return 0; }
 
 	virtual glm::ivec2 getSize() const override { return {0, 0}; }
-		
+	virtual ImageFormat getFormat() const override { return ImageFormat::UNKNOWN; }
+
+	virtual void copyFrom(HostImage& hostImage) override;
+	virtual void copyTo(HostImage& hostImage) override;
+
 	virtual GraphicsCommand& beginCommandPass() override;
 	virtual void endCommandPass(GraphicsCommand& commandContext) override;
 

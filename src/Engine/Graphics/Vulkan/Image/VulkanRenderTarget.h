@@ -17,10 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../GraphicsSurface.h"
+#include "../../GraphicsSurface.h"
 
 #include <vulkan/vulkan.hpp>
 #include <vk_mem_alloc.h> // VMA
+
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 
 
 namespace OpenXcom
@@ -36,8 +39,8 @@ private:
 
 	VmaAllocation _allocation;
 
-	uint32_t _width;
-	uint32_t _height;
+	glm::ivec2 _size;
+	glm::vec4 _color;
 
 	vk::Image _image;
 	vk::ImageView _imageView;
@@ -46,12 +49,16 @@ private:
 	vk::Framebuffer _framebuffer;
 
 public:
-	VulkanRenderTarget(VulkanContext& context, uint32_t width, uint32_t height, ImageFormat format);
+	VulkanRenderTarget(VulkanContext& context, glm::ivec2 size, ImageFormat format, glm::vec4 color);
 	virtual ~VulkanRenderTarget();
 
-	virtual uint32_t getWidth() const override { return _width; }
-	virtual uint32_t getHeight() const override { return _height; }
-	virtual glm::ivec2 getSize() const override { return glm::ivec2(_width, _height); }
+	virtual uint32_t getWidth() const override { return _size.x; }
+	virtual uint32_t getHeight() const override { return _size.y; }
+	virtual glm::ivec2 getSize() const override { return _size; }
+	virtual ImageFormat getFormat() const override { return ImageFormat::UNKNOWN; }
+		
+	virtual void copyFrom(HostImage& hostImage) override;
+	virtual void copyTo(HostImage& hostImage) override;
 
 	vk::Image& getImage() { return _image; }
 	const vk::ImageView& getImageView() const { return _imageView; }

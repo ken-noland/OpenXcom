@@ -22,11 +22,19 @@
 namespace OpenXcom
 {
 
+class HostImage;
+class DeviceImage;
+enum class ImageFormat;
+
 class ImageManager
 {
 public:
 	ImageManager() = default;
 	virtual ~ImageManager() = default;
+
+	virtual std::unique_ptr<HostImage> createHostImage(ImageFormat format, uint32_t width, uint32_t height) = 0;
+	virtual std::unique_ptr<DeviceImage> createDeviceImage(ImageFormat format, uint32_t width, uint32_t height) = 0;
+	virtual std::unique_ptr<DeviceImage> createDeviceImage(HostImage& host) = 0;
 };
 
 } // namespace OpenXcom

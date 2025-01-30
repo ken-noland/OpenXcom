@@ -55,6 +55,17 @@ VulkanHeadlessSurface::~VulkanHeadlessSurface()
 	}
 }
 
+void VulkanHeadlessSurface::copyFrom(HostImage& hostImage)
+{
+	throw new std::runtime_error("Not implemented");
+}
+
+void VulkanHeadlessSurface::copyTo(HostImage& hostImage)
+{
+	throw new std::runtime_error("Not implemented");
+}
+
+
 GraphicsCommand& VulkanHeadlessSurface::beginCommandPass()
 {
 	// Begin recording commands
@@ -67,6 +78,15 @@ void VulkanHeadlessSurface::endCommandPass(GraphicsCommand& commandContext)
 {
 	// End command buffer recording
 	_commandBuffer.end();
+
+	// Submit the command buffer and wait for completion
+	vk::SubmitInfo submitInfo{};
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &_commandBuffer;
+
+	vk::Queue graphicsQueue = _context.getGraphicsQueue().getQueue();
+	graphicsQueue.submit(submitInfo, nullptr);
+	graphicsQueue.waitIdle();
 }
 
 void VulkanHeadlessSurface::beginRenderPass(GraphicsCommand& commandContext)

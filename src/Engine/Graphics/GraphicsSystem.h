@@ -19,6 +19,9 @@
  */
 #include <memory>
 
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
+
 namespace OpenXcom
 {
 
@@ -48,7 +51,7 @@ public:
 
 	virtual std::unique_ptr<GraphicsSurface> createWindowedSurface(PlatformWindow& window) = 0;
 	virtual std::unique_ptr<GraphicsSurface> createHeadlessSurface() = 0;
-	virtual std::unique_ptr<RenderTarget> createRenderTarget(int width, int height, ImageFormat format) = 0;
+	virtual std::unique_ptr<RenderTarget> createRenderTarget(glm::ivec2 size, ImageFormat format, glm::vec4 color) = 0;
 
 	// resource managers
 	virtual std::unique_ptr<ShaderManager> createShaderManager() = 0;

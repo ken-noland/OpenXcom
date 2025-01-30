@@ -27,23 +27,35 @@ namespace OpenXcom
 {
 
 class VulkanContext;
-class VulkanHostImage;
-class VulkanRenderTargetImage;
 
-class VulkanImageFactory
+class VulkanHostImage : public HostImage
 {
 protected:
 	VulkanContext& _context;
 
-public:
-	VulkanImageFactory(VulkanContext& context);
-	~VulkanImageFactory();
+	VmaAllocation _allocation;
 
-	// create an empty host image
-	std::unique_ptr<VulkanHostImage> createHostImage(uint32_t width, uint32_t height, ImageFormat format);
+	vk::Buffer _buffer;
+
+	glm::ivec2 _size;
+	ImageFormat _format;
+
+public:
+	VulkanHostImage(VulkanContext& context, ImageFormat format, uint32_t width, uint32_t height);
+	virtual ~VulkanHostImage();
+
+	virtual ImageFormat getFormat() const override;
+	virtual glm::ivec2 getSize() const override;
+	virtual uint32_t getWidth() const override;
+	virtual uint32_t getHeight() const override;
+
+	virtual void* map() override;
+	virtual void unmap() override;
+
+	const vk::Buffer& getBuffer() const { return _buffer; }
 };
 
-class VulkanImage
+class VulkanDeviceImage : public DeviceImage
 {
 protected:
 	VulkanContext& _context;
@@ -53,25 +65,26 @@ protected:
 	vk::Image _image;
 	vk::ImageView _imageView;
 
-	int _width;
-	int _height;
+	vk::ImageLayout _currentLayout;
+
+	glm::ivec2 _size;
 	ImageFormat _format;
 
 public:
-	VulkanImage(VulkanContext& context, uint32_t width, uint32_t height, vk::ImageUsageFlags flags);
-	virtual ~VulkanImage();
+	VulkanDeviceImage(VulkanContext& context, ImageFormat format, uint32_t width, uint32_t height);
+	VulkanDeviceImage(VulkanContext& context, VulkanHostImage& image);
+	virtual ~VulkanDeviceImage();
+
+	virtual void copyFrom(HostImage& hostImage) override;
+	virtual void copyTo(HostImage& hostImage) override;
+
+	virtual ImageFormat getFormat() const override;
+	virtual glm::ivec2 getSize() const override;
+	virtual uint32_t getWidth() const override;
+	virtual uint32_t getHeight() const override;
 
 	const vk::Image& getImage() const { return _image; }
 	const vk::ImageView& getImageView() const { return _imageView; }
 };
-
-class VulkanHostImage : public VulkanImage, public HostImage
-{
-};
-
-class VulkanDeviceImage : public VulkanImage, public DeviceImage
-{
-};
-
 
 } // namespace OpenXcom

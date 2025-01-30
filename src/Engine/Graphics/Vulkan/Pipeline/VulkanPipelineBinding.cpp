@@ -24,8 +24,8 @@
 #include "../VulkanSampler.h"
 #include "../VulkanCommand.h"
 #include "../Image/VulkanImage.h"
+#include "../Image/VulkanRenderTarget.h"
 #include "../Buffer/VulkanBuffer.h"
-#include "../VulkanRenderTarget.h"
 
 namespace OpenXcom
 {

@@ -17,19 +17,23 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "VulkanRenderTarget.h"
-#include "VulkanContext.h"
-#include "VulkanCommand.h"
+#include "VulkanImage.h"
+
+#include "../VulkanContext.h"
+#include "../VulkanCommand.h"
 
 namespace OpenXcom
 {
 
-VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, uint32_t width, uint32_t height, ImageFormat format)
-	: _context(context), _allocation(nullptr), _width(width), _height(height), _image(nullptr), _imageView(nullptr), _renderPass(nullptr), _framebuffer(nullptr)
+void transitionImageLayout(vk::CommandBuffer cmdBuffer,	vk::Image image, vk::ImageLayout oldLayout,	vk::ImageLayout newLayout);
+
+VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 size, ImageFormat format, glm::vec4 color)
+	: _context(context), _allocation(nullptr), _size(size), _color(color), _image(nullptr), _imageView(nullptr), _renderPass(nullptr), _framebuffer(nullptr)
 {
 	// Create the render target image
 	vk::ImageCreateInfo imageInfo{};
 	imageInfo.imageType = vk::ImageType::e2D;
-	imageInfo.extent = vk::Extent3D{_width, _height, 1};
+	imageInfo.extent = vk::Extent3D(_size.x, _size.y, 1);
 	imageInfo.mipLevels = 1;
 	imageInfo.arrayLayers = 1;
 	imageInfo.format = vk::Format::eR8G8B8A8Unorm; // 8-bit color with alpha
@@ -101,6 +105,57 @@ VulkanRenderTarget::~VulkanRenderTarget()
 	vmaDestroyImage(_context.getAllocator(), _image, _allocation);
 }
 
+void VulkanRenderTarget::copyFrom(HostImage& hostImage)
+{
+	throw new std::runtime_error("Not implemented");
+}
+
+void VulkanRenderTarget::copyTo(HostImage& image)
+{
+	VulkanHostImage& hostImage = static_cast<VulkanHostImage&>(image);
+	vk::CommandBuffer cmdBuffer = _context.getGraphicsQueue().getCommandBuffer(0);
+
+	// Begin recording commands
+	vk::CommandBufferBeginInfo beginInfo{};
+	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+	cmdBuffer.begin(beginInfo);
+
+	// Transition image for reading
+	transitionImageLayout(cmdBuffer, _image, vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageLayout::eTransferSrcOptimal);
+
+	// Define buffer copy region
+	vk::BufferImageCopy region{};
+	region.bufferOffset = 0;
+	region.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+	region.imageSubresource.mipLevel = 0;
+	region.imageSubresource.baseArrayLayer = 0;
+	region.imageSubresource.layerCount = 1;
+	region.imageExtent = vk::Extent3D(_size.x, _size.y, 1);
+
+	// Copy image to buffer
+	cmdBuffer.copyImageToBuffer(
+		_image, // Render target image
+		vk::ImageLayout::eTransferSrcOptimal,
+		hostImage.getBuffer(),
+		1,
+		&region);
+
+	// Transition image back to readable state
+	transitionImageLayout(cmdBuffer, _image, vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+
+	// End recording commands
+	cmdBuffer.end();
+
+	// Submit the command buffer and wait for completion
+	vk::SubmitInfo submitInfo{};
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &cmdBuffer;
+
+	vk::Queue graphicsQueue = _context.getGraphicsQueue().getQueue();
+	graphicsQueue.submit(submitInfo, nullptr);
+	graphicsQueue.waitIdle();
+}
+
 void VulkanRenderTarget::beginRenderPass(GraphicsCommand& command)
 {
 	vk::CommandBuffer& vkCommand = static_cast<VulkanCommand&>(command).getCommandBuffer();
@@ -124,7 +179,7 @@ void VulkanRenderTarget::beginRenderPass(GraphicsCommand& command)
 
 	vkCommand.setScissor(0, 1, &scissor);
 
-	vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{0.0f, 0.0f, 1.0f, 1.0f});
+	vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{_color.r, _color.g, _color.b, _color.a});
 
 	vk::RenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.renderPass = _renderPass;

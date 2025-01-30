@@ -31,7 +31,7 @@ GameSurface::GameSurface(EngineContext& engine)
 	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
 
 	// create a render target for the game surface
-	_renderTarget = graphicsSystem.createRenderTarget(320, 200, ImageFormat::RGBA8); // TODO: use game options to define the game surface dimensions
+	_renderTarget = graphicsSystem.createRenderTarget({320, 200}, ImageFormat::RGBA8, {0,0,0,0}); // TODO: use game options to define the game surface dimensions
 }
 
 GameSurface::~GameSurface()
@@ -48,6 +48,12 @@ void GameSurface::render(GraphicsCommand& command)
 
 	command.endRenderPass();
 }
+
+void GameSurface::captureFrame(HostImage& image)
+{
+	_renderTarget->copyTo(image);
+}
+
 
 glm::ivec2 GameSurface::getScreenSize() const
 {
