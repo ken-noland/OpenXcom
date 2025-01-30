@@ -19,6 +19,8 @@
  */
 #include <memory>
 
+#include <glm/vec2.hpp>
+
 namespace OpenXcom
 {
 
@@ -32,8 +34,8 @@ public:
 	ImageManager() = default;
 	virtual ~ImageManager() = default;
 
-	virtual std::unique_ptr<HostImage> createHostImage(ImageFormat format, uint32_t width, uint32_t height) = 0;
-	virtual std::unique_ptr<DeviceImage> createDeviceImage(ImageFormat format, uint32_t width, uint32_t height) = 0;
+	virtual std::unique_ptr<HostImage> createHostImage(glm::vec2 size, ImageFormat format) = 0;
+	virtual std::unique_ptr<DeviceImage> createDeviceImage(glm::vec2 size, ImageFormat format) = 0;
 	virtual std::unique_ptr<DeviceImage> createDeviceImage(HostImage& host) = 0;
 };
 

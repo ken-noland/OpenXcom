@@ -156,7 +156,7 @@ void VulkanPipeline::createInputAssemblyState(vk::PipelineInputAssemblyStateCrea
 
 void VulkanPipeline::createViewportState(vk::PipelineViewportStateCreateInfo& viewportState, vk::Viewport& viewport, vk::Rect2D& scissor, const RenderTarget& surface)
 {
-	glm::ivec2 surfaceExtent = surface.getSize();
+	glm::ivec2 surfaceExtent = surface.getExtent();
 
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;

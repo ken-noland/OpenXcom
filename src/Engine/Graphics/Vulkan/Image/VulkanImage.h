@@ -37,15 +37,15 @@ protected:
 
 	vk::Buffer _buffer;
 
-	glm::ivec2 _size;
+	glm::ivec2 _extent;
 	ImageFormat _format;
 
 public:
-	VulkanHostImage(VulkanContext& context, ImageFormat format, uint32_t width, uint32_t height);
+	VulkanHostImage(VulkanContext& context, glm::vec2 size, ImageFormat format);
 	virtual ~VulkanHostImage();
 
 	virtual ImageFormat getFormat() const override;
-	virtual glm::ivec2 getSize() const override;
+	virtual glm::ivec2 getExtent() const override;
 	virtual uint32_t getWidth() const override;
 	virtual uint32_t getHeight() const override;
 
@@ -67,11 +67,11 @@ protected:
 
 	vk::ImageLayout _currentLayout;
 
-	glm::ivec2 _size;
+	glm::ivec2 _extent;
 	ImageFormat _format;
 
 public:
-	VulkanDeviceImage(VulkanContext& context, ImageFormat format, uint32_t width, uint32_t height);
+	VulkanDeviceImage(VulkanContext& context, glm::vec2 size, ImageFormat format);
 	VulkanDeviceImage(VulkanContext& context, VulkanHostImage& image);
 	virtual ~VulkanDeviceImage();
 
@@ -79,7 +79,7 @@ public:
 	virtual void copyTo(HostImage& hostImage) override;
 
 	virtual ImageFormat getFormat() const override;
-	virtual glm::ivec2 getSize() const override;
+	virtual glm::ivec2 getExtent() const override;
 	virtual uint32_t getWidth() const override;
 	virtual uint32_t getHeight() const override;
 

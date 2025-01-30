@@ -27,13 +27,13 @@ namespace OpenXcom
 
 void transitionImageLayout(vk::CommandBuffer cmdBuffer,	vk::Image image, vk::ImageLayout oldLayout,	vk::ImageLayout newLayout);
 
-VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 size, ImageFormat format, glm::vec4 color)
-	: _context(context), _allocation(nullptr), _size(size), _color(color), _image(nullptr), _imageView(nullptr), _renderPass(nullptr), _framebuffer(nullptr)
+VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 extent, ImageFormat format, glm::vec4 color)
+	: _context(context), _allocation(nullptr), _extent(extent), _color(color), _image(nullptr), _imageView(nullptr), _renderPass(nullptr), _framebuffer(nullptr)
 {
 	// Create the render target image
 	vk::ImageCreateInfo imageInfo{};
 	imageInfo.imageType = vk::ImageType::e2D;
-	imageInfo.extent = vk::Extent3D(_size.x, _size.y, 1);
+	imageInfo.extent = vk::Extent3D(_extent.x, _extent.y, 1);
 	imageInfo.mipLevels = 1;
 	imageInfo.arrayLayers = 1;
 	imageInfo.format = vk::Format::eR8G8B8A8Unorm; // 8-bit color with alpha
@@ -130,7 +130,7 @@ void VulkanRenderTarget::copyTo(HostImage& image)
 	region.imageSubresource.mipLevel = 0;
 	region.imageSubresource.baseArrayLayer = 0;
 	region.imageSubresource.layerCount = 1;
-	region.imageExtent = vk::Extent3D(_size.x, _size.y, 1);
+	region.imageExtent = vk::Extent3D(_extent.x, _extent.y, 1);
 
 	// Copy image to buffer
 	cmdBuffer.copyImageToBuffer(

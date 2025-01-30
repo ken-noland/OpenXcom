@@ -46,7 +46,7 @@ public:
 	virtual ~HostImage() = default;
 
 	virtual ImageFormat getFormat() const = 0;
-	virtual glm::ivec2 getSize() const = 0;
+	virtual glm::ivec2 getExtent() const = 0;
 	virtual uint32_t getWidth() const = 0;
 	virtual uint32_t getHeight() const = 0;
 
@@ -73,7 +73,7 @@ public:
 
 
 	virtual ImageFormat getFormat() const = 0;
-	virtual glm::ivec2 getSize() const = 0;
+	virtual glm::ivec2 getExtent() const = 0;
 	virtual uint32_t getWidth() const = 0;
 	virtual uint32_t getHeight() const = 0;
 

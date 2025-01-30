@@ -22,6 +22,8 @@
 #include <vulkan/vulkan.hpp>
 #include <vk_mem_alloc.h> // VMA
 
+#include <glm/vec2.hpp>
+
 namespace OpenXcom
 {
 
@@ -36,8 +38,8 @@ public:
 	VulkanImageManager(VulkanContext& context);
 	virtual ~VulkanImageManager();
 
-	virtual std::unique_ptr<HostImage> createHostImage(ImageFormat format, uint32_t width, uint32_t height) override;
-	virtual std::unique_ptr<DeviceImage> createDeviceImage(ImageFormat format, uint32_t width, uint32_t height) override;
+	virtual std::unique_ptr<HostImage> createHostImage(glm::vec2 size, ImageFormat format) override;
+	virtual std::unique_ptr<DeviceImage> createDeviceImage(glm::vec2 size, ImageFormat format) override;
 	virtual std::unique_ptr<DeviceImage> createDeviceImage(HostImage& host) override;
 };
 

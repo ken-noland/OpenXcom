@@ -46,7 +46,7 @@ public:
 	virtual uint32_t getWidth() const override { return 0; }
 	virtual uint32_t getHeight() const override { return 0; }
 
-	virtual glm::ivec2 getSize() const override { return {0, 0}; }
+	virtual glm::ivec2 getExtent() const override { return {0, 0}; }
 	virtual ImageFormat getFormat() const override { return ImageFormat::UNKNOWN; }
 
 	virtual void copyFrom(HostImage& hostImage) override;

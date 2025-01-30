@@ -31,7 +31,7 @@ GameSurface::GameSurface(EngineContext& engine)
 	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
 
 	// create a render target for the game surface
-	_renderTarget = graphicsSystem.createRenderTarget({320, 200}, ImageFormat::RGBA8, {0,0,0,0}); // TODO: use game options to define the game surface dimensions
+	_renderTarget = graphicsSystem.createRenderTarget({320, 200}, ImageFormat::RGBA8, {0, 0, 0.2f, 1.0f}); // TODO: use game options to define the game surface dimensions
 }
 
 GameSurface::~GameSurface()
@@ -57,7 +57,7 @@ void GameSurface::captureFrame(HostImage& image)
 
 glm::ivec2 GameSurface::getScreenSize() const
 {
-	return _renderTarget->getSize();
+	return _renderTarget->getExtent();
 }
 
 } // namespace OpenXcom

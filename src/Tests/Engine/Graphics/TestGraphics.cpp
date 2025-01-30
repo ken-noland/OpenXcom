@@ -30,6 +30,14 @@
 #include "../../../Engine/Graphics/Common/WindowSurface.h"
 #include "../../../Engine/Platform/Window.h"
 
+#include <lodepng.h>
+
+// Anonymouse namespace to avoid name collisions in the global
+namespace
+{
+	bool FORCE_REGENERATE_BASELINE = false;
+}
+
 using namespace OpenXcom;
 
 TEST(TestGraphics, TestGraphicsInitialization)
@@ -56,13 +64,40 @@ TEST(TestGraphics, TestGraphicsSurface)
 	//render once
 	windowSurface.update();
 
-	std::unique_ptr<HostImage> hostImage = engine.getResourceSystem().getImageManager().createHostImage(ImageFormat::RGBA8, 640, 480);
+	std::unique_ptr<HostImage> hostImage = engine.getResourceSystem().getImageManager().createHostImage(gameSurface.getScreenSize(), ImageFormat::RGBA8);
 	EXPECT_TRUE(hostImage);
 
 	gameSurface.captureFrame(*hostImage);
 
 	//with the game surface rendered, let's check against the expected results
-	void* pixels = hostImage->map();
+	const uint8_t* pixels = static_cast<const uint8_t*>(hostImage->map());
+		
+	// If baseline file is missing, generate and save it
+	std::filesystem::path filename = dataPath / "Test" / "Graphics" / "game_surface_blank.png";
+	if (!std::filesystem::exists(filename) || FORCE_REGENERATE_BASELINE)
+	{
+		// Save the image
+		unsigned error = lodepng::encode(filename.string().c_str(), pixels, hostImage->getWidth(), hostImage->getHeight(), LodePNGColorType::LCT_RGBA, 8);
+		EXPECT_EQ(error, 0);
+	}
+	else
+	{
+		// Load the baseline image
+		std::vector<unsigned char> baseline;
+		uint32_t width = 0, height = 0;
+
+		unsigned error = lodepng::decode(baseline, width, height, filename.string().c_str());
+		EXPECT_EQ(error, 0);
+
+		// Compare the images
+		ASSERT_EQ(width, hostImage->getExtent().x);
+		ASSERT_EQ(height, hostImage->getExtent().y);
+
+		for (size_t i = 0; i < baseline.size(); ++i)
+		{
+			ASSERT_EQ(baseline[i], pixels[i]);
+		}
+	}
 
 	hostImage->unmap();
 }

@@ -33,14 +33,14 @@ VulkanImageManager::~VulkanImageManager()
 {
 }
 
-std::unique_ptr<HostImage> VulkanImageManager::createHostImage(ImageFormat format, uint32_t width, uint32_t height)
+std::unique_ptr<HostImage> VulkanImageManager::createHostImage(glm::vec2 size, ImageFormat format)
 {
-	return std::make_unique<VulkanHostImage>(_context, format, width, height);
+	return std::make_unique<VulkanHostImage>(_context, size, format);
 }
 
-std::unique_ptr<DeviceImage> VulkanImageManager::createDeviceImage(ImageFormat format, uint32_t width, uint32_t height)
+std::unique_ptr<DeviceImage> VulkanImageManager::createDeviceImage(glm::vec2 size, ImageFormat format)
 {
-	return std::make_unique<VulkanDeviceImage>(_context, format, width, height);
+	return std::make_unique<VulkanDeviceImage>(_context, size, format);
 }
 
 std::unique_ptr<DeviceImage> VulkanImageManager::createDeviceImage(HostImage& image)

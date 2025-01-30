@@ -49,7 +49,6 @@ public:
 	const RenderTarget& getRenderTarget() const { return *_renderTarget; }
 	glm::ivec2 getScreenSize() const;
 
-
 	MulticastDelegate<void(GraphicsCommand&)>& onRender() { return _onRender; }
 };
 

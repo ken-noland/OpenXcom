@@ -785,6 +785,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(lodepng)
 
+# Lodepng does not provide a CMake build system, so we need to manually set up the target
+add_library(lodepng STATIC  "${lodepng_SOURCE_DIR}/lodepng.cpp")
+target_include_directories(lodepng PUBLIC ${lodepng_SOURCE_DIR})
 
 #--------------------------------
 # set up the defines and includes
@@ -815,6 +818,7 @@ set(openxcom_includes
   ${inja_SOURCE_DIR}
   ${vulkan_headers_SOURCE_DIR}/include
   ${glslang_SOURCE_DIR}
+  ${lodepng_SOURCE_DIR}
 )
 
 set(openxcom_libs
@@ -824,6 +828,7 @@ set(openxcom_libs
   shaderc
   glm
   GPUOpen::VulkanMemoryAllocator
+  lodepng
 )
 
 if(UNIX)

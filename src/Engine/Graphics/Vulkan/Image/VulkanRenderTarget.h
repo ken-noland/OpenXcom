@@ -39,7 +39,7 @@ private:
 
 	VmaAllocation _allocation;
 
-	glm::ivec2 _size;
+	glm::ivec2 _extent;
 	glm::vec4 _color;
 
 	vk::Image _image;
@@ -52,9 +52,9 @@ public:
 	VulkanRenderTarget(VulkanContext& context, glm::ivec2 size, ImageFormat format, glm::vec4 color);
 	virtual ~VulkanRenderTarget();
 
-	virtual uint32_t getWidth() const override { return _size.x; }
-	virtual uint32_t getHeight() const override { return _size.y; }
-	virtual glm::ivec2 getSize() const override { return _size; }
+	virtual uint32_t getWidth() const override { return _extent.x; }
+	virtual uint32_t getHeight() const override { return _extent.y; }
+	virtual glm::ivec2 getExtent() const override { return _extent; }
 	virtual ImageFormat getFormat() const override { return ImageFormat::UNKNOWN; }
 		
 	virtual void copyFrom(HostImage& hostImage) override;

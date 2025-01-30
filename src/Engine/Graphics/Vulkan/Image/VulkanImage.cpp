@@ -91,12 +91,12 @@ void transitionImageLayout(
 }
 
 
-VulkanHostImage::VulkanHostImage(VulkanContext& context, ImageFormat format, uint32_t width, uint32_t height)
-	: HostImage(ImageType::Texture), _context(context), _format(format), _size(width, height)
+VulkanHostImage::VulkanHostImage(VulkanContext& context, glm::vec2 size, ImageFormat format)
+	: HostImage(ImageType::Texture), _context(context), _format(format), _extent(size)
 {
 	// Step 1: Define Buffer Create Info
 	vk::BufferCreateInfo bufferInfo{};
-	bufferInfo.size = _size.x * _size.y * 4; // Assuming 4 bytes per pixel (RGBA)
+	bufferInfo.size = _extent.x * _extent.y * 4; // Assuming 4 bytes per pixel (RGBA)
 	bufferInfo.usage = vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst;
 	bufferInfo.sharingMode = vk::SharingMode::eExclusive;
 
@@ -125,19 +125,19 @@ ImageFormat VulkanHostImage::getFormat() const
 	return ImageFormat();
 }
 
-glm::ivec2 VulkanHostImage::getSize() const
+glm::ivec2 VulkanHostImage::getExtent() const
 {
-	return _size;
+	return _extent;
 }
 
 uint32_t VulkanHostImage::getWidth() const
 {
-	return _size.x;
+	return _extent.x;
 }
 
 uint32_t VulkanHostImage::getHeight() const
 {
-	return _size.y;
+	return _extent.y;
 }
 
 void* VulkanHostImage::map()
@@ -152,13 +152,13 @@ void VulkanHostImage::unmap()
 	vmaUnmapMemory(_context.getAllocator(), _allocation);
 }
 
-VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, ImageFormat format, uint32_t width, uint32_t height)
-	: DeviceImage(ImageType::Texture), _context(context), _format(format), _size(width, height), _currentLayout(vk::ImageLayout::eUndefined)
+VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::vec2 extent, ImageFormat format)
+	: DeviceImage(ImageType::Texture), _context(context), _format(format), _extent(extent), _currentLayout(vk::ImageLayout::eUndefined)
 {
 	// Step 1: Define Image Creation Info
 	vk::ImageCreateInfo imageInfo{};
 	imageInfo.imageType = vk::ImageType::e2D;
-	imageInfo.extent = vk::Extent3D(_size.x, _size.y, 1);
+	imageInfo.extent = vk::Extent3D(_extent.x, _extent.y, 1);
 	imageInfo.mipLevels = 1;
 	imageInfo.arrayLayers = 1;
 	imageInfo.format = vk::Format::eR8G8B8A8Unorm; // 8-bit RGBA format
@@ -190,7 +190,7 @@ VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, ImageFormat format,
 }
 
 VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, VulkanHostImage& image)
-	: VulkanDeviceImage(context, image.getFormat(), image.getWidth(), image.getHeight())
+	: VulkanDeviceImage(context, image.getExtent(), image.getFormat())
 {
 }
 
@@ -228,7 +228,7 @@ void VulkanDeviceImage::copyFrom(HostImage& image)
 	region.imageSubresource.mipLevel = 0;
 	region.imageSubresource.baseArrayLayer = 0;
 	region.imageSubresource.layerCount = 1;
-	region.imageExtent = vk::Extent3D(_size.x, _size.y, 1);
+	region.imageExtent = vk::Extent3D(_extent.x, _extent.y, 1);
 
 	// Perform the buffer-to-image copy
 	cmdBuffer.copyBufferToImage(
@@ -263,19 +263,19 @@ ImageFormat VulkanDeviceImage::getFormat() const
 	return ImageFormat();
 }
 
-glm::ivec2 VulkanDeviceImage::getSize() const
+glm::ivec2 VulkanDeviceImage::getExtent() const
 {
-	return _size;
+	return _extent;
 }
 
 uint32_t VulkanDeviceImage::getWidth() const
 {
-	return _size.x;
+	return _extent.x;
 }
 
 uint32_t VulkanDeviceImage::getHeight() const
 {
-	return _size.y;
+	return _extent.y;
 }
 
 } // namespace OpenXcom

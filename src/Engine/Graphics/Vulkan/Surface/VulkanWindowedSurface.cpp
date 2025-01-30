@@ -328,7 +328,7 @@ uint32_t VulkanWindowedSurface::getHeight() const
 	return _swapChainExtent.height;
 }
 
-glm::ivec2 VulkanWindowedSurface::getSize() const
+glm::ivec2 VulkanWindowedSurface::getExtent() const
 {
 	return glm::ivec2(_swapChainExtent.width, _swapChainExtent.height);
 }

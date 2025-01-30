@@ -94,7 +94,7 @@ public:
 	virtual uint32_t getWidth() const override;
 	virtual uint32_t getHeight() const override;
 
-	virtual glm::ivec2 getSize() const override;
+	virtual glm::ivec2 getExtent() const override;
 
 	// copy the host image to this device image
 	virtual void copyFrom(HostImage& hostImage) override;
