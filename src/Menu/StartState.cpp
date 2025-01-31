@@ -40,8 +40,8 @@ StartState::StartState(EngineContext& engine)
 	ResourceSystem& resourceSystem = engine.getResourceSystem();
 
 	// load the DOS font
-	_terminalFontHandle = resourceSystem.getFontManager().loadFont("Terminal", dosFont, DOSFONT_SIZE);
-	_terminalPaletteHandle = resourceSystem.getPaletteManager().loadPalette("Terminal", terminalColors, sizeof(terminalColors));
+//	_terminalFontHandle = resourceSystem.getFontManager().loadFont("Terminal", dosFont, DOSFONT_SIZE);
+//	_terminalPaletteHandle = resourceSystem.getPaletteManager().loadPalette("Terminal", terminalColors, sizeof(terminalColors));
 
 
 

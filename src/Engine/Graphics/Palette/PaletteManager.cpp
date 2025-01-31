@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "PaletteManager.h"
 
 namespace OpenXcom
 {
 
-PaletteManager::PaletteManager()
+PaletteManager::PaletteManager(EngineContext& context)
+	: _context(context)
 {
 }
 
@@ -30,19 +30,14 @@ PaletteManager::~PaletteManager()
 {
 }
 
-ResourceManager<Palette>::OwningHandle PaletteManager::loadPalette(const std::string& name, const glm::ivec4* data, size_t size)
+ResourceManager<Palette>::OwningHandle PaletteManager::createPalette(const std::string& name, const PackedColor* data, size_t count)
 {
-	return ResourceManager<Palette>::OwningHandle(ResourceManager<Palette>::Handle::Invalid_Handle, *this);
+	return add(std::make_unique<Palette>(_context, name, data, count));
 }
 
-ResourceManager<Palette>::OwningHandle PaletteManager::loadPalette(const std::string& name, std::initializer_list<glm::ivec4> data)
+ResourceManager<Palette>::OwningHandle PaletteManager::createPalette(const std::string& name, std::initializer_list<PackedColor> data)
 {
-	return ResourceManager<Palette>::OwningHandle(ResourceManager<Palette>::Handle::Invalid_Handle, *this);
-}
-
-ResourceManager<Palette>::OwningHandle PaletteManager::loadPalette(const std::string& name, const std::filesystem::path& path)
-{
-	return ResourceManager<Palette>::OwningHandle(ResourceManager<Palette>::Handle::Invalid_Handle, *this);
+	return ResourceManager<Palette>::OwningHandle();
 }
 
 } // namespace OpenXcom

@@ -33,6 +33,7 @@ class PipelineBinding;
 class Pipeline;
 class RenderTarget;
 class DeviceBuffer;
+class Palette;
 
 struct LineVertex
 {
@@ -53,7 +54,7 @@ protected:
 
 public:
 	LineListPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-					  const LineVertex* lines, size_t count, int color, /* temp */ DeviceBuffer& palette);
+					  const LineVertex* lines, size_t count, int color, const Palette& palette);
 	virtual ~LineListPrimitive();
 
 	void draw(GraphicsCommand& command);

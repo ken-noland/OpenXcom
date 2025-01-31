@@ -56,7 +56,7 @@ protected:
 
 	std::unique_ptr<VulkanDescriptorSet> _descriptorSet;
 
-	std::array<std::vector<std::optional<std::reference_wrapper<VulkanDeviceBuffer>>>, (std::size_t)ShaderStage::Count> _uniformBuffers;
+	std::array<std::vector<std::optional<std::reference_wrapper<const VulkanDeviceBuffer>>>, (std::size_t)ShaderStage::Count> _uniformBuffers;
 	std::array<std::unique_ptr<VulkanPushConstant>, (size_t)ShaderStage::Count> _pushConstants;
 
 	std::optional<std::reference_wrapper<VulkanDeviceBuffer>> _vertexBuffer;
@@ -73,7 +73,7 @@ public:
 
 	virtual void setVertexBuffer(DeviceBuffer& buffer) override;
 	virtual void setIndexBuffer(DeviceBuffer& buffer) override;
-	virtual void setUniformBuffer(ShaderStage stage, uint32_t binding, DeviceBuffer& buffer) override;
+	virtual void setUniformBuffer(ShaderStage stage, uint32_t binding, const DeviceBuffer& buffer) override;
 
 	virtual void setPushConstant(const SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size) override;
 

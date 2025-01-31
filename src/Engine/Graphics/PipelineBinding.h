@@ -36,7 +36,7 @@ public:
 
 	virtual void setVertexBuffer(DeviceBuffer& buffer) = 0;
 	virtual void setIndexBuffer(DeviceBuffer& buffer) = 0;
-	virtual void setUniformBuffer(ShaderStage stage, uint32_t binding, DeviceBuffer& buffer) = 0;
+	virtual void setUniformBuffer(ShaderStage stage, uint32_t binding, const DeviceBuffer& buffer) = 0;
 
 	template <typename ConstantType>
 	void setPushConstant(ShaderStage stage, const ConstantType& data);

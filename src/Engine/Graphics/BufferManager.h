@@ -56,6 +56,7 @@ public:
 template <typename BufferType>
 std::unique_ptr<HostBuffer> BufferManager::createHostBuffer(const BufferType* data, size_t count, BufferUsage usage)
 {
+	assert(SimpleRTTR::types().has_type<BufferType>() && "Buffer type must be registered with SimpleRTTR before usage as a host buffer");
 	size_t size = count * sizeof(BufferType);
 	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer(SimpleRTTR::types().get_type<BufferType>().value(), size, usage);
 	hostBuffer->copyTo(data, 0, size);
@@ -65,6 +66,7 @@ std::unique_ptr<HostBuffer> BufferManager::createHostBuffer(const BufferType* da
 template <typename BufferType>
 std::unique_ptr<DeviceBuffer> BufferManager::createDeviceBuffer(const BufferType* data, size_t count, BufferUsage usage)
 {
+	assert(SimpleRTTR::types().has_type<BufferType>() && "Buffer type must be registered with SimpleRTTR before usage as a device buffer");
 	size_t size = count * sizeof(BufferType);
 	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer<BufferType>(data, count, usage);
 	std::unique_ptr<DeviceBuffer> deviceBuffer = createDeviceBuffer(*hostBuffer);

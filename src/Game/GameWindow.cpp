@@ -106,7 +106,7 @@ struct LineVertex
 	glm::ivec2 pos;
 };
 
-struct Palette
+struct TempPalette
 {
 	uint32_t colors[256];
 };
@@ -122,7 +122,7 @@ SIMPLERTTR
 	SimpleRTTR::registration().type<LineVertex>()
 		.property(&OpenXcom::LineVertex::pos, "pos");
 
-	SimpleRTTR::registration().type<Palette>();
+	SimpleRTTR::registration().type<TempPalette>();
 
 	SimpleRTTR::registration().type<PushConstants>()
 		.property(&OpenXcom::PushConstants::screenSize, "screenSize")
@@ -175,7 +175,7 @@ GameWindow::GameWindow(EngineContext& engine)
 
 															   // vertex shader stage
 															   .setVertexType<LineVertex>()
-															   .addStorageBuffer<Palette>(ShaderStage::Vertex, 0)
+															   .addStorageBuffer<TempPalette>(ShaderStage::Vertex, 0)
 															   .addPushConstant<PushConstants>(ShaderStage::Vertex) // push constant for screen width and height
 
 															   .build())
@@ -191,7 +191,7 @@ GameWindow::GameWindow(EngineContext& engine)
 	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lineVerticesTemp, 2, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
-	Palette paletteData = {{0x00000000, 0xFFFFFFFF}};
+	TempPalette paletteData = {{0x00000000, 0xFFFFFFFF}};
 	_palette = bufferManager.createDeviceBuffer(&paletteData, 1, BufferUsage::Storage);
 	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, *_palette);
 

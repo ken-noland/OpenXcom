@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,32 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../../Resource/ResourceManager.h"
-#include "Palette.h"
+#include "PackedColor.h"
 
-#include <filesystem>
-#include <glm/vec4.hpp>
+#include "../../Utility/RTTR.h"
+
+// Run time type information
+SIMPLERTTR
+{
+	SimpleRTTR::registration().type<OpenXcom::PackedColor>();
+}
 
 namespace OpenXcom
 {
 
-class EngineContext;
-class PackedColor;
-
-class PaletteManager : public ResourceManager<Palette>
-{
-protected:
-	EngineContext& _context;
-
-public:
-	PaletteManager(EngineContext& context);
-	virtual ~PaletteManager();
-
-	// load palette from memory
-	ResourceManager<Palette>::OwningHandle createPalette(const std::string& name, const PackedColor* data, size_t count);
-
-	// load palette from parameters
-	ResourceManager<Palette>::OwningHandle createPalette(const std::string& name, std::initializer_list<PackedColor> data);
-};
+// hack to get this to link
+int FORCE_LINK_RTTRPACKEDCOLOR = 0;
 
 } // namespace OpenXcom

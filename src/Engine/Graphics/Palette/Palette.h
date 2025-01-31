@@ -17,20 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "../Types/PackedColor.h"
+
+#include <memory>
 #include <string>
-#include <vector>
-#include <glm/vec4.hpp>
+#include <initializer_list>
 
 namespace OpenXcom
 {
+
+class EngineContext;
+class DeviceBuffer;
 
 class Palette
 {
 private:
 	std::string _name;
-	std::vector<glm::vec4> _colors;
+	std::unique_ptr<DeviceBuffer> _deviceBuffer;
 
 public:
+	Palette(EngineContext& context, const std::string& name, const PackedColor* data, std::size_t count);
+	Palette(EngineContext& context, const std::string& name, std::initializer_list<PackedColor> data);
+	virtual ~Palette();
+
+	const std::string& getName() const { return _name; };
+	const DeviceBuffer& getDeviceBuffer() const { return *_deviceBuffer; };
 
 };
 

@@ -29,7 +29,8 @@ class RenderTarget;
 
 class Pipeline;
 class Shader;
-class DeviceBuffer;
+class Palette;
+
 
 class LineListPrimitive;
 class LineStripPrimitive;
@@ -52,7 +53,7 @@ public:
 	LinePrimitiveFactory(EngineContext& context, RenderTarget& surface);
 	~LinePrimitiveFactory();
 
-	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, /* temp */ DeviceBuffer& palette);	
+	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, const Palette& palette);	
 	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive();
 };
 

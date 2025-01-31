@@ -22,6 +22,8 @@
 namespace OpenXcom
 {
 
+class EngineContext;
+
 class ShaderManager;
 class PipelineManager;
 class BufferManager;
@@ -32,7 +34,6 @@ class ImageManager;
 
 class VirtualFileSystem;
 class GraphicsSystem;
-class Options;
 
 class ResourceSystem
 {
@@ -45,7 +46,7 @@ class ResourceSystem
 	std::unique_ptr<ImageManager> _imageManager;
 
 public:
-	ResourceSystem(VirtualFileSystem& virtualFileSystem, GraphicsSystem& graphicsSystem, Options& options);
+	ResourceSystem(EngineContext& context);
 	virtual ~ResourceSystem();
 
 	ShaderManager& getShaderManager() { return *_shaderManager; };

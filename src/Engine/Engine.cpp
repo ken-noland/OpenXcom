@@ -32,11 +32,13 @@ namespace OpenXcom
 
 // annoyingly, I have to put this in somewhere so it correctly links the RTTR stuff
 extern int FORCE_LINK_RTTRGLM;
+extern int FORCE_LINK_RTTRPACKEDCOLOR;
 
 Engine::Engine(const std::vector<std::string>& args)
 {
 	// hack to force the linker to include the RTTR stuff
 	FORCE_LINK_RTTRGLM = 42;
+	FORCE_LINK_RTTRPACKEDCOLOR = 42;
 
 	_engineContext = std::make_unique<EngineContext>(*this);
 
@@ -57,7 +59,7 @@ Engine::Engine(const std::vector<std::string>& args)
 	_engineContext->setGraphicsSystem(_graphicsSystem.get());
 		
 	// Initialize the resource system
-	_resourceSystem = std::make_unique<ResourceSystem>(*_virtualFileSystem, *_graphicsSystem, *_options);
+	_resourceSystem = std::make_unique<ResourceSystem>(*_engineContext);
 	_engineContext->setResourceSystem(_resourceSystem.get());
 
 	std::ostringstream title;

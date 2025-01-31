@@ -26,6 +26,7 @@ namespace OpenXcom
 class EngineContext;
 class LineListPrimitive;
 class LineStripPrimitive;
+class Palette;
 
 class PrimitiveFactory
 {
@@ -36,7 +37,7 @@ public:
 	PrimitiveFactory(EngineContext& context, RenderTarget& surface);
 	~PrimitiveFactory();
 
-	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, /* temp */ DeviceBuffer& palette); 
+	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, const Palette& palette); 
 	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive();
 };
 

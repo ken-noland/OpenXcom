@@ -25,6 +25,7 @@
 #include "../PipelineDefinition.h"
 #include "../Pipeline.h"
 #include "../Shader.h"
+#include "../Palette/Palette.h"
 
 #include "../../Resource/ResourceSystem.h"
 #include "../../EngineContext.h"
@@ -33,7 +34,7 @@ namespace OpenXcom
 {
 
 LineListPrimitive::LineListPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-									 const LineVertex* lines, size_t count, int color, /* temp */ DeviceBuffer& palette)
+									 const LineVertex* lines, size_t count, int color, const Palette& palette)
 {
 	ResourceSystem& resourceSystem = context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
@@ -43,7 +44,7 @@ LineListPrimitive::LineListPrimitive(EngineContext& context, Pipeline& pipeline,
 	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lines, count, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette);
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
 
 	LinePushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);

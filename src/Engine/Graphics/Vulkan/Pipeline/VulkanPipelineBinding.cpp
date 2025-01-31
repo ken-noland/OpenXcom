@@ -104,16 +104,16 @@ void VulkanPipelineBinding::setIndexBuffer(DeviceBuffer& buffer)
 	_indexBuffer = static_cast<VulkanDeviceBuffer&>(buffer);
 }
 
-void VulkanPipelineBinding::setUniformBuffer(ShaderStage stage, uint32_t binding, DeviceBuffer& buffer)
+void VulkanPipelineBinding::setUniformBuffer(ShaderStage stage, uint32_t binding, const DeviceBuffer& buffer)
 {
-	std::vector<std::optional<std::reference_wrapper<VulkanDeviceBuffer>>>& uniformBuffers = _uniformBuffers[(int)stage];
+	std::vector<std::optional<std::reference_wrapper<const VulkanDeviceBuffer>>>& uniformBuffers = _uniformBuffers[(int)stage];
 
 	if (binding >= uniformBuffers.size())
 	{
 		uniformBuffers.resize(binding + 1);
 	}
 
-	VulkanDeviceBuffer& vulkanBuffer = static_cast<VulkanDeviceBuffer&>(buffer);
+	const VulkanDeviceBuffer& vulkanBuffer = static_cast<const VulkanDeviceBuffer&>(buffer);
 	uniformBuffers[binding] = vulkanBuffer;
 
 	vk::DescriptorBufferInfo bufferInfo{};

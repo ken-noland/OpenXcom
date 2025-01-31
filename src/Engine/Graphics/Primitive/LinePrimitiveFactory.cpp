@@ -131,7 +131,7 @@ LinePrimitiveFactory::~LinePrimitiveFactory()
 {
 }
 
-std::unique_ptr<LineListPrimitive> LinePrimitiveFactory::createLineListPrimitive(const LineVertex* lines, size_t count, int color, /* temp */ DeviceBuffer& palette)
+std::unique_ptr<LineListPrimitive> LinePrimitiveFactory::createLineListPrimitive(const LineVertex* lines, size_t count, int color, const Palette& palette)
 {
 	return std::make_unique<LineListPrimitive>(_context, *_pipeline, _surface, lines, count, color, palette);
 }

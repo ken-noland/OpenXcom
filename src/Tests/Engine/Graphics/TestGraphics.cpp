@@ -21,8 +21,13 @@
 #include "../../../Engine/Engine.h"
 #include "../../../Engine/Graphics/Common/GameSurface.h"
 #include "../../../Engine/Graphics/Common/WindowSurface.h"
+#include "../../../Engine/Graphics/Image/Image.h"
+#include "../../../Engine/Graphics/Image/ImageManager.h"
+#include "../../../Engine/Graphics/Palette/Palette.h"
+#include "../../../Engine/Graphics/Palette/PaletteManager.h"
 #include "../../../Engine/Graphics/Primitive/LinePrimitive.h"
 #include "../../../Engine/Graphics/Primitive/PrimitiveFactory.h"
+#include "../../../Engine/Graphics/Types/PackedColor.h"
 #include "../../../Engine/Graphics/GraphicsSurface.h"
 #include "../../../Engine/Graphics/GraphicsSystem.h"
 #include "../../../Engine/Graphics/BufferManager.h"
@@ -31,8 +36,6 @@
 
 #include "../../../Engine/Resource/ResourceManager.h"
 #include "../../../Engine/Resource/ResourceSystem.h"
-#include "../../../Engine/Graphics/Image/Image.h"
-#include "../../../Engine/Graphics/Image/ImageManager.h"
 #include <filesystem>
 #include <lodepng.h>
 #include <memory>
@@ -145,11 +148,17 @@ TEST_F(GraphicsTest, TestGraphicsSurface)
 TEST_F(GraphicsTest, TestLineList)
 {
 	//TODO: Temp palette buffer(we need to finish the palette system)
-	const uint32_t paletteData[] = {0x00000000, 0xFFFFFFFF};
-	std::unique_ptr<DeviceBuffer> palette = _engine->getResourceSystem().getBufferManager().createDeviceBuffer<uint32_t>(paletteData, 2, BufferUsage::Storage);
+	PackedColor paletteData[] = {0x00000000, 0xFFFFFFFF};
+
+	PaletteManager& paletteManager = _engine->getEngineContext().getResourceSystem().getPaletteManager();
+
+	PaletteManager::OwningHandle paletteHandle = paletteManager.createPalette("blank_and_white", paletteData, 2);
+	ASSERT_TRUE(paletteHandle.isValid());
+
+	const Palette& palette = paletteManager.get(paletteHandle);
 
 	LineVertex lines[] = {{{0, 0}}, {{320, 200}}};
-	std::unique_ptr<LineListPrimitive> lineList = _gameSurface->getRenderTarget().getPrimitiveFactory().createLineListPrimitive(lines, 2, 1, *palette);
+	std::unique_ptr<LineListPrimitive> lineList = _gameSurface->getRenderTarget().getPrimitiveFactory().createLineListPrimitive(lines, 2, 1, palette);
 	ASSERT_TRUE(lineList);
 
 	// draw the line

@@ -19,6 +19,7 @@
 
 #include "ResourceSystem.h"
 
+#include "../EngineContext.h"
 #include "../Graphics/GraphicsSystem.h"
 #include "../Graphics/ShaderManager.h"
 #include "../Graphics/PipelineManager.h"
@@ -31,13 +32,15 @@
 namespace OpenXcom
 {
 
-ResourceSystem::ResourceSystem(VirtualFileSystem& virtualFileSystem, GraphicsSystem& graphicsSystem, Options& options)
+ResourceSystem::ResourceSystem(EngineContext& context)
 {
+	GraphicsSystem& graphicsSystem = context.getGraphicsSystem();
+
 	_shaderManager = graphicsSystem.createShaderManager();
 	_pipelineManager = graphicsSystem.createPipelineManager();
 	_bufferManager = graphicsSystem.createBufferManager();
 
-	_paletteManager = std::make_unique<PaletteManager>();
+	_paletteManager = std::make_unique<PaletteManager>(context);
 	_fontManager = std::make_unique<FontManager>();
 	_imageManager = graphicsSystem.createImageManager();
 }

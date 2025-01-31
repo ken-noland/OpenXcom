@@ -145,6 +145,7 @@ set ( engine_src
   "Engine/Graphics/Primitive/LinePrimitive.cpp"
   "Engine/Graphics/Primitive/LinePrimitiveFactory.cpp"
   "Engine/Graphics/Primitive/PrimitiveFactory.cpp"
+  "Engine/Graphics/Types/PackedColor.cpp"
   "Engine/Graphics/Vulkan/Buffer/VulkanBuffer.cpp"
   "Engine/Graphics/Vulkan/Buffer/VulkanBufferManager.cpp"
   "Engine/Graphics/Vulkan/Image/VulkanImage.cpp"
