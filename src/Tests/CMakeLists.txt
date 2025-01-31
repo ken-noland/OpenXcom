@@ -45,12 +45,6 @@ target_link_libraries(openxcom_tests PUBLIC openxcom_lib GTest::gtest_main)
 include(GoogleTest)
 gtest_discover_tests(openxcom_tests)
 
-# Optionally, register the test with CMake
-add_test(NAME openxcom_tests COMMAND ${CMAKE_BINARY_DIR}/bin/openxcom_tests)
-
-# Pass an environment variable to `ctest`
-set_tests_properties(openxcom_tests PROPERTIES ENVIRONMENT "SKIP_SLOW_TESTS=1")
-
 # Create a custom target to run tests after building the main executable
 add_custom_target(run_tests_after_build ALL
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure

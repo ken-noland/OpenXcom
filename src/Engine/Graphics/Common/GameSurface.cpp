@@ -20,8 +20,8 @@
 #include "../GraphicsSystem.h"
 #include "../GraphicsSurface.h"
 #include "../GraphicsCommand.h"
+#include "../Image/Image.h"
 #include "../../EngineContext.h"
-#include "../../Resource/Image/Image.h"
 
 namespace OpenXcom
 {
@@ -31,7 +31,7 @@ GameSurface::GameSurface(EngineContext& engine)
 	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
 
 	// create a render target for the game surface
-	_renderTarget = graphicsSystem.createRenderTarget({320, 200}, ImageFormat::RGBA8, {0, 0, 0.2f, 1.0f}); // TODO: use game options to define the game surface dimensions
+	_renderTarget = graphicsSystem.createRenderTarget({320, 200}, ImageFormat::RGBA8, {0, 0, 0, 1.0f}); // TODO: use game options to define the game surface dimensions
 }
 
 GameSurface::~GameSurface()

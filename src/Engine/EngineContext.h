@@ -34,27 +34,17 @@ class EngineContext
 protected:
 	Engine& _engine;
 
-	Options& _options;
-	VirtualFileSystem& _virtualFileSystem;
-	PlatformProcessSystem& _platformProcessSystem;
-	GraphicsSystem& _graphicsSystem;
-	ResourceSystem& _resourceSystem;
+	Options* _options;
+	VirtualFileSystem* _virtualFileSystem;
+	PlatformProcessSystem* _platformProcessSystem;
+	GraphicsSystem* _graphicsSystem;
+	ResourceSystem* _resourceSystem;
 
 	std::string _title;
 
 public:
-	EngineContext(Engine& engine,
-				  Options& options,
-				  VirtualFileSystem& virtualFileSystem,
-				  PlatformProcessSystem& platformProcessSystem,
-				  GraphicsSystem& graphicsSystem,
-				  ResourceSystem& resourceSystem)
-		: _engine(engine),
-		  _options(options),
-		  _virtualFileSystem(virtualFileSystem),
-		  _platformProcessSystem(platformProcessSystem),
-		  _graphicsSystem(graphicsSystem),
-		  _resourceSystem(resourceSystem)
+	EngineContext(Engine& engine)
+		: _engine(engine)
 	{
 	}
 
@@ -63,10 +53,20 @@ public:
 
 	Engine& getEngine() { return _engine; }
 
-	Options& getOptions() { return _options; }
-	VirtualFileSystem& getVirtualFileSystem() { return _virtualFileSystem; }
-	GraphicsSystem& getGraphicsSystem() { return _graphicsSystem; }
-	ResourceSystem& getResourceSystem() { return _resourceSystem; }
+	void setOptions(Options* options) { _options = options; }
+	Options& getOptions() { return *_options; }
+
+	void setVirtualFileSystem(VirtualFileSystem* virtualFileSystem) { _virtualFileSystem = virtualFileSystem; }
+	VirtualFileSystem& getVirtualFileSystem() { return *_virtualFileSystem; }
+
+	void setPlatformProcessSystem(PlatformProcessSystem* platformProcessSystem) { _platformProcessSystem = platformProcessSystem; }
+	PlatformProcessSystem& getPlatformProcessSystem() { return *_platformProcessSystem; }
+
+	void setGraphicsSystem(GraphicsSystem* graphicsSystem) { _graphicsSystem = graphicsSystem; }
+	GraphicsSystem& getGraphicsSystem() { return *_graphicsSystem; }
+
+	void setResourceSystem(ResourceSystem* resourceSystem) { _resourceSystem = resourceSystem; }
+	ResourceSystem& getResourceSystem() { return *_resourceSystem; }
 };
 
 

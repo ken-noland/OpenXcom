@@ -26,6 +26,7 @@ namespace OpenXcom
 {
 
 class Options;
+class EngineContext;
 
 enum class ImageFormat;
 class GraphicsSurface;
@@ -36,10 +37,7 @@ class PlatformWindow;
 class ShaderManager;
 class PipelineManager;
 class BufferManager;
-
 class ImageManager;
-class FontManager;
-class PaletteManager;
 
 class PipelineDefinition;
 
@@ -57,12 +55,9 @@ public:
 	virtual std::unique_ptr<ShaderManager> createShaderManager() = 0;
 	virtual std::unique_ptr<PipelineManager> createPipelineManager() = 0;
 	virtual std::unique_ptr<BufferManager> createBufferManager() = 0;
-
-	virtual std::unique_ptr<PaletteManager> createPaletteManager() = 0;
 	virtual std::unique_ptr<ImageManager> createImageManager() = 0;
-	virtual std::unique_ptr<FontManager> createFontManager() = 0;
 };
 
-std::unique_ptr<GraphicsSystem> createGraphicsSystem(const Options& options);
+std::unique_ptr<GraphicsSystem> createGraphicsSystem(EngineContext& options);
 
 } // namespace OpenXcom

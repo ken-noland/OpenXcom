@@ -30,13 +30,15 @@
 namespace OpenXcom
 {
 
+class EngineContext;
+
 class VulkanSystem : public GraphicsSystem
 {
 protected:
 	VulkanContext _context;
 
 public:
-	VulkanSystem(const Options& options);
+	VulkanSystem(EngineContext& context);
 	virtual ~VulkanSystem();
 
 	virtual std::unique_ptr<GraphicsSurface> createWindowedSurface(PlatformWindow& window) override;
@@ -47,10 +49,7 @@ public:
 	virtual std::unique_ptr<ShaderManager> createShaderManager() override;
 	virtual std::unique_ptr<PipelineManager> createPipelineManager() override;
 	virtual std::unique_ptr<BufferManager> createBufferManager() override;
-
-	virtual std::unique_ptr<FontManager> createFontManager() override;
 	virtual std::unique_ptr<ImageManager> createImageManager() override;
-	virtual std::unique_ptr<PaletteManager> createPaletteManager() override;
 };
 
 } // namespace OpenXcom

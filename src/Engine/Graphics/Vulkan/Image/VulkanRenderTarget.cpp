@@ -22,6 +22,8 @@
 #include "../VulkanContext.h"
 #include "../VulkanCommand.h"
 
+#include "../../Primitive/PrimitiveFactory.h"
+
 namespace OpenXcom
 {
 
@@ -94,6 +96,9 @@ VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 extent
 	framebufferInfo.layers = 1;
 
 	_framebuffer = _context.getDevice().createFramebuffer(framebufferInfo);
+
+	// need to create the primitives factory
+	_primitiveFactory = std::make_unique<PrimitiveFactory>(_context.getEngineContext(), *this);
 }
 
 VulkanRenderTarget::~VulkanRenderTarget()

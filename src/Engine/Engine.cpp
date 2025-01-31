@@ -36,25 +36,29 @@ extern int FORCE_LINK_RTTRGLM;
 Engine::Engine(const std::vector<std::string>& args)
 {
 	// hack to force the linker to include the RTTR stuff
-	FORCE_LINK_RTTRGLM = 42; 
+	FORCE_LINK_RTTRGLM = 42;
+
+	_engineContext = std::make_unique<EngineContext>(*this);
 
 	// Initialize the options
 	_options = std::make_unique<Options>(args);
+	_engineContext->setOptions(_options.get());
 
 	// Initialize the virtual file system
 	_virtualFileSystem = std::make_unique<VirtualFileSystem>(*_options);
+	_engineContext->setVirtualFileSystem(_virtualFileSystem.get());
 
 	// Initialize the process system
 	_platformProcessSystem = std::make_unique<PlatformProcessSystem>();
+	_engineContext->setPlatformProcessSystem(_platformProcessSystem.get());
 
 	// Initialize the graphics system
-	_graphicsSystem = createGraphicsSystem(*_options);
+	_graphicsSystem = createGraphicsSystem(*_engineContext);
+	_engineContext->setGraphicsSystem(_graphicsSystem.get());
 		
 	// Initialize the resource system
 	_resourceSystem = std::make_unique<ResourceSystem>(*_virtualFileSystem, *_graphicsSystem, *_options);
-
-	//finally, now that the systems have all been initialized, let's make the engine context which is used to get access to the systems from within the game
-	_engineContext = std::make_unique<EngineContext>(*this, *_options, *_virtualFileSystem, *_platformProcessSystem, *_graphicsSystem, *_resourceSystem);
+	_engineContext->setResourceSystem(_resourceSystem.get());
 
 	std::ostringstream title;
 	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
@@ -68,8 +72,6 @@ Engine::~Engine()
 
 	// shut down graphics
 	_graphicsSystem.reset();
-
-	SimpleRTTR::shutdown();
 }
 
 void Engine::update()

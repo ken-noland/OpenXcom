@@ -22,12 +22,10 @@
 #include "Surface/VulkanHeadlessSurface.h"
 #include "Image/VulkanRenderTarget.h"
 
-#include "../../Engine.h"
+#include "../../EngineContext.h"
 #include "../../Options.h"
 
-#include "Font/VulkanFontManager.h"
 #include "Image/VulkanImageManager.h"
-#include "Palette/VulkanPaletteManager.h"
 #include "Shader/VulkanShaderManager.h"
 #include "Pipeline/VulkanPipelineManager.h"
 #include "Buffer/VulkanBufferManager.h"
@@ -39,8 +37,8 @@ namespace OpenXcom
 
 
 
-VulkanSystem::VulkanSystem(const Options& options)
-	: _context(options)
+VulkanSystem::VulkanSystem(EngineContext& context)
+	: _context(context)
 {
 }
 
@@ -83,20 +81,9 @@ std::unique_ptr<BufferManager> VulkanSystem::createBufferManager()
 	return std::make_unique<VulkanBufferManager>(_context);
 }
 
-std::unique_ptr<FontManager> VulkanSystem::createFontManager()
-{
-	return std::make_unique<VulkanFontManager>(_context);
-}
-
 std::unique_ptr<ImageManager> VulkanSystem::createImageManager()
 {
 	return std::make_unique<VulkanImageManager>(_context);
 }
-
-std::unique_ptr<PaletteManager> VulkanSystem::createPaletteManager()
-{
-	return std::make_unique<VulkanPaletteManager>(_context);
-}
-
 
 } // namespace OpenXcom

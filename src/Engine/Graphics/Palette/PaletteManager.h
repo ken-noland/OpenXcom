@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,20 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "VulkanPaletteManager.h"
+#include "../../Resource/ResourceManager.h"
+#include "Palette.h"
 
-#include "../../../Logger.h"
+#include <filesystem>
+#include <glm/vec4.hpp>
 
 namespace OpenXcom
 {
 
-VulkanPaletteManager::VulkanPaletteManager(VulkanContext& context)
+class PaletteManager : public ResourceManager<Palette>
 {
-}
+public:
+	PaletteManager();
+	virtual ~PaletteManager();
 
-VulkanPaletteManager::~VulkanPaletteManager()
-{
-}
+	// load palette from memory
+	ResourceManager<Palette>::OwningHandle loadPalette(const std::string& name, const glm::ivec4* data, size_t size);
 
+	// load palette from parameters
+	ResourceManager<Palette>::OwningHandle loadPalette(const std::string& name, std::initializer_list<glm::ivec4> data);
+
+	// load palette from file
+	ResourceManager<Palette>::OwningHandle loadPalette(const std::string& name, const std::filesystem::path& path);
+};
 
 } // namespace OpenXcom

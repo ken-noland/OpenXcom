@@ -198,9 +198,6 @@ GameWindow::GameWindow(EngineContext& engine)
 	PushConstants pushConstants = {glm::ivec2(_gameSurface->getScreenSize()), 1};
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
 
-	// even more temp temp stuff... this should be moved to a uniform buffer
-	glm::ivec2 screenSize = _gameSurface->getScreenSize();
-
 	/////////////////////////////////////////////
 }
 

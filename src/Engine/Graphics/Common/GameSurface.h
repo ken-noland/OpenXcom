@@ -46,7 +46,7 @@ public:
 
 	void captureFrame(HostImage& image);
 
-	const RenderTarget& getRenderTarget() const { return *_renderTarget; }
+	RenderTarget& getRenderTarget() { return *_renderTarget; }
 	glm::ivec2 getScreenSize() const;
 
 	MulticastDelegate<void(GraphicsCommand&)>& onRender() { return _onRender; }

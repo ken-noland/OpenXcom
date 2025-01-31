@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <simplerttr.h>
 
 #if defined(_DEBUG) && defined(_MSC_VER)
 // The following is used to capture memory allocations to find out where
@@ -176,6 +177,8 @@ int main(int argc, char *argv[])
 
 #endif
 		ret = OpenXcom::run(args);
+
+		SimpleRTTR::shutdown();
 	}
 
 #if defined(_DEBUG) && defined(_MSC_VER)

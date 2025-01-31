@@ -17,15 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "../../../Resource/Font/Font.h"
-#include "../VulkanInclude.h"
+#include "LinePrimitiveFactory.h"
+#include <memory>
 
 namespace OpenXcom
 {
 
-class VulkanFont : public Font
+class EngineContext;
+class LineListPrimitive;
+class LineStripPrimitive;
+
+class PrimitiveFactory
 {
+protected:
+	LinePrimitiveFactory _lineFactory;
+
+public:
+	PrimitiveFactory(EngineContext& context, RenderTarget& surface);
+	~PrimitiveFactory();
+
+	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, /* temp */ DeviceBuffer& palette); 
+	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive();
 };
 
 } // namespace OpenXcom

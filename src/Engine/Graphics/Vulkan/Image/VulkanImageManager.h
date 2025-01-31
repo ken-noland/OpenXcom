@@ -18,7 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../Resource/Image/ImageManager.h"
+#include "../../Image/ImageManager.h"
 #include <vulkan/vulkan.hpp>
 #include <vk_mem_alloc.h> // VMA
 

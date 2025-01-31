@@ -17,29 +17,43 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../ResourceManager.h"
-#include "Palette.h"
-
-#include <filesystem>
-#include <glm/vec4.hpp>
+#include <memory>
+#include <vector>
+#include <array>
 
 namespace OpenXcom
 {
 
-class PaletteManager : public ResourceManager<Palette>
+class EngineContext;
+class RenderTarget;
+
+class Pipeline;
+class Shader;
+class DeviceBuffer;
+
+class LineListPrimitive;
+class LineStripPrimitive;
+
+struct LineVertex;
+
+class LinePrimitiveFactory
 {
+protected:
+	EngineContext& _context;
+	RenderTarget& _surface;
+
+	std::unique_ptr<Pipeline> _pipeline;
+
+	std::unique_ptr<Shader> _vertexShader;
+	std::unique_ptr<Shader> _fragmentShader;
+
+
 public:
-	PaletteManager();
-	virtual ~PaletteManager();
+	LinePrimitiveFactory(EngineContext& context, RenderTarget& surface);
+	~LinePrimitiveFactory();
 
-	// load palette from memory
-	ResourceManager<Palette>::OwningHandle loadPalette(const std::string& name, const glm::ivec4* data, size_t size);
-
-	// load palette from parameters
-	ResourceManager<Palette>::OwningHandle loadPalette(const std::string& name, std::initializer_list<glm::ivec4> data);
-
-	// load palette from file
-	ResourceManager<Palette>::OwningHandle loadPalette(const std::string& name, const std::filesystem::path& path);
+	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, /* temp */ DeviceBuffer& palette);	
+	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive();
 };
 
 } // namespace OpenXcom

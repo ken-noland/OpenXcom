@@ -23,10 +23,10 @@
 #include "../Graphics/ShaderManager.h"
 #include "../Graphics/PipelineManager.h"
 #include "../Graphics/BufferManager.h"
+#include "../Graphics/Palette/PaletteManager.h"
+#include "../Graphics/Image/ImageManager.h"
 
-#include "Palette/PaletteManager.h"
 #include "Font/FontManager.h"
-#include "Image/ImageManager.h"
 
 namespace OpenXcom
 {

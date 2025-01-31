@@ -17,19 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../../../Resource/Palette/PaletteManager.h"
-#include "VulkanPalette.h"
 
 namespace OpenXcom
 {
 
-class VulkanContext;
-
-class VulkanPaletteManager : public PaletteManager
+class Primitive
 {
-public:
-	VulkanPaletteManager(VulkanContext& context);
-	virtual ~VulkanPaletteManager();
+
 };
 
 } // namespace OpenXcom

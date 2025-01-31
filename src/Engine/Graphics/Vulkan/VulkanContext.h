@@ -26,6 +26,7 @@
 namespace OpenXcom
 {
 
+class EngineContext;
 class Options;
 class VulkanBufferFactory;
 class VulkanDescriptorSetFactory;
@@ -67,6 +68,8 @@ public:
 class VulkanContext
 {
 protected:
+	EngineContext& _engineContext;
+
 	vk::Instance _instance;
 	vk::Device _device;
 	vk::PhysicalDevice _physicalDevice;
@@ -100,8 +103,10 @@ protected:
 	void initializeDevice(std::optional<vk::SurfaceKHR> surface);
 
 public:
-	VulkanContext(const Options& options);
+	VulkanContext(EngineContext& context);
 	~VulkanContext();
+
+	EngineContext& getEngineContext() { return _engineContext; }
 
 	vk::Instance& getInstance() { return _instance; }
 	vk::Device& getDevice() { return _device; }

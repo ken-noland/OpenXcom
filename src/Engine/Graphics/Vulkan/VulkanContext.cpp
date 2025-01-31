@@ -21,6 +21,7 @@
 
 #include "../../Logger.h"
 #include "../../Options.h"
+#include "../../EngineContext.h"
 
 #include "VulkanDescriptorSet.h"
 #include "VulkanSampler.h"
@@ -109,11 +110,11 @@ void VulkanQueue::create(vk::Device device, uint32_t familyIndex, bool shouldCre
 }
 
 
-VulkanContext::VulkanContext(const Options& options)
-	: _instance(nullptr), _device(nullptr), _physicalDevice(nullptr),
+VulkanContext::VulkanContext(EngineContext& context)
+	: _engineContext(context), _instance(nullptr), _device(nullptr), _physicalDevice(nullptr),
 	_swapChainImageFormat(vk::Format::eUndefined), _allocator()
 {
-	bool isHeadless = options.get<&GraphicsOptions::_headless>();
+	bool isHeadless = _engineContext.getOptions().get<&GraphicsOptions::_headless>();
 	initializeInstance(isHeadless);
 
 	// Create the Vulkan Memory Allocator

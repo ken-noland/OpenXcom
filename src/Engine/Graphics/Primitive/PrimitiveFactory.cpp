@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,21 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "../../../Resource/Font/FontManager.h"
-#include "../VulkanInclude.h"
+#include "PrimitiveFactory.h"
+#include "LinePrimitive.h"
 
 namespace OpenXcom
 {
 
-class VulkanContext;
-
-class VulkanFontManager : public FontManager
+PrimitiveFactory::PrimitiveFactory(EngineContext& context, RenderTarget& surface)
+	: _lineFactory(context, surface)
 {
-public:
-	VulkanFontManager(VulkanContext& context);
-	virtual ~VulkanFontManager();
-};
+}
 
+PrimitiveFactory::~PrimitiveFactory()
+{
+}
+
+std::unique_ptr<LineListPrimitive> PrimitiveFactory::createLineListPrimitive(const LineVertex* lines, size_t count, int color, /* temp */ DeviceBuffer& palette)
+{
+	return _lineFactory.createLineListPrimitive(lines, count, color, palette);
+}
+
+std::unique_ptr<LineStripPrimitive> PrimitiveFactory::createLineStripPrimitive()
+{
+	return _lineFactory.createLineStripPrimitive();
+}
 
 } // namespace OpenXcom

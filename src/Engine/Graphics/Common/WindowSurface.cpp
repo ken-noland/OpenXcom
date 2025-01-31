@@ -30,12 +30,12 @@
 #include "../Pipeline.h"
 #include "../Shader.h"
 #include "../ShaderManager.h"
+#include "../Image/ImageManager.h"
+#include "../Image/Image.h"
 #include "../../Engine.h"
 #include "../../EngineContext.h"
 #include "../../Options.h"
 #include "../../Resource/ResourceSystem.h"
-#include "../../Resource/Image/ImageManager.h"
-#include "../../Resource/Image/Image.h"
 #include "../../Platform/Window.h"
 
 #include <simplerttr.h>

@@ -23,7 +23,7 @@
 namespace OpenXcom
 {
 
-std::unique_ptr<GraphicsSystem> createGraphicsSystem(const Options& options)
+std::unique_ptr<GraphicsSystem> createGraphicsSystem(EngineContext& options)
 {
 	// right now we only have one type of graphics system(Vulkan) so ignore whatever is set in the config and use it for now
 	return std::make_unique<VulkanSystem>(options);
