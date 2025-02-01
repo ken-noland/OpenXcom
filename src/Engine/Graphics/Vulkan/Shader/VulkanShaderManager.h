@@ -32,7 +32,7 @@ protected:
 
 	std::unique_ptr<shaderc::Compiler> _compiler;
 
-	std::vector<uint32_t> compileGLSL(const std::string& source, ShaderType type);
+	std::vector<uint32_t> compileGLSL(const std::string& name, const std::string& source, ShaderType type);
 
 public:
 	VulkanShaderManager(VulkanContext& context);

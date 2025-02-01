@@ -17,6 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "GameWindow.h"
+#include "../Engine/EngineContext.h"
 #include "../Engine/Graphics/Common/WindowSurface.h"
 #include "../Engine/Graphics/Common/GameSurface.h"
 #include "../Engine/Graphics/GraphicsCommand.h"
@@ -26,118 +27,18 @@
 /////////////////////////////////////////////
 // TEMP
 #include "../Engine/Engine.h"
-
-#include "../Engine/Graphics/GraphicsSystem.h"
-#include "../Engine/Graphics/GraphicsSurface.h"
-#include "../Engine/Graphics/Buffer.h"
-#include "../Engine/Graphics/BufferManager.h"
-#include "../Engine/Graphics/Pipeline.h"
-#include "../Engine/Graphics/PipelineBinding.h"
-#include "../Engine/Graphics/PipelineDefinition.h"
-#include "../Engine/Graphics/PipelineManager.h"
-#include "../Engine/Graphics/Shader.h"
-#include "../Engine/Graphics/ShaderManager.h"
-
 #include "../Engine/Resource/ResourceSystem.h"
+#include "../Engine/Graphics/GraphicsSurface.h"
+#include "../Engine/Graphics/Palette/Palette.h"
+#include "../Engine/Graphics/Palette/PaletteManager.h"
+#include "../Engine/Graphics/Primitive/PrimitiveFactory.h"
+#include "../Engine/Graphics/Primitive/LinePrimitive.h"
+#include "../Engine/Graphics/Primitive/BoxPrimitive.h"
 /////////////////////////////////////////////
 
 
 namespace OpenXcom
 {
-
-	
-/////////////////////////////////////////////
-// TEMP
-
-// Vertex shader used to render the game surface to the platform window screen
-const char* vertexLineDrawShaderSource = R"(
-	#version 450
-
-	layout(location = 0) in ivec2 inPosition;  // Input as signed integers
-
-	layout(location = 0) out vec4 fragColor;  // Output color
-
-	layout(push_constant) uniform PushConstants {
-		int screenWidth;    //TODO: Move to uniform buffer
-		int screenHeight;   //TODO: Move to uniform buffer
-		int paletteColor;
-	} pushConstants;
-
-	layout(set = 0, binding = 0, std430) buffer Palette {
-		uint colors[];     // Dynamically sized palette
-	};
-
-	void main() {
-		// Convert screen coordinates to normalized device coordinates (NDC)
-		ivec2 snappedPosition = inPosition; // Already in integer format
-		vec2 ndc = (vec2(snappedPosition) + 0.5) / vec2(pushConstants.screenWidth, pushConstants.screenHeight) * 2.0 - 1.0;
-
-		gl_Position = vec4(ndc, 0.0, 1.0);
-
-		uint packedColor = colors[pushConstants.paletteColor];
-
-		fragColor = vec4(
-			float((packedColor >> 0) & 0xFF) / 255.0,   // Red
-			float((packedColor >> 8) & 0xFF) / 255.0,   // Green
-			float((packedColor >> 16) & 0xFF) / 255.0,  // Blue
-			float((packedColor >> 24) & 0xFF) / 255.0   // Alpha
-		);
-	}
-)";
-
-// Fragment shader used to render the game surface to the platform window screen
-const char* fragmentLineDrawShaderSource = R"(
-	#version 450
-
-	// Input from the vertex shader
-	layout(location = 0) in vec4 fragColor; // Interpolated color from the vertex shader
-
-	// Output to the framebuffer
-	layout(location = 0) out vec4 outColor;
-
-	void main() {
-		// Write the interpolated color to the output
-		outColor = fragColor;
-	}
-)";
-
-struct LineVertex
-{
-	glm::ivec2 pos;
-};
-
-struct TempPalette
-{
-	uint32_t colors[256];
-};
-
-struct PushConstants
-{
-	glm::ivec2 screenSize;
-	int paletteColor;
-};
-
-SIMPLERTTR
-{
-	SimpleRTTR::registration().type<LineVertex>()
-		.property(&OpenXcom::LineVertex::pos, "pos");
-
-	SimpleRTTR::registration().type<TempPalette>();
-
-	SimpleRTTR::registration().type<PushConstants>()
-		.property(&OpenXcom::PushConstants::screenSize, "screenSize")
-		.property(&OpenXcom::PushConstants::paletteColor, "paletteColor");
-}
-
-LineVertex lineVerticesTemp[] = {
-	{{0, 0}},     // Bottom-left
-	{{320, 200}}, // Bottom-right
-};
-
-
-
-/////////////////////////////////////////////
-
 
 GameWindow::GameWindow(EngineContext& engine)
 {
@@ -154,51 +55,38 @@ GameWindow::GameWindow(EngineContext& engine)
 		this->onGameRender(command);
 	};
 
-	/////////////////////////////////////////////
-	// TEMP
+	// set up the palette
+	PackedColor paletteData[] = {
+		0x00000000, // 0 - Black
+		0xFFFFFFFF, // 1 - White
+		0xFF808080, // 2 - Gray
+		0xFFFF0000, // 3 - Red
+		0xFF00FF00, // 4 - Green
+		0xFF0000FF, // 5 - Blue
+		0xFFFFFF00, // 6 - Yellow
+		0xFFFF00FF, // 7 - Magenta
+		0xFF00FFFF, // 8 - Cyan
+		0xFFFFA500, // 9 - Orange
+		0xFF8A2BE2, // 10 - Blue Violet
+		0xFF008080, // 11 - Teal
+		0xFF4B0082, // 12 - Indigo
+		0xFF800000, // 13 - Maroon
+		0xFF808000, // 14 - Olive
+		0xFF8B4513  // 15 - Saddle Brown
+	};
 
-	ResourceSystem& resourceSystem = engine.getResourceSystem();
-	ShaderManager& shaderManager = resourceSystem.getShaderManager();
-	PipelineManager& pipelineManager = resourceSystem.getPipelineManager();
-	BufferManager& bufferManager = resourceSystem.getBufferManager();
-	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
+	PaletteManager& paletteManager = engine.getResourceSystem().getPaletteManager();
+	_paletteHandle = paletteManager.createPalette("16colors", paletteData, 16);
 
-	// load the shaders
-	_vertexShader = shaderManager.loadShaderFromMemory("WindowSurfaceVertShader", vertexLineDrawShaderSource, ShaderType::Vertex); // TODO: make vertex shader for windows surface configurable/scriptable
-	_fragmentShader = shaderManager.loadShaderFromMemory("WindowSurfaceFragShader", fragmentLineDrawShaderSource, ShaderType::Fragment); // TODO: make fragment shader for windows surface configurable/scriptable
+	//LineVertex lines[] = {
+	//	{{10, 10}},
+	//	{{10, 190}},
+	//	{{310, 190}},
+	//	{{310, 10}},
+	//	{{10, 10}}
+	//};
 
-	PipelineBuilder pipelineBuilder;
-	PipelineDefinition definition = pipelineBuilder
-										.setResourceLayout(ResourceLayoutBuilder()
-															   // topology
-															   .setTopology(PrimitiveTopology::LineList)
-
-															   // vertex shader stage
-															   .setVertexType<LineVertex>()
-															   .addStorageBuffer<TempPalette>(ShaderStage::Vertex, 0)
-															   .addPushConstant<PushConstants>(ShaderStage::Vertex) // push constant for screen width and height
-
-															   .build())
-										.setVertexShader(*_vertexShader)
-										.setFragmentShader(*_fragmentShader)
-										.setRenderTarget(_gameSurface->getRenderTarget())
-										.build();
-
-	_pipeline = pipelineManager.createPipeline(definition);
-
-	_pipelineBinding = _pipeline->createBinding();
-
-	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lineVerticesTemp, 2, BufferUsage::Vertex);
-	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
-
-	TempPalette paletteData = {{0x00000000, 0xFFFFFFFF}};
-	_palette = bufferManager.createDeviceBuffer(&paletteData, 1, BufferUsage::Storage);
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, *_palette);
-
-	PushConstants pushConstants = {glm::ivec2(_gameSurface->getScreenSize()), 1};
-	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
-
-	/////////////////////////////////////////////
+	_box = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({10,10}, {300, 180}, 1, _paletteHandle.getHandle());
 }
 
 GameWindow::~GameWindow()
@@ -222,7 +110,7 @@ void GameWindow::onWindowRender(GraphicsCommand& command)
 
 void GameWindow::onGameRender(GraphicsCommand& command)
 {
-	_pipelineBinding->commit(command);
+	_box->draw(command);
 }
 
 

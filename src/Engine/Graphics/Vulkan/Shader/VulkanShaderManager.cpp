@@ -71,7 +71,7 @@ VulkanShaderManager::~VulkanShaderManager()
 {
 }
 
-std::vector<uint32_t> VulkanShaderManager::compileGLSL(const std::string& source, ShaderType type)
+std::vector<uint32_t> VulkanShaderManager::compileGLSL(const std::string& name, const std::string& source, ShaderType type)
 {
 	shaderc_shader_kind kind = getShadercKind(type);
 
@@ -82,7 +82,8 @@ std::vector<uint32_t> VulkanShaderManager::compileGLSL(const std::string& source
 
 	if (result.GetCompilationStatus() != shaderc_compilation_status_success)
 	{
-		Log(LOG_ERROR) << "Failed to compile GLSL shader: " << result.GetErrorMessage();
+		Log(LOG_ERROR) << "Failed to compile GLSL shader: \n"
+					   << name << "\n" << result.GetErrorMessage();
 		return {};
 	}
 	return {result.cbegin(), result.cend()};
@@ -91,7 +92,7 @@ std::vector<uint32_t> VulkanShaderManager::compileGLSL(const std::string& source
 
 std::unique_ptr<Shader> VulkanShaderManager::loadShaderFromMemory(const std::string& name, const std::string shader, ShaderType type)
 {
-	std::vector<uint32_t> spirv = compileGLSL(shader, type);
+	std::vector<uint32_t> spirv = compileGLSL(name, shader, type);
 	std::unique_ptr<VulkanShader> vulkanShader = std::make_unique<VulkanShader>(name, _context.getDevice(), spirv);
 	return std::move(vulkanShader);
 }

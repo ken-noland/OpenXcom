@@ -28,18 +28,6 @@
 #include "../../EngineContext.h"
 #include "../../Resource/ResourceSystem.h"
 
-#include "../../Utility/RTTR.h"
-
-SIMPLERTTR
-{
-	SimpleRTTR::registration().type<OpenXcom::LineVertex>()
-		.property(&OpenXcom::LineVertex::pos, "pos");
-
-	SimpleRTTR::registration().type<OpenXcom::LinePushConstants>()
-		.property(&OpenXcom::LinePushConstants::surfaceExtent, "surfaceExtent")
-		.property(&OpenXcom::LinePushConstants::color, "color");
-}
-
 namespace OpenXcom
 {
 
@@ -64,7 +52,7 @@ const char* defaultVertexLineDrawShaderSource = R"(
 	void main() {
 		// Convert screen coordinates to normalized device coordinates (NDC)
 		ivec2 snappedPosition = inPosition; // Already in integer format
-		vec2 ndc = (vec2(snappedPosition) + 0.5) / vec2(pushConstants.screenWidth, pushConstants.screenHeight) * 2.0 - 1.0;
+		vec2 ndc = (((vec2(snappedPosition) + vec2(0.5, 0.5)) / vec2(pushConstants.screenWidth, pushConstants.screenHeight)) * 2.0) - 1.0;
 
 		gl_Position = vec4(ndc, 0.0, 1.0);
 
@@ -107,8 +95,10 @@ LinePrimitiveFactory::LinePrimitiveFactory(EngineContext& context, RenderTarget&
 	_vertexShader = shaderManager.loadShaderFromMemory("LinePrimitiveVertShader", defaultVertexLineDrawShaderSource, ShaderType::Vertex); // TODO: make vertex shader for windows surface configurable/scriptable
 	_fragmentShader = shaderManager.loadShaderFromMemory("LinePrimitiveFragShader", defaultFragmentLineDrawShaderSource, ShaderType::Fragment); // TODO: make fragment shader for windows surface configurable/scriptable
 
-	PipelineBuilder pipelineBuilder;
-	PipelineDefinition definition = pipelineBuilder
+	//---
+	// line list pipeline
+	PipelineBuilder lineListPipelineBuilder;
+	PipelineDefinition lineListDefinition = lineListPipelineBuilder
 										.setResourceLayout(ResourceLayoutBuilder()
 															   // topology
 															   .setTopology(PrimitiveTopology::LineList)
@@ -124,21 +114,42 @@ LinePrimitiveFactory::LinePrimitiveFactory(EngineContext& context, RenderTarget&
 										.setRenderTarget(_surface)
 										.build();
 
-	_pipeline = pipelineManager.createPipeline(definition);
+	_lineListPipeline = pipelineManager.createPipeline(lineListDefinition);
+
+	//---
+	// line strip pipeline
+	PipelineBuilder lineStripPipelineBuilder;
+	PipelineDefinition lineStripDefinition = lineStripPipelineBuilder
+										.setResourceLayout(ResourceLayoutBuilder()
+															   // topology
+															   .setTopology(PrimitiveTopology::LineStrip)
+
+															   // vertex shader stage
+															   .setVertexType<LineVertex>()
+															   .addStorageBuffer<uint8_t>(ShaderStage::Vertex, 0)       // palette buffer
+															   .addPushConstant<LinePushConstants>(ShaderStage::Vertex) // push constant for screen width and height
+
+															   .build())
+										.setVertexShader(*_vertexShader)
+										.setFragmentShader(*_fragmentShader)
+										.setRenderTarget(_surface)
+										.build();
+
+	_lineStripPipeline = pipelineManager.createPipeline(lineStripDefinition);
 }
 
 LinePrimitiveFactory::~LinePrimitiveFactory()
 {
 }
 
-std::unique_ptr<LineListPrimitive> LinePrimitiveFactory::createLineListPrimitive(const LineVertex* lines, size_t count, int color, const Palette& palette)
+std::unique_ptr<LineListPrimitive> LinePrimitiveFactory::createLineListPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& palette)
 {
-	return std::make_unique<LineListPrimitive>(_context, *_pipeline, _surface, lines, count, color, palette);
+	return std::make_unique<LineListPrimitive>(_context, *_lineListPipeline, _surface, lines, count, color, palette);
 }
 
-std::unique_ptr<LineStripPrimitive> LinePrimitiveFactory::createLineStripPrimitive()
+std::unique_ptr<LineStripPrimitive> LinePrimitiveFactory::createLineStripPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& palette)
 {
-	return std::make_unique<LineStripPrimitive>(*_pipeline, _surface);
+	return std::make_unique<LineStripPrimitive>(_context, *_lineStripPipeline, _surface, lines, count, color, palette);
 }
 
 } // namespace OpenXcom

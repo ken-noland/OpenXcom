@@ -18,9 +18,9 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Primitive.h"
+#include <array>
 #include <memory>
 #include <vector>
-#include <array>
 
 #include <glm/vec2.hpp>
 
@@ -35,45 +35,44 @@ class RenderTarget;
 class DeviceBuffer;
 class Palette;
 
-
 template <typename ResourceType>
 class ResourceHandle;
 
-struct LineVertex
+struct BoxVertex
 {
 	glm::ivec2 pos;
 };
 
-struct LinePushConstants
+struct BoxPushConstants
 {
-	glm::ivec2 surfaceExtent;	//TODO: temporary until I move the screen extents to a uniform buffer
+	glm::ivec2 surfaceExtent; // TODO: temporary until I move the screen extents to a uniform buffer
 	int color;
 };
 
-class LineListPrimitive : public Primitive
+class BoxFilledPrimitive : public Primitive
 {
 protected:
 	std::unique_ptr<PipelineBinding> _pipelineBinding;
 	std::unique_ptr<DeviceBuffer> _vertexBuffer;
 
 public:
-	LineListPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-					  const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle);
-	virtual ~LineListPrimitive();
+	BoxFilledPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
+					   glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle);
+	virtual ~BoxFilledPrimitive();
 
 	void draw(GraphicsCommand& command);
 };
 
-class LineStripPrimitive : public Primitive
+class BoxOutlinePrimitive : public Primitive
 {
 protected:
 	std::unique_ptr<PipelineBinding> _pipelineBinding;
 	std::unique_ptr<DeviceBuffer> _vertexBuffer;
 
 public:
-	LineStripPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-					   const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle);
-	virtual ~LineStripPrimitive();
+	BoxOutlinePrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
+						glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle);
+	virtual ~BoxOutlinePrimitive();
 
 	void draw(GraphicsCommand& command);
 };

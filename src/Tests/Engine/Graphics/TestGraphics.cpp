@@ -25,6 +25,7 @@
 #include "../../../Engine/Graphics/Image/ImageManager.h"
 #include "../../../Engine/Graphics/Palette/Palette.h"
 #include "../../../Engine/Graphics/Palette/PaletteManager.h"
+#include "../../../Engine/Graphics/Primitive/BoxPrimitive.h"
 #include "../../../Engine/Graphics/Primitive/LinePrimitive.h"
 #include "../../../Engine/Graphics/Primitive/PrimitiveFactory.h"
 #include "../../../Engine/Graphics/Types/PackedColor.h"
@@ -59,6 +60,8 @@ protected:
 	std::filesystem::path _configPath;
 	std::filesystem::path _userPath;
 
+	PaletteManager::OwningHandle _paletteHandle;
+
 	void SetUp() override
 	{
 		std::filesystem::path path = TEST_DATA_DIR;
@@ -69,12 +72,37 @@ protected:
 		std::vector<std::string> args = {"-data", _dataPath.string(), "-config", _configPath.string(), "-user", _userPath.string(), "-headless"};
 		_engine = std::make_unique<Engine>(args);
 
+		// set up the palette
+		PackedColor paletteData[] = {
+			0x000000FF, // 0 - Black
+			0xFFFFFFFF, // 1 - White
+			0x808080FF, // 2 - Gray
+			0xFF0000FF, // 3 - Red
+			0x00FF00FF, // 4 - Green
+			0x0000FFFF, // 5 - Blue
+			0xFFFF00FF, // 6 - Yellow
+			0xFF00FFFF, // 7 - Magenta
+			0x00FFFFFF, // 8 - Cyan
+			0xFFA500FF, // 9 - Orange
+			0x8A2BE2FF, // 10 - Blue Violet
+			0x008080FF, // 11 - Teal
+			0x4B0082FF, // 12 - Indigo
+			0x800000FF, // 13 - Maroon
+			0x808000FF, // 14 - Olive
+			0x8B4513FF  // 15 - Saddle Brown
+		};
+
+		PaletteManager& paletteManager = _engine->getEngineContext().getResourceSystem().getPaletteManager();
+
+		_paletteHandle = paletteManager.createPalette("16colors", paletteData, 16);
+
 		_gameSurface = std::make_unique<GameSurface>(_engine->getEngineContext());
 		_windowSurface = std::make_unique<WindowSurface>(_engine->getEngineContext(), *_gameSurface);
 	}
 
 	void TearDown() override
 	{
+		_paletteHandle.release();
 		_windowSurface.reset();
 		_gameSurface.reset();
 		_engine.reset();
@@ -128,7 +156,9 @@ protected:
 			ASSERT_EQ(baseline.size(), hostImage->getExtent().x * hostImage->getExtent().y * 4) << "Image data size mismatch.";
 			for (size_t i = 0; i < baseline.size(); ++i)
 			{
-				ASSERT_EQ(baseline[i], pixels[i]) << "Pixel mismatch at index " << i;
+				std::size_t x = (i / 4) % hostImage->getExtent().x;
+				std::size_t y = (i/4) / hostImage->getExtent().x;
+				ASSERT_EQ(baseline[i], pixels[i]) << "Pixel mismatch at index " << i << "(x=" << x << " y=" << y << ")";
 			}
 		}
 
@@ -141,24 +171,14 @@ TEST_F(GraphicsTest, TestGraphicsSurface)
 	std::unique_ptr<HostImage> hostImage = captureGameSurface();
 	ASSERT_TRUE(hostImage);
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "game_surface_blank.png";
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "001_game_surface_blank.png";
 	compareWithBaseline(hostImage, baselinePath);
 }
 
 TEST_F(GraphicsTest, TestLineList)
 {
-	//TODO: Temp palette buffer(we need to finish the palette system)
-	PackedColor paletteData[] = {0x00000000, 0xFFFFFFFF};
-
-	PaletteManager& paletteManager = _engine->getEngineContext().getResourceSystem().getPaletteManager();
-
-	PaletteManager::OwningHandle paletteHandle = paletteManager.createPalette("blank_and_white", paletteData, 2);
-	ASSERT_TRUE(paletteHandle.isValid());
-
-	const Palette& palette = paletteManager.get(paletteHandle);
-
 	LineVertex lines[] = {{{0, 0}}, {{320, 200}}};
-	std::unique_ptr<LineListPrimitive> lineList = _gameSurface->getRenderTarget().getPrimitiveFactory().createLineListPrimitive(lines, 2, 1, palette);
+	std::unique_ptr<LineListPrimitive> lineList = _gameSurface->getRenderTarget().getPrimitiveFactory().createLineListPrimitive(lines, 2, 1, _paletteHandle.getHandle());
 	ASSERT_TRUE(lineList);
 
 	// draw the line
@@ -169,6 +189,80 @@ TEST_F(GraphicsTest, TestLineList)
 	std::unique_ptr<HostImage> hostImage = captureGameSurface();
 	ASSERT_TRUE(hostImage);
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "game_surface_line_1.png";
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "002_game_surface_line_1.png";
+	compareWithBaseline(hostImage, baselinePath);
+}
+
+TEST_F(GraphicsTest, TestLineListMultiple)
+{
+	// create multiple vertical lines
+	LineVertex lines[] = {{{10, 10}}, {{10, 190}}, {{20, 10}}, {{20, 190}}, {{30, 10}}, {{30, 190}}};
+	std::unique_ptr<LineListPrimitive> lineList = _gameSurface->getRenderTarget().getPrimitiveFactory().createLineListPrimitive(lines, 6, 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(lineList);
+
+	// draw the line
+	_gameSurface->onRender() << [&lineList](GraphicsCommand& command) {
+		lineList->draw(command);
+	};
+
+	std::unique_ptr<HostImage> hostImage = captureGameSurface();
+	ASSERT_TRUE(hostImage);
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "003_game_surface_line_multiple_1.png";
+	compareWithBaseline(hostImage, baselinePath);
+}
+
+TEST_F(GraphicsTest, TestLineStrip)
+{
+	LineVertex lines[] = {
+		{{10, 10}},
+		{{10, 190}},
+		{{310, 190}},
+		{{310, 10}},
+		{{10, 10}}};
+
+	std::unique_ptr<LineStripPrimitive> lineStrip = _gameSurface->getRenderTarget().getPrimitiveFactory().createLineStripPrimitive(lines, 5, 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(lineStrip);
+
+	// draw the line
+	_gameSurface->onRender() << [&lineStrip](GraphicsCommand& command) {
+		lineStrip->draw(command);
+	};
+
+	std::unique_ptr<HostImage> hostImage = captureGameSurface();
+	ASSERT_TRUE(hostImage);
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "004_game_surface_line_strip_1.png";
+	compareWithBaseline(hostImage, baselinePath);
+}
+
+TEST_F(GraphicsTest, TestFilledBox)
+{
+	std::unique_ptr<BoxFilledPrimitive> boxOutline = _gameSurface->getRenderTarget().getPrimitiveFactory().createFilledBoxPrimitive({140, 20}, {40, 40}, 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(boxOutline);
+
+	// draw the line
+	_gameSurface->onRender() << [&boxOutline](GraphicsCommand& command) {
+		boxOutline->draw(command);
+	};
+
+	std::unique_ptr<HostImage> hostImage = captureGameSurface();
+	ASSERT_TRUE(hostImage);
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "005_game_surface_filled_box_1.png";
+	compareWithBaseline(hostImage, baselinePath);
+}
+
+TEST_F(GraphicsTest, TestOutlineBox)
+{
+	std::unique_ptr<BoxOutlinePrimitive> boxOutline = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({140, 70}, {40, 40}, 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(boxOutline);
+
+	// draw the line
+	_gameSurface->onRender() << [&boxOutline](GraphicsCommand& command) {
+		boxOutline->draw(command);
+	};
+
+	std::unique_ptr<HostImage> hostImage = captureGameSurface();
+	ASSERT_TRUE(hostImage);
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "006_game_surface_outline_box_1.png";
 	compareWithBaseline(hostImage, baselinePath);
 }

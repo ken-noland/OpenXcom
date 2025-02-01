@@ -142,6 +142,8 @@ set ( engine_src
   "Engine/Graphics/Image/ImageManager.cpp"
   "Engine/Graphics/Palette/Palette.cpp"
   "Engine/Graphics/Palette/PaletteManager.cpp"
+  "Engine/Graphics/Primitive/BoxPrimitive.cpp"
+  "Engine/Graphics/Primitive/BoxPrimitiveFactory.cpp"
   "Engine/Graphics/Primitive/LinePrimitive.cpp"
   "Engine/Graphics/Primitive/LinePrimitiveFactory.cpp"
   "Engine/Graphics/Primitive/PrimitiveFactory.cpp"

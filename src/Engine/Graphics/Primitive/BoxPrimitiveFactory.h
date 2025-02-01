@@ -18,47 +18,45 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <memory>
-#include <string>
 
-/////////////////////////////////////////////
-// TEMP
-#include "../Engine/Resource/Handle.h"
-
-/////////////////////////////////////////////
-
+#include <glm/vec2.hpp>
 
 namespace OpenXcom
 {
 
 class EngineContext;
-class GameSurface;
-class WindowSurface;
-class GraphicsCommand;
+class RenderTarget;
 
-class BoxOutlinePrimitive;
-class LineStripPrimitive;
-
+class Pipeline;
+class Shader;
 class Palette;
 
-class GameWindow
+template <typename ResourceType>
+class ResourceHandle;
+
+class BoxFilledPrimitive;
+class BoxOutlinePrimitive;
+
+struct BoxVertex;
+
+class BoxPrimitiveFactory
 {
 protected:
-	std::unique_ptr<GameSurface> _gameSurface;
-	std::unique_ptr<WindowSurface> _windowSurface;
+	EngineContext& _context;
+	RenderTarget& _surface;
 
-	OwningHandle<Palette> _paletteHandle;
-	std::unique_ptr<BoxOutlinePrimitive> _box;
+	std::unique_ptr<Pipeline> _boxFilledPipeline;
+	std::unique_ptr<Pipeline> _boxOutlinePipeline;
 
-	void onWindowRender(GraphicsCommand& command);
-	void onGameRender(GraphicsCommand& command);
+	std::unique_ptr<Shader> _vertexShader;
+	std::unique_ptr<Shader> _fragmentShader;
 
 public:
-	GameWindow(EngineContext& engine);
-	~GameWindow();
+	BoxPrimitiveFactory(EngineContext& context, RenderTarget& surface);
+	~BoxPrimitiveFactory();
 
-	void update();
-
-	bool isRunning() const;
+	std::unique_ptr<BoxFilledPrimitive> createFilledBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle);
+	std::unique_ptr<BoxOutlinePrimitive> createOutlineBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& palette);
 };
 
 } // namespace OpenXcom

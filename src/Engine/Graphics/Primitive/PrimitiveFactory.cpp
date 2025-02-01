@@ -17,13 +17,14 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "PrimitiveFactory.h"
+#include "BoxPrimitive.h"
 #include "LinePrimitive.h"
 
 namespace OpenXcom
 {
 
 PrimitiveFactory::PrimitiveFactory(EngineContext& context, RenderTarget& surface)
-	: _lineFactory(context, surface)
+	: _lineFactory(context, surface), _boxFactory(context, surface)
 {
 }
 
@@ -31,14 +32,24 @@ PrimitiveFactory::~PrimitiveFactory()
 {
 }
 
-std::unique_ptr<LineListPrimitive> PrimitiveFactory::createLineListPrimitive(const LineVertex* lines, size_t count, int color, const Palette& palette)
+std::unique_ptr<BoxFilledPrimitive> PrimitiveFactory::createFilledBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle)
+{
+	return _boxFactory.createFilledBoxPrimitive(position, size, color, paletteHandle);
+}
+
+std::unique_ptr<BoxOutlinePrimitive> PrimitiveFactory::createOutlineBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& palette)
+{
+	return _boxFactory.createOutlineBoxPrimitive(position, size, color, palette);
+}
+
+std::unique_ptr<LineListPrimitive> PrimitiveFactory::createLineListPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& palette)
 {
 	return _lineFactory.createLineListPrimitive(lines, count, color, palette);
 }
 
-std::unique_ptr<LineStripPrimitive> PrimitiveFactory::createLineStripPrimitive()
+std::unique_ptr<LineStripPrimitive> PrimitiveFactory::createLineStripPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& palette)
 {
-	return _lineFactory.createLineStripPrimitive();
+	return _lineFactory.createLineStripPrimitive(lines, count, color, palette);
 }
 
 } // namespace OpenXcom

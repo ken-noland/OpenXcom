@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "LinePrimitive.h"
+#include "BoxPrimitive.h"
 #include "../GraphicsCommand.h"
 #include "../GraphicsSurface.h"
 #include "../Buffer.h"
@@ -35,17 +35,19 @@
 
 SIMPLERTTR
 {
-	SimpleRTTR::registration().type<OpenXcom::LineVertex>().property(&OpenXcom::LineVertex::pos, "pos");
+	SimpleRTTR::registration().type<OpenXcom::BoxVertex>()
+		.property(&OpenXcom::BoxVertex::pos, "pos");
 
-	SimpleRTTR::registration().type<OpenXcom::LinePushConstants>().property(&OpenXcom::LinePushConstants::surfaceExtent, "surfaceExtent").property(&OpenXcom::LinePushConstants::color, "color");
+	SimpleRTTR::registration().type<OpenXcom::BoxPushConstants>()
+		.property(&OpenXcom::BoxPushConstants::surfaceExtent, "surfaceExtent")
+		.property(&OpenXcom::BoxPushConstants::color, "color");
 }
-
 
 namespace OpenXcom
 {
 
-LineListPrimitive::LineListPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-									 const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle)
+BoxFilledPrimitive::BoxFilledPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
+									   glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle)
 {
 	ResourceSystem& resourceSystem = context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
@@ -55,26 +57,37 @@ LineListPrimitive::LineListPrimitive(EngineContext& context, Pipeline& pipeline,
 
 	_pipelineBinding = pipeline.createBinding();
 
-	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lines, count, BufferUsage::Vertex);
+	// Define two triangles that form a quad
+	BoxVertex vertices[6] = {
+		{position},                         // Top-left
+		{position + glm::ivec2(size.x, 0)}, // Top-right
+		{position + glm::ivec2(0, size.y)}, // Bottom-left
+
+		{position + glm::ivec2(size.x, 0)}, // Top-right
+		{position + size},                  // Bottom-right
+		{position + glm::ivec2(0, size.y)}  // Bottom-left
+	};
+
+	_vertexBuffer = bufferManager.createDeviceBuffer<BoxVertex>(vertices, 6, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
 	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
 
-	LinePushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
+	BoxPushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
 }
 
-LineListPrimitive::~LineListPrimitive()
+BoxFilledPrimitive::~BoxFilledPrimitive()
 {
 }
 
-void LineListPrimitive::draw(GraphicsCommand& command)
+void BoxFilledPrimitive::draw(GraphicsCommand& command)
 {
 	_pipelineBinding->commit(command);
 }
 
-LineStripPrimitive::LineStripPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-									   const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle)
+BoxOutlinePrimitive::BoxOutlinePrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
+										 glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle)
 {
 	ResourceSystem& resourceSystem = context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
@@ -84,22 +97,32 @@ LineStripPrimitive::LineStripPrimitive(EngineContext& context, Pipeline& pipelin
 
 	_pipelineBinding = pipeline.createBinding();
 
-	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lines, count, BufferUsage::Vertex);
+	// Define the 4 corner points forming a closed loop (line strip)
+	BoxVertex vertices[5] = {
+		{position},                              // Top-left
+		{position + glm::ivec2(size.x, 0)},      // Top-right
+		{position + size},                       // Bottom-right **+1**
+		//{position + glm::ivec2(0, size.y)},      // Bottom-left
+		//{position}                               // Closing the loop
+	};
+
+	_vertexBuffer = bufferManager.createDeviceBuffer<BoxVertex>(vertices, 3, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
 	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
 
-	LinePushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
+	BoxPushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
 }
 
-LineStripPrimitive::~LineStripPrimitive()
+BoxOutlinePrimitive::~BoxOutlinePrimitive()
 {
 }
 
-void LineStripPrimitive::draw(GraphicsCommand& command)
+void BoxOutlinePrimitive::draw(GraphicsCommand& command)
 {
 	_pipelineBinding->commit(command);
 }
+
 
 } // namespace OpenXcom

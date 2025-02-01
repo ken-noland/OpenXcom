@@ -18,8 +18,6 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <memory>
-#include <vector>
-#include <array>
 
 namespace OpenXcom
 {
@@ -31,6 +29,8 @@ class Pipeline;
 class Shader;
 class Palette;
 
+template <typename ResourceType>
+class ResourceHandle;
 
 class LineListPrimitive;
 class LineStripPrimitive;
@@ -43,7 +43,8 @@ protected:
 	EngineContext& _context;
 	RenderTarget& _surface;
 
-	std::unique_ptr<Pipeline> _pipeline;
+	std::unique_ptr<Pipeline> _lineListPipeline;
+	std::unique_ptr<Pipeline> _lineStripPipeline;
 
 	std::unique_ptr<Shader> _vertexShader;
 	std::unique_ptr<Shader> _fragmentShader;
@@ -53,8 +54,8 @@ public:
 	LinePrimitiveFactory(EngineContext& context, RenderTarget& surface);
 	~LinePrimitiveFactory();
 
-	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, const Palette& palette);	
-	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive();
+	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle);	
+	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& palette);
 };
 
 } // namespace OpenXcom

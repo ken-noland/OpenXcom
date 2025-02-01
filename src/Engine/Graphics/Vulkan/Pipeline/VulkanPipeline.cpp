@@ -58,13 +58,21 @@ VulkanPipeline::VulkanPipeline(VulkanContext& context, const PipelineDefinition&
 	vk::PipelineRasterizationStateCreateInfo rasterizer{};
 	vk::PipelineMultisampleStateCreateInfo multisampling{};
 	vk::PipelineColorBlendStateCreateInfo colorBlending{};
+	vk::PipelineRasterizationLineStateCreateInfoEXT lineRasterizationState{};
 
 	createVertexInputInfo(bindingDescription, attributeDescriptions, vertexInputInfo);
 	createInputAssemblyState(inputAssembly);
 	createViewportState(viewportState, viewport, scissor, renderTarget);
-	createRasterizerState(rasterizer);
+	createRasterizerState(rasterizer, lineRasterizationState);
 	createMultisampleState(multisampling);
 	createColorBlendState(colorBlending, colorBlendAttachment);
+
+	
+	if (pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineStrip || pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineList)
+	{
+		rasterizer.polygonMode = vk::PolygonMode::ePoint;
+	}
+
 
 	createPipelineLayout();
 
@@ -174,15 +182,33 @@ void VulkanPipeline::createViewportState(vk::PipelineViewportStateCreateInfo& vi
 	viewportState.pScissors = &scissor;
 }
 
-void VulkanPipeline::createRasterizerState(vk::PipelineRasterizationStateCreateInfo& rasterizer)
+void VulkanPipeline::createRasterizerState(vk::PipelineRasterizationStateCreateInfo& rasterizer, vk::PipelineRasterizationLineStateCreateInfoEXT& lineState)
 {
+	lineState.lineRasterizationMode = vk::LineRasterizationModeEXT::eRectangular; // Or eRectangularSmooth, eBresenham, eDefault
+	lineState.stippledLineEnable = VK_FALSE;                                      // Disable stippling if not needed
+
 	rasterizer.depthClampEnable = VK_FALSE;
 	rasterizer.rasterizerDiscardEnable = VK_FALSE;
-	rasterizer.polygonMode = vk::PolygonMode::eFill;
+
+	if(_pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineList ||
+		_pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineStrip)
+	{
+		rasterizer.polygonMode = vk::PolygonMode::eLine;
+	}
+	else if (_pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::PointList)
+	{
+		rasterizer.polygonMode = vk::PolygonMode::ePoint;
+	}
+	else
+	{
+		rasterizer.polygonMode = vk::PolygonMode::eFill;
+	}
+
 	rasterizer.lineWidth = 1.0f;
-	rasterizer.cullMode = vk::CullModeFlagBits::eBack;
+	rasterizer.cullMode = vk::CullModeFlagBits::eNone;
 	rasterizer.frontFace = vk::FrontFace::eClockwise;
 	rasterizer.depthBiasEnable = VK_FALSE;
+	rasterizer.pNext = &lineState;
 }
 
 void VulkanPipeline::createMultisampleState(vk::PipelineMultisampleStateCreateInfo& multisampling)

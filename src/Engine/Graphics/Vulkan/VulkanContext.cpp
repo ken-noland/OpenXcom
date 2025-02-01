@@ -412,6 +412,8 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 		deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
 
+	deviceExtensions.push_back(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME);
+
 	// Finally, create the logical device
 	vk::DeviceCreateInfo deviceCreateInfo{};
 	deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());

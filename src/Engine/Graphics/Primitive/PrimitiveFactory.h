@@ -17,28 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "BoxPrimitiveFactory.h"
 #include "LinePrimitiveFactory.h"
 #include <memory>
 
 namespace OpenXcom
 {
 
-class EngineContext;
-class LineListPrimitive;
-class LineStripPrimitive;
-class Palette;
-
 class PrimitiveFactory
 {
 protected:
+	BoxPrimitiveFactory _boxFactory;
 	LinePrimitiveFactory _lineFactory;
 
 public:
 	PrimitiveFactory(EngineContext& context, RenderTarget& surface);
 	~PrimitiveFactory();
 
-	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, const Palette& palette); 
-	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive();
+	std::unique_ptr<BoxFilledPrimitive> createFilledBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle);
+	std::unique_ptr<BoxOutlinePrimitive> createOutlineBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& palette);
+
+	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle); 
+	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& palette);
 };
 
 } // namespace OpenXcom
