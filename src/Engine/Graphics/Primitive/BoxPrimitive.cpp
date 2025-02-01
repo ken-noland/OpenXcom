@@ -102,11 +102,11 @@ BoxOutlinePrimitive::BoxOutlinePrimitive(EngineContext& context, Pipeline& pipel
 		{position},                              // Top-left
 		{position + glm::ivec2(size.x, 0)},      // Top-right
 		{position + size},                       // Bottom-right **+1**
-		//{position + glm::ivec2(0, size.y)},      // Bottom-left
-		//{position}                               // Closing the loop
+		{position + glm::ivec2(0, size.y)},      // Bottom-left
+		{position}                               // Closing the loop
 	};
 
-	_vertexBuffer = bufferManager.createDeviceBuffer<BoxVertex>(vertices, 3, BufferUsage::Vertex);
+	_vertexBuffer = bufferManager.createDeviceBuffer<BoxVertex>(vertices, 5, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
 	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
