@@ -26,8 +26,8 @@ class EngineContext;
 class RenderTarget;
 
 class Pipeline;
-class Shader;
 class Palette;
+class ShaderCollection;
 
 template <typename ResourceType>
 class ResourceHandle;
@@ -46,16 +46,12 @@ protected:
 	std::unique_ptr<Pipeline> _lineListPipeline;
 	std::unique_ptr<Pipeline> _lineStripPipeline;
 
-	std::unique_ptr<Shader> _vertexShader;
-	std::unique_ptr<Shader> _fragmentShader;
-
-
 public:
-	LinePrimitiveFactory(EngineContext& context, RenderTarget& surface);
+	LinePrimitiveFactory(EngineContext& context, RenderTarget& surface, ShaderCollection& shaders);
 	~LinePrimitiveFactory();
 
 	std::unique_ptr<LineListPrimitive> createLineListPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle);	
-	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& palette);
+	std::unique_ptr<LineStripPrimitive> createLineStripPrimitive(const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle);
 };
 
 } // namespace OpenXcom

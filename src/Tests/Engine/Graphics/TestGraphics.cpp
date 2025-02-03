@@ -27,6 +27,7 @@
 #include "../../../Engine/Graphics/Palette/PaletteManager.h"
 #include "../../../Engine/Graphics/Primitive/BoxPrimitive.h"
 #include "../../../Engine/Graphics/Primitive/LinePrimitive.h"
+#include "../../../Engine/Graphics/Primitive/PointPrimitive.h"
 #include "../../../Engine/Graphics/Primitive/PrimitiveFactory.h"
 #include "../../../Engine/Graphics/Types/PackedColor.h"
 #include "../../../Engine/Graphics/GraphicsSurface.h"
@@ -290,5 +291,76 @@ TEST_F(GraphicsTest, TestOutlineBoxesCorners)
 	std::unique_ptr<HostImage> hostImage = captureGameSurface();
 	ASSERT_TRUE(hostImage);
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "007_game_surface_outline_box_corners_1.png";
+	compareWithBaseline(hostImage, baselinePath);
+}
+
+TEST_F(GraphicsTest, TestPointListPrimitive16Points)
+{
+	// Create 16 points arranged in 2 rows (8 columns per row).
+	std::vector<PointVertex> points;
+	for (int row = 0; row < 2; ++row)
+	{
+		for (int col = 0; col < 8; ++col)
+		{
+			// Starting at (10,10) with 20 pixels spacing horizontally and vertically.
+			PointVertex vertex = {glm::ivec2(10 + col * 20, 10 + row * 20)};
+			points.push_back(vertex);
+		}
+	}
+
+	// Create the PointListPrimitive using the primitive factory.
+	std::unique_ptr<PointListPrimitive> pointListPrimitive =
+		_gameSurface->getRenderTarget().getPrimitiveFactory().createPointListPrimitive(points.data(), points.size(), 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(pointListPrimitive);
+
+	// Render the point list primitive.
+	_gameSurface->onRender() << [&pointListPrimitive](GraphicsCommand& command) {
+		pointListPrimitive->draw(command);
+	};
+
+	// Capture the game surface after drawing.
+	std::unique_ptr<HostImage> hostImage = captureGameSurface();
+	ASSERT_TRUE(hostImage);
+
+	// Define the baseline image path for comparison.
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "008_game_surface_point_list_1.png";
+	compareWithBaseline(hostImage, baselinePath);
+}
+
+TEST_F(GraphicsTest, TestPointColorListPrimitive16Points)
+{
+	// Create 16 vertices arranged in 2 rows (8 columns per row),
+	// cycling through the 16 palette colors.
+	std::vector<PointColorVertex> vertices;
+	for (int row = 0; row < 2; ++row)
+	{
+		for (int col = 0; col < 8; ++col)
+		{
+			// Calculate the overall index and cycle through 16 colors.
+			int index = row * 8 + col;
+			int color = index % 16; // Cycle through colors 0-15
+
+			// Create a vertex starting at (10,10) with 20 pixels spacing.
+			PointColorVertex vertex = {glm::ivec2(10 + col * 20, 10 + row * 20), color};
+			vertices.push_back(vertex);
+		}
+	}
+
+	// Create the PointColorListPrimitive using the primitive factory.
+	std::unique_ptr<PointColorListPrimitive> pointColorListPrimitive =
+		_gameSurface->getRenderTarget().getPrimitiveFactory().createPointColorListPrimitive(vertices.data(), vertices.size(), _paletteHandle.getHandle());
+	ASSERT_TRUE(pointColorListPrimitive);
+
+	// Render the point color list primitive.
+	_gameSurface->onRender() << [&pointColorListPrimitive](GraphicsCommand& command) {
+		pointColorListPrimitive->draw(command);
+	};
+
+	// Capture the game surface after drawing.
+	std::unique_ptr<HostImage> hostImage = captureGameSurface();
+	ASSERT_TRUE(hostImage);
+
+	// Define the baseline image path for comparison.
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "009_game_surface_point_color_list_1.png";
 	compareWithBaseline(hostImage, baselinePath);
 }

@@ -17,43 +17,37 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "BoxPrimitiveFactory.h"
+#include "LinePrimitiveFactory.h"
+#include "PointPrimitiveFactory.h"
 #include <memory>
-
-#include <glm/vec2.hpp>
 
 namespace OpenXcom
 {
 
-class EngineContext;
-class RenderTarget;
+class Shader;
 
-class Pipeline;
-class Palette;
-class ShaderCollection;
-
-template <typename ResourceType>
-class ResourceHandle;
-
-class BoxFilledPrimitive;
-class BoxOutlinePrimitive;
-
-struct BoxVertex;
-
-class BoxPrimitiveFactory
+// TODO: This class is mostly temporary because I want an object to hold the default
+// shaders without having to implement a huge shader manager
+class ShaderCollection
 {
 protected:
 	EngineContext& _context;
-	RenderTarget& _surface;
 
-	std::unique_ptr<Pipeline> _boxFilledPipeline;
-	std::unique_ptr<Pipeline> _boxOutlinePipeline;
+	// vertex shaders
+	std::unique_ptr<Shader> _defaultVec2Shader;
+	std::unique_ptr<Shader> _defaultVec2ColorShader;
+
+	std::unique_ptr<Shader> _defaultFragmentShader;
 
 public:
-	BoxPrimitiveFactory(EngineContext& context, RenderTarget& surface, ShaderCollection& shaders);
-	~BoxPrimitiveFactory();
+	ShaderCollection(EngineContext& context);
+	~ShaderCollection();
 
-	std::unique_ptr<BoxFilledPrimitive> createFilledBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle);
-	std::unique_ptr<BoxOutlinePrimitive> createOutlineBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& palette);
+	Shader& getDefaultVec2VertexShader();
+	Shader& getDefaultVec2ColorVertexShader();
+
+	Shader& getDefaultFragmentShader();
 };
 
 } // namespace OpenXcom

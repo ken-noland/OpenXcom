@@ -19,12 +19,13 @@
 #include "PrimitiveFactory.h"
 #include "BoxPrimitive.h"
 #include "LinePrimitive.h"
+#include "PointPrimitive.h"
 
 namespace OpenXcom
 {
 
 PrimitiveFactory::PrimitiveFactory(EngineContext& context, RenderTarget& surface)
-	: _lineFactory(context, surface), _boxFactory(context, surface)
+	: _shaders(context), _lineFactory(context, surface, _shaders), _boxFactory(context, surface, _shaders), _pointFactory(context, surface, _shaders)
 {
 }
 
@@ -51,5 +52,16 @@ std::unique_ptr<LineStripPrimitive> PrimitiveFactory::createLineStripPrimitive(c
 {
 	return _lineFactory.createLineStripPrimitive(lines, count, color, palette);
 }
+
+std::unique_ptr<PointListPrimitive> PrimitiveFactory::createPointListPrimitive(const PointVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle)
+{
+	return _pointFactory.createPointListPrimitive(lines, count, color, paletteHandle);
+}
+
+std::unique_ptr<PointColorListPrimitive> PrimitiveFactory::createPointColorListPrimitive(const PointColorVertex* lines, size_t count, const ResourceHandle<Palette>& paletteHandle)
+{
+	return _pointFactory.createPointColorListPrimitive(lines, count, paletteHandle);
+}
+
 
 } // namespace OpenXcom

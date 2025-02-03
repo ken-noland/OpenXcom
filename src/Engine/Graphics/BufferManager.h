@@ -20,6 +20,7 @@
 #include <memory>
 #include "Buffer.h"
 #include <simplerttr.h>
+#include <cassert>
 
 namespace OpenXcom
 {

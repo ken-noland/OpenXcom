@@ -19,8 +19,6 @@
  */
 #include <memory>
 
-#include <glm/vec2.hpp>
-
 namespace OpenXcom
 {
 
@@ -34,26 +32,28 @@ class ShaderCollection;
 template <typename ResourceType>
 class ResourceHandle;
 
-class BoxFilledPrimitive;
-class BoxOutlinePrimitive;
+class PointListPrimitive;
+class PointColorListPrimitive;
 
-struct BoxVertex;
+struct PointVertex;
+struct PointColorVertex;
 
-class BoxPrimitiveFactory
+class PointPrimitiveFactory
 {
 protected:
 	EngineContext& _context;
 	RenderTarget& _surface;
+	ShaderCollection& _shaders;
 
-	std::unique_ptr<Pipeline> _boxFilledPipeline;
-	std::unique_ptr<Pipeline> _boxOutlinePipeline;
+	std::unique_ptr<Pipeline> _pointListPipeline;
+	std::unique_ptr<Pipeline> _pointColorListPipeline;
 
 public:
-	BoxPrimitiveFactory(EngineContext& context, RenderTarget& surface, ShaderCollection& shaders);
-	~BoxPrimitiveFactory();
+	PointPrimitiveFactory(EngineContext& context, RenderTarget& surface, ShaderCollection& shaders);
+	~PointPrimitiveFactory();
 
-	std::unique_ptr<BoxFilledPrimitive> createFilledBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle);
-	std::unique_ptr<BoxOutlinePrimitive> createOutlineBoxPrimitive(glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& palette);
+	std::unique_ptr<PointListPrimitive> createPointListPrimitive(const PointVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle);
+	std::unique_ptr<PointColorListPrimitive> createPointColorListPrimitive(const PointColorVertex* lines, size_t count, const ResourceHandle<Palette>& paletteHandle);
 };
 
 } // namespace OpenXcom

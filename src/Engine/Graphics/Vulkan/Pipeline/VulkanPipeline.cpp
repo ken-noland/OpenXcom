@@ -330,6 +330,10 @@ vk::Format VulkanPipeline::determineFormat(const SimpleRTTR::Type& type)
 	{
 		return vk::Format::eR32G32B32A32Sfloat;
 	}
+	else if (type == SimpleRTTR::types().get_type<int>())
+	{
+		return vk::Format::eR32Sint;
+	}
 	else
 	{
 		throw std::runtime_error("Unsupported vertex type");
