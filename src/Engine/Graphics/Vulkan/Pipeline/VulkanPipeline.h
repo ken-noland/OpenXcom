@@ -49,7 +49,7 @@ protected:
 	void createVertexInputInfo(vk::VertexInputBindingDescription& bindingDescription, std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions, vk::PipelineVertexInputStateCreateInfo& vertexInputInfo);
 	void createInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo& inputAssembly);
 	void createViewportState(vk::PipelineViewportStateCreateInfo& viewportState, vk::Viewport& viewport, vk::Rect2D& scissor, const RenderTarget& surface);
-	void createRasterizerState(vk::PipelineRasterizationStateCreateInfo& rasterizer, vk::PipelineRasterizationLineStateCreateInfoEXT& lineState);
+	void createRasterizerState(vk::PipelineRasterizationStateCreateInfo& rasterizer);
 	void createMultisampleState(vk::PipelineMultisampleStateCreateInfo& multisampling);
 	void createColorBlendState(vk::PipelineColorBlendStateCreateInfo& colorBlending, vk::PipelineColorBlendAttachmentState& colorBlendAttachment);
 

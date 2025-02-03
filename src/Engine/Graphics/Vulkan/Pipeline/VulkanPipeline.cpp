@@ -58,12 +58,11 @@ VulkanPipeline::VulkanPipeline(VulkanContext& context, const PipelineDefinition&
 	vk::PipelineRasterizationStateCreateInfo rasterizer{};
 	vk::PipelineMultisampleStateCreateInfo multisampling{};
 	vk::PipelineColorBlendStateCreateInfo colorBlending{};
-	vk::PipelineRasterizationLineStateCreateInfoEXT lineRasterizationState{};
 
 	createVertexInputInfo(bindingDescription, attributeDescriptions, vertexInputInfo);
 	createInputAssemblyState(inputAssembly);
 	createViewportState(viewportState, viewport, scissor, renderTarget);
-	createRasterizerState(rasterizer, lineRasterizationState);
+	createRasterizerState(rasterizer);
 	createMultisampleState(multisampling);
 	createColorBlendState(colorBlending, colorBlendAttachment);
 
@@ -182,11 +181,8 @@ void VulkanPipeline::createViewportState(vk::PipelineViewportStateCreateInfo& vi
 	viewportState.pScissors = &scissor;
 }
 
-void VulkanPipeline::createRasterizerState(vk::PipelineRasterizationStateCreateInfo& rasterizer, vk::PipelineRasterizationLineStateCreateInfoEXT& lineState)
+void VulkanPipeline::createRasterizerState(vk::PipelineRasterizationStateCreateInfo& rasterizer)
 {
-	lineState.lineRasterizationMode = vk::LineRasterizationModeEXT::eRectangular; // Or eRectangularSmooth, eBresenham, eDefault
-	lineState.stippledLineEnable = VK_FALSE;                                      // Disable stippling if not needed
-
 	rasterizer.depthClampEnable = VK_FALSE;
 	rasterizer.rasterizerDiscardEnable = VK_FALSE;
 
@@ -208,13 +204,12 @@ void VulkanPipeline::createRasterizerState(vk::PipelineRasterizationStateCreateI
 	rasterizer.cullMode = vk::CullModeFlagBits::eNone;
 	rasterizer.frontFace = vk::FrontFace::eClockwise;
 	rasterizer.depthBiasEnable = VK_FALSE;
-	rasterizer.pNext = &lineState;
 }
 
 void VulkanPipeline::createMultisampleState(vk::PipelineMultisampleStateCreateInfo& multisampling)
 {
-	multisampling.sampleShadingEnable = VK_FALSE;
-	multisampling.rasterizationSamples = vk::SampleCountFlagBits::e1;
+	multisampling.sampleShadingEnable = VK_TRUE;
+	multisampling.rasterizationSamples = vk::SampleCountFlagBits::e4;
 }
 
 void VulkanPipeline::createColorBlendState(vk::PipelineColorBlendStateCreateInfo& colorBlending, vk::PipelineColorBlendAttachmentState& colorBlendAttachment)

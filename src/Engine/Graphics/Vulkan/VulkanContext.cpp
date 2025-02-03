@@ -112,7 +112,7 @@ void VulkanQueue::create(vk::Device device, uint32_t familyIndex, bool shouldCre
 
 VulkanContext::VulkanContext(EngineContext& context)
 	: _engineContext(context), _instance(nullptr), _device(nullptr), _physicalDevice(nullptr),
-	_swapChainImageFormat(vk::Format::eUndefined), _allocator()
+	  _swapChainImageFormat(vk::Format::eUndefined), _allocator()
 {
 	bool isHeadless = _engineContext.getOptions().get<&GraphicsOptions::_headless>();
 	initializeInstance(isHeadless);
@@ -328,7 +328,7 @@ void VulkanContext::selectPhysicalDevice(std::optional<vk::SurfaceKHR> surface)
 			}
 		}
 
-		if (supportsGraphics && (!surface || (supportsPresentation && supportsSwapchain)))
+		if (supportsGraphics && (!surface || (supportsPresentation && supportsSwapchain)) && checkPhysicalDeviceHasFeatures(properties, features))
 		{
 			_physicalDevice = device;
 			Log(LOG_DEBUG) << "Selected Device: " << properties.deviceName;
@@ -339,6 +339,19 @@ void VulkanContext::selectPhysicalDevice(std::optional<vk::SurfaceKHR> surface)
 	Log(LOG_ERROR) << "Failed to find a suitable GPU.";
 	throw new std::runtime_error("Failed to find a suitable GPU.");
 }
+
+bool VulkanContext::checkPhysicalDeviceHasFeatures(const vk::PhysicalDeviceProperties& properties, const vk::PhysicalDeviceFeatures& features)
+{
+	//check for antialiasing
+	if (!features.sampleRateShading)
+	{
+		Log(LOG_WARNING) << "Device does not support sample rate shading. Will attempt another device.";
+		return false;
+	}
+
+	return true;
+}
+
 
 void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 {
@@ -412,8 +425,6 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 		deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
 
-	deviceExtensions.push_back(VK_EXT_LINE_RASTERIZATION_EXTENSION_NAME);
-
 	// Finally, create the logical device
 	vk::DeviceCreateInfo deviceCreateInfo{};
 	deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
@@ -433,6 +444,41 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	}
 }
 
+vk::SampleCountFlagBits getMultisampleFlagBits(vk::SampleCountFlags flags)
+{
+	if (flags & vk::SampleCountFlagBits::e1)
+	{
+		return vk::SampleCountFlagBits::e1;
+	}
+	else if (flags & vk::SampleCountFlagBits::e2)
+	{
+		return vk::SampleCountFlagBits::e2;
+	}
+	else if (flags & vk::SampleCountFlagBits::e4)
+	{
+		return vk::SampleCountFlagBits::e4;
+	}
+	else if (flags & vk::SampleCountFlagBits::e8)
+	{
+		return vk::SampleCountFlagBits::e8;
+	}
+	else if (flags & vk::SampleCountFlagBits::e16)
+	{
+		return vk::SampleCountFlagBits::e16;
+	}
+	else if (flags & vk::SampleCountFlagBits::e32)
+	{
+		return vk::SampleCountFlagBits::e32;
+	}
+	else if (flags & vk::SampleCountFlagBits::e64)
+	{
+		return vk::SampleCountFlagBits::e64;
+	}
+	else
+	{
+		throw std::runtime_error("Unsupported sample count");
+	}
+}
 
 
 } // namespace OpenXcom

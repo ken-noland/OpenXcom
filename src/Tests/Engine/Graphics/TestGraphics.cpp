@@ -266,3 +266,29 @@ TEST_F(GraphicsTest, TestOutlineBox)
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "006_game_surface_outline_box_1.png";
 	compareWithBaseline(hostImage, baselinePath);
 }
+
+TEST_F(GraphicsTest, TestOutlineBoxesCorners)
+{
+	std::unique_ptr<BoxOutlinePrimitive> boxOutline[4];
+	boxOutline[0] = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({0, 0}, {40, 40}, 1, _paletteHandle.getHandle());
+	boxOutline[1] = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({279, 0}, {40, 40}, 1, _paletteHandle.getHandle());
+	boxOutline[2] = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({0, 159}, {40, 40}, 1, _paletteHandle.getHandle());
+	boxOutline[3] = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({279, 159}, {40, 40}, 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(boxOutline[0]);
+	ASSERT_TRUE(boxOutline[1]);
+	ASSERT_TRUE(boxOutline[2]);
+	ASSERT_TRUE(boxOutline[3]);
+
+	// draw the line
+	_gameSurface->onRender() << [&boxOutline](GraphicsCommand& command) {
+		boxOutline[0]->draw(command);
+		boxOutline[1]->draw(command);
+		boxOutline[2]->draw(command);
+		boxOutline[3]->draw(command);
+	};
+
+	std::unique_ptr<HostImage> hostImage = captureGameSurface();
+	ASSERT_TRUE(hostImage);
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "007_game_surface_outline_box_corners_1.png";
+	compareWithBaseline(hostImage, baselinePath);
+}

@@ -102,6 +102,8 @@ protected:
 	void selectPhysicalDevice(std::optional<vk::SurfaceKHR> surface);
 	void initializeDevice(std::optional<vk::SurfaceKHR> surface);
 
+	bool checkPhysicalDeviceHasFeatures(const vk::PhysicalDeviceProperties& properties, const vk::PhysicalDeviceFeatures& features);
+
 public:
 	VulkanContext(EngineContext& context);
 	~VulkanContext();

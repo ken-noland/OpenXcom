@@ -52,7 +52,7 @@ const char* defaultVertexLineDrawShaderSource = R"(
 	void main() {
 		// Convert screen coordinates to normalized device coordinates (NDC)
 		ivec2 snappedPosition = inPosition; // Already in integer format
-		vec2 ndc = (((vec2(snappedPosition) + vec2(0.5, 0.5)) / vec2(pushConstants.screenWidth, pushConstants.screenHeight)) * 2.0 - 1.0) * 1.001;
+		vec2 ndc = (((vec2(snappedPosition) + vec2(0.5, 0.5)) / vec2(pushConstants.screenWidth, pushConstants.screenHeight)) * 2.0 - 1.0);
 
 		gl_Position = vec4(ndc, 0.0, 1.0);
 
