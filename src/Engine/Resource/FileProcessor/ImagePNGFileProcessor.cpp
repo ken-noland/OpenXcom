@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,28 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../Handle.h"
-#include <filesystem>
-#include <utility>
 
 namespace OpenXcom
 {
-
-class EngineContext;
-class HostImage;
-class Palette;
-
-class ImageBMPFileProcessor
-{
-protected:
-	EngineContext& _context;
-
-public:
-	ImageBMPFileProcessor(EngineContext& context);
-	~ImageBMPFileProcessor();
-
-	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> load(const std::filesystem::path& filename, bool loadPalette = false);
-	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> load(const uint8_t* buffer, std::size_t size, bool loadPalette = false);
-};
 
 } // namespace OpenXcom

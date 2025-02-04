@@ -47,6 +47,10 @@ ResourceSystem::ResourceSystem(EngineContext& context)
 	_paletteManager = std::make_unique<PaletteManager>(context);
 	_fontManager = std::make_unique<FontManager>();
 	_imageManager = graphicsSystem.createImageManager();
+
+	_imageFileProcessor = std::make_unique<ImageFileProcessor>();
+	_imageBMPFileProcessor = std::make_unique<ImageBMPFileProcessor>(context);
+	_imagePNGFileProcessor = std::make_unique<ImagePNGFileProcessor>();
 }
 
 ResourceSystem::~ResourceSystem()
