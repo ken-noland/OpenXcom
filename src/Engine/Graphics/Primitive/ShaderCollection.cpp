@@ -175,15 +175,26 @@ const char* defaultUVFragmentShaderSource = R"(
 		uint palette[];
 	};
 
+
 	void main() {
-		// Sample the texture; the result's red channel holds the index in normalized form.
-		float indexValue = texture(uImage, fragUV).r;
+		// Sample the indexed image. For an R8 texture, the red channel will contain the index
+		// in normalized form (i.e. in the range [0.0, 1.0]).
+		float indexNormalized = texture(uImage, fragUV).r;
     
-		// If the color index is above 0, output red, else output black.
-		if(indexValue > 0.0)
-			fragColor = vec4(1.0, 0.0, 0.0, 1.0);
-		else
-			fragColor = vec4(0.0, 0.0, 1.0, 1.0);
+		// Convert the normalized value to an integer index.
+		// For an 8-bit channel, multiply by 255 and round.
+		uint index = uint(round(indexNormalized * 255.0));
+
+		// Look up the color in the palette.
+		uint packedColor = palette[index];
+
+		// Unpack the color assuming it is stored as 0xRRGGBBAA.
+		fragColor = vec4(
+			float((packedColor >> 24) & 0xFF) / 255.0,  // Red
+			float((packedColor >> 16) & 0xFF) / 255.0,  // Green
+			float((packedColor >> 8)  & 0xFF) / 255.0,  // Blue
+			float((packedColor >> 0)  & 0xFF) / 255.0   // Alpha
+		);
 	}
 )";
 
