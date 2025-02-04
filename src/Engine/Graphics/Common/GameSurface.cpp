@@ -31,7 +31,7 @@ GameSurface::GameSurface(EngineContext& engine)
 	GraphicsSystem& graphicsSystem = engine.getGraphicsSystem();
 
 	// create a render target for the game surface
-	_renderTarget = graphicsSystem.createRenderTarget({320, 200}, ImageFormat::RGBA8, {0, 0, 0, 1.0f}); // TODO: use game options to define the game surface dimensions
+	_renderTarget = graphicsSystem.createRenderTarget({320, 200}, ImageFormat::R8G8B8A8, {0, 0, 0, 1.0f}); // TODO: use game options to define the game surface dimensions
 }
 
 GameSurface::~GameSurface()

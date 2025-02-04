@@ -116,7 +116,7 @@ protected:
 	{
 		_windowSurface->update();	// render the surface once
 
-		std::unique_ptr<HostImage> hostImage = _engine->getResourceSystem().getImageManager().createHostImage(_gameSurface->getScreenSize(), ImageFormat::RGBA8);
+		std::unique_ptr<HostImage> hostImage = _engine->getResourceSystem().getImageManager().createHostImage(_gameSurface->getScreenSize(), ImageFormat::R8G8B8A8);
 		if (!hostImage)
 		{
 			ADD_FAILURE() << "Failed to create HostImage.";

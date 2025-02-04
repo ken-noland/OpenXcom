@@ -94,6 +94,22 @@ void transitionImageLayout(
 VulkanHostImage::VulkanHostImage(VulkanContext& context, glm::vec2 size, ImageFormat format)
 	: HostImage(ImageType::Texture), _context(context), _format(format), _extent(size)
 {
+	int bytePerPixel = 0;
+	switch(format)
+	{
+	case ImageFormat::R8G8B8A8:
+		bytePerPixel = 4;
+		break;
+	case ImageFormat::R8G8B8:
+		bytePerPixel = 3;
+		break;
+	case ImageFormat::R8:
+		bytePerPixel = 1;
+		break;
+	default:
+		throw std::runtime_error("Unsupported image format.");
+	}
+
 	// Step 1: Define Buffer Create Info
 	vk::BufferCreateInfo bufferInfo{};
 	bufferInfo.size = _extent.x * _extent.y * 4; // Assuming 4 bytes per pixel (RGBA)

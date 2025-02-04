@@ -574,6 +574,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 include(FetchContent)
 
 # Fetch YAML
+message(STATUS "Fetching yaml-cpp")
 FetchContent_Declare(
   yaml-cpp
   GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
@@ -591,6 +592,7 @@ add_custom_target(build_yaml
 
 # Fetch Lua
 #  Lua is used as a scripting language to showcase the script binding capabilities of SimpleRTTR
+message(STATUS "Fetching Lua")
 FetchContent_Declare(
   lua
   GIT_REPOSITORY https://github.com/lua/lua.git
@@ -644,6 +646,7 @@ add_custom_target(build_lua
 
 # Fetch EnTT
 #  EnTT is used as the Entity Component System library for the game
+message(STATUS "Fetching EnTT")
 FetchContent_Declare(
   EnTT
   GIT_REPOSITORY https://github.com/skypjack/entt.git
@@ -653,6 +656,7 @@ FetchContent_MakeAvailable(EnTT)
 
 # Fetch SimpleRTTR
 #  SimpleRTTR is used for reflection in the Entity Component System
+message(STATUS "Fetching SimpleRTTR")
 set(SIMPLERTTR_BUILD_TESTS OFF CACHE BOOL "Build SimpleRTTR Tests and Examples")
 set(SIMPLERTTR_BUILD_EXAMPLES OFF CACHE BOOL "Build SimpleRTTR Tests and Examples")
 FetchContent_Declare(
@@ -664,6 +668,7 @@ FetchContent_MakeAvailable(SimpleRTTR)
 
 # Fetch nlohmann/json
 #  nlohmann/json is used for JSON serialization which is used all over the place
+message(STATUS "Fetching nlohmann/json")
 FetchContent_Declare(
   nlohmann_json
   GIT_REPOSITORY https://github.com/nlohmann/json
@@ -673,6 +678,7 @@ FetchContent_MakeAvailable(nlohmann_json)
 
 # Fetch inja
 #  inja is used for templating for the code generation
+message(STATUS "Fetching Inja")
 FetchContent_Declare(
   inja
   URL https://github.com/pantor/inja/releases/download/v3.4.0/inja.hpp
@@ -682,6 +688,7 @@ FetchContent_MakeAvailable(inja)
 
 # Fetch Dear ImGui
 #  Dear ImGui is used for the entity inspector
+message(STATUS "Fetching Dear ImGui")
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
@@ -705,6 +712,7 @@ target_include_directories(ImGui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/
 
 # Fetch Vulkan-Headers
 #  Vulkan-Headers is used for Vulkan API headers
+message(STATUS "Fetching Vulkan-Headers")
 FetchContent_Declare(
     vulkan_headers
     GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers.git
@@ -714,6 +722,7 @@ FetchContent_MakeAvailable(vulkan_headers)
 
 # Fetch SPIRV-Headers first
 #  SPIRV-Headers is a dependency of SPIRV-Tools
+message(STATUS "Fetching SPIRV-Headers")
 FetchContent_Declare(
     spirv-headers
     GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Headers.git
@@ -724,6 +733,7 @@ FetchContent_MakeAvailable(spirv-headers)
 
 # Fetch SPIRV-Tools
 #  SPIRV-Tools is used for compiling SPIR-V shaders
+message(STATUS "Fetching SPIRV-Tools")
 set(SPIRV_SKIP_TESTS ON CACHE BOOL "" FORCE)
 set(SPIRV_HEADERS_SKIP_INSTALL ON CACHE BOOL "" FORCE)
 set(SPIRV_WERROR OFF CACHE BOOL "" FORCE)
@@ -738,6 +748,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(spirv-tools)
 
 # Fetch glslang
+#  glslang is used for compiling GLSL shaders
+message(STATUS "Fetching glslang")
 set(ENABLE_GLSLANG_BINARIES OFF CACHE BOOL "" FORCE) # Skip building glslangValidator, etc.
 set(ENABLE_SPVREMAPPER OFF CACHE BOOL "" FORCE)
 set(ENABLE_HLSL ON CACHE BOOL "" FORCE) # Optional, depending on if you need HLSL support
@@ -753,6 +765,7 @@ FetchContent_MakeAvailable(glslang)
 
 # Fetch Shaderc
 #  Shaderc is used for compiling GLSL shaders
+message(STATUS "Fetching Shaderc")
 set(SHADERC_SKIP_INSTALL ON CACHE BOOL "Skip building ShaderC install")
 set(SHADERC_SKIP_TESTS ON CACHE BOOL "Skip building ShaderC tests")
 set(SHADERC_SKIP_EXAMPLES ON CACHE BOOL "Skip building ShaderC examples")
@@ -767,6 +780,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(shaderc)
 
 # Fetch GLM
+#  GLM is used for math operations
+message(STATUS "Fetching GLM")
 FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
@@ -777,6 +792,7 @@ FetchContent_MakeAvailable(glm)
 
 # Fetch VulkanMemoryAllocator
 #  VulkanMemoryAllocator is used for managing Vulkan memory
+message(STATUS "Fetching VulkanMemoryAllocator")
 FetchContent_Declare(
     VulkanMemoryAllocator
     GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
@@ -785,6 +801,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(VulkanMemoryAllocator)
 
 # Fetch lodepng
+#  lodepng is used for loading PNG images
+message(STATUS "Fetching lodepng")
 FetchContent_Declare(
     lodepng
     GIT_REPOSITORY https://github.com/lvandeve/lodepng.git
@@ -795,6 +813,20 @@ FetchContent_MakeAvailable(lodepng)
 # Lodepng does not provide a CMake build system, so we need to manually set up the target
 add_library(lodepng STATIC  "${lodepng_SOURCE_DIR}/lodepng.cpp")
 target_include_directories(lodepng PUBLIC ${lodepng_SOURCE_DIR})
+
+# Fetch libbmp
+#  libbmp is used for loading BMP images
+message(STATUS "Fetching libbmp")
+FetchContent_Declare(
+    libbmp
+    GIT_REPOSITORY https://github.com/marc-q/libbmp.git
+    GIT_TAG master  # You can replace this with a specific commit or release tag
+)
+FetchContent_MakeAvailable(libbmp)
+
+# Libbmp does not provide a CMake build system, so we need to manually set up the target
+add_library(libbmp STATIC  "${libbmp_SOURCE_DIR}/libbmp.c")
+target_include_directories(libbmp PUBLIC ${libbmp_SOURCE_DIR})
 
 #--------------------------------
 # set up the defines and includes
@@ -826,6 +858,7 @@ set(openxcom_includes
   ${vulkan_headers_SOURCE_DIR}/include
   ${glslang_SOURCE_DIR}
   ${lodepng_SOURCE_DIR}
+  ${libbmp_SOURCE_DIR}
 )
 
 set(openxcom_libs
@@ -836,6 +869,7 @@ set(openxcom_libs
   glm
   GPUOpen::VulkanMemoryAllocator
   lodepng
+  libbmp
 )
 
 if(UNIX)

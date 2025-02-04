@@ -25,8 +25,10 @@ namespace OpenXcom
 
 enum class ImageFormat
 {
-	UNKNOWN,
-	RGBA8,
+	R8,       // Grayscale or palette index
+	R8G8B8,   // RGB
+	R8G8B8A8, // RGBA
+	UNKNOWN
 };
 
 enum class ImageType
