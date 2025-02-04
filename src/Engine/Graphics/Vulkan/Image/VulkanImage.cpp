@@ -19,6 +19,12 @@
 #include "VulkanImage.h"
 #include "../VulkanContext.h"
 
+#include "../../BufferManager.h"
+#include "../../../EngineContext.h"
+#include "../../../Resource/ResourceSystem.h"
+
+#include "../Buffer/VulkanBuffer.h"
+
 namespace OpenXcom
 {
 
@@ -91,8 +97,8 @@ void transitionImageLayout(
 }
 
 
-VulkanHostImage::VulkanHostImage(VulkanContext& context, glm::vec2 size, ImageFormat format)
-	: HostImage(ImageType::Texture), _context(context), _format(format), _extent(size)
+VulkanHostImage::VulkanHostImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format)
+	: HostImage(ImageType::Texture), _context(context), _format(format), _extent(extent)
 {
 	int bytePerPixel = 0;
 	switch(format)
@@ -112,7 +118,7 @@ VulkanHostImage::VulkanHostImage(VulkanContext& context, glm::vec2 size, ImageFo
 
 	// Step 1: Define Buffer Create Info
 	vk::BufferCreateInfo bufferInfo{};
-	bufferInfo.size = _extent.x * _extent.y * 4; // Assuming 4 bytes per pixel (RGBA)
+	bufferInfo.size = _extent.x * _extent.y * bytePerPixel; // Assuming 4 bytes per pixel (RGBA)
 	bufferInfo.usage = vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst;
 	bufferInfo.sharingMode = vk::SharingMode::eExclusive;
 
@@ -168,7 +174,7 @@ void VulkanHostImage::unmap()
 	vmaUnmapMemory(_context.getAllocator(), _allocation);
 }
 
-VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::vec2 extent, ImageFormat format)
+VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format)
 	: DeviceImage(ImageType::Texture), _context(context), _format(format), _extent(extent), _currentLayout(vk::ImageLayout::eUndefined)
 {
 	// Step 1: Define Image Creation Info
@@ -203,6 +209,10 @@ VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::vec2 extent, I
 	imageViewInfo.subresourceRange.layerCount = 1;
 
 	_imageView = _context.getDevice().createImageView(imageViewInfo);
+
+	// Create the device buffer which contains the image information on GPU
+	BufferManager& bufferManager = _context.getEngineContext().getResourceSystem().getBufferManager();
+	_deviceImageData = bufferManager.createDeviceBuffer<glm::ivec2>(&_extent, 1, BufferUsage::Uniform);
 }
 
 VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, VulkanHostImage& image)

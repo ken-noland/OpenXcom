@@ -27,6 +27,7 @@ namespace OpenXcom
 {
 
 class VulkanContext;
+class DeviceBuffer;
 
 class VulkanHostImage : public HostImage
 {
@@ -41,7 +42,7 @@ protected:
 	ImageFormat _format;
 
 public:
-	VulkanHostImage(VulkanContext& context, glm::vec2 size, ImageFormat format);
+	VulkanHostImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format);
 	virtual ~VulkanHostImage();
 
 	virtual ImageFormat getFormat() const override;
@@ -70,8 +71,11 @@ protected:
 	glm::ivec2 _extent;
 	ImageFormat _format;
 
+	// stores the image data in device memory
+	std::unique_ptr<DeviceBuffer> _deviceImageData;
+
 public:
-	VulkanDeviceImage(VulkanContext& context, glm::vec2 size, ImageFormat format);
+	VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format);
 	VulkanDeviceImage(VulkanContext& context, VulkanHostImage& image);
 	virtual ~VulkanDeviceImage();
 

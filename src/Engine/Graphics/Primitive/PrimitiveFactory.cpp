@@ -20,12 +20,17 @@
 #include "BoxPrimitive.h"
 #include "LinePrimitive.h"
 #include "PointPrimitive.h"
+#include "ImagePrimitive.h"
 
 namespace OpenXcom
 {
 
 PrimitiveFactory::PrimitiveFactory(EngineContext& context, RenderTarget& surface)
-	: _shaders(context), _lineFactory(context, surface, _shaders), _boxFactory(context, surface, _shaders), _pointFactory(context, surface, _shaders)
+	: _shaders(context),
+	  _lineFactory(context, surface, _shaders),
+	  _boxFactory(context, surface, _shaders),
+	  _pointFactory(context, surface, _shaders),
+	  _imageFactory(context, surface, _shaders)
 {
 }
 
@@ -62,6 +67,12 @@ std::unique_ptr<PointColorListPrimitive> PrimitiveFactory::createPointColorListP
 {
 	return _pointFactory.createPointColorListPrimitive(lines, count, paletteHandle);
 }
+
+std::unique_ptr<ImagePrimitive> PrimitiveFactory::createImagePrimitive(glm::ivec2 dst, glm::ivec2 src, glm::ivec2 extents, const ResourceHandle<DeviceImage>& image, const ResourceHandle<Palette>& palette)
+{
+	return _imageFactory.createImagePrimitive(dst, src, extents, image, palette);
+}
+
 
 
 } // namespace OpenXcom

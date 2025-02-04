@@ -24,6 +24,12 @@
 
 #include "../../Primitive/PrimitiveFactory.h"
 
+#include "../../BufferManager.h"
+#include "../../../EngineContext.h"
+#include "../../../Resource/ResourceSystem.h"
+
+#include "../Buffer/VulkanBuffer.h"
+
 namespace OpenXcom
 {
 
@@ -99,6 +105,10 @@ VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 extent
 
 	// need to create the primitives factory
 	_primitiveFactory = std::make_unique<PrimitiveFactory>(_context.getEngineContext(), *this);
+
+	// Create the device buffer which contains the image information on GPU
+	BufferManager& bufferManager = _context.getEngineContext().getResourceSystem().getBufferManager();
+	_deviceImageData = bufferManager.createDeviceBuffer<glm::ivec2>(&_extent, 1, BufferUsage::Uniform);
 }
 
 VulkanRenderTarget::~VulkanRenderTarget()

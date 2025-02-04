@@ -39,7 +39,6 @@ SIMPLERTTR
 		.property(&OpenXcom::BoxVertex::pos, "pos");
 
 	SimpleRTTR::registration().type<OpenXcom::BoxPushConstants>()
-		.property(&OpenXcom::BoxPushConstants::surfaceExtent, "surfaceExtent")
 		.property(&OpenXcom::BoxPushConstants::color, "color");
 }
 
@@ -71,9 +70,10 @@ BoxFilledPrimitive::BoxFilledPrimitive(EngineContext& context, Pipeline& pipelin
 	_vertexBuffer = bufferManager.createDeviceBuffer<BoxVertex>(vertices, 6, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer());
 
-	BoxPushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
+	BoxPushConstants pushConstants{color};
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
 }
 
@@ -109,9 +109,10 @@ BoxOutlinePrimitive::BoxOutlinePrimitive(EngineContext& context, Pipeline& pipel
 	_vertexBuffer = bufferManager.createDeviceBuffer<BoxVertex>(vertices, 5, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer());
 
-	BoxPushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
+	BoxPushConstants pushConstants{color};
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
 }
 

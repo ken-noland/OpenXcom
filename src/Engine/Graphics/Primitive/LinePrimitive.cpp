@@ -39,7 +39,6 @@ SIMPLERTTR
 		.property(&OpenXcom::LineVertex::pos, "pos");
 
 	SimpleRTTR::registration().type<OpenXcom::LinePushConstants>()
-		.property(&OpenXcom::LinePushConstants::surfaceExtent, "surfaceExtent")
 		.property(&OpenXcom::LinePushConstants::color, "color");
 }
 
@@ -61,9 +60,10 @@ LineListPrimitive::LineListPrimitive(EngineContext& context, Pipeline& pipeline,
 	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lines, count, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer());    // bind the palette
 
-	LinePushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
+	LinePushConstants pushConstants{color};
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
 }
 
@@ -90,9 +90,10 @@ LineStripPrimitive::LineStripPrimitive(EngineContext& context, Pipeline& pipelin
 	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lines, count, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer());    // bind the palette
 
-	LinePushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
+	LinePushConstants pushConstants{color};
 	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
 }
 

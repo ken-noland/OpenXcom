@@ -18,10 +18,8 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Primitive.h"
-#include <array>
-#include <memory>
-#include <vector>
 
+#include <memory>
 #include <glm/vec2.hpp>
 
 namespace OpenXcom
@@ -38,46 +36,27 @@ class Palette;
 template <typename ResourceType>
 class ResourceHandle;
 
-struct PointVertex
+struct ImageVertex
 {
 	glm::ivec2 pos;
+	glm::ivec2 uv;
 };
 
-struct PointColorVertex
+struct ImagePushConstants
 {
-	glm::ivec2 pos;
-	int color;
+	glm::ivec2 surfaceExtent; // TODO: temporary until I move the screen extents to a uniform buffer
 };
 
-struct PointPushConstants
-{
-	int color;
-};
-
-class PointListPrimitive : public Primitive
+class ImagePrimitive : public Primitive
 {
 protected:
 	std::unique_ptr<PipelineBinding> _pipelineBinding;
 	std::unique_ptr<DeviceBuffer> _vertexBuffer;
 
 public:
-	PointListPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-					   const PointVertex* points, size_t count, int color, const ResourceHandle<Palette>& paletteHandle);
-	virtual ~PointListPrimitive();
-
-	void draw(GraphicsCommand& command);
-};
-
-class PointColorListPrimitive : public Primitive
-{
-protected:
-	std::unique_ptr<PipelineBinding> _pipelineBinding;
-	std::unique_ptr<DeviceBuffer> _vertexBuffer;
-
-public:
-	PointColorListPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-							const PointColorVertex* points, size_t count, const ResourceHandle<Palette>& paletteHandle);
-	virtual ~PointColorListPrimitive();
+	ImagePrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
+				   glm::ivec2 dstPosition, glm::ivec2 srcPosition, glm::ivec2 size, const ResourceHandle<Palette>& paletteHandle);
+	virtual ~ImagePrimitive();
 
 	void draw(GraphicsCommand& command);
 };

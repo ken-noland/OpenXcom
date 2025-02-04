@@ -48,6 +48,8 @@ private:
 	vk::RenderPass _renderPass;
 	vk::Framebuffer _framebuffer;
 
+	std::unique_ptr<DeviceBuffer> _deviceImageData;
+
 public:
 	VulkanRenderTarget(VulkanContext& context, glm::ivec2 size, ImageFormat format, glm::vec4 color);
 	virtual ~VulkanRenderTarget();
@@ -59,6 +61,9 @@ public:
 		
 	virtual void copyFrom(HostImage& hostImage) override;
 	virtual void copyTo(HostImage& hostImage) override;
+
+	// device buffer for a render target contains the extents of the render target
+	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }
 
 	vk::Image& getImage() { return _image; }
 	const vk::ImageView& getImageView() const { return _imageView; }

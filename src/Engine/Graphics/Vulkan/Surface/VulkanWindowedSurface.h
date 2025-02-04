@@ -67,6 +67,9 @@ protected:
 
 	PlatformWindow& _window;
 	std::unique_ptr<VulkanCommand> _commandContext;
+	
+	// device image data for a render surface contains the extents of the framebuffer
+	std::unique_ptr<DeviceBuffer> _deviceImageData;
 
 	void initializeSwapChain();
 	void destroySwapChain();
@@ -95,6 +98,9 @@ public:
 	virtual uint32_t getHeight() const override;
 
 	virtual glm::ivec2 getExtent() const override;
+		
+	// device image data for a render surface contains the extents of the framebuffer
+	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }; 
 
 	// copy the host image to this device image
 	virtual void copyFrom(HostImage& hostImage) override;

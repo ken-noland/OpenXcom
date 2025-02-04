@@ -47,8 +47,9 @@ BoxPrimitiveFactory::BoxPrimitiveFactory(EngineContext& context, RenderTarget& s
 
 																		// vertex shader stage
 																		.setVertexType<BoxVertex>()
-																		.addStorageBuffer<uint8_t>(ShaderStage::Vertex, 0)      // palette buffer
-																		.addPushConstant<BoxPushConstants>(ShaderStage::Vertex) // push constant for screen width and height
+																		.addPushConstant<BoxPushConstants>(ShaderStage::Vertex) // push constant for color
+																		.addUniformBuffer<glm::ivec2>(ShaderStage::Vertex, 0)    // screen size buffer
+																		.addStorageBuffer<uint8_t>(ShaderStage::Vertex, 1)       // palette buffer
 
 																		.build())
 												 .setVertexShader(shaders.getDefaultVec2VertexShader())
@@ -68,8 +69,9 @@ BoxPrimitiveFactory::BoxPrimitiveFactory(EngineContext& context, RenderTarget& s
 
 																		 // vertex shader stage
 																		 .setVertexType<BoxVertex>()
-																		 .addStorageBuffer<uint8_t>(ShaderStage::Vertex, 0)      // palette buffer
-																		 .addPushConstant<BoxPushConstants>(ShaderStage::Vertex) // push constant for screen width and height
+																		 .addPushConstant<BoxPushConstants>(ShaderStage::Vertex) // push constant for color
+																		 .addUniformBuffer<glm::ivec2>(ShaderStage::Vertex, 0)   // screen size buffer
+																		 .addStorageBuffer<uint8_t>(ShaderStage::Vertex, 1)      // palette buffer
 
 																		 .build())
 												  .setVertexShader(shaders.getDefaultVec2VertexShader())

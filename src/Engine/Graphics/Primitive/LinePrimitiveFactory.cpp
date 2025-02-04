@@ -43,20 +43,21 @@ LinePrimitiveFactory::LinePrimitiveFactory(EngineContext& context, RenderTarget&
 	// line list pipeline
 	PipelineBuilder lineListPipelineBuilder;
 	PipelineDefinition lineListDefinition = lineListPipelineBuilder
-										.setResourceLayout(ResourceLayoutBuilder()
-															   // topology
-															   .setTopology(PrimitiveTopology::LineList)
+												.setResourceLayout(ResourceLayoutBuilder()
+																	   // topology
+																	   .setTopology(PrimitiveTopology::LineList)
 
-															   // vertex shader stage
-															   .setVertexType<LineVertex>()
-															   .addStorageBuffer<uint8_t>(ShaderStage::Vertex, 0)   // palette buffer
-															   .addPushConstant<LinePushConstants>(ShaderStage::Vertex) // push constant for screen width and height
+																	   // vertex shader stage
+																	   .setVertexType<LineVertex>()
+																	   .addPushConstant<LinePushConstants>(ShaderStage::Vertex) // push constant for color
+																	   .addUniformBuffer<glm::ivec2>(ShaderStage::Vertex, 0)    // screen size buffer
+																	   .addStorageBuffer<uint8_t>(ShaderStage::Vertex, 1)       // palette buffer
 
-															   .build())
-										.setVertexShader(shaders.getDefaultVec2VertexShader())
-										.setFragmentShader(shaders.getDefaultFragmentShader())
-										.setRenderTarget(_surface)
-										.build();
+																	   .build())
+												.setVertexShader(shaders.getDefaultVec2VertexShader())
+												.setFragmentShader(shaders.getDefaultFragmentShader())
+												.setRenderTarget(_surface)
+												.build();
 
 	_lineListPipeline = pipelineManager.createPipeline(lineListDefinition);
 
@@ -64,20 +65,21 @@ LinePrimitiveFactory::LinePrimitiveFactory(EngineContext& context, RenderTarget&
 	// line strip pipeline
 	PipelineBuilder lineStripPipelineBuilder;
 	PipelineDefinition lineStripDefinition = lineStripPipelineBuilder
-										.setResourceLayout(ResourceLayoutBuilder()
-															   // topology
-															   .setTopology(PrimitiveTopology::LineStrip)
+												 .setResourceLayout(ResourceLayoutBuilder()
+																		// topology
+																		.setTopology(PrimitiveTopology::LineStrip)
 
-															   // vertex shader stage
-															   .setVertexType<LineVertex>()
-															   .addStorageBuffer<uint8_t>(ShaderStage::Vertex, 0)       // palette buffer
-															   .addPushConstant<LinePushConstants>(ShaderStage::Vertex) // push constant for screen width and height
+																		// vertex shader stage
+																		.setVertexType<LineVertex>()
+																		.addPushConstant<LinePushConstants>(ShaderStage::Vertex) // push constant for color
+																		.addUniformBuffer<glm::ivec2>(ShaderStage::Vertex, 0)    // screen size buffer
+																		.addStorageBuffer<uint8_t>(ShaderStage::Vertex, 1)       // palette buffer
 
-															   .build())
-										.setVertexShader(shaders.getDefaultVec2VertexShader())
-										.setFragmentShader(shaders.getDefaultFragmentShader())
-										.setRenderTarget(_surface)
-										.build();
+																		.build())
+												 .setVertexShader(shaders.getDefaultVec2VertexShader())
+												 .setFragmentShader(shaders.getDefaultFragmentShader())
+												 .setRenderTarget(_surface)
+												 .build();
 
 	_lineStripPipeline = pipelineManager.createPipeline(lineStripDefinition);
 }

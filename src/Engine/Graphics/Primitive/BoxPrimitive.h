@@ -45,7 +45,6 @@ struct BoxVertex
 
 struct BoxPushConstants
 {
-	glm::ivec2 surfaceExtent; // TODO: temporary until I move the screen extents to a uniform buffer
 	int color;
 };
 

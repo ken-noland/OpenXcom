@@ -38,6 +38,9 @@ protected:
 	vk::CommandBuffer _commandBuffer;
 
 	std::unique_ptr<VulkanCommand> _commandContext;
+		
+	// device image data for a render surface contains the extents of the framebuffer
+	std::unique_ptr<DeviceBuffer> _deviceImageData;
 
 public:
 	VulkanHeadlessSurface(VulkanContext& context);
@@ -48,6 +51,9 @@ public:
 
 	virtual glm::ivec2 getExtent() const override { return {0, 0}; }
 	virtual ImageFormat getFormat() const override { return ImageFormat::UNKNOWN; }
+
+	// device image data for a render surface contains the extents of the framebuffer
+	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }
 
 	virtual void copyFrom(HostImage& hostImage) override;
 	virtual void copyTo(HostImage& hostImage) override;

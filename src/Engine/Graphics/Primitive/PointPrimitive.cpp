@@ -44,11 +44,7 @@ SIMPLERTTR
 		.property(&OpenXcom::PointColorVertex::color, "color");
 
 	SimpleRTTR::registration().type<OpenXcom::PointPushConstants>()
-		.property(&OpenXcom::PointPushConstants::surfaceExtent, "surfaceExtent")
 		.property(&OpenXcom::PointPushConstants::color, "color");
-
-	SimpleRTTR::registration().type<OpenXcom::PointColorPushConstants>()
-		.property(&OpenXcom::PointColorPushConstants::surfaceExtent, "surfaceExtent");
 }
 
 namespace OpenXcom
@@ -67,10 +63,11 @@ PointListPrimitive::PointListPrimitive(EngineContext& context, Pipeline& pipelin
 	_vertexBuffer = bufferManager.createDeviceBuffer<PointVertex>(points, count, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData());	// bind the surface extents
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer());
 
-	PointPushConstants pushConstants = {glm::ivec2(surface.getExtent()), color};
-	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
+	PointPushConstants pushConstants{color};
+	_pipelineBinding->setPushConstant<PointPushConstants>(ShaderStage::Vertex, pushConstants);
 }
 
 PointListPrimitive::~PointListPrimitive()
@@ -96,10 +93,8 @@ PointColorListPrimitive::PointColorListPrimitive(EngineContext& context, Pipelin
 	_vertexBuffer = bufferManager.createDeviceBuffer<PointColorVertex>(points, count, BufferUsage::Vertex);
 	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
 
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, palette.getDeviceBuffer());
-
-	PointColorPushConstants pushConstants = {glm::ivec2(surface.getExtent())};
-	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer());
 }
 
 PointColorListPrimitive::~PointColorListPrimitive()

@@ -36,19 +36,25 @@ const char* defaultVec2VertexShaderSource = R"(
 	layout(location = 0) out vec4 fragColor;  // Output color
 
 	layout(push_constant) uniform PushConstants {
-		int screenWidth;    //TODO: Move to uniform buffer
-		int screenHeight;   //TODO: Move to uniform buffer
 		int paletteColor;
 	} pushConstants;
 
-	layout(set = 0, binding = 0, std430) buffer Palette {
-		uint colors[];     // Dynamically sized palette
+	// Uniform buffer for screen dimensions (set 0, binding 0)
+	layout(set = 0, binding = 0, std140) uniform ScreenInfo {
+		int screenWidth;
+		int screenHeight;
+	} screenInfo;
+
+	// Buffer for palette colors (set 0, binding 1)
+	layout(set = 0, binding = 1, std430) buffer Palette {
+		uint colors[];
 	};
 
 	void main() {
 		// Convert screen coordinates to normalized device coordinates (NDC)
 		ivec2 snappedPosition = inPosition; // Already in integer format
-		vec2 ndc = (((vec2(snappedPosition) + vec2(0.5, 0.5)) / vec2(pushConstants.screenWidth, pushConstants.screenHeight)) * 2.0 - 1.0);
+		vec2 ndc = (((vec2(snappedPosition) + vec2(0.5, 0.5)) / 
+					vec2(screenInfo.screenWidth, screenInfo.screenHeight)) * 2.0 - 1.0);
 
 		gl_Position = vec4(ndc, 0.0, 1.0);
 
@@ -69,21 +75,24 @@ const char* defaultVec2ColorVertexShaderSource = R"(
 	layout(location = 0) in ivec2 inPosition;  // Input as signed integers
 	layout(location = 1) in uint inColor;      // Input color
 
-	layout(location = 0) out vec4 fragColor;  // Output color
+	layout(location = 0) out vec4 fragColor;     // Output color
 
-	layout(push_constant) uniform PushConstants {
-		int screenWidth;    //TODO: Move to uniform buffer
-		int screenHeight;   //TODO: Move to uniform buffer
-	} pushConstants;
+	// Uniform buffer for screen dimensions (set 0, binding 0)
+	layout(set = 0, binding = 0, std140) uniform ScreenInfo {
+		int screenWidth;
+		int screenHeight;
+	} screenInfo;
 
-	layout(set = 0, binding = 0, std430) buffer Palette {
-		uint colors[];     // Dynamically sized palette
+	// Buffer for palette colors (set 0, binding 1)
+	layout(set = 0, binding = 1, std430) buffer Palette {
+		uint colors[];
 	};
 
 	void main() {
 		// Convert screen coordinates to normalized device coordinates (NDC)
 		ivec2 snappedPosition = inPosition; // Already in integer format
-		vec2 ndc = (((vec2(snappedPosition) + vec2(0.5, 0.5)) / vec2(pushConstants.screenWidth, pushConstants.screenHeight)) * 2.0 - 1.0);
+		vec2 ndc = (((vec2(snappedPosition) + vec2(0.5, 0.5)) / 
+					vec2(screenInfo.screenWidth, screenInfo.screenHeight)) * 2.0 - 1.0);
 
 		gl_Position = vec4(ndc, 0.0, 1.0);
 

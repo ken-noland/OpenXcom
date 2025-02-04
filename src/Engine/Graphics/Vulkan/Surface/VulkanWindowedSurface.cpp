@@ -31,6 +31,13 @@
 #include "../../../Logger.h"
 #include "../../../Utility/RTTR.h"
 
+#include "../../../EngineContext.h"
+#include "../../../Resource/ResourceSystem.h"
+#include "../../BufferManager.h"
+
+#include "../Buffer/VulkanBuffer.h"
+
+
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <glm/vec2.hpp>
@@ -53,6 +60,11 @@ VulkanWindowedSurface::VulkanWindowedSurface(VulkanContext& context, PlatformWin
 	window.onResize() << std::bind(&VulkanWindowedSurface::handleResize, this);
 
 	_commandContext = std::make_unique<VulkanCommand>(_context);
+
+	// Create the device buffer which contains the image information on GPU
+	BufferManager& bufferManager = _context.getEngineContext().getResourceSystem().getBufferManager();
+	glm::ivec2 extent = getExtent();
+	_deviceImageData = bufferManager.createDeviceBuffer<glm::ivec2>(&extent, 1, BufferUsage::Uniform);
 }
 
 VulkanWindowedSurface::~VulkanWindowedSurface()
@@ -247,7 +259,11 @@ void VulkanWindowedSurface::destroySwapChain()
 	_frames.clear();
 
 	// reset the command pool
-	_context.getDevice().destroyCommandPool(_commandPool);
+	if (_commandPool)
+	{
+		_context.getDevice().destroyCommandPool(_commandPool);
+		_commandPool = nullptr;
+	}
 
 	// destroy the render pass
 	if (_renderPass)

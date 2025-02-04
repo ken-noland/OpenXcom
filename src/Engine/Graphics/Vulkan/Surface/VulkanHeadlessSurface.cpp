@@ -20,6 +20,12 @@
 #include "../VulkanContext.h"
 #include "../VulkanCommand.h"
 
+#include "../../../EngineContext.h"
+#include "../../../Resource/ResourceSystem.h"
+#include "../../BufferManager.h"
+
+#include "../Buffer/VulkanBuffer.h"
+
 #include <stdexcept>
 
 namespace OpenXcom
@@ -45,6 +51,11 @@ VulkanHeadlessSurface::VulkanHeadlessSurface(VulkanContext& context)
 
 	_commandContext = std::make_unique<VulkanCommand>(_context);
 	_commandContext->setCommandBuffer(_commandBuffer);
+
+		// Create the device buffer which contains the image information on GPU
+	BufferManager& bufferManager = _context.getEngineContext().getResourceSystem().getBufferManager();
+	glm::ivec2 extent(-1, -1);
+	_deviceImageData = bufferManager.createDeviceBuffer<glm::ivec2>(&extent, 1, BufferUsage::Uniform);
 }
 
 VulkanHeadlessSurface::~VulkanHeadlessSurface()

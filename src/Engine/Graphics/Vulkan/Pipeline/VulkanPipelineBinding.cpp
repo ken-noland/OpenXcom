@@ -113,6 +113,20 @@ void VulkanPipelineBinding::setUniformBuffer(ShaderStage stage, uint32_t binding
 		uniformBuffers.resize(binding + 1);
 	}
 
+	vk::DescriptorType descriptorType;
+	if(buffer.getUsage() == BufferUsage::Uniform)
+	{
+		descriptorType = vk::DescriptorType::eUniformBuffer;
+	}
+	else if (buffer.getUsage() == BufferUsage::Storage)
+	{
+		descriptorType = vk::DescriptorType::eStorageBuffer;
+	}
+	else
+	{
+		throw new std::runtime_error("Invalid buffer usage");
+	}
+
 	const VulkanDeviceBuffer& vulkanBuffer = static_cast<const VulkanDeviceBuffer&>(buffer);
 	uniformBuffers[binding] = vulkanBuffer;
 
@@ -125,7 +139,7 @@ void VulkanPipelineBinding::setUniformBuffer(ShaderStage stage, uint32_t binding
 	descriptorWrite.dstSet = _descriptorSet->getDescriptorSet();          // Target descriptor set
 	descriptorWrite.dstBinding = binding;                                 // Binding index in the shader
 	descriptorWrite.dstArrayElement = 0;                                  // First array element to update
-	descriptorWrite.descriptorType = vk::DescriptorType::eStorageBuffer;  // Uniform buffer
+	descriptorWrite.descriptorType = descriptorType;                      // Uniform buffer
 	descriptorWrite.descriptorCount = 1;                                  // Number of descriptors to update
 	descriptorWrite.pBufferInfo = &bufferInfo;                            // Buffer info to bind
 

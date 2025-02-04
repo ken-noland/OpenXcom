@@ -47,8 +47,9 @@ PointPrimitiveFactory::PointPrimitiveFactory(EngineContext& context, RenderTarge
 
 																		// vertex shader stage
 																		.setVertexType<PointVertex>()
-																		.addStorageBuffer<uint8_t>(ShaderStage::Vertex, 0)      // palette buffer
-																		.addPushConstant<PointPushConstants>(ShaderStage::Vertex) // push constant for screen width and height
+																		.addPushConstant<PointPushConstants>(ShaderStage::Vertex) // push constant for color
+																		.addUniformBuffer<glm::ivec2>(ShaderStage::Vertex, 0) // screen size buffer
+																		.addStorageBuffer<uint8_t>(ShaderStage::Vertex, 1)    // palette buffer
 
 																		.build())
 												 .setVertexShader(shaders.getDefaultVec2VertexShader())
@@ -63,20 +64,20 @@ PointPrimitiveFactory::PointPrimitiveFactory(EngineContext& context, RenderTarge
 	// point color list pipeline
 	PipelineBuilder pointColorListPipelineBuilder;
 	PipelineDefinition pointColorListDefinition = pointColorListPipelineBuilder
-												 .setResourceLayout(ResourceLayoutBuilder()
-																		// topology
-																		.setTopology(PrimitiveTopology::PointList)
+													  .setResourceLayout(ResourceLayoutBuilder()
+																			 // topology
+																			 .setTopology(PrimitiveTopology::PointList)
 
-																		// vertex shader stage
-																		.setVertexType<PointColorVertex>()
-																		.addStorageBuffer<uint8_t>(ShaderStage::Vertex, 0)        // palette buffer
-																		.addPushConstant<PointColorPushConstants>(ShaderStage::Vertex) // push constant for screen width and height
+																			 // vertex shader stage
+																			 .setVertexType<PointColorVertex>()
+																			 .addUniformBuffer<glm::ivec2>(ShaderStage::Vertex, 0) // screen size buffer
+																			 .addStorageBuffer<uint8_t>(ShaderStage::Vertex, 1)    // palette buffer
 
-																		.build())
-												 .setVertexShader(shaders.getDefaultVec2ColorVertexShader())
-												 .setFragmentShader(shaders.getDefaultFragmentShader())
-												 .setRenderTarget(_surface)
-												 .build();
+																			 .build())
+													  .setVertexShader(shaders.getDefaultVec2ColorVertexShader())
+													  .setFragmentShader(shaders.getDefaultFragmentShader())
+													  .setRenderTarget(_surface)
+													  .build();
 
 	_pointColorListPipeline = pipelineManager.createPipeline(pointColorListDefinition);
 }
