@@ -169,34 +169,139 @@ bool FORCE_REGENERATE_BASELINE = false;
 }
 
 
-// Function to read a BMP header from an in-memory buffer.
-bool readBMPHeader(const unsigned char* buffer, size_t bufferSize, bmp_header& header)
+// Base template (will never be used directly)
+template <int Bits>
+struct PixelUnpacker
 {
-	// First, ensure there are at least 2 bytes for the magic and enough for the header.
-	if (bufferSize < 2 + sizeof(bmp_header))
+	// Unpack from BMP's pixel data into dst (host image buffer).
+	// rowBytes: the number of bytes per row in the BMP data (not including padding)
+	// padding: the extra bytes at the end of each row.
+	// bottomUp: whether the image is stored bottom-up.
+	static void unpack(const unsigned char* pixelData, int width, int height,
+					   int rowBytes, int padding, bool bottomUp, uint8_t* dst)
 	{
-		std::cerr << "Buffer too small for BMP header." << std::endl;
-		return false;
+		static_assert(Bits == 1 || Bits == 4 || Bits == 8 || Bits == 24 || Bits == 32,
+					  "Unsupported bit depth.");
 	}
+};
 
-	// Read the magic value from the first 2 bytes.
-	unsigned short magic;
-	std::memcpy(&magic, buffer, sizeof(magic));
-
-	// Verify the magic matches BMP_MAGIC.
-	if (magic != BMP_MAGIC)
+// Specialization for 1-bit images (unpack into one byte per pixel holding a palette index).
+template <>
+struct PixelUnpacker<1>
+{
+	static void unpack(const unsigned char* pixelData, int width, int height,
+					   int rowBytes, int padding, bool bottomUp, uint8_t* dst)
 	{
-		std::cerr << "Invalid BMP magic. Expected 0x" << std::hex << BMP_MAGIC
-				  << " but got 0x" << magic << std::dec << std::endl;
-		return false;
+		// Each row in the BMP is rowBytes (computed as (width+7)/8) plus 'padding' bytes.
+		for (int row = 0; row < height; row++)
+		{
+			int actualRow = bottomUp ? (height - 1 - row) : row;
+			const unsigned char* rowPtr = pixelData + actualRow * (rowBytes + padding);
+			for (int col = 0; col < width; col++)
+			{
+				int byteIndex = col / 8;
+				int bitIndex = 7 - (col % 8); // BMP uses MSB first.
+				uint8_t bit = (rowPtr[byteIndex] >> bitIndex) & 0x01;
+				dst[row * width + col] = bit;
+			}
+		}
 	}
+};
 
-	// Copy the rest of the header (after the 2-byte magic).
-	std::memcpy(&header, buffer + 2, sizeof(bmp_header));
+// Specialization for 4-bit images (each byte contains 2 pixels).
+template <>
+struct PixelUnpacker<4>
+{
+	static void unpack(const unsigned char* pixelData, int width, int height,
+					   int rowBytes, int padding, bool bottomUp, uint8_t* dst)
+	{
+		// rowBytes is (width + 1)/2.
+		for (int row = 0; row < height; row++)
+		{
+			int actualRow = bottomUp ? (height - 1 - row) : row;
+			const unsigned char* rowPtr = pixelData + actualRow * (rowBytes + padding);
+			int dstIndex = row * width;
+			for (int col = 0; col < width; col++)
+			{
+				int byteIndex = col / 2;
+				bool highNibble = (col % 2 == 0);
+				uint8_t nibble = highNibble ? (rowPtr[byteIndex] >> 4) & 0x0F
+											: rowPtr[byteIndex] & 0x0F;
+				dst[dstIndex + col] = nibble;
+			}
+		}
+	}
+};
 
-	return true;
+// Specialization for 8-bit images (direct copy, one byte per pixel).
+template <>
+struct PixelUnpacker<8>
+{
+	static void unpack(const unsigned char* pixelData, int width, int height,
+					   int rowBytes, int padding, bool bottomUp, uint8_t* dst)
+	{
+		// For 8-bit images, rowBytes equals the width.
+		for (int row = 0; row < height; row++)
+		{
+			int actualRow = bottomUp ? (height - 1 - row) : row;
+			const unsigned char* srcRow = pixelData + actualRow * (rowBytes + padding);
+			std::memcpy(dst + row * width, srcRow, width);
+		}
+	}
+};
 
-}
+// Specialization for 24-bit images (BGR to RGB conversion).
+template <>
+struct PixelUnpacker<24>
+{
+	static void unpack(const unsigned char* pixelData, int width, int height,
+					   int rowBytes, int padding, bool bottomUp, uint8_t* dst)
+	{
+		// For 24-bit, each pixel is 3 bytes.
+		int bytesPerPixel = 3;
+		for (int row = 0; row < height; row++)
+		{
+			int actualRow = bottomUp ? (height - 1 - row) : row;
+			const unsigned char* srcRow = pixelData + actualRow * (rowBytes + padding);
+			uint8_t* dstRow = dst + row * width * bytesPerPixel;
+			for (int col = 0; col < width; col++)
+			{
+				const unsigned char* srcPixel = srcRow + col * bytesPerPixel;
+				// BMP stores pixels as BGR; convert to RGB.
+				dstRow[col * 3 + 0] = srcPixel[2];
+				dstRow[col * 3 + 1] = srcPixel[1];
+				dstRow[col * 3 + 2] = srcPixel[0];
+			}
+		}
+	}
+};
+
+// Specialization for 32-bit images (BGRA to RGBA conversion).
+template <>
+struct PixelUnpacker<32>
+{
+	static void unpack(const unsigned char* pixelData, int width, int height,
+					   int rowBytes, int padding, bool bottomUp, uint8_t* dst)
+	{
+		// For 32-bit, each pixel is 4 bytes.
+		int bytesPerPixel = 4;
+		for (int row = 0; row < height; row++)
+		{
+			int actualRow = bottomUp ? (height - 1 - row) : row;
+			const unsigned char* srcRow = pixelData + actualRow * (rowBytes + padding);
+			uint8_t* dstRow = dst + row * width * bytesPerPixel;
+			for (int col = 0; col < width; col++)
+			{
+				const unsigned char* srcPixel = srcRow + col * bytesPerPixel;
+				// BMP typically stores as BGRA.
+				dstRow[col * 4 + 0] = srcPixel[2];
+				dstRow[col * 4 + 1] = srcPixel[1];
+				dstRow[col * 4 + 2] = srcPixel[0];
+				dstRow[col * 4 + 3] = srcPixel[3];
+			}
+		}
+	}
+};
 
 using namespace OpenXcom;
 
@@ -262,178 +367,123 @@ protected:
 	 * 3. Converts the pixel data into RGBA8 format (using the palette if necessary).
 	 * 4. Creates a HostImage via the engine's ImageManager and fills it with the converted data.
 	 */
-	std::pair<PaletteManager::OwningHandle, std::unique_ptr<HostImage>>
+	std::pair<OwningHandle<Palette>, OwningHandle<HostImage>>
 		loadBMPAsHostImage(const unsigned char* bmpBuffer, bool loadPalette)
 	{
-		// First, verify that the magic number matches.
+		// Verify magic.
 		unsigned short magic;
 		std::memcpy(&magic, bmpBuffer, sizeof(magic));
 		if (magic != BMP_MAGIC)
 		{
-			// Handle error (for example, by returning a pair of nullptrs).
-			return {PaletteManager::OwningHandle(), nullptr};
+			return {OwningHandle<Palette>(), OwningHandle<HostImage>()};
 		}
 
-		// Read the BMP header (which starts immediately after the 2-byte magic).
+		// Read header.
 		bmp_header header;
 		std::memcpy(&header, bmpBuffer + 2, sizeof(bmp_header));
-
-		// Extract image dimensions.
 		int width = header.biWidth;
 		int height = std::abs(header.biHeight);
+		bool bottomUp = (header.biHeight > 0);
 
-		ImageFormat hostFormat = ImageFormat::R8;
-		if (header.biBitCount > 8)
-		{
-			hostFormat = ImageFormat::R8G8B8A8;
-		}
-
-		// Optionally extract the palette.
 		PaletteManager::OwningHandle paletteHandle;
-		if (loadPalette && hostFormat == ImageFormat::R8)
+		if (header.biBitCount <= 8 && loadPalette)
 		{
-			// The palette immediately follows the header.
+			// Load palette (same as before).
 			size_t paletteOffset = 2 + sizeof(bmp_header);
-			// For 1-bit images, if biClrUsed is 0 then use 2 entries.
 			unsigned int numEntries = header.biClrUsed ? header.biClrUsed : (1 << header.biBitCount);
-
-			std::vector<PackedColor> palette;
-			palette.resize(numEntries);
-
-			// Each palette entry is 4 bytes: Blue, Green, Red, Reserved.
+			std::vector<PackedColor> palette(numEntries);
 			for (unsigned int i = 0; i < numEntries; i++)
 			{
 				const unsigned char* entryPtr = bmpBuffer + paletteOffset + i * 4;
 				uint8_t red = entryPtr[2];
 				uint8_t green = entryPtr[1];
 				uint8_t blue = entryPtr[0];
-
-				// Reserved byte is unused; we assume fully opaque.
 				uint8_t alpha = 255;
-
-				// Pack as 0xRRGGBBAA.
 				uint32_t packedColor = (red << 24) | (green << 16) | (blue << 8) | (alpha);
 				palette[i] = packedColor;
 			}
-
 			PaletteManager& paletteManager = _engine->getEngineContext().getResourceSystem().getPaletteManager();
 			paletteHandle = paletteManager.createPalette("BMP", palette.data(), numEntries);
 		}
 
-
-
-		// Create a HostImage with a greyscale format (1 byte per pixel).
-		// (Assume GRAY8 means 8-bit per pixel.)
+		// Create a HostImage with an appropriate image format.
 		glm::ivec2 imageSize(width, height);
 		ImageManager& imageManager = _engine->getEngineContext().getResourceSystem().getImageManager();
-		std::unique_ptr<HostImage> hostImage = imageManager.createHostImage(imageSize, hostFormat);
-		if (!hostImage)
+		ImageFormat format;
+		int bytesPerPixelFile = 0;
+		switch (header.biBitCount)
 		{
-			return {PaletteManager::OwningHandle(), nullptr};
+		case 1:
+		case 4:
+		case 8:
+			format = ImageFormat::R8;
+			bytesPerPixelFile = 1; // Not per-pixel in the file, but we'll unpack into one byte per pixel.
+			break;
+		case 24:
+			format = ImageFormat::R8G8B8;
+			bytesPerPixelFile = 3;
+			break;
+		case 32:
+			format = ImageFormat::R8G8B8A8;
+			bytesPerPixelFile = 4;
+			break;
+		default:
+			throw std::runtime_error("Unsupported bit depth");
 		}
+		OwningHandle<HostImage> hostImageHandle = imageManager.createHostImage(imageSize, format);
+		if (!hostImageHandle.isValid())
+		{
+			return {OwningHandle<Palette>(), OwningHandle<HostImage>()};
+		}
+		HostImage& hostImage = hostImageHandle.get();
 
-		// Map the HostImage so we can fill its contents.
-		uint8_t* dstImageData = static_cast<uint8_t*>(hostImage->map());
 
-		// Pointer to the BMP pixel data.
-		const unsigned char* pixelData = bmpBuffer + header.bfOffBits;
-		bool bottomUp = (header.biHeight > 0);
+		uint8_t* dstImageData = static_cast<uint8_t*>(hostImage.map());
 
+		// Compute row sizes and padding from the file.
+		int rowBytesFile = 0;
 		if (header.biBitCount <= 8)
 		{
-			// For indexed images (e.g. 1, 4, 8 bits):
-			// We'll convert the packed bit/pixel data into one byte per pixel.
-			// For simplicity, here we show the 1-bit case.
+			// For 1-bit: rowBytes = (width+7)/8; for 4-bit: (width+1)/2; for 8-bit: width.
 			if (header.biBitCount == 1)
-			{
-				int rowSizeBytes = (width + 7) / 8;
-				int padding = (4 - (rowSizeBytes % 4)) % 4;
-
-				for (int row = 0; row < height; row++)
-				{
-					int actualRow = bottomUp ? (height - 1 - row) : row;
-					const unsigned char* rowPtr = pixelData + actualRow * (rowSizeBytes + padding);
-
-					for (int col = 0; col < width; col++)
-					{
-						int byteIndex = col / 8;
-						int bitIndex = 7 - (col % 8);
-						uint8_t bit = (rowPtr[byteIndex] >> bitIndex) & 0x01;
-						dstImageData[row * width + col] = bit * 255;
-					}
-				}
-			}
+				rowBytesFile = (width + 7) / 8;
 			else if (header.biBitCount == 4)
-			{
-				// For 4-bit images, each byte packs two pixels.
-				int rowSizeBytes = (width + 1) / 2;
-				int padding = (4 - (rowSizeBytes % 4)) % 4;
-
-				for (int row = 0; row < height; row++)
-				{
-					int actualRow = bottomUp ? (height - 1 - row) : row;
-					const unsigned char* rowPtr = pixelData + actualRow * (rowSizeBytes + padding);
-
-					for (int col = 0; col < width; col++)
-					{
-						int byteIndex = col / 2;
-						uint8_t value;
-						if (col % 2 == 0)
-							value = rowPtr[byteIndex] >> 4;
-						else
-							value = rowPtr[byteIndex] & 0x0F;
-						dstImageData[row * width + col] = value;
-					}
-				}
-			}
-			else if (header.biBitCount == 8)
-			{
-				// For 8-bit images, each pixel is one byte.
-				int padding = (4 - (width % 4)) % 4;
-				for (int row = 0; row < height; row++)
-				{
-					int actualRow = bottomUp ? (height - 1 - row) : row;
-					const unsigned char* rowPtr = pixelData + actualRow * (width + padding);
-					std::memcpy(dstImageData + row * width, rowPtr, width);
-				}
-			}
+				rowBytesFile = (width + 1) / 2;
+			else // 8-bit
+				rowBytesFile = width;
 		}
 		else
 		{
-			// For truecolor images (e.g., 24-bit or 32-bit).
-			// The row size in the file is based on the bit count.
-			int bytesPerPixel = header.biBitCount / 8;
-			int rowSizeBytes = width * bytesPerPixel;
-			// Rows are padded to a multiple of 4 bytes.
-			int padding = (4 - (rowSizeBytes % 4)) % 4;
-
-			// Here we assume the BMP is stored in BGR format (or BGRA for 32-bit).
-			// We'll convert each pixel into RGBA8.
-			for (int row = 0; row < height; row++)
-			{
-				int actualRow = bottomUp ? (height - 1 - row) : row;
-				const unsigned char* rowPtr = pixelData + actualRow * (rowSizeBytes + padding);
-				for (int col = 0; col < width; col++)
-				{
-					const unsigned char* pixelPtr = rowPtr + col * bytesPerPixel;
-					uint8_t blue = pixelPtr[0];
-					uint8_t green = pixelPtr[1];
-					uint8_t red = pixelPtr[2];
-					uint8_t alpha = (bytesPerPixel == 4) ? pixelPtr[3] : 255;
-					// Write into dstImageData in RGBA order.
-					int dstIndex = (row * width + col) * 4;
-					dstImageData[dstIndex + 0] = red;
-					dstImageData[dstIndex + 1] = green;
-					dstImageData[dstIndex + 2] = blue;
-					dstImageData[dstIndex + 3] = alpha;
-				}
-			}
+			rowBytesFile = width * bytesPerPixelFile;
 		}
+		int padding = (4 - (rowBytesFile % 4)) % 4;
+		const unsigned char* pixelData = bmpBuffer + header.bfOffBits;
 
-		hostImage->unmap();
+		// Call the appropriate unpacker based on bit depth.
+		switch (header.biBitCount)
+		{
+		case 1:
+			PixelUnpacker<1>::unpack(pixelData, width, height, rowBytesFile, padding, bottomUp, dstImageData);
+			break;
+		case 4:
+			PixelUnpacker<4>::unpack(pixelData, width, height, rowBytesFile, padding, bottomUp, dstImageData);
+			break;
+		case 8:
+			PixelUnpacker<8>::unpack(pixelData, width, height, rowBytesFile, padding, bottomUp, dstImageData);
+			break;
+		case 24:
+			PixelUnpacker<24>::unpack(pixelData, width, height, rowBytesFile, padding, bottomUp, dstImageData);
+			break;
+		case 32:
+			PixelUnpacker<32>::unpack(pixelData, width, height, rowBytesFile, padding, bottomUp, dstImageData);
+			break;
+		default:
+			// Should not reach here.
+			break;
+		}
+		hostImage.unmap();
 
-
-		return {std::move(paletteHandle), std::move(hostImage)};
+		return {std::move(paletteHandle), std::move(hostImageHandle)};
 	}
 
 	/**
@@ -441,27 +491,28 @@ protected:
 	 *
 	 * This function is largely the same as in GraphicsTest, but now is applied to our BMP test.
 	 */
-	void compareWithBaseline(const std::unique_ptr<HostImage>& hostImage, const std::filesystem::path& baselinePath)
+	void compareWithBaseline(const OwningHandle<HostImage>& hostImageHandle, const std::filesystem::path& baselinePath)
 	{
-		const uint8_t* pixels = static_cast<const uint8_t*>(hostImage->map());
+		HostImage& hostImage = hostImageHandle.get();
+		const uint8_t* pixels = static_cast<const uint8_t*>(hostImage.map());
 
 		// Generate a baseline if it doesn't exist
 		if (!std::filesystem::exists(baselinePath) || FORCE_REGENERATE_BASELINE)
 		{
 			unsigned error = 0;
-			if (hostImage->getFormat() == ImageFormat::R8)
+			if (hostImage.getFormat() == ImageFormat::R8)
 			{
-				error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage->getWidth(), hostImage->getHeight(),
+				error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage.getWidth(), hostImage.getHeight(),
 										LodePNGColorType::LCT_GREY, 8);
 			}
-			else if (hostImage->getFormat() == ImageFormat::R8G8B8)
+			else if (hostImage.getFormat() == ImageFormat::R8G8B8)
 			{
-				error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage->getWidth(), hostImage->getHeight(),
+				error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage.getWidth(), hostImage.getHeight(),
 										LodePNGColorType::LCT_RGB, 8);
 			}
-			else if (hostImage->getFormat() == ImageFormat::R8G8B8A8)
+			else if (hostImage.getFormat() == ImageFormat::R8G8B8A8)
 			{
-				error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage->getWidth(), hostImage->getHeight(),
+				error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage.getWidth(), hostImage.getHeight(),
 										LodePNGColorType::LCT_RGBA, 8);
 			}
 			else
@@ -473,40 +524,70 @@ protected:
 		}
 		else
 		{
-			// Load the baseline image
+			// Determine the expected LodePNG color type and number of channels based on the HostImage format.
+			LodePNGColorType decodeColorType;
+			unsigned expectedChannels = 0;
+			if (hostImage.getFormat() == ImageFormat::R8)
+			{
+				decodeColorType = LCT_GREY;
+				expectedChannels = 1;
+			}
+			else if (hostImage.getFormat() == ImageFormat::R8G8B8)
+			{
+				decodeColorType = LCT_RGB;
+				expectedChannels = 3;
+			}
+			else if (hostImage.getFormat() == ImageFormat::R8G8B8A8)
+			{
+				decodeColorType = LCT_RGBA;
+				expectedChannels = 4;
+			}
+			else
+			{
+				FAIL() << "Unsupported image format.";
+			}
+
+			// Load the baseline image with the appropriate color type.
 			std::vector<unsigned char> baseline;
 			uint32_t width = 0, height = 0;
-
-			unsigned error = lodepng::decode(baseline, width, height, baselinePath.string().c_str());
+			unsigned error = lodepng::decode(baseline, width, height, baselinePath.string().c_str(), decodeColorType, 8);
 			EXPECT_EQ(error, 0) << "Failed to load baseline image.";
 
-			// Compare dimensions
-			ASSERT_EQ(width, hostImage->getExtent().x) << "Image width mismatch.";
-			ASSERT_EQ(height, hostImage->getExtent().y) << "Image height mismatch.";
+			// Compare dimensions.
+			ASSERT_EQ(width, hostImage.getExtent().x) << "Image width mismatch.";
+			ASSERT_EQ(height, hostImage.getExtent().y) << "Image height mismatch.";
 
-			// Compare pixel data
-			ASSERT_EQ(baseline.size(), hostImage->getExtent().x * hostImage->getExtent().y * 4) << "Image data size mismatch.";
-			for (size_t i = 0; i < baseline.size(); ++i)
+			// Compute the expected data size.
+			size_t expectedDataSize = hostImage.getExtent().x * hostImage.getExtent().y * expectedChannels;
+			ASSERT_EQ(baseline.size(), expectedDataSize) << "Image data size mismatch.";
+
+			// Assume 'pixels' is the pointer to the HostImage data.
+			for (size_t i = 0; i < baseline.size(); i += expectedChannels)
 			{
-				std::size_t x = (i / 4) % hostImage->getExtent().x;
-				std::size_t y = (i / 4) / hostImage->getExtent().x;
-				ASSERT_EQ(baseline[i], pixels[i]) << "Pixel mismatch at index " << i << " (x=" << x << " y=" << y << ")";
+				// Compute pixel coordinate (optional, for better error messages).
+				std::size_t pixelIndex = i / expectedChannels;
+				std::size_t x = pixelIndex % hostImage.getExtent().x;
+				std::size_t y = pixelIndex / hostImage.getExtent().x;
+				for (unsigned channel = 0; channel < expectedChannels; channel++)
+				{
+					ASSERT_EQ(baseline[i + channel], pixels[i + channel])
+						<< "Pixel mismatch at (x=" << x << ", y=" << y << ") channel " << channel;
+				}
 			}
 		}
 
-		hostImage->unmap();
+		hostImage.unmap();
 	}
 };
 
 TEST_F(BMPTest, LoadBMP)
 {
 	// Specify the BMP file path; assume it’s located in the Data directory
-	std::pair<PaletteManager::OwningHandle, std::unique_ptr<HostImage>> ret = loadBMPAsHostImage(dosFont, false);
+	std::pair<OwningHandle<Palette>, OwningHandle<HostImage>> ret = loadBMPAsHostImage(dosFont, false);
 
-	PaletteManager::OwningHandle paletteHandle = std::move(ret.first);
-	std::unique_ptr<HostImage> hostImage = std::move(ret.second);
-
-	ASSERT_NE(hostImage, nullptr) << "HostImage creation from BMP failed.";
+	OwningHandle<Palette> paletteHandle = std::move(ret.first);
+	OwningHandle<HostImage> hostImage = std::move(ret.second);
+	ASSERT_TRUE(hostImage.isValid()) << "Failed to load BMP file.";
 
 	// Compare the loaded image with a baseline
 	std::filesystem::path baselinePath = _dataPath / "Test" / "BMP" / "test.bmp.png";

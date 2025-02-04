@@ -17,9 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "../../Resource/Handle.h"
+#include "../../Resource/ResourceManager.h"
+
 #include <memory>
+#include <filesystem>
 
 #include <glm/vec2.hpp>
+
 
 namespace OpenXcom
 {
@@ -30,13 +35,20 @@ enum class ImageFormat;
 
 class ImageManager
 {
+protected:
+	ResourceManager<HostImage> _hostImageManager;
+	ResourceManager<DeviceImage> _deviceImageManager;
+
 public:
 	ImageManager() = default;
 	virtual ~ImageManager() = default;
 
-	virtual std::unique_ptr<HostImage> createHostImage(glm::vec2 size, ImageFormat format) = 0;
-	virtual std::unique_ptr<DeviceImage> createDeviceImage(glm::vec2 size, ImageFormat format) = 0;
-	virtual std::unique_ptr<DeviceImage> createDeviceImage(HostImage& host) = 0;
+	virtual OwningHandle<HostImage> createHostImage(glm::vec2 size, ImageFormat format) = 0;
+	virtual OwningHandle<DeviceImage> createDeviceImage(glm::vec2 size, ImageFormat format) = 0;
+	virtual OwningHandle<DeviceImage> createDeviceImage(HostImage& host) = 0;
+
+	ResourceManager<HostImage>& getHostImageManager() { return _hostImageManager; }
+	ResourceManager<DeviceImage>& getDeviceImageManager() { return _deviceImageManager; }
 };
 
 } // namespace OpenXcom

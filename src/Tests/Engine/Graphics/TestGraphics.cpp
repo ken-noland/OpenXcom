@@ -112,32 +112,33 @@ protected:
 	/**
 	 * Captures the game surface into a HostImage.
 	 */
-	std::unique_ptr<HostImage> captureGameSurface()
+	OwningHandle<HostImage> captureGameSurface()
 	{
 		_windowSurface->update();	// render the surface once
 
-		std::unique_ptr<HostImage> hostImage = _engine->getResourceSystem().getImageManager().createHostImage(_gameSurface->getScreenSize(), ImageFormat::R8G8B8A8);
-		if (!hostImage)
+		OwningHandle<HostImage> hostImageHandle = _engine->getResourceSystem().getImageManager().createHostImage(_gameSurface->getScreenSize(), ImageFormat::R8G8B8A8);
+		if (!hostImageHandle.isValid())
 		{
 			ADD_FAILURE() << "Failed to create HostImage.";
-			return nullptr;
+			return OwningHandle<HostImage>();
 		}
 
-		_gameSurface->captureFrame(*hostImage);
-		return hostImage;
+		_gameSurface->captureFrame(hostImageHandle.get());
+		return hostImageHandle;
 	}
 
 	/**
 	 * Compares a captured image with a baseline.
 	 */
-	void compareWithBaseline(const std::unique_ptr<HostImage>& hostImage, const std::filesystem::path& baselinePath)
+	void compareWithBaseline(const OwningHandle<HostImage>& hostImageHandle, const std::filesystem::path& baselinePath)
 	{
-		const uint8_t* pixels = static_cast<const uint8_t*>(hostImage->map());
+		HostImage& hostImage = hostImageHandle.get();
+		const uint8_t* pixels = static_cast<const uint8_t*>(hostImage.map());
 
 		// Generate a baseline if it doesn't exist
 		if (!std::filesystem::exists(baselinePath) || FORCE_REGENERATE_BASELINE)
 		{
-			unsigned error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage->getWidth(), hostImage->getHeight(), LodePNGColorType::LCT_RGBA, 8);
+			unsigned error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage.getWidth(), hostImage.getHeight(), LodePNGColorType::LCT_RGBA, 8);
 			EXPECT_EQ(error, 0) << "Failed to save baseline image.";
 		}
 		else
@@ -150,30 +151,30 @@ protected:
 			EXPECT_EQ(error, 0) << "Failed to load baseline image.";
 
 			// Compare dimensions
-			ASSERT_EQ(width, hostImage->getExtent().x) << "Image width mismatch.";
-			ASSERT_EQ(height, hostImage->getExtent().y) << "Image height mismatch.";
+			ASSERT_EQ(width, hostImage.getExtent().x) << "Image width mismatch.";
+			ASSERT_EQ(height, hostImage.getExtent().y) << "Image height mismatch.";
 
 			// Compare pixel data
-			ASSERT_EQ(baseline.size(), hostImage->getExtent().x * hostImage->getExtent().y * 4) << "Image data size mismatch.";
+			ASSERT_EQ(baseline.size(), hostImage.getExtent().x * hostImage.getExtent().y * 4) << "Image data size mismatch.";
 			for (size_t i = 0; i < baseline.size(); ++i)
 			{
-				std::size_t x = (i / 4) % hostImage->getExtent().x;
-				std::size_t y = (i/4) / hostImage->getExtent().x;
+				std::size_t x = (i / 4) % hostImage.getExtent().x;
+				std::size_t y = (i/4) / hostImage.getExtent().x;
 				ASSERT_EQ(baseline[i], pixels[i]) << "Pixel mismatch at index " << i << "(x=" << x << " y=" << y << ")";
 			}
 		}
 
-		hostImage->unmap();
+		hostImage.unmap();
 	}
 };
 
 TEST_F(GraphicsTest, TestGraphicsSurface)
 {
-	std::unique_ptr<HostImage> hostImage = captureGameSurface();
-	ASSERT_TRUE(hostImage);
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
 
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "001_game_surface_blank.png";
-	compareWithBaseline(hostImage, baselinePath);
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTest, TestLineList)
@@ -187,11 +188,11 @@ TEST_F(GraphicsTest, TestLineList)
 		lineList->draw(command);
 	};
 
-	std::unique_ptr<HostImage> hostImage = captureGameSurface();
-	ASSERT_TRUE(hostImage);
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
 
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "002_game_surface_line_1.png";
-	compareWithBaseline(hostImage, baselinePath);
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTest, TestLineListMultiple)
@@ -206,11 +207,11 @@ TEST_F(GraphicsTest, TestLineListMultiple)
 		lineList->draw(command);
 	};
 
-	std::unique_ptr<HostImage> hostImage = captureGameSurface();
-	ASSERT_TRUE(hostImage);
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
 
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "003_game_surface_line_multiple_1.png";
-	compareWithBaseline(hostImage, baselinePath);
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTest, TestLineStrip)
@@ -230,10 +231,11 @@ TEST_F(GraphicsTest, TestLineStrip)
 		lineStrip->draw(command);
 	};
 
-	std::unique_ptr<HostImage> hostImage = captureGameSurface();
-	ASSERT_TRUE(hostImage);
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "004_game_surface_line_strip_1.png";
-	compareWithBaseline(hostImage, baselinePath);
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTest, TestFilledBox)
@@ -246,10 +248,11 @@ TEST_F(GraphicsTest, TestFilledBox)
 		boxOutline->draw(command);
 	};
 
-	std::unique_ptr<HostImage> hostImage = captureGameSurface();
-	ASSERT_TRUE(hostImage);
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "005_game_surface_filled_box_1.png";
-	compareWithBaseline(hostImage, baselinePath);
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTest, TestOutlineBox)
@@ -262,10 +265,11 @@ TEST_F(GraphicsTest, TestOutlineBox)
 		boxOutline->draw(command);
 	};
 
-	std::unique_ptr<HostImage> hostImage = captureGameSurface();
-	ASSERT_TRUE(hostImage);
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "006_game_surface_outline_box_1.png";
-	compareWithBaseline(hostImage, baselinePath);
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTest, TestOutlineBoxesCorners)
@@ -288,10 +292,11 @@ TEST_F(GraphicsTest, TestOutlineBoxesCorners)
 		boxOutline[3]->draw(command);
 	};
 
-	std::unique_ptr<HostImage> hostImage = captureGameSurface();
-	ASSERT_TRUE(hostImage);
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "007_game_surface_outline_box_corners_1.png";
-	compareWithBaseline(hostImage, baselinePath);
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTest, TestPointListPrimitive16Points)
@@ -319,12 +324,12 @@ TEST_F(GraphicsTest, TestPointListPrimitive16Points)
 	};
 
 	// Capture the game surface after drawing.
-	std::unique_ptr<HostImage> hostImage = captureGameSurface();
-	ASSERT_TRUE(hostImage);
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
 
 	// Define the baseline image path for comparison.
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "008_game_surface_point_list_1.png";
-	compareWithBaseline(hostImage, baselinePath);
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTest, TestPointColorListPrimitive16Points)
@@ -357,10 +362,10 @@ TEST_F(GraphicsTest, TestPointColorListPrimitive16Points)
 	};
 
 	// Capture the game surface after drawing.
-	std::unique_ptr<HostImage> hostImage = captureGameSurface();
-	ASSERT_TRUE(hostImage);
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
 
 	// Define the baseline image path for comparison.
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "009_game_surface_point_color_list_1.png";
-	compareWithBaseline(hostImage, baselinePath);
+	compareWithBaseline(hostImageHandle, baselinePath);
 }

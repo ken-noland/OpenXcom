@@ -130,6 +130,12 @@ public:
 		return _handle;
 	}
 
+	// Access the underlying resource
+	ResourceType& get() const
+	{
+		return _manager->get(_handle);
+	}
+
 	// Get a non-owning handle
 	ResourceHandle<ResourceType> getHandle() const
 	{
@@ -147,6 +153,7 @@ public:
 
 namespace std
 {
+
 template <typename ResourceType>
 struct hash<OpenXcom::ResourceHandle<ResourceType>>
 {
@@ -155,4 +162,5 @@ struct hash<OpenXcom::ResourceHandle<ResourceType>>
 		return std::hash<std::uint32_t>{}(handle.getId());
 	}
 };
+
 } // namespace std

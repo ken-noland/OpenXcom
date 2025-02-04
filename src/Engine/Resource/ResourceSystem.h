@@ -35,6 +35,11 @@ class ImageManager;
 class VirtualFileSystem;
 class GraphicsSystem;
 
+// Loaders
+class ImageFileProcessor;
+class ImageBMPFileProcessor;
+class ImagePNGFileProcessor;
+
 class ResourceSystem
 {
 	std::unique_ptr<ShaderManager> _shaderManager;
@@ -44,6 +49,11 @@ class ResourceSystem
 	std::unique_ptr<PaletteManager> _paletteManager;
 	std::unique_ptr<FontManager> _fontManager;
 	std::unique_ptr<ImageManager> _imageManager;
+
+	// Loaders
+	std::unique_ptr<ImageFileProcessor> _imageFileProcessor;
+	std::unique_ptr<ImageBMPFileProcessor> _imageBMPFileProcessor;
+	std::unique_ptr<ImagePNGFileProcessor> _imagePNGFileProcessor;
 
 public:
 	ResourceSystem(EngineContext& context);
@@ -56,6 +66,11 @@ public:
 	PaletteManager& getPaletteManager() { return *_paletteManager; };
 	FontManager& getFontManager() { return *_fontManager; };
 	ImageManager& getImageManager() { return *_imageManager; };
+
+	// Loaders
+	ImageFileProcessor& getImageFileProcessor() { return *_imageFileProcessor; };
+	ImageBMPFileProcessor& getImageBMPFileProcessor() { return *_imageBMPFileProcessor; };
+	ImagePNGFileProcessor& getImagePNGFileProcessor() { return *_imagePNGFileProcessor; };
 };
 
 } // namespace OpenXcom

@@ -33,19 +33,19 @@ VulkanImageManager::~VulkanImageManager()
 {
 }
 
-std::unique_ptr<HostImage> VulkanImageManager::createHostImage(glm::vec2 size, ImageFormat format)
+OwningHandle<HostImage> VulkanImageManager::createHostImage(glm::vec2 size, ImageFormat format)
 {
-	return std::make_unique<VulkanHostImage>(_context, size, format);
+	return _hostImageManager.add(std::make_unique<VulkanHostImage>(_context, size, format));
 }
 
-std::unique_ptr<DeviceImage> VulkanImageManager::createDeviceImage(glm::vec2 size, ImageFormat format)
+OwningHandle<DeviceImage> VulkanImageManager::createDeviceImage(glm::vec2 size, ImageFormat format)
 {
-	return std::make_unique<VulkanDeviceImage>(_context, size, format);
+	return _deviceImageManager.add(std::make_unique<VulkanDeviceImage>(_context, size, format));
 }
 
-std::unique_ptr<DeviceImage> VulkanImageManager::createDeviceImage(HostImage& image)
+OwningHandle<DeviceImage> VulkanImageManager::createDeviceImage(HostImage& image)
 {
-	return std::make_unique<VulkanDeviceImage>(_context, static_cast<VulkanHostImage&>(image));
+	return _deviceImageManager.add(std::make_unique<VulkanDeviceImage>(_context, static_cast<VulkanHostImage&>(image)));
 }
 
 } // namespace OpenXcom

@@ -29,6 +29,10 @@
 
 #include "Font/FontManager.h"
 
+#include "FileProcessor/ImageFileProcessor.h"
+#include "FileProcessor/ImageBMPFileProcessor.h"
+#include "FileProcessor/ImagePNGFileProcessor.h"
+
 namespace OpenXcom
 {
 

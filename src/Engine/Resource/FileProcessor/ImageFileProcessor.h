@@ -18,29 +18,11 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../Image/ImageManager.h"
-#include <vulkan/vulkan.hpp>
-#include <vk_mem_alloc.h> // VMA
-
-#include <glm/vec2.hpp>
-
 namespace OpenXcom
 {
 
-class VulkanContext;
-
-class VulkanImageManager : public ImageManager
+class ImageFileProcessor
 {
-protected:
-	VulkanContext& _context;
-
-public:
-	VulkanImageManager(VulkanContext& context);
-	virtual ~VulkanImageManager();
-
-	virtual OwningHandle<HostImage> createHostImage(glm::vec2 size, ImageFormat format) override;
-	virtual OwningHandle<DeviceImage> createDeviceImage(glm::vec2 size, ImageFormat format) override;
-	virtual OwningHandle<DeviceImage> createDeviceImage(HostImage& host) override;
 };
 
 } // namespace OpenXcom
