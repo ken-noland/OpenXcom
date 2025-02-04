@@ -37,8 +37,10 @@ protected:
 	// vertex shaders
 	std::unique_ptr<Shader> _defaultVec2Shader;
 	std::unique_ptr<Shader> _defaultVec2ColorShader;
+	std::unique_ptr<Shader> _defaultVec2UvShader;
 
 	std::unique_ptr<Shader> _defaultFragmentShader;
+	std::unique_ptr<Shader> _defaultUVFragmentShader;
 
 public:
 	ShaderCollection(EngineContext& context);
@@ -46,8 +48,10 @@ public:
 
 	Shader& getDefaultVec2VertexShader();
 	Shader& getDefaultVec2ColorVertexShader();
+	Shader& getDefaultVec2UVVertexShader();
 
 	Shader& getDefaultFragmentShader();
+	Shader& getDefaultUVFragmentShader();
 };
 
 } // namespace OpenXcom

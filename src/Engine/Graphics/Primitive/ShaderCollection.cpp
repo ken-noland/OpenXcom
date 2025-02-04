@@ -107,6 +107,40 @@ const char* defaultVec2ColorVertexShaderSource = R"(
 	}
 )";
 
+const char* defaultVec2UVVertexShaderSource = R"(
+	#version 450
+
+	// Input vertex attributes: position and UV, both in integer (pixel) coordinates.
+	layout(location = 0) in ivec2 inPosition;
+	layout(location = 1) in ivec2 inUV;
+
+	// Output to the fragment shader: normalized texture coordinates.
+	layout(location = 0) out vec2 fragUV;
+
+	// Uniform buffer for screen dimensions (set 0, binding 0)
+	layout(set = 0, binding = 0, std140) uniform ScreenInfo {
+		int screenWidth;
+		int screenHeight;
+	} screenInfo;
+
+	// Uniform buffer for the source image (texture) size. (set 0, binding 1)
+	layout(set = 0, binding = 1, std140) uniform SourceSize {
+		ivec2 sourceSize;
+	};
+
+	void main() {
+		// Convert screen coordinates to normalized device coordinates (NDC)
+		ivec2 snappedPosition = inPosition; // Already in integer format
+		vec2 ndc = (((vec2(snappedPosition) + vec2(0.5, 0.5)) / 
+					vec2(screenInfo.screenWidth, screenInfo.screenHeight)) * 2.0 - 1.0);
+
+		// Note: Depending on your coordinate system you might need to flip the Y axis.
+		gl_Position = vec4(ndc, 0.0, 1.0);
+
+		// Convert the source image coordinates (UV) to normalized coordinates for texture sampling.
+		fragUV = (vec2(inUV) + vec2(0.5)) / vec2(sourceSize);
+	}
+)";
 
 // Fragment shader used to render the game surface to the platform window screen
 const char* defaultFragmentShaderSource = R"(
@@ -124,6 +158,35 @@ const char* defaultFragmentShaderSource = R"(
 	}
 )";
 
+const char* defaultUVFragmentShaderSource = R"(
+	#version 450
+
+	// Input UV coordinates from the vertex shader.
+	layout(location = 0) in vec2 fragUV;
+
+	// Output final color.
+	layout(location = 0) out vec4 fragColor;
+
+	// R8 texture (the image) bound to set 0, binding 0.
+	layout(set = 0, binding = 2) uniform sampler2D uImage;
+
+	// Palette
+	layout(set = 0, binding = 3, std430) buffer PaletteBuffer {
+		uint palette[];
+	};
+
+	void main() {
+		// Sample the texture; the result's red channel holds the index in normalized form.
+		float indexValue = texture(uImage, fragUV).r;
+    
+		// If the color index is above 0, output red, else output black.
+		if(indexValue > 0.0)
+			fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		else
+			fragColor = vec4(0.0, 0.0, 1.0, 1.0);
+	}
+)";
+
 ShaderCollection::ShaderCollection(EngineContext& context)
 	: _context(context)
 {
@@ -133,8 +196,10 @@ ShaderCollection::ShaderCollection(EngineContext& context)
 	// load the shaders
 	_defaultVec2Shader = shaderManager.loadShaderFromMemory("defaultVec2VertexShader", defaultVec2VertexShaderSource, ShaderType::Vertex);
 	_defaultVec2ColorShader = shaderManager.loadShaderFromMemory("defaultVec2ColorVertexShader", defaultVec2ColorVertexShaderSource, ShaderType::Vertex);
+	_defaultVec2UvShader = shaderManager.loadShaderFromMemory("defaultVec2UVVertexShader", defaultVec2UVVertexShaderSource, ShaderType::Vertex);
 
-	_defaultFragmentShader = shaderManager.loadShaderFromMemory("LinePrimitiveFragShader", defaultFragmentShaderSource, ShaderType::Fragment);
+	_defaultFragmentShader = shaderManager.loadShaderFromMemory("defaultFragmentShaderSource", defaultFragmentShaderSource, ShaderType::Fragment);
+	_defaultUVFragmentShader = shaderManager.loadShaderFromMemory("defaultUVFragmentShaderSource", defaultUVFragmentShaderSource, ShaderType::Fragment);
 }
 
 ShaderCollection::~ShaderCollection()
@@ -151,11 +216,19 @@ Shader& ShaderCollection::getDefaultVec2ColorVertexShader()
 	return *_defaultVec2ColorShader;
 }
 
+Shader& ShaderCollection::getDefaultVec2UVVertexShader()
+{
+	return *_defaultVec2UvShader;
+}
+
 Shader& ShaderCollection::getDefaultFragmentShader()
 {
 	return *_defaultFragmentShader;
 }
 
-
+Shader& ShaderCollection::getDefaultUVFragmentShader()
+{
+	return *_defaultUVFragmentShader;
+}
 
 } // namespace OpenXcom

@@ -38,8 +38,10 @@ class GraphicsCommand;
 class BoxOutlinePrimitive;
 class LineStripPrimitive;
 class PointColorListPrimitive;
+class ImagePrimitive;
 
 class Palette;
+class DeviceImage;
 
 class GameWindow
 {
@@ -48,7 +50,8 @@ protected:
 	std::unique_ptr<WindowSurface> _windowSurface;
 
 	OwningHandle<Palette> _paletteHandle;
-	std::unique_ptr<PointColorListPrimitive> _thingToDraw;
+	OwningHandle<DeviceImage> _image;
+	std::unique_ptr<ImagePrimitive> _thingToDraw;
 
 	void onWindowRender(GraphicsCommand& command);
 	void onGameRender(GraphicsCommand& command);

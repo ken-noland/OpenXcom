@@ -195,9 +195,6 @@ void VulkanPipelineBinding::setTexture(ShaderStage stage, uint32_t binding, cons
 
 	// Update the descriptor set with the texture and sampler
 	_context.getDevice().updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
-
-	// TODO: Optionally, store the texture information for later use(recreating the pipeline binding if necessary)
-	//_textures[binding] = &image;
 }
 
 void VulkanPipelineBinding::commit(GraphicsCommand& command)

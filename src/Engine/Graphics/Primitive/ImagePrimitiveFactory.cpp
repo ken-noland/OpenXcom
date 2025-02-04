@@ -19,6 +19,7 @@
 #include "ImagePrimitiveFactory.h"
 
 #include "ImagePrimitive.h"
+#include "ShaderCollection.h"
 
 #include "../Pipeline.h"
 #include "../PipelineDefinition.h"
@@ -34,8 +35,34 @@ namespace OpenXcom
 ImagePrimitiveFactory::ImagePrimitiveFactory(EngineContext& context, RenderTarget& surface, ShaderCollection& shaders)
 	: _context(context), _surface(surface)
 {
-	//ResourceSystem& resourceSystem = _context.getResourceSystem();
-	//PipelineManager& pipelineManager = resourceSystem.getPipelineManager();
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	PipelineManager& pipelineManager = resourceSystem.getPipelineManager();
+
+	//---
+	// image pipeline
+	PipelineBuilder pointListPipelineBuilder;
+	PipelineDefinition pointListDefinition = pointListPipelineBuilder
+												 .setResourceLayout(ResourceLayoutBuilder()
+																		// topology
+																		.setTopology(PrimitiveTopology::TriangleList)
+
+																		// vertex shader stage
+																		.setVertexType<ImageVertex>()
+																		.addUniformBuffer<glm::ivec2>(ShaderStage::Vertex, 0) // screen size buffer
+																		.addUniformBuffer<glm::ivec2>(ShaderStage::Vertex, 1) // source image size buffer
+
+																		// fragment shader stage
+																		.addCombinedImageSampler(ShaderStage::Fragment, 2)   // image sampler
+																		.addTexture(ShaderStage::Fragment, 2)                // image texture
+																		.addStorageBuffer<uint8_t>(ShaderStage::Fragment, 3) // palette buffer
+
+																		.build())
+												 .setVertexShader(shaders.getDefaultVec2UVVertexShader())
+												 .setFragmentShader(shaders.getDefaultUVFragmentShader())
+												 .setRenderTarget(_surface)
+												 .build();
+
+	_imagePipeline = pipelineManager.createPipeline(pointListDefinition);
 }
 
 ImagePrimitiveFactory::~ImagePrimitiveFactory()
@@ -44,7 +71,7 @@ ImagePrimitiveFactory::~ImagePrimitiveFactory()
 
 std::unique_ptr<ImagePrimitive> ImagePrimitiveFactory::createImagePrimitive(glm::ivec2 position, glm::ivec2 size, glm::ivec2 extents, const ResourceHandle<DeviceImage>& imageHandle, const ResourceHandle<Palette>& paletteHandle)
 {
-	return nullptr;
+	return std::make_unique<ImagePrimitive>(_context, *_imagePipeline, _surface, position, size, extents, imageHandle, paletteHandle);
 }
 
 

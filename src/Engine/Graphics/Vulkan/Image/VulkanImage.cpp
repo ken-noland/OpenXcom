@@ -54,13 +54,6 @@ void transitionImageLayout(
 		sourceStage = vk::PipelineStageFlagBits::eTopOfPipe;
 		destinationStage = vk::PipelineStageFlagBits::eTransfer;
 	}
-	else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal)
-	{
-		barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-		barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-		sourceStage = vk::PipelineStageFlagBits::eTransfer;
-		destinationStage = vk::PipelineStageFlagBits::eFragmentShader;
-	}
 	else if (oldLayout == vk::ImageLayout::eGeneral && newLayout == vk::ImageLayout::eTransferSrcOptimal)
 	{
 		barrier.srcAccessMask = vk::AccessFlagBits::eMemoryRead;
@@ -75,9 +68,23 @@ void transitionImageLayout(
 		sourceStage = vk::PipelineStageFlagBits::eFragmentShader;
 		destinationStage = vk::PipelineStageFlagBits::eTransfer;
 	}
+	else if (oldLayout == vk::ImageLayout::eShaderReadOnlyOptimal && newLayout == vk::ImageLayout::eTransferDstOptimal)
+	{
+		barrier.srcAccessMask = vk::AccessFlagBits::eShaderRead; // or possibly 0 depending on your synchronization
+		barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+		sourceStage = vk::PipelineStageFlagBits::eFragmentShader; // or VK_PIPELINE_STAGE_ALL_COMMANDS_BIT if necessary
+		destinationStage = vk::PipelineStageFlagBits::eTransfer;
+	}
 	else if (oldLayout == vk::ImageLayout::eTransferSrcOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal)
 	{
 		barrier.srcAccessMask = vk::AccessFlagBits::eTransferRead;
+		barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+		sourceStage = vk::PipelineStageFlagBits::eTransfer;
+		destinationStage = vk::PipelineStageFlagBits::eFragmentShader;
+	}
+	else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal)
+	{
+		barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
 		barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
 		sourceStage = vk::PipelineStageFlagBits::eTransfer;
 		destinationStage = vk::PipelineStageFlagBits::eFragmentShader;
@@ -177,13 +184,29 @@ void VulkanHostImage::unmap()
 VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format)
 	: DeviceImage(ImageType::Texture), _context(context), _format(format), _extent(extent), _currentLayout(vk::ImageLayout::eUndefined)
 {
+	vk::Format vkFormat;
+	switch (format)
+	{
+	case ImageFormat::R8:
+		vkFormat = vk::Format::eR8Unorm;
+		break;
+	case ImageFormat::R8G8B8:
+		vkFormat = vk::Format::eR8G8B8Unorm;
+		break;
+	case ImageFormat::R8G8B8A8:
+		vkFormat = vk::Format::eR8G8B8A8Unorm;
+		break;
+	default:
+		throw std::runtime_error("Unsupported image format.");
+	}
+
 	// Step 1: Define Image Creation Info
 	vk::ImageCreateInfo imageInfo{};
 	imageInfo.imageType = vk::ImageType::e2D;
 	imageInfo.extent = vk::Extent3D(_extent.x, _extent.y, 1);
 	imageInfo.mipLevels = 1;
 	imageInfo.arrayLayers = 1;
-	imageInfo.format = vk::Format::eR8G8B8A8Unorm; // 8-bit RGBA format
+	imageInfo.format = vkFormat;
 	imageInfo.samples = vk::SampleCountFlagBits::e1;
 	imageInfo.tiling = vk::ImageTiling::eOptimal; // Optimized for GPU
 	imageInfo.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
@@ -218,6 +241,7 @@ VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, 
 VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, VulkanHostImage& image)
 	: VulkanDeviceImage(context, image.getExtent(), image.getFormat())
 {
+	copyFrom(static_cast<HostImage&>(image));
 }
 
 VulkanDeviceImage::~VulkanDeviceImage()

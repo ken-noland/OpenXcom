@@ -170,7 +170,7 @@ public:
 		return *this;
 	}
 
-	ResourceLayoutBuilder& addTexture(uint32_t binding, ShaderStage stage)
+	ResourceLayoutBuilder& addTexture(ShaderStage stage, uint32_t binding)
 	{
 		_resourceLayout.addTexture({binding, stage});
 		return *this;
@@ -182,7 +182,7 @@ public:
 		return *this;
 	}
 
-	ResourceLayoutBuilder& addCombinedImageSampler(uint32_t binding, ShaderStage stage) // TODO: Specify the sampler parameters
+	ResourceLayoutBuilder& addCombinedImageSampler(ShaderStage stage, uint32_t binding) // TODO: Specify the sampler parameters
 	{
 		_resourceLayout.addCombinedImageSampler(binding, stage);
 		return *this;

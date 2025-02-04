@@ -89,6 +89,9 @@ public:
 
 	const vk::Image& getImage() const { return _image; }
 	const vk::ImageView& getImageView() const { return _imageView; }
+
+	// device image data for an contains the extents of the image stored on the GPU
+	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }
 };
 
 } // namespace OpenXcom

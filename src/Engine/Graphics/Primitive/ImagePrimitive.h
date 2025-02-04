@@ -31,6 +31,7 @@ class PipelineBinding;
 class Pipeline;
 class RenderTarget;
 class DeviceBuffer;
+class DeviceImage;
 class Palette;
 
 template <typename ResourceType>
@@ -42,11 +43,6 @@ struct ImageVertex
 	glm::ivec2 uv;
 };
 
-struct ImagePushConstants
-{
-	glm::ivec2 surfaceExtent; // TODO: temporary until I move the screen extents to a uniform buffer
-};
-
 class ImagePrimitive : public Primitive
 {
 protected:
@@ -55,7 +51,8 @@ protected:
 
 public:
 	ImagePrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-				   glm::ivec2 dstPosition, glm::ivec2 srcPosition, glm::ivec2 size, const ResourceHandle<Palette>& paletteHandle);
+				   glm::ivec2 dstPosition, glm::ivec2 srcPosition, glm::ivec2 size,
+				   const ResourceHandle<DeviceImage>& imageHandle, const ResourceHandle<Palette>& paletteHandle);
 	virtual ~ImagePrimitive();
 
 	void draw(GraphicsCommand& command);

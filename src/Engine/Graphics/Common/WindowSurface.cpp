@@ -149,8 +149,8 @@ void WindowSurface::createWindowed(GameSurface& gameSurface)
 																	   .addPushConstant<glm::mat4>(ShaderStage::Vertex)
 
 																	   // fragment shader stage
-																	   .addCombinedImageSampler(0, ShaderStage::Fragment)
-																	   .addTexture(0, ShaderStage::Fragment)
+																	   .addCombinedImageSampler(ShaderStage::Fragment, 0)
+																	   .addTexture(ShaderStage::Fragment, 0)
 																	   .build())
 												.setFragmentShader(*_fragmentShader)
 												.setRenderTarget(*_windowSurface)

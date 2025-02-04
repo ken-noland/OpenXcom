@@ -23,6 +23,8 @@
 namespace OpenXcom
 {
 
+class DeviceBuffer;
+
 enum class ImageFormat
 {
 	R8,       // Grayscale or palette index
@@ -73,6 +75,8 @@ public:
 	// copy this device image to the host image
 	virtual void copyTo(HostImage& hostImage) = 0;
 
+	// device image data for an contains the extents of the image stored on the GPU
+	virtual const DeviceBuffer& getDeviceImageData() const = 0;
 
 	virtual ImageFormat getFormat() const = 0;
 	virtual glm::ivec2 getExtent() const = 0;

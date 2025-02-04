@@ -70,6 +70,7 @@ Game::Game(Engine& engine)
  */
 Game::~Game()
 {
+	_gameWindow.reset();
 }
 
 int Game::run()
