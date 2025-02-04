@@ -107,6 +107,24 @@ const char* defaultVec2ColorVertexShaderSource = R"(
 	}
 )";
 
+// Fragment shader used to render the game surface to the platform window screen
+const char* defaultFragmentShaderSource = R"(
+	#version 450
+
+	// Input from the vertex shader
+	layout(location = 0) in vec4 fragColor; // Interpolated color from the vertex shader
+
+	// Output to the framebuffer
+	layout(location = 0) out vec4 outColor;
+
+	void main() {
+		// Write the interpolated color to the output
+		outColor = fragColor;
+	}
+)";
+
+
+
 const char* defaultVec2UVVertexShaderSource = R"(
 	#version 450
 
@@ -139,22 +157,6 @@ const char* defaultVec2UVVertexShaderSource = R"(
 
 		// Convert the source image coordinates (UV) to normalized coordinates for texture sampling.
 		fragUV = (vec2(inUV) + vec2(0.5)) / vec2(sourceSize);
-	}
-)";
-
-// Fragment shader used to render the game surface to the platform window screen
-const char* defaultFragmentShaderSource = R"(
-	#version 450
-
-	// Input from the vertex shader
-	layout(location = 0) in vec4 fragColor; // Interpolated color from the vertex shader
-
-	// Output to the framebuffer
-	layout(location = 0) out vec4 outColor;
-
-	void main() {
-		// Write the interpolated color to the output
-		outColor = fragColor;
 	}
 )";
 

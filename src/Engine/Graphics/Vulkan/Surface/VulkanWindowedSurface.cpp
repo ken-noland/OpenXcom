@@ -460,6 +460,8 @@ void VulkanWindowedSurface::endCommandPass(GraphicsCommand& command)
 
 void VulkanWindowedSurface::beginRenderPass(GraphicsCommand& command)
 {
+	vk::CommandBuffer& commandBuffer = _commandContext->getCommandBuffer();
+
 	vk::Viewport viewport = {};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
@@ -468,13 +470,13 @@ void VulkanWindowedSurface::beginRenderPass(GraphicsCommand& command)
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
 
-	_commandContext->getCommandBuffer().setViewport(0, 1, &viewport);
+	commandBuffer.setViewport(0, 1, &viewport);
 
 	vk::Rect2D scissor = {};
 	scissor.offset = vk::Offset2D{0, 0};
 	scissor.extent = _swapChainExtent;
 
-	_commandContext->getCommandBuffer().setScissor(0, 1, &scissor);
+	commandBuffer.setScissor(0, 1, &scissor);
 
 	vk::RenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.renderPass = _renderPass;
@@ -486,7 +488,7 @@ void VulkanWindowedSurface::beginRenderPass(GraphicsCommand& command)
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
 
-	_commandContext->getCommandBuffer().beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+	commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 }
 
 void VulkanWindowedSurface::endRenderPass(GraphicsCommand& command)

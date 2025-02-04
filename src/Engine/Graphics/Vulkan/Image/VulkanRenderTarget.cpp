@@ -209,8 +209,36 @@ void VulkanRenderTarget::beginRenderPass(GraphicsCommand& command)
 
 void VulkanRenderTarget::endRenderPass(GraphicsCommand& command)
 {
-	vk::CommandBuffer& vkCommand = static_cast<VulkanCommand&>(command).getCommandBuffer();
-	vkCommand.endRenderPass();
+	vk::CommandBuffer& commandBuffer = static_cast<VulkanCommand&>(command).getCommandBuffer();
+	commandBuffer.endRenderPass();
+
+	// insert a pipeline barrier here to ensure the image has time to render
+	vk::ImageSubresourceRange subresourceRange{
+		vk::ImageAspectFlagBits::eColor, // aspect mask
+		0,                               // baseMipLevel
+		1,                               // levelCount
+		0,                               // baseArrayLayer
+		1                                // layerCount
+	};
+
+	vk::ImageMemoryBarrier imageBarrier{
+		{},                                       // srcAccessMask: you might specify vk::AccessFlagBits::eColorAttachmentWrite here
+		vk::AccessFlagBits::eColorAttachmentRead, // dstAccessMask: so that subsequent reads are safe
+		vk::ImageLayout::eColorAttachmentOptimal, // oldLayout: layout used in pass #1
+		vk::ImageLayout::eColorAttachmentOptimal, // newLayout: layout needed in pass #2 (or shader read, if that’s what you need)
+		VK_QUEUE_FAMILY_IGNORED,                  // srcQueueFamilyIndex
+		VK_QUEUE_FAMILY_IGNORED,                  // dstQueueFamilyIndex
+		_image,                                   // the image to transition
+		subresourceRange                          // the subresource range that applies
+	};
+
+	commandBuffer.pipelineBarrier(
+		vk::PipelineStageFlagBits::eColorAttachmentOutput, // src stage: finishing writes in pass #1
+		vk::PipelineStageFlagBits::eColorAttachmentOutput, // dst stage: about to begin color writes in pass #2
+		vk::DependencyFlags(),                             // dependency flags (e.g. vk::DependencyFlagBits::eByRegion if needed)
+		0, nullptr,                                        // no global memory barriers
+		0, nullptr,                                        // no buffer memory barriers
+		1, &imageBarrier);                                 // the image memory barrier
 }
 
 } // namespace OpenXcom
