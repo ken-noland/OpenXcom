@@ -377,7 +377,7 @@ TEST_F(GraphicsTest, TestPointColorListPrimitive16Points)
 		{
 			// Calculate the overall index and cycle through 16 colors.
 			int index = row * 8 + col;
-			int color = index % 16; // Cycle through colors 0-15
+			uint32_t color = index % 16; // Cycle through colors 0-15
 
 			// Create a vertex starting at (10,10) with 20 pixels spacing.
 			PointColorVertex vertex = {glm::ivec2(10 + col * 20, 10 + row * 20), color};

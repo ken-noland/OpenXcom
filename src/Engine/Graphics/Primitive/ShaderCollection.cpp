@@ -57,6 +57,7 @@ const char* defaultVec2VertexShaderSource = R"(
 					vec2(screenInfo.screenWidth, screenInfo.screenHeight)) * 2.0 - 1.0);
 
 		gl_Position = vec4(ndc, 0.0, 1.0);
+		gl_PointSize = 1.0; // Specify a point size.
 
 		uint packedColor = colors[pushConstants.paletteColor];
 
@@ -95,6 +96,7 @@ const char* defaultVec2ColorVertexShaderSource = R"(
 					vec2(screenInfo.screenWidth, screenInfo.screenHeight)) * 2.0 - 1.0);
 
 		gl_Position = vec4(ndc, 0.0, 1.0);
+		gl_PointSize = 1.0; // Specify a point size.
 
 		uint packedColor = colors[inColor];
 
@@ -154,6 +156,7 @@ const char* defaultVec2UVVertexShaderSource = R"(
 
 		// Note: Depending on your coordinate system you might need to flip the Y axis.
 		gl_Position = vec4(ndc, 0.0, 1.0);
+		gl_PointSize = 1.0; // Specify a point size.
 
 		// Convert the source image coordinates (UV) to normalized coordinates for texture sampling.
 		fragUV = (vec2(inUV) + vec2(0.5)) / vec2(sourceSize);

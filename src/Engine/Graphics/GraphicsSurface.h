@@ -40,8 +40,10 @@ public:
 	virtual void beginRenderPass(GraphicsCommand& commandContext) = 0;
 	virtual void endRenderPass(GraphicsCommand& commandContext) = 0;
 
+	virtual uint32_t getMultisampleCount() const = 0;
+
 	// device buffer for a render target contains the extents of the render target
-	virtual const DeviceBuffer& getDeviceImageData() const = 0; 
+	virtual const DeviceBuffer& getDeviceImageData() const = 0;
 
 	PrimitiveFactory& getPrimitiveFactory() { return *_primitiveFactory; }
 };

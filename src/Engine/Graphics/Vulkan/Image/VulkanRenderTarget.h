@@ -37,18 +37,25 @@ class VulkanRenderTarget : public RenderTarget
 private:
 	VulkanContext& _context;
 
-	VmaAllocation _allocation;
+	std::array<vk::Image, 2> _image;
+	std::array<vk::ImageView, 2> _imageView;
+	std::array<VmaAllocation, 2> _allocation;
 
 	glm::ivec2 _extent;
 	glm::vec4 _color;
-
-	vk::Image _image;
-	vk::ImageView _imageView;
 
 	vk::RenderPass _renderPass;
 	vk::Framebuffer _framebuffer;
 
 	std::unique_ptr<DeviceBuffer> _deviceImageData;
+
+	vk::SampleCountFlagBits getSampleCountFlagBits() { return static_cast<vk::SampleCountFlagBits>(getMultisampleCount()); }
+
+	void createMultiSampleImage();
+	void createSingleSampleImage();
+
+	void create();
+	void destroy();
 
 public:
 	VulkanRenderTarget(VulkanContext& context, glm::ivec2 size, ImageFormat format, glm::vec4 color);
@@ -58,6 +65,7 @@ public:
 	virtual uint32_t getHeight() const override { return _extent.y; }
 	virtual glm::ivec2 getExtent() const override { return _extent; }
 	virtual ImageFormat getFormat() const override { return ImageFormat::UNKNOWN; }
+	virtual uint32_t getMultisampleCount() const override { return 2; }
 		
 	virtual void copyFrom(HostImage& hostImage) override;
 	virtual void copyTo(HostImage& hostImage) override;
@@ -65,8 +73,11 @@ public:
 	// device buffer for a render target contains the extents of the render target
 	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }
 
-	vk::Image& getImage() { return _image; }
-	const vk::ImageView& getImageView() const { return _imageView; }
+	const vk::Image& getRenderTargetImage() const { return _image[0]; }
+	const vk::ImageView& getRenderTargetImageView() const { return _imageView[0]; }
+
+	const vk::Image& getResolveImage() const { return _image[1]; }
+	const vk::ImageView& getResolveImageView() const { return _imageView[1]; }
 
 	const vk::RenderPass& getRenderPass() const { return _renderPass; }
 

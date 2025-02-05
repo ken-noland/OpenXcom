@@ -95,12 +95,11 @@ public:
 	const vk::Extent2D& getVKExtent() const { return _swapChainExtent; }
 	const vk::RenderPass& getRenderPass() const { return _renderPass; }
 
-	virtual ImageFormat getFormat() const override;
-
 	virtual uint32_t getWidth() const override;
 	virtual uint32_t getHeight() const override;
-
 	virtual glm::ivec2 getExtent() const override;
+	virtual ImageFormat getFormat() const override;
+	virtual uint32_t getMultisampleCount() const override { return 1; }
 		
 	// device image data for a render surface contains the extents of the framebuffer
 	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }; 

@@ -169,7 +169,7 @@ void VulkanPipelineBinding::setTexture(ShaderStage stage, uint32_t binding, cons
 	else if (image.getType() == ImageType::RenderTarget)
 	{
 		const VulkanRenderTarget& renderTarget = static_cast<const VulkanRenderTarget&>(image);
-		imageView = renderTarget.getImageView();
+		imageView = renderTarget.getResolveImageView();
 	}
 	else
 	{
@@ -229,7 +229,7 @@ void VulkanPipelineBinding::commit(GraphicsCommand& command)
 		vkCommand.bindIndexBuffer(indexBuffer.getBuffer(), 0, vk::IndexType::eUint16);
 
 		// finally, issue draw command
-		vkCommand.drawIndexed(indexBuffer.getCount(), 1, 0, 0, 0);
+		vkCommand.drawIndexed(static_cast<uint32_t>(indexBuffer.getCount()), 1, 0, 0, 0);
 	}
 	else
 	{
@@ -237,7 +237,7 @@ void VulkanPipelineBinding::commit(GraphicsCommand& command)
 		vkCommand.bindVertexBuffers(0, vertexBuffer.getBuffer(), offsets);
 
 		// finally, issue draw command
-		vkCommand.draw(vertexBuffer.getCount(), 1, 0, 0);
+		vkCommand.draw(static_cast<uint32_t>(vertexBuffer.getCount()), 1, 0, 0);
 		isIndexed = false;
 	}
 }

@@ -34,6 +34,16 @@
 
 #include <glslang/Public/ShaderLang.h>
 
+#if defined(_MSC_VER)
+#define DEBUG_BREAK() __debugbreak()
+#elif defined(__GNUC__) || defined(__clang__)
+#include <signal.h>
+#define DEBUG_BREAK() raise(SIGTRAP)
+#else
+#include <signal.h>
+#define DEBUG_BREAK() raise(SIGTRAP)
+#endif
+
 namespace OpenXcom
 {
 
@@ -47,7 +57,7 @@ VkBool32 debugCallback(
 	(void)messageTypes;
 	(void)pUserData;
 	Log(LOG_DEBUG) << "Validation layer: " << pCallbackData->pMessage;
-	assert(false);
+	DEBUG_BREAK();
 	return VK_FALSE;
 }
 
@@ -225,11 +235,9 @@ void VulkanContext::initializeInstance(bool isHeadless)
 								VK_MAKE_VERSION(OPENXCOM_VERSION_MAJOR, OPENXCOM_VERSION_MINOR, OPENXCOM_VERSION_PATCH),
 								VK_API_VERSION_1_0);
 
-	vk::InstanceCreateInfo createInfo{};
-	createInfo.pApplicationInfo = &appInfo;
-	createInfo.pNext = &debugCreateInfo;
 
 	std::vector<const char*> extensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
+	std::vector<const char*> layers = {"VK_LAYER_KHRONOS_validation"};
 
 	if (!isHeadless)
 	{
@@ -255,8 +263,15 @@ void VulkanContext::initializeInstance(bool isHeadless)
 		}
 	}
 
+	vk::InstanceCreateInfo createInfo{};
+	createInfo.pApplicationInfo = &appInfo;
+	createInfo.pNext = &debugCreateInfo;
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 	createInfo.ppEnabledExtensionNames = extensions.data();
+
+	// Add the validation layers to the create info
+	createInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
+	createInfo.ppEnabledLayerNames = layers.data();
 
 	_instance = vk::createInstance(createInfo);
 	VULKAN_HPP_DEFAULT_DISPATCHER.init(_instance);
@@ -418,6 +433,9 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	// Specify Device Features
 	vk::PhysicalDeviceFeatures deviceFeatures{};
 
+	deviceFeatures.sampleRateShading = VK_TRUE;
+	deviceFeatures.fillModeNonSolid = VK_TRUE;
+
 	// Specify device extensions
 	std::vector<const char*> deviceExtensions;
 	if (!isHeadless)
@@ -444,42 +462,6 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	}
 }
 
-vk::SampleCountFlagBits VulkanContext::getSampleCountFlagBits(vk::SampleCountFlags flags)
-{
-	if (flags & vk::SampleCountFlagBits::e1)
-	{
-		return vk::SampleCountFlagBits::e1;
-	}
-	else if (flags & vk::SampleCountFlagBits::e2)
-	{
-		return vk::SampleCountFlagBits::e2;
-	}
-	else if (flags & vk::SampleCountFlagBits::e4)
-	{
-		return vk::SampleCountFlagBits::e4;
-	}
-	else if (flags & vk::SampleCountFlagBits::e8)
-	{
-		return vk::SampleCountFlagBits::e8;
-	}
-	else if (flags & vk::SampleCountFlagBits::e16)
-	{
-		return vk::SampleCountFlagBits::e16;
-	}
-	else if (flags & vk::SampleCountFlagBits::e32)
-	{
-		return vk::SampleCountFlagBits::e32;
-	}
-	else if (flags & vk::SampleCountFlagBits::e64)
-	{
-		return vk::SampleCountFlagBits::e64;
-	}
-	else
-	{
-		throw std::runtime_error("Unsupported sample count");
-	}
-}
-
 vk::BufferUsageFlags VulkanContext::getBufferUsageFlags(BufferUsage usage)
 {
 	switch (usage)
@@ -496,6 +478,7 @@ vk::BufferUsageFlags VulkanContext::getBufferUsageFlags(BufferUsage usage)
 
 	return vk::BufferUsageFlags();
 }
+
 
 
 

@@ -46,7 +46,7 @@ struct PointVertex
 struct PointColorVertex
 {
 	glm::ivec2 pos;
-	int color;
+	uint32_t color;
 };
 
 struct PointPushConstants

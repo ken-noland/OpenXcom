@@ -36,7 +36,17 @@ namespace OpenXcom
 void transitionImageLayout(vk::CommandBuffer cmdBuffer,	vk::Image image, vk::ImageLayout oldLayout,	vk::ImageLayout newLayout);
 
 VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 extent, ImageFormat format, glm::vec4 color)
-	: _context(context), _allocation(nullptr), _extent(extent), _color(color), _image(nullptr), _imageView(nullptr), _renderPass(nullptr), _framebuffer(nullptr)
+	: _context(context), _image{nullptr, nullptr}, _imageView{nullptr, nullptr}, _allocation{nullptr, nullptr}, _extent(extent), _color(color), _renderPass(nullptr), _framebuffer(nullptr)
+{
+	create();
+}
+
+VulkanRenderTarget::~VulkanRenderTarget()
+{
+	destroy();
+}
+
+void VulkanRenderTarget::createMultiSampleImage()
 {
 	// Create the render target image
 	vk::ImageCreateInfo imageInfo{};
@@ -45,7 +55,8 @@ VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 extent
 	imageInfo.mipLevels = 1;
 	imageInfo.arrayLayers = 1;
 	imageInfo.format = vk::Format::eR8G8B8A8Unorm; // 8-bit color with alpha
-	imageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled;
+	imageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferSrc;
+	imageInfo.samples = getSampleCountFlagBits();
 
 	VmaAllocationCreateInfo allocCreateInfo = {};
 	allocCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
@@ -55,39 +66,94 @@ VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 extent
 
 	vmaCreateImage(_context.getAllocator(), reinterpret_cast<VkImageCreateInfo*>(&imageInfo), &allocCreateInfo, &image, &allocation, nullptr);
 
-	_image = image;
-	_allocation = allocation;
+	_image[0] = image;
+	_allocation[0] = allocation;
 
 	vk::ImageViewCreateInfo imageViewInfo{};
-	imageViewInfo.image = _image;
+	imageViewInfo.image = _image[0];
 	imageViewInfo.viewType = vk::ImageViewType::e2D;
 	imageViewInfo.format = vk::Format::eR8G8B8A8Unorm;
 	imageViewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
 	imageViewInfo.subresourceRange.levelCount = 1;
 	imageViewInfo.subresourceRange.layerCount = 1;
 
-	_imageView = _context.getDevice().createImageView(imageViewInfo);
+	_imageView[0] = _context.getDevice().createImageView(imageViewInfo);
+}
+
+void VulkanRenderTarget::createSingleSampleImage()
+{
+	// Create the render target image
+	vk::ImageCreateInfo imageInfo{};
+	imageInfo.imageType = vk::ImageType::e2D;
+	imageInfo.extent = vk::Extent3D(_extent.x, _extent.y, 1);
+	imageInfo.mipLevels = 1;
+	imageInfo.arrayLayers = 1;
+	imageInfo.format = vk::Format::eR8G8B8A8Unorm; // 8-bit color with alpha
+	imageInfo.usage = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferSrc;
+	imageInfo.samples = vk::SampleCountFlagBits::e1;
+
+	VmaAllocationCreateInfo allocCreateInfo = {};
+	allocCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+
+	VkImage image;
+	VmaAllocation allocation;
+
+	vmaCreateImage(_context.getAllocator(), reinterpret_cast<VkImageCreateInfo*>(&imageInfo), &allocCreateInfo, &image, &allocation, nullptr);
+
+	_image[1] = image;
+	_allocation[1] = allocation;
+
+	vk::ImageViewCreateInfo imageViewInfo{};
+	imageViewInfo.image = _image[1];
+	imageViewInfo.viewType = vk::ImageViewType::e2D;
+	imageViewInfo.format = vk::Format::eR8G8B8A8Unorm;
+	imageViewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+	imageViewInfo.subresourceRange.levelCount = 1;
+	imageViewInfo.subresourceRange.layerCount = 1;
+
+	_imageView[1] = _context.getDevice().createImageView(imageViewInfo);
+}
+
+void VulkanRenderTarget::create()
+{
+	createMultiSampleImage();
+	createSingleSampleImage();
 
 	vk::AttachmentDescription colorAttachment{};
 	colorAttachment.format = vk::Format::eR8G8B8A8Unorm;
-	colorAttachment.samples = vk::SampleCountFlagBits::e1;
+	colorAttachment.samples = getSampleCountFlagBits();
 	colorAttachment.loadOp = vk::AttachmentLoadOp::eClear;
 	colorAttachment.storeOp = vk::AttachmentStoreOp::eStore;
 	colorAttachment.initialLayout = vk::ImageLayout::eUndefined;
-	colorAttachment.finalLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+	colorAttachment.finalLayout = vk::ImageLayout::eColorAttachmentOptimal;
+
+	vk::AttachmentDescription resolveAttachment{};
+	resolveAttachment.format = vk::Format::eR8G8B8A8Unorm;
+	resolveAttachment.samples = vk::SampleCountFlagBits::e1;
+	resolveAttachment.loadOp = vk::AttachmentLoadOp::eDontCare;
+	resolveAttachment.storeOp = vk::AttachmentStoreOp::eStore;
+	resolveAttachment.initialLayout = vk::ImageLayout::eUndefined;
+	resolveAttachment.finalLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 
 	vk::AttachmentReference colorAttachmentRef{};
 	colorAttachmentRef.attachment = 0; // Index of the attachment in the render pass (color attachment)
 	colorAttachmentRef.layout = vk::ImageLayout::eColorAttachmentOptimal;
 
+	vk::AttachmentReference resolveAttachmentRef{};
+	resolveAttachmentRef.attachment = 1;
+	resolveAttachmentRef.layout = vk::ImageLayout::eColorAttachmentOptimal;
+
 	vk::SubpassDescription subpass{};
 	subpass.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
 	subpass.colorAttachmentCount = 1;
 	subpass.pColorAttachments = &colorAttachmentRef;
+	subpass.pResolveAttachments = &resolveAttachmentRef;
+
+	std::array<vk::AttachmentDescription, 2> attachments = {colorAttachment, resolveAttachment};
 
 	vk::RenderPassCreateInfo renderPassInfo{};
-	renderPassInfo.attachmentCount = 1;
-	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+	renderPassInfo.pAttachments = attachments.data();
 	renderPassInfo.subpassCount = 1;
 	renderPassInfo.pSubpasses = &subpass;
 
@@ -95,8 +161,8 @@ VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 extent
 
 	vk::FramebufferCreateInfo framebufferInfo{};
 	framebufferInfo.renderPass = _renderPass;
-	framebufferInfo.attachmentCount = 1;
-	framebufferInfo.pAttachments = &_imageView;
+	framebufferInfo.attachmentCount = static_cast<uint32_t>(_imageView.size());
+	framebufferInfo.pAttachments = _imageView.data();
 	framebufferInfo.width = 320;
 	framebufferInfo.height = 200;
 	framebufferInfo.layers = 1;
@@ -111,13 +177,16 @@ VulkanRenderTarget::VulkanRenderTarget(VulkanContext& context, glm::ivec2 extent
 	_deviceImageData = bufferManager.createDeviceBuffer<glm::ivec2>(&_extent, 1, BufferUsage::Uniform);
 }
 
-VulkanRenderTarget::~VulkanRenderTarget()
+void VulkanRenderTarget::destroy()
 {
 	_context.getDevice().destroyFramebuffer(_framebuffer);
 	_context.getDevice().destroyRenderPass(_renderPass);
 
-	_context.getDevice().destroyImageView(_imageView);
-	vmaDestroyImage(_context.getAllocator(), _image, _allocation);
+	_context.getDevice().destroyImageView(_imageView[0]);
+	_context.getDevice().destroyImageView(_imageView[1]);
+
+	vmaDestroyImage(_context.getAllocator(), _image[0], _allocation[0]);
+	vmaDestroyImage(_context.getAllocator(), _image[1], _allocation[1]);
 }
 
 void VulkanRenderTarget::copyFrom(HostImage& hostImage)
@@ -136,7 +205,7 @@ void VulkanRenderTarget::copyTo(HostImage& image)
 	cmdBuffer.begin(beginInfo);
 
 	// Transition image for reading
-	transitionImageLayout(cmdBuffer, _image, vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageLayout::eTransferSrcOptimal);
+	transitionImageLayout(cmdBuffer, _image[1], vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageLayout::eTransferSrcOptimal);
 
 	// Define buffer copy region
 	vk::BufferImageCopy region{};
@@ -149,14 +218,14 @@ void VulkanRenderTarget::copyTo(HostImage& image)
 
 	// Copy image to buffer
 	cmdBuffer.copyImageToBuffer(
-		_image, // Render target image
+		_image[1], // Render target image
 		vk::ImageLayout::eTransferSrcOptimal,
 		hostImage.getBuffer(),
 		1,
 		&region);
 
 	// Transition image back to readable state
-	transitionImageLayout(cmdBuffer, _image, vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+	transitionImageLayout(cmdBuffer, _image[1], vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
 
 	// End recording commands
 	cmdBuffer.end();
@@ -224,11 +293,11 @@ void VulkanRenderTarget::endRenderPass(GraphicsCommand& command)
 	vk::ImageMemoryBarrier imageBarrier{
 		{},                                       // srcAccessMask: you might specify vk::AccessFlagBits::eColorAttachmentWrite here
 		vk::AccessFlagBits::eColorAttachmentRead, // dstAccessMask: so that subsequent reads are safe
-		vk::ImageLayout::eColorAttachmentOptimal, // oldLayout: layout used in pass #1
-		vk::ImageLayout::eColorAttachmentOptimal, // newLayout: layout needed in pass #2 (or shader read, if that’s what you need)
+		vk::ImageLayout::eShaderReadOnlyOptimal,  // oldLayout: layout used in pass #1
+		vk::ImageLayout::eShaderReadOnlyOptimal,  // newLayout: layout needed in pass #2 (or shader read, if that’s what you need)
 		VK_QUEUE_FAMILY_IGNORED,                  // srcQueueFamilyIndex
 		VK_QUEUE_FAMILY_IGNORED,                  // dstQueueFamilyIndex
-		_image,                                   // the image to transition
+		_image[1],                                // the image to transition
 		subresourceRange                          // the subresource range that applies
 	};
 

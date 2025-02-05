@@ -208,8 +208,18 @@ void VulkanPipeline::createRasterizerState(vk::PipelineRasterizationStateCreateI
 
 void VulkanPipeline::createMultisampleState(vk::PipelineMultisampleStateCreateInfo& multisampling)
 {
-	multisampling.sampleShadingEnable = VK_TRUE;
-	multisampling.rasterizationSamples = vk::SampleCountFlagBits::e4;
+	uint32_t sampleCount = _pipelineDefinition.getSurface().getMultisampleCount();
+	if (sampleCount > 1)
+	{
+		vk::SampleCountFlagBits sampleCountFlagBits = static_cast<vk::SampleCountFlagBits>(sampleCount);
+		multisampling.sampleShadingEnable = VK_TRUE;
+		multisampling.rasterizationSamples = sampleCountFlagBits;
+	}
+	else
+	{
+		multisampling.sampleShadingEnable = VK_FALSE;
+		multisampling.rasterizationSamples = vk::SampleCountFlagBits::e1;
+	}
 }
 
 void VulkanPipeline::createColorBlendState(vk::PipelineColorBlendStateCreateInfo& colorBlending, vk::PipelineColorBlendAttachmentState& colorBlendAttachment)
@@ -329,6 +339,10 @@ vk::Format VulkanPipeline::determineFormat(const SimpleRTTR::Type& type)
 	else if (type == SimpleRTTR::types().get_type<glm::vec4>())
 	{
 		return vk::Format::eR32G32B32A32Sfloat;
+	}
+	else if (type == SimpleRTTR::types().get_type<unsigned int>())
+	{
+		return vk::Format::eR32Uint;
 	}
 	else if (type == SimpleRTTR::types().get_type<int>())
 	{

@@ -51,6 +51,7 @@ public:
 
 	virtual glm::ivec2 getExtent() const override { return {0, 0}; }
 	virtual ImageFormat getFormat() const override { return ImageFormat::UNKNOWN; }
+	virtual uint32_t getMultisampleCount() const override { return 1; }
 
 	// device image data for a render surface contains the extents of the framebuffer
 	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }

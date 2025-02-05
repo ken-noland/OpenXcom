@@ -65,14 +65,15 @@ protected:
 
 	vk::Image _image;
 	vk::ImageView _imageView;
-
-	vk::ImageLayout _currentLayout;
+	vk::ImageLayout _imageLayout;
 
 	glm::ivec2 _extent;
 	ImageFormat _format;
 
 	// stores the image data in device memory
 	std::unique_ptr<DeviceBuffer> _deviceImageData;
+
+	vk::SampleCountFlagBits getSampleCountFlagBits() { return vk::SampleCountFlagBits::e1; }
 
 public:
 	VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format);

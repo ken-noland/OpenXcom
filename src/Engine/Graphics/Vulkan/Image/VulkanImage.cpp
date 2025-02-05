@@ -182,7 +182,7 @@ void VulkanHostImage::unmap()
 }
 
 VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format)
-	: DeviceImage(ImageType::Texture), _context(context), _format(format), _extent(extent), _currentLayout(vk::ImageLayout::eUndefined)
+	: DeviceImage(ImageType::Texture), _context(context), _format(format), _extent(extent), _imageLayout(vk::ImageLayout::eUndefined)
 {
 	vk::Format vkFormat;
 	switch (format)
@@ -207,7 +207,7 @@ VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, 
 	imageInfo.mipLevels = 1;
 	imageInfo.arrayLayers = 1;
 	imageInfo.format = vkFormat;
-	imageInfo.samples = vk::SampleCountFlagBits::e1;
+	imageInfo.samples = getSampleCountFlagBits();
 	imageInfo.tiling = vk::ImageTiling::eOptimal; // Optimized for GPU
 	imageInfo.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
 	imageInfo.sharingMode = vk::SharingMode::eExclusive;
@@ -269,7 +269,7 @@ void VulkanDeviceImage::copyFrom(HostImage& image)
 	cmdBuffer.begin(beginInfo);
 
 	// Transition device image to TRANSFER_DST layout
-	transitionImageLayout(cmdBuffer, _image, vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageLayout::eTransferDstOptimal);
+	transitionImageLayout(cmdBuffer, _image, _imageLayout, vk::ImageLayout::eTransferDstOptimal);
 
 	// Define the region for copying from the buffer to the image
 	vk::BufferImageCopy region{};
@@ -289,7 +289,8 @@ void VulkanDeviceImage::copyFrom(HostImage& image)
 		&region);
 
 	// Transition device image to SHADER_READ layout
-	transitionImageLayout(cmdBuffer, _image, vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+	transitionImageLayout(cmdBuffer, _image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+	_imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 
 	// End recording commands
 	cmdBuffer.end();
