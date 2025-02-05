@@ -46,7 +46,7 @@ VulkanRenderTarget::~VulkanRenderTarget()
 	destroy();
 }
 
-void VulkanRenderTarget::createMultiSampleImage()
+void VulkanRenderTarget::createRenderSampleImage()
 {
 	// Create the render target image
 	vk::ImageCreateInfo imageInfo{};
@@ -114,9 +114,9 @@ void VulkanRenderTarget::createSingleSampleImage()
 	_imageView[1] = _context.getDevice().createImageView(imageViewInfo);
 }
 
-void VulkanRenderTarget::create()
+void VulkanRenderTarget::createMultisampled()
 {
-	createMultiSampleImage();
+	createRenderSampleImage();
 	createSingleSampleImage();
 
 	vk::AttachmentDescription colorAttachment{};
@@ -163,8 +163,8 @@ void VulkanRenderTarget::create()
 	framebufferInfo.renderPass = _renderPass;
 	framebufferInfo.attachmentCount = static_cast<uint32_t>(_imageView.size());
 	framebufferInfo.pAttachments = _imageView.data();
-	framebufferInfo.width = 320;
-	framebufferInfo.height = 200;
+	framebufferInfo.width = _extent.x;
+	framebufferInfo.height = _extent.y;
 	framebufferInfo.layers = 1;
 
 	_framebuffer = _context.getDevice().createFramebuffer(framebufferInfo);
@@ -177,16 +177,89 @@ void VulkanRenderTarget::create()
 	_deviceImageData = bufferManager.createDeviceBuffer<glm::ivec2>(&_extent, 1, BufferUsage::Uniform);
 }
 
+void VulkanRenderTarget::createStandard()
+{
+	createRenderSampleImage();
+	_image[1] = _image[0];
+	_imageView[1] = _imageView[0];
+
+	
+	vk::AttachmentDescription colorAttachment{};
+	colorAttachment.format = vk::Format::eR8G8B8A8Unorm;
+	colorAttachment.samples = getSampleCountFlagBits();
+	colorAttachment.loadOp = vk::AttachmentLoadOp::eClear;
+	colorAttachment.storeOp = vk::AttachmentStoreOp::eStore;
+	colorAttachment.initialLayout = vk::ImageLayout::eUndefined;
+	colorAttachment.finalLayout = vk::ImageLayout::eColorAttachmentOptimal;
+
+	vk::AttachmentReference colorAttachmentRef{};
+	colorAttachmentRef.attachment = 0; // Index of the attachment in the render pass (color attachment)
+	colorAttachmentRef.layout = vk::ImageLayout::eColorAttachmentOptimal;
+
+	vk::SubpassDescription subpass{};
+	subpass.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+
+	vk::RenderPassCreateInfo renderPassInfo{};
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+
+	_renderPass = _context.getDevice().createRenderPass(renderPassInfo);
+
+	vk::FramebufferCreateInfo framebufferInfo{};
+	framebufferInfo.renderPass = _renderPass;
+	framebufferInfo.attachmentCount = 1;
+	framebufferInfo.pAttachments = &_imageView[0];
+	framebufferInfo.width = _extent.x;
+	framebufferInfo.height = _extent.y;
+	framebufferInfo.layers = 1;
+
+	_framebuffer = _context.getDevice().createFramebuffer(framebufferInfo);
+
+	// need to create the primitives factory
+	_primitiveFactory = std::make_unique<PrimitiveFactory>(_context.getEngineContext(), *this);
+
+	// Create the device buffer which contains the image information on GPU
+	BufferManager& bufferManager = _context.getEngineContext().getResourceSystem().getBufferManager();
+	_deviceImageData = bufferManager.createDeviceBuffer<glm::ivec2>(&_extent, 1, BufferUsage::Uniform);
+}
+
+void VulkanRenderTarget::create()
+{
+	if (getMultisampleCount() > 1)
+	{
+		createMultisampled();
+	}
+	else
+	{
+		createStandard();
+	}
+}
+
 void VulkanRenderTarget::destroy()
 {
 	_context.getDevice().destroyFramebuffer(_framebuffer);
 	_context.getDevice().destroyRenderPass(_renderPass);
 
-	_context.getDevice().destroyImageView(_imageView[0]);
-	_context.getDevice().destroyImageView(_imageView[1]);
+	if (_image[0] == _image[1])
+	{
+		// standard
+		_context.getDevice().destroyImageView(_imageView[0]);
 
-	vmaDestroyImage(_context.getAllocator(), _image[0], _allocation[0]);
-	vmaDestroyImage(_context.getAllocator(), _image[1], _allocation[1]);
+		vmaDestroyImage(_context.getAllocator(), _image[0], _allocation[0]);
+	}
+	else
+	{
+		// multisampled
+		_context.getDevice().destroyImageView(_imageView[0]);
+		_context.getDevice().destroyImageView(_imageView[1]);
+
+		vmaDestroyImage(_context.getAllocator(), _image[0], _allocation[0]);
+		vmaDestroyImage(_context.getAllocator(), _image[1], _allocation[1]);
+	}
 }
 
 void VulkanRenderTarget::copyFrom(HostImage& hostImage)
@@ -282,32 +355,64 @@ void VulkanRenderTarget::endRenderPass(GraphicsCommand& command)
 	commandBuffer.endRenderPass();
 
 	// insert a pipeline barrier here to ensure the image has time to render
-	vk::ImageSubresourceRange subresourceRange{
-		vk::ImageAspectFlagBits::eColor, // aspect mask
-		0,                               // baseMipLevel
-		1,                               // levelCount
-		0,                               // baseArrayLayer
-		1                                // layerCount
-	};
+	if (getMultisampleCount() > 1)
+	{
+		vk::ImageSubresourceRange subresourceRange{
+			vk::ImageAspectFlagBits::eColor, // aspect mask
+			0,                               // baseMipLevel
+			1,                               // levelCount
+			0,                               // baseArrayLayer
+			1                                // layerCount
+		};
 
-	vk::ImageMemoryBarrier imageBarrier{
-		{},                                       // srcAccessMask: you might specify vk::AccessFlagBits::eColorAttachmentWrite here
-		vk::AccessFlagBits::eColorAttachmentRead, // dstAccessMask: so that subsequent reads are safe
-		vk::ImageLayout::eShaderReadOnlyOptimal,  // oldLayout: layout used in pass #1
-		vk::ImageLayout::eShaderReadOnlyOptimal,  // newLayout: layout needed in pass #2 (or shader read, if that’s what you need)
-		VK_QUEUE_FAMILY_IGNORED,                  // srcQueueFamilyIndex
-		VK_QUEUE_FAMILY_IGNORED,                  // dstQueueFamilyIndex
-		_image[1],                                // the image to transition
-		subresourceRange                          // the subresource range that applies
-	};
+		vk::ImageMemoryBarrier imageBarrier{
+			{},                                       // srcAccessMask: you might specify vk::AccessFlagBits::eColorAttachmentWrite here
+			vk::AccessFlagBits::eColorAttachmentRead, // dstAccessMask: so that subsequent reads are safe
+			vk::ImageLayout::eShaderReadOnlyOptimal,  // oldLayout: layout used in pass #1
+			vk::ImageLayout::eShaderReadOnlyOptimal,  // newLayout: layout needed in pass #2 (or shader read, if that’s what you need)
+			VK_QUEUE_FAMILY_IGNORED,                  // srcQueueFamilyIndex
+			VK_QUEUE_FAMILY_IGNORED,                  // dstQueueFamilyIndex
+			_image[1],                                // the image to transition
+			subresourceRange                          // the subresource range that applies
+		};
 
-	commandBuffer.pipelineBarrier(
-		vk::PipelineStageFlagBits::eColorAttachmentOutput, // src stage: finishing writes in pass #1
-		vk::PipelineStageFlagBits::eColorAttachmentOutput, // dst stage: about to begin color writes in pass #2
-		vk::DependencyFlags(),                             // dependency flags (e.g. vk::DependencyFlagBits::eByRegion if needed)
-		0, nullptr,                                        // no global memory barriers
-		0, nullptr,                                        // no buffer memory barriers
-		1, &imageBarrier);                                 // the image memory barrier
+		commandBuffer.pipelineBarrier(
+			vk::PipelineStageFlagBits::eColorAttachmentOutput, // src stage: finishing writes in pass #1
+			vk::PipelineStageFlagBits::eColorAttachmentOutput, // dst stage: about to begin color writes in pass #2
+			vk::DependencyFlags(),                             // dependency flags (e.g. vk::DependencyFlagBits::eByRegion if needed)
+			0, nullptr,                                        // no global memory barriers
+			0, nullptr,                                        // no buffer memory barriers
+			1, &imageBarrier);                                 // the image memory barrier
+	}
+	else
+	{
+		vk::ImageSubresourceRange subresourceRange{
+			vk::ImageAspectFlagBits::eColor, // aspect mask
+			0,                               // baseMipLevel
+			1,                               // levelCount
+			0,                               // baseArrayLayer
+			1                                // layerCount
+		};
+
+		vk::ImageMemoryBarrier imageBarrier{
+			{},                                       // srcAccessMask: you might specify vk::AccessFlagBits::eColorAttachmentWrite here
+			vk::AccessFlagBits::eColorAttachmentRead, // dstAccessMask: so that subsequent reads are safe
+			vk::ImageLayout::eColorAttachmentOptimal, // oldLayout: layout used in pass #1
+			vk::ImageLayout::eShaderReadOnlyOptimal,  // newLayout: layout needed in pass #2 (or shader read, if that’s what you need)
+			VK_QUEUE_FAMILY_IGNORED,                  // srcQueueFamilyIndex
+			VK_QUEUE_FAMILY_IGNORED,                  // dstQueueFamilyIndex
+			_image[1],                                // the image to transition
+			subresourceRange                          // the subresource range that applies
+		};
+
+		commandBuffer.pipelineBarrier(
+			vk::PipelineStageFlagBits::eColorAttachmentOutput, // src stage: finishing writes in pass #1
+			vk::PipelineStageFlagBits::eColorAttachmentOutput, // dst stage: about to begin color writes in pass #2
+			vk::DependencyFlags(),                             // dependency flags (e.g. vk::DependencyFlagBits::eByRegion if needed)
+			0, nullptr,                                        // no global memory barriers
+			0, nullptr,                                        // no buffer memory barriers
+			1, &imageBarrier);                                 // the image memory barrier
+	}
 }
 
 } // namespace OpenXcom

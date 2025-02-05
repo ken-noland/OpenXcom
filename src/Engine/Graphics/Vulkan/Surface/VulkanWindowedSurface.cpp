@@ -28,7 +28,6 @@
 #include "../../../Platform/Window.h"
 #include "../../../Engine.h"
 #include "../../../Resource/ResourceSystem.h"
-#include "../../../Logger.h"
 #include "../../../Utility/RTTR.h"
 
 #include "../../../EngineContext.h"
@@ -309,8 +308,6 @@ void VulkanWindowedSurface::handleResize(glm::ivec2 newSize)
 	{
 		return;
 	}
-
-	Log(LOG_INFO) << "Handling window resize. New size: {" << newSize.x << ", " << newSize.y <<"}";
 
 	// Wait for the device to finish
 	_context.getDevice().waitIdle();

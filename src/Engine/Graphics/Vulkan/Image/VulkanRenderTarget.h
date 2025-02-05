@@ -51,8 +51,11 @@ private:
 
 	vk::SampleCountFlagBits getSampleCountFlagBits() { return static_cast<vk::SampleCountFlagBits>(getMultisampleCount()); }
 
-	void createMultiSampleImage();
+	void createRenderSampleImage();
 	void createSingleSampleImage();
+
+	void createMultisampled();
+	void createStandard();
 
 	void create();
 	void destroy();
@@ -65,7 +68,7 @@ public:
 	virtual uint32_t getHeight() const override { return _extent.y; }
 	virtual glm::ivec2 getExtent() const override { return _extent; }
 	virtual ImageFormat getFormat() const override { return ImageFormat::UNKNOWN; }
-	virtual uint32_t getMultisampleCount() const override { return 2; }
+	virtual uint32_t getMultisampleCount() const override { return 1; }
 		
 	virtual void copyFrom(HostImage& hostImage) override;
 	virtual void copyTo(HostImage& hostImage) override;

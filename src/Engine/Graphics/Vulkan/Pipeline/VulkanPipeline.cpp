@@ -65,13 +65,11 @@ VulkanPipeline::VulkanPipeline(VulkanContext& context, const PipelineDefinition&
 	createRasterizerState(rasterizer);
 	createMultisampleState(multisampling);
 	createColorBlendState(colorBlending, colorBlendAttachment);
-
 	
 	if (pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineStrip || pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineList)
 	{
 		rasterizer.polygonMode = vk::PolygonMode::ePoint;
 	}
-
 
 	createPipelineLayout();
 
