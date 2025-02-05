@@ -22,28 +22,25 @@
 namespace OpenXcom
 {
 
-vk::BufferUsageFlags VulkanBuffer::getUsageFlags(BufferUsage usage)
+VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, std::size_t elementSize, std::size_t count, BufferUsage usage)
+	: HostBuffer(usage, elementSize), _context(context)
 {
-	switch(usage)
-	{
-	case BufferUsage::Vertex:
-		return vk::BufferUsageFlagBits::eVertexBuffer;
-	case BufferUsage::Index:
-		return vk::BufferUsageFlagBits::eIndexBuffer;
-	case BufferUsage::Uniform:
-		return vk::BufferUsageFlagBits::eUniformBuffer;
-	case BufferUsage::Storage:
-		return vk::BufferUsageFlagBits::eStorageBuffer;
-	}
+	assert(elementSize > 0);
+	assert(count > 0);
 
-	return vk::BufferUsageFlags();
+	allocate(elementSize * count);
+	_count = count;
 }
 
-
-VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage)
-	: VulkanBuffer(context, type, size), HostBuffer(usage)
+VulkanHostBuffer::~VulkanHostBuffer()
 {
-	vk::BufferUsageFlags usageFlags = getUsageFlags(usage) | vk::BufferUsageFlagBits::eTransferSrc;
+	deallocate();
+}
+
+void VulkanHostBuffer::allocate(std::size_t size)
+{
+	_size = size;
+	vk::BufferUsageFlags usageFlags = _context.getBufferUsageFlags(_usage) | vk::BufferUsageFlagBits::eTransferSrc;
 
 	// create a buffer that is only accessible by the CPU
 	vk::BufferCreateInfo bufferInfo{};
@@ -57,61 +54,67 @@ VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, const SimpleRTTR::Typ
 
 	VkBuffer buffer = nullptr;
 	VkBufferCreateInfo createInfo = bufferInfo;
-	vmaCreateBuffer(context.getAllocator(), &createInfo, &allocInfo, &buffer, &_allocation, nullptr);
+	vmaCreateBuffer(_context.getAllocator(), &createInfo, &allocInfo, &buffer, &_allocation, nullptr);
 
 	_buffer = buffer;
+	_allocatedSize = size;
 }
 
-VulkanHostBuffer::~VulkanHostBuffer()
+void VulkanHostBuffer::deallocate()
 {
 	vmaDestroyBuffer(_context.getAllocator(), _buffer, _allocation);
 }
 
-void* VulkanHostBuffer::map()
+void VulkanHostBuffer::resize(std::size_t count)
+{
+	std::size_t newSize = _elementSize * count;
+	if (newSize <= _allocatedSize)
+	{
+		_count = count;
+		_size = newSize;
+	}
+	else
+	{
+		deallocate();
+		allocate(newSize);
+	}
+
+}
+
+void VulkanHostBuffer::copy(const void* data, std::size_t size)
 {
 	void* mappedData = nullptr;
 	vmaMapMemory(_context.getAllocator(), _allocation, &mappedData);
-	return mappedData;
-}
-
-void VulkanHostBuffer::unmap()
-{
+	memcpy(mappedData, data, size);
 	vmaUnmapMemory(_context.getAllocator(), _allocation);
 }
 
-void VulkanHostBuffer::copyTo(const void* data, std::size_t offset, std::size_t size)
-{
-	void* mappedData = map();
-	memcpy(static_cast<char*>(mappedData) + offset, data, size);
-	unmap();
-}
-
 VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, VulkanHostBuffer& hostBuffer)
-	: VulkanBuffer(context, hostBuffer.getType(), hostBuffer.getSize()), DeviceBuffer(hostBuffer.getUsage())
+	: VulkanDeviceBuffer(context, hostBuffer.getElementSize(), hostBuffer.getCount(), hostBuffer.getUsage())
 {
-	create();
-
 	// copy the host buffer to the device buffer
-	update(hostBuffer);
-
+	copy(hostBuffer);
 }
 
-VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage)
-	: VulkanBuffer(context, type, size), DeviceBuffer(usage)
+VulkanDeviceBuffer::VulkanDeviceBuffer(VulkanContext& context, std::size_t elementSize, std::size_t count, BufferUsage usage)
+	: DeviceBuffer(usage, elementSize), _context(context)
 {
-	create();
+	assert(elementSize > 0);
+	assert(count > 0);
+
+	allocate(elementSize * count);
+	_count = count;
 }
 
 VulkanDeviceBuffer::~VulkanDeviceBuffer()
 {
-	_context.getDevice().waitIdle();
-	vmaDestroyBuffer(_context.getAllocator(), _buffer, _allocation);
+	deallocate();
 }
 
-/// Create a buffer that is accessible by the GPU
-void VulkanDeviceBuffer::create()
+void VulkanDeviceBuffer::allocate(std::size_t size)
 {
-	vk::BufferUsageFlags usageFlags = getUsageFlags(getUsage()) | vk::BufferUsageFlagBits::eTransferDst;
+	_size = size;
+	vk::BufferUsageFlags usageFlags = _context.getBufferUsageFlags(_usage) | vk::BufferUsageFlagBits::eTransferDst;
 
 	vk::BufferCreateInfo bufferInfo{};
 	bufferInfo.size = _size;
@@ -126,12 +129,19 @@ void VulkanDeviceBuffer::create()
 	vmaCreateBuffer(_context.getAllocator(), &createInfo, &allocInfo, &buffer, &_allocation, nullptr);
 
 	_buffer = buffer;
+	_allocatedSize = size;
 }
 
-void VulkanDeviceBuffer::update(VulkanHostBuffer& hostBuffer)
+void VulkanDeviceBuffer::deallocate()
 {
-	//KN NOTE: It's possible that we could use a multithreaded version of this which allows us to push up the contents without
-	// having to wait for the previous command. This would reduce load times, but at the cost of adding complexity.
+	_context.getDevice().waitIdle();
+	vmaDestroyBuffer(_context.getAllocator(), _buffer, _allocation);
+}
+
+void VulkanDeviceBuffer::copy(const VulkanHostBuffer& hostBuffer)
+{
+	// KN NOTE: It's possible that we could use a multithreaded version of this which allows us to push up the contents without
+	//  having to wait for the previous command. This would reduce load times, but at the cost of adding complexity.
 	vk::Result result = vk::Result::eSuccess;
 
 	vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
@@ -157,6 +167,27 @@ void VulkanDeviceBuffer::update(VulkanHostBuffer& hostBuffer)
 	result = transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
 
 	transferQueue.waitIdle();
+}
+
+void VulkanDeviceBuffer::resize(std::size_t count)
+{
+	std::size_t newSize = _elementSize * count;
+	if (newSize <= _allocatedSize)
+	{
+		_count = count;
+		_size = newSize;
+	}
+	else
+	{
+		deallocate();
+		allocate(newSize);
+	}
+}
+
+void VulkanDeviceBuffer::copy(const HostBuffer& buffer)
+{
+	const VulkanHostBuffer& hostBuffer = static_cast<const VulkanHostBuffer&>(buffer);
+	copy(hostBuffer);
 }
 
 

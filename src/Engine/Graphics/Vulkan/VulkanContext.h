@@ -36,6 +36,8 @@ class VulkanPipelineFactory;
 class VulkanShaderManager;
 class VulkanPipelineManager;
 
+enum class BufferUsage;
+
 class VulkanQueue
 {
 protected:
@@ -125,6 +127,10 @@ public:
 	VulkanQueue& getGraphicsQueue() { return _graphicsQueue; }
 	VulkanQueue& getTransferQueue() { return _transferQueue; }
 	VulkanQueue& getPresentQueue() { return _presentQueue; }
+
+	//helpers
+	vk::SampleCountFlagBits getSampleCountFlagBits(vk::SampleCountFlags flags);
+	vk::BufferUsageFlags getBufferUsageFlags(BufferUsage usage);
 };
 
 } // namespace OpenXcom

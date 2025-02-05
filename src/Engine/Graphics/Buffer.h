@@ -17,7 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <cstddef>
+#include <cstdlib>
+#include <vector>
+#include <stdexcept>
 
 namespace OpenXcom
 {
@@ -35,25 +37,94 @@ class HostBuffer
 protected:
 	BufferUsage _usage;
 
+	std::size_t _elementSize;
+	std::size_t _count;
+
+	std::size_t _allocatedSize;
+	std::size_t _size;
+
 public:
-	HostBuffer(BufferUsage usage) : _usage(usage) {}
+	HostBuffer(BufferUsage usage, std::size_t elementSize) : _usage(usage), _elementSize(elementSize) {};
 	virtual ~HostBuffer() = default;
 
 	const BufferUsage getUsage() const { return _usage; }
 
-	virtual void copyTo(const void* data, std::size_t offset, std::size_t size) = 0;
+	std::size_t getCount() const { return _count; }
+
+	std::size_t getSize() const { return _size; }
+
+	std::size_t getElementSize() const { return _elementSize; }
+
+	std::size_t getAllocatedSize() const { return _allocatedSize; }
+
+	virtual void resize(std::size_t count) = 0;
+
+	virtual void copy(const void* data, std::size_t size) = 0;
+
+    // Template helper to set data from a vector.
+	template <typename T>
+	inline void set(const std::vector<T>& data);
+	
+    // Template helper to set data from an initializer list.
+	template <typename T>
+	inline void set(std::initializer_list<T> data);
 };
+
+template <typename Type>
+void HostBuffer::set(std::initializer_list<Type> data)
+{
+	// Verify that the element size matches.
+	if (_elementSize != sizeof(Type))
+		throw std::runtime_error("Element size mismatch in HostBuffer::set()");
+
+	// Resize the buffer to hold the new count of elements.
+	resize(data.size());
+	// Copy data into the buffer.
+	copy(static_cast<const void*>(data.data()), data.size());
+}
+
+template <typename Type>
+void HostBuffer::set(const std::vector<Type>& data)
+{
+	// Verify that the element size matches.
+	if (_elementSize != sizeof(Type))
+		throw std::runtime_error("Element size mismatch in HostBuffer::set()");
+
+	// Resize the buffer to hold the new count of elements.
+	resize(data.size());
+	// Copy data into the buffer.
+	copy(static_cast<const void*>(data.data()), data.size());
+}
+
 
 class DeviceBuffer
 {
 protected:
 	BufferUsage _usage;
 
+	std::size_t _elementSize;
+	std::size_t _count;
+
+	std::size_t _allocatedSize;
+	std::size_t _size;
+
 public:
-	DeviceBuffer(BufferUsage usage) : _usage(usage) {}
+	DeviceBuffer(BufferUsage usage, std::size_t elementSize) : _usage(usage), _elementSize(elementSize) {}
 	virtual ~DeviceBuffer() = default;
 
 	const BufferUsage getUsage() const { return _usage; }
+
+	std::size_t getCount() const { return _count; }
+
+	std::size_t getSize() const { return _size; }
+
+	std::size_t getElementSize() const { return _elementSize; }
+
+	std::size_t getAllocatedSize() const { return _allocatedSize; }
+
+	virtual void resize(std::size_t count) = 0;
+
+	virtual void copy(const HostBuffer& buffer) = 0;
 };
 
 } // namespace OpenXcom

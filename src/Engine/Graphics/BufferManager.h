@@ -19,7 +19,6 @@
  */
 #include <memory>
 #include "Buffer.h"
-#include <simplerttr.h>
 #include <cassert>
 
 namespace OpenXcom
@@ -34,14 +33,14 @@ public:
 	virtual ~BufferManager() = default;
 	
 	// Create an empty host buffer
-	virtual std::unique_ptr<HostBuffer> createHostBuffer(const SimpleRTTR::Type& type, std::size_t size, BufferUsage usage) = 0;
+	virtual std::unique_ptr<HostBuffer> createHostBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) = 0;
 
 	// Create a host buffer and copy data into it
 	template <typename BufferType>
 	inline std::unique_ptr<HostBuffer> createHostBuffer(const BufferType* data, size_t count, BufferUsage usage);
 
 	// Create an empty device buffer
-	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(const SimpleRTTR::Type& type, std::size_t size, BufferUsage usage) = 0;
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) = 0;
 
 	// Create a device buffer from a host buffer
 	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(HostBuffer& hostBuffer) = 0;
@@ -57,18 +56,14 @@ public:
 template <typename BufferType>
 std::unique_ptr<HostBuffer> BufferManager::createHostBuffer(const BufferType* data, size_t count, BufferUsage usage)
 {
-	assert(SimpleRTTR::types().has_type<BufferType>() && "Buffer type must be registered with SimpleRTTR before usage as a host buffer");
-	size_t size = count * sizeof(BufferType);
-	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer(SimpleRTTR::types().get_type<BufferType>().value(), size, usage);
-	hostBuffer->copyTo(data, 0, size);
+	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer(sizeof(BufferType), count, usage);
+	hostBuffer->copy(data, sizeof(BufferType) * count);
 	return hostBuffer;
 }
 
 template <typename BufferType>
 std::unique_ptr<DeviceBuffer> BufferManager::createDeviceBuffer(const BufferType* data, size_t count, BufferUsage usage)
 {
-	assert(SimpleRTTR::types().has_type<BufferType>() && "Buffer type must be registered with SimpleRTTR before usage as a device buffer");
-	size_t size = count * sizeof(BufferType);
 	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer<BufferType>(data, count, usage);
 	std::unique_ptr<DeviceBuffer> deviceBuffer = createDeviceBuffer(*hostBuffer);
 	return deviceBuffer;

@@ -40,10 +40,10 @@ public:
 	~VulkanBufferManager();
 
 	// Create an empty host buffer
-	virtual std::unique_ptr<HostBuffer> createHostBuffer(const SimpleRTTR::Type& type, std::size_t size, BufferUsage usage) override;
+	virtual std::unique_ptr<HostBuffer> createHostBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) override;
 
 	// Create an empty device buffer
-	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(const SimpleRTTR::Type& type, std::size_t size, BufferUsage usage) override;
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) override;
 
 	// Create a device buffer from a host buffer
 	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(HostBuffer& hostBuffer) override;

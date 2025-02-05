@@ -444,7 +444,7 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	}
 }
 
-vk::SampleCountFlagBits getMultisampleFlagBits(vk::SampleCountFlags flags)
+vk::SampleCountFlagBits VulkanContext::getSampleCountFlagBits(vk::SampleCountFlags flags)
 {
 	if (flags & vk::SampleCountFlagBits::e1)
 	{
@@ -479,6 +479,24 @@ vk::SampleCountFlagBits getMultisampleFlagBits(vk::SampleCountFlags flags)
 		throw std::runtime_error("Unsupported sample count");
 	}
 }
+
+vk::BufferUsageFlags VulkanContext::getBufferUsageFlags(BufferUsage usage)
+{
+	switch (usage)
+	{
+	case BufferUsage::Vertex:
+		return vk::BufferUsageFlagBits::eVertexBuffer;
+	case BufferUsage::Index:
+		return vk::BufferUsageFlagBits::eIndexBuffer;
+	case BufferUsage::Uniform:
+		return vk::BufferUsageFlagBits::eUniformBuffer;
+	case BufferUsage::Storage:
+		return vk::BufferUsageFlagBits::eStorageBuffer;
+	}
+
+	return vk::BufferUsageFlags();
+}
+
 
 
 } // namespace OpenXcom

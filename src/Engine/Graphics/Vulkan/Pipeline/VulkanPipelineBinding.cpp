@@ -229,8 +229,7 @@ void VulkanPipelineBinding::commit(GraphicsCommand& command)
 		vkCommand.bindIndexBuffer(indexBuffer.getBuffer(), 0, vk::IndexType::eUint16);
 
 		// finally, issue draw command
-		uint32_t count = (uint32_t)(indexBuffer.getSize() / indexBuffer.getType().size());
-		vkCommand.drawIndexed(count, 1, 0, 0, 0);
+		vkCommand.drawIndexed(indexBuffer.getCount(), 1, 0, 0, 0);
 	}
 	else
 	{
@@ -238,8 +237,7 @@ void VulkanPipelineBinding::commit(GraphicsCommand& command)
 		vkCommand.bindVertexBuffers(0, vertexBuffer.getBuffer(), offsets);
 
 		// finally, issue draw command
-		uint32_t count = (uint32_t)(vertexBuffer.getSize() / vertexBuffer.getType().size());
-		vkCommand.draw(count, 1, 0, 0);
+		vkCommand.draw(vertexBuffer.getCount(), 1, 0, 0);
 		isIndexed = false;
 	}
 }

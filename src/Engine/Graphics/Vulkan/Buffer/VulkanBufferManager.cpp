@@ -34,14 +34,14 @@ VulkanBufferManager::~VulkanBufferManager()
 {
 }
 
-std::unique_ptr<HostBuffer> VulkanBufferManager::createHostBuffer(const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage)
+std::unique_ptr<HostBuffer> VulkanBufferManager::createHostBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage)
 {
-	return std::make_unique<VulkanHostBuffer>(_context, type, size, usage);
+	return std::make_unique<VulkanHostBuffer>(_context, elementSize, count, usage);
 }
 
-std::unique_ptr<DeviceBuffer> VulkanBufferManager::createDeviceBuffer(const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage)
+std::unique_ptr<DeviceBuffer> VulkanBufferManager::createDeviceBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage)
 {
-	return std::make_unique<VulkanDeviceBuffer>(_context, type, size, usage);
+	return std::make_unique<VulkanDeviceBuffer>(_context, elementSize, count, usage);
 }
 
 std::unique_ptr<DeviceBuffer> VulkanBufferManager::createDeviceBuffer(HostBuffer& hostBuffer)

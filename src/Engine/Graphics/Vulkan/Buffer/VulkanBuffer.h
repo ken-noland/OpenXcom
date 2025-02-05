@@ -34,56 +34,51 @@ namespace OpenXcom
 
 class VulkanContext;
 
-class VulkanBuffer
+class VulkanHostBuffer : public HostBuffer
 {
 protected:
 	VulkanContext& _context;
 	VmaAllocation _allocation;
 
-	SimpleRTTR::TypeReference _type;
-
 	vk::Buffer _buffer;
-	vk::DeviceSize _size;
 
-	static vk::BufferUsageFlags getUsageFlags(BufferUsage usage);
-
-public:
-	VulkanBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size) : _context(context), _allocation(0), _type(type), _buffer(), _size(size) {}
-	virtual ~VulkanBuffer() = default;
-
-	vk::DeviceSize getSize() const { return _size; }
-	vk::Buffer getBuffer() const { return _buffer; }
-
-	SimpleRTTR::Type getType() { return _type.type(); }
-};
-
-class VulkanHostBuffer : public VulkanBuffer, public HostBuffer
-{
-private:
+	void allocate(std::size_t size);
+	void deallocate();
 
 public:
-	VulkanHostBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage);
+	VulkanHostBuffer(VulkanContext& context, std::size_t elementSize, std::size_t count, BufferUsage usage);
 	virtual ~VulkanHostBuffer();
 
-	void* map();
-	void unmap();
+	const vk::Buffer& getBuffer() const { return _buffer; }
 
-	virtual void copyTo(const void* data, size_t offset, size_t size) override;
+	virtual void resize(std::size_t count) override;
+
+	virtual void copy(const void* data, std::size_t size) override;
 };
 
-class VulkanDeviceBuffer : public VulkanBuffer, public DeviceBuffer
+class VulkanDeviceBuffer : public DeviceBuffer
 {
 private:
-	void create();
-	void update(VulkanHostBuffer& hostBuffer);
+	VulkanContext& _context;
+	VmaAllocation _allocation;
+
+	vk::Buffer _buffer;
+
+	void allocate(std::size_t size);
+	void deallocate();
+
+	void copy(const VulkanHostBuffer& hostBuffer);
 
 public:
 	VulkanDeviceBuffer(VulkanContext& context, VulkanHostBuffer& hostBuffer);
-	VulkanDeviceBuffer(VulkanContext& context, const SimpleRTTR::Type& type, vk::DeviceSize size, BufferUsage usage); // create a blank device buffer
+	VulkanDeviceBuffer(VulkanContext& context, std::size_t elementSize, std::size_t count, BufferUsage usage); // create a blank device buffer
 	virtual ~VulkanDeviceBuffer();
+
+	const vk::Buffer& getBuffer() const { return _buffer; }
+		
+	virtual void resize(std::size_t count) override;
+
+	virtual void copy(const HostBuffer& buffer) override;
 };
-
-
-
 
 } // namespace OpenXcom
