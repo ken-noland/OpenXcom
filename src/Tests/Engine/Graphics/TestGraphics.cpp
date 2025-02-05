@@ -214,6 +214,40 @@ TEST_F(GraphicsTest, TestLineListMultiple)
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
+TEST_F(GraphicsTest, TestLineListResize)
+{
+	// create multiple vertical lines
+	LineVertex lines[] = {{{10, 10}}, {{10, 190}}, {{20, 10}}, {{20, 190}}, {{30, 10}}, {{30, 190}}, {{40, 10}}, {{40, 190}}};
+	std::unique_ptr<LineListPrimitive> lineList = _gameSurface->getRenderTarget().getPrimitiveFactory().createLineListPrimitive(lines, 6, 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(lineList);
+
+	// draw the line
+	_gameSurface->onRender() << [&lineList](GraphicsCommand& command) {
+		lineList->draw(command);
+	};
+
+	OwningHandle<HostImage> hostImageHandle;
+	hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	compareWithBaseline(hostImageHandle, _dataPath / "Test" / "Graphics" / "003_game_surface_line_multiple_1.png");
+
+	lineList->setLines(lines, 4);
+
+	hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	compareWithBaseline(hostImageHandle, _dataPath / "Test" / "Graphics" / "003_game_surface_line_multiple_2.png");
+
+	lineList->setLines(lines, 8);
+
+	hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	compareWithBaseline(hostImageHandle, _dataPath / "Test" / "Graphics" / "003_game_surface_line_multiple_3.png");
+}
+
+
 TEST_F(GraphicsTest, TestLineStrip)
 {
 	LineVertex lines[] = {
@@ -369,3 +403,4 @@ TEST_F(GraphicsTest, TestPointColorListPrimitive16Points)
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "009_game_surface_point_color_list_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
+

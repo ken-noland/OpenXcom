@@ -61,22 +61,32 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_EXITSIZEMOVE:
-		// End of resizing
-		window->resize();
+	{
+		// get the new size of the window
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+		window->resize(glm::ivec2(rect.right - rect.left, rect.bottom - rect.top));
 		break;
+	}
 
 	case WM_SIZE:
+	{
+		// get the new size of the window
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+		glm::ivec2 newSize(rect.right - rect.left, rect.bottom - rect.top);
 		if (wParam == SIZE_MINIMIZED)
 		{
 			window->_minimized = true;
-			window->resize();
+			window->resize(newSize);
 		}
 		else if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED)
 		{
 			window->_minimized = false;
-			window->resize();
+			window->resize(newSize);
 		}
 		break;
+	}
 
 	// Handle other messages as needed
 	default:

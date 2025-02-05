@@ -174,7 +174,7 @@ void WindowSurface::createWindowed(GameSurface& gameSurface)
 
 	// setup the callbacks
 	_window->onClose() << std::bind(&WindowSurface::onClose, this);
-	_window->onResize() << std::bind(&WindowSurface::onResize, this);
+	_window->onResize() << std::bind(&WindowSurface::onResize, this, std::placeholders::_1);
 
 	_window->show();
 
@@ -243,7 +243,17 @@ void WindowSurface::update()
 	}
 }
 
-void WindowSurface::onResize()
+RenderTarget& WindowSurface::getRenderTarget()
+{
+	return *_windowSurface;
+}
+
+PlatformWindow& WindowSurface::getWindow()
+{
+	return *_window;
+}
+
+void WindowSurface::onResize(glm::ivec2 size)
 {
 	updateProjection();
 }

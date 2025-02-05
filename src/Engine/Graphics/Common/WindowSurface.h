@@ -29,6 +29,7 @@ namespace OpenXcom
 class EngineContext;
 class GameSurface;
 class PlatformWindow;
+class RenderTarget;
 class GraphicsSurface;
 class Shader;
 class DeviceBuffer;
@@ -67,7 +68,7 @@ protected:
 
 	void updateProjection();
 	
-	void onResize();
+	void onResize(glm::ivec2 size);
 	void onClose();
 
 public:
@@ -77,6 +78,9 @@ public:
 	void update();
 
 	bool isRunning() const { return _isRunning; }
+		
+	RenderTarget& getRenderTarget();
+	PlatformWindow& getWindow();
 
 	MulticastDelegate<void(GraphicsCommand&)>& onRender() { return _onRender; }
 };

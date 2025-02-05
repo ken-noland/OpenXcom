@@ -23,6 +23,8 @@
 #include <string>
 #include <memory>
 
+#include <glm/vec2.hpp>
+
 
 #if defined(_WIN32)
  // Forward declarations for Windows types
@@ -70,11 +72,11 @@ protected:
 
 	PlatformWindowHandle _handle;
 
-	void resize();
+	void resize(glm::ivec2 size);
 
 	//message
 	MulticastDelegate<void(void)> _onClose;
-	MulticastDelegate<void(void)> _onResize;
+	MulticastDelegate<void(glm::ivec2)> _onResize;
 
 	// flags(maybe convert these to bit mask fields later?)
 	bool _minimized;
@@ -97,7 +99,7 @@ public:
 	const PlatformWindowHandle& getHandle() const { return _handle; }
 
 	MulticastDelegate<void(void)>& onClose() { return _onClose; }
-	MulticastDelegate<void(void)>& onResize() { return _onResize; }
+	MulticastDelegate<void(glm::ivec2)>& onResize() { return _onResize; }
 };
 
 

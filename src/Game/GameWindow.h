@@ -19,6 +19,7 @@
  */
 #include <memory>
 #include <string>
+#include <glm/vec2.hpp>
 
 /////////////////////////////////////////////
 // TEMP
@@ -55,6 +56,8 @@ protected:
 
 	void onWindowRender(GraphicsCommand& command);
 	void onGameRender(GraphicsCommand& command);
+
+	void onWindowResize(glm::ivec2);
 
 public:
 	GameWindow(EngineContext& engine);

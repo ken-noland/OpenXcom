@@ -48,28 +48,49 @@ namespace OpenXcom
 
 LineListPrimitive::LineListPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
 									 const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle)
+	: _context(context)
 {
-	ResourceSystem& resourceSystem = context.getResourceSystem();
-	BufferManager& bufferManager = resourceSystem.getBufferManager();
-	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
-
-	Palette& palette = paletteManager.get(paletteHandle);
-
 	_pipelineBinding = pipeline.createBinding();
 
-	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lines, count, BufferUsage::Vertex);
-	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
-
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer());    // bind the palette
-
-	LinePushConstants pushConstants{color};
-	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
+	setLines(lines, count);
+	setPalette(paletteHandle);
+	setPaletteColorIndex(color);
+	setSurface(surface);
 }
 
 LineListPrimitive::~LineListPrimitive()
 {
 }
+
+void LineListPrimitive::setLines(const LineVertex* lines, size_t count)
+{
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	BufferManager& bufferManager = resourceSystem.getBufferManager();
+
+	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lines, count, BufferUsage::Vertex);
+	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
+}
+
+void LineListPrimitive::setPaletteColorIndex(int color)
+{
+	LinePushConstants pushConstants{color};
+	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
+}
+
+void LineListPrimitive::setPalette(const ResourceHandle<Palette>& paletteHandle)
+{
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
+
+	Palette& palette = paletteManager.get(paletteHandle);
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer()); // bind the palette
+}
+
+void LineListPrimitive::setSurface(RenderTarget& surface)
+{
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
+}
+
 
 void LineListPrimitive::draw(GraphicsCommand& command)
 {
@@ -78,28 +99,49 @@ void LineListPrimitive::draw(GraphicsCommand& command)
 
 LineStripPrimitive::LineStripPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
 									   const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle)
+	: _context(context)
 {
-	ResourceSystem& resourceSystem = context.getResourceSystem();
-	BufferManager& bufferManager = resourceSystem.getBufferManager();
-	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
-
-	Palette& palette = paletteManager.get(paletteHandle);
-
 	_pipelineBinding = pipeline.createBinding();
 
-	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lines, count, BufferUsage::Vertex);
-	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
-
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer());    // bind the palette
-
-	LinePushConstants pushConstants{color};
-	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
+	setLines(lines, count);
+	setPalette(paletteHandle);
+	setPaletteColorIndex(color);
+	setSurface(surface);
 }
 
 LineStripPrimitive::~LineStripPrimitive()
 {
 }
+
+void LineStripPrimitive::setLines(const LineVertex* lines, size_t count)
+{
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	BufferManager& bufferManager = resourceSystem.getBufferManager();
+
+	_vertexBuffer = bufferManager.createDeviceBuffer<LineVertex>(lines, count, BufferUsage::Vertex);
+	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
+}
+
+void LineStripPrimitive::setPaletteColorIndex(int color)
+{
+	LinePushConstants pushConstants{color};
+	_pipelineBinding->setPushConstant(ShaderStage::Vertex, pushConstants);
+}
+
+void LineStripPrimitive::setPalette(const ResourceHandle<Palette>& paletteHandle)
+{
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
+
+	Palette& palette = paletteManager.get(paletteHandle);
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, palette.getDeviceBuffer()); // bind the palette
+}
+
+void LineStripPrimitive::setSurface(RenderTarget& surface)
+{
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
+}
+
 
 void LineStripPrimitive::draw(GraphicsCommand& command)
 {

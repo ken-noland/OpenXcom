@@ -30,6 +30,7 @@ class GraphicsCommand;
 class PipelineBinding;
 class Pipeline;
 class RenderTarget;
+class HostBuffer;
 class DeviceBuffer;
 class DeviceImage;
 class Palette;
@@ -46,14 +47,24 @@ struct ImageVertex
 class ImagePrimitive : public Primitive
 {
 protected:
+	EngineContext& _context;
+
 	std::unique_ptr<PipelineBinding> _pipelineBinding;
-	std::unique_ptr<DeviceBuffer> _vertexBuffer;
+
+	std::unique_ptr<HostBuffer> _vertexHostBuffer;
+	std::unique_ptr<DeviceBuffer> _vertexDeviceBuffer;
 
 public:
 	ImagePrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
 				   glm::ivec2 dstPosition, glm::ivec2 srcPosition, glm::ivec2 size,
 				   const ResourceHandle<DeviceImage>& imageHandle, const ResourceHandle<Palette>& paletteHandle);
 	virtual ~ImagePrimitive();
+
+	void set(glm::ivec2 dstPosition, glm::ivec2 srcPosition, glm::ivec2 extents);
+
+	void setPalette(const ResourceHandle<Palette>& paletteHandle);
+	void setImage(const ResourceHandle<DeviceImage>& imageHandle);
+	void setSurface(RenderTarget& surface);
 
 	void draw(GraphicsCommand& command);
 };

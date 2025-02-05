@@ -114,6 +114,7 @@ VulkanDeviceBuffer::~VulkanDeviceBuffer()
 void VulkanDeviceBuffer::allocate(std::size_t size)
 {
 	_size = size;
+
 	vk::BufferUsageFlags usageFlags = _context.getBufferUsageFlags(_usage) | vk::BufferUsageFlagBits::eTransferDst;
 
 	vk::BufferCreateInfo bufferInfo{};
@@ -142,6 +143,9 @@ void VulkanDeviceBuffer::copy(const VulkanHostBuffer& hostBuffer)
 {
 	// KN NOTE: It's possible that we could use a multithreaded version of this which allows us to push up the contents without
 	//  having to wait for the previous command. This would reduce load times, but at the cost of adding complexity.
+
+	resize(hostBuffer.getCount());
+
 	vk::Result result = vk::Result::eSuccess;
 
 	vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();

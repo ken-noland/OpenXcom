@@ -27,6 +27,7 @@
 /////////////////////////////////////////////
 // TEMP
 #include "../Engine/Engine.h"
+#include "../Engine/Platform/Window.h"
 #include "../Engine/Resource/ResourceSystem.h"
 #include "../Engine/Graphics/GraphicsSurface.h"
 #include "../Engine/Graphics/Image/ImageManager.h"
@@ -178,6 +179,10 @@ GameWindow::GameWindow(EngineContext& engine)
 		this->onGameRender(command);
 	};
 
+	_windowSurface->getWindow().onResize() << [this](glm::ivec2 size) {
+		this->onWindowResize(size);
+	};
+
 	// set up the palette
 	PackedColor paletteData[] = {
 		0x000000FF, // 0 - Black:   (R=00, G=00, B=00, A=FF)
@@ -208,7 +213,7 @@ GameWindow::GameWindow(EngineContext& engine)
 	_image = resourceSystem.getImageManager().createDeviceImage(loadedImage.first.get());
 
 	// create an image primitive
-	PrimitiveFactory& primitiveFactory = _gameSurface->getRenderTarget().getPrimitiveFactory();
+	PrimitiveFactory& primitiveFactory = _windowSurface->getRenderTarget().getPrimitiveFactory();
 	_thingToDraw = primitiveFactory.createImagePrimitive({10, 10}, {16, 0}, {16, 16}, _image.getHandle(), _paletteHandle.getHandle());
 
 }
@@ -229,13 +234,15 @@ bool GameWindow::isRunning() const
 
 void GameWindow::onWindowRender(GraphicsCommand& command)
 {
-
+	_thingToDraw->draw(command);
 }
 
 void GameWindow::onGameRender(GraphicsCommand& command)
 {
-	_thingToDraw->draw(command);
 }
 
+void GameWindow::onWindowResize(glm::ivec2 size)
+{
+}
 
 } // namespace OpenXcom

@@ -128,9 +128,12 @@ public:
 	VulkanQueue& getTransferQueue() { return _transferQueue; }
 	VulkanQueue& getPresentQueue() { return _presentQueue; }
 
-	//helpers
+	// helpers
 	vk::SampleCountFlagBits getSampleCountFlagBits(vk::SampleCountFlags flags);
 	vk::BufferUsageFlags getBufferUsageFlags(BufferUsage usage);
+
+	// settings
+
 };
 
 } // namespace OpenXcom

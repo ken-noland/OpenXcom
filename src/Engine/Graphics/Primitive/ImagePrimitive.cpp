@@ -33,6 +33,8 @@
 #include "../../EngineContext.h"
 #include "../../Resource/ResourceSystem.h"
 
+#include "../../Logger.h"
+
 #include "../../Utility/RTTR.h"
 
 SIMPLERTTR
@@ -45,46 +47,75 @@ SIMPLERTTR
 namespace OpenXcom
 {
 
-ImagePrimitive::ImagePrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface, glm
-	::ivec2 dst, glm::ivec2 src, glm::ivec2 extents,
-	const ResourceHandle<DeviceImage>& imageHandle, const ResourceHandle<Palette>& paletteHandle)
+ImagePrimitive::ImagePrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
+							   glm::ivec2 dstPosition, glm::ivec2 srcPosition, glm::ivec2 extents,
+							   const ResourceHandle<DeviceImage>& imageHandle,
+							   const ResourceHandle<Palette>& paletteHandle)
+	: _context(context)
 {
-	ResourceSystem& resourceSystem = context.getResourceSystem();
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
-	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
 
-	Palette& palette = paletteManager.get(paletteHandle);
+	_vertexHostBuffer = bufferManager.createHostBuffer(sizeof(ImageVertex), 6, BufferUsage::Vertex);
+	_vertexDeviceBuffer = bufferManager.createDeviceBuffer(sizeof(ImageVertex), 6, BufferUsage::Vertex);
 
 	_pipelineBinding = pipeline.createBinding();
 
-	// Define two triangles that form a quad
-	ImageVertex vertices[6] = {
-		// Triangle 1
-		{dst, src},                                                       // Top-left
-		{dst + glm::ivec2(extents.x, 0), src + glm::ivec2(extents.x, 0)}, // Top-right
-		{dst + glm::ivec2(0, extents.y), src + glm::ivec2(0, extents.y)}, // Bottom-left
-
-		// Triangle 2
-		{dst + glm::ivec2(extents.x, 0), src + glm::ivec2(extents.x, 0)}, // Top-right
-		{dst + extents, src + extents},                                   // Bottom-right
-		{dst + glm::ivec2(0, extents.y), src + glm::ivec2(0, extents.y)}  // Bottom-left
-	};
-
-	_vertexBuffer = bufferManager.createDeviceBuffer<ImageVertex>(vertices, 6, BufferUsage::Vertex);
-	_pipelineBinding->setVertexBuffer(*_vertexBuffer);
-
-	ImageManager& imageManager = resourceSystem.getImageManager();
-	const DeviceImage& image = imageManager.getDeviceImageManager().get(imageHandle);
-
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
-	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, image.getDeviceImageData()); // bind the surface extents
-
-	_pipelineBinding->setTexture(ShaderStage::Fragment, 2, image);                           // bind the image texture
-	_pipelineBinding->setUniformBuffer(ShaderStage::Fragment, 3, palette.getDeviceBuffer()); // bind the palette buffer
+	set(dstPosition, srcPosition, extents);
+	setImage(imageHandle);
+	setPalette(paletteHandle);
+	setSurface(surface);
 }
 
 ImagePrimitive::~ImagePrimitive()
 {
+}
+
+void ImagePrimitive::set(glm::ivec2 dstPosition, glm::ivec2 srcPosition, glm::ivec2 extents)
+{
+	// Define two triangles that form a quad
+	ImageVertex vertices[6] = {
+		// Triangle 1
+		{dstPosition, srcPosition},                                                       // Top-left
+		{dstPosition + glm::ivec2(extents.x, 0), srcPosition + glm::ivec2(extents.x, 0)}, // Top-right
+		{dstPosition + glm::ivec2(0, extents.y), srcPosition + glm::ivec2(0, extents.y)}, // Bottom-left
+
+		// Triangle 2
+		{dstPosition + glm::ivec2(extents.x, 0), srcPosition + glm::ivec2(extents.x, 0)}, // Top-right
+		{dstPosition + extents, srcPosition + extents},                                   // Bottom-right
+		{dstPosition + glm::ivec2(0, extents.y), srcPosition + glm::ivec2(0, extents.y)}  // Bottom-left
+	};
+
+	_vertexHostBuffer->copy(vertices, sizeof(vertices));
+	_vertexDeviceBuffer->copy(*_vertexHostBuffer);
+
+	_pipelineBinding->setVertexBuffer(*_vertexDeviceBuffer);
+}
+
+void ImagePrimitive::setPalette(const ResourceHandle<Palette>& paletteHandle)
+{
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
+	Palette& palette = paletteManager.get(paletteHandle);
+
+	_pipelineBinding->setUniformBuffer(ShaderStage::Fragment, 3, palette.getDeviceBuffer()); // bind the palette buffer
+}
+
+void ImagePrimitive::setImage(const ResourceHandle<DeviceImage>& imageHandle)
+{
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	ImageManager& imageManager = resourceSystem.getImageManager();
+	const DeviceImage& image = imageManager.getDeviceImageManager().get(imageHandle);
+
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, image.getDeviceImageData()); // bind the surface extents
+	_pipelineBinding->setTexture(ShaderStage::Fragment, 2, image);                          // bind the image texture
+}
+
+void ImagePrimitive::setSurface(RenderTarget& surface)
+{
+	Log(LOG_DEBUG) << "ImagePrimitive::setSurface";
+	Log(LOG_DEBUG) << "dimensions (width=" << surface.getExtent().x << ", height=" << surface.getExtent().y << " )";
+	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
 }
 
 void ImagePrimitive::draw(GraphicsCommand& command)

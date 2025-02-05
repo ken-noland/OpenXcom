@@ -33,6 +33,7 @@ class VulkanPipelineFactory;
 class VulkanPipeline;
 class PipelineDefinition;
 class PlatformWindow;
+class HostBuffer;
 
 struct FrameData
 {
@@ -69,12 +70,14 @@ protected:
 	std::unique_ptr<VulkanCommand> _commandContext;
 	
 	// device image data for a render surface contains the extents of the framebuffer
+	std::unique_ptr<HostBuffer> _hostImageData;
 	std::unique_ptr<DeviceBuffer> _deviceImageData;
 
 	void initializeSwapChain();
 	void destroySwapChain();
 
-	void handleResize();
+	void updateDeviceImageData();
+	void handleResize(glm::ivec2 newSize);
 
 	// this function is used to create the surface for the platform window, but equally, VulkanContext needs to
 	// create a surface to select a physical device, so rather than duplicate the code, we'll make it static and

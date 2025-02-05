@@ -57,14 +57,18 @@ VulkanWindowedSurface::VulkanWindowedSurface(VulkanContext& context, PlatformWin
 	initializeSwapChain();
 
 	//register a callback with the window for resize events
-	window.onResize() << std::bind(&VulkanWindowedSurface::handleResize, this);
+	window.onResize() << [this](glm::ivec2 newSize) { this->handleResize(newSize); };
 
 	_commandContext = std::make_unique<VulkanCommand>(_context);
 
+	// Create the primitives factory
+	_primitiveFactory = std::make_unique<PrimitiveFactory>(_context.getEngineContext(), *this);
+
 	// Create the device buffer which contains the image information on GPU
 	BufferManager& bufferManager = _context.getEngineContext().getResourceSystem().getBufferManager();
-	glm::ivec2 extent = getExtent();
-	_deviceImageData = bufferManager.createDeviceBuffer<glm::ivec2>(&extent, 1, BufferUsage::Uniform);
+	_hostImageData = bufferManager.createHostBuffer(sizeof(glm::ivec2), 1, BufferUsage::Uniform);
+	_deviceImageData = bufferManager.createDeviceBuffer(sizeof(glm::ivec2), 1, BufferUsage::Uniform);
+	updateDeviceImageData();
 }
 
 VulkanWindowedSurface::~VulkanWindowedSurface()
@@ -283,8 +287,31 @@ void VulkanWindowedSurface::destroySwapChain()
 	_imageIndex = 0;
 }
 
-void VulkanWindowedSurface::handleResize()
+void VulkanWindowedSurface::updateDeviceImageData()
 {
+	// update the device buffer with the new extent
+	glm::ivec2 extent = getExtent();
+	_hostImageData->copy(&extent, sizeof(glm::ivec2));
+	_deviceImageData->copy(*_hostImageData);
+}
+
+void VulkanWindowedSurface::handleResize(glm::ivec2 newSize)
+{
+	//check if new size is different from the old size
+	if (newSize != glm::ivec2(-1, -1) &&
+		newSize == glm::ivec2(_swapChainExtent.width, _swapChainExtent.height))
+	{
+		return;
+	}
+
+	// if window size is 0, then the window is minimized
+	if (newSize == glm::ivec2(0, 0))
+	{
+		return;
+	}
+
+	Log(LOG_INFO) << "Handling window resize. New size: {" << newSize.x << ", " << newSize.y <<"}";
+
 	// Wait for the device to finish
 	_context.getDevice().waitIdle();
 
@@ -293,6 +320,8 @@ void VulkanWindowedSurface::handleResize()
 
 	// Recreate the swap chain
 	initializeSwapChain();
+
+	updateDeviceImageData();
 }
 
 vk::SurfaceKHR VulkanWindowedSurface::createSurface(vk::Instance& instance, const PlatformWindow& window)
@@ -385,7 +414,7 @@ GraphicsCommand& VulkanWindowedSurface::beginCommandPass()
 		else if (result == vk::Result::eErrorOutOfDateKHR)
 		{
 			// Handle window resize (recreate swap chain)
-			handleResize();
+			handleResize(glm::ivec2(-1,-1));
 
 			// After handling the resize, try again
 			continue;
@@ -446,7 +475,7 @@ void VulkanWindowedSurface::endCommandPass(GraphicsCommand& command)
 	result = _context.getPresentQueue().getQueue().presentKHR(&presentInfo);
 	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
 	{
-		handleResize(); // Handle window resize (recreate swapchain)
+		handleResize(glm::ivec2(-1, -1)); // Handle window resize (recreate swapchain)
 		return;
 	}
 	else if (result != vk::Result::eSuccess)

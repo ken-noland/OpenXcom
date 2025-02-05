@@ -52,6 +52,8 @@ struct LinePushConstants
 class LineListPrimitive : public Primitive
 {
 protected:
+	EngineContext& _context;
+
 	std::unique_ptr<PipelineBinding> _pipelineBinding;
 	std::unique_ptr<DeviceBuffer> _vertexBuffer;
 
@@ -60,12 +62,19 @@ public:
 					  const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle);
 	virtual ~LineListPrimitive();
 
+	void setLines(const LineVertex* lines, size_t count);
+	void setPaletteColorIndex(int color);
+	void setPalette(const ResourceHandle<Palette>& paletteHandle);
+	void setSurface(RenderTarget& surface);
+
 	void draw(GraphicsCommand& command);
 };
 
 class LineStripPrimitive : public Primitive
 {
 protected:
+	EngineContext& _context;
+
 	std::unique_ptr<PipelineBinding> _pipelineBinding;
 	std::unique_ptr<DeviceBuffer> _vertexBuffer;
 
@@ -73,6 +82,11 @@ public:
 	LineStripPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
 					   const LineVertex* lines, size_t count, int color, const ResourceHandle<Palette>& paletteHandle);
 	virtual ~LineStripPrimitive();
+
+	void setLines(const LineVertex* lines, size_t count);
+	void setPaletteColorIndex(int color);
+	void setPalette(const ResourceHandle<Palette>& paletteHandle);
+	void setSurface(RenderTarget& surface);
 
 	void draw(GraphicsCommand& command);
 };

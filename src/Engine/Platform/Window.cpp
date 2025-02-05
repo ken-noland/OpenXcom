@@ -63,9 +63,9 @@ void PlatformWindow::close()
 	platformSpecificDestroyWindow();
 }
 
-void PlatformWindow::resize()
+void PlatformWindow::resize(glm::ivec2 size)
 {
-	_onResize.call();
+	_onResize.call(size);
 }
 
 } // namespace OpenXcom
