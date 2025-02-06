@@ -46,7 +46,7 @@ namespace OpenXcom
 {
 
 BoxFilledPrimitive::BoxFilledPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-									   glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle)
+									   glm::ivec2 position, glm::ivec2 extent, int color, const ResourceHandle<Palette>& paletteHandle)
 {
 	ResourceSystem& resourceSystem = context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
@@ -56,15 +56,17 @@ BoxFilledPrimitive::BoxFilledPrimitive(EngineContext& context, Pipeline& pipelin
 
 	_pipelineBinding = pipeline.createBinding();
 
+	glm::ivec2 extent1 = extent + glm::ivec2(1, 1); // +1 to include the right and bottom edges
+
 	// Define two triangles that form a quad
 	BoxVertex vertices[6] = {
-		{position},                         // Top-left
-		{position + glm::ivec2(size.x, 0)}, // Top-right
-		{position + glm::ivec2(0, size.y)}, // Bottom-left
+		{position},                           // Top-left
+		{position + glm::ivec2(extent1.x, 0)}, // Top-right
+		{position + glm::ivec2(0, extent1.y)}, // Bottom-left
 
-		{position + glm::ivec2(size.x, 0)}, // Top-right
-		{position + size},                  // Bottom-right
-		{position + glm::ivec2(0, size.y)}  // Bottom-left
+		{position + glm::ivec2(extent1.x, 0)}, // Top-right
+		{position + extent1},                  // Bottom-right
+		{position + glm::ivec2(0, extent1.y)}  // Bottom-left
 	};
 
 	_vertexBuffer = bufferManager.createDeviceBuffer<BoxVertex>(vertices, 6, BufferUsage::Vertex);
@@ -87,7 +89,7 @@ void BoxFilledPrimitive::draw(GraphicsCommand& command)
 }
 
 BoxOutlinePrimitive::BoxOutlinePrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-										 glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle)
+										 glm::ivec2 position, glm::ivec2 extent, int color, const ResourceHandle<Palette>& paletteHandle)
 {
 	ResourceSystem& resourceSystem = context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
@@ -99,11 +101,11 @@ BoxOutlinePrimitive::BoxOutlinePrimitive(EngineContext& context, Pipeline& pipel
 
 	// Define the 4 corner points forming a closed loop (line strip)
 	BoxVertex vertices[5] = {
-		{position},                              // Top-left
-		{position + glm::ivec2(size.x, 0)},      // Top-right
-		{position + size},                       // Bottom-right **+1**
-		{position + glm::ivec2(0, size.y)},      // Bottom-left
-		{position}                               // Closing the loop
+		{position},                           // Top-left
+		{position + glm::ivec2(extent.x, 0)}, // Top-right
+		{position + extent},                  // Bottom-right **+1**
+		{position + glm::ivec2(0, extent.y)}, // Bottom-left
+		{position}                            // Closing the loop
 	};
 
 	_vertexBuffer = bufferManager.createDeviceBuffer<BoxVertex>(vertices, 5, BufferUsage::Vertex);

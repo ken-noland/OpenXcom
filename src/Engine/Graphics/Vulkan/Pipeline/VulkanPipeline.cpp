@@ -68,10 +68,9 @@ VulkanPipeline::VulkanPipeline(VulkanContext& context, const PipelineDefinition&
 
 	//temp
 	vk::PipelineRasterizationLineStateCreateInfoEXT lineRasterizationState{};
-	lineRasterizationState.lineRasterizationMode = vk::LineRasterizationModeEXT::eRectangularSmooth;
+	lineRasterizationState.lineRasterizationMode = vk::LineRasterizationModeEXT::eBresenham;
 	rasterizer.pNext = &lineRasterizationState;
 
-	
 	if (pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineStrip || pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineList)
 	{
 		rasterizer.polygonMode = vk::PolygonMode::ePoint;

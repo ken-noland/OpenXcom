@@ -56,7 +56,7 @@ protected:
 
 public:
 	BoxFilledPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-					   glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle);
+					   glm::ivec2 position, glm::ivec2 extent, int color, const ResourceHandle<Palette>& paletteHandle);
 	virtual ~BoxFilledPrimitive();
 
 	void draw(GraphicsCommand& command);
@@ -70,7 +70,7 @@ protected:
 
 public:
 	BoxOutlinePrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-						glm::ivec2 position, glm::ivec2 size, int color, const ResourceHandle<Palette>& paletteHandle);
+						glm::ivec2 position, glm::ivec2 extent, int color, const ResourceHandle<Palette>& paletteHandle);
 	virtual ~BoxOutlinePrimitive();
 
 	void draw(GraphicsCommand& command);

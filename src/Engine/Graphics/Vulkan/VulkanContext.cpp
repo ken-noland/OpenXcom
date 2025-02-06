@@ -438,6 +438,8 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 
 	vk::PhysicalDeviceLineRasterizationFeaturesKHR lineRasterizationFeatures{};
 	lineRasterizationFeatures.smoothLines = VK_TRUE;
+	lineRasterizationFeatures.rectangularLines = VK_TRUE;
+	lineRasterizationFeatures.bresenhamLines = VK_TRUE;
 
 	// Specify device extensions
 	std::vector<const char*> deviceExtensions;
