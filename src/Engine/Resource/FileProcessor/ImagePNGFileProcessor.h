@@ -17,12 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "../Handle.h"
+#include <filesystem>
 
 namespace OpenXcom
 {
 
+class EngineContext;
+class HostImage;
+class Palette;
+class ImageFile;
+
 class ImagePNGFileProcessor
 {
+protected:
+	EngineContext& _context;
+
+public:
+	ImagePNGFileProcessor(EngineContext& context);
+	~ImagePNGFileProcessor();
+
+	ImageFile load(const std::string& name, const std::filesystem::path& filename, bool loadPalette = false);
+
+	bool save(const std::filesystem::path& filename, ImageFile& imageData);
 };
 
 } // namespace OpenXcom

@@ -28,6 +28,7 @@
 
 #include "../../../Engine/Resource/ResourceManager.h"
 #include "../../../Engine/Resource/ResourceSystem.h"
+#include "../../../Engine/Resource/FileProcessor/ImageFile.h"
 #include "../../../Engine/Resource/FileProcessor/ImageBMPFileProcessor.h"
 
 #include <filesystem>
@@ -312,12 +313,12 @@ protected:
 TEST_F(BMPTest, TestLoadBMP)
 {
 	// Specify the BMP file path; assume it’s located in the Data directory
-	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ret = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load("dosFont", dosFont, DOSFONT_SIZE, false);
+	ImageFile imageFile = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load("dosFont", dosFont, DOSFONT_SIZE, false);
 
-	OwningHandle<HostImage> hostImage = std::move(ret.first);
+	OwningHandle<HostImage> hostImage = imageFile.takeImage();
 	ASSERT_TRUE(hostImage.isValid()) << "Failed to load BMP file.";
 
-	OwningHandle<Palette> paletteHandle = std::move(ret.second);
+	OwningHandle<Palette> paletteHandle = imageFile.takePalette();
 	ASSERT_FALSE(paletteHandle.isValid()) << "Loaded palette, even though we told it not to";
 
 	// Compare the loaded image with a baseline
@@ -443,45 +444,4 @@ Color hsv_to_rgb(float h, float s, float v)
 //	}
 //
 //
-//    // --- lodepng Setup ---
-//	// We use the C++ interface and set up a State object.
-//	lodepng::State state;
-//	// Specify that both the PNG output and the raw image data use a palette.
-//	state.info_png.color.colortype = LCT_PALETTE;
-//	state.info_png.color.bitdepth = 8;
-//	state.info_raw.colortype = LCT_PALETTE;
-//	state.info_raw.bitdepth = 8;
-//	state.encoder.auto_convert = 0; // Disable automatic conversion
-//
-//	// Set up the palette using lodepng_palette_add.
-//	// For index 0, we want black (used for grid lines).
-//	lodepng_palette_add(&state.info_png.color, 0, 0, 0, 255);
-//	lodepng_palette_add(&state.info_raw, 0, 0, 0, 255);
-//
-//	// For indices 1 to 255, generate colors via an HSV color wheel.
-//	for (int i = 1; i < 256; i++)
-//	{
-//		// Map i-1 from 0 to 254 into hue [0,1)
-//		float hue = (i - 1) / 255.0f;
-//		Color c = hsv_to_rgb(hue, 1.0f, 1.0f);
-//		lodepng_palette_add(&state.info_png.color, c.r, c.g, c.b, 255);
-//		lodepng_palette_add(&state.info_raw, c.r, c.g, c.b, 255);
-//	}
-//
-//	// --- Encode and Save the PNG ---
-//	std::vector<unsigned char> buffer;
-//	unsigned error = lodepng::encode(buffer, image, width, height, state);
-//	if (error)
-//	{
-//		std::cerr << "Encoder error " << error << ": "
-//				  << lodepng_error_text(error) << std::endl;
-//	}
-//
-//	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "test_image.png";
-//	error = lodepng::save_file(buffer, baselinePath.string());
-//	if (error)
-//	{
-//		std::cerr << "Save file error " << error << ": "
-//				  << lodepng_error_text(error) << std::endl;
-//	}
 //}

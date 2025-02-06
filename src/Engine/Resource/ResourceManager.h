@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <vector>
 #include <limits>
+#include <cassert>
 
 namespace OpenXcom
 {
@@ -65,6 +66,8 @@ public:
 	template <typename Type = ResourceType>
 	Type& get(const Handle& handle)
 	{
+		assert(handle != Handle::Invalid_Handle);
+		assert(exists(handle));
 		return *static_cast<Type*>(_resources[handle.getId()].get());
 	}
 		

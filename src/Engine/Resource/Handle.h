@@ -64,6 +64,12 @@ public:
 		return _handle < other._handle;
 	}
 
+	// Check if the handle is valid
+	bool isValid() const
+	{
+		return _handle != ResourceHandle<ResourceType>::Invalid_Handle;
+	}
+
 	static const HandleType Invalid_Handle = std::numeric_limits<HandleType>::max();
 };
 

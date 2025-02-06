@@ -188,12 +188,30 @@ ImageBMPFileProcessor::~ImageBMPFileProcessor()
 {
 }
 
-std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ImageBMPFileProcessor::load(const std::filesystem::path& filename, bool loadPalette)
+ImageFile ImageBMPFileProcessor::load(const std::string& name, const std::filesystem::path& filename, bool loadPalette)
 {
-	return std::pair<OwningHandle<HostImage>, OwningHandle<Palette>>();
+	// Open the file in binary mode and position at the end.
+	std::ifstream file(filename, std::ios::binary | std::ios::ate);
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Failed to open file: " + filename.string());
+	}
+
+	// Get the file size by checking the current position (at the end).
+	std::streamsize size = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	// Create a buffer and read the file data into it.
+	std::vector<char> buffer(static_cast<size_t>(size));
+	if (!file.read(buffer.data(), size))
+	{
+		throw std::runtime_error("Failed to read file: " + filename.string());
+	}
+
+	return load(name, reinterpret_cast<const uint8_t*>(buffer.data()), static_cast<std::size_t>(size), loadPalette);
 }
 
-std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bmpBuffer, std::size_t size, bool loadPalette)
+ImageFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bmpBuffer, std::size_t size, bool loadPalette)
 {
 	// Verify magic.
 	unsigned short magic;
@@ -228,7 +246,7 @@ std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ImageBMPFileProcessor:
 			palette[i] = packedColor;
 		}
 		PaletteManager& paletteManager = _context.getResourceSystem().getPaletteManager();
-		paletteHandle = paletteManager.createPalette("BMP", palette.data(), numEntries);
+		paletteHandle = paletteManager.createPalette(name + "_bmp_palette", palette.data(), numEntries);
 	}
 
 	// Create a HostImage with an appropriate image format.
@@ -307,10 +325,10 @@ std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ImageBMPFileProcessor:
 	}
 	hostImage.unmap();
 
-	return {std::move(hostImageHandle), std::move(paletteHandle)};
+	return ImageFile(std::move(hostImageHandle), std::move(paletteHandle));
 }
 
-void ImageBMPFileProcessor::save(const std::filesystem::path& filename, ImageFile& imageData)
+bool ImageBMPFileProcessor::save(const std::filesystem::path& filename, ImageFile& imageData)
 {
 	ResourceSystem& resourceSystem = _context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
@@ -331,6 +349,7 @@ void ImageBMPFileProcessor::save(const std::filesystem::path& filename, ImageFil
 	if (!ofs.is_open())
 	{
 		throw std::runtime_error("Failed to open file for writing.");
+		return false;
 	}
 
 	// Write the BMP magic (2 bytes). BMP_MAGIC is defined by libbmp.
@@ -358,11 +377,11 @@ void ImageBMPFileProcessor::save(const std::filesystem::path& filename, ImageFil
 
 	// Set header values.
 	// bfOffBits = magic (2 bytes already written) + header + palette data.
-	header.bfSize = fileByteSize;
+	header.bfSize = static_cast<unsigned int>(fileByteSize);
 	header.bfReserved = 0;
-	header.bfOffBits = pixelsByteOffset;
+	header.bfOffBits = static_cast<unsigned int>(pixelsByteOffset);
 
-	header.biSize = 40;
+	header.biSize = 40; // Size of the header structure. Always 40 for BMP.
 	header.biWidth = width;	
 	header.biHeight = height; // Negative height means top-down.
 	header.biPlanes = 1;
@@ -424,6 +443,8 @@ void ImageBMPFileProcessor::save(const std::filesystem::path& filename, ImageFil
 
 	ofs.flush();
 	ofs.close();
+
+	return true;
 }
 
 } // namespace OpenXcom

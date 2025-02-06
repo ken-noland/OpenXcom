@@ -39,6 +39,9 @@ public:
 	HostImage& getImage();
 	Palette& getPalette();
 
+	ResourceHandle<HostImage> getImageHandle();
+	ResourceHandle<Palette> getPaletteHandle();
+
 	// Transfers ownership of the image and invalidates the internal handle.
 	OwningHandle<HostImage> takeImage();
 

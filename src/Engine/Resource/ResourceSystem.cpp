@@ -50,7 +50,7 @@ ResourceSystem::ResourceSystem(EngineContext& context)
 
 	_imageFileProcessor = std::make_unique<ImageFileProcessor>();
 	_imageBMPFileProcessor = std::make_unique<ImageBMPFileProcessor>(context);
-	_imagePNGFileProcessor = std::make_unique<ImagePNGFileProcessor>();
+	_imagePNGFileProcessor = std::make_unique<ImagePNGFileProcessor>(context);
 }
 
 ResourceSystem::~ResourceSystem()

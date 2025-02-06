@@ -43,6 +43,16 @@ Palette& ImageFile::getPalette()
 	return *_palette;
 }
 
+ResourceHandle<HostImage> ImageFile::getImageHandle()
+{
+	return _image.getHandle();
+}
+
+ResourceHandle<Palette> ImageFile::getPaletteHandle()
+{
+	return _palette.getHandle();
+}
+
 OwningHandle<HostImage> ImageFile::takeImage()
 {
 	return std::move(_image);

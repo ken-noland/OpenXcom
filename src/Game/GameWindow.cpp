@@ -38,6 +38,7 @@
 #include "../Engine/Graphics/Primitive/BoxPrimitive.h"
 #include "../Engine/Graphics/Primitive/PointPrimitive.h"
 #include "../Engine/Graphics/Primitive/ImagePrimitive.h"
+#include "../Engine/Resource/FileProcessor/ImageFile.h"
 #include "../Engine/Resource/FileProcessor/ImageBMPFileProcessor.h"
 
 
@@ -209,14 +210,14 @@ GameWindow::GameWindow(EngineContext& engine)
 	// load an image
 	ResourceSystem& resourceSystem = engine.getResourceSystem();
 	ImageBMPFileProcessor& imageProcessor = resourceSystem.getImageBMPFileProcessor();
-	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> loadedImage = imageProcessor.load("dosFont", tempDosFont, DOSFONT_SIZE, false);
-	_image = resourceSystem.getImageManager().createDeviceImage(loadedImage.first.get());
+	ImageFile loadedImage = imageProcessor.load("dosFont", tempDosFont, DOSFONT_SIZE, false);
+	_image = resourceSystem.getImageManager().createDeviceImage(loadedImage.getImage());	//move to device
 
 	// create an image primitive
 	PrimitiveFactory& windowPrimitiveFactory = _windowSurface->getRenderTarget().getPrimitiveFactory();
 	_thingToDraw = windowPrimitiveFactory.createImagePrimitive({10, 10}, {16, 0}, {16, 16}, _image.getHandle(), _paletteHandle.getHandle());
 
-	//create a box outlien primitive
+	//create a box outline primitive
 	PrimitiveFactory& gamePrimitiveFactory = _gameSurface->getRenderTarget().getPrimitiveFactory();
 	_thingToDraw2 = gamePrimitiveFactory.createOutlineBoxPrimitive({10, 10}, {40, 40}, 1, _paletteHandle.getHandle());
 }

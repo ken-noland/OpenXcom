@@ -119,7 +119,7 @@ protected:
 		// Adjustable parameters:
 		unsigned cellSize = 16;        // Size (in pixels) of each cell.
 		unsigned subCellSize = 4;      // Spacing (in pixels) for sub-cell lines.
-		unsigned subPaletteOffset = 8; // Palette offset for sub-cell lines.
+		unsigned subPaletteOffset = 16; // Palette offset for sub-cell lines.
 
 		// Get an address to the pixels to allow us to write to them.
 		uint8_t* pixels = static_cast<uint8_t*>(imageHandle->map());
@@ -202,12 +202,83 @@ std::filesystem::path ImageFileProcessorTest::_configPath;
 std::filesystem::path ImageFileProcessorTest::_userPath;
 
 
-TEST_F(ImageFileProcessorTest, TestBmpSave)
+TEST_F(ImageFileProcessorTest, TestBmp8bit)
 {
 	ImageFile generatedImage = createImage();
+	ASSERT_TRUE(generatedImage.getImageHandle().isValid()) << "Image handle should be valid";
+	ASSERT_NE(&generatedImage.getImage(), nullptr) << "Image should not be null";
+	ASSERT_TRUE(generatedImage.getPaletteHandle().isValid()) << "Palette handle should be valid";
+	ASSERT_EQ(generatedImage.getImage().getFormat(), ImageFormat::R8) << "Generated image format should be R8";
 
 	ImageBMPFileProcessor& bmpProcessor = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor();
 
-	std::filesystem::path path = _dataPath / "Test" / "BMP" / "01_generated.bmp";
+	// Save the image
+	std::filesystem::path path = _dataPath / "Test" / "BMP" / "001_generated.bmp";
 	bmpProcessor.save(path, generatedImage);
+
+	// Load the image back
+	ImageFile loadedImage = bmpProcessor.load("loaded_bmp_bitmap", path);
+	ASSERT_TRUE(loadedImage.getImageHandle().isValid()) << "Image handle should be valid";
+	ASSERT_NE(&loadedImage.getImage(), nullptr) << "Image should not be null";
+	ASSERT_FALSE(loadedImage.getPaletteHandle().isValid()) << "Palette handle should not be valid(we didn't request it to load)";
+
+	// Check image format
+	ASSERT_EQ(loadedImage.getImage().getFormat(), ImageFormat::R8) << "Image format mismatch";
+
+	// Check the image data
+	HostImage& loadedHostImage = loadedImage.getImage();
+	const uint8_t* loadedPixels = static_cast<const uint8_t*>(loadedHostImage.map());
+	const uint8_t* generatedPixels = static_cast<const uint8_t*>(generatedImage.getImage().map());
+
+	for (uint32_t y = 0; y < loadedHostImage.getHeight(); y++)
+	{
+		for (uint32_t x = 0; x < loadedHostImage.getWidth(); x++)
+		{
+			ASSERT_EQ(loadedPixels[y * loadedHostImage.getWidth() + x], generatedPixels[y * loadedHostImage.getWidth() + x]) << "Pixel mismatch at (" << x << ", " << y << ")";
+		}
+	}
+
+	loadedHostImage.unmap();
+	generatedImage.getImage().unmap();
+}
+
+
+TEST_F(ImageFileProcessorTest, TestPng8bit)
+{
+	ImageFile generatedImage = createImage();
+	ASSERT_TRUE(generatedImage.getImageHandle().isValid()) << "Image handle should be valid";
+	ASSERT_NE(&generatedImage.getImage(), nullptr) << "Image should not be null";
+	ASSERT_TRUE(generatedImage.getPaletteHandle().isValid()) << "Palette handle should be valid";
+	ASSERT_EQ(generatedImage.getImage().getFormat(), ImageFormat::R8) << "Generated image format should be R8";
+
+	ImagePNGFileProcessor& pngProcessor = _engine->getEngineContext().getResourceSystem().getImagePNGFileProcessor();
+
+	// Save the image
+	std::filesystem::path path = _dataPath / "Test" / "BMP" / "001_generated.png";
+	pngProcessor.save(path, generatedImage);
+
+	// Load the image back
+	ImageFile loadedImage = pngProcessor.load("loaded_bmp_bitmap", path);
+	ASSERT_TRUE(loadedImage.getImageHandle().isValid()) << "Image handle should be valid";
+	ASSERT_NE(&loadedImage.getImage(), nullptr) << "Image should not be null";
+	ASSERT_FALSE(loadedImage.getPaletteHandle().isValid()) << "Palette handle should not be valid(we didn't request it to load)";
+
+	// Check image format
+	ASSERT_EQ(loadedImage.getImage().getFormat(), ImageFormat::R8) << "Image format mismatch";
+
+	// Check the image data
+	HostImage& loadedHostImage = loadedImage.getImage();
+	const uint8_t* loadedPixels = static_cast<const uint8_t*>(loadedHostImage.map());
+	const uint8_t* generatedPixels = static_cast<const uint8_t*>(generatedImage.getImage().map());
+
+	for (uint32_t y = 0; y < loadedHostImage.getHeight(); y++)
+	{
+		for (uint32_t x = 0; x < loadedHostImage.getWidth(); x++)
+		{
+			ASSERT_EQ(loadedPixels[y * loadedHostImage.getWidth() + x], generatedPixels[y * loadedHostImage.getWidth() + x]) << "Pixel mismatch at (" << x << ", " << y << ")";
+		}
+	}
+
+	loadedHostImage.unmap();
+	generatedImage.getImage().unmap();
 }

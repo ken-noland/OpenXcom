@@ -19,7 +19,6 @@
  */
 #include "../Handle.h"
 #include <filesystem>
-#include <utility>
 
 namespace OpenXcom
 {
@@ -38,10 +37,10 @@ public:
 	ImageBMPFileProcessor(EngineContext& context);
 	~ImageBMPFileProcessor();
 
-	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> load(const std::filesystem::path& filename, bool loadPalette = false);
-	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> load(const std::string& name, const uint8_t* buffer, std::size_t size, bool loadPalette = false);
+	ImageFile load(const std::string& name, const std::filesystem::path& filename, bool loadPalette = false);
+	ImageFile load(const std::string& name, const uint8_t* buffer, std::size_t size, bool loadPalette = false);
 
-	void save(const std::filesystem::path& filename, ImageFile& imageData);
+	bool save(const std::filesystem::path& filename, ImageFile& imageData);
 };
 
 } // namespace OpenXcom
