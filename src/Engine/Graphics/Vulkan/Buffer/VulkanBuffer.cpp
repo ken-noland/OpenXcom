@@ -22,6 +22,13 @@
 namespace OpenXcom
 {
 
+VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, VulkanDeviceBuffer& deviceBuffer)
+	: VulkanHostBuffer(context, deviceBuffer.getElementSize(), deviceBuffer.getCount(), deviceBuffer.getUsage())
+{
+	// copy the device buffer to the host buffer
+	copy(deviceBuffer);
+}
+
 VulkanHostBuffer::VulkanHostBuffer(VulkanContext& context, std::size_t elementSize, std::size_t count, BufferUsage usage)
 	: HostBuffer(usage, elementSize), _context(context)
 {
@@ -40,7 +47,7 @@ VulkanHostBuffer::~VulkanHostBuffer()
 void VulkanHostBuffer::allocate(std::size_t size)
 {
 	_size = size;
-	vk::BufferUsageFlags usageFlags = _context.getBufferUsageFlags(_usage) | vk::BufferUsageFlagBits::eTransferSrc;
+	vk::BufferUsageFlags usageFlags = _context.getBufferUsageFlags(_usage) | vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eTransferSrc;
 
 	// create a buffer that is only accessible by the CPU
 	vk::BufferCreateInfo bufferInfo{};
@@ -81,6 +88,53 @@ void VulkanHostBuffer::resize(std::size_t count)
 
 }
 
+void VulkanHostBuffer::copy(DeviceBuffer& deviceBuffer)
+{
+	VulkanDeviceBuffer& vulkanBuffer = static_cast<VulkanDeviceBuffer&>(deviceBuffer);
+
+	assert(vulkanBuffer.getElementSize() == _elementSize);
+
+	resize(vulkanBuffer.getCount());
+
+	vk::Result result = vk::Result::eSuccess;
+
+	vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
+
+	vk::CommandBufferBeginInfo beginInfo{};
+	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+
+	result = commandBuffer.begin(&beginInfo);
+
+	vk::BufferCopy copyRegion{};
+	copyRegion.srcOffset = 0;
+	copyRegion.dstOffset = 0;
+	copyRegion.size = _size;
+	commandBuffer.copyBuffer(vulkanBuffer.getBuffer(), _buffer, 1, &copyRegion);
+
+	commandBuffer.end();
+
+	vk::SubmitInfo submitInfo{};
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vk::Queue& transferQueue = _context.getTransferQueue().getQueue();
+	result = transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+
+	transferQueue.waitIdle();
+}
+
+void* VulkanHostBuffer::map()
+{
+	void* mappedData = nullptr;
+	vmaMapMemory(_context.getAllocator(), _allocation, &mappedData);
+	return mappedData;
+}
+
+void VulkanHostBuffer::unmap()
+{
+	vmaUnmapMemory(_context.getAllocator(), _allocation);
+}
+
 void VulkanHostBuffer::copy(const void* data, std::size_t size)
 {
 	void* mappedData = nullptr;
@@ -115,7 +169,7 @@ void VulkanDeviceBuffer::allocate(std::size_t size)
 {
 	_size = size;
 
-	vk::BufferUsageFlags usageFlags = _context.getBufferUsageFlags(_usage) | vk::BufferUsageFlagBits::eTransferDst;
+	vk::BufferUsageFlags usageFlags = _context.getBufferUsageFlags(_usage) | vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eTransferSrc;
 
 	vk::BufferCreateInfo bufferInfo{};
 	bufferInfo.size = _size;

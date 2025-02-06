@@ -18,8 +18,8 @@
  */
 #include "ImagePrimitive.h"
 
-#include "../Buffer.h"
-#include "../BufferManager.h"
+#include "../Buffer/Buffer.h"
+#include "../Buffer/BufferManager.h"
 #include "../GraphicsCommand.h"
 #include "../GraphicsSurface.h"
 #include "../Palette/Palette.h"

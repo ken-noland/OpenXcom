@@ -23,7 +23,7 @@
 #include "../Graphics/GraphicsSystem.h"
 #include "../Graphics/ShaderManager.h"
 #include "../Graphics/PipelineManager.h"
-#include "../Graphics/BufferManager.h"
+#include "../Graphics/Buffer/BufferManager.h"
 #include "../Graphics/Palette/PaletteManager.h"
 #include "../Graphics/Image/ImageManager.h"
 

@@ -183,6 +183,7 @@ set ( engine_src
   "Engine/Platform/ProcessSystem.cpp"
   "Engine/Platform/Window.cpp"
   "Engine/Resource/FileProcessor/ImageBMPFileProcessor.cpp"
+  "Engine/Resource/FileProcessor/ImageFile.cpp"
   "Engine/Resource/FileProcessor/ImageFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"
   "Engine/Resource/Font/FontManager.cpp"

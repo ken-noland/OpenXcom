@@ -39,6 +39,11 @@ std::unique_ptr<HostBuffer> VulkanBufferManager::createHostBuffer(std::size_t el
 	return std::make_unique<VulkanHostBuffer>(_context, elementSize, count, usage);
 }
 
+std::unique_ptr<HostBuffer> VulkanBufferManager::createHostBuffer(DeviceBuffer& deviceBuffer)
+{
+	return std::make_unique<VulkanHostBuffer>(_context, static_cast<VulkanDeviceBuffer&>(deviceBuffer));
+}
+
 std::unique_ptr<DeviceBuffer> VulkanBufferManager::createDeviceBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage)
 {
 	return std::make_unique<VulkanDeviceBuffer>(_context, elementSize, count, usage);

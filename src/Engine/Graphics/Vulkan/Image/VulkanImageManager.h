@@ -38,8 +38,8 @@ public:
 	VulkanImageManager(VulkanContext& context);
 	virtual ~VulkanImageManager();
 
-	virtual OwningHandle<HostImage> createHostImage(glm::vec2 size, ImageFormat format) override;
-	virtual OwningHandle<DeviceImage> createDeviceImage(glm::vec2 size, ImageFormat format) override;
+	virtual OwningHandle<HostImage> createHostImage(const std::string& name, glm::ivec2 size, ImageFormat format) override;
+	virtual OwningHandle<DeviceImage> createDeviceImage(const std::string& name, glm::ivec2 size, ImageFormat format) override;
 	virtual OwningHandle<DeviceImage> createDeviceImage(HostImage& host) override;
 };
 

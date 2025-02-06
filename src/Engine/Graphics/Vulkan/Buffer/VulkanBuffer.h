@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../../Buffer.h"
+#include "../../Buffer/Buffer.h"
 
 #ifdef __linux__
 #undef None // Xlib.h defines None, which conflicts with Vulkan
@@ -33,6 +33,7 @@ namespace OpenXcom
 {
 
 class VulkanContext;
+class VulkanDeviceBuffer;
 
 class VulkanHostBuffer : public HostBuffer
 {
@@ -46,6 +47,7 @@ protected:
 	void deallocate();
 
 public:
+	VulkanHostBuffer(VulkanContext& context, VulkanDeviceBuffer& deviceBuffer);
 	VulkanHostBuffer(VulkanContext& context, std::size_t elementSize, std::size_t count, BufferUsage usage);
 	virtual ~VulkanHostBuffer();
 
@@ -53,7 +55,11 @@ public:
 
 	virtual void resize(std::size_t count) override;
 
+	virtual void* map() override;
+	virtual void unmap() override;
+
 	virtual void copy(const void* data, std::size_t size) override;
+	virtual void copy(DeviceBuffer& deviceBuffer) override;
 };
 
 class VulkanDeviceBuffer : public DeviceBuffer

@@ -209,7 +209,7 @@ GameWindow::GameWindow(EngineContext& engine)
 	// load an image
 	ResourceSystem& resourceSystem = engine.getResourceSystem();
 	ImageBMPFileProcessor& imageProcessor = resourceSystem.getImageBMPFileProcessor();
-	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> loadedImage = imageProcessor.load(tempDosFont, DOSFONT_SIZE, false);
+	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> loadedImage = imageProcessor.load("dosFont", tempDosFont, DOSFONT_SIZE, false);
 	_image = resourceSystem.getImageManager().createDeviceImage(loadedImage.first.get());
 
 	// create an image primitive

@@ -1,4 +1,3 @@
-#include "ImageBMPFileProcessor.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,6 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "ImageBMPFileProcessor.h"
+
+#include "ImageFile.h"
 
 #include "../../EngineContext.h"
 
@@ -25,7 +27,10 @@
 #include "../../Graphics/Palette/PaletteManager.h"
 #include "../../Graphics/Image/Image.h"
 #include "../../Graphics/Image/ImageManager.h"
+#include "../../Graphics/Buffer/Buffer.h"
+#include "../../Graphics/Buffer/BufferManager.h"
 
+#include <fstream>
 #include <glm/vec2.hpp>
 
 extern "C" {
@@ -188,7 +193,7 @@ std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ImageBMPFileProcessor:
 	return std::pair<OwningHandle<HostImage>, OwningHandle<Palette>>();
 }
 
-std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ImageBMPFileProcessor::load(const uint8_t* bmpBuffer, std::size_t size, bool loadPalette)
+std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bmpBuffer, std::size_t size, bool loadPalette)
 {
 	// Verify magic.
 	unsigned short magic;
@@ -250,7 +255,7 @@ std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ImageBMPFileProcessor:
 	default:
 		throw std::runtime_error("Unsupported bit depth");
 	}
-	OwningHandle<HostImage> hostImageHandle = imageManager.createHostImage(imageSize, format);
+	OwningHandle<HostImage> hostImageHandle = imageManager.createHostImage(name, imageSize, format);
 	if (!hostImageHandle.isValid())
 	{
 		return {OwningHandle<HostImage>(), OwningHandle<Palette>()};
@@ -303,6 +308,122 @@ std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ImageBMPFileProcessor:
 	hostImage.unmap();
 
 	return {std::move(hostImageHandle), std::move(paletteHandle)};
+}
+
+void ImageBMPFileProcessor::save(const std::filesystem::path& filename, ImageFile& imageData)
+{
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	BufferManager& bufferManager = resourceSystem.getBufferManager();
+
+	HostImage& hostImage = imageData.getImage();
+	DeviceBuffer& devicePaletteBuffer = imageData.getPalette().getDeviceBuffer();
+	std::unique_ptr<HostBuffer> hostPaletteBufferPtr = bufferManager.createHostBuffer(devicePaletteBuffer);
+	HostBuffer& hostPaletteBuffer = *hostPaletteBufferPtr;
+
+	// For now, only support 8-bit (R8) images.
+	assert(hostImage.getFormat() == ImageFormat::R8);
+	assert(hostPaletteBuffer.getElementSize() == sizeof(PackedColor));
+
+	const uint32_t bitsPerPixel = 8;
+
+	// Open file for binary writing.
+	std::ofstream ofs(filename, std::ios::binary);
+	if (!ofs.is_open())
+	{
+		throw std::runtime_error("Failed to open file for writing.");
+	}
+
+	// Write the BMP magic (2 bytes). BMP_MAGIC is defined by libbmp.
+	unsigned short magic = BMP_MAGIC;
+	ofs.write(reinterpret_cast<const char*>(&magic), sizeof(magic));
+
+	// Prepare the bmp_header structure.
+	bmp_header header = {};
+	int width = hostImage.getWidth();
+	int height = hostImage.getHeight();
+
+	// Calculate row size and padding.
+	// For 8-bit images, each row in the file is "width" bytes.
+	int rowBytesFile = (width / bitsPerPixel) * 8;
+	int padding = BMP_GET_PADDING(rowBytesFile);
+	int pixelDataSize = (rowBytesFile + padding) * height;
+
+	// Calculate palette size in bytes.
+	size_t paletteByteSize = hostPaletteBuffer.getSize();
+	size_t pixelsByteOffset = sizeof(magic) + sizeof(bmp_header) + paletteByteSize;
+	size_t fileByteSize = pixelsByteOffset + pixelDataSize;
+
+	// Assuming each palette entry is 4 bytes.
+	unsigned int numPaletteEntries = static_cast<unsigned int>(hostPaletteBuffer.getCount());
+
+	// Set header values.
+	// bfOffBits = magic (2 bytes already written) + header + palette data.
+	header.bfSize = fileByteSize;
+	header.bfReserved = 0;
+	header.bfOffBits = pixelsByteOffset;
+
+	header.biSize = 40;
+	header.biWidth = width;	
+	header.biHeight = height; // Negative height means top-down.
+	header.biPlanes = 1;
+	header.biBitCount = bitsPerPixel;
+	header.biCompression = 0; // BI_RGB (no compression)
+	header.biSizeImage = pixelDataSize;
+	header.biXPelsPerMeter = 2835; // ~72 DPI.
+	header.biYPelsPerMeter = 2835;
+	header.biClrUsed = numPaletteEntries;
+	header.biClrImportant = 0;
+
+	// Write header.
+	ofs.write(reinterpret_cast<const char*>(&header), sizeof(header));
+
+	// Write palette data.
+	// Map the host palette buffer.
+	PackedColor* paletteData = reinterpret_cast<PackedColor*>(hostPaletteBuffer.map());
+	for (unsigned int i = 0; i < numPaletteEntries; i++)
+	{
+		// The palette entries in your HostBuffer are PackedColor values, arranged as:
+		// (red << 24) | (green << 16) | (blue << 8) | (alpha)
+		// BMP palette entries are written in BGRA order.
+		PackedColor pc = paletteData[i];
+		uint8_t red = pc.r();
+		uint8_t green = pc.g();
+		uint8_t blue = pc.b();
+
+		// The BMP palette reserved byte is typically set to 0.
+		uint8_t reserved = 0;
+
+		ofs.put(static_cast<char>(blue));
+		ofs.put(static_cast<char>(green));
+		ofs.put(static_cast<char>(red));
+		ofs.put(static_cast<char>(reserved));
+	}
+	hostPaletteBuffer.unmap();
+
+	// Write pixel data.
+	// Map the host image to access raw pixel data.
+	uint8_t* imagePixels = static_cast<uint8_t*>(hostImage.map());
+	if (!imagePixels)
+	{
+		throw std::runtime_error("Failed to map host image.");
+	}
+
+	// BMP files store pixel rows in bottom-up order.
+	for (int y = height - 1; y >= 0; y--)
+	{
+		// Each row is "width" bytes (one byte per pixel index).
+		const uint8_t* rowPtr = imagePixels + y * width;
+		ofs.write(reinterpret_cast<const char*>(rowPtr), width);
+		// Write row padding.
+		for (int p = 0; p < padding; p++)
+		{
+			ofs.put(0);
+		}
+	}
+	hostImage.unmap();
+
+	ofs.flush();
+	ofs.close();
 }
 
 } // namespace OpenXcom

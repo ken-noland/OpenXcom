@@ -312,7 +312,7 @@ protected:
 TEST_F(BMPTest, TestLoadBMP)
 {
 	// Specify the BMP file path; assume it’s located in the Data directory
-	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ret = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load(dosFont, DOSFONT_SIZE, false);
+	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ret = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load("dosFont", dosFont, DOSFONT_SIZE, false);
 
 	OwningHandle<HostImage> hostImage = std::move(ret.first);
 	ASSERT_TRUE(hostImage.isValid()) << "Failed to load BMP file.";
@@ -335,7 +335,7 @@ struct Color
 // to an RGB color.
 Color hsv_to_rgb(float h, float s, float v)
 {
-	float r, g, b;
+	float r = 0.f, g = 0.f, b = 0.f;
 	int i = int(h * 6);
 	float f = h * 6 - i;
 	float p = v * (1 - s);

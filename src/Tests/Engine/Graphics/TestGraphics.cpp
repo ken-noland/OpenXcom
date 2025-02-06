@@ -32,7 +32,7 @@
 #include "../../../Engine/Graphics/Types/PackedColor.h"
 #include "../../../Engine/Graphics/GraphicsSurface.h"
 #include "../../../Engine/Graphics/GraphicsSystem.h"
-#include "../../../Engine/Graphics/BufferManager.h"
+#include "../../../Engine/Graphics/Buffer/BufferManager.h"
 #include "../../../Engine/Options.h"
 #include "../../../Engine/Platform/Window.h"
 
@@ -53,17 +53,18 @@ using namespace OpenXcom;
 class GraphicsTest : public ::testing::Test
 {
 protected:
-	std::unique_ptr<Engine> _engine;
+	static std::unique_ptr<Engine> _engine;
+
+	static std::filesystem::path _dataPath;
+	static std::filesystem::path _configPath;
+	static std::filesystem::path _userPath;
+
 	std::unique_ptr<GameSurface> _gameSurface;
 	std::unique_ptr<WindowSurface> _windowSurface;
 
-	std::filesystem::path _dataPath;
-	std::filesystem::path _configPath;
-	std::filesystem::path _userPath;
-
 	PaletteManager::OwningHandle _paletteHandle;
 
-	void SetUp() override
+	static void SetUpTestSuite()
 	{
 		std::filesystem::path path = TEST_DATA_DIR;
 		_dataPath = path / "Data";
@@ -72,7 +73,15 @@ protected:
 
 		std::vector<std::string> args = {"-data", _dataPath.string(), "-config", _configPath.string(), "-user", _userPath.string(), "-headless"};
 		_engine = std::make_unique<Engine>(args);
+	}
 
+	static void TearDownTestSuite()
+	{
+		_engine.reset();
+	}
+
+	void SetUp() override
+	{
 		// set up the palette
 		PackedColor paletteData[] = {
 			0x000000FF, // 0 - Black
@@ -106,7 +115,6 @@ protected:
 		_paletteHandle.release();
 		_windowSurface.reset();
 		_gameSurface.reset();
-		_engine.reset();
 	}
 
 	/**
@@ -116,7 +124,7 @@ protected:
 	{
 		_windowSurface->update();	// render the surface once
 
-		OwningHandle<HostImage> hostImageHandle = _engine->getResourceSystem().getImageManager().createHostImage(_gameSurface->getScreenSize(), ImageFormat::R8G8B8A8);
+		OwningHandle<HostImage> hostImageHandle = _engine->getResourceSystem().getImageManager().createHostImage("screenCapture", _gameSurface->getScreenSize(), ImageFormat::R8G8B8A8);
 		if (!hostImageHandle.isValid())
 		{
 			ADD_FAILURE() << "Failed to create HostImage.";
@@ -167,6 +175,13 @@ protected:
 		hostImage.unmap();
 	}
 };
+
+std::unique_ptr<Engine> GraphicsTest::_engine = nullptr;
+
+std::filesystem::path GraphicsTest::_dataPath;
+std::filesystem::path GraphicsTest::_configPath;
+std::filesystem::path GraphicsTest::_userPath;
+
 
 TEST_F(GraphicsTest, TestGraphicsSurface)
 {

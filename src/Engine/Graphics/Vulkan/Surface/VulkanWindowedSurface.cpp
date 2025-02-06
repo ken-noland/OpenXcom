@@ -32,7 +32,7 @@
 
 #include "../../../EngineContext.h"
 #include "../../../Resource/ResourceSystem.h"
-#include "../../BufferManager.h"
+#include "../../Buffer/BufferManager.h"
 
 #include "../Buffer/VulkanBuffer.h"
 

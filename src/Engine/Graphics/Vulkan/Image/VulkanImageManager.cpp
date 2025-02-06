@@ -33,12 +33,12 @@ VulkanImageManager::~VulkanImageManager()
 {
 }
 
-OwningHandle<HostImage> VulkanImageManager::createHostImage(glm::vec2 size, ImageFormat format)
+OwningHandle<HostImage> VulkanImageManager::createHostImage(const std::string& name, glm::ivec2 size, ImageFormat format)
 {
 	return _hostImageManager.add(std::make_unique<VulkanHostImage>(_context, size, format));
 }
 
-OwningHandle<DeviceImage> VulkanImageManager::createDeviceImage(glm::vec2 size, ImageFormat format)
+OwningHandle<DeviceImage> VulkanImageManager::createDeviceImage(const std::string& name, glm::ivec2 size, ImageFormat format)
 {
 	return _deviceImageManager.add(std::make_unique<VulkanDeviceImage>(_context, size, format));
 }

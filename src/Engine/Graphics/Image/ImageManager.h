@@ -43,8 +43,8 @@ public:
 	ImageManager() = default;
 	virtual ~ImageManager() = default;
 
-	virtual OwningHandle<HostImage> createHostImage(glm::vec2 size, ImageFormat format) = 0;
-	virtual OwningHandle<DeviceImage> createDeviceImage(glm::vec2 size, ImageFormat format) = 0;
+	virtual OwningHandle<HostImage> createHostImage(const std::string& name, glm::ivec2 size, ImageFormat format) = 0;
+	virtual OwningHandle<DeviceImage> createDeviceImage(const std::string& name, glm::ivec2 size, ImageFormat format) = 0;
 	virtual OwningHandle<DeviceImage> createDeviceImage(HostImage& host) = 0;
 
 	ResourceManager<HostImage>& getHostImageManager() { return _hostImageManager; }

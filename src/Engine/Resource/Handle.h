@@ -136,6 +136,18 @@ public:
 		return _manager->get(_handle);
 	}
 
+	// Dereference operator
+	ResourceType& operator*() const
+	{
+		return get();
+	}
+
+	// Arrow operator
+	ResourceType* operator->() const
+	{
+		return &get();
+	}
+
 	// Get a non-owning handle
 	ResourceHandle<ResourceType> getHandle() const
 	{

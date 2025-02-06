@@ -19,7 +19,7 @@
 #include "VulkanImage.h"
 #include "../VulkanContext.h"
 
-#include "../../BufferManager.h"
+#include "../../Buffer/BufferManager.h"
 #include "../../../EngineContext.h"
 #include "../../../Resource/ResourceSystem.h"
 

@@ -38,6 +38,9 @@ public:
 	PaletteManager(EngineContext& context);
 	virtual ~PaletteManager();
 
+	// create an empty palette
+	ResourceManager<Palette>::OwningHandle createPalette(const std::string& name, size_t count);
+
 	// load palette from memory
 	ResourceManager<Palette>::OwningHandle createPalette(const std::string& name, const PackedColor* data, size_t count);
 

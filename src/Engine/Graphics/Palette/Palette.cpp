@@ -20,19 +20,19 @@
 
 #include "../../EngineContext.h"
 #include "../../Resource/ResourceSystem.h"
-#include "../BufferManager.h"
+#include "../Buffer/BufferManager.h"
 
 namespace OpenXcom
 {
 
+Palette::Palette(EngineContext& context, const std::string& name, std::size_t count)
+{
+	_deviceBuffer = context.getResourceSystem().getBufferManager().createDeviceBuffer(sizeof(PackedColor), count, BufferUsage::Storage);
+}
+
 Palette::Palette(EngineContext& context, const std::string& name, const PackedColor* data, std::size_t count)
 {
 	_deviceBuffer = context.getResourceSystem().getBufferManager().createDeviceBuffer<PackedColor>(data, count, BufferUsage::Storage);
-}
-
-Palette::Palette(EngineContext& context, const std::string& name, std::initializer_list<PackedColor> data)
-	: Palette(context, name, static_cast<const PackedColor*>(data.begin()), data.size())
-{
 }
 
 Palette::~Palette()

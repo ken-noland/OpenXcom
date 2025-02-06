@@ -18,7 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../BufferManager.h"
+#include "../../Buffer/BufferManager.h"
 #include <vulkan/vulkan.hpp>
 #include <memory>
 #include <simplerttr.h>
@@ -41,6 +41,9 @@ public:
 
 	// Create an empty host buffer
 	virtual std::unique_ptr<HostBuffer> createHostBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) override;
+
+	// Create a host buffer from a device buffer
+	virtual std::unique_ptr<HostBuffer> createHostBuffer(DeviceBuffer& deviceBuffer) override;
 
 	// Create an empty device buffer
 	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) override;

@@ -31,13 +31,27 @@ class BufferManager
 public:
 	BufferManager() = default;
 	virtual ~BufferManager() = default;
+
+	//TODO: Move over to handles!
 	
 	// Create an empty host buffer
 	virtual std::unique_ptr<HostBuffer> createHostBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) = 0;
 
+	// Create a host buffer from a device buffer
+	virtual std::unique_ptr<HostBuffer> createHostBuffer(DeviceBuffer& deviceBuffer) = 0;
+
 	// Create a host buffer and copy data into it
 	template <typename BufferType>
 	inline std::unique_ptr<HostBuffer> createHostBuffer(const BufferType* data, size_t count, BufferUsage usage);
+
+	// Create a host buffer and copy data into it (std::vector variant)
+	template <typename BufferType>
+	inline std::unique_ptr<HostBuffer> createHostBuffer(const std::vector<BufferType>& data, BufferUsage usage);
+
+	// Create a host buffer and copy data into it (std::initializer_list variant)
+	template <typename BufferType>
+	inline std::unique_ptr<HostBuffer> createHostBuffer(const std::initializer_list<BufferType>& data, BufferUsage usage);
+
 
 	// Create an empty device buffer
 	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) = 0;
@@ -58,6 +72,22 @@ std::unique_ptr<HostBuffer> BufferManager::createHostBuffer(const BufferType* da
 {
 	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer(sizeof(BufferType), count, usage);
 	hostBuffer->copy(data, sizeof(BufferType) * count);
+	return hostBuffer;
+}
+
+template <typename BufferType>
+std::unique_ptr<HostBuffer> BufferManager::createHostBuffer(const std::vector<BufferType>& data, BufferUsage usage)
+{
+	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer(sizeof(BufferType), data.size(), usage);
+	hostBuffer->copy(data.data(), sizeof(BufferType) * data.size());
+	return hostBuffer;
+}
+
+template <typename BufferType>
+std::unique_ptr<HostBuffer> BufferManager::createHostBuffer(const std::initializer_list<BufferType>& data, BufferUsage usage)
+{
+	std::unique_ptr<HostBuffer> hostBuffer = createHostBuffer(sizeof(BufferType), data.size(), usage);
+	hostBuffer->copy(data.begin(), sizeof(BufferType) * data.size());
 	return hostBuffer;
 }
 

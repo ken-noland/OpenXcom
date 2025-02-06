@@ -37,13 +37,17 @@ private:
 	std::unique_ptr<DeviceBuffer> _deviceBuffer;
 
 public:
+	// create an empty palette
+	Palette(EngineContext& context, const std::string& name, std::size_t count);
+
+	// create a palette from an array of colors
 	Palette(EngineContext& context, const std::string& name, const PackedColor* data, std::size_t count);
-	Palette(EngineContext& context, const std::string& name, std::initializer_list<PackedColor> data);
+
 	virtual ~Palette();
 
 	const std::string& getName() const { return _name; };
-	const DeviceBuffer& getDeviceBuffer() const { return *_deviceBuffer; };
 
+	DeviceBuffer& getDeviceBuffer() { return *_deviceBuffer; };
 };
 
 

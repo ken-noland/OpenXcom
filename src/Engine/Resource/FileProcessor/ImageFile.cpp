@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,34 +16,41 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../Handle.h"
+#include "ImageFile.h"
+#include "../../Graphics/Image/Image.h"
+#include "../../Graphics/Palette/Palette.h"
+#include "../../Resource/ResourceManager.h"
 
 namespace OpenXcom
 {
 
-class HostImage;
-class Palette;
-
-class ImageFile
+ImageFile::ImageFile(OwningHandle<HostImage> image, OwningHandle<Palette> palette)
+	: _image(std::move(image)), _palette(std::move(palette))
 {
-protected:
-	OwningHandle<HostImage> _image;
-	OwningHandle<Palette> _palette;
+}
 
-public:
+ImageFile ::~ImageFile()
+{
+}
 
-	ImageFile(OwningHandle<HostImage> image, OwningHandle<Palette> palette);
-	~ImageFile();
+HostImage& ImageFile::getImage()
+{
+	return *_image;
+}
 
-	HostImage& getImage();
-	Palette& getPalette();
+Palette& ImageFile::getPalette()
+{
+	return *_palette;
+}
 
-	// Transfers ownership of the image and invalidates the internal handle.
-	OwningHandle<HostImage> takeImage();
+OwningHandle<HostImage> ImageFile::takeImage()
+{
+	return std::move(_image);
+}
 
-	// Transfers ownership of the palette and invalidates the internal handle.
-	OwningHandle<Palette> takePalette();
-
-};
+OwningHandle<Palette> ImageFile::takePalette()
+{
+	return std::move(_palette);
+}
 
 } // namespace OpenXcom

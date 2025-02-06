@@ -33,6 +33,7 @@
 #include "../../../version.h"
 
 #include <glslang/Public/ShaderLang.h>
+#include <format>
 
 #if defined(_MSC_VER)
 #define DEBUG_BREAK() __debugbreak()
@@ -193,16 +194,25 @@ VulkanContext::~VulkanContext()
 
 	if (_device)
 	{
+		std::string ptrStr = std::format("{:p}", static_cast<const void*>((VkDevice)_device));
+		Log(LOG_INFO) << "Destroying Vulkan Device at " << ptrStr;
+
+		_device.waitIdle();
 		_device.destroy();
+		_device = nullptr;
+
+		Log(LOG_INFO) << "Vulkan Device Destroyed";
 	}
 
 	if (_debugMessenger)
 	{
 		_instance.destroyDebugUtilsMessengerEXT(_debugMessenger);
+		_debugMessenger = nullptr;
 	}
 	if (_instance)
 	{
 		_instance.destroy();
+		_instance = nullptr;
 	}
 
 	glslang::FinalizeProcess();
@@ -278,7 +288,7 @@ void VulkanContext::initializeInstance(bool isHeadless)
 
 	_debugMessenger = _instance.createDebugUtilsMessengerEXT(debugCreateInfo);
 
-	Log(LOG_DEBUG) << "Vulkan instance created";
+	Log(LOG_INFO) << "Vulkan Instance created";
 
 	vk::SurfaceKHR surface;
 	if (!isHeadless)
@@ -309,15 +319,15 @@ void VulkanContext::selectPhysicalDevice(std::optional<vk::SurfaceKHR> surface)
 		throw new std::runtime_error("Failed to find GPUs with Vulkan support.");
 	}
 
-	Log(LOG_DEBUG) << "Available physical devices:";
+	Log(LOG_INFO) << "Available physical devices:";
 	for (const vk::PhysicalDevice& device : physicalDevices)
 	{
 		vk::PhysicalDeviceProperties properties = device.getProperties();
 		vk::PhysicalDeviceFeatures features = device.getFeatures();
 		std::vector<vk::QueueFamilyProperties> queueFamilies = device.getQueueFamilyProperties();
 
-		Log(LOG_DEBUG) << "  Device Name: " << properties.deviceName;
-		Log(LOG_DEBUG) << "  Device Type: " << vk::to_string(properties.deviceType);
+		Log(LOG_INFO) << "  Device Name: " << properties.deviceName;
+		Log(LOG_INFO) << "  Device Type: " << vk::to_string(properties.deviceType);
 
 		bool supportsGraphics = false;
 		bool supportsPresentation = false;
@@ -346,7 +356,7 @@ void VulkanContext::selectPhysicalDevice(std::optional<vk::SurfaceKHR> surface)
 		if (supportsGraphics && (!surface || (supportsPresentation && supportsSwapchain)) && checkPhysicalDeviceHasFeatures(properties, features))
 		{
 			_physicalDevice = device;
-			Log(LOG_DEBUG) << "Selected Device: " << properties.deviceName;
+			Log(LOG_INFO) << "Selected Device: " << properties.deviceName;
 			return;
 		}
 	}
@@ -461,6 +471,8 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	deviceCreateInfo.pNext = &lineRasterizationFeatures;
 
 	_device = _physicalDevice.createDevice(deviceCreateInfo);
+	std::string ptrStr = std::format("{:p}", static_cast<const void*>((VkDevice)_device));
+	Log(LOG_INFO) << "Vulkan Device Created at " << ptrStr;
 
 	_graphicsQueue.create(_device, graphicsQueueFamilyIndex, true);
 	_transferQueue.create(_device, transferQueueFamilyIndex, true);

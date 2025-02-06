@@ -32,6 +32,8 @@ enum class BufferUsage
 	Storage,
 };
 
+class DeviceBuffer;
+
 class HostBuffer
 {
 protected:
@@ -58,6 +60,12 @@ public:
 	std::size_t getAllocatedSize() const { return _allocatedSize; }
 
 	virtual void resize(std::size_t count) = 0;
+
+	virtual void* map() = 0;
+	virtual void unmap() = 0;
+
+
+	virtual void copy(DeviceBuffer& deviceBuffer) = 0;
 
 	virtual void copy(const void* data, std::size_t size) = 0;
 
