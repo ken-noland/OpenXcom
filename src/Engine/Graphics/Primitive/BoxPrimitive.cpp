@@ -56,7 +56,8 @@ BoxFilledPrimitive::BoxFilledPrimitive(EngineContext& context, Pipeline& pipelin
 
 	_pipelineBinding = pipeline.createBinding();
 
-	glm::ivec2 extent1 = extent + glm::ivec2(1, 1); // +1 to include the right and bottom edges
+	glm::ivec2 extent1 = extent + glm::ivec2(1, 1); // +1 to include the right and bottom edges due
+													// to the rasterization rules in Vulkan
 
 	// Define two triangles that form a quad
 	BoxVertex vertices[6] = {
@@ -103,7 +104,7 @@ BoxOutlinePrimitive::BoxOutlinePrimitive(EngineContext& context, Pipeline& pipel
 	BoxVertex vertices[5] = {
 		{position},                           // Top-left
 		{position + glm::ivec2(extent.x, 0)}, // Top-right
-		{position + extent},                  // Bottom-right **+1**
+		{position + extent},                  // Bottom-right
 		{position + glm::ivec2(0, extent.y)}, // Bottom-left
 		{position}                            // Closing the loop
 	};

@@ -35,6 +35,9 @@ extern "C" {
 namespace OpenXcom
 {
 
+// TODO: maybe grab https://github.com/jsummers/bmpsuite, which is a utility to generate tons of bitmaps(some of them invalid on purpose) and test this code with it
+
+
 // Base template (will never be used directly)
 template <int Bits>
 struct PixelUnpacker

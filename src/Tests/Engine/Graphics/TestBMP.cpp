@@ -309,7 +309,7 @@ protected:
 	}
 };
 
-TEST_F(BMPTest, LoadBMP)
+TEST_F(BMPTest, TestLoadBMP)
 {
 	// Specify the BMP file path; assume it’s located in the Data directory
 	std::pair<OwningHandle<HostImage>, OwningHandle<Palette>> ret = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load(dosFont, DOSFONT_SIZE, false);
@@ -324,3 +324,164 @@ TEST_F(BMPTest, LoadBMP)
 	std::filesystem::path baselinePath = _dataPath / "Test" / "BMP" / "test.bmp.png";
 	compareWithBaseline(hostImage, baselinePath);
 }
+
+// Simple structure to hold RGB color values.
+struct Color
+{
+	unsigned char r, g, b;
+};
+
+// Convert an HSV color (with h in [0,1], s in [0,1], and v in [0,1])
+// to an RGB color.
+Color hsv_to_rgb(float h, float s, float v)
+{
+	float r, g, b;
+	int i = int(h * 6);
+	float f = h * 6 - i;
+	float p = v * (1 - s);
+	float q = v * (1 - f * s);
+	float t = v * (1 - (1 - f) * s);
+
+	switch (i % 6)
+	{
+	case 0:
+		r = v, g = t, b = p;
+		break;
+	case 1:
+		r = q, g = v, b = p;
+		break;
+	case 2:
+		r = p, g = v, b = t;
+		break;
+	case 3:
+		r = p, g = q, b = v;
+		break;
+	case 4:
+		r = t, g = p, b = v;
+		break;
+	case 5:
+		r = v, g = p, b = q;
+		break;
+	}
+	return Color{static_cast<unsigned char>(r * 255),
+				 static_cast<unsigned char>(g * 255),
+				 static_cast<unsigned char>(b * 255)};
+}
+//
+//TEST_F(BMPTest, TestTemp)
+//{
+//	// Adjustable parameters:
+//	unsigned cellSize = 16;         // Size (in pixels) of each cell.
+//	unsigned subCellSize = 4;       // Spacing (in pixels) for sub-cell lines.
+//	unsigned subPaletteOffset = 8; // Palette offset for sub-cell lines.
+//
+//	// For a 256x256 image:
+//	const unsigned width = 256;
+//	const unsigned height = 256;
+//	std::vector<unsigned char> image(width * height, 0);
+//
+//	// Create a 16x16 grid of cells (16 cells per row, 16 rows = 256 cells).
+//	// The outer grid lines (every cellSize pixels) use palette index 0 (black).
+//	// Inside each cell, pixels on a sub-grid boundary (every subCellSize pixels)
+//	// use the cell's base palette index plus subPaletteOffset (wrapped modulo 256),
+//	// and other pixels use the base cell palette index.
+//	// Note: cell indices are computed from the cell coordinates, and we add 1
+//	// so that index 0 remains reserved for the grid.
+//	for (unsigned y = 0; y < height; y++)
+//	{
+//		for (unsigned x = 0; x < width; x++)
+//		{
+//			if (x % cellSize == 0 || y % cellSize == 0)
+//			{
+//				// Outer grid line.
+//				image[y * width + x] = 0;
+//			}
+//			else
+//			{
+//				// Determine which cell we are in.
+//				unsigned cell_x = x / cellSize;
+//				unsigned cell_y = y / cellSize;
+//				// Base cell index (using indices 1..255)
+//				unsigned baseIndex = cell_y * 16 + cell_x + 1;
+//				// Determine local coordinates within the cell.
+//				unsigned localX = x % cellSize;
+//				unsigned localY = y % cellSize;
+//				// If we're on a sub-grid line inside the cell, use baseIndex plus subPaletteOffset.
+//				if ((localX % subCellSize == 0) || (localY % subCellSize == 0))
+//				{
+//					image[y * width + x] = static_cast<unsigned char>((baseIndex + subPaletteOffset) % 256);
+//				}
+//				else
+//				{
+//					// Regular cell interior.
+//					image[y * width + x] = static_cast<unsigned char>(baseIndex % 256);
+//				}
+//			}
+//		}
+//	}
+//
+//	// --- Palette Setup ---
+//	// Create a palette of 256 colors, each palette entry is 4 bytes: R, G, B, A.
+//	// We want index 0 to be used for grid lines. Here we choose black.
+//	unsigned char palette[256 * 4];
+//	// Palette entry for index 0 (grid lines): black.
+//	palette[0] = 0;   // R
+//	palette[1] = 0;   // G
+//	palette[2] = 0;   // B
+//	palette[3] = 255; // A
+//
+//	// Generate unique colors for indices 1 to 255 using an HSV color wheel.
+//	for (unsigned i = 1; i < 256; i++)
+//	{
+//		// Map i-1 from 0 to 254 into the hue range [0, 1).
+//		float hue = (i - 1) / 255.0f;
+//		Color c = hsv_to_rgb(hue, 1.0f, 1.0f);
+//		palette[i * 4 + 0] = c.r;
+//		palette[i * 4 + 1] = c.g;
+//		palette[i * 4 + 2] = c.b;
+//		palette[i * 4 + 3] = 255; // Fully opaque.
+//	}
+//
+//
+//    // --- lodepng Setup ---
+//	// We use the C++ interface and set up a State object.
+//	lodepng::State state;
+//	// Specify that both the PNG output and the raw image data use a palette.
+//	state.info_png.color.colortype = LCT_PALETTE;
+//	state.info_png.color.bitdepth = 8;
+//	state.info_raw.colortype = LCT_PALETTE;
+//	state.info_raw.bitdepth = 8;
+//	state.encoder.auto_convert = 0; // Disable automatic conversion
+//
+//	// Set up the palette using lodepng_palette_add.
+//	// For index 0, we want black (used for grid lines).
+//	lodepng_palette_add(&state.info_png.color, 0, 0, 0, 255);
+//	lodepng_palette_add(&state.info_raw, 0, 0, 0, 255);
+//
+//	// For indices 1 to 255, generate colors via an HSV color wheel.
+//	for (int i = 1; i < 256; i++)
+//	{
+//		// Map i-1 from 0 to 254 into hue [0,1)
+//		float hue = (i - 1) / 255.0f;
+//		Color c = hsv_to_rgb(hue, 1.0f, 1.0f);
+//		lodepng_palette_add(&state.info_png.color, c.r, c.g, c.b, 255);
+//		lodepng_palette_add(&state.info_raw, c.r, c.g, c.b, 255);
+//	}
+//
+//	// --- Encode and Save the PNG ---
+//	std::vector<unsigned char> buffer;
+//	unsigned error = lodepng::encode(buffer, image, width, height, state);
+//	if (error)
+//	{
+//		std::cerr << "Encoder error " << error << ": "
+//				  << lodepng_error_text(error) << std::endl;
+//	}
+//
+//	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "test_image.png";
+//	error = lodepng::save_file(buffer, baselinePath.string());
+//	if (error)
+//	{
+//		std::cerr << "Save file error " << error << ": "
+//				  << lodepng_error_text(error) << std::endl;
+//	}
+//}
