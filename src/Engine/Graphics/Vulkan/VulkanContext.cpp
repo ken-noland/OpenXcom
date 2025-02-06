@@ -436,6 +436,9 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	deviceFeatures.sampleRateShading = VK_TRUE;
 	deviceFeatures.fillModeNonSolid = VK_TRUE;
 
+	vk::PhysicalDeviceLineRasterizationFeaturesKHR lineRasterizationFeatures{};
+	lineRasterizationFeatures.smoothLines = VK_TRUE;
+
 	// Specify device extensions
 	std::vector<const char*> deviceExtensions;
 	if (!isHeadless)
@@ -452,6 +455,8 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
 	deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 	deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
+	deviceCreateInfo.pNext = &lineRasterizationFeatures;
 
 	_device = _physicalDevice.createDevice(deviceCreateInfo);
 

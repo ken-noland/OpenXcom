@@ -213,9 +213,12 @@ GameWindow::GameWindow(EngineContext& engine)
 	_image = resourceSystem.getImageManager().createDeviceImage(loadedImage.first.get());
 
 	// create an image primitive
-	PrimitiveFactory& primitiveFactory = _windowSurface->getRenderTarget().getPrimitiveFactory();
-	_thingToDraw = primitiveFactory.createImagePrimitive({10, 10}, {16, 0}, {16, 16}, _image.getHandle(), _paletteHandle.getHandle());
+	PrimitiveFactory& windowPrimitiveFactory = _windowSurface->getRenderTarget().getPrimitiveFactory();
+	_thingToDraw = windowPrimitiveFactory.createImagePrimitive({10, 10}, {16, 0}, {16, 16}, _image.getHandle(), _paletteHandle.getHandle());
 
+	//create a box outlien primitive
+	PrimitiveFactory& gamePrimitiveFactory = _gameSurface->getRenderTarget().getPrimitiveFactory();
+	_thingToDraw2 = gamePrimitiveFactory.createOutlineBoxPrimitive({10, 10}, {40, 40}, 1, _paletteHandle.getHandle());
 }
 
 GameWindow::~GameWindow()
@@ -239,6 +242,7 @@ void GameWindow::onWindowRender(GraphicsCommand& command)
 
 void GameWindow::onGameRender(GraphicsCommand& command)
 {
+	_thingToDraw2->draw(command);
 }
 
 void GameWindow::onWindowResize(glm::ivec2 size)

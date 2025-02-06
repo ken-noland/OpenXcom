@@ -65,6 +65,12 @@ VulkanPipeline::VulkanPipeline(VulkanContext& context, const PipelineDefinition&
 	createRasterizerState(rasterizer);
 	createMultisampleState(multisampling);
 	createColorBlendState(colorBlending, colorBlendAttachment);
+
+	//temp
+	vk::PipelineRasterizationLineStateCreateInfoEXT lineRasterizationState{};
+	lineRasterizationState.lineRasterizationMode = vk::LineRasterizationModeEXT::eRectangularSmooth;
+	rasterizer.pNext = &lineRasterizationState;
+
 	
 	if (pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineStrip || pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineList)
 	{

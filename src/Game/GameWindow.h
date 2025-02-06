@@ -53,6 +53,7 @@ protected:
 	OwningHandle<Palette> _paletteHandle;
 	OwningHandle<DeviceImage> _image;
 	std::unique_ptr<ImagePrimitive> _thingToDraw;
+	std::unique_ptr<BoxOutlinePrimitive> _thingToDraw2;
 
 	void onWindowRender(GraphicsCommand& command);
 	void onGameRender(GraphicsCommand& command);
