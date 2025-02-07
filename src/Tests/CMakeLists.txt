@@ -24,6 +24,7 @@ add_executable(
   "Engine/Graphics/TestBuffer.cpp"
   "Engine/Graphics/TestGraphics.cpp"
   "Engine/Resource/FileProcessor/TestImageFileProcessor.cpp"
+  "Engine/Resource/Font/TestFont.cpp"
   "Engine/Resource/TestResourceManager.cpp"
   "Engine/TestEngine.cpp"
   "Engine/TestECS.cpp"
@@ -40,6 +41,9 @@ target_compile_definitions(openxcom_tests PRIVATE
     TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/src/Tests/Data"
 )
 
+if (MSVC)
+    target_compile_options(openxcom_tests PRIVATE /utf-8)
+endif()
 
 # Link Google Test libraries with your test executable
 target_link_libraries(openxcom_tests PUBLIC openxcom_lib GTest::gtest_main)

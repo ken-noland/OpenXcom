@@ -186,9 +186,9 @@ set ( engine_src
   "Engine/Resource/FileProcessor/ImageFile.cpp"
   "Engine/Resource/FileProcessor/ImageFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"
+  "Engine/Resource/Font/Font.cpp"
   "Engine/Resource/Font/FontManager.cpp"
   "Engine/Resource/ResourceSystem.cpp"
-  #"Engine/Resource/Font/Font.cpp"
   "Engine/Utility/RTTRGlm.cpp"
 #  "Engine/Action.cpp"
 #  "Engine/AdlibMusic.cpp"
@@ -868,11 +868,7 @@ if(NOT harfbuzz_POPULATED)
 endif()
 
 add_library(harfbuzz STATIC
-    ${harfbuzz_SOURCE_DIR}/src/hb-buffer.cc
-    ${harfbuzz_SOURCE_DIR}/src/hb-common.cc
-    ${harfbuzz_SOURCE_DIR}/src/hb-shape.cc
-    ${harfbuzz_SOURCE_DIR}/src/hb-ot-shape.cc
-    ${harfbuzz_SOURCE_DIR}/src/hb-font.cc
+    ${harfbuzz_SOURCE_DIR}/src/harfbuzz.cc
 )
 
 target_include_directories(harfbuzz PUBLIC ${harfbuzz_SOURCE_DIR}/src)
@@ -881,6 +877,42 @@ target_compile_definitions(harfbuzz PRIVATE HB_NO_FREETYPE=1)
 # Disable warnings for HarfBuzz
 target_compile_options(harfbuzz PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4267 /wd4996 /D_CRT_SECURE_NO_WARNINGS>
+)
+
+# Fetch libunibreak
+#  libunibreak is used for line breaking in text
+message(STATUS "Fetching libunibreak")
+FetchContent_Declare(
+    libunibreak 
+    GIT_REPOSITORY https://github.com/adah1972/libunibreak.git
+    GIT_TAG libunibreak_6_1
+)
+
+FetchContent_GetProperties(libunibreak)
+if(NOT libunibreak_POPULATED)
+    FetchContent_Populate(libunibreak)
+endif()
+
+add_library(libunibreak STATIC
+    ${libunibreak_SOURCE_DIR}/src/eastasianwidthdata.c
+    ${libunibreak_SOURCE_DIR}/src/eastasianwidthdef.c
+    ${libunibreak_SOURCE_DIR}/src/emojidata.c
+    ${libunibreak_SOURCE_DIR}/src/emojidef.c
+    ${libunibreak_SOURCE_DIR}/src/graphemebreak.c
+    ${libunibreak_SOURCE_DIR}/src/graphemebreakdata.c
+    ${libunibreak_SOURCE_DIR}/src/indicconjunctbreakdata.c
+    ${libunibreak_SOURCE_DIR}/src/linebreak.c
+    ${libunibreak_SOURCE_DIR}/src/linebreakdata.c
+    ${libunibreak_SOURCE_DIR}/src/linebreakdef.c
+    ${libunibreak_SOURCE_DIR}/src/unibreakbase.c
+    ${libunibreak_SOURCE_DIR}/src/unibreakdef.c
+    ${libunibreak_SOURCE_DIR}/src/wordbreak.c
+    ${libunibreak_SOURCE_DIR}/src/wordbreakdata.c
+)
+
+# Disable warnings for libunibreak
+target_compile_options(libunibreak PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4267>
 )
 
 #--------------------------------
@@ -914,6 +946,7 @@ set(openxcom_includes
   ${glslang_SOURCE_DIR}
   ${lodepng_SOURCE_DIR}
   ${libbmp_SOURCE_DIR}
+  ${libunibreak_SOURCE_DIR}/src
 )
 
 set(openxcom_libs
@@ -926,6 +959,7 @@ set(openxcom_libs
   lodepng
   libbmp
   harfbuzz
+  libunibreak
 )
 
 if(UNIX)
@@ -948,7 +982,7 @@ target_link_libraries(openxcom_base_lib PUBLIC ${openxcom_libs})
 
 if (MSVC)
     #mod.cpp is so massive that MSVC has trouble keeping it all in a single object, so we need to split it up with this command
-    target_compile_options(openxcom_base_lib PRIVATE /bigobj)
+    target_compile_options(openxcom_base_lib PRIVATE /bigobj /utf-8)
 elseif (UNIX)
     # Enable all warnings for the base library
     # -Wno-nullability-completeness add a target compiler option to disable warnings for VMA
