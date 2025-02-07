@@ -595,6 +595,11 @@ add_custom_target(build_yaml
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
+# Disable warnings for Yaml
+target_compile_options(yaml-cpp PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4267>
+)
+
 
 # Fetch Lua
 #  Lua is used as a scripting language to showcase the script binding capabilities of SimpleRTTR
@@ -768,6 +773,10 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glslang)
 
+# Disable warnings for glslang
+target_compile_options(glslang PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4267>
+)
 
 # Fetch Shaderc
 #  Shaderc is used for compiling GLSL shaders
@@ -784,6 +793,11 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(shaderc)
+
+# Disable warnings for shaderc
+target_compile_options(shaderc PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4996 /wd4251 /D_CRT_SECURE_NO_WARNINGS>
+)
 
 # Fetch GLM
 #  GLM is used for math operations
@@ -834,6 +848,41 @@ FetchContent_MakeAvailable(libbmp)
 add_library(libbmp STATIC  "${libbmp_SOURCE_DIR}/libbmp.c")
 target_include_directories(libbmp PUBLIC ${libbmp_SOURCE_DIR})
 
+# Disable warnings for libbmp
+target_compile_options(libbmp PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4267>
+)
+
+# Fetch HarfBuzz
+#  HarfBuzz is a text layout engine which supports most of the world's writing systems
+message(STATUS "Fetching HarfBuzz")
+FetchContent_Declare(
+    harfbuzz
+    GIT_REPOSITORY https://github.com/harfbuzz/harfbuzz.git
+    GIT_TAG 10.2.0
+)
+
+FetchContent_GetProperties(harfbuzz)
+if(NOT harfbuzz_POPULATED)
+    FetchContent_Populate(harfbuzz)
+endif()
+
+add_library(harfbuzz STATIC
+    ${harfbuzz_SOURCE_DIR}/src/hb-buffer.cc
+    ${harfbuzz_SOURCE_DIR}/src/hb-common.cc
+    ${harfbuzz_SOURCE_DIR}/src/hb-shape.cc
+    ${harfbuzz_SOURCE_DIR}/src/hb-ot-shape.cc
+    ${harfbuzz_SOURCE_DIR}/src/hb-font.cc
+)
+
+target_include_directories(harfbuzz PUBLIC ${harfbuzz_SOURCE_DIR}/src)
+target_compile_definitions(harfbuzz PRIVATE HB_NO_FREETYPE=1)
+
+# Disable warnings for HarfBuzz
+target_compile_options(harfbuzz PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4267 /wd4996 /D_CRT_SECURE_NO_WARNINGS>
+)
+
 #--------------------------------
 # set up the defines and includes
 set(openxcom_defines
@@ -876,6 +925,7 @@ set(openxcom_libs
   GPUOpen::VulkanMemoryAllocator
   lodepng
   libbmp
+  harfbuzz
 )
 
 if(UNIX)

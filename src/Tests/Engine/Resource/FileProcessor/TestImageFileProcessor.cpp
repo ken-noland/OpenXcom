@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
@@ -33,6 +33,9 @@
 
 #include <memory>
 #include <filesystem>
+#include <cmath>
+#include <algorithm>
+#include <numbers>
 
 using namespace OpenXcom;
 
@@ -108,29 +111,30 @@ protected:
 	ImageFile createImage()
 	{
 		ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();
+		const uint32_t width = 256;
+		const uint32_t height = 256;
 
-		uint32_t width = 256;
-		uint32_t height = 256;
-
-		// create a host image
+		// Create a host image with 1 byte per pixel (indexed color).
 		ImageManager& imageManager = resourceSystem.getImageManager();
-		OwningHandle<HostImage> imageHandle = imageManager.createHostImage("testImage", glm::ivec2(width, height), ImageFormat::R8);		
+		OwningHandle<HostImage> imageHandle = imageManager.createHostImage("squareColorWheel", glm::ivec2(width, height), ImageFormat::R8);
 
-		// Adjustable parameters:
-		unsigned cellSize = 16;        // Size (in pixels) of each cell.
-		unsigned subCellSize = 4;      // Spacing (in pixels) for sub-cell lines.
-		unsigned subPaletteOffset = 16; // Palette offset for sub-cell lines.
-
-		// Get an address to the pixels to allow us to write to them.
+		// Map the pixel buffer.
 		uint8_t* pixels = static_cast<uint8_t*>(imageHandle->map());
 
-		// Create a 16x16 grid of cells (16 cells per row, 16 rows = 256 cells).
-		// The outer grid lines (every cellSize pixels) use palette index 0 (black).
-		// Inside each cell, pixels on a sub-grid boundary (every subCellSize pixels)
-		// use the cell's base palette index plus subPaletteOffset (wrapped modulo 256),
-		// and other pixels use the base cell palette index.
-		// Note: cell indices are computed from the cell coordinates, and we add 1
-		// so that index 0 remains reserved for the grid.
+		// Adjustable parameters:
+		unsigned cellSize = 16; // Size (in pixels) of each cell.
+
+		// Define center. For a square image, use half the width.
+		float centerX = width / 2.0f;
+		float centerY = height / 2.0f;
+		// For a square, using Chebyshev distance the maximum “radius” is half the width.
+		float maxRadius = centerX; // i.e. 128 for a 256x256 image.
+
+		// Define discrete levels for quantization.
+		const int H_levels = 17; // Number of hue steps.
+		const int S_levels = 15; // Number of saturation steps.
+		// Total colors for the wheel: 15 * 17 = 255 (using palette indices 1 to 255).
+
 		for (unsigned y = 0; y < height; y++)
 		{
 			for (unsigned x = 0; x < width; x++)
@@ -142,53 +146,63 @@ protected:
 				}
 				else
 				{
-					// Determine which cell we are in.
-					unsigned cell_x = x / cellSize;
-					unsigned cell_y = y / cellSize;
-					// Base cell index (using indices 1..255)
-					unsigned baseIndex = cell_y * 16 + cell_x + 1;
-					// Determine local coordinates within the cell.
-					unsigned localX = x % cellSize;
-					unsigned localY = y % cellSize;
-					// If we're on a sub-grid line inside the cell, use baseIndex plus subPaletteOffset.
-					if ((localX % subCellSize == 0) || (localY % subCellSize == 0))
-					{
-						pixels[y * width + x] = static_cast<unsigned char>((baseIndex + subPaletteOffset) % 256);
-					}
-					else
-					{
-						// Regular cell interior.
-						pixels[y * width + x] = static_cast<unsigned char>(baseIndex % 256);
-					}
+					// Compute offset from center.
+					float dx = x - centerX;
+					float dy = y - centerY;
+
+					// Use Chebyshev distance to stretch the circle into a square.
+					float distance = std::max(std::abs(dx), std::abs(dy));
+
+					// Normalize the "distance" for saturation (0 at center, 1 at edge).
+					float saturation = distance / maxRadius;
+					saturation = std::min(1.0f, saturation); // Clamp to [0,1].
+
+					// Compute angle (hue) in radians.
+					float angle = std::atan2(dy, dx);
+					// Normalize angle from [-π, π] to [0,1).
+					float hue = (angle + static_cast<float>(std::numbers::pi)) / (2.0f * static_cast<float>(std::numbers::pi));
+
+					// Quantize saturation and hue to our discrete grid.
+					int s_index = static_cast<int>(saturation * (S_levels - 1) + 0.5f); // Range: 0 .. S_levels-1.
+					int h_index = static_cast<int>(hue * (H_levels - 1) + 0.5f);        // Range: 0 .. H_levels-1.
+
+					// For a near–white center (saturation 0), force hue to 0 so that all white pixels match.
+					if (s_index == 0)
+						h_index = 0;
+
+					// Compute the palette index (reserve index 0 for black).
+					int paletteIndex = 1 + s_index * H_levels + h_index;
+					pixels[y * width + x] = static_cast<uint8_t>(paletteIndex);
 				}
 			}
 		}
-
 		imageHandle->unmap();
 
-		// --- Palette Setup ---
-		// Create a palette of 256 colors, each palette entry is 4 bytes: R, G, B, A.
-		// We want index 0 to be used for grid lines. Here we choose black.
+		// --- Build the palette ---
+		// There are 256 entries in the palette. Entry 0 is black.
 		PackedColor paletteColors[256];
 
-		// Palette entry for index 0 (grid lines): black.
+		// Palette entry 0: black.
 		paletteColors[0].set(0, 0, 0, 255);
 
-		// Generate unique colors for indices 1 to 255 using an HSV color wheel.
-		for (unsigned i = 1; i < 256; i++)
+		// Fill in indices 1 to 255 using the same quantization.
+		for (int s = 0; s < S_levels; s++)
 		{
-			// Map i-1 from 0 to 254 into the hue range [0, 1).
-			float hue = (i - 1) / 255.0f;
-			Color c = hsv_to_rgb(hue, 1.0f, 1.0f);
-			paletteColors[i].set(c.r, c.g, c.b, 255);
+			// Normalize the saturation level.
+			float sat = s / static_cast<float>(S_levels - 1);
+			for (int h = 0; h < H_levels; h++)
+			{
+				// For s == 0, force hue to 0 to always get white.
+				float hue = (s == 0) ? 0.0f : h / static_cast<float>(H_levels - 1);
+				Color c = hsv_to_rgb(hue, sat, 1.0f);
+				int paletteIndex = 1 + s * H_levels + h; // Runs from 1 to 255.
+				paletteColors[paletteIndex].set(c.r, c.g, c.b, 255);
+			}
 		}
 
-		// create a palette. It's worth noting that the palette is always
-		//	constructed on the device, so we will need to transfer it back
-		//	to the CPU later for reading.
 		PaletteManager& paletteManager = resourceSystem.getPaletteManager();
-		OwningHandle<Palette> paletteHandle = paletteManager.createPalette("testPalette", paletteColors, 256);
-		
+		OwningHandle<Palette> paletteHandle = paletteManager.createPalette("squareColorWheelPalette", paletteColors, 256);
+
 		return ImageFile(std::move(imageHandle), std::move(paletteHandle));
 	}
 
