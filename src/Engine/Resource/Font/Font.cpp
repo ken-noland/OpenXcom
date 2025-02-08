@@ -38,11 +38,19 @@ Font::Font(OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asci
 										nullptr, nullptr);
 	_hbFont = hb_font_create(_hbFace);
 
+	_tempBuffer = hb_buffer_create();
+
 	initializeHarfBuzz();
 }
 
 Font::~Font()
 {
+	if (_tempBuffer)
+	{
+		hb_buffer_destroy(_tempBuffer);
+		_tempBuffer = nullptr;
+	}
+
 	hb_font_destroy(_hbFont);
 	hb_face_destroy(_hbFace);
 }
@@ -59,19 +67,17 @@ void Font::initializeHarfBuzz()
 			return true;
 		}
 		return false; // No fallback handling for now
-	},
-										 nullptr, nullptr);
+	}, nullptr, nullptr);
 
 	// Override advance width function
 	hb_font_funcs_set_glyph_h_advance_func(funcs, [](hb_font_t*, void* fontData, hb_codepoint_t glyph, void* userData) -> hb_position_t {
 		Font* font = static_cast<Font*>(userData);
 		const Glyph* g = font->getGlyph(glyph);
 		return g ? g->xAdvance * 64 : 9 * 64; // Default to 9 pixels advance
-	},
-										   this, nullptr);
+	}, this, nullptr);
 
 	hb_font_set_funcs(_hbFont, funcs, this, nullptr);
-	hb_font_set_scale(_hbFont, 9 * 64, 16 * 64); // Fixed 26.6 format
+	//hb_font_set_scale(_hbFont, 9 * 64, 16 * 64); // Fixed 26.6 format
 }
 
 const Glyph* Font::getGlyph(char32_t codepoint) const
@@ -83,19 +89,31 @@ const Glyph* Font::getGlyph(char32_t codepoint) const
 
 glm::ivec2 Font::getTextExtents(const std::string& text) const
 {
-	// Shape the text at (0,0) to obtain positioned glyphs.
-	std::vector<PositionedGlyph> glyphs = shapeText(text, glm::ivec2(0, 0));
+	// Create a HarfBuzz buffer and add the UTF-8 text.
+	hb_buffer_clear_contents(_tempBuffer);
 
-	if (glyphs.empty())
+	int size = static_cast<int>(text.size());
+	hb_buffer_add_utf8(_tempBuffer, text.c_str(), size, 0, size);
+	hb_buffer_guess_segment_properties(_tempBuffer);
+
+	// Shape the text using our HarfBuzz font.
+	hb_shape(_hbFont, _tempBuffer, nullptr, 0);
+
+	// Retrieve the glyph positions.
+	unsigned int glyphCount = 0;
+	hb_glyph_position_t* glyphPositions = hb_buffer_get_glyph_positions(_tempBuffer, &glyphCount);
+
+	int totalAdvance = 0;
+	for (unsigned int i = 0; i < glyphCount; i++)
 	{
-		return glm::ivec2(0, 0);
+		totalAdvance += glyphPositions[i].x_advance; // x_advance is in 26.6 fixed-point format.
 	}
 
-	// One way: The total width is the x position of the last glyph plus its advance.
-	// (This assumes your shaping function positions the first glyph at x = 0.)
-	int32_t width = glyphs.back().position.x + glyphs.back().advance;
+	// Convert total advance from fixed-point (26.6) to integer pixels.
+	int width = totalAdvance / 64;
 
-	return glm::ivec2(width, 16); // Fixed font height
+	// For this bitmap font, the height is constant (e.g., 16 pixels).
+	return glm::ivec2(width, 16);
 }
 
 // Generates positioned glyphs for rendering
@@ -147,66 +165,99 @@ std::vector<PositionedGlyph> Font::wrappedText(const std::string& text, glm::ive
 
 	// Allocate a buffer for break properties for each byte of the UTF-8 text.
 	std::vector<char> breakProps(textLen);
-	// Use libunibreak (via libuniwrapper) to fill breakProps.
 	set_linebreaks_utf8(reinterpret_cast<const utf8_t*>(text.c_str()), textLen, "", breakProps.data());
 
-	// Helper lambda to measure the width of a given substring.
-	auto measureTextWidth = [this](const std::string& s) -> float {
-		// Shape the text at (0,0); we only need the advances.
-		auto glyphs = this->shapeText(s, glm::ivec2(0, 0));
-		float width = 0.0f;
-		for (const auto& g : glyphs)
-			width += g.advance;
-		return width;
-	};
-
 	size_t start = 0;
-	int lineSpacing = 2; // Extra pixels between lines.
 	int currentY = position.y;
+	const int lineHeight = 16;            // Fixed height of the bitmap font.
+	const int lineSpacing = _lineSpacing; // Assume _lineSpacing is defined in Font.
 
-	// Process the entire string.
 	while (start < textLen)
 	{
 		size_t bestBreak = start;
+		size_t lastAllowBreak = start; // Track the last index where LINEBREAK_ALLOWBREAK was seen.
+		bool encounteredMustBreak = false;
 		size_t pos = start;
-		// Greedily extend the candidate until it no longer fits.
+
+		// Extend candidate from 'start' until either the candidate exceeds maxWidth
+		// or we run out of text.
 		while (pos < textLen)
 		{
-			// If this position is a valid break point, consider it.
-			if (breakProps[pos] == LINEBREAK_ALLOWBREAK ||
-				breakProps[pos] == LINEBREAK_MUSTBREAK)
+			char flag = breakProps[pos];
+
+			// If a mandatory break is encountered, set bestBreak and exit immediately.
+			if (flag == LINEBREAK_MUSTBREAK)
 			{
-				// Candidate substring from 'start' up through this character.
-				std::string candidate = text.substr(start, pos - start + 1);
-				float candidateWidth = measureTextWidth(candidate);
-				if (candidateWidth <= maxWidth)
-				{
-					bestBreak = pos + 1; // Break after this character.
-				}
-				else
-				{
-					break; // Exceeded maxWidth.
-				}
+				bestBreak = pos + 1;
+				encounteredMustBreak = true;
+				break;
+			}
+
+			// Record a candidate break if allowed.
+			if (flag == LINEBREAK_ALLOWBREAK)
+			{
+				lastAllowBreak = pos + 1;
+			}
+
+			// Create candidate substring from 'start' to pos (inclusive).
+			std::string candidate = text.substr(start, pos - start + 1);
+			float candidateWidth = getTextExtents(candidate).x;
+
+			// If candidate fits within maxWidth, update bestBreak.
+			if (candidateWidth <= maxWidth)
+			{
+				bestBreak = pos + 1;
+			}
+			else
+			{
+				// Candidate too wide: break out of the loop.
+				break;
 			}
 			pos++;
 		}
-		// If no break was found that advances the pointer, force a break at one character.
+
+		// If we reached the end of text and the candidate still fits, take the rest.
+		if (pos >= textLen)
+		{
+			std::string candidate = text.substr(start, textLen - start);
+			if (getTextExtents(candidate).x <= maxWidth)
+			{
+				bestBreak = textLen;
+			}
+			else if (bestBreak == start && lastAllowBreak > start)
+			{
+				// If the very first candidate exceeded maxWidth, but we had an allowed break earlier,
+				// use that instead.
+				bestBreak = lastAllowBreak;
+			}
+		}
+
+		// If no progress was made and we haven't encountered a MUSTBREAK,
+		// force a break after one character.
 		if (bestBreak == start)
 		{
 			bestBreak = start + 1;
 		}
 
+		// If we haven't encountered a MUSTBREAK and we have a valid allowed break,
+		// prefer that if the candidate with it still fits.
+		else if (!encounteredMustBreak && lastAllowBreak > start)
+		{
+			std::string candidate = text.substr(start, lastAllowBreak - start);
+			if (getTextExtents(candidate).x <= maxWidth)
+			{
+				bestBreak = lastAllowBreak;
+			}
+		}
+
 		// Extract the line text.
 		std::string lineStr = text.substr(start, bestBreak - start);
-		// Shape the line (positioned at the desired x and current y).
-		auto lineGlyphs = this->shapeText(lineStr, glm::ivec2(position.x, currentY));
-		// Append the glyphs for this line.
+		// Shape the line at the desired starting x and current y.
+		std::vector<PositionedGlyph> lineGlyphs = this->shapeText(lineStr, glm::ivec2(position.x, currentY));
 		allGlyphs.insert(allGlyphs.end(), lineGlyphs.begin(), lineGlyphs.end());
 
-		// Advance start to the next segment.
 		start = bestBreak;
-		// Move currentY down by the font's height (here, 16 pixels) plus line spacing.
-		currentY += 16 + lineSpacing;
+		currentY += lineHeight + lineSpacing;
 	}
 	return allGlyphs;
 }

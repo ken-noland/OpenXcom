@@ -227,6 +227,7 @@ protected:
 
 		// Create the font object
 		_font = std::make_unique<Font>(std::move(deviceFontTexture), getAsciiGlyphs());
+		_font->setLineSpacing(0);
 	}
 
 	void TearDown() override
@@ -274,6 +275,10 @@ TEST_F(FontTest, TestHelloWorldShape)
 	// Starting position (for example, top-left corner at (0,0))
 	glm::ivec2 startPos(0, 0);
 
+	glm::ivec2 extents = _font->getTextExtents(text);
+	EXPECT_EQ(extents.x, 108) << "Expected text width of 99 pixels";
+	EXPECT_EQ(extents.y, 16) << "Expected text height of 16 pixels";
+
 	// Call your Font::shapeText() method
 	std::vector<PositionedGlyph> positionedGlyphs = _font->shapeText(text, startPos);
 
@@ -295,7 +300,7 @@ TEST_F(FontTest, TestHelloWorldShape)
 	}
 }
 
-TEST_F(FontTest, TestLoremIpsumMultiLine)
+TEST_F(FontTest, TestMultiLineLoremIpsum)
 {
 	// The text to shape
 	std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
@@ -305,11 +310,144 @@ TEST_F(FontTest, TestLoremIpsumMultiLine)
 	glm::ivec2 startPos(0, 0);
 
 	// Maximum width for wrapping
-	int maxWidth = 80;
+	int maxWidth = 200;
 
 	// Call your Font::wrappedText() method
 	std::vector<PositionedGlyph> positionedGlyphs = _font->wrappedText(text, startPos, maxWidth);
 
 	// Check we got the expected number of glyphs
 	ASSERT_GT(positionedGlyphs.size(), 0) << "Expected at least one glyph";
+
+	// First line is "Lorem ipsum dolor sit "
+	EXPECT_EQ(positionedGlyphs[0].codepoint, 'L');
+	EXPECT_EQ(positionedGlyphs[0].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[0].position.y, startPos.y + (16 * 0));
+
+	// Second line is "amet, consectetur "
+	EXPECT_EQ(positionedGlyphs[22].codepoint, 'a');
+	EXPECT_EQ(positionedGlyphs[22].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[22].position.y, startPos.y + (16 * 1));
+
+	// Third line is "adipiscing elit. Sed "
+	EXPECT_EQ(positionedGlyphs[40].codepoint, 'a');
+	EXPECT_EQ(positionedGlyphs[40].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[40].position.y, startPos.y + (16 * 2));
+
+	// Fourth line is "do eiusmod tempor "
+	EXPECT_EQ(positionedGlyphs[61].codepoint, 'd');
+	EXPECT_EQ(positionedGlyphs[61].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[61].position.y, startPos.y + (16 * 3));
+
+	// Fifth line is "incididunt ut labore "
+	EXPECT_EQ(positionedGlyphs[79].codepoint, 'i');
+	EXPECT_EQ(positionedGlyphs[79].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[79].position.y, startPos.y + (16 * 4));
+
+	// Sixth line is "et dolore magna "
+	EXPECT_EQ(positionedGlyphs[100].codepoint, 'e');
+	EXPECT_EQ(positionedGlyphs[100].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[100].position.y, startPos.y + (16 * 5));
+
+	// Seventh line is "aliqua."
+	EXPECT_EQ(positionedGlyphs[116].codepoint, 'a');
+	EXPECT_EQ(positionedGlyphs[116].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[116].position.y, startPos.y + (16 * 6));
+
+	EXPECT_EQ(positionedGlyphs[117].codepoint, 'l');
+	EXPECT_EQ(positionedGlyphs[117].position.x, startPos.x + 9);
+	EXPECT_EQ(positionedGlyphs[117].position.y, startPos.y + (16 * 6));
+}
+
+TEST_F(FontTest, TestMultiReallyLongWord)
+{
+	// The text to shape
+	std::string text = "A0000000000000000000B1111111111111111111C2222222222222222222D3333333333333333333";
+
+	// Starting position (for example, top-left corner at (0,0))
+	glm::ivec2 startPos(0, 0);
+
+	// Maximum width for wrapping
+	int maxWidth = 180;
+
+	// Call your Font::wrappedText() method
+	std::vector<PositionedGlyph> positionedGlyphs = _font->wrappedText(text, startPos, maxWidth);
+
+	// Check we got the expected number of glyphs
+	ASSERT_GT(positionedGlyphs.size(), 0) << "Expected at least one glyph";
+
+	// First line is "A0000000000000000000"
+	EXPECT_EQ(positionedGlyphs[0].codepoint, 'A');
+	EXPECT_EQ(positionedGlyphs[0].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[0].position.y, startPos.y + (16 * 0));
+
+	// Second line is "B1111111111111111111"
+	EXPECT_EQ(positionedGlyphs[20].codepoint, 'B');
+	EXPECT_EQ(positionedGlyphs[20].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[20].position.y, startPos.y + (16 * 1));
+
+	// Third line is "C2222222222222222222"
+	EXPECT_EQ(positionedGlyphs[40].codepoint, 'C');
+	EXPECT_EQ(positionedGlyphs[40].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[40].position.y, startPos.y + (16 * 2));
+
+	// Fourth line is "D3333333333333333333"
+	EXPECT_EQ(positionedGlyphs[60].codepoint, 'D');
+	EXPECT_EQ(positionedGlyphs[60].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[60].position.y, startPos.y + (16 * 3));
+}
+
+TEST_F(FontTest, TestMultiNewLine)
+{
+	// The text to shape
+	std::string text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n\n"
+					   "Sed do eiusmod tempor incididunt\nut labore et dolore magna aliqua.";
+
+	// Starting position (for example, top-left corner at (0,0))
+	glm::ivec2 startPos(0, 0);
+
+	// Maximum width for wrapping
+	int maxWidth = 200;
+
+	// Call your Font::wrappedText() method
+	std::vector<PositionedGlyph> positionedGlyphs = _font->wrappedText(text, startPos, maxWidth);
+
+	// Check we got the expected number of glyphs
+	ASSERT_GT(positionedGlyphs.size(), 0) << "Expected at least one glyph";
+
+	// First line is "Lorem ipsum dolor sit "
+	EXPECT_EQ(positionedGlyphs[0].codepoint, 'L');
+	EXPECT_EQ(positionedGlyphs[0].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[0].position.y, startPos.y + (16 * 0));
+
+	// Second line is "amet, consectetur "
+	EXPECT_EQ(positionedGlyphs[22].codepoint, 'a');
+	EXPECT_EQ(positionedGlyphs[22].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[22].position.y, startPos.y + (16 * 1));
+
+	// Third line is "adipiscing elit.\n\n"
+	EXPECT_EQ(positionedGlyphs[40].codepoint, 'a');
+	EXPECT_EQ(positionedGlyphs[40].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[40].position.y, startPos.y + (16 * 2));
+
+	// Skip fourth and fifth line
+
+	// Sixth line is "Sed do eiusmod tempor "
+	EXPECT_EQ(positionedGlyphs[58].codepoint, 'S');
+	EXPECT_EQ(positionedGlyphs[58].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[58].position.y, startPos.y + (16 * 4));
+
+	// Seventh line is "incididunt\n"
+	EXPECT_EQ(positionedGlyphs[80].codepoint, 'i');
+	EXPECT_EQ(positionedGlyphs[80].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[80].position.y, startPos.y + (16 * 5));
+
+	// Eighth line is "ut labore et dolore "
+	EXPECT_EQ(positionedGlyphs[92].codepoint, 'u');
+	EXPECT_EQ(positionedGlyphs[92].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[92].position.y, startPos.y + (16 * 6));
+
+	// Ninth line is "magna aliqua."
+	EXPECT_EQ(positionedGlyphs[112].codepoint, 'm');
+	EXPECT_EQ(positionedGlyphs[112].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[112].position.y, startPos.y + (16 * 7));
 }

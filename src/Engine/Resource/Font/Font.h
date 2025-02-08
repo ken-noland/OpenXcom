@@ -27,6 +27,7 @@
 
 struct hb_face_t;
 struct hb_font_t;
+struct hb_buffer_t;
 
 namespace OpenXcom
 {
@@ -56,8 +57,13 @@ private:
 	hb_face_t* _hbFace = nullptr;
 	hb_font_t* _hbFont = nullptr;
 
+	// Temporary buffer for HarfBuzz text shaping
+	mutable hb_buffer_t* _tempBuffer = nullptr;
+
 	std::array<Glyph, 128> _asciiGlyphs;                 // Fast lookup for Codepage 437
 	std::unordered_map<char32_t, Glyph> _extendedGlyphs; // Fallback for Unicode extensions
+
+	uint32_t _lineSpacing = 0;
 
 	void initializeHarfBuzz();
 
@@ -68,6 +74,9 @@ public:
 	const Glyph* getGlyph(char32_t codepoint) const;
 
 	glm::ivec2 getTextExtents(const std::string& text) const;
+
+	void setLineSpacing(uint32_t lineSpacing) { _lineSpacing = lineSpacing; }
+	uint32_t getLineSpacing() const { return _lineSpacing; }
 
 	std::vector<PositionedGlyph> shapeText(const std::string& text, glm::ivec2 position) const;
 	std::vector<PositionedGlyph> wrappedText(const std::string& text, glm::ivec2 position, int maxWidth) const;
