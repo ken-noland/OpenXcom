@@ -20,6 +20,10 @@ enable_testing()
 # Add the test executable
 add_executable(
   openxcom_tests
+  "Engine/Graphics/Primitives/TestBox.cpp"
+  "Engine/Graphics/Primitives/TestImage.cpp"
+  "Engine/Graphics/Primitives/TestLine.cpp"
+  "Engine/Graphics/Primitives/TestPoint.cpp"
   "Engine/Graphics/TestBMP.cpp"
   "Engine/Graphics/TestBuffer.cpp"
   "Engine/Graphics/TestGraphics.cpp"

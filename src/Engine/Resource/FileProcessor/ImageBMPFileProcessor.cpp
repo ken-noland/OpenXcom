@@ -32,6 +32,7 @@
 
 #include <fstream>
 #include <glm/vec2.hpp>
+#include <cstring>
 
 extern "C" {
 #include <libbmp.h>

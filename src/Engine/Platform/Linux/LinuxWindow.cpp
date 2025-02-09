@@ -80,8 +80,8 @@ void PlatformWindow::platformSpecificUpdateWindow()
 				// Handle window close event (e.g., "WM_DELETE_WINDOW")
 				if (event.xclient.data.l[0] == _handle.wmDeleteMessage)
 				{
-					//this->isRunning = false; // Set flag to indicate window close
-					getEngine().exit();
+					_running = false; // Set flag to indicate window close
+					platformSpecificDestroyWindow();
 				}
 				break;
 			// Add other event handling cases as needed

@@ -33,7 +33,6 @@
 #include "../../../version.h"
 
 #include <glslang/Public/ShaderLang.h>
-#include <format>
 
 #if defined(_MSC_VER)
 #define DEBUG_BREAK() __debugbreak()
@@ -194,9 +193,6 @@ VulkanContext::~VulkanContext()
 
 	if (_device)
 	{
-		std::string ptrStr = std::format("{:p}", static_cast<const void*>((VkDevice)_device));
-		Log(LOG_INFO) << "Destroying Vulkan Device at " << ptrStr;
-
 		_device.waitIdle();
 		_device.destroy();
 		_device = nullptr;
@@ -471,8 +467,6 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	deviceCreateInfo.pNext = &lineRasterizationFeatures;
 
 	_device = _physicalDevice.createDevice(deviceCreateInfo);
-	std::string ptrStr = std::format("{:p}", static_cast<const void*>((VkDevice)_device));
-	Log(LOG_INFO) << "Vulkan Device Created at " << ptrStr;
 
 	_graphicsQueue.create(_device, graphicsQueueFamilyIndex, true);
 	_transferQueue.create(_device, transferQueueFamilyIndex, true);

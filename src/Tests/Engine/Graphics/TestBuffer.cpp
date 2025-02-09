@@ -122,7 +122,7 @@ TEST_F(BufferTest, TestHostToDeviceToHostBuffer)
 	void* data1 = hostBuffer1->map();
 	void* data2 = hostBuffer2->map();
 
-	EXPECT_EQ(std::memcmp(data1, data2, hostBuffer1->getSize()), 0);
+	EXPECT_EQ(memcmp(data1, data2, hostBuffer1->getSize()), 0);
 
 	hostBuffer1->unmap();
 	hostBuffer2->unmap();

@@ -39,14 +39,20 @@ public:
 
 	virtual IStreamPtr openRead() override
 	{
+		throw std::runtime_error("Not implemented");
+		return nullptr;
 	}
 
 	virtual OStreamPtr openWrite() override
 	{
+		throw std::runtime_error("Not implemented");
+		return nullptr;
 	}
 
 	virtual IOStreamPtr open() override
 	{
+		throw std::runtime_error("Not implemented");
+		return nullptr;
 	}
 
 	virtual std::filesystem::path getPath() const override
@@ -67,7 +73,8 @@ public:
 
 	virtual VFSEntryPtr dereference() const override
 	{
-
+		throw std::runtime_error("Not implemented");
+		return nullptr;
 	}
 
 	virtual void increment() override

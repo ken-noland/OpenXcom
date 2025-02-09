@@ -18,16 +18,26 @@
  */
 #include <gtest/gtest.h>
 
-#include "../../../Engine/Engine.h"
-#include "../../../Engine/Graphics/Common/GameSurface.h"
-#include "../../../Engine/Graphics/Common/WindowSurface.h"
-#include "../../../Engine/Graphics/Image/Image.h"
-#include "../../../Engine/Graphics/Image/ImageManager.h"
-#include "../../../Engine/Graphics/Palette/PaletteManager.h"
-#include "../../../Engine/Graphics/Types/PackedColor.h"
+#include "../../../../Engine/Engine.h"
+#include "../../../../Engine/Graphics/Buffer/BufferManager.h"
+#include "../../../../Engine/Graphics/Common/GameSurface.h"
+#include "../../../../Engine/Graphics/Common/WindowSurface.h"
+#include "../../../../Engine/Graphics/GraphicsSurface.h"
+#include "../../../../Engine/Graphics/GraphicsSystem.h"
+#include "../../../../Engine/Graphics/Image/Image.h"
+#include "../../../../Engine/Graphics/Image/ImageManager.h"
+#include "../../../../Engine/Graphics/Palette/Palette.h"
+#include "../../../../Engine/Graphics/Palette/PaletteManager.h"
+#include "../../../../Engine/Graphics/Primitive/BoxPrimitive.h"
+#include "../../../../Engine/Graphics/Primitive/LinePrimitive.h"
+#include "../../../../Engine/Graphics/Primitive/PointPrimitive.h"
+#include "../../../../Engine/Graphics/Primitive/PrimitiveFactory.h"
+#include "../../../../Engine/Graphics/Types/PackedColor.h"
+#include "../../../../Engine/Options.h"
+#include "../../../../Engine/Platform/Window.h"
 
-#include "../../../Engine/Resource/ResourceManager.h"
-#include "../../../Engine/Resource/ResourceSystem.h"
+#include "../../../../Engine/Resource/ResourceManager.h"
+#include "../../../../Engine/Resource/ResourceSystem.h"
 #include <filesystem>
 #include <lodepng.h>
 #include <memory>
@@ -40,7 +50,7 @@ bool FORCE_REGENERATE_BASELINE = false;
 
 using namespace OpenXcom;
 
-class GraphicsTest : public ::testing::Test
+class GraphicsBoxTest : public ::testing::Test
 {
 protected:
 	static std::unique_ptr<Engine> _engine;
@@ -112,7 +122,7 @@ protected:
 	 */
 	OwningHandle<HostImage> captureGameSurface()
 	{
-		_windowSurface->update();	// render the surface once
+		_windowSurface->update(); // render the surface once
 
 		OwningHandle<HostImage> hostImageHandle = _engine->getResourceSystem().getImageManager().createHostImage("screenCapture", _gameSurface->getScreenSize(), ImageFormat::R8G8B8A8);
 		if (!hostImageHandle.isValid())
@@ -157,7 +167,7 @@ protected:
 			for (size_t i = 0; i < baseline.size(); ++i)
 			{
 				std::size_t x = (i / 4) % hostImage.getExtent().x;
-				std::size_t y = (i/4) / hostImage.getExtent().x;
+				std::size_t y = (i / 4) / hostImage.getExtent().x;
 				ASSERT_EQ(baseline[i], pixels[i]) << "Pixel mismatch at index " << i << "(x=" << x << " y=" << y << ")";
 			}
 		}
@@ -166,18 +176,70 @@ protected:
 	}
 };
 
-std::unique_ptr<Engine> GraphicsTest::_engine = nullptr;
+std::unique_ptr<Engine> GraphicsBoxTest::_engine = nullptr;
 
-std::filesystem::path GraphicsTest::_dataPath;
-std::filesystem::path GraphicsTest::_configPath;
-std::filesystem::path GraphicsTest::_userPath;
+std::filesystem::path GraphicsBoxTest::_dataPath;
+std::filesystem::path GraphicsBoxTest::_configPath;
+std::filesystem::path GraphicsBoxTest::_userPath;
 
 
-TEST_F(GraphicsTest, TestGraphicsSurface)
+TEST_F(GraphicsBoxTest, TestFilledBox)
 {
+	std::unique_ptr<BoxFilledPrimitive> boxOutline = _gameSurface->getRenderTarget().getPrimitiveFactory().createFilledBoxPrimitive({140, 20}, {40, 40}, 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(boxOutline);
+
+	// draw the line
+	_gameSurface->onRender() << [&boxOutline](GraphicsCommand& command) {
+		boxOutline->draw(command);
+	};
+
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "001_game_surface_blank.png";
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "005_game_surface_filled_box_1.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
+}
+
+TEST_F(GraphicsBoxTest, TestOutlineBox)
+{
+	std::unique_ptr<BoxOutlinePrimitive> boxOutline = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({140, 70}, {40, 40}, 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(boxOutline);
+
+	// draw the line
+	_gameSurface->onRender() << [&boxOutline](GraphicsCommand& command) {
+		boxOutline->draw(command);
+	};
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "006_game_surface_outline_box_1.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
+}
+
+TEST_F(GraphicsBoxTest, TestOutlineBoxesCorners)
+{
+	std::unique_ptr<BoxOutlinePrimitive> boxOutline[4];
+	boxOutline[0] = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({0, 0}, {40, 40}, 1, _paletteHandle.getHandle());
+	boxOutline[1] = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({279, 0}, {40, 40}, 1, _paletteHandle.getHandle());
+	boxOutline[2] = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({0, 159}, {40, 40}, 1, _paletteHandle.getHandle());
+	boxOutline[3] = _gameSurface->getRenderTarget().getPrimitiveFactory().createOutlineBoxPrimitive({279, 159}, {40, 40}, 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(boxOutline[0]);
+	ASSERT_TRUE(boxOutline[1]);
+	ASSERT_TRUE(boxOutline[2]);
+	ASSERT_TRUE(boxOutline[3]);
+
+	// draw the line
+	_gameSurface->onRender() << [&boxOutline](GraphicsCommand& command) {
+		boxOutline[0]->draw(command);
+		boxOutline[1]->draw(command);
+		boxOutline[2]->draw(command);
+		boxOutline[3]->draw(command);
+	};
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "007_game_surface_outline_box_corners_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }

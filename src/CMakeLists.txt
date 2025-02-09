@@ -1,6 +1,17 @@
 # Define option to enable or disable the EntityInspector
 option(ENABLE_ENTITY_INSPECTOR "Enable the EntityInspector for debugging and editing entities." ON)
 
+# Force fetch of github dependencies
+option(FORCE_FETCH "Force re-download of FetchContent dependencies" OFF)
+
+if(FORCE_FETCH)
+  # When forcing a re-download, let FetchContent check for updates
+  set(FETCHCONTENT_UPDATES_DISCONNECTED OFF CACHE BOOL "Force updating of fetched content" FORCE)
+else()
+  # Otherwise, assume you are offline or want to use the local copy
+  set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE BOOL "Disable update check for fetched content" FORCE)
+endif()
+
 set ( root_src
   "md5.cpp"
 )
@@ -579,341 +590,24 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # External libraries
 include(FetchContent)
 
-# Fetch YAML
-message(STATUS "Fetching yaml-cpp")
-FetchContent_Declare(
-  yaml-cpp
-  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-  GIT_TAG "master" # Can be a tag (yaml-cpp-x.x.x), a commit hash, or a branch name (master)
-)
-FetchContent_MakeAvailable(yaml-cpp)
-
-# Define custom target for Yaml
-add_custom_target(build_yaml
-    DEPENDS yaml-cpp::yaml-cpp
-    COMMAND ${CMAKE_COMMAND} --build . --target yaml-cpp
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
-
-# Disable warnings for Yaml
-target_compile_options(yaml-cpp PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4267>
-)
-
-
-# Fetch Lua
-#  Lua is used as a scripting language to showcase the script binding capabilities of SimpleRTTR
-message(STATUS "Fetching Lua")
-FetchContent_Declare(
-  lua
-  GIT_REPOSITORY https://github.com/lua/lua.git
-  GIT_TAG "origin/v5.4"
-)
-FetchContent_MakeAvailable(lua)
-
-# Lua does not provide a CMake build system, so we need to manually set up the target
-add_library(lua STATIC  "${lua_SOURCE_DIR}/lapi.c"
-                        "${lua_SOURCE_DIR}/lauxlib.c"
-                        "${lua_SOURCE_DIR}/lbaselib.c"
-                        "${lua_SOURCE_DIR}/lcode.c"
-                        "${lua_SOURCE_DIR}/lcorolib.c"
-                        "${lua_SOURCE_DIR}/lctype.c"
-                        "${lua_SOURCE_DIR}/ldblib.c"
-                        "${lua_SOURCE_DIR}/ldebug.c"
-                        "${lua_SOURCE_DIR}/ldo.c"
-                        "${lua_SOURCE_DIR}/ldump.c"
-                        "${lua_SOURCE_DIR}/lfunc.c"
-                        "${lua_SOURCE_DIR}/lgc.c"
-                        "${lua_SOURCE_DIR}/linit.c"
-                        "${lua_SOURCE_DIR}/liolib.c"
-                        "${lua_SOURCE_DIR}/llex.c"
-                        "${lua_SOURCE_DIR}/lmathlib.c"
-                        "${lua_SOURCE_DIR}/lmem.c"
-                        "${lua_SOURCE_DIR}/loadlib.c"
-                        "${lua_SOURCE_DIR}/lobject.c"
-                        "${lua_SOURCE_DIR}/lopcodes.c"
-                        "${lua_SOURCE_DIR}/loslib.c"
-                        "${lua_SOURCE_DIR}/lparser.c"
-                        "${lua_SOURCE_DIR}/lstate.c"
-                        "${lua_SOURCE_DIR}/lstring.c"
-                        "${lua_SOURCE_DIR}/lstrlib.c"
-                        "${lua_SOURCE_DIR}/ltable.c"
-                        "${lua_SOURCE_DIR}/ltablib.c"
-                        "${lua_SOURCE_DIR}/ltests.c"
-                        "${lua_SOURCE_DIR}/ltm.c"
-                        "${lua_SOURCE_DIR}/lundump.c"
-                        "${lua_SOURCE_DIR}/lutf8lib.c"
-                        "${lua_SOURCE_DIR}/lvm.c"
-                        "${lua_SOURCE_DIR}/lzio.c")
-
-target_include_directories(lua PUBLIC ${lua_SOURCE_DIR}/src)
-
-# Define custom target for Lua
-add_custom_target(build_lua
-    DEPENDS lua
-    COMMAND ${CMAKE_COMMAND} --build . --target lua
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
-
-# Fetch EnTT
-#  EnTT is used as the Entity Component System library for the game
-message(STATUS "Fetching EnTT")
-FetchContent_Declare(
-  EnTT
-  GIT_REPOSITORY https://github.com/skypjack/entt.git
-  GIT_TAG "origin/master"
-)
-FetchContent_MakeAvailable(EnTT)
-
-# Fetch SimpleRTTR
-#  SimpleRTTR is used for reflection in the Entity Component System
-message(STATUS "Fetching SimpleRTTR")
-set(SIMPLERTTR_BUILD_TESTS OFF CACHE BOOL "Build SimpleRTTR Tests and Examples")
-set(SIMPLERTTR_BUILD_EXAMPLES OFF CACHE BOOL "Build SimpleRTTR Tests and Examples")
-FetchContent_Declare(
-  SimpleRTTR
-  GIT_REPOSITORY https://github.com/ken-noland/SimpleRTTR
-  GIT_TAG "origin/main"
-)
-FetchContent_MakeAvailable(SimpleRTTR)
-
-# Fetch nlohmann/json
-#  nlohmann/json is used for JSON serialization which is used all over the place
-message(STATUS "Fetching nlohmann/json")
-FetchContent_Declare(
-  nlohmann_json
-  GIT_REPOSITORY https://github.com/nlohmann/json
-  GIT_TAG "v3.11.3"
-)
-FetchContent_MakeAvailable(nlohmann_json)
-
-# Fetch inja
-#  inja is used for templating for the code generation
-message(STATUS "Fetching Inja")
-FetchContent_Declare(
-  inja
-  URL https://github.com/pantor/inja/releases/download/v3.4.0/inja.hpp
-  DOWNLOAD_NO_EXTRACT TRUE
-)
-FetchContent_MakeAvailable(inja)
-
-# Fetch Dear ImGui
-#  Dear ImGui is used for the entity inspector
-message(STATUS "Fetching Dear ImGui")
-FetchContent_Declare(
-    imgui
-    GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG        v1.91.4
-    GIT_SHALLOW    TRUE
-)
-FetchContent_MakeAvailable(imgui)
-
-# Define ImGui sources
-set(IMGUI_SOURCES
-    ${imgui_SOURCE_DIR}/imgui.cpp
-    ${imgui_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_SOURCE_DIR}/imgui_tables.cpp
-    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-    ${imgui_SOURCE_DIR}/imgui_demo.cpp
-)
-
-# Add ImGui library
-add_library(ImGui STATIC ${IMGUI_SOURCES})
-target_include_directories(ImGui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
-
-# Fetch Vulkan-Headers
-#  Vulkan-Headers is used for Vulkan API headers
-message(STATUS "Fetching Vulkan-Headers")
-FetchContent_Declare(
-    vulkan_headers
-    GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers.git
-    GIT_TAG        v1.3.296  # Update to the desired version(which is dependent on SPIRV-headers and SPIRV-tools below)
-)
-FetchContent_MakeAvailable(vulkan_headers)
-
-# Fetch SPIRV-Headers first
-#  SPIRV-Headers is a dependency of SPIRV-Tools
-message(STATUS "Fetching SPIRV-Headers")
-FetchContent_Declare(
-    spirv-headers
-    GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Headers.git
-    GIT_TAG vulkan-sdk-1.3.296.0
-)
-
-FetchContent_MakeAvailable(spirv-headers)
-
-# Fetch SPIRV-Tools
-#  SPIRV-Tools is used for compiling SPIR-V shaders
-message(STATUS "Fetching SPIRV-Tools")
-set(SPIRV_SKIP_TESTS ON CACHE BOOL "" FORCE)
-set(SPIRV_HEADERS_SKIP_INSTALL ON CACHE BOOL "" FORCE)
-set(SPIRV_WERROR OFF CACHE BOOL "" FORCE)
-
-FetchContent_Declare(
-    spirv-tools
-    GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Tools.git
-    GIT_TAG vulkan-sdk-1.3.296.0
-)
-
-# Enable building of SPIRV-Tools as Shaderc requires it
-FetchContent_MakeAvailable(spirv-tools)
-
-# Fetch glslang
-#  glslang is used for compiling GLSL shaders
-message(STATUS "Fetching glslang")
-set(ENABLE_GLSLANG_BINARIES OFF CACHE BOOL "" FORCE) # Skip building glslangValidator, etc.
-set(ENABLE_SPVREMAPPER OFF CACHE BOOL "" FORCE)
-set(ENABLE_HLSL ON CACHE BOOL "" FORCE) # Optional, depending on if you need HLSL support
-
-FetchContent_Declare(
-    glslang
-    GIT_REPOSITORY https://github.com/KhronosGroup/glslang.git
-    GIT_TAG vulkan-sdk-1.3.296.0
-)
-
-FetchContent_MakeAvailable(glslang)
-
-# Disable warnings for glslang
-target_compile_options(glslang PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/wd4267>
-)
-
-# Fetch Shaderc
-#  Shaderc is used for compiling GLSL shaders
-message(STATUS "Fetching Shaderc")
-set(SHADERC_SKIP_INSTALL ON CACHE BOOL "Skip building ShaderC install")
-set(SHADERC_SKIP_TESTS ON CACHE BOOL "Skip building ShaderC tests")
-set(SHADERC_SKIP_EXAMPLES ON CACHE BOOL "Skip building ShaderC examples")
-set(SHADERC_SKIP_COPYRIGHT_CHECK ON CACHE BOOL "Skip building ShaderC copyright check")
-
-FetchContent_Declare(
-    shaderc
-    GIT_REPOSITORY https://github.com/google/shaderc.git
-    GIT_TAG v2024.3
-)
-
-FetchContent_MakeAvailable(shaderc)
-
-# Disable warnings for shaderc
-target_compile_options(shaderc PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/wd4996 /wd4251 /D_CRT_SECURE_NO_WARNINGS>
-)
-
-# Fetch GLM
-#  GLM is used for math operations
-message(STATUS "Fetching GLM")
-FetchContent_Declare(
-    glm
-    GIT_REPOSITORY https://github.com/g-truc/glm.git
-    GIT_TAG 1.0.1
-)
-
-FetchContent_MakeAvailable(glm)
-
-# Fetch VulkanMemoryAllocator
-#  VulkanMemoryAllocator is used for managing Vulkan memory
-message(STATUS "Fetching VulkanMemoryAllocator")
-FetchContent_Declare(
-    VulkanMemoryAllocator
-    GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
-    GIT_TAG v3.1.0
-)
-FetchContent_MakeAvailable(VulkanMemoryAllocator)
-
-# Fetch lodepng
-#  lodepng is used for loading PNG images
-message(STATUS "Fetching lodepng")
-FetchContent_Declare(
-    lodepng
-    GIT_REPOSITORY https://github.com/lvandeve/lodepng.git
-    GIT_TAG master  # You can replace this with a specific commit or release tag
-)
-FetchContent_MakeAvailable(lodepng)
-
-# Lodepng does not provide a CMake build system, so we need to manually set up the target
-add_library(lodepng STATIC  "${lodepng_SOURCE_DIR}/lodepng.cpp")
-target_include_directories(lodepng PUBLIC ${lodepng_SOURCE_DIR})
-
-# Fetch libbmp
-#  libbmp is used for loading BMP images
-message(STATUS "Fetching libbmp")
-FetchContent_Declare(
-    libbmp
-    GIT_REPOSITORY https://github.com/marc-q/libbmp.git
-    GIT_TAG master  # You can replace this with a specific commit or release tag
-)
-FetchContent_MakeAvailable(libbmp)
-
-# Libbmp does not provide a CMake build system, so we need to manually set up the target
-add_library(libbmp STATIC  "${libbmp_SOURCE_DIR}/libbmp.c")
-target_include_directories(libbmp PUBLIC ${libbmp_SOURCE_DIR})
-
-# Disable warnings for libbmp
-target_compile_options(libbmp PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/wd4267>
-)
-
-# Fetch HarfBuzz
-#  HarfBuzz is a text layout engine which supports most of the world's writing systems
-message(STATUS "Fetching HarfBuzz")
-FetchContent_Declare(
-    harfbuzz
-    GIT_REPOSITORY https://github.com/harfbuzz/harfbuzz.git
-    GIT_TAG 10.2.0
-)
-
-FetchContent_GetProperties(harfbuzz)
-if(NOT harfbuzz_POPULATED)
-    FetchContent_Populate(harfbuzz)
-endif()
-
-add_library(harfbuzz STATIC
-    ${harfbuzz_SOURCE_DIR}/src/harfbuzz.cc
-)
-
-target_include_directories(harfbuzz PUBLIC ${harfbuzz_SOURCE_DIR}/src)
-target_compile_definitions(harfbuzz PRIVATE HB_NO_FREETYPE=1)
-
-# Disable warnings for HarfBuzz
-target_compile_options(harfbuzz PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4267 /wd4996 /D_CRT_SECURE_NO_WARNINGS>
-)
-
-# Fetch libunibreak
-#  libunibreak is used for line breaking in text
-message(STATUS "Fetching libunibreak")
-FetchContent_Declare(
-    libunibreak 
-    GIT_REPOSITORY https://github.com/adah1972/libunibreak.git
-    GIT_TAG libunibreak_6_1
-)
-
-FetchContent_GetProperties(libunibreak)
-if(NOT libunibreak_POPULATED)
-    FetchContent_Populate(libunibreak)
-endif()
-
-add_library(libunibreak STATIC
-    ${libunibreak_SOURCE_DIR}/src/eastasianwidthdata.c
-    ${libunibreak_SOURCE_DIR}/src/eastasianwidthdef.c
-    ${libunibreak_SOURCE_DIR}/src/emojidata.c
-    ${libunibreak_SOURCE_DIR}/src/emojidef.c
-    ${libunibreak_SOURCE_DIR}/src/graphemebreak.c
-    ${libunibreak_SOURCE_DIR}/src/graphemebreakdata.c
-    ${libunibreak_SOURCE_DIR}/src/indicconjunctbreakdata.c
-    ${libunibreak_SOURCE_DIR}/src/linebreak.c
-    ${libunibreak_SOURCE_DIR}/src/linebreakdata.c
-    ${libunibreak_SOURCE_DIR}/src/linebreakdef.c
-    ${libunibreak_SOURCE_DIR}/src/unibreakbase.c
-    ${libunibreak_SOURCE_DIR}/src/unibreakdef.c
-    ${libunibreak_SOURCE_DIR}/src/wordbreak.c
-    ${libunibreak_SOURCE_DIR}/src/wordbreakdata.c
-)
-
-# Disable warnings for libunibreak
-target_compile_options(libunibreak PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/wd4267>
-)
+include(cmake/yaml.cmake)
+include(cmake/lua.cmake)
+include(cmake/entt.cmake)
+include(cmake/nlohmann_json.cmake)
+include(cmake/simplerttr.cmake)
+include(cmake/inja.cmake)
+include(cmake/imgui.cmake)
+include(cmake/vulkan-headers.cmake)
+include(cmake/spirv-headers.cmake)
+include(cmake/spirv-tools.cmake)
+include(cmake/glslang.cmake)
+include(cmake/shaderc.cmake)
+include(cmake/glm.cmake)
+include(cmake/vulkanmemoryallocator.cmake)
+include(cmake/lodepng.cmake)
+include(cmake/libbmp.cmake)
+include(cmake/harfbuzz.cmake)
+include(cmake/libunibreak.cmake)
 
 #--------------------------------
 # set up the defines and includes

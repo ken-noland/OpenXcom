@@ -26,12 +26,12 @@ using namespace OpenXcom;
 TEST(VirtualFileSystemTest, TestPhysicalFileEntry)
 {
 	std::filesystem::path path = TEST_DATA_DIR;
+	std::filesystem::path dataPath = path / "Data";
+	std::filesystem::path configPath = path / "Config";
+	std::filesystem::path userPath = path / "User";
 
-	Options options({});
-
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, path / "Config");
-	options.set<&GameOptions::_dataPath>(OptionLevel::CONFIG, { path / "Data", path / "Data.zip" });
-	options.set<&GameOptions::_userPath>(OptionLevel::CONFIG, path / "User");
+	std::vector<std::string> args = {"-data", dataPath.string(), "-config", configPath.string(), "-user", userPath.string(), "-headless"};
+	Options options(args);
 
 	VirtualFileSystem vfs(options);
 
@@ -56,15 +56,13 @@ TEST(VirtualFileSystemTest, TestPhysicalFileEntry)
 
 TEST(VirtualFileSystemTest, TestPhysicalFilesystemIterator)
 {
-	//_crtBreakAlloc = 25546;
-
 	std::filesystem::path path = TEST_DATA_DIR;
+	std::filesystem::path dataPath = path / "Data";
+	std::filesystem::path configPath = path / "Config";
+	std::filesystem::path userPath = path / "User";
 
-	Options options({});
-
-	options.set<&GameOptions::_cfgPath>(OptionLevel::CONFIG, path / "Config");
-	options.set<&GameOptions::_dataPath>(OptionLevel::CONFIG, { path / "Data" });
-	options.set<&GameOptions::_userPath>(OptionLevel::CONFIG, path / "User");
+	std::vector<std::string> args = {"-data", dataPath.string(), "-config", configPath.string(), "-user", userPath.string(), "-headless"};
+	Options options(args);
 
 	VirtualFileSystem vfs(options);
 

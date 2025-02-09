@@ -27,7 +27,7 @@
 
 #include "Logger.h"
 
-#include <simplerttr.h>
+#include "Utility/RTTR.h"
 
 namespace OpenXcom
 {

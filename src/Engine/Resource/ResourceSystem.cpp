@@ -25,6 +25,7 @@
 #include "../Graphics/PipelineManager.h"
 #include "../Graphics/Buffer/BufferManager.h"
 #include "../Graphics/Palette/PaletteManager.h"
+#include "../Graphics/Image/Image.h"
 #include "../Graphics/Image/ImageManager.h"
 
 #include "Font/FontManager.h"

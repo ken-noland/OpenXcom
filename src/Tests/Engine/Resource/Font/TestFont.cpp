@@ -127,7 +127,7 @@ namespace
 std::array<Glyph, 128> getAsciiGlyphs()
 {
 	std::array<Glyph, 128> asciiGlyphs;
-	std::memset(asciiGlyphs.data(), 0, asciiGlyphs.size() * sizeof(Glyph));
+	memset(asciiGlyphs.data(), 0, asciiGlyphs.size() * sizeof(Glyph));
 
 	int charWidth = 9;
 	int charHeight = 16;
@@ -429,25 +429,25 @@ TEST_F(FontTest, TestMultiNewLine)
 	EXPECT_EQ(positionedGlyphs[40].position.x, startPos.x);
 	EXPECT_EQ(positionedGlyphs[40].position.y, startPos.y + (16 * 2));
 
-	// Skip fourth and fifth line
+	// Skip fourth line
 
-	// Sixth line is "Sed do eiusmod tempor "
+	// Forth line is "Sed do eiusmod tempor "
 	EXPECT_EQ(positionedGlyphs[58].codepoint, 'S');
 	EXPECT_EQ(positionedGlyphs[58].position.x, startPos.x);
 	EXPECT_EQ(positionedGlyphs[58].position.y, startPos.y + (16 * 4));
 
-	// Seventh line is "incididunt\n"
+	// Fifth line is "incididunt\n"
 	EXPECT_EQ(positionedGlyphs[80].codepoint, 'i');
 	EXPECT_EQ(positionedGlyphs[80].position.x, startPos.x);
 	EXPECT_EQ(positionedGlyphs[80].position.y, startPos.y + (16 * 5));
 
-	// Eighth line is "ut labore et dolore "
-	EXPECT_EQ(positionedGlyphs[92].codepoint, 'u');
-	EXPECT_EQ(positionedGlyphs[92].position.x, startPos.x);
-	EXPECT_EQ(positionedGlyphs[92].position.y, startPos.y + (16 * 6));
+	// Seventh line is "ut labore et dolore "
+	EXPECT_EQ(positionedGlyphs[91].codepoint, 'u');
+	EXPECT_EQ(positionedGlyphs[91].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[91].position.y, startPos.y + (16 * 6));
 
-	// Ninth line is "magna aliqua."
-	EXPECT_EQ(positionedGlyphs[112].codepoint, 'm');
-	EXPECT_EQ(positionedGlyphs[112].position.x, startPos.x);
-	EXPECT_EQ(positionedGlyphs[112].position.y, startPos.y + (16 * 7));
+	// Eighth line is "magna aliqua."
+	EXPECT_EQ(positionedGlyphs[111].codepoint, 'm');
+	EXPECT_EQ(positionedGlyphs[111].position.x, startPos.x);
+	EXPECT_EQ(positionedGlyphs[111].position.y, startPos.y + (16 * 7));
 }

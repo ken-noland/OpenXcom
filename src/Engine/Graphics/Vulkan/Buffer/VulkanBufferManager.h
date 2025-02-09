@@ -21,7 +21,7 @@
 #include "../../Buffer/BufferManager.h"
 #include <vulkan/vulkan.hpp>
 #include <memory>
-#include <simplerttr.h>
+
 
 namespace OpenXcom
 {

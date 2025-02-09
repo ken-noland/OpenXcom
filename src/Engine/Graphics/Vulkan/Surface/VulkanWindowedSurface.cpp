@@ -336,8 +336,8 @@ vk::SurfaceKHR VulkanWindowedSurface::createSurface(vk::Instance& instance, cons
 	}
 #elif defined(__linux__)
 	vk::XlibSurfaceCreateInfoKHR surfaceCreateInfo{};
-	surfaceCreateInfo.dpy = (Display*)window.display;
-	surfaceCreateInfo.window = window.window;
+	surfaceCreateInfo.dpy = (Display*)window.getHandle().display;
+	surfaceCreateInfo.window = window.getHandle().window;
 	surface = instance.createXlibSurfaceKHR(surfaceCreateInfo);
 	if (!surface)
 	{

@@ -65,11 +65,11 @@ _ReSharper.*/
 CMakeSettings.json
 #OpenXcom stuff (no ending slashes for dirs so symlinks can be ignored as well as real dirs)
 /data/
+/out
 bin/UFO
 bin/TFTD
 deps/*
 docs/html/
-build/
 Dependencies/
 translations/
 *.*.user

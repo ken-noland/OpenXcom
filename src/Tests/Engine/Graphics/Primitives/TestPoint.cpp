@@ -18,16 +18,28 @@
  */
 #include <gtest/gtest.h>
 
-#include "../../../Engine/Engine.h"
-#include "../../../Engine/Graphics/Common/GameSurface.h"
-#include "../../../Engine/Graphics/Common/WindowSurface.h"
-#include "../../../Engine/Graphics/Image/Image.h"
-#include "../../../Engine/Graphics/Image/ImageManager.h"
-#include "../../../Engine/Graphics/Palette/PaletteManager.h"
-#include "../../../Engine/Graphics/Types/PackedColor.h"
+#include "../../../../Engine/Engine.h"
+#include "../../../../Engine/Graphics/Buffer/BufferManager.h"
+#include "../../../../Engine/Graphics/Common/GameSurface.h"
+#include "../../../../Engine/Graphics/Common/WindowSurface.h"
+#include "../../../../Engine/Graphics/GraphicsSurface.h"
+#include "../../../../Engine/Graphics/GraphicsSystem.h"
+#include "../../../../Engine/Graphics/Image/Image.h"
+#include "../../../../Engine/Graphics/Image/ImageManager.h"
+#include "../../../../Engine/Graphics/Palette/Palette.h"
+#include "../../../../Engine/Graphics/Palette/PaletteManager.h"
+#include "../../../../Engine/Graphics/Primitive/BoxPrimitive.h"
+#include "../../../../Engine/Graphics/Primitive/LinePrimitive.h"
+#include "../../../../Engine/Graphics/Primitive/PointPrimitive.h"
+#include "../../../../Engine/Graphics/Primitive/PrimitiveFactory.h"
+#include "../../../../Engine/Graphics/Types/PackedColor.h"
+#include "../../../../Engine/Options.h"
+#include "../../../../Engine/Platform/Window.h"
 
-#include "../../../Engine/Resource/ResourceManager.h"
-#include "../../../Engine/Resource/ResourceSystem.h"
+#include "../../../../Engine/Resource/FileProcessor/ImagePNGFileProcessor.h"
+
+#include "../../../../Engine/Resource/ResourceManager.h"
+#include "../../../../Engine/Resource/ResourceSystem.h"
 #include <filesystem>
 #include <lodepng.h>
 #include <memory>
@@ -40,7 +52,7 @@ bool FORCE_REGENERATE_BASELINE = false;
 
 using namespace OpenXcom;
 
-class GraphicsTest : public ::testing::Test
+class GraphicsPointTest : public ::testing::Test
 {
 protected:
 	static std::unique_ptr<Engine> _engine;
@@ -112,7 +124,7 @@ protected:
 	 */
 	OwningHandle<HostImage> captureGameSurface()
 	{
-		_windowSurface->update();	// render the surface once
+		_windowSurface->update(); // render the surface once
 
 		OwningHandle<HostImage> hostImageHandle = _engine->getResourceSystem().getImageManager().createHostImage("screenCapture", _gameSurface->getScreenSize(), ImageFormat::R8G8B8A8);
 		if (!hostImageHandle.isValid())
@@ -136,6 +148,7 @@ protected:
 		// Generate a baseline if it doesn't exist
 		if (!std::filesystem::exists(baselinePath) || FORCE_REGENERATE_BASELINE)
 		{
+
 			unsigned error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage.getWidth(), hostImage.getHeight(), LodePNGColorType::LCT_RGBA, 8);
 			EXPECT_EQ(error, 0) << "Failed to save baseline image.";
 		}
@@ -157,7 +170,7 @@ protected:
 			for (size_t i = 0; i < baseline.size(); ++i)
 			{
 				std::size_t x = (i / 4) % hostImage.getExtent().x;
-				std::size_t y = (i/4) / hostImage.getExtent().x;
+				std::size_t y = (i / 4) / hostImage.getExtent().x;
 				ASSERT_EQ(baseline[i], pixels[i]) << "Pixel mismatch at index " << i << "(x=" << x << " y=" << y << ")";
 			}
 		}
@@ -166,18 +179,80 @@ protected:
 	}
 };
 
-std::unique_ptr<Engine> GraphicsTest::_engine = nullptr;
+std::unique_ptr<Engine> GraphicsPointTest::_engine = nullptr;
 
-std::filesystem::path GraphicsTest::_dataPath;
-std::filesystem::path GraphicsTest::_configPath;
-std::filesystem::path GraphicsTest::_userPath;
+std::filesystem::path GraphicsPointTest::_dataPath;
+std::filesystem::path GraphicsPointTest::_configPath;
+std::filesystem::path GraphicsPointTest::_userPath;
 
 
-TEST_F(GraphicsTest, TestGraphicsSurface)
+TEST_F(GraphicsPointTest, TestPointListPrimitive16Points)
 {
+	// Create 16 points arranged in 2 rows (8 columns per row).
+	std::vector<PointVertex> points;
+	for (int row = 0; row < 2; ++row)
+	{
+		for (int col = 0; col < 8; ++col)
+		{
+			// Starting at (10,10) with 20 pixels spacing horizontally and vertically.
+			PointVertex vertex = {glm::ivec2(10 + col * 20, 10 + row * 20)};
+			points.push_back(vertex);
+		}
+	}
+
+	// Create the PointListPrimitive using the primitive factory.
+	std::unique_ptr<PointListPrimitive> pointListPrimitive =
+		_gameSurface->getRenderTarget().getPrimitiveFactory().createPointListPrimitive(points.data(), points.size(), 1, _paletteHandle.getHandle());
+	ASSERT_TRUE(pointListPrimitive);
+
+	// Render the point list primitive.
+	_gameSurface->onRender() << [&pointListPrimitive](GraphicsCommand& command) {
+		pointListPrimitive->draw(command);
+	};
+
+	// Capture the game surface after drawing.
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "001_game_surface_blank.png";
+	// Define the baseline image path for comparison.
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "008_game_surface_point_list_1.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
+}
+
+TEST_F(GraphicsPointTest, TestPointColorListPrimitive16Points)
+{
+	// Create 16 vertices arranged in 2 rows (8 columns per row),
+	// cycling through the 16 palette colors.
+	std::vector<PointColorVertex> vertices;
+	for (int row = 0; row < 2; ++row)
+	{
+		for (int col = 0; col < 8; ++col)
+		{
+			// Calculate the overall index and cycle through 16 colors.
+			int index = row * 8 + col;
+			uint32_t color = index % 16; // Cycle through colors 0-15
+
+			// Create a vertex starting at (10,10) with 20 pixels spacing.
+			PointColorVertex vertex = {glm::ivec2(10 + col * 20, 10 + row * 20), color};
+			vertices.push_back(vertex);
+		}
+	}
+
+	// Create the PointColorListPrimitive using the primitive factory.
+	std::unique_ptr<PointColorListPrimitive> pointColorListPrimitive =
+		_gameSurface->getRenderTarget().getPrimitiveFactory().createPointColorListPrimitive(vertices.data(), vertices.size(), _paletteHandle.getHandle());
+	ASSERT_TRUE(pointColorListPrimitive);
+
+	// Render the point color list primitive.
+	_gameSurface->onRender() << [&pointColorListPrimitive](GraphicsCommand& command) {
+		pointColorListPrimitive->draw(command);
+	};
+
+	// Capture the game surface after drawing.
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	// Define the baseline image path for comparison.
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "009_game_surface_point_color_list_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }

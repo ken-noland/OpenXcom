@@ -18,16 +18,26 @@
  */
 #include <gtest/gtest.h>
 
-#include "../../../Engine/Engine.h"
-#include "../../../Engine/Graphics/Common/GameSurface.h"
-#include "../../../Engine/Graphics/Common/WindowSurface.h"
-#include "../../../Engine/Graphics/Image/Image.h"
-#include "../../../Engine/Graphics/Image/ImageManager.h"
-#include "../../../Engine/Graphics/Palette/PaletteManager.h"
-#include "../../../Engine/Graphics/Types/PackedColor.h"
+#include "../../../../Engine/Engine.h"
+#include "../../../../Engine/Graphics/Buffer/BufferManager.h"
+#include "../../../../Engine/Graphics/Common/GameSurface.h"
+#include "../../../../Engine/Graphics/Common/WindowSurface.h"
+#include "../../../../Engine/Graphics/GraphicsSurface.h"
+#include "../../../../Engine/Graphics/GraphicsSystem.h"
+#include "../../../../Engine/Graphics/Image/Image.h"
+#include "../../../../Engine/Graphics/Image/ImageManager.h"
+#include "../../../../Engine/Graphics/Palette/Palette.h"
+#include "../../../../Engine/Graphics/Palette/PaletteManager.h"
+#include "../../../../Engine/Graphics/Primitive/BoxPrimitive.h"
+#include "../../../../Engine/Graphics/Primitive/LinePrimitive.h"
+#include "../../../../Engine/Graphics/Primitive/PointPrimitive.h"
+#include "../../../../Engine/Graphics/Primitive/PrimitiveFactory.h"
+#include "../../../../Engine/Graphics/Types/PackedColor.h"
+#include "../../../../Engine/Options.h"
+#include "../../../../Engine/Platform/Window.h"
 
-#include "../../../Engine/Resource/ResourceManager.h"
-#include "../../../Engine/Resource/ResourceSystem.h"
+#include "../../../../Engine/Resource/ResourceManager.h"
+#include "../../../../Engine/Resource/ResourceSystem.h"
 #include <filesystem>
 #include <lodepng.h>
 #include <memory>
@@ -40,7 +50,7 @@ bool FORCE_REGENERATE_BASELINE = false;
 
 using namespace OpenXcom;
 
-class GraphicsTest : public ::testing::Test
+class GraphicsImageTest : public ::testing::Test
 {
 protected:
 	static std::unique_ptr<Engine> _engine;
@@ -112,7 +122,7 @@ protected:
 	 */
 	OwningHandle<HostImage> captureGameSurface()
 	{
-		_windowSurface->update();	// render the surface once
+		_windowSurface->update(); // render the surface once
 
 		OwningHandle<HostImage> hostImageHandle = _engine->getResourceSystem().getImageManager().createHostImage("screenCapture", _gameSurface->getScreenSize(), ImageFormat::R8G8B8A8);
 		if (!hostImageHandle.isValid())
@@ -157,7 +167,7 @@ protected:
 			for (size_t i = 0; i < baseline.size(); ++i)
 			{
 				std::size_t x = (i / 4) % hostImage.getExtent().x;
-				std::size_t y = (i/4) / hostImage.getExtent().x;
+				std::size_t y = (i / 4) / hostImage.getExtent().x;
 				ASSERT_EQ(baseline[i], pixels[i]) << "Pixel mismatch at index " << i << "(x=" << x << " y=" << y << ")";
 			}
 		}
@@ -166,18 +176,8 @@ protected:
 	}
 };
 
-std::unique_ptr<Engine> GraphicsTest::_engine = nullptr;
+std::unique_ptr<Engine> GraphicsImageTest::_engine = nullptr;
 
-std::filesystem::path GraphicsTest::_dataPath;
-std::filesystem::path GraphicsTest::_configPath;
-std::filesystem::path GraphicsTest::_userPath;
-
-
-TEST_F(GraphicsTest, TestGraphicsSurface)
-{
-	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
-	ASSERT_TRUE(hostImageHandle.isValid());
-
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "001_game_surface_blank.png";
-	compareWithBaseline(hostImageHandle, baselinePath);
-}
+std::filesystem::path GraphicsImageTest::_dataPath;
+std::filesystem::path GraphicsImageTest::_configPath;
+std::filesystem::path GraphicsImageTest::_userPath;

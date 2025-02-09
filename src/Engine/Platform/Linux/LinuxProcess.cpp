@@ -51,7 +51,7 @@ void PlatformProcessSystem::platformSpecificUpdate()
 	//}
 }
 
-void PlatformProcessSystem::platformSpecificExit()
+void PlatformProcessSystem::platformSpecificExit(int exitCode)
 {
 	_isRunning = false; // Signal to Engine that the application should stop
 }
