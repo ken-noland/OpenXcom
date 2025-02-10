@@ -16,33 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../../_TestEngine.h"
+#include "_TestEngine.h"
 
-#include "../../../../Engine/Graphics/Primitive/ImagePrimitive.h"
-#include "../../../../Engine/Graphics/Primitive/PrimitiveFactory.h"
+std::unique_ptr<OpenXcom::Engine> TestEngineSuite::_engine(nullptr);
 
-#include <filesystem>
-#include <memory>
+std::filesystem::path TestEngineSuite::_dataPath;
+std::filesystem::path TestEngineSuite::_configPath;
+std::filesystem::path TestEngineSuite::_userPath;
 
-using namespace OpenXcom;
-
-class GraphicsImageTest : public TestEngineSuite
-{
-protected:
-	OwningHandle<Palette> _paletteHandle;
-
-	void SetUp() override
-	{
-		_paletteHandle = create16ColorPalette();
-	}
-
-	void TearDown() override
-	{
-		_paletteHandle.release();
-	}
-};
-
-TEST_F(GraphicsImageTest, TestBasicImage)
-{
-	throw std::runtime_error("Not implemented");
-}
+std::unique_ptr<OpenXcom::GameSurface> TestEngineSuite::_gameSurface(nullptr);
+std::unique_ptr<OpenXcom::WindowSurface> TestEngineSuite::_windowSurface(nullptr);

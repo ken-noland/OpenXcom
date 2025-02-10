@@ -31,12 +31,14 @@ TickableComponent::~TickableComponent()
 
 void TickableComponent::addTickable(const TickableCallback& tickable)
 {
-	_tickables.push_back(tickable);
+	throw std::runtime_error("Not implemented");
+	//	_tickables.add(tickable);
 }
 
 void TickableComponent::tick()
 {
-	_tickables.call();
+	throw std::runtime_error("Not implemented");
+	//_tickables.call();
 }
 
 TickableSystem::TickableSystem()

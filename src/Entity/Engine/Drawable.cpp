@@ -42,12 +42,14 @@ DrawableComponent::~DrawableComponent()
 
 void DrawableComponent::addDrawable(const DrawableCallback& drawable)
 {
-	_drawables.push_back(drawable);
+	throw std::runtime_error("Not implemented");
+	//_drawables.push_back(drawable);
 }
 
 void DrawableComponent::draw()
 {
-	_drawables.call();
+	throw std::runtime_error("Not implemented");
+	//_drawables.call();
 }
 
 DrawableSystem::DrawableSystem()

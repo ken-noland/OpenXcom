@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
 
 namespace OpenXcom
 {
@@ -46,6 +47,9 @@ protected:
 
 	std::unique_ptr<PlatformWindow> _window;
 	std::unique_ptr<GraphicsSurface> _windowSurface;
+
+	MulticastDelegate<void()>::Handle _onClose;
+	MulticastDelegate<void(glm::ivec2)>::Handle _onResize;
 
 	std::unique_ptr<Pipeline> _pipeline;
 	std::unique_ptr<PipelineBinding> _pipelineBinding;

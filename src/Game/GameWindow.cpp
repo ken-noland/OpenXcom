@@ -172,17 +172,17 @@ GameWindow::GameWindow(EngineContext& engine)
 	_gameSurface = std::make_unique<GameSurface>(engine);
 	_windowSurface = std::make_unique<WindowSurface>(engine, *_gameSurface);
 
-	_windowSurface->onRender() << [this](GraphicsCommand& command) {
+	_onWindowRender = _windowSurface->onRender().add([this](GraphicsCommand& command) {
 		this->onWindowRender(command);
-	};
+	});
 
-	_gameSurface->onRender() << [this](GraphicsCommand& command) {
+	_onGameRender = _gameSurface->onRender().add([this](GraphicsCommand& command) {
 		this->onGameRender(command);
-	};
+	});
 
-	_windowSurface->getWindow().onResize() << [this](glm::ivec2 size) {
+	_onResize = _windowSurface->getWindow().onResize().add([this](glm::ivec2 size) {
 		this->onWindowResize(size);
-	};
+	});
 
 	// set up the palette
 	PackedColor paletteData[] = {
@@ -224,6 +224,9 @@ GameWindow::GameWindow(EngineContext& engine)
 
 GameWindow::~GameWindow()
 {
+	_onWindowRender.release();
+	_onGameRender.release();
+	_onResize.release();
 }
 
 void GameWindow::update()

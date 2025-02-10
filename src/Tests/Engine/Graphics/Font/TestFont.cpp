@@ -607,5 +607,7 @@ TEST_F(FontTest, TestTextColorSections)
 	// Using ANSI escape characters to change text color
 	std::string text = "\x1b[31mRed\x1b[0m \x1b[32mGreen\x1b[0m \x1b[34mBlue\x1b[0m";
 
-
+//	TextPrimitiveFactory = 
+//	std::unique_ptr<TextPrimitive> textPrimitive =
+	throw std::runtime_error("Not implemented");
 }

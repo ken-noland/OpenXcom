@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <glm/vec2.hpp>
+#include "../Engine/Utility/Delegate.h"
 
 /////////////////////////////////////////////
 // TEMP
@@ -54,6 +55,11 @@ protected:
 	OwningHandle<DeviceImage> _image;
 	std::unique_ptr<ImagePrimitive> _thingToDraw;
 	std::unique_ptr<BoxOutlinePrimitive> _thingToDraw2;
+
+	MulticastDelegate<void(GraphicsCommand&)>::Handle _onWindowRender;
+	MulticastDelegate<void(GraphicsCommand&)>::Handle _onGameRender;
+	MulticastDelegate<void(glm::ivec2)>::Handle _onResize;
+
 
 	void onWindowRender(GraphicsCommand& command);
 	void onGameRender(GraphicsCommand& command);

@@ -19,6 +19,7 @@
  */
 #include "VulkanSurface.h"
 #include "../../GraphicsCommand.h"
+#include "../../../Utility/Delegate.h"
 
 #include <vulkan/vulkan.hpp>
 #include <glm/vec2.hpp>
@@ -54,6 +55,7 @@ protected:
 	vk::CommandPool _commandPool;
 
 	vk::SurfaceKHR _surface;
+	MulticastDelegate<void(glm::ivec2)>::Handle _onResize;
 
 	vk::SwapchainKHR _swapChain;		
 	vk::Format _swapChainImageFormat;

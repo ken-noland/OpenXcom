@@ -123,6 +123,8 @@ WindowSurface::WindowSurface(EngineContext& engine, GameSurface& gameSurface)
 
 WindowSurface::~WindowSurface()
 {
+	_onClose.release();
+	_onResize.release();
 }
 
 void WindowSurface::createWindowed(GameSurface& gameSurface)
@@ -173,8 +175,8 @@ void WindowSurface::createWindowed(GameSurface& gameSurface)
 	updateProjection();
 
 	// setup the callbacks
-	_window->onClose() << std::bind(&WindowSurface::onClose, this);
-	_window->onResize() << std::bind(&WindowSurface::onResize, this, std::placeholders::_1);
+	_onClose = _window->onClose().add(std::bind(&WindowSurface::onClose, this));
+	_onResize = _window->onResize().add(std::bind(&WindowSurface::onResize, this, std::placeholders::_1));
 
 	_window->show();
 

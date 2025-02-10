@@ -36,6 +36,7 @@ add_executable(
   "Engine/TestTimer.cpp"
   "Engine/TestTypeErasedPtr.cpp"
   "Engine/TestVirtualFileSystem.cpp"
+  "Engine/_TestEngine.cpp"
   "Entity/Interface/WindowTest.cpp"
   "Entity/Interface/ButtonTest.cpp"
 )

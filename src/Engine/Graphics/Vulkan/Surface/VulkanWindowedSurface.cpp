@@ -56,7 +56,7 @@ VulkanWindowedSurface::VulkanWindowedSurface(VulkanContext& context, PlatformWin
 	initializeSwapChain();
 
 	//register a callback with the window for resize events
-	window.onResize() << [this](glm::ivec2 newSize) { this->handleResize(newSize); };
+	_onResize = window.onResize().add([this](glm::ivec2 newSize) { this->handleResize(newSize); });
 
 	_commandContext = std::make_unique<VulkanCommand>(_context);
 
@@ -72,6 +72,8 @@ VulkanWindowedSurface::VulkanWindowedSurface(VulkanContext& context, PlatformWin
 
 VulkanWindowedSurface::~VulkanWindowedSurface()
 {
+	_onResize.release();
+
 	// Wait for the device to finish
 	_context.getDevice().waitIdle();
 
