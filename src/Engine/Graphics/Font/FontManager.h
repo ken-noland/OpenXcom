@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../ResourceManager.h"
+#include "../../Resource/ResourceManager.h"
 #include "Font.h"
 
 #include <filesystem>
@@ -32,10 +32,13 @@ public:
 	virtual ~FontManager();
 
 	// load font from memory
-	ResourceManager<Font>::OwningHandle loadFont(const std::string& name, const unsigned char* data, size_t size);
+	OwningHandle<Font> loadFont(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
 
 	// load font from file
-	ResourceManager<Font>::OwningHandle loadFont(const std::string& name, const std::filesystem::path& filename);
+	OwningHandle<Font> loadFont(const std::string& name, const std::filesystem::path& filename);
+
+	// get a font handle by name
+	ResourceHandle<Font> getFontByName(const std::string& name) const;
 };
 
 } // namespace OpenXcom

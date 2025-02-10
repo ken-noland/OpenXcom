@@ -28,7 +28,7 @@
 #include "../Graphics/Image/Image.h"
 #include "../Graphics/Image/ImageManager.h"
 
-#include "Font/FontManager.h"
+#include "../Graphics/Font/FontManager.h"
 
 #include "FileProcessor/ImageFileProcessor.h"
 #include "FileProcessor/ImageBMPFileProcessor.h"

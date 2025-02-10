@@ -30,19 +30,19 @@ PaletteManager::~PaletteManager()
 {
 }
 
-ResourceManager<Palette>::OwningHandle PaletteManager::createPalette(const std::string& name, size_t count)
+OwningHandle<Palette> PaletteManager::createPalette(const std::string& name, size_t count)
 {
 	return add(std::make_unique<Palette>(_context, name, count));
 }
 
-ResourceManager<Palette>::OwningHandle PaletteManager::createPalette(const std::string& name, const PackedColor* data, size_t count)
+OwningHandle<Palette> PaletteManager::createPalette(const std::string& name, const PackedColor* data, size_t count)
 {
 	return add(std::make_unique<Palette>(_context, name, data, count));
 }
 
-ResourceManager<Palette>::OwningHandle PaletteManager::createPalette(const std::string& name, std::initializer_list<PackedColor> data)
+OwningHandle<Palette> PaletteManager::createPalette(const std::string& name, std::initializer_list<PackedColor> data)
 {
-	return ResourceManager<Palette>::OwningHandle();
+	return OwningHandle<Palette>();
 }
 
 } // namespace OpenXcom

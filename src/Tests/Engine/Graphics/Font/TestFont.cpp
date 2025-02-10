@@ -20,7 +20,6 @@
 
 #include "../../../../Engine/Engine.h"
 #include "../../../../Engine/Resource/ResourceSystem.h"
-#include "../../../../Engine/Resource/Font/Font.h"
 #include "../../../../Engine/Resource/FileProcessor/ImageFile.h"
 #include "../../../../Engine/Resource/FileProcessor/ImageFileProcessor.h"
 #include "../../../../Engine/Resource/FileProcessor/ImageBMPFileProcessor.h"
@@ -31,6 +30,8 @@
 #include "../../../../Engine/Graphics/Image/ImageManager.h"
 #include "../../../../Engine/Graphics/Palette/Palette.h"
 #include "../../../../Engine/Graphics/Palette/PaletteManager.h"
+#include "../../../../Engine/Graphics/Font/Font.h"
+#include "../../../../Engine/Graphics/Font/FontManager.h"
 
 #include <memory>
 #include <filesystem>
@@ -119,7 +120,7 @@ TEST(LibUniWrapperTest, BasicLineBreakTest)
 // wrap in an anonymous namespace to avoid name conflicts
 namespace
 {
-#include "../../../../Engine/Resource/Font/DosFont.h"
+#include "../../../../Engine/Graphics/Font/DosFont.h"
 }
 
 
@@ -169,7 +170,7 @@ protected:
 	static std::filesystem::path _configPath;
 	static std::filesystem::path _userPath;
 
-	static PaletteManager::OwningHandle _paletteHandle;
+	static OwningHandle<Palette> _paletteHandle;
 
 	std::unique_ptr<Font> _font;
 
@@ -226,7 +227,7 @@ protected:
 		OwningHandle<DeviceImage> deviceFontTexture = resourceSystem.getImageManager().createDeviceImage(*hostFontTexture);
 
 		// Create the font object
-		_font = std::make_unique<Font>(std::move(deviceFontTexture), getAsciiGlyphs());
+		_font = std::make_unique<Font>("dosFont", std::move(deviceFontTexture), getAsciiGlyphs());
 		_font->setLineSpacing(0);
 	}
 
@@ -242,7 +243,7 @@ std::filesystem::path FontTest::_dataPath;
 std::filesystem::path FontTest::_configPath;
 std::filesystem::path FontTest::_userPath;
 
-PaletteManager::OwningHandle FontTest::_paletteHandle;
+OwningHandle<Palette> FontTest::_paletteHandle;
 
 TEST_F(FontTest, TestSomeAsciiCharacters)
 {
@@ -450,4 +451,161 @@ TEST_F(FontTest, TestMultiNewLine)
 	EXPECT_EQ(positionedGlyphs[111].codepoint, 'm');
 	EXPECT_EQ(positionedGlyphs[111].position.x, startPos.x);
 	EXPECT_EQ(positionedGlyphs[111].position.y, startPos.y + (16 * 7));
+}
+
+struct TextStyle
+{
+	uint8_t colorIndex;
+	uint8_t backgroundColorIndex;
+	bool underline;
+};
+
+struct TextSection
+{
+	std::string text;
+	TextStyle style;
+	ResourceHandle<Font> font;
+};
+
+//--------------------------------------------------------------------
+// Parser function: converts a raw ANSI escape–style string into
+// a vector of TextSection objects.
+std::vector<TextSection> parseText(const std::string& rawText, const ResourceHandle<Font>& defaultFont, /* temp */ FontManager& manager)
+{
+	std::vector<TextSection> sections;
+	ResourceHandle<Font> currentFont = defaultFont;
+	TextStyle currentStyle;
+	std::string buffer;
+
+	// Iterate over each character in the raw text.
+	for (size_t i = 0; i < rawText.size(); ++i)
+	{
+		if (rawText[i] == '\x1B')
+		{ // ESC character found.
+			// Flush any accumulated plain text.
+			if (!buffer.empty())
+			{
+				TextSection section{buffer, currentStyle, currentFont};
+				sections.emplace_back(section);
+				buffer.clear();
+			}
+
+			// Verify we have an opening '[' after ESC.
+			if (i + 1 < rawText.size() && rawText[i + 1] == '[')
+			{
+				size_t seqStart = i + 2;
+				std::string parameter;
+				char terminator = '\0';
+				size_t j = seqStart;
+
+				// Read characters until we hit a letter (the terminator).
+				while (j < rawText.size() && !std::isalpha(static_cast<unsigned char>(rawText[j])))
+				{
+					parameter.push_back(rawText[j]);
+					++j;
+				}
+				if (j < rawText.size())
+					terminator = rawText[j];
+				else
+					break; // Incomplete escape sequence.
+
+				// Check for our custom font switch sequence: we expect a terminator 'f'.
+				if (terminator == 'f')
+				{
+					// Our custom sequence should start with "fn=".
+					const std::string fnPrefix = "fn=";
+					if (parameter.substr(0, fnPrefix.size()) == fnPrefix)
+					{
+						std::string fontName = parameter.substr(fnPrefix.size());
+						currentFont = manager.getFontByName(fontName);
+					}
+				}
+				// Otherwise, if the terminator is 'm', process standard SGR codes.
+				else if (terminator == 'm')
+				{
+					// An empty parameter means reset (i.e. code 0).
+					if (parameter.empty())
+					{
+						currentStyle = TextStyle();
+						currentFont = defaultFont;
+					}
+					else
+					{
+						// Process semicolon-separated numeric codes.
+						std::istringstream iss(parameter);
+						std::string token;
+						while (std::getline(iss, token, ';'))
+						{
+							int code = std::stoi(token);
+							if (code == 0)
+							{
+								// Reset all attributes.
+								currentStyle = TextStyle();
+								currentFont = defaultFont;
+							}
+							else if (code == 1)
+							{
+								// Bold code – add handling if your TextStyle supports it.
+							}
+							// Foreground colors (30–37).
+							else if (code >= 30 && code <= 37)
+							{
+								currentStyle.colorIndex = static_cast<uint8_t>(code - 30);
+							}
+							else if (code == 39)
+							{
+								// Reset foreground color.
+								currentStyle.colorIndex = TextStyle().colorIndex;
+							}
+							// Background colors (40–47).
+							else if (code >= 40 && code <= 47)
+							{
+								currentStyle.backgroundColorIndex = static_cast<uint8_t>(code - 40);
+							}
+							else if (code == 49)
+							{
+								// Reset background color.
+								currentStyle.backgroundColorIndex = TextStyle().backgroundColorIndex;
+							}
+							// Underline on/off (4 to enable, 24 to disable).
+							else if (code == 4)
+							{
+								currentStyle.underline = true;
+							}
+							else if (code == 24)
+							{
+								currentStyle.underline = false;
+							}
+							// Add additional SGR codes as needed.
+						}
+					}
+				}
+				// Advance index to the end of the escape sequence.
+				i = j;
+				continue; // Continue with the next character.
+			}
+		}
+		else
+		{
+			// Regular character: accumulate in the buffer.
+			buffer.push_back(rawText[i]);
+		}
+	}
+	// Flush any remaining text.
+	if (!buffer.empty())
+	{
+		TextSection section{buffer, currentStyle, currentFont};
+		sections.emplace_back(section);
+	}
+
+	return sections;
+}
+
+
+TEST_F(FontTest, TestTextColorSections)
+{
+	// Using ANSI escape characters to change text color
+	std::string text = "\x1b[31mRed\x1b[0m \x1b[32mGreen\x1b[0m \x1b[34mBlue\x1b[0m";
+
+
 }

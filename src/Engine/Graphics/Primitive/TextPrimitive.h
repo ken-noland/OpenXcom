@@ -17,35 +17,45 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../../Resource/ResourceManager.h"
-#include "Palette.h"
+#include "Primitive.h"
+#include <array>
+#include <memory>
+#include <vector>
+#include <string>
 
-#include <filesystem>
-#include <glm/vec4.hpp>
+#include <glm/vec2.hpp>
 
 namespace OpenXcom
 {
 
 class EngineContext;
-class PackedColor;
+class GraphicsCommand;
+class PipelineBinding;
+class Pipeline;
+class RenderTarget;
+class DeviceBuffer;
+class Palette;
+class Font;
 
-class PaletteManager : public ResourceManager<Palette>
+template <typename ResourceType>
+class ResourceHandle;
+
+class TextPrimitive : public Primitive
 {
 protected:
 	EngineContext& _context;
 
+	std::unique_ptr<PipelineBinding> _pipelineBinding;
+	std::unique_ptr<DeviceBuffer> _vertexBuffer;
+
 public:
-	PaletteManager(EngineContext& context);
-	virtual ~PaletteManager();
+	TextPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
+				  const std::string text, const ResourceHandle<Font>& defaultFontHandle, const ResourceHandle<Palette>& paletteHandle);
+	virtual ~TextPrimitive();
 
-	// create an empty palette
-	OwningHandle<Palette> createPalette(const std::string& name, size_t count);
+	void setText(const std::string& text);
 
-	// load palette from memory
-	OwningHandle<Palette> createPalette(const std::string& name, const PackedColor* data, size_t count);
-
-	// load palette from parameters
-	OwningHandle<Palette> createPalette(const std::string& name, std::initializer_list<PackedColor> data);
+	void draw(GraphicsCommand& command);
 };
 
 } // namespace OpenXcom

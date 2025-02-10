@@ -32,28 +32,23 @@ namespace OpenXcom
 template <typename ResourceType>
 class ResourceManager
 {
-public:
-	using Handle = ResourceHandle<ResourceType>;
-	using OwningHandle = OwningHandle<ResourceType>;
-
 protected:
-	using ResourceMap = std::unordered_map<Handle, std::unique_ptr<ResourceType>>;
-
-	ResourceMap _resources;
+	// TODO: compact the map to an array for faster iterations
+	std::unordered_map<ResourceHandle<ResourceType>, std::unique_ptr<ResourceType>> _resources;
 	std::uint32_t nextHandle = 0;
 
 public:
 	ResourceManager() = default;
 	virtual ~ResourceManager() = default;
 
-	OwningHandle add(std::unique_ptr<ResourceType> resource)
+	OwningHandle<ResourceType> add(std::unique_ptr<ResourceType> resource)
 	{
 		OwningHandle handle(nextHandle++, *this);
 		_resources.emplace(handle.getHandle(), std::move(resource));
 		return handle;
 	}
 
-	std::optional<std::reference_wrapper<ResourceType>> try_get(Handle handle)
+	std::optional<std::reference_wrapper<ResourceType>> try_get(const ResourceHandle<ResourceType>& handle)
 	{
 		auto it = _resources.find(handle);
 		if (it != _resources.end())
@@ -64,35 +59,35 @@ public:
 	}
 
 	template <typename Type = ResourceType>
-	Type& get(const Handle& handle)
+	Type& get(const ResourceHandle<ResourceType>& handle)
 	{
-		assert(handle != Handle::Invalid_Handle);
+		assert(handle != ResourceHandle<ResourceType>::Invalid_Handle);
 		assert(exists(handle));
 		return *static_cast<Type*>(_resources[handle.getId()].get());
 	}
 		
 	template <typename Type = ResourceType>
-	Type& get(const OwningHandle& handle)
+	Type& get(const OwningHandle<ResourceType>& handle)
 	{
 		return get<Type>(handle.getHandle());
 	}
 
-	bool exists(const Handle& handle)
+	bool exists(const ResourceHandle<ResourceType>& handle)
 	{
 		return _resources.find(handle) != _resources.end();
 	}
 
-	bool exists(const OwningHandle& handle)
+	bool exists(const OwningHandle<ResourceType>& handle)
 	{
 		return exists(handle.getHandle());
 	}
 
-	void remove(Handle handle)
+	void remove(const ResourceHandle<ResourceType>& handle)
 	{
 		_resources.erase(handle);
 	}
 
-	void remove(OwningHandle handle)
+	void remove(const OwningHandle<ResourceType>& handle)
 	{
 		remove(handle.getHandle());
 	}

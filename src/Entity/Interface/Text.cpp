@@ -18,7 +18,7 @@
  */
 #include "Text.h"
 #include "../../Mod/Mod.h"
-#include "../../Engine/Resource/Font/Font.h"
+#include "../../Engine/Graphics/Font/Font.h"
 
 //#include "../../Engine/ShaderDraw.h"
 //#include "../../Engine/ShaderMove.h"

@@ -18,8 +18,8 @@
  */
 #include "Font.h"
 
-#include "../../Graphics/Image/Image.h"
-#include "../../Graphics/Image/ImageManager.h"
+#include "../Image/Image.h"
+#include "../Image/ImageManager.h"
 
 #include <hb.h>
 #include <linebreak.h>
@@ -27,8 +27,8 @@
 namespace OpenXcom
 {
 
-Font::Font(OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
-	: _fontTexture(std::move(texture)), _asciiGlyphs(asciiGlyphs), _extendedGlyphs(extendedGlyphs)
+Font::Font(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
+	: _name(name), _fontTexture(std::move(texture)), _asciiGlyphs(asciiGlyphs), _extendedGlyphs(extendedGlyphs)
 {
 
 	// Initialize HarfBuzz with a dummy face (no TrueType tables needed)

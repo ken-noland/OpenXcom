@@ -16,28 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "FontManager.h"
+#include "TextPrimitive.h"
+#include "../Buffer/Buffer.h"
+#include "../PipelineBinding.h"
 
 namespace OpenXcom
 {
 
-FontManager::FontManager()
+TextPrimitive::TextPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface, const std::string text, const ResourceHandle<Font>& defaultFontHandle, const ResourceHandle<Palette>& paletteHandle)
+	: _context(context)
 {
 }
 
-FontManager::~FontManager()
+TextPrimitive::~TextPrimitive()
 {
 }
 
-ResourceManager<Font>::OwningHandle FontManager::loadFont(const std::string& name, const unsigned char* data, size_t size)
+void TextPrimitive::setText(const std::string& text)
 {
-	return ResourceManager<Font>::OwningHandle(ResourceManager<Font>::Handle::Invalid_Handle, *this);
+	// Step 1: Cut up the text by any style delimiters(ANSI escape codes)
 }
 
-ResourceManager<Font>::OwningHandle FontManager::loadFont(const std::string& name, const std::filesystem::path& filename)
+void TextPrimitive::draw(GraphicsCommand& command)
 {
-	return ResourceManager<Font>::OwningHandle(ResourceManager<Font>::Handle::Invalid_Handle, *this);
 }
 
 } // namespace OpenXcom

@@ -229,7 +229,7 @@ ImageFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bm
 	int height = std::abs(header.biHeight);
 	bool bottomUp = (header.biHeight > 0);
 
-	PaletteManager::OwningHandle paletteHandle;
+	OwningHandle<Palette> paletteHandle;
 	if (header.biBitCount <= 8 && loadPalette)
 	{
 		// Load palette (same as before).

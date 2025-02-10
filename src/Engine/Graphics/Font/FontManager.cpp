@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,35 +16,36 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../../Resource/ResourceManager.h"
-#include "Palette.h"
 
-#include <filesystem>
-#include <glm/vec4.hpp>
+#include "FontManager.h"
+#include "../Image/Image.h"
 
 namespace OpenXcom
 {
 
-class EngineContext;
-class PackedColor;
-
-class PaletteManager : public ResourceManager<Palette>
+FontManager::FontManager()
 {
-protected:
-	EngineContext& _context;
+}
 
-public:
-	PaletteManager(EngineContext& context);
-	virtual ~PaletteManager();
+FontManager::~FontManager()
+{
+}
 
-	// create an empty palette
-	OwningHandle<Palette> createPalette(const std::string& name, size_t count);
+OwningHandle<Font> FontManager::loadFont(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
+{
+	return add(std::make_unique<Font>(name, std::move(texture), asciiGlyphs, extendedGlyphs));
+}
 
-	// load palette from memory
-	OwningHandle<Palette> createPalette(const std::string& name, const PackedColor* data, size_t count);
-
-	// load palette from parameters
-	OwningHandle<Palette> createPalette(const std::string& name, std::initializer_list<PackedColor> data);
-};
+ResourceHandle<Font> FontManager::getFontByName(const std::string& name) const
+{
+	for (const std::pair<const ResourceHandle<Font>, std::unique_ptr<Font>>& font : _resources)
+	{
+		if (font.second->getName() == name)
+		{
+			return font.first;
+		}
+	}
+	return ResourceHandle<Font>::Invalid_Handle;
+}
 
 } // namespace OpenXcom

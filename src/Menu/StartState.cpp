@@ -19,8 +19,8 @@
 #include "StartState.h"
 #include "../Engine/EngineContext.h"
 #include "../Engine/Resource/ResourceSystem.h"
-#include "../Engine/Resource/Font/FontManager.h"
-#include "../Engine/Resource/Font/DosFont.h"
+#include "../Engine/Graphics/Font/FontManager.h"
+#include "../Engine/Graphics/Font/DosFont.h"
 #include "../Engine/Graphics/Palette/PaletteManager.h"
 
 #include <glm/vec4.hpp>

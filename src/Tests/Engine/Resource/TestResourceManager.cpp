@@ -38,12 +38,12 @@ public:
 	{
 	}
 
-	ResourceManager<MockData>::OwningHandle load(const std::string& name)
+	OwningHandle<MockData> load(const std::string& name)
 	{
 		std::unique_ptr<MockData> data = std::make_unique<MockData>();
 		data->name = name;
 
-		ResourceManager<MockData>::OwningHandle handle = add(std::move(data));
+		OwningHandle<MockData> handle = add(std::move(data));
 		return handle;
 	}
 };
@@ -51,7 +51,7 @@ public:
 TEST(ResourceManagerTest, TestResourceManager)
 {
 	MockResourceManager manager;
-	MockResourceManager::OwningHandle handle = manager.load("test");
+	OwningHandle<MockData> handle = manager.load("test");
 	ASSERT_TRUE(manager.exists(handle));
 
 	MockData& data = manager.get(handle);

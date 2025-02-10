@@ -40,7 +40,7 @@ extern "C" {
 // wrap in an anonymous namespace to avoid name conflicts
 namespace
 {
-#include "../../../Engine/Resource/Font/DosFont.h"
+#include "../../../Engine/Graphics/Font/DosFont.h"
 }
 
 
@@ -63,7 +63,7 @@ protected:
 	std::filesystem::path _configPath;
 	std::filesystem::path _userPath;
 
-	PaletteManager::OwningHandle _paletteHandle;
+	OwningHandle<Palette> _paletteHandle;
 
 	void SetUp() override
 	{

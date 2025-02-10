@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../Handle.h"
+#include "../../Resource/Handle.h"
 
 #include <string>
 #include <array>
@@ -53,6 +53,8 @@ struct PositionedGlyph
 class Font
 {
 private:
+	const std::string _name;
+
 	OwningHandle<DeviceImage> _fontTexture; // The font atlas
 	hb_face_t* _hbFace = nullptr;
 	hb_font_t* _hbFont = nullptr;
@@ -68,8 +70,10 @@ private:
 	void initializeHarfBuzz();
 
 public:
-	Font(OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
+	Font(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
 	~Font();
+
+	const std::string& getName() const { return _name; }
 
 	const Glyph* getGlyph(char32_t codepoint) const;
 

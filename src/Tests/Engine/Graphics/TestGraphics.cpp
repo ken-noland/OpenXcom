@@ -52,7 +52,7 @@ protected:
 	std::unique_ptr<GameSurface> _gameSurface;
 	std::unique_ptr<WindowSurface> _windowSurface;
 
-	PaletteManager::OwningHandle _paletteHandle;
+	OwningHandle<Palette> _paletteHandle;
 
 	static void SetUpTestSuite()
 	{
