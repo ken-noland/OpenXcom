@@ -379,12 +379,12 @@ glm::ivec2 VulkanWindowedSurface::getExtent() const
 
 void VulkanWindowedSurface::copyFrom(HostImage& hostImage)
 {
-	throw new std::runtime_error("Not implemented");
+	throw new std::runtime_error("VulkanWindowedSurface::copyFrom(HostImage& hostImage) Not implemented");
 }
 
 void VulkanWindowedSurface::copyTo(HostImage& hostImage)
 {
-	throw new std::runtime_error("Not implemented");
+	throw new std::runtime_error("VulkanWindowedSurface::copyTo(HostImage& hostImage) Not implemented");
 }
 
 GraphicsCommand& VulkanWindowedSurface::beginCommandPass()

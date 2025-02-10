@@ -39,19 +39,19 @@ public:
 
 	virtual IStreamPtr openRead() override
 	{
-		throw std::runtime_error("Not implemented");
+		throw std::runtime_error("IStreamPtr EmbeddedFileEntry::openRead() Not implemented");
 		return nullptr;
 	}
 
 	virtual OStreamPtr openWrite() override
 	{
-		throw std::runtime_error("Not implemented");
+		throw std::runtime_error("OStreamPtr EmbeddedFileEntry::openWrite() Not implemented");
 		return nullptr;
 	}
 
 	virtual IOStreamPtr open() override
 	{
-		throw std::runtime_error("Not implemented");
+		throw std::runtime_error("IOStreamPtr EmbeddedFileEntry::open() Not implemented");
 		return nullptr;
 	}
 
@@ -73,7 +73,7 @@ public:
 
 	virtual VFSEntryPtr dereference() const override
 	{
-		throw std::runtime_error("Not implemented");
+		throw std::runtime_error("VFSEntryPtr EmbeddedFileIteratorImpl::dereference() Not implemented");
 		return nullptr;
 	}
 

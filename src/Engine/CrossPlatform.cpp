@@ -119,7 +119,7 @@ static char const *getHome()
  */
 std::vector<std::string> findDataFolders()
 {
-	assert(!"Not implemented");
+	assert(!"std::vector<std::string> findDataFolders() Not implemented");
 	std::vector<std::string> list;
 	//#ifdef __MORPHOS__
 //	list.push_back("PROGDIR:");
@@ -237,7 +237,7 @@ std::vector<std::string> findDataFolders()
  */
 std::vector<std::string> findUserFolders()
 {
-	assert(!"Not implemented");
+	assert(!"std::vector<std::string> findUserFolders() Not implemented");
 	std::vector<std::string> list;
 	//
 //#ifdef __MORPHOS__
@@ -320,7 +320,7 @@ std::vector<std::string> findUserFolders()
  */
 std::string findConfigFolder()
 {
-	assert(!"Not implemented");
+	assert(!"std::string findConfigFolder() Not implemented");
 // #ifdef __MORPHOS__
 //	return "PROGDIR:";
 //#endif
@@ -352,7 +352,7 @@ std::string findConfigFolder()
 
 std::string searchDataFile(const std::string &filename)
 {
-	assert(!"Not implemented");
+	assert(!"std::string searchDataFile(const std::string &filename) Not implemented");
 	//// Correct folder separator
 	//std::string name = filename;
 
@@ -379,7 +379,7 @@ std::string searchDataFile(const std::string &filename)
 
 std::string searchDataFolder(const std::string &foldername)
 {
-	assert(!"Not implemented");
+	assert(!"std::string searchDataFolder(const std::string &foldername) Not implemented");
 	//// Correct folder separator
 	//std::string name = foldername;
 	//std::string path;
@@ -424,7 +424,7 @@ std::string searchDataFolder(const std::string &foldername)
  */
 bool createFolder(const std::string &path)
 {
-	assert(!"Not implemented");
+	assert(!"bool createFolder(const std::string &path) Not implemented");
 	return false;
 // #ifdef _WIN32
 //	auto pathW = pathToWindows(path);
@@ -451,7 +451,7 @@ bool createFolder(const std::string &path)
  */
 std::string convertPath(const std::string &path)
 {
-	assert(!"Not implemented");
+	assert(!"std::string convertPath(const std::string &path) Not implemented");
 	//if (!path.empty() && path.at(path.size() - 1) != '/')
 	//	return path + '/';
 	return path;
@@ -478,7 +478,7 @@ std::string convertPath(const std::string &path)
  */
 FolderContents getFolderContents(const std::string &path, const std::string &ext)
 {
-	assert(!"Not implemented");
+	assert(!"FolderContents getFolderContents(const std::string &path, const std::string &ext) Not implemented");
 	std::vector<std::tuple<std::string, bool, time_t>> files;
 	//#ifdef _WIN32
 //	auto search_path = path + "/*";
@@ -545,7 +545,7 @@ FolderContents getFolderContents(const std::string &path, const std::string &ext
  */
 bool folderExists(const std::string &path)
 {
-	assert(!"Not implemented");
+	assert(!"bool folderExists(const std::string &path) Not implemented");
 	return false;
 //#ifdef _WIN32
 //	auto pathW = pathToWindows(path);
@@ -573,7 +573,7 @@ bool folderExists(const std::string &path)
  */
 bool fileExists(const std::string &path)
 {
-	assert(!"Not implemented");
+	assert(!"bool fileExists(const std::string &path) Not implemented");
 	return false;
 //#ifdef _WIN32
 //	auto pathW = pathToWindows(path);
@@ -601,7 +601,7 @@ bool fileExists(const std::string &path)
  */
 bool deleteFile(const std::string &path)
 {
-	assert(!"Not implemented");
+	assert(!"bool deleteFile(const std::string &path) Not implemented");
 	return false;
 //#ifdef _WIN32
 //	auto pathW = pathToWindows(path);
@@ -618,7 +618,7 @@ bool deleteFile(const std::string &path)
  */
 std::string baseFilename(const std::string &path)
 {
-	assert(!"Not implemented");
+	assert(!"std::string baseFilename(const std::string &path) Not implemented");
 	size_t sep = path.find_last_of('/');
 	std::string filename;
 	if (sep == std::string::npos)
@@ -643,7 +643,7 @@ std::string baseFilename(const std::string &path)
  */
 std::string dirFilename(const std::string &path)
 {
-	assert(!"Not implemented");
+	assert(!"std::string dirFilename(const std::string &path) Not implemented");
 	size_t sep = path.find_last_of('/');
 	std::string filename;
 	if (sep == std::string::npos)
@@ -668,7 +668,7 @@ std::string dirFilename(const std::string &path)
  */
 std::string sanitizeFilename(const std::string &filename)
 {
-	assert(!"Not implemented");
+	assert(!"std::string sanitizeFilename(const std::string &filename) Not implemented");
 	std::string newFilename = filename;
 	for (std::string::iterator i = newFilename.begin(); i != newFilename.end(); ++i)
 	{
@@ -698,7 +698,7 @@ std::string sanitizeFilename(const std::string &filename)
  */
 std::string noExt(const std::string &filename)
 {
-	assert(!"Not implemented");
+	assert(!"std::string noExt(const std::string &filename) Not implemented");
 	size_t dot = filename.find_last_of('.');
 	if (dot == std::string::npos)
 	{
@@ -715,7 +715,7 @@ std::string noExt(const std::string &filename)
  */
 std::string getExt(const std::string &filename)
 {
-	assert(!"Not implemented");
+	assert(!"std::string getExt(const std::string &filename) Not implemented");
 	size_t dot = filename.find_last_of('.');
 	if (dot == std::string::npos)
 	{
@@ -732,7 +732,7 @@ std::string getExt(const std::string &filename)
  */
 bool compareExt(const std::string &filename, const std::string &extension)
 {
-	assert(!"Not implemented");
+	assert(!"bool compareExt(const std::string &filename, const std::string &extension) Not implemented");
 	if (extension.empty())
 		return true;
 	int j = (int)(filename.length() - extension.length());
@@ -754,7 +754,7 @@ bool compareExt(const std::string &filename, const std::string &extension)
  */
 std::string getLocale()
 {
-	assert(!"Not implemented");
+	assert(!"std::string getLocale() Not implemented");
 	return "en-en";
 
 //#ifdef _WIN32
@@ -804,7 +804,7 @@ std::string getLocale()
  */
 bool isQuitShortcut(const SDL_Event &ev)
 {
-	assert(!"Not implemented");
+	assert(!"bool isQuitShortcut(const SDL_Event &ev) Not implemented");
 // SDLHACK
 //#ifdef _WIN32
 //	// Alt + F4
@@ -826,7 +826,7 @@ bool isQuitShortcut(const SDL_Event &ev)
  */
 time_t getDateModified(const std::string &path)
 {
-	assert(!"Not implemented");
+	assert(!"time_t getDateModified(const std::string &path) Not implemented");
 	return 0;
 //#ifdef _WIN32
 //	time_t rv = 0;
@@ -862,7 +862,7 @@ time_t getDateModified(const std::string &path)
  */
 std::pair<std::string, std::string> timeToString(time_t time)
 {
-	assert(!"Not implemented");
+	assert(!"std::pair<std::string, std::string> timeToString(time_t time) Not implemented");
 	char localDate[25], localTime[25];
 
 /*#ifdef _WIN32
@@ -895,7 +895,7 @@ std::pair<std::string, std::string> timeToString(time_t time)
  */
 bool moveFile(const std::string &src, const std::string &dest)
 {
-	assert(!"Not implemented");
+	assert(!"bool moveFile(const std::string &src, const std::string &dest) Not implemented");
 	return false;
 //#ifdef _WIN32
 //	auto srcW = pathToWindows(src);
@@ -934,7 +934,7 @@ bool moveFile(const std::string &src, const std::string &dest)
  */
 bool copyFile(const std::string& src, const std::string& dest)
 {
-	assert(!"Not implemented");
+	assert(!"bool copyFile(const std::string& src, const std::string& dest) Not implemented");
 //#ifdef _WIN32
 //	auto srcW = pathToWindows(src);
 //	auto dstW = pathToWindows(dest);
@@ -950,7 +950,7 @@ bool copyFile(const std::string& src, const std::string& dest)
  * @return if we did write it.
  */
 bool writeFile(const std::string& filename, const std::string& data) {
-	assert(!"Not implemented");
+	assert(!"bool writeFile(const std::string& filename, const std::string& data) Not implemented");
 // SDLHACK
 	//// Even SDL1 file IO accepts UTF-8 file names on windows.
 	//SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "w");
@@ -974,7 +974,7 @@ bool writeFile(const std::string& filename, const std::string& data) {
  * @return if we did write it.
  */
 bool writeFile(const std::string& filename, const std::vector<unsigned char>& data) {
-	assert(!"Not implemented");
+	assert(!"bool writeFile(const std::string& filename, const std::vector<unsigned char>& data) Not implemented");
 // SDLHACK
 	//// Even SDL1 file IO accepts UTF-8 file names on windows.
 	//SDL_RWops *rwops = SDL_RWFromFile(filename.c_str(), "wb");
@@ -1067,7 +1067,7 @@ bool writeFile(const std::string& filename, const std::vector<unsigned char>& da
  */
 void flashWindow()
 {
-assert(!"Not implemented");
+assert(!"void flashWindow() Not implemented");
 #ifdef _WIN32
 // SDLHACK
 	//SDL_SysWMinfo wminfo;
@@ -1087,7 +1087,7 @@ assert(!"Not implemented");
  */
 std::string getDosPath()
 {
-assert(!"Not implemented");
+assert(!"std::string getDosPath() Not implemented");
 #ifdef _WIN32
 	std::string path, bufstr;
 	char buf[MAX_PATH];
@@ -1305,7 +1305,7 @@ void stackTrace(void *ctx)
  */
 void crashDump(void *ex, const std::string &err)
 {
-	assert(!"Not implemented");
+	assert(!"void crashDump(void *ex, const std::string &err) Not implemented");
 //	std::ostringstream error;
 //#ifdef _MSC_VER
 //	PEXCEPTION_POINTERS exception = (PEXCEPTION_POINTERS)ex;
@@ -1475,7 +1475,7 @@ SDL_RWops *getEmbeddedAsset(const std::string& assetName) {
  */
 bool testInternetConnection(const std::string& url)
 {
-	assert(!"Not implemented");
+	assert(!"bool testInternetConnection(const std::string& url) Not implemented");
 	return false;
 //#ifdef _WIN32
 //	auto urlW = pathToWindows(url, false);
@@ -1494,7 +1494,7 @@ bool testInternetConnection(const std::string& url)
  */
 bool downloadFile(const std::string& url, const std::string& filename)
 {
-	assert(!"Not implemented");
+	assert(!"bool downloadFile(const std::string& url, const std::string& filename) Not implemented");
 	return false;
 //#ifdef _WIN32
 //	auto urlW = pathToWindows(url, false);
@@ -1512,7 +1512,7 @@ bool downloadFile(const std::string& url, const std::string& filename)
  */
 std::array<int, 4> parseVersion(const std::string& newVersion)
 {
-	assert(!"Not implemented");
+	assert(!"std::array<int, 4> parseVersion(const std::string& newVersion) Not implemented");
 
 	std::array<int, 4> newOxceVersion = {};
 	return newOxceVersion;
@@ -1546,7 +1546,7 @@ std::array<int, 4> parseVersion(const std::string& newVersion)
  */
 bool isHigherThanCurrentVersion(const std::string& newVersion)
 {
-	assert(!"Not implemented");
+	assert(!"bool isHigherThanCurrentVersion(const std::string& newVersion) Not implemented");
 	return false;
 	//return isHigherThanCurrentVersion(parseVersion(newVersion), {OPENXCOM_VERSION_NUMBER});
 }
@@ -1559,7 +1559,7 @@ bool isHigherThanCurrentVersion(const std::string& newVersion)
  */
 bool isHigherThanCurrentVersion(const std::array<int, 4>& newOxceVersion, const int (&ver)[4])
 {
-	assert(!"Not implemented");
+	assert(!"bool isHigherThanCurrentVersion(const std::array<int, 4>& newOxceVersion, const int (&ver)[4]) Not implemented");
 	return false;
 	//bool isHigher = false;
 
@@ -1585,7 +1585,7 @@ bool isHigherThanCurrentVersion(const std::array<int, 4>& newOxceVersion, const 
  */
 std::string getExeFolder()
 {
-	assert(!"Not implemented");
+	assert(!"std::string getExeFolder() Not implemented");
 	return "";
 //#ifdef _WIN32
 //	wchar_t dest[MAX_PATH + 1];
@@ -1606,7 +1606,7 @@ std::string getExeFolder()
  */
 std::string getExeFilename(bool includingPath)
 {
-	assert(!"Not implemented");
+	assert(!"std::string getExeFilename(bool includingPath) Not implemented");
 // #ifdef _WIN32
 //	wchar_t dest[MAX_PATH + 1];
 //	if (GetModuleFileNameW(NULL, dest, MAX_PATH) != 0)
@@ -1632,7 +1632,7 @@ std::string getExeFilename(bool includingPath)
  */
 void startUpdateProcess()
 {
-	assert(!"Not implemented");
+	assert(!"startUpdateProcess() Not implemented");
 //#ifdef _WIN32
 //	auto operationW = pathToWindows("open", false);
 //	auto fileW = pathToWindows("oxce-upd.bat", false);

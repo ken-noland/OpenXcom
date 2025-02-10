@@ -68,12 +68,12 @@ VulkanHeadlessSurface::~VulkanHeadlessSurface()
 
 void VulkanHeadlessSurface::copyFrom(HostImage& hostImage)
 {
-	throw new std::runtime_error("Not implemented");
+	throw new std::runtime_error("VulkanHeadlessSurface::copyFrom(HostImage& hostImage) Not implemented");
 }
 
 void VulkanHeadlessSurface::copyTo(HostImage& hostImage)
 {
-	throw new std::runtime_error("Not implemented");
+	throw new std::runtime_error("VulkanHeadlessSurface::copyTo(HostImage& hostImage) Not implemented");
 }
 
 

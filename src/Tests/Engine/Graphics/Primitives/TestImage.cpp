@@ -21,6 +21,8 @@
 #include "../../../../Engine/Graphics/Primitive/ImagePrimitive.h"
 #include "../../../../Engine/Graphics/Primitive/PrimitiveFactory.h"
 
+#include "../../../../Engine/Graphics/Buffer/BufferManager.h"
+
 #include <filesystem>
 #include <memory>
 
@@ -44,5 +46,26 @@ protected:
 
 TEST_F(GraphicsImageTest, TestBasicImage)
 {
-	throw std::runtime_error("Not implemented");
+
+	ImageFile imageFile = createImage();
+
+	ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();
+	ImageManager& imageManager = resourceSystem.getImageManager();
+
+	//transfer the image to device
+	OwningHandle<DeviceImage> deviceImage = imageManager.createDeviceImage(imageFile.getImage());
+
+	std::unique_ptr<ImagePrimitive> image = _gameSurface->getRenderTarget().getPrimitiveFactory().createImagePrimitive({0, 0}, {0, 0}, {32, 32}, deviceImage.getHandle(), imageFile.getPaletteHandle());
+	ASSERT_TRUE(image);
+
+	// draw the line
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&image](GraphicsCommand& command) {
+		image->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "010_game_surface_image_1.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
 }

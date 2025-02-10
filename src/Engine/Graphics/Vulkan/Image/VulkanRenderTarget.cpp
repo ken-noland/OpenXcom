@@ -264,7 +264,7 @@ void VulkanRenderTarget::destroy()
 
 void VulkanRenderTarget::copyFrom(HostImage& hostImage)
 {
-	throw new std::runtime_error("Not implemented");
+	throw new std::runtime_error("ulkanRenderTarget::copyFrom(HostImage& hostImage) Not implemented");
 }
 
 void VulkanRenderTarget::copyTo(HostImage& image)

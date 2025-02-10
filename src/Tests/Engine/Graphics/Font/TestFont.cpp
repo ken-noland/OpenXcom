@@ -16,31 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <gtest/gtest.h>
+#include "../../_TestEngine.h"
 
 #include "../../../../Engine/Engine.h"
-#include "../../../../Engine/Resource/ResourceSystem.h"
-#include "../../../../Engine/Resource/FileProcessor/ImageFile.h"
-#include "../../../../Engine/Resource/FileProcessor/ImageFileProcessor.h"
-#include "../../../../Engine/Resource/FileProcessor/ImageBMPFileProcessor.h"
-#include "../../../../Engine/Resource/FileProcessor/ImagePNGFileProcessor.h"
-#include "../../../../Engine/Graphics/Buffer/Buffer.h"
-#include "../../../../Engine/Graphics/Buffer/BufferManager.h"
-#include "../../../../Engine/Graphics/Image/Image.h"
-#include "../../../../Engine/Graphics/Image/ImageManager.h"
-#include "../../../../Engine/Graphics/Palette/Palette.h"
-#include "../../../../Engine/Graphics/Palette/PaletteManager.h"
 #include "../../../../Engine/Graphics/Font/Font.h"
 #include "../../../../Engine/Graphics/Font/FontManager.h"
+#include "../../../../Engine/Resource/ResourceSystem.h"
+#include "../../../../Engine/Resource/FileProcessor/ImageFile.h"
+#include "../../../../Engine/Resource/FileProcessor/ImageBMPFileProcessor.h"
 
 #include <memory>
-#include <filesystem>
-#include <cmath>
-#include <algorithm>
-#include <numbers>
-#include <unordered_map>
 #include <array>
-
 
 #include <hb.h>
 
@@ -161,61 +147,17 @@ std::array<Glyph, 128> getAsciiGlyphs()
 	return asciiGlyphs;
 }
 
-class FontTest : public ::testing::Test
+class FontTest : public TestEngineSuite
 {
 protected:
-	static std::unique_ptr<Engine> _engine;
 
-	static std::filesystem::path _dataPath;
-	static std::filesystem::path _configPath;
-	static std::filesystem::path _userPath;
-
-	static OwningHandle<Palette> _paletteHandle;
-
+	OwningHandle<Palette> _paletteHandle;
 	std::unique_ptr<Font> _font;
-
-	static void SetUpTestSuite()
-	{
-		std::filesystem::path path = TEST_DATA_DIR;
-		_dataPath = path / "Data";
-		_configPath = path / "Config";
-		_userPath = path / "User";
-
-		std::vector<std::string> args = {"-data", _dataPath.string(), "-config", _configPath.string(), "-user", _userPath.string(), "-headless"};
-		_engine = std::make_unique<Engine>(args);
-
-		// Set up a palette, if your BMP relies on a specific palette (indexed mode)
-		PackedColor paletteData[] = {
-			0x000000FF, // 0 - Black
-			0xFFFFFFFF, // 1 - White
-			0x808080FF, // 2 - Gray
-			0xFF0000FF, // 3 - Red
-			0x00FF00FF, // 4 - Green
-			0x0000FFFF, // 5 - Blue
-			0xFFFF00FF, // 6 - Yellow
-			0xFF00FFFF, // 7 - Magenta
-			0x00FFFFFF, // 8 - Cyan
-			0xFFA500FF, // 9 - Orange
-			0x8A2BE2FF, // 10 - Blue Violet
-			0x008080FF, // 11 - Teal
-			0x4B0082FF, // 12 - Indigo
-			0x800000FF, // 13 - Maroon
-			0x808000FF, // 14 - Olive
-			0x8B4513FF  // 15 - Saddle Brown
-		};
-
-		PaletteManager& paletteManager = _engine->getEngineContext().getResourceSystem().getPaletteManager();
-		_paletteHandle = paletteManager.createPalette("16colors", paletteData, 16);
-	}
-
-	static void TearDownTestSuite()
-	{
-		_paletteHandle.release();
-		_engine.reset();
-	}
 
 	void SetUp() override
 	{
+		_paletteHandle = create16ColorPalette();
+
 		ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();
 
 		// Load the DOS font
@@ -233,17 +175,12 @@ protected:
 
 	void TearDown() override
 	{
+		_paletteHandle.release();
 		_font.reset();
 	}
 };
 
-std::unique_ptr<Engine> FontTest::_engine(nullptr);
 
-std::filesystem::path FontTest::_dataPath;
-std::filesystem::path FontTest::_configPath;
-std::filesystem::path FontTest::_userPath;
-
-OwningHandle<Palette> FontTest::_paletteHandle;
 
 TEST_F(FontTest, TestSomeAsciiCharacters)
 {
@@ -601,7 +538,6 @@ std::vector<TextSection> parseText(const std::string& rawText, const ResourceHan
 	return sections;
 }
 
-
 TEST_F(FontTest, TestTextColorSections)
 {
 	// Using ANSI escape characters to change text color
@@ -609,5 +545,5 @@ TEST_F(FontTest, TestTextColorSections)
 
 //	TextPrimitiveFactory = 
 //	std::unique_ptr<TextPrimitive> textPrimitive =
-	throw std::runtime_error("Not implemented");
+	throw std::runtime_error("TestTextColorSections Not implemented");
 }
