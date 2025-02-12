@@ -43,6 +43,14 @@ class Font;
 template <typename ResourceType>
 class ResourceHandle;
 
+enum class TextAlignment
+{
+	Left,
+	Center,
+	Right
+};
+
+
 struct TextVertex
 {
 	glm::ivec2 position;
@@ -58,6 +66,8 @@ struct TextStyle
 
 struct TextSettings
 {
+	TextAlignment alignment;
+
 	glm::ivec2 extents;
 	glm::ivec2 offset;
 
@@ -77,8 +87,13 @@ struct TextSection
 struct TextLine
 {
 	std::string_view line;
-	int32_t y_offset;
-	int32_t y_height;
+
+	int32_t yOffset;
+	int32_t yHeight;
+
+	int32_t lineWidth;
+
+	TextAlignment alignment;
 };
 
 class TextPrimitive : public Primitive
@@ -91,12 +106,13 @@ protected:
 
 	std::vector<TextSection> _sections;
 	std::vector<TextLine> _lines;
+	std::vector<PositionedGlyph> _glyphs;
 
 	std::unique_ptr<PipelineBinding> _pipelineBinding;
 	std::unique_ptr<DeviceBuffer> _vertexBuffer;
 
-	std::vector<TextSection> parseTextSections();
-	std::vector<TextLine> wrapText();
+	void processTextSections();
+	void processLineShaping();
 	void generateGlyphs();
 
 public:

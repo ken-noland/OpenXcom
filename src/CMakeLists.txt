@@ -678,7 +678,7 @@ target_link_libraries(openxcom_base_lib PUBLIC ${openxcom_libs})
 
 if (MSVC)
     #mod.cpp is so massive that MSVC has trouble keeping it all in a single object, so we need to split it up with this command
-    target_compile_options(openxcom_base_lib PRIVATE /bigobj /utf-8)
+    target_compile_options(openxcom_base_lib PRIVATE /bigobj /utf-8 /wd4828)
 elseif (UNIX)
     # Enable all warnings for the base library
     # -Wno-nullability-completeness add a target compiler option to disable warnings for VMA

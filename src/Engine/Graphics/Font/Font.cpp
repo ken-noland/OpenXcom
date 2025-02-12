@@ -123,13 +123,13 @@ glm::ivec2 Font::getTextExtents(const std::string_view& text) const
 
 
 // Generates positioned glyphs for rendering
-std::vector<PositionedGlyph> Font::shapeText(const std::string& text, glm::ivec2 position) const
+std::vector<PositionedGlyph> Font::shapeText(const std::string_view& text, glm::ivec2 position) const
 {
 	std::vector<PositionedGlyph> positionedGlyphs;
 
 	hb_buffer_t* buffer = hb_buffer_create();
 	int size = static_cast<int>(text.size());
-	hb_buffer_add_utf8(buffer, text.c_str(), size, 0, size);
+	hb_buffer_add_utf8(buffer, text.data(), size, 0, size);
 	hb_buffer_guess_segment_properties(buffer);
 
 	hb_shape(_hbFont, buffer, nullptr, 0);
@@ -163,110 +163,5 @@ std::vector<PositionedGlyph> Font::shapeText(const std::string& text, glm::ivec2
 	hb_buffer_destroy(buffer);
 	return positionedGlyphs;
 }
-
-std::vector<PositionedGlyph> Font::wrappedText(const std::string& text, glm::ivec2 position, int maxWidth) const
-{
-	std::vector<PositionedGlyph> allGlyphs;
-	size_t textLen = text.size();
-
-	// Allocate a buffer for break properties for each byte of the UTF-8 text.
-	std::vector<char> breakProps(textLen);
-	set_linebreaks_utf8(reinterpret_cast<const utf8_t*>(text.c_str()), textLen, "", breakProps.data());
-
-	size_t start = 0;
-	int currentY = position.y;
-	const int lineHeight = 16;            // Fixed height of the bitmap font.
-	const int lineSpacing = _lineSpacing; // Assume _lineSpacing is defined in Font.
-
-	while (start < textLen)
-	{
-		size_t bestBreak = start;
-		size_t lastAllowBreak = start; // Track the last index where LINEBREAK_ALLOWBREAK was seen.
-		bool encounteredMustBreak = false;
-		size_t pos = start;
-
-		// Extend candidate from 'start' until either the candidate exceeds maxWidth
-		// or we run out of text.
-		while (pos < textLen)
-		{
-			char flag = breakProps[pos];
-
-			// If a mandatory break is encountered, set bestBreak and exit immediately.
-			if (flag == LINEBREAK_MUSTBREAK)
-			{
-				bestBreak = pos + 1;
-				encounteredMustBreak = true;
-				break;
-			}
-
-			// Record a candidate break if allowed.
-			if (flag == LINEBREAK_ALLOWBREAK)
-			{
-				lastAllowBreak = pos + 1;
-			}
-
-			// Create candidate substring from 'start' to pos (inclusive).
-			std::string candidate = text.substr(start, pos - start + 1);
-			int32_t candidateWidth = getTextExtents(candidate).x;
-
-			// If candidate fits within maxWidth, update bestBreak.
-			if (candidateWidth <= maxWidth)
-			{
-				bestBreak = pos + 1;
-			}
-			else
-			{
-				// Candidate too wide: break out of the loop.
-				break;
-			}
-			pos++;
-		}
-
-		// If we reached the end of text and the candidate still fits, take the rest.
-		if (pos >= textLen)
-		{
-			std::string candidate = text.substr(start, textLen - start);
-			if (getTextExtents(candidate).x <= maxWidth)
-			{
-				bestBreak = textLen;
-			}
-			else if (bestBreak == start && lastAllowBreak > start)
-			{
-				// If the very first candidate exceeded maxWidth, but we had an allowed break earlier,
-				// use that instead.
-				bestBreak = lastAllowBreak;
-			}
-		}
-
-		// If no progress was made and we haven't encountered a MUSTBREAK,
-		// force a break after one character.
-		if (bestBreak == start)
-		{
-			bestBreak = start + 1;
-		}
-
-		// If we haven't encountered a MUSTBREAK and we have a valid allowed break,
-		// prefer that if the candidate with it still fits.
-		else if (!encounteredMustBreak && lastAllowBreak > start)
-		{
-			std::string candidate = text.substr(start, lastAllowBreak - start);
-			if (getTextExtents(candidate).x <= maxWidth)
-			{
-				bestBreak = lastAllowBreak;
-			}
-		}
-
-		// Extract the line text.
-		std::string lineStr = text.substr(start, bestBreak - start);
-		// Shape the line at the desired starting x and current y.
-		std::vector<PositionedGlyph> lineGlyphs = this->shapeText(lineStr, glm::ivec2(position.x, currentY));
-		allGlyphs.insert(allGlyphs.end(), lineGlyphs.begin(), lineGlyphs.end());
-
-		start = bestBreak;
-		currentY += lineHeight + lineSpacing;
-	}
-	return allGlyphs;
-}
-
 
 } // namespace OpenXcom

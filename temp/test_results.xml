@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="2" failures="1" disabled="0" errors="0" time="6.817" timestamp="2025-02-11T16:57:09.580" name="AllTests">
-  <testsuite name="GraphicsTextTest" tests="2" failures="1" disabled="0" skipped="0" errors="0" time="5.622" timestamp="2025-02-11T16:57:10.691">
-    <testcase name="TestHelloWorld" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp" line="50" status="run" result="completed" time="0.002" timestamp="2025-02-11T16:57:10.691" classname="GraphicsTextTest">
-      <failure message="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp:59&#x0A;Expected equality of these values:&#x0A;  1&#x0A;  lines.size()&#x0A;    Which is: 0" type=""><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp:59
-Expected equality of these values:
-  1
-  lines.size()
-    Which is: 0]]></failure>
-      <failure message="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp:62&#x0A;Expected equality of these values:&#x0A;  1&#x0A;  sections.size()&#x0A;    Which is: 0" type=""><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp:62
-Expected equality of these values:
-  1
-  sections.size()
-    Which is: 0]]></failure>
-    </testcase>
-    <testcase name="TestColorSections" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp" line="68" status="run" result="completed" time="5.619" timestamp="2025-02-11T16:57:10.694" classname="GraphicsTextTest" />
+<testsuites tests="1" failures="0" disabled="0" errors="0" time="7.752" timestamp="2025-02-12T17:29:37.207" name="AllTests">
+  <testsuite name="GraphicsTextTest" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="6.517" timestamp="2025-02-12T17:29:38.360">
+    <testcase name="TestMultiNewLine" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp" line="260" status="run" result="completed" time="6.515" timestamp="2025-02-12T17:29:38.361" classname="GraphicsTextTest" />
   </testsuite>
 </testsuites>

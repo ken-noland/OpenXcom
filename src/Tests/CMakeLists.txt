@@ -48,7 +48,7 @@ target_compile_definitions(openxcom_tests PRIVATE
 )
 
 if (MSVC)
-    target_compile_options(openxcom_tests PRIVATE /utf-8)
+    target_compile_options(openxcom_tests PRIVATE /utf-8 /wd4828)
 endif()
 
 # Link Google Test libraries with your test executable

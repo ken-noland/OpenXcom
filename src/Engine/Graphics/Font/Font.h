@@ -83,8 +83,7 @@ public:
 	void setLineSpacing(uint32_t lineSpacing) { _lineSpacing = lineSpacing; }
 	uint32_t getLineSpacing() const { return _lineSpacing; }
 
-	std::vector<PositionedGlyph> shapeText(const std::string& text, glm::ivec2 position) const;
-	std::vector<PositionedGlyph> wrappedText(const std::string& text, glm::ivec2 position, int maxWidth) const;
+	std::vector<PositionedGlyph> shapeText(const std::string_view& text, glm::ivec2 position) const;
 };
 
 }
