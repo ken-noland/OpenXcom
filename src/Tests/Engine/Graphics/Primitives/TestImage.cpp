@@ -46,7 +46,6 @@ protected:
 
 TEST_F(GraphicsImageTest, TestBasicImage)
 {
-
 	ImageFile imageFile = createImage();
 
 	ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();

@@ -21,6 +21,7 @@
 #include "LinePrimitive.h"
 #include "PointPrimitive.h"
 #include "ImagePrimitive.h"
+#include "TextPrimitive.h"
 
 namespace OpenXcom
 {
@@ -30,7 +31,8 @@ PrimitiveFactory::PrimitiveFactory(EngineContext& context, RenderTarget& surface
 	  _lineFactory(context, surface, _shaders),
 	  _boxFactory(context, surface, _shaders),
 	  _pointFactory(context, surface, _shaders),
-	  _imageFactory(context, surface, _shaders)
+	  _imageFactory(context, surface, _shaders),
+	  _textFactory(context, surface, _shaders)
 {
 }
 
@@ -73,6 +75,9 @@ std::unique_ptr<ImagePrimitive> PrimitiveFactory::createImagePrimitive(glm::ivec
 	return _imageFactory.createImagePrimitive(dst, src, extents, image, palette);
 }
 
-
+std::unique_ptr<TextPrimitive> PrimitiveFactory::createTextPrimitive(const std::string& text, const TextSettings& settings)
+{
+	return _textFactory.createTextPrimitive(text, settings);
+}
 
 } // namespace OpenXcom

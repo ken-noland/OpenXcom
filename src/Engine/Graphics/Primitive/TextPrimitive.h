@@ -18,6 +18,9 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Primitive.h"
+
+#include "../Font/Font.h"
+
 #include <array>
 #include <memory>
 #include <vector>
@@ -40,20 +43,71 @@ class Font;
 template <typename ResourceType>
 class ResourceHandle;
 
+struct TextVertex
+{
+	glm::ivec2 position;
+	glm::ivec2 texCoord;
+};
+
+struct TextStyle
+{
+	uint8_t colorIndex;
+	uint8_t backgroundColorIndex;
+	bool underline;
+};
+
+struct TextSettings
+{
+	glm::ivec2 extents;
+	glm::ivec2 offset;
+
+	ResourceHandle<Font> defaultFontHandle;
+	ResourceHandle<Palette> defaultPaletteHandle;
+};
+
+struct TextSection
+{
+	std::string_view text;
+	TextStyle style;
+	ResourceHandle<Font> font;
+
+	std::vector<PositionedGlyph> glyphs;
+};
+
+struct TextLine
+{
+	std::string_view line;
+	int32_t y_offset;
+	int32_t y_height;
+};
+
 class TextPrimitive : public Primitive
 {
 protected:
 	EngineContext& _context;
 
+	std::string _text;
+	TextSettings _settings;
+
+	std::vector<TextSection> _sections;
+	std::vector<TextLine> _lines;
+
 	std::unique_ptr<PipelineBinding> _pipelineBinding;
 	std::unique_ptr<DeviceBuffer> _vertexBuffer;
 
+	std::vector<TextSection> parseTextSections();
+	std::vector<TextLine> wrapText();
+	void generateGlyphs();
+
 public:
 	TextPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,
-				  const std::string text, const ResourceHandle<Font>& defaultFontHandle, const ResourceHandle<Palette>& paletteHandle);
+				  const std::string text, const TextSettings& settings);
 	virtual ~TextPrimitive();
 
 	void setText(const std::string& text);
+
+	const std::vector<TextSection>& getSections() const { return _sections; }
+	const std::vector<TextLine>& getLines() const { return _lines; }
 
 	void draw(GraphicsCommand& command);
 };

@@ -21,6 +21,7 @@
 #include "LinePrimitiveFactory.h"
 #include "PointPrimitiveFactory.h"
 #include "ImagePrimitiveFactory.h"
+#include "TextPrimitiveFactory.h"
 
 #include "ShaderCollection.h"
 
@@ -38,6 +39,7 @@ protected:
 	LinePrimitiveFactory _lineFactory;
 	PointPrimitiveFactory _pointFactory;
 	ImagePrimitiveFactory _imageFactory;
+	TextPrimitiveFactory _textFactory;
 
 public:
 	PrimitiveFactory(EngineContext& context, RenderTarget& surface);
@@ -53,6 +55,8 @@ public:
 	std::unique_ptr<PointColorListPrimitive> createPointColorListPrimitive(const PointColorVertex* lines, size_t count, const ResourceHandle<Palette>& paletteHandle);
 
 	std::unique_ptr<ImagePrimitive> createImagePrimitive(glm::ivec2 dst, glm::ivec2 src, glm::ivec2 extents, const ResourceHandle<DeviceImage>& image, const ResourceHandle<Palette>& palette);
+
+	std::unique_ptr<TextPrimitive> createTextPrimitive(const std::string& text, const TextSettings& settings);
 };
 
 } // namespace OpenXcom

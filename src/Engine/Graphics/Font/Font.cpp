@@ -89,11 +89,16 @@ const Glyph* Font::getGlyph(char32_t codepoint) const
 
 glm::ivec2 Font::getTextExtents(const std::string& text) const
 {
+	return getTextExtents(std::string_view(text));
+}
+
+glm::ivec2 Font::getTextExtents(const std::string_view& text) const
+{
 	// Create a HarfBuzz buffer and add the UTF-8 text.
 	hb_buffer_clear_contents(_tempBuffer);
 
 	int size = static_cast<int>(text.size());
-	hb_buffer_add_utf8(_tempBuffer, text.c_str(), size, 0, size);
+	hb_buffer_add_utf8(_tempBuffer, text.data(), size, 0, size);
 	hb_buffer_guess_segment_properties(_tempBuffer);
 
 	// Shape the text using our HarfBuzz font.
@@ -115,6 +120,7 @@ glm::ivec2 Font::getTextExtents(const std::string& text) const
 	// For this bitmap font, the height is constant (e.g., 16 pixels).
 	return glm::ivec2(width, 16);
 }
+
 
 // Generates positioned glyphs for rendering
 std::vector<PositionedGlyph> Font::shapeText(const std::string& text, glm::ivec2 position) const
@@ -201,7 +207,7 @@ std::vector<PositionedGlyph> Font::wrappedText(const std::string& text, glm::ive
 
 			// Create candidate substring from 'start' to pos (inclusive).
 			std::string candidate = text.substr(start, pos - start + 1);
-			float candidateWidth = getTextExtents(candidate).x;
+			int32_t candidateWidth = getTextExtents(candidate).x;
 
 			// If candidate fits within maxWidth, update bestBreak.
 			if (candidateWidth <= maxWidth)

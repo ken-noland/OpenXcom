@@ -25,6 +25,7 @@ add_executable(
   "Engine/Graphics/Primitives/TestImage.cpp"
   "Engine/Graphics/Primitives/TestLine.cpp"
   "Engine/Graphics/Primitives/TestPoint.cpp"
+  "Engine/Graphics/Primitives/TestText.cpp"
   "Engine/Graphics/TestBMP.cpp"
   "Engine/Graphics/TestBuffer.cpp"
   "Engine/Graphics/TestGraphics.cpp"

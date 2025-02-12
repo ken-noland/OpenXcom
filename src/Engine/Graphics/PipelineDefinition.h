@@ -194,7 +194,7 @@ public:
 template <typename VertexType>
 ResourceLayoutBuilder& ResourceLayoutBuilder::setVertexType()
 {
-	assert(SimpleRTTR::types().has_type<VertexType>() && "IndexType not registered with SimpleRTTR");
+	assert(SimpleRTTR::types().has_type<VertexType>() && "VertexType not registered with SimpleRTTR");
 	return setVertexType(SimpleRTTR::types().get_type<VertexType>().value());
 }
 

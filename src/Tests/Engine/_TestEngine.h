@@ -26,15 +26,25 @@
 #include "../../Engine/Graphics/Image/ImageManager.h"
 #include "../../Engine/Graphics/Palette/Palette.h"
 #include "../../Engine/Graphics/Palette/PaletteManager.h"
+#include "../../Engine/Graphics/Font/Font.h"
+#include "../../Engine/Graphics/Font/FontManager.h"
 #include "../../Engine/Resource/Handle.h"
 #include "../../Engine/Resource/ResourceSystem.h"
 #include "../../Engine/Resource/FileProcessor/ImageFile.h"
+#include "../../Engine/Resource/FileProcessor/ImageBMPFileProcessor.h"
 
 #include <numbers>
 #include <filesystem>
 #include <algorithm>
 
 #include <lodepng.h>
+
+// wrap in an anonymous namespace to avoid name conflicts
+namespace
+{
+#include "../../Engine/Graphics/Font/DosFont.h"
+}
+
 
 class TestEngineSuite : public ::testing::Test
 {
@@ -321,6 +331,63 @@ public:
 		OpenXcom::OwningHandle<OpenXcom::Palette> paletteHandle = paletteManager.createPalette("squareColorWheelPalette", paletteColors, 256);
 
 		return OpenXcom::ImageFile(std::move(imageHandle), std::move(paletteHandle));
+	}
+
+	// helper function to get the glyph from the font
+	std::array<OpenXcom::Glyph, 128> getAsciiGlyphs()
+	{
+		std::array<OpenXcom::Glyph, 128> asciiGlyphs;
+		memset(asciiGlyphs.data(), 0, asciiGlyphs.size() * sizeof(OpenXcom::Glyph));
+
+		int charWidth = 9;
+		int charHeight = 16;
+		int textureWidth = 288;
+		int textureHeight = 48;
+		int charsPerRow = textureWidth / charWidth;
+
+		std::string characters =
+			" !\"#$%&'()*+,-./0123456789:;<=>?"
+			"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^"
+			"_`abcdefghijklmnopqrstuvwxyz{|}~";
+
+		for (size_t i = 0; i < characters.size(); i++)
+		{
+			int x = static_cast<int>((i % charsPerRow) * charWidth);
+			int y = static_cast<int>((i / charsPerRow) * charHeight);
+
+			assert(characters[i] < 127);
+
+			asciiGlyphs[characters[i]] = {
+				static_cast<uint16_t>(x),
+				static_cast<uint16_t>(y),
+				static_cast<uint16_t>(charWidth),
+				static_cast<uint16_t>(charHeight),
+				0, 0,
+				static_cast<int8_t>(charWidth) // Fixed width spacing
+			};
+		}
+
+		return asciiGlyphs;
+	}
+
+	OpenXcom::OwningHandle<OpenXcom::Font> createDosFont()
+	{
+		OpenXcom::ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();
+
+		//std::unique_ptr<OpenXcom::Font> font;
+
+		// Load the DOS font
+		OpenXcom::ImageFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, false);
+		OpenXcom::OwningHandle<OpenXcom::HostImage> hostFontTexture = fontTextureFile.takeImage();
+
+		// Transfer the host image to device so we can use it as a font texture
+		OpenXcom::OwningHandle<OpenXcom::DeviceImage> deviceFontTexture = resourceSystem.getImageManager().createDeviceImage(*hostFontTexture);
+
+		// Create the font object
+		OpenXcom::OwningHandle<OpenXcom::Font> font = resourceSystem.getFontManager().loadFont("dosFont", std::move(deviceFontTexture), getAsciiGlyphs());
+		font->setLineSpacing(0);
+
+		return font;
 	}
 
 };

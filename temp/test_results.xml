@@ -1,133 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="64" failures="0" disabled="0" errors="0" time="7.853" timestamp="2025-02-10T13:58:12.431" name="AllTests">
-  <testsuite name="HarfBuzzTest" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-02-10T13:58:12.433">
-    <testcase name="InitializeHarfBuzz" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="51" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:12.433" classname="HarfBuzzTest" />
-    <testcase name="ShapeSimpleText" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="58" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:12.433" classname="HarfBuzzTest" />
-    <testcase name="ShapeArabicText" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="76" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:12.433" classname="HarfBuzzTest" />
-  </testsuite>
-  <testsuite name="LibUniWrapperTest" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-02-10T13:58:12.434">
-    <testcase name="BasicLineBreakTest" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="94" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:12.434" classname="LibUniWrapperTest" />
-  </testsuite>
-  <testsuite name="FontTest" tests="6" failures="0" disabled="0" skipped="0" errors="0" time="0.016" timestamp="2025-02-10T13:58:12.767">
-    <testcase name="TestSomeAsciiCharacters" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="248" status="run" result="completed" time="0.002" timestamp="2025-02-10T13:58:12.768" classname="FontTest" />
-    <testcase name="TestHelloWorldShape" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="271" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:12.771" classname="FontTest" />
-    <testcase name="TestMultiLineLoremIpsum" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="304" status="run" result="completed" time="0.001" timestamp="2025-02-10T13:58:12.773" classname="FontTest" />
-    <testcase name="TestMultiReallyLongWord" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="362" status="run" result="completed" time="0.001" timestamp="2025-02-10T13:58:12.775" classname="FontTest" />
-    <testcase name="TestMultiNewLine" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="400" status="run" result="completed" time="0.002" timestamp="2025-02-10T13:58:12.777" classname="FontTest" />
-    <testcase name="TestTextColorSections" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Font\TestFont.cpp" line="605" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:12.782" classname="FontTest" />
-  </testsuite>
-  <testsuite name="GraphicsBoxTest" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="1.477" timestamp="2025-02-10T13:58:12.929">
-    <testcase name="TestFilledBox" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestBox.cpp" line="186" status="run" result="completed" time="1.009" timestamp="2025-02-10T13:58:12.929" classname="GraphicsBoxTest" />
-    <testcase name="TestOutlineBox" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestBox.cpp" line="203" status="run" result="completed" time="0.234" timestamp="2025-02-10T13:58:13.940" classname="GraphicsBoxTest" />
-    <testcase name="TestOutlineBoxesCorners" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestBox.cpp" line="220" status="run" result="completed" time="0.229" timestamp="2025-02-10T13:58:14.175" classname="GraphicsBoxTest" />
-  </testsuite>
-  <testsuite name="GraphicsLineTest" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="1.561" timestamp="2025-02-10T13:58:14.611">
-    <testcase name="TestLineList" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestLine.cpp" line="187" status="run" result="completed" time="0.839" timestamp="2025-02-10T13:58:14.612" classname="GraphicsLineTest" />
-    <testcase name="TestLineListMultiple" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestLine.cpp" line="205" status="run" result="completed" time="0.23" timestamp="2025-02-10T13:58:15.453" classname="GraphicsLineTest" />
-    <testcase name="TestLineListResize" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestLine.cpp" line="224" status="run" result="completed" time="0.27" timestamp="2025-02-10T13:58:15.686" classname="GraphicsLineTest" />
-    <testcase name="TestLineStrip" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestLine.cpp" line="257" status="run" result="completed" time="0.214" timestamp="2025-02-10T13:58:15.958" classname="GraphicsLineTest" />
-  </testsuite>
-  <testsuite name="GraphicsPointTest" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="1.031" timestamp="2025-02-10T13:58:16.368">
-    <testcase name="TestPointListPrimitive16Points" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestPoint.cpp" line="189" status="run" result="completed" time="0.812" timestamp="2025-02-10T13:58:16.368" classname="GraphicsPointTest" />
-    <testcase name="TestPointColorListPrimitive16Points" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestPoint.cpp" line="222" status="run" result="completed" time="0.216" timestamp="2025-02-10T13:58:17.182" classname="GraphicsPointTest" />
-  </testsuite>
-  <testsuite name="BMPTest" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0.362" timestamp="2025-02-10T13:58:17.469">
-    <testcase name="TestLoadBMP" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\TestBMP.cpp" line="205" status="run" result="completed" time="0.137" timestamp="2025-02-10T13:58:17.470" classname="BMPTest" />
-    <testcase name="TestLoadBMP1" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\TestBMP.cpp" line="222" status="run" result="completed" time="0.222" timestamp="2025-02-10T13:58:17.608" classname="BMPTest" />
-  </testsuite>
-  <testsuite name="BufferTest" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0.005" timestamp="2025-02-10T13:58:17.946">
-    <testcase name="TestHostBufferCreate" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\TestBuffer.cpp" line="63" status="run" result="completed" time="0.001" timestamp="2025-02-10T13:58:17.946" classname="BufferTest" />
-    <testcase name="TestDeviceBufferCreate" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\TestBuffer.cpp" line="76" status="run" result="completed" time="0.001" timestamp="2025-02-10T13:58:17.948" classname="BufferTest" />
-    <testcase name="TestHostToDeviceToHostBuffer" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\TestBuffer.cpp" line="96" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:17.951" classname="BufferTest" />
-  </testsuite>
-  <testsuite name="GraphicsTest" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0.792" timestamp="2025-02-10T13:58:18.083">
-    <testcase name="TestGraphicsSurface" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\TestGraphics.cpp" line="176" status="run" result="completed" time="0.791" timestamp="2025-02-10T13:58:18.083" classname="GraphicsTest" />
-  </testsuite>
-  <testsuite name="ImageFileProcessorTest" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0.056" timestamp="2025-02-10T13:58:19.062">
-    <testcase name="TestBmp8bit" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Resource\FileProcessor\TestImageFileProcessor.cpp" line="219" status="run" result="completed" time="0.024" timestamp="2025-02-10T13:58:19.062" classname="ImageFileProcessorTest" />
-    <testcase name="TestPng8bit" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Resource\FileProcessor\TestImageFileProcessor.cpp" line="260" status="run" result="completed" time="0.029" timestamp="2025-02-10T13:58:19.088" classname="ImageFileProcessorTest" />
-  </testsuite>
-  <testsuite name="ResourceManagerTest" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2025-02-10T13:58:19.142">
-    <testcase name="TestResourceManager" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Resource\TestResourceManager.cpp" line="51" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:19.142" classname="ResourceManagerTest" />
-  </testsuite>
-  <testsuite name="TestEngine" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0.132" timestamp="2025-02-10T13:58:19.143">
-    <testcase name="TestEngineStart" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestEngine.cpp" line="26" status="run" result="completed" time="0.132" timestamp="2025-02-10T13:58:19.144" classname="TestEngine" />
-  </testsuite>
-  <testsuite name="ECSTest" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0" timestamp="2025-02-10T13:58:19.277">
-    <testcase name="Update" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestECS.cpp" line="25" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:19.277" classname="ECSTest" />
-  </testsuite>
-  <testsuite name="OptionsTest" tests="10" failures="0" disabled="0" skipped="0" errors="0" time="0.036" timestamp="2025-02-10T13:58:19.278">
-    <testcase name="TestOptionsLoad" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="36" status="run" result="completed" time="0.004" timestamp="2025-02-10T13:58:19.278" classname="OptionsTest" />
-    <testcase name="TestOptionsSave" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="42" status="run" result="completed" time="0.003" timestamp="2025-02-10T13:58:19.283" classname="OptionsTest" />
-    <testcase name="TestOptionsVersion" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="51" status="run" result="completed" time="0.007" timestamp="2025-02-10T13:58:19.287" classname="OptionsTest" />
-    <testcase name="TestOptionsCommandLineArgumentNotValid" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="61" status="run" result="completed" time="0.001" timestamp="2025-02-10T13:58:19.296" classname="OptionsTest" />
-    <testcase name="TestOptionsHelp" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="69" status="run" result="completed" time="0.003" timestamp="2025-02-10T13:58:19.298" classname="OptionsTest" />
-    <testcase name="TestOptionsData" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="79" status="run" result="completed" time="0.002" timestamp="2025-02-10T13:58:19.302" classname="OptionsTest" />
-    <testcase name="TestOptionsUser" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="91" status="run" result="completed" time="0.002" timestamp="2025-02-10T13:58:19.305" classname="OptionsTest" />
-    <testcase name="TestOptionsMaster" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="103" status="run" result="completed" time="0.003" timestamp="2025-02-10T13:58:19.308" classname="OptionsTest" />
-    <testcase name="TestOptionsMasterNotValid" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="113" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:19.313" classname="OptionsTest" />
-    <testcase name="TestOptionsMasterNotPresent" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestOptions.cpp" line="123" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:19.314" classname="OptionsTest" />
-  </testsuite>
-  <testsuite name="TimeSystemTest" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0.212" timestamp="2025-02-10T13:58:19.315">
-    <testcase name="update" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTimer.cpp" line="29" status="run" result="completed" time="0.21" timestamp="2025-02-10T13:58:19.316" classname="TimeSystemTest" />
-  </testsuite>
-  <testsuite name="ProgressTimerTest" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0.722" timestamp="2025-02-10T13:58:19.529">
-    <testcase name="ProgressCallbackCalledCorrectly" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTimer.cpp" line="75" status="run" result="completed" time="0.104" timestamp="2025-02-10T13:58:19.529" classname="ProgressTimerTest" />
-    <testcase name="CompleteCallbackCalledCorrectly" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTimer.cpp" line="122" status="run" result="completed" time="0.307" timestamp="2025-02-10T13:58:19.635" classname="ProgressTimerTest" />
-    <testcase name="ProgressDoesNotExceedOne" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTimer.cpp" line="163" status="run" result="completed" time="0.306" timestamp="2025-02-10T13:58:19.943" classname="ProgressTimerTest" />
-  </testsuite>
-  <testsuite name="TypeErasedPtrTest" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0.002" timestamp="2025-02-10T13:58:20.252">
-    <testcase name="TestTypeConstructor" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTypeErasedPtr.cpp" line="25" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.252" classname="TypeErasedPtrTest" />
-    <testcase name="TestFunctionConstructor" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTypeErasedPtr.cpp" line="32" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.253" classname="TypeErasedPtrTest" />
-    <testcase name="TestComplexType" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTypeErasedPtr.cpp" line="39" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.254" classname="TypeErasedPtrTest" />
-  </testsuite>
-  <testsuite name="TypeErasedUpdatePtrTest" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="0.002" timestamp="2025-02-10T13:58:20.255">
-    <testcase name="TestTypeHasUpdate" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTypeErasedPtr.cpp" line="67" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.256" classname="TypeErasedUpdatePtrTest" />
-    <testcase name="TestTypeNoUpdate" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTypeErasedPtr.cpp" line="82" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.256" classname="TypeErasedUpdatePtrTest" />
-    <testcase name="TestUpdateFunction" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTypeErasedPtr.cpp" line="96" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.257" classname="TypeErasedUpdatePtrTest" />
-    <testcase name="TestMove" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestTypeErasedPtr.cpp" line="115" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.257" classname="TypeErasedUpdatePtrTest" />
-  </testsuite>
-  <testsuite name="VirtualFileSystemTest" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0.009" timestamp="2025-02-10T13:58:20.258">
-    <testcase name="TestPhysicalFileEntry" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestVirtualFileSystem.cpp" line="26" status="run" result="completed" time="0.004" timestamp="2025-02-10T13:58:20.259" classname="VirtualFileSystemTest" />
-    <testcase name="TestPhysicalFilesystemIterator" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\TestVirtualFileSystem.cpp" line="57" status="run" result="completed" time="0.004" timestamp="2025-02-10T13:58:20.263" classname="VirtualFileSystemTest" />
-  </testsuite>
-  <testsuite name="WindowSystemTest" tests="8" failures="0" disabled="0" skipped="7" errors="0" time="0.009" timestamp="2025-02-10T13:58:20.269">
-    <testcase name="WindowComponentParameterPropagation" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp" line="52" status="run" result="skipped" time="0" timestamp="2025-02-10T13:58:20.269" classname="WindowSystemTest">
-      <skipped message="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:54&#x0A;Skipping test until we factor out mod dependencies from the factory."><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:54
-Skipping test until we factor out mod dependencies from the factory.]]></skipped>
+<testsuites tests="2" failures="1" disabled="0" errors="0" time="6.817" timestamp="2025-02-11T16:57:09.580" name="AllTests">
+  <testsuite name="GraphicsTextTest" tests="2" failures="1" disabled="0" skipped="0" errors="0" time="5.622" timestamp="2025-02-11T16:57:10.691">
+    <testcase name="TestHelloWorld" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp" line="50" status="run" result="completed" time="0.002" timestamp="2025-02-11T16:57:10.691" classname="GraphicsTextTest">
+      <failure message="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp:59&#x0A;Expected equality of these values:&#x0A;  1&#x0A;  lines.size()&#x0A;    Which is: 0" type=""><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp:59
+Expected equality of these values:
+  1
+  lines.size()
+    Which is: 0]]></failure>
+      <failure message="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp:62&#x0A;Expected equality of these values:&#x0A;  1&#x0A;  sections.size()&#x0A;    Which is: 0" type=""><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp:62
+Expected equality of these values:
+  1
+  sections.size()
+    Which is: 0]]></failure>
     </testcase>
-    <testcase name="SetAndGetColor" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp" line="87" status="run" result="skipped" time="0" timestamp="2025-02-10T13:58:20.271" classname="WindowSystemTest">
-      <skipped message="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:89&#x0A;Skipping test until we factor out mod dependencies from the factory."><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:89
-Skipping test until we factor out mod dependencies from the factory.]]></skipped>
-    </testcase>
-    <testcase name="SetHighContrast" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp" line="101" status="run" result="skipped" time="0" timestamp="2025-02-10T13:58:20.272" classname="WindowSystemTest">
-      <skipped message="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:103&#x0A;Skipping test until we factor out mod dependencies from the factory."><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:103
-Skipping test until we factor out mod dependencies from the factory.]]></skipped>
-    </testcase>
-    <testcase name="SetThinBorder" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp" line="115" status="run" result="skipped" time="0" timestamp="2025-02-10T13:58:20.273" classname="WindowSystemTest">
-      <skipped message="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:117&#x0A;Skipping test until we factor out mod dependencies from the factory."><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:117
-Skipping test until we factor out mod dependencies from the factory.]]></skipped>
-    </testcase>
-    <testcase name="SetInnerColor" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp" line="128" status="run" result="skipped" time="0" timestamp="2025-02-10T13:58:20.274" classname="WindowSystemTest">
-      <skipped message="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:130&#x0A;Skipping test until we factor out mod dependencies from the factory."><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:130
-Skipping test until we factor out mod dependencies from the factory.]]></skipped>
-    </testcase>
-    <testcase name="AddAndPlayPopupSound" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp" line="142" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.276" classname="WindowSystemTest" />
-    <testcase name="UpdateWindowProgress" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp" line="151" status="run" result="skipped" time="0" timestamp="2025-02-10T13:58:20.276" classname="WindowSystemTest">
-      <skipped message="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:153&#x0A;Skipping test until we factor out mod dependencies from the factory."><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:153
-Skipping test until we factor out mod dependencies from the factory.]]></skipped>
-    </testcase>
-    <testcase name="CompleteWindowProgress" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp" line="165" status="run" result="skipped" time="0" timestamp="2025-02-10T13:58:20.277" classname="WindowSystemTest">
-      <skipped message="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:167&#x0A;Skipping test until we factor out mod dependencies from the factory."><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\WindowTest.cpp:167
-Skipping test until we factor out mod dependencies from the factory.]]></skipped>
-    </testcase>
-  </testsuite>
-  <testsuite name="ButtonSystemTest" tests="3" failures="0" disabled="0" skipped="1" errors="0" time="0.004" timestamp="2025-02-10T13:58:20.279">
-    <testcase name="SetAndGetColor" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\ButtonTest.cpp" line="63" status="run" result="skipped" time="0" timestamp="2025-02-10T13:58:20.279" classname="ButtonSystemTest">
-      <skipped message="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\ButtonTest.cpp:65&#x0A;Skipping test until we factor out mod dependencies from the factory."><![CDATA[D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\ButtonTest.cpp:65
-Skipping test until we factor out mod dependencies from the factory.]]></skipped>
-    </testcase>
-    <testcase name="DrawTextButton" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\ButtonTest.cpp" line="77" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.280" classname="ButtonSystemTest" />
-    <testcase name="HandleInput" file="D:\Dev\Personal\OpenXcom\src\Tests\Entity\Interface\ButtonTest.cpp" line="86" status="run" result="completed" time="0" timestamp="2025-02-10T13:58:20.282" classname="ButtonSystemTest" />
+    <testcase name="TestColorSections" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp" line="68" status="run" result="completed" time="5.619" timestamp="2025-02-11T16:57:10.694" classname="GraphicsTextTest" />
   </testsuite>
 </testsuites>
