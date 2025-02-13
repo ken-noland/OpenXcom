@@ -80,6 +80,7 @@ public:
 	virtual void setTexture(ShaderStage stage, uint32_t binding, const DeviceImage& image) override;
 
 	virtual void commit(GraphicsCommand& command) override;
+	virtual void commit(GraphicsCommand& command, size_t offset, size_t count) override;
 };
 
 } // namespace OpenXcom

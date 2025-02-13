@@ -54,6 +54,8 @@ public:
 	const vk::Buffer& getBuffer() const { return _buffer; }
 
 	virtual void resize(std::size_t count) override;
+	virtual void reserve(std::size_t count) override;
+	virtual void clear() override;
 
 	virtual void* map() override;
 	virtual void unmap() override;
@@ -83,6 +85,8 @@ public:
 	const vk::Buffer& getBuffer() const { return _buffer; }
 		
 	virtual void resize(std::size_t count) override;
+	virtual void reserve(std::size_t count) override;
+	virtual void clear() override;
 
 	virtual void copy(const HostBuffer& buffer) override;
 };

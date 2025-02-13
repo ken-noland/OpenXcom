@@ -20,6 +20,7 @@
 
 #include "../Image/Image.h"
 #include "../Image/ImageManager.h"
+#include "../Buffer/Buffer.h"
 
 #include <hb.h>
 #include <linebreak.h>
@@ -162,6 +163,16 @@ std::vector<PositionedGlyph> Font::shapeText(const std::string_view& text, glm::
 
 	hb_buffer_destroy(buffer);
 	return positionedGlyphs;
+}
+
+const DeviceImage& Font::getDeviceImage() const
+{
+	return *_fontTexture;
+}
+
+const DeviceBuffer& Font::getDeviceFontData() const
+{
+	return _fontTexture->getDeviceImageData();
 }
 
 } // namespace OpenXcom

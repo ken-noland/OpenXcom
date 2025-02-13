@@ -36,6 +36,7 @@ class GraphicsCommand;
 class PipelineBinding;
 class Pipeline;
 class RenderTarget;
+class HostBuffer;
 class DeviceBuffer;
 class Palette;
 class Font;
@@ -82,6 +83,8 @@ struct TextSection
 	ResourceHandle<Font> font;
 
 	std::vector<PositionedGlyph> glyphs;
+
+	std::unique_ptr<PipelineBinding> pipelineBinding;
 };
 
 struct TextLine
@@ -100,20 +103,24 @@ class TextPrimitive : public Primitive
 {
 protected:
 	EngineContext& _context;
+	Pipeline& _pipeline;
+	RenderTarget& _surface;
 
 	std::string _text;
 	TextSettings _settings;
 
 	std::vector<TextSection> _sections;
 	std::vector<TextLine> _lines;
-	std::vector<PositionedGlyph> _glyphs;
 
-	std::unique_ptr<PipelineBinding> _pipelineBinding;
-	std::unique_ptr<DeviceBuffer> _vertexBuffer;
+	std::unique_ptr<HostBuffer> _vertexHostBuffer;
+	std::unique_ptr<DeviceBuffer> _vertexDeviceBuffer;
+
+	void initializeVertexBuffer(Pipeline& pipeline);
 
 	void processTextSections();
 	void processLineShaping();
-	void generateGlyphs();
+	void processGlyphs();
+	void processVertexBuffer();
 
 public:
 	TextPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface,

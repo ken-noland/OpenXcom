@@ -34,6 +34,7 @@ namespace OpenXcom
 
 using CodePoint = uint32_t;
 class DeviceImage;
+class DeviceBuffer;
 
 struct Glyph
 {
@@ -82,6 +83,9 @@ public:
 
 	void setLineSpacing(uint32_t lineSpacing) { _lineSpacing = lineSpacing; }
 	uint32_t getLineSpacing() const { return _lineSpacing; }
+
+	const DeviceImage& getDeviceImage() const;
+	const DeviceBuffer& getDeviceFontData() const;
 
 	std::vector<PositionedGlyph> shapeText(const std::string_view& text, glm::ivec2 position) const;
 };

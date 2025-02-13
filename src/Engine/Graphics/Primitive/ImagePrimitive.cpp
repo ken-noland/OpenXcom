@@ -113,8 +113,6 @@ void ImagePrimitive::setImage(const ResourceHandle<DeviceImage>& imageHandle)
 
 void ImagePrimitive::setSurface(RenderTarget& surface)
 {
-	Log(LOG_DEBUG) << "ImagePrimitive::setSurface";
-	Log(LOG_DEBUG) << "dimensions (width=" << surface.getExtent().x << ", height=" << surface.getExtent().y << " )";
 	_pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, surface.getDeviceImageData()); // bind the surface extents
 }
 

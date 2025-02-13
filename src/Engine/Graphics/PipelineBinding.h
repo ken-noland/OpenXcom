@@ -45,6 +45,7 @@ public:
 	virtual void setTexture(ShaderStage stage, uint32_t binding, const DeviceImage& image) = 0;
 
 	virtual void commit(GraphicsCommand& command) = 0;
+	virtual void commit(GraphicsCommand& command, size_t offset, size_t count) = 0;
 };
 
 

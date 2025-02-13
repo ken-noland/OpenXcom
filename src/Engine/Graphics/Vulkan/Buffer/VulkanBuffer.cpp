@@ -88,6 +88,22 @@ void VulkanHostBuffer::resize(std::size_t count)
 
 }
 
+void VulkanHostBuffer::reserve(std::size_t count)
+{
+	std::size_t newSize = _elementSize * count;
+	if (newSize > _allocatedSize)
+	{
+		deallocate();
+		allocate(newSize);
+	}
+}
+
+void VulkanHostBuffer::clear()
+{
+	_count = 0;
+	_size = 0;
+}
+
 void VulkanHostBuffer::copy(DeviceBuffer& deviceBuffer)
 {
 	VulkanDeviceBuffer& vulkanBuffer = static_cast<VulkanDeviceBuffer&>(deviceBuffer);
@@ -137,7 +153,20 @@ void VulkanHostBuffer::unmap()
 
 void VulkanHostBuffer::copy(const void* data, std::size_t size)
 {
+	// yeah, I'm not too happy with this function. I'd prefer to have a container style interface(push_back, etc) but
+	// that's a bit more work than I have time for right now.
+
 	void* mappedData = nullptr;
+
+	assert(size % _elementSize == 0); // size must be a multiple of the element size
+
+	if (size > _size)
+	{
+		resize(size / _elementSize);
+	}
+
+	_count = size / _elementSize;
+
 	vmaMapMemory(_context.getAllocator(), _allocation, &mappedData);
 	memcpy(mappedData, data, size);
 	vmaUnmapMemory(_context.getAllocator(), _allocation);
@@ -193,6 +222,37 @@ void VulkanDeviceBuffer::deallocate()
 	vmaDestroyBuffer(_context.getAllocator(), _buffer, _allocation);
 }
 
+void VulkanDeviceBuffer::resize(std::size_t count)
+{
+	std::size_t newSize = _elementSize * count;
+	if (newSize <= _allocatedSize)
+	{
+		_count = count;
+		_size = newSize;
+	}
+	else
+	{
+		deallocate();
+		allocate(newSize);
+	}
+}
+
+void VulkanDeviceBuffer::reserve(std::size_t count)
+{
+	std::size_t newSize = _elementSize * count;
+	if (newSize > _allocatedSize)
+	{
+		deallocate();
+		allocate(newSize);
+	}
+}
+
+void VulkanDeviceBuffer::clear()
+{
+	_count = 0;
+	_size = 0;
+}
+
 void VulkanDeviceBuffer::copy(const VulkanHostBuffer& hostBuffer)
 {
 	// KN NOTE: It's possible that we could use a multithreaded version of this which allows us to push up the contents without
@@ -227,26 +287,10 @@ void VulkanDeviceBuffer::copy(const VulkanHostBuffer& hostBuffer)
 	transferQueue.waitIdle();
 }
 
-void VulkanDeviceBuffer::resize(std::size_t count)
-{
-	std::size_t newSize = _elementSize * count;
-	if (newSize <= _allocatedSize)
-	{
-		_count = count;
-		_size = newSize;
-	}
-	else
-	{
-		deallocate();
-		allocate(newSize);
-	}
-}
-
 void VulkanDeviceBuffer::copy(const HostBuffer& buffer)
 {
 	const VulkanHostBuffer& hostBuffer = static_cast<const VulkanHostBuffer&>(buffer);
 	copy(hostBuffer);
 }
-
 
 } // namespace OpenXcom

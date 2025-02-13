@@ -17,8 +17,16 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "TextPrimitive.h"
-#include "../Buffer/Buffer.h"
+
+#include "../Pipeline.h"
 #include "../PipelineBinding.h"
+#include "../PipelineDefinition.h"
+#include "../Shader.h"
+#include "../GraphicsSurface.h"
+#include "../Buffer/Buffer.h"
+#include "../Buffer/BufferManager.h"
+#include "../Palette/Palette.h"
+#include "../Palette/PaletteManager.h"
 
 #include "../Font/Font.h"
 #include "../Font/FontManager.h"
@@ -45,8 +53,9 @@ namespace OpenXcom
 {
 
 TextPrimitive::TextPrimitive(EngineContext& context, Pipeline& pipeline, RenderTarget& surface, const std::string text, const TextSettings& settings)
-	: _context(context), _settings(settings)
+	: _context(context), _pipeline(pipeline), _surface(surface), _settings(settings)
 {
+	initializeVertexBuffer(pipeline);
 	setText(text);
 }
 
@@ -62,24 +71,41 @@ void TextPrimitive::setText(const std::string& text)
 		return;
 	}
 
+	if(_text.size() == 0)
+	{
+		//clear all text
+		_sections.clear();
+		_lines.clear();
+
+		_vertexHostBuffer->clear();
+		_vertexDeviceBuffer->clear();
+	}
+
 	_text = text;
 
 	// Step 1: Cut up the text by any style delimiters(ANSI escape codes)
 	processTextSections();
 
-	// Step 2: Process line shaping(word wrapping)
+	// Step 2: Process line shaping and word wrapping
 	processLineShaping();
 
-	// Step 3: Generate glyphs(text alignment and placement)
-	generateGlyphs();
+	// Step 3: Generate glyphs (text alignment and placement)
+	processGlyphs();
 
 	// Step 4: Generate vertices
-
+	processVertexBuffer();
 }
 
-void TextPrimitive::draw(GraphicsCommand& command)
+void TextPrimitive::initializeVertexBuffer(Pipeline& pipeline)
 {
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	BufferManager& bufferManager = resourceSystem.getBufferManager();
+
+	// create the vertex buffer with at least 1 entry
+	_vertexHostBuffer = bufferManager.createHostBuffer(sizeof(TextVertex), 6, BufferUsage::Vertex);
+	_vertexDeviceBuffer = bufferManager.createDeviceBuffer(sizeof(TextVertex), 6, BufferUsage::Vertex);
 }
+
 
 void TextPrimitive::processTextSections()
 {
@@ -411,9 +437,19 @@ std::string_view intersectViews(std::string_view a, std::string_view b)
 		return std::string_view(); // empty view if no overlap
 }
 
-void TextPrimitive::generateGlyphs()
+void TextPrimitive::processGlyphs()
 {
 	assert(!_lines.empty());
+
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	FontManager& fontManager = resourceSystem.getFontManager();
+	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
+
+	for(TextSection& section : _sections)
+	{
+		// Clear out any old glyphs
+		section.glyphs.clear();
+	}
 
 	std::vector<TextLine>::iterator lineIter = _lines.begin();
 
@@ -422,7 +458,21 @@ void TextPrimitive::generateGlyphs()
 	// For each section
 	for(TextSection& section : _sections)
 	{
-		Font& font = _context.getResourceSystem().getFontManager().get(section.font);
+		Font& font = fontManager.get(section.font);
+
+		// initialize the pipeline binding
+		section.pipelineBinding = _pipeline.createBinding();
+
+		// bind the surface extents
+		section.pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, _surface.getDeviceImageData()); 
+
+		// bind the section font
+		section.pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, font.getDeviceFontData());
+		section.pipelineBinding->setTexture(ShaderStage::Fragment, 2, font.getDeviceImage());
+
+		// bind the palette
+		Palette& palette = paletteManager.get(_settings.defaultPaletteHandle);
+		section.pipelineBinding->setUniformBuffer(ShaderStage::Fragment, 3, palette.getDeviceBuffer());
 
 		// Get the intersection of the section and the line
 		for (std::string_view intersection = intersectViews(section.text, lineIter->line);
@@ -435,9 +485,9 @@ void TextPrimitive::generateGlyphs()
 			bool endOfSection = intersection.data() + intersection.size() == section.text.data() + section.text.size();
 			bool endOfLine = intersection.data() + intersection.size() == lineIter->line.data() + lineIter->line.size();
 
-			// if we are at the end of a section and end of a line, then move on to the next line
 			if (endOfSection && endOfLine)
 			{
+				// If we are at the end of a section and end of a line, then move on to the next line
 				position.y += lineIter->yHeight;
 				position.x = _settings.offset.x;
 				++lineIter;
@@ -449,20 +499,18 @@ void TextPrimitive::generateGlyphs()
 
 				break;
 			}
-
-			// if we are at the end of the section, then move on to the next section
-			if (endOfSection)
+			else if (endOfSection)
 			{
+				// If we are at the end of the section, then move on to the next section
 				// update position based on the last glyph
 				PositionedGlyph& lastGlyph = glyphs.back();
 				position.x = lastGlyph.position.x + lastGlyph.advance;
 
 				break;
 			}
-
-			// if we are at the end of the line, then move on to the next line
-			if (endOfLine)
+			else if (endOfLine)
 			{
+				// If we are at the end of the line, then move on to the next line
 				position.y += lineIter->yHeight;
 				position.x = _settings.offset.x;
 				++lineIter;
@@ -474,6 +522,92 @@ void TextPrimitive::generateGlyphs()
 				}
 			}
 		}
+	}
+}
+
+void TextPrimitive::processVertexBuffer()
+{
+	// First, collect all glyphs from all sections.
+	// (You might choose to merge them into a single vector if that suits your pipeline.)
+	std::vector<PositionedGlyph> allGlyphs;
+	for (const TextSection& section : _sections)
+	{
+		allGlyphs.insert(allGlyphs.end(), section.glyphs.begin(), section.glyphs.end());
+	}
+
+	// Reserve space for vertices: each glyph yields 6 vertices (2 triangles per quad).
+	std::vector<TextVertex> vertices;
+	vertices.reserve(allGlyphs.size() * 6); // TODO: we don't really need to allocate a separate buffer from the host buffer, but I'm starting to run low on time and this is easy to implement
+
+	// We'll need access to the FontManager to retrieve the Glyph (atlas info)
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	FontManager& fontManager = resourceSystem.getFontManager();
+
+	// For each positioned glyph, generate a quad.
+	for (const PositionedGlyph& pg : allGlyphs)
+	{
+		// Retrieve the Font for this glyph.
+		// (If you have glyphs from different fonts, you might have stored a pointer to the Font or similar.)
+		// Here we assume you can get the Glyph via the font's getGlyph(glyphID) method.
+		// For example, assume we have:
+		//   const Glyph& glyph = font.getGlyph(pg.glyphID);
+		// If you stored the font handle in the section, you'll need to look it up accordingly.
+		// For illustration, assume all glyphs use the same font:
+		Font& font = fontManager.get(_settings.defaultFontHandle);
+		const Glyph* glyph = font.getGlyph(pg.glyphID);
+
+		// Compute the destination quad.
+		// The PositionedGlyph::position is the base (pen) position.
+		// Apply any shaping adjustments (if needed) using glyph offsets.
+		int x0 = pg.position.x + glyph->xOffset;
+		int y0 = pg.position.y + glyph->yOffset;
+		int x1 = x0 + glyph->width;
+		int y1 = y0 + glyph->height;
+
+		// Compute texture coordinates from the glyph.
+		// (Assuming the atlas coordinates are stored in the Glyph struct.)
+		int s0 = glyph->x;
+		int t0 = glyph->y;
+		int s1 = s0 + glyph->width;
+		int t1 = t0 + glyph->height;
+
+		// Create two triangles for the glyph quad:
+		// Triangle 1: top-left, top-right, bottom-left.
+		vertices.push_back({{x0, y0}, {s0, t0}});
+		vertices.push_back({{x1, y0}, {s1, t0}});
+		vertices.push_back({{x0, y1}, {s0, t1}});
+
+		// Triangle 2: top-right, bottom-right, bottom-left.
+		vertices.push_back({{x1, y0}, {s1, t0}});
+		vertices.push_back({{x1, y1}, {s1, t1}});
+		vertices.push_back({{x0, y1}, {s0, t1}});
+	}
+
+	// Now copy these vertices to your GPU buffers.
+	// Assume _vertexHostBuffer and _vertexDeviceBuffer are DeviceBuffer pointers.
+	_vertexHostBuffer->copy(vertices.data(), vertices.size() * sizeof(TextVertex));
+	_vertexDeviceBuffer->copy(*_vertexHostBuffer);
+
+}
+
+
+void TextPrimitive::draw(GraphicsCommand& command)
+{
+	// keep track of the offset
+	size_t offset = 0;
+
+	// for each section
+	for (const TextSection& section : _sections)
+	{
+		// Bind the vertex buffer in your pipeline.
+		section.pipelineBinding->setVertexBuffer(*_vertexDeviceBuffer);
+
+		size_t length = section.glyphs.size() * 6; // 6 vertices per glyph
+
+		// draw the section
+		section.pipelineBinding->commit(command, offset, length);
+
+		offset += length;
 	}
 }
 

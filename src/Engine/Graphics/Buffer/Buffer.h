@@ -61,6 +61,10 @@ public:
 
 	virtual void resize(std::size_t count) = 0;
 
+	virtual void reserve(std::size_t count) = 0;
+
+	virtual void clear() = 0;
+
 	virtual void* map() = 0;
 	virtual void unmap() = 0;
 
@@ -131,6 +135,10 @@ public:
 	std::size_t getAllocatedSize() const { return _allocatedSize; }
 
 	virtual void resize(std::size_t count) = 0;
+
+	virtual void reserve(std::size_t count) = 0;
+
+	virtual void clear() = 0;
 
 	virtual void copy(const HostBuffer& buffer) = 0;
 };

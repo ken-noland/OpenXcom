@@ -199,6 +199,13 @@ void VulkanPipelineBinding::setTexture(ShaderStage stage, uint32_t binding, cons
 
 void VulkanPipelineBinding::commit(GraphicsCommand& command)
 {
+	assert(_vertexBuffer.has_value() && "You must bind a vertex buffer to the pipeline binding prior to calling commit()");
+	VulkanDeviceBuffer& vertexBuffer = _vertexBuffer.value().get();
+	commit(command, 0, vertexBuffer.getCount());
+}
+
+void VulkanPipelineBinding::commit(GraphicsCommand& command, size_t offset, size_t count)
+{
 	vk::CommandBuffer& vkCommand = static_cast<VulkanCommand&>(command).getCommandBuffer();
 
 	// bind the pipeline
@@ -237,9 +244,10 @@ void VulkanPipelineBinding::commit(GraphicsCommand& command)
 		vkCommand.bindVertexBuffers(0, vertexBuffer.getBuffer(), offsets);
 
 		// finally, issue draw command
-		vkCommand.draw(static_cast<uint32_t>(vertexBuffer.getCount()), 1, 0, 0);
+		vkCommand.draw(static_cast<uint32_t>(count), 1, static_cast<uint32_t>(offset), 0);
 		isIndexed = false;
 	}
 }
+
 
 } // namespace OpenXcom

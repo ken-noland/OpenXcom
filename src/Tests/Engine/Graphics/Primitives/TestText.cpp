@@ -58,7 +58,7 @@ TEST_F(GraphicsTextTest, TestHelloWorld)
 	settings.defaultFontHandle = _fontHandle.getHandle();
 	settings.defaultPaletteHandle = _paletteHandle.getHandle();
 	settings.extents = {0, 0};
-	settings.offset = {0, 0};
+	settings.offset = {2, 0};
 
 	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
 	ASSERT_TRUE(textPrimitive);
@@ -71,6 +71,17 @@ TEST_F(GraphicsTextTest, TestHelloWorld)
 
 	const TextSection& section = sections[0];
 	EXPECT_EQ(text.size(), section.glyphs.size()); // we should have the same number of glyphs as characters in the text
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "001_hello_world.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTextTest, TestColorSections)
@@ -92,6 +103,23 @@ TEST_F(GraphicsTextTest, TestColorSections)
 
 	const std::vector<TextSection>& sections = textPrimitive->getSections();
 	ASSERT_EQ(5, sections.size()) << "Expected five sections";
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "002_multi_color.png";
+	//compareWithBaseline(hostImageHandle, baselinePath);
+
+	OpenXcom::HostImage& hostImage = hostImageHandle.get();
+	const uint8_t* pixels = static_cast<const uint8_t*>(hostImage.map());
+	unsigned error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage.getWidth(), hostImage.getHeight(), LodePNGColorType::LCT_RGBA, 8);
+	EXPECT_EQ(error, 0) << "Failed to save baseline image.";
+	hostImage.unmap();
 }
 
 TEST_F(GraphicsTextTest, TestHelloWorldShape)
