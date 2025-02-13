@@ -45,6 +45,10 @@ SIMPLERTTR
 	SimpleRTTR::registration().type<OpenXcom::TextVertex>()
 		.property(&OpenXcom::TextVertex::position, "position")
 		.property(&OpenXcom::TextVertex::texCoord, "texCoord");
+
+	SimpleRTTR::registration().type<OpenXcom::TextPushConstant>()
+		.property(&OpenXcom::TextPushConstant::colorIndex, "colorIndex")
+		.property(&OpenXcom::TextPushConstant::numPaletteEntries, "numPaletteEntries");
 }
 
 
@@ -113,8 +117,8 @@ void TextPrimitive::processTextSections()
 	FontManager& fontManager = resourceSystem.getFontManager();
 
 	_sections.clear();
-	ResourceHandle<Font> currentFont = _settings.defaultFontHandle;
-	TextStyle currentStyle{0,0,false};
+	ResourceHandle<Font> currentFont = _settings.fontHandle;
+	TextStyle currentStyle(_settings.defaultStyle);
 
 	// Use the member _text as the source string.
 	const std::string& rawText = _text;
@@ -175,8 +179,8 @@ void TextPrimitive::processTextSections()
 					if (parameter.empty())
 					{
 						// Reset style and font.
-						currentStyle = TextStyle();
-						currentFont = _settings.defaultFontHandle;
+						currentStyle = _settings.defaultStyle;
+						currentFont = _settings.fontHandle;
 					}
 					else
 					{
@@ -187,8 +191,8 @@ void TextPrimitive::processTextSections()
 							int code = std::stoi(token);
 							if (code == 0)
 							{
-								currentStyle = TextStyle();
-								currentFont = _settings.defaultFontHandle;
+								currentStyle = _settings.defaultStyle;
+								currentFont = _settings.fontHandle;
 							}
 							else if (code == 1)
 							{
@@ -471,8 +475,12 @@ void TextPrimitive::processGlyphs()
 		section.pipelineBinding->setTexture(ShaderStage::Fragment, 2, font.getDeviceImage());
 
 		// bind the palette
-		Palette& palette = paletteManager.get(_settings.defaultPaletteHandle);
+		Palette& palette = paletteManager.get(_settings.paletteHandle);
 		section.pipelineBinding->setUniformBuffer(ShaderStage::Fragment, 3, palette.getDeviceBuffer());
+
+		// bind the push constants
+		TextPushConstant pushConstants{section.style.colorIndex, section.style.backgroundColorIndex, 1};
+		section.pipelineBinding->setPushConstant(ShaderStage::Fragment, pushConstants);
 
 		// Get the intersection of the section and the line
 		for (std::string_view intersection = intersectViews(section.text, lineIter->line);
@@ -547,13 +555,7 @@ void TextPrimitive::processVertexBuffer()
 	for (const PositionedGlyph& pg : allGlyphs)
 	{
 		// Retrieve the Font for this glyph.
-		// (If you have glyphs from different fonts, you might have stored a pointer to the Font or similar.)
-		// Here we assume you can get the Glyph via the font's getGlyph(glyphID) method.
-		// For example, assume we have:
-		//   const Glyph& glyph = font.getGlyph(pg.glyphID);
-		// If you stored the font handle in the section, you'll need to look it up accordingly.
-		// For illustration, assume all glyphs use the same font:
-		Font& font = fontManager.get(_settings.defaultFontHandle);
+		Font& font = fontManager.get(_settings.fontHandle);
 		const Glyph* glyph = font.getGlyph(pg.glyphID);
 
 		// Compute the destination quad.
@@ -587,7 +589,6 @@ void TextPrimitive::processVertexBuffer()
 	// Assume _vertexHostBuffer and _vertexDeviceBuffer are DeviceBuffer pointers.
 	_vertexHostBuffer->copy(vertices.data(), vertices.size() * sizeof(TextVertex));
 	_vertexDeviceBuffer->copy(*_vertexHostBuffer);
-
 }
 
 

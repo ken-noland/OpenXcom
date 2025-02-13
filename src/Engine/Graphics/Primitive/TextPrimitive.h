@@ -72,8 +72,10 @@ struct TextSettings
 	glm::ivec2 extents;
 	glm::ivec2 offset;
 
-	ResourceHandle<Font> defaultFontHandle;
-	ResourceHandle<Palette> defaultPaletteHandle;
+	ResourceHandle<Font> fontHandle;
+	ResourceHandle<Palette> paletteHandle;
+
+	TextStyle defaultStyle;
 };
 
 struct TextSection
@@ -97,6 +99,13 @@ struct TextLine
 	int32_t lineWidth;
 
 	TextAlignment alignment;
+};
+
+struct TextPushConstant
+{
+	uint32_t colorIndex;
+	uint32_t backgroundColorIndex;
+	uint32_t numPaletteEntries;
 };
 
 class TextPrimitive : public Primitive

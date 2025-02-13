@@ -148,8 +148,10 @@ void VulkanPipelineBinding::setUniformBuffer(ShaderStage stage, uint32_t binding
 
 void VulkanPipelineBinding::setPushConstant(const SimpleRTTR::Type& type, ShaderStage stage, const void* data, std::size_t size)
 {
+	assert(_pushConstants[(int)stage] && "Push constant not defined for this stage");
+
 	// Get the push constant
-	VulkanPushConstant& pushConstant = *_pushConstants[(int)stage];
+	VulkanPushConstant& pushConstant = *(_pushConstants[(int)stage]);
 	// Copy the data to the push constant
 	pushConstant.copyTo(data, size);
 }

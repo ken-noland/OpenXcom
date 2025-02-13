@@ -54,10 +54,11 @@ TextPrimitiveFactory::TextPrimitiveFactory(EngineContext& context, RenderTarget&
 																		.addCombinedImageSampler(ShaderStage::Fragment, 2)   // image sampler
 																		.addTexture(ShaderStage::Fragment, 2)                // image texture
 																		.addStorageBuffer<uint8_t>(ShaderStage::Fragment, 3) // palette buffer
+																		.addPushConstant<TextPushConstant>(ShaderStage::Fragment) // text settings
 
 																		.build())
 												 .setVertexShader(shaders.getDefaultVec2UVVertexShader())
-												 .setFragmentShader(shaders.getDefaultUVFragmentShader())
+												 .setFragmentShader(shaders.getDefaultFontFragmentShader())
 												 .setRenderTarget(_surface)
 												 .build();
 

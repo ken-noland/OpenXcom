@@ -41,6 +41,7 @@ protected:
 
 	std::unique_ptr<Shader> _defaultFragmentShader;
 	std::unique_ptr<Shader> _defaultUVFragmentShader;
+	std::unique_ptr<Shader> _defaultFontFragmentShader;
 
 public:
 	ShaderCollection(EngineContext& context);
@@ -52,6 +53,7 @@ public:
 
 	Shader& getDefaultFragmentShader();
 	Shader& getDefaultUVFragmentShader();
+	Shader& getDefaultFontFragmentShader();
 };
 
 } // namespace OpenXcom

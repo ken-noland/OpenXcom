@@ -117,6 +117,32 @@ public:
 		return paletteManager.createPalette("16colors", paletteData, 16);
 	}
 
+	OpenXcom::OwningHandle<OpenXcom::Palette> createAnsiColorPalette()
+	{
+		// set up the palette
+		OpenXcom::PackedColor paletteData[] = {
+			0x000000FF, // 0: Black       (0,0,0)
+			0xAA0000FF, // 1: Red         (170,0,0)
+			0x00AA00FF, // 2: Green       (0,170,0)
+			0xAA5500FF, // 3: Yellow      (170,85,0)
+			0x0000AAFF, // 4: Blue        (0,0,170)
+			0xAA00AAFF, // 5: Magenta     (170,0,170)
+			0x00AAAAFF, // 6: Cyan        (0,170,170)
+			0xAAAAAAFF, // 7: White       (170,170,170)
+			0x555555FF, // 8: Bright Black (Gray) (85,85,85)
+			0xFF5555FF, // 9: Bright Red  (255,85,85)
+			0x55FF55FF, // 10: Bright Green (85,255,85)
+			0xFFFF55FF, // 11: Bright Yellow (255,255,85)
+			0x5555FFFF, // 12: Bright Blue (85,85,255)
+			0xFF55FFFF, // 13: Bright Magenta (255,85,255)
+			0x55FFFFFF, // 14: Bright Cyan (85,255,255)
+			0xFFFFFFFF  // 15: Bright White (255,255,255)
+		};
+
+		OpenXcom::PaletteManager& paletteManager = _engine->getEngineContext().getResourceSystem().getPaletteManager();
+		return paletteManager.createPalette("16colors", paletteData, 16);
+	}
+
 	/**
 	 * Captures the game surface into a HostImage.
 	 */

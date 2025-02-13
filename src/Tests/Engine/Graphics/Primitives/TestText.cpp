@@ -32,11 +32,13 @@ class GraphicsTextTest : public TestEngineSuite
 {
 protected:
 	OwningHandle<Palette> _paletteHandle;
+	OwningHandle<Palette> _ansiPaletteHandle;
 	OwningHandle<Font> _fontHandle;
 
 	void SetUp() override
 	{
 		_paletteHandle = create16ColorPalette();
+		_ansiPaletteHandle = createAnsiColorPalette();
 		_fontHandle = createDosFont();
 	}
 
@@ -55,10 +57,13 @@ TEST_F(GraphicsTextTest, TestHelloWorld)
 	TextSettings settings;
 
 	settings.alignment = TextAlignment::Left;
-	settings.defaultFontHandle = _fontHandle.getHandle();
-	settings.defaultPaletteHandle = _paletteHandle.getHandle();
+	settings.fontHandle = _fontHandle.getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
 	settings.extents = {0, 0};
 	settings.offset = {2, 0};
+	settings.defaultStyle.colorIndex = 7;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
 
 	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
 	ASSERT_TRUE(textPrimitive);
@@ -93,10 +98,13 @@ TEST_F(GraphicsTextTest, TestColorSections)
 	TextSettings settings;
 
 	settings.alignment = TextAlignment::Left;
-	settings.defaultFontHandle = _fontHandle.getHandle();
-	settings.defaultPaletteHandle = _paletteHandle.getHandle();
+	settings.fontHandle = _fontHandle.getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
 	settings.extents = {0, 0};
 	settings.offset = {0, 0};
+	settings.defaultStyle.colorIndex = 7;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
 
 	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
 	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
@@ -131,10 +139,13 @@ TEST_F(GraphicsTextTest, TestHelloWorldShape)
 	TextSettings settings;
 
 	settings.alignment = TextAlignment::Left;
-	settings.defaultFontHandle = _fontHandle.getHandle();
-	settings.defaultPaletteHandle = _paletteHandle.getHandle();
+	settings.fontHandle = _fontHandle.getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
 	settings.extents = {0, 0};
 	settings.offset = {0, 0};
+	settings.defaultStyle.colorIndex = 7;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
 
 	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
 	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
@@ -170,10 +181,13 @@ TEST_F(GraphicsTextTest, TestMultiLineLoremIpsum)
 	TextSettings settings;
 
 	settings.alignment = TextAlignment::Left;
-	settings.defaultFontHandle = _fontHandle.getHandle();
-	settings.defaultPaletteHandle = _paletteHandle.getHandle();
+	settings.fontHandle = _fontHandle.getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
 	settings.extents = {200, 0};
 	settings.offset = {0, 0};
+	settings.defaultStyle.colorIndex = 7;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
 
 	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
 	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
@@ -243,10 +257,13 @@ TEST_F(GraphicsTextTest, TestMultilineReallyLongWord)
 	TextSettings settings;
 
 	settings.alignment = TextAlignment::Left;
-	settings.defaultFontHandle = _fontHandle.getHandle();
-	settings.defaultPaletteHandle = _paletteHandle.getHandle();
+	settings.fontHandle = _fontHandle.getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
 	settings.extents = {180, 0};
 	settings.offset = {0, 0};
+	settings.defaultStyle.colorIndex = 7;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
 
 	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
 	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
@@ -295,10 +312,13 @@ TEST_F(GraphicsTextTest, TestMultiNewLine)
 	TextSettings settings;
 
 	settings.alignment = TextAlignment::Left;
-	settings.defaultFontHandle = _fontHandle.getHandle();
-	settings.defaultPaletteHandle = _paletteHandle.getHandle();
+	settings.fontHandle = _fontHandle.getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
 	settings.extents = {200, 0};
 	settings.offset = {0, 0};
+	settings.defaultStyle.colorIndex = 7;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
 
 	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
 	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";

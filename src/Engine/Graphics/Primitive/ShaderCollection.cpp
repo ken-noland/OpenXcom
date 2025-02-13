@@ -203,6 +203,64 @@ const char* defaultUVFragmentShaderSource = R"(
 	}
 )";
 
+const char* defaultFontFragmentShaderSource = R"(
+	#version 450
+
+	// Input UV coordinates from the vertex shader.
+	layout(location = 0) in vec2 fragUV;
+
+	// Output final color.
+	layout(location = 0) out vec4 fragColor;
+
+	// R8 texture (the image) bound to set 0, binding 0.
+	layout(set = 0, binding = 2) uniform sampler2D uImage;
+
+	// Palette
+	layout(set = 0, binding = 3, std430) buffer PaletteBuffer {
+		uint palette[];
+	};
+
+	// Push constant block with our text-specific data.
+	layout(push_constant) uniform TextPushConstants {
+		uint colorIndex;
+		uint backgroundColorIndex;
+		uint numPaletteEntries;
+	} textPush;
+
+	void main() {
+		// Sample the indexed image. For an R8 texture, the red channel will contain the index
+		// in normalized form (i.e. in the range [0.0, 1.0]).
+		float indexNormalized = texture(uImage, fragUV).r;
+    
+		// Convert the normalized value to an integer index.
+		// For an 8-bit channel, multiply by 255 and round.
+		uint index = uint(round(indexNormalized * 255.0));
+		uint finalPaletteIndex = 0;
+
+		// Handle the special case where the index is 0(background).
+		if(index == 0)
+		{
+			finalPaletteIndex = textPush.backgroundColorIndex;
+		}
+		else
+		{
+			// Compute the final palette index.
+			finalPaletteIndex = ((textPush.colorIndex - 1) * textPush.numPaletteEntries) + index;
+		}
+
+		// Look up the color in the palette.
+		uint packedColor = palette[finalPaletteIndex];
+
+		// Unpack the color assuming it is stored as 0xRRGGBBAA.
+		fragColor = vec4(
+			float((packedColor >> 24) & 0xFF) / 255.0,  // Red
+			float((packedColor >> 16) & 0xFF) / 255.0,  // Green
+			float((packedColor >> 8)  & 0xFF) / 255.0,  // Blue
+			float((packedColor >> 0)  & 0xFF) / 255.0   // Alpha
+		);
+	}
+)";
+
 ShaderCollection::ShaderCollection(EngineContext& context)
 	: _context(context)
 {
@@ -216,6 +274,7 @@ ShaderCollection::ShaderCollection(EngineContext& context)
 
 	_defaultFragmentShader = shaderManager.loadShaderFromMemory("defaultFragmentShaderSource", defaultFragmentShaderSource, ShaderType::Fragment);
 	_defaultUVFragmentShader = shaderManager.loadShaderFromMemory("defaultUVFragmentShaderSource", defaultUVFragmentShaderSource, ShaderType::Fragment);
+	_defaultFontFragmentShader = shaderManager.loadShaderFromMemory("defaultFontFragmentShaderSource", defaultFontFragmentShaderSource, ShaderType::Fragment);
 }
 
 ShaderCollection::~ShaderCollection()
@@ -245,6 +304,11 @@ Shader& ShaderCollection::getDefaultFragmentShader()
 Shader& ShaderCollection::getDefaultUVFragmentShader()
 {
 	return *_defaultUVFragmentShader;
+}
+
+Shader& ShaderCollection::getDefaultFontFragmentShader()
+{
+	return *_defaultFontFragmentShader;
 }
 
 } // namespace OpenXcom
