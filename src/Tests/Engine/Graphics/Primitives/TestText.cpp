@@ -76,6 +76,20 @@ TEST_F(GraphicsTextTest, TestHelloWorld)
 
 	const TextSection& section = sections[0];
 	EXPECT_EQ(text.size(), section.glyphs.size()); // we should have the same number of glyphs as characters in the text
+		
+	// Now verify each glyph's advance and offsets.
+	// We expect each glyph's advance to be 9 (since 9 * 64 = 576 in fixed-point)
+	// and offsets to be zero.
+	uint32_t expectedAdvance = 0;
+	for (size_t i = 0; i < section.glyphs.size(); i++)
+	{
+		const PositionedGlyph& glyph = section.glyphs[i];
+		EXPECT_EQ(glyph.advance, 9) << "Glyph index " << i << " has incorrect advance";
+		EXPECT_EQ(glyph.position.x, settings.offset.x + expectedAdvance) << "Glyph index " << i << " has incorrect x position";
+		EXPECT_EQ(glyph.offsetX, 0) << "Glyph index " << i << " has nonzero x offset";
+		EXPECT_EQ(glyph.offsetY, 0) << "Glyph index " << i << " has nonzero y offset";
+		expectedAdvance += glyph.advance;
+	}
 
 	// draw the text
 	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
@@ -121,54 +135,7 @@ TEST_F(GraphicsTextTest, TestColorSections)
 	ASSERT_TRUE(hostImageHandle.isValid());
 
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "002_multi_color.png";
-	//compareWithBaseline(hostImageHandle, baselinePath);
-
-	OpenXcom::HostImage& hostImage = hostImageHandle.get();
-	const uint8_t* pixels = static_cast<const uint8_t*>(hostImage.map());
-	unsigned error = lodepng::encode(baselinePath.string().c_str(), pixels, hostImage.getWidth(), hostImage.getHeight(), LodePNGColorType::LCT_RGBA, 8);
-	EXPECT_EQ(error, 0) << "Failed to save baseline image.";
-	hostImage.unmap();
-}
-
-TEST_F(GraphicsTextTest, TestHelloWorldShape)
-{
-	// The text to shape
-	std::string text = "Hello World!";
-
-	PrimitiveFactory& factory = _gameSurface->getRenderTarget().getPrimitiveFactory();
-	TextSettings settings;
-
-	settings.alignment = TextAlignment::Left;
-	settings.fontHandle = _fontHandle.getHandle();
-	settings.paletteHandle = _ansiPaletteHandle.getHandle();
-	settings.extents = {0, 0};
-	settings.offset = {0, 0};
-	settings.defaultStyle.colorIndex = 7;
-	settings.defaultStyle.backgroundColorIndex = 0;
-	settings.defaultStyle.underline = false;
-
-	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
-	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
-
-	const std::vector<TextSection>& sections = textPrimitive->getSections();
-	ASSERT_EQ(1, sections.size()) << "Expected one section";
-
-	const TextSection& section = sections[0];
-	ASSERT_EQ(text.size(), section.glyphs.size()) << "Expected one glyph per character";
-
-	// Now verify each glyph's advance and offsets.
-	// We expect each glyph's advance to be 9 (since 9 * 64 = 576 in fixed-point)
-	// and offsets to be zero.
-	uint32_t expectedAdvance = 0;
-	for (size_t i = 0; i < section.glyphs.size(); i++)
-	{
-		const PositionedGlyph& glyph = section.glyphs[i];
-		EXPECT_EQ(glyph.advance, 9) << "Glyph index " << i << " has incorrect advance";
-		EXPECT_EQ(glyph.position.x, settings.offset.x + expectedAdvance) << "Glyph index " << i << " has incorrect x position";
-		EXPECT_EQ(glyph.offsetX, 0) << "Glyph index " << i << " has nonzero x offset";
-		EXPECT_EQ(glyph.offsetY, 0) << "Glyph index " << i << " has nonzero y offset";
-		expectedAdvance += glyph.advance;
-	}
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTextTest, TestMultiLineLoremIpsum)
@@ -246,6 +213,17 @@ TEST_F(GraphicsTextTest, TestMultiLineLoremIpsum)
 	EXPECT_EQ(section.glyphs[117].codepoint, 'l');
 	EXPECT_EQ(section.glyphs[117].position.x, settings.offset.x + 9);
 	EXPECT_EQ(section.glyphs[117].position.y, settings.offset.y + (16 * 6));
+		
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "003_lorem_ipsum_wrapping.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTextTest, TestMultilineReallyLongWord)
@@ -300,6 +278,17 @@ TEST_F(GraphicsTextTest, TestMultilineReallyLongWord)
 	EXPECT_EQ(section.glyphs[60].codepoint, 'D');
 	EXPECT_EQ(section.glyphs[60].position.x, settings.offset.x);
 	EXPECT_EQ(section.glyphs[60].position.y, settings.offset.y + (16 * 3));
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "004_really_long_word_wrapping.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
 TEST_F(GraphicsTextTest, TestMultiNewLine)
@@ -375,4 +364,15 @@ TEST_F(GraphicsTextTest, TestMultiNewLine)
 	EXPECT_EQ(section.glyphs[111].codepoint, 'm');
 	EXPECT_EQ(section.glyphs[111].position.x, settings.offset.x);
 	EXPECT_EQ(section.glyphs[111].position.y, settings.offset.y + (16 * 7));
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "005_lorem_ipsum_multiline_wrapping.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
 }
