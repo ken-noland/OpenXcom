@@ -138,6 +138,34 @@ bool toJson<std::string>(const std::string& type, nlohmann::json& json)
 }
 
 template <>
+bool fromJson<std::u16string>(const nlohmann::json& json, std::u16string& type)
+{
+	type = json.get<std::u16string>();
+	return true;
+}
+
+template <>
+bool toJson<std::u16string>(const std::u16string& type, nlohmann::json& json)
+{
+	json = type;
+	return true;
+}
+
+template <>
+bool fromJson<std::u32string>(const nlohmann::json& json, std::u32string& type)
+{
+	type = json.get<std::u32string>();
+	return true;
+}
+
+template <>
+bool toJson<std::u32string>(const std::u32string& type, nlohmann::json& json)
+{
+	json = type;
+	return true;
+}
+
+template <>
 bool fromJson<std::filesystem::path>(const nlohmann::json& json, std::filesystem::path& type)
 {
 	type = json.get<std::filesystem::path>();

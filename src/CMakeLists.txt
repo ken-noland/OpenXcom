@@ -151,6 +151,7 @@ set ( engine_src
   "Engine/Graphics/Common/WindowSurface.cpp"
   "Engine/Graphics/Font/Font.cpp"
   "Engine/Graphics/Font/FontManager.cpp"
+  "Engine/Graphics/Font/FontPack.cpp"
   "Engine/Graphics/Image/Image.cpp"
   "Engine/Graphics/Image/ImageManager.cpp"
   "Engine/Graphics/Palette/Palette.cpp"
@@ -245,6 +246,7 @@ set ( engine_src
 #  "Engine/SurfaceSet.cpp"
   "Engine/Timer.cpp"
   "Engine/Unicode.cpp"
+  "Engine/Yaml.cpp"
 #  "Engine/Zoom.cpp
 )
 
@@ -633,6 +635,7 @@ endif()
 
 set(openxcom_includes
   ${yaml-cpp_SOURCE_DIR}/include
+  ${rapidyaml_SOURCE_DIR}/src
   ${lua_SOURCE_DIR}
   ${EnTT_SOURCE_DIR}/single_include
   ${SimpleRTTR_SOURCE_DIR}/include
@@ -647,6 +650,7 @@ set(openxcom_includes
 
 set(openxcom_libs
   yaml-cpp::yaml-cpp
+  ryml::ryml
   lua
   ImGui
   shaderc
@@ -705,10 +709,11 @@ endif()
 # Define the generated source files
 set(generated_sources
     "${CMAKE_BINARY_DIR}/generated/json.cpp"
+    "${CMAKE_BINARY_DIR}/generated/yaml.cpp"
     # Add more generated files as needed
 )
 
-set(codegen_templates
+set(json_codegen_templates
     "Codegen/Templates/Json/Json.cpp.inja"
     "Codegen/Templates/Json/JsonEnum.cpp.inja"
     "Codegen/Templates/Json/JsonHeader.cpp.inja"
@@ -719,18 +724,40 @@ set(codegen_templates
     "Codegen/Templates/Json/JsonTemplate.json"
 )
 
+set(yaml_codegen_templates
+    "Codegen/Templates/Yaml/Yaml.cpp.inja"
+    "Codegen/Templates/Yaml/YamlEnum.cpp.inja"
+    "Codegen/Templates/Yaml/YamlHeader.cpp.inja"
+    "Codegen/Templates/Yaml/YamlMap.cpp.inja"
+    "Codegen/Templates/Yaml/YamlObject.cpp.inja"
+    "Codegen/Templates/Yaml/YamlOption.cpp.inja"
+    "Codegen/Templates/Yaml/YamlVector.cpp.inja"
+    "Codegen/Templates/Yaml/YamlTemplate.json"
+)
+
 add_custom_target(create_generated_dir ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/generated"
     COMMENT "Creating generated directory"
 )
 
 # Custom command to generate the source files using codegen
+
+# Json
 add_custom_command(
     OUTPUT "${CMAKE_BINARY_DIR}/generated/json.cpp"
     COMMAND $<TARGET_FILE:codegen> -template "${CMAKE_CURRENT_SOURCE_DIR}/Codegen/Templates/Json/JsonTemplate.json" -output "${CMAKE_BINARY_DIR}/generated/json.cpp"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated
-    DEPENDS create_generated_dir codegen ${codegen_templates}
-    COMMENT "Generating source files with codegen"
+    DEPENDS create_generated_dir codegen ${json_codegen_templates}
+    COMMENT "Generating Json source files with codegen"
+)
+
+# Yaml
+add_custom_command(
+    OUTPUT "${CMAKE_BINARY_DIR}/generated/yaml.cpp"
+    COMMAND $<TARGET_FILE:codegen> -template "${CMAKE_CURRENT_SOURCE_DIR}/Codegen/Templates/Yaml/YamlTemplate.json" -output "${CMAKE_BINARY_DIR}/generated/yaml.cpp"
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated
+    DEPENDS create_generated_dir codegen ${yaml_codegen_templates}
+    COMMENT "Generating Yaml source files with codegen"
 )
 
 # openxcom_lib: Library compiled from generated source files, depends on openxcom_base_lib

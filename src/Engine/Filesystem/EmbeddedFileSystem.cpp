@@ -102,9 +102,9 @@ EmbeddedFileSystem::~EmbeddedFileSystem()
 {
 }
 
-FilePtr EmbeddedFileSystem::getFile(const std::filesystem::path& path)
+std::unique_ptr<FileEntry> EmbeddedFileSystem::getFile(const std::filesystem::path& path)
 {
-	return FilePtr();
+	return std::unique_ptr<FileEntry>();
 }
 
 FolderPtr EmbeddedFileSystem::getFolder(const std::filesystem::path& path)

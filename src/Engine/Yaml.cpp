@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,33 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../../Resource/ResourceManager.h"
-#include "Font.h"
-
+#include "Yaml.h"
 #include <filesystem>
+#include <cassert>
 
 namespace OpenXcom
 {
 
-class EngineContext;
-
-class FontManager : public ResourceManager<Font>
-{
-protected:
-	EngineContext& _context;
-
-public:
-	FontManager(EngineContext& context);
-	virtual ~FontManager();
-
-	// load font from memory
-	OwningHandle<Font> load(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
-
-	// load font from file
-	OwningHandle<Font> load(const std::string& name, const std::filesystem::path& filename);
-
-	// get a font handle by name
-	ResourceHandle<Font> getFontByName(const std::string& name) const;
-};
-
-} // namespace OpenXcom
+}

@@ -102,7 +102,7 @@ PhysicalFileSystem::~PhysicalFileSystem()
 {
 }
 
-FilePtr PhysicalFileSystem::getFile(const std::filesystem::path& path)
+std::unique_ptr<FileEntry> PhysicalFileSystem::getFile(const std::filesystem::path& path)
 {
 	std::filesystem::path fullPath = _path / path;
 
@@ -112,7 +112,7 @@ FilePtr PhysicalFileSystem::getFile(const std::filesystem::path& path)
 		return std::make_unique<PhysicalFileEntry>(fullPath);
 	}
 
-	return FilePtr();
+	return std::unique_ptr<FileEntry>();
 }
 
 FolderPtr PhysicalFileSystem::getFolder(const std::filesystem::path& path)

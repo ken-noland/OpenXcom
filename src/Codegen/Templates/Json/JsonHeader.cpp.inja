@@ -6,4 +6,14 @@
 #include <nlohmann/json.hpp>
 #include <cassert>
 
+
+namespace OpenXcom {
+
+// forward declarations of template specializations
+{% for type in types %}template <> extern bool OpenXcom::fromJson<{{type.fullName}}>(const nlohmann::json& json, {{type.fullName}}& object);
+template <> extern bool OpenXcom::toJson<{{type.fullName}}>(const {{type.fullName}}& object, nlohmann::json& json);
+{% endfor %}
+
+} // namespace OpenXcom
+
 // END JsonHeader.cpp.inja

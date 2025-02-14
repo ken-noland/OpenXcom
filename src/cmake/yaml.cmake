@@ -20,3 +20,17 @@ add_custom_target(build_yaml
 target_compile_options(yaml-cpp PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4267>
 )
+
+# Fetch rapidyaml
+#  Rapidyaml is a header-only library for parsing YAML files
+set(RYML_BUILD_TOOLS OFF CACHE BOOL "Skip building rapidyaml tools")
+
+
+message(STATUS "Fetching rapidyaml")
+FetchContent_Declare(
+  rapidyaml
+  GIT_REPOSITORY https://github.com/biojppm/rapidyaml.git
+  GIT_TAG "v0.7.2" # Can be a tag
+  SOURCE_DIR  "${CMAKE_BINARY_DIR}/_deps/rapidyaml-src"
+)
+FetchContent_MakeAvailable(rapidyaml)

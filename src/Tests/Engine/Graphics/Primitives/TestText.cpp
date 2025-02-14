@@ -45,6 +45,7 @@ protected:
 	void TearDown() override
 	{
 		_fontHandle.release();
+		_ansiPaletteHandle.release();
 		_paletteHandle.release();
 	}
 };
@@ -138,6 +139,37 @@ TEST_F(GraphicsTextTest, TestColorSections)
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
+TEST_F(GraphicsTextTest, TestMultiLineQuickBrownFox)
+{
+	std::string text = "The quick brown fox jumps over the lazy dog";
+
+	PrimitiveFactory& factory = _gameSurface->getRenderTarget().getPrimitiveFactory();
+	TextSettings settings;
+
+	settings.alignment = TextAlignment::Left;
+	settings.fontHandle = _fontHandle.getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
+	settings.extents = {200, 0};
+	settings.offset = {0, 0};
+	settings.defaultStyle.colorIndex = 7;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
+
+	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
+	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "003_quick_brown_fox_wrapping.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
+}
+
 TEST_F(GraphicsTextTest, TestMultiLineLoremIpsum)
 {
 	// The text to shape
@@ -222,7 +254,7 @@ TEST_F(GraphicsTextTest, TestMultiLineLoremIpsum)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "003_lorem_ipsum_wrapping.png";
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "004_lorem_ipsum_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -287,7 +319,7 @@ TEST_F(GraphicsTextTest, TestMultilineReallyLongWord)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "004_really_long_word_wrapping.png";
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "005_really_long_word_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -373,6 +405,29 @@ TEST_F(GraphicsTextTest, TestMultiNewLine)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "005_lorem_ipsum_multiline_wrapping.png";
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "006_lorem_ipsum_multiline_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
+}
+
+
+#include "../../../../Engine/Graphics/Font/FontPack.h"
+
+class GraphicsInGameFontTextTest : public TestEngineSuite
+{
+protected:
+	std::unique_ptr<FontPack> _fontPack;
+
+	void SetUp() override
+	{
+		_fontPack = std::make_unique<FontPack>(_engine->getEngineContext(), "Common/Font/Font.yml");
+	}
+
+	void TearDown() override
+	{
+	}
+};
+
+TEST_F(GraphicsInGameFontTextTest, TestBasic)
+{
+	throw std::runtime_error("GraphicsInGameFontTextTest::TestBasic not implemented");
 }

@@ -36,7 +36,7 @@ TEST(VirtualFileSystemTest, TestPhysicalFileEntry)
 	VirtualFileSystem vfs(options);
 
 	FileSystem& data = vfs.getDataFileSystem();
-	FilePtr entry = data.getFile("test.txt");
+	std::unique_ptr<FileEntry> entry = data.getFile("test.txt");
 	EXPECT_TRUE(entry);
 
 	FileEntry::IStreamPtr stream = entry->openRead();

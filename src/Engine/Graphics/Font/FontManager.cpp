@@ -20,10 +20,15 @@
 #include "FontManager.h"
 #include "../Image/Image.h"
 
+#include "../../EngineContext.h"
+#include "../../Logger.h"
+#include "../../Filesystem/VirtualFileSystem.h"
+
 namespace OpenXcom
 {
 
-FontManager::FontManager()
+FontManager::FontManager(EngineContext& context)
+	: _context(context)
 {
 }
 
@@ -31,10 +36,28 @@ FontManager::~FontManager()
 {
 }
 
-OwningHandle<Font> FontManager::loadFont(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
+OwningHandle<Font> FontManager::load(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
 {
 	return add(std::make_unique<Font>(name, std::move(texture), asciiGlyphs, extendedGlyphs));
 }
+
+OwningHandle<Font> FontManager::load(const std::string& name, const std::filesystem::path& filename)
+{
+	// use the virtual file system to find the font file
+	FileSystem& vfs = _context.getVirtualFileSystem().getDataFileSystem();
+	std::unique_ptr<FileEntry> file = vfs.getFile(filename);
+
+	if (!file)
+	{
+		Log(LOG_ERROR) << "FontManager: Could not find font file: " << filename;
+		return OwningHandle<Font>();
+	}
+
+
+	throw std::runtime_error("FontManager::load not implemented");
+	return OwningHandle<Font>();
+}
+
 
 ResourceHandle<Font> FontManager::getFontByName(const std::string& name) const
 {

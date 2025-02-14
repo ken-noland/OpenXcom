@@ -105,14 +105,21 @@ bool isTypeSerializable(const SimpleRTTR::Type& type)
 	return false;
 }
 
-bool isPropertySerializable(const SimpleRTTR::Property& property)
+OpenXcom::PropertySerialize getPropertySerializable(const SimpleRTTR::Property& property)
 {
 	if (property.meta().has("Serialize"))
 	{
-		OpenXcom::PropertySerialize serialize = property.meta().get("Serialize").value().get_as<OpenXcom::PropertySerialize>();
-		return serialize == OpenXcom::PropertySerialize::ALWAYS;
+		const SimpleRTTR::Variant& serializeMetaValue = property.meta().get("Serialize").value();
+		if(serializeMetaValue.type() != SimpleRTTR::types().get_type<OpenXcom::PropertySerialize>())
+		{
+			std::cerr << "Serialize type for property `" << property.name() << "' is not of type 'OpenXcom::PropertySerialize'. It is registered as type '" << serializeMetaValue.type().name() << "'." << std::endl;
+			return OpenXcom::PropertySerialize::NEVER;
+		}
+
+		OpenXcom::PropertySerialize serialize = serializeMetaValue.get_as<OpenXcom::PropertySerialize>();
+		return serialize;
 	}
-	return false;
+	return OpenXcom::PropertySerialize::NEVER;
 }
 
 
@@ -152,7 +159,8 @@ void collectProperties(TypeSet& types, const SimpleRTTR::Type& type, const std::
 {
 	for (const SimpleRTTR::Property& prop : type.properties())
 	{
-		if(!isPropertySerializable(prop))
+		OpenXcom::PropertySerialize shouldSerialize = getPropertySerializable(prop);
+		if (shouldSerialize == OpenXcom::PropertySerialize::NEVER)
 		{
 			continue;
 		}
@@ -170,7 +178,7 @@ void collectProperties(TypeSet& types, const SimpleRTTR::Type& type, const std::
 		}
 		if (passesAllFilters)
 		{
-			types.push_front(propType);
+			types.push_back(propType);
 		}
 	}
 }
@@ -208,7 +216,9 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 	//exclude std::string, std::filesystem::path, and others that we will be implicitly handling
 	typeFilters.push_back([](const SimpleRTTR::Type& type) {
 		static std::vector<std::type_index> typesToExclude = {
-			typeid(std::string),			
+			typeid(std::string),
+			typeid(std::u16string),
+			typeid(std::u32string),
 			typeid(std::filesystem::path),
 			typeid(bool),
 			typeid(int),
@@ -444,7 +454,6 @@ bool loadTemplate(inja::Template& templ, std::filesystem::path path, inja::Envir
 	return true;
 }
 
-
 std::string getTemplateForType(const SimpleRTTR::Type& type)
 {
 	if (type.meta().has("Codegen-Override-Template"))
@@ -531,7 +540,8 @@ bool convertTypesToJson(nlohmann::json::reference typesJson, const TypeSet& type
 		typeJson["properties"] = nlohmann::json::array();
 		for (const SimpleRTTR::Property& prop : type.properties())
 		{
-			if (!isPropertySerializable(prop))
+			OpenXcom::PropertySerialize propertySerialize = getPropertySerializable(prop);
+			if (getPropertySerializable(prop) == OpenXcom::PropertySerialize::NEVER)
 			{
 				continue;
 			}
@@ -541,6 +551,7 @@ bool convertTypesToJson(nlohmann::json::reference typesJson, const TypeSet& type
 			propJson["name"] = prop.name();
 			propJson["fulltype"] = getFullNameForType(prop.type());
 			propJson["type"] = prop.type().name();
+			propJson["optional"] = propertySerialize == OpenXcom::PropertySerialize::OPTIONAL ? true : false;
 
 			typeJson["properties"].push_back(propJson);
 		}
@@ -758,8 +769,8 @@ bool parseCommandLine(CommandLineArguments& args, int argc, char* argv[])
 	// check the template actually exists
 	if (!std::filesystem::exists(args.templatePath))
 	{
-		std::cerr << "Template file does not exist" << std::endl;
-		return 1;
+		std::cerr << "Template file could not be found" << std::endl;
+		return false;
 	}
 
 	// check that the output was specified in the command line

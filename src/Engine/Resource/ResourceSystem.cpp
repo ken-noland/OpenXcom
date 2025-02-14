@@ -46,7 +46,7 @@ ResourceSystem::ResourceSystem(EngineContext& context)
 	_bufferManager = graphicsSystem.createBufferManager();
 
 	_paletteManager = std::make_unique<PaletteManager>(context);
-	_fontManager = std::make_unique<FontManager>();
+	_fontManager = std::make_unique<FontManager>(context);
 	_imageManager = graphicsSystem.createImageManager();
 
 	_imageFileProcessor = std::make_unique<ImageFileProcessor>();

@@ -93,18 +93,18 @@ void CompositeFilesystem::addFileSystem(std::unique_ptr<FileSystem> fs)
 	_filesystems.push_back(std::move(fs));
 }
 
-FilePtr CompositeFilesystem::getFile(const std::filesystem::path& path)
+std::unique_ptr<FileEntry> CompositeFilesystem::getFile(const std::filesystem::path& path)
 {
 	// first come, first serve
 	for (const auto& fs : _filesystems)
 	{
-		FilePtr file = fs->getFile(path);
+		std::unique_ptr<FileEntry> file = fs->getFile(path);
 		if (file)
 		{
 			return file;
 		}
 	}
-	return FilePtr();
+	return std::unique_ptr<FileEntry>();
 }
 
 FolderPtr CompositeFilesystem::getFolder(const std::filesystem::path& path)

@@ -90,4 +90,4 @@ public:
 	std::vector<PositionedGlyph> shapeText(const std::string_view& text, glm::ivec2 position) const;
 };
 
-}
+} // namespace OpenXcom

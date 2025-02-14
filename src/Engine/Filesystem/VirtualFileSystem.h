@@ -72,8 +72,6 @@ protected:
 
 };
 
-using FilePtr = std::unique_ptr<FileEntry>;
-
 class FolderEntry : public VFSEntry
 {
 public:
@@ -83,7 +81,6 @@ public:
 };
 
 using FolderPtr = std::unique_ptr<FolderEntry>;
-
 
 class FileSystemIteratorImpl
 {
@@ -172,12 +169,15 @@ class FileSystem
 public:
 	virtual ~FileSystem() = default;
 
-	virtual FilePtr getFile(const std::filesystem::path& path) = 0;
+	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) = 0;
 	virtual FolderPtr getFolder(const std::filesystem::path& path) = 0;
 
 	// Iterator support
 	virtual FileSystemIterator begin() = 0;
 	virtual FileSystemIterator end() = 0;
+
+	// Helper functions
+	std::string getFileExtension(const std::filesystem::path& path) const;
 };
 
 // for files that are embedded in the executable
@@ -187,7 +187,7 @@ public:
 	EmbeddedFileSystem();
 	virtual ~EmbeddedFileSystem() override;
 
-	virtual FilePtr getFile(const std::filesystem::path& path) override;
+	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) override;
 	virtual FolderPtr getFolder(const std::filesystem::path& path) override;
 
 	virtual FileSystemIterator begin() override;
@@ -201,7 +201,7 @@ public:
 	PhysicalFileSystem(const std::filesystem::path& path);
 	virtual ~PhysicalFileSystem() override;
 
-	virtual FilePtr getFile(const std::filesystem::path& path) override;
+	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) override;
 	virtual FolderPtr getFolder(const std::filesystem::path& path) override;
 		
 	virtual FileSystemIterator begin() override;
@@ -220,7 +220,7 @@ public:
 	ZipFileSystem(const std::filesystem::path& path);
 	virtual ~ZipFileSystem() override;
 
-	virtual FilePtr getFile(const std::filesystem::path& path) override;
+	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) override;
 	virtual FolderPtr getFolder(const std::filesystem::path& path) override;
 
 	virtual FileSystemIterator begin() override;
@@ -240,7 +240,7 @@ public:
 
 	void addFileSystem(std::unique_ptr<FileSystem> fs);
 
-	virtual FilePtr getFile(const std::filesystem::path& path) override;
+	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) override;
 	virtual FolderPtr getFolder(const std::filesystem::path& path) override;
 
 	virtual FileSystemIterator begin() override;

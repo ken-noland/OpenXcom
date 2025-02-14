@@ -18,12 +18,15 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <entt/entt.hpp>
+#include <simplerttr.h>
 
 #if defined(None)
 #undef None
 #endif
 
-#include <simplerttr.h>
+#if defined(OPTIONAL)
+#undef OPTIONAL
+#endif
 
 namespace OpenXcom
 {
@@ -53,6 +56,7 @@ enum class ObjectSerialize
 enum class PropertySerialize
 {
 	NEVER, // default
+	OPTIONAL,
 	ALWAYS
 };
 

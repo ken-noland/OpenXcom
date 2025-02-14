@@ -400,8 +400,6 @@ public:
 	{
 		OpenXcom::ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();
 
-		//std::unique_ptr<OpenXcom::Font> font;
-
 		// Load the DOS font
 		OpenXcom::ImageFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, false);
 		OpenXcom::OwningHandle<OpenXcom::HostImage> hostFontTexture = fontTextureFile.takeImage();
@@ -410,7 +408,7 @@ public:
 		OpenXcom::OwningHandle<OpenXcom::DeviceImage> deviceFontTexture = resourceSystem.getImageManager().createDeviceImage(*hostFontTexture);
 
 		// Create the font object
-		OpenXcom::OwningHandle<OpenXcom::Font> font = resourceSystem.getFontManager().loadFont("dosFont", std::move(deviceFontTexture), getAsciiGlyphs());
+		OpenXcom::OwningHandle<OpenXcom::Font> font = resourceSystem.getFontManager().load("dosFont", std::move(deviceFontTexture), getAsciiGlyphs());
 		font->setLineSpacing(0);
 
 		return font;

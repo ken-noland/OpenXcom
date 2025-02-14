@@ -1,0 +1,19 @@
+// BEGIN YamlHeader.cpp.inja
+
+{% for header in headers %}{{ header }}
+{% endfor %}
+
+#include <ryml.hpp>
+
+namespace OpenXcom {
+
+// forward declarations of template specializations
+{% for type in types %}template <>
+extern bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object);
+template <>
+extern bool OpenXcom::toYaml<{{type.fullName}}>(const {{type.fullName}}& object, ryml::NodeRef& yaml);
+{% endfor %}
+
+} // namespace OpenXcom
+
+// END YamlHeader.cpp.inja

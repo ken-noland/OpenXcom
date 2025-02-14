@@ -69,6 +69,11 @@ private:
 	std::ostringstream os;
 };
 
-#define Log(level) if (level > Logger::reportingLevel()) { } else Logger().get(level)
+#define Log(level)                                  \
+	if (level > OpenXcom::Logger::reportingLevel()) \
+	{                                               \
+	}                                               \
+	else                                            \
+		OpenXcom::Logger().get(level)
 
 }

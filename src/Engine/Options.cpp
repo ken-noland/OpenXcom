@@ -20,6 +20,7 @@
 #include "Options.h"
 #include "Logger.h"
 #include "Json.h"
+#include "Yaml.h"
 #include "../version.h"
 
 #include <sstream>
