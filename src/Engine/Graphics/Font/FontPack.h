@@ -31,7 +31,7 @@ class EngineContext;
 struct FileFontImageDefinition
 {
 	std::filesystem::path file;
-	std::string chars;
+	std::u32string chars;
 	uint32_t width;
 	int32_t spacing;
 };

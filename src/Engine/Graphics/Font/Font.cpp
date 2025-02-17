@@ -122,6 +122,39 @@ glm::ivec2 Font::getTextExtents(const std::string_view& text) const
 	return glm::ivec2(width, 16);
 }
 
+glm::ivec2 Font::getTextExtents(const std::u32string& text) const
+{
+	return getTextExtents(std::u32string_view(text));
+}
+
+glm::ivec2 Font::getTextExtents(const std::u32string_view& text) const
+{
+	// Create a HarfBuzz buffer and add the UTF-8 text.
+	hb_buffer_clear_contents(_tempBuffer);
+
+	int size = static_cast<int>(text.size());
+	hb_buffer_add_utf32(_tempBuffer, reinterpret_cast<const uint32_t*>(text.data()), size, 0, size);
+	hb_buffer_guess_segment_properties(_tempBuffer);
+
+	// Shape the text using our HarfBuzz font.
+	hb_shape(_hbFont, _tempBuffer, nullptr, 0);
+
+	// Retrieve the glyph positions.
+	unsigned int glyphCount = 0;
+	hb_glyph_position_t* glyphPositions = hb_buffer_get_glyph_positions(_tempBuffer, &glyphCount);
+
+	int totalAdvance = 0;
+	for (unsigned int i = 0; i < glyphCount; i++)
+	{
+		totalAdvance += glyphPositions[i].x_advance; // x_advance is in 26.6 fixed-point format.
+	}
+
+	// Convert total advance from fixed-point (26.6) to integer pixels.
+	int width = totalAdvance / 64;
+
+	// For this bitmap font, the height is constant (e.g., 16 pixels).
+	return glm::ivec2(width, 16);
+}
 
 // Generates positioned glyphs for rendering
 std::vector<PositionedGlyph> Font::shapeText(const std::string_view& text, glm::ivec2 position) const
@@ -164,6 +197,50 @@ std::vector<PositionedGlyph> Font::shapeText(const std::string_view& text, glm::
 	hb_buffer_destroy(buffer);
 	return positionedGlyphs;
 }
+
+
+// Generates positioned glyphs for rendering
+std::vector<PositionedGlyph> Font::shapeText(const std::u32string_view& text, glm::ivec2 position) const
+{
+	std::vector<PositionedGlyph> positionedGlyphs;
+
+	hb_buffer_t* buffer = hb_buffer_create();
+	int size = static_cast<int>(text.size());
+	hb_buffer_add_utf32(buffer, reinterpret_cast<const uint32_t*>(text.data()), size, 0, size);
+	hb_buffer_guess_segment_properties(buffer);
+
+	hb_shape(_hbFont, buffer, nullptr, 0);
+
+	unsigned int glyphCount;
+	hb_glyph_info_t* glyphInfo = hb_buffer_get_glyph_infos(buffer, &glyphCount);
+	hb_glyph_position_t* glyphPos = hb_buffer_get_glyph_positions(buffer, &glyphCount);
+
+	float x = static_cast<float>(position.x);
+	float y = static_cast<float>(position.y);
+
+	for (unsigned int i = 0; i < glyphCount; i++)
+	{
+		char32_t codepoint = glyphInfo[i].codepoint;
+		const Glyph* glyph = getGlyph(codepoint);
+		if (!glyph) continue; // Skip missing characters
+
+		glm::ivec2 pos = {static_cast<int>(x + glyphPos[i].x_offset / 64.0f), // Apply HarfBuzz offset (fixed 26.6 format)
+						  static_cast<int>(y + glyphPos[i].y_offset / 64.0f)};
+
+		positionedGlyphs.push_back({codepoint,
+									pos,
+									static_cast<int32_t>(glyphPos[i].x_advance / 64.0f),
+									static_cast<int32_t>(glyphPos[i].x_offset / 64.0f),
+									static_cast<int32_t>(glyphPos[i].y_offset / 64.0f),
+									glyphInfo[i].codepoint});
+
+		x += glyphPos[i].x_advance / 64.0f; // Move cursor forward
+	}
+
+	hb_buffer_destroy(buffer);
+	return positionedGlyphs;
+}
+
 
 const DeviceImage& Font::getDeviceImage() const
 {

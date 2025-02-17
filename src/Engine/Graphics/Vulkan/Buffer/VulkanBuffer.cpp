@@ -18,6 +18,7 @@
  */
 #include "VulkanBuffer.h"
 #include "../VulkanContext.h"
+#include "../../../Logger.h"
 
 namespace OpenXcom
 {
@@ -257,6 +258,11 @@ void VulkanDeviceBuffer::copy(const VulkanHostBuffer& hostBuffer)
 {
 	// KN NOTE: It's possible that we could use a multithreaded version of this which allows us to push up the contents without
 	//  having to wait for the previous command. This would reduce load times, but at the cost of adding complexity.
+	if(hostBuffer.getCount() == 0)
+	{
+		Log(LOG_DEBUG) << "Attempting to copy a zero sized buffer";
+		return;
+	}
 
 	resize(hostBuffer.getCount());
 

@@ -182,7 +182,7 @@ public:
 			uint32_t width = 0, height = 0;
 
 			unsigned error = lodepng::decode(baseline, width, height, baselinePath.string().c_str());
-			EXPECT_EQ(error, 0) << "Failed to load baseline image.";
+			ASSERT_EQ(error, 0) << "Failed to load baseline image.";
 
 			// Compare dimensions
 			ASSERT_EQ(width, hostImage.getExtent().x) << "Image width mismatch.";

@@ -612,6 +612,7 @@ include(cmake/lodepng.cmake)
 include(cmake/libbmp.cmake)
 include(cmake/harfbuzz.cmake)
 include(cmake/libunibreak.cmake)
+include(cmake/utfcpp.cmake)
 
 #--------------------------------
 # set up the defines and includes
@@ -646,6 +647,7 @@ set(openxcom_includes
   ${lodepng_SOURCE_DIR}
   ${libbmp_SOURCE_DIR}
   ${libunibreak_SOURCE_DIR}/src
+  ${utfcpp_SOURCE_DIR}/source
 )
 
 set(openxcom_libs

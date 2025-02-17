@@ -35,10 +35,14 @@
 #include "../../Resource/ResourceSystem.h"
 
 #include <linebreak.h>
+#include <utf8.h>
 
 #include "../../Logger.h"
 
 #include "../../Utility/RTTR.h"
+
+// need to define this string stream because the std library doesn't define one for char32_t
+using u32stringstream = std::basic_istringstream<char32_t, std::char_traits<char32_t>, std::allocator<char32_t>>;
 
 SIMPLERTTR
 {
@@ -87,16 +91,21 @@ void TextPrimitive::setText(const std::string& text)
 
 	_text = text;
 
-	// Step 1: Cut up the text by any style delimiters(ANSI escape codes)
+	// Step 1: parse the text into utf-32
+	_utf32Text.clear();
+	_utf32Text.reserve(text.size());
+	utf8::utf8to32(_text.begin(), _text.end(), std::back_inserter(_utf32Text));
+
+	// Step 2: Cut up the text by any style delimiters(ANSI escape codes)
 	processTextSections();
 
-	// Step 2: Process line shaping and word wrapping
+	// Step 3: Process line shaping and word wrapping
 	processLineShaping();
 
-	// Step 3: Generate glyphs (text alignment and placement)
+	// Step 4: Generate glyphs (text alignment and placement)
 	processGlyphs();
 
-	// Step 4: Generate vertices
+	// Step 5: Generate vertices
 	processVertexBuffer();
 }
 
@@ -120,13 +129,14 @@ void TextPrimitive::processTextSections()
 	ResourceHandle<Font> currentFont = _settings.fontHandle;
 	TextStyle currentStyle(_settings.defaultStyle);
 
-	// Use the member _text as the source string.
-	const std::string& rawText = _text;
+	// Use the member _utf32Text as the source string.
+	const std::u32string& rawText = _utf32Text;
 
-	std::string::const_iterator it = rawText.begin();
-	std::string::const_iterator end = rawText.end();
+	std::u32string::const_iterator it = rawText.begin();
+	std::u32string::const_iterator end = rawText.end();
+
 	// sectionStart marks the beginning of a plain-text segment.
-	std::string::const_iterator sectionStart = it;
+	std::u32string::const_iterator sectionStart = it;
 
 	while (it != end)
 	{
@@ -135,19 +145,19 @@ void TextPrimitive::processTextSections()
 			// Flush any plain text from sectionStart up to (but not including) this ESC.
 			if (it != sectionStart)
 			{
-				std::string_view view(&*sectionStart, static_cast<size_t>(it - sectionStart));
+				std::u32string_view view(&*sectionStart, static_cast<size_t>(it - sectionStart));
 				_sections.emplace_back(TextSection{view, currentStyle, currentFont});
 			}
 
 			// Verify that the character following ESC is '['.
-			std::string::const_iterator nextIt = std::next(it);
+			std::u32string::const_iterator nextIt = std::next(it);
 			if (nextIt != end && *nextIt == '[')
 			{
 				// Skip the ESC and '['.
-				std::string::const_iterator seqStart = std::next(it, 2);
-				std::string parameter;
-				char terminator = '\0';
-				std::string::const_iterator j = seqStart;
+				std::u32string::const_iterator seqStart = std::next(it, 2);
+				std::u32string parameter;
+				char32_t terminator = U'\0';
+				std::u32string::const_iterator j = seqStart;
 
 				// Read characters until a letter (the terminator) is encountered.
 				while (j != end && !std::isalpha(static_cast<unsigned char>(*j)))
@@ -167,11 +177,13 @@ void TextPrimitive::processTextSections()
 				// Process the escape sequence.
 				if (terminator == 'f')
 				{
-					const std::string fnPrefix = "fn=";
+					const std::u32string fnPrefix = U"fn=";
 					if (parameter.substr(0, fnPrefix.size()) == fnPrefix)
 					{
-						std::string fontName = parameter.substr(fnPrefix.size());
-						currentFont = fontManager.getFontByName(fontName);
+						std::u32string fontName = parameter.substr(fnPrefix.size());
+						std::string fontNameUtf8;
+						utf8::utf32to8(fontName.begin(), fontName.end(), std::back_inserter(fontNameUtf8));
+						currentFont = fontManager.getFontByName(fontNameUtf8);
 					}
 				}
 				else if (terminator == 'm')
@@ -184,11 +196,14 @@ void TextPrimitive::processTextSections()
 					}
 					else
 					{
-						std::istringstream iss(parameter);
-						std::string token;
-						while (std::getline(iss, token, ';'))
+						u32stringstream iss(parameter);
+						std::u32string token;
+						while (std::getline(iss, token, U';'))
 						{
-							int code = std::stoi(token);
+							std::string tokenUtf8; // annoyingly, we need to convert it back to utf8 if we want to use std::stoi()
+							utf8::utf32to8(token.begin(), token.end(), std::back_inserter(tokenUtf8));
+
+							int code = std::stoi(tokenUtf8);
 							if (code == 0)
 							{
 								currentStyle = _settings.defaultStyle;
@@ -248,7 +263,7 @@ void TextPrimitive::processTextSections()
 	// Flush any remaining text after the loop.
 	if (it != sectionStart)
 	{
-		std::string_view view(&*sectionStart, static_cast<size_t>(it - sectionStart));
+		std::u32string_view view(&*sectionStart, static_cast<size_t>(it - sectionStart));
 		_sections.emplace_back(TextSection{view, currentStyle, currentFont});
 	}
 }
@@ -259,7 +274,7 @@ void TextPrimitive::processLineShaping()
 
 	int maxWidth = _settings.extents.x;
 	int y_offset = _settings.offset.y;
-	std::string_view textView(_text);
+	std::u32string_view textView(_utf32Text);
 	
 	if (maxWidth <= 0)
 	{
@@ -303,7 +318,7 @@ void TextPrimitive::processLineShaping()
 		// Precompute break properties for this section.
 		size_t secLen = section.text.size();
 		std::vector<char> breakProps(secLen);
-		set_linebreaks_utf8(reinterpret_cast<const utf8_t*>(section.text.data()),
+		set_linebreaks_utf32(reinterpret_cast<const utf32_t*>(section.text.data()),
 							secLen, "en", breakProps.data());
 
 		// Reset the current section’s local-run start.
@@ -319,7 +334,7 @@ void TextPrimitive::processLineShaping()
 			prevExtents = runExtents;
 
 			// Measure the run from localRunStart to i (in this section)
-			std::string_view runSegment = section.text.substr(localRunStart, i - localRunStart + 1);
+			std::u32string_view runSegment = section.text.substr(localRunStart, i - localRunStart + 1);
 			runExtents = font.getTextExtents(runSegment);
 			// The current line width is the sum of the accumulated width (from previous sections)
 			// and the measured width in the current section’s run.
@@ -347,7 +362,7 @@ void TextPrimitive::processLineShaping()
 			{
 				// On a mandatory break, flush immediately.
 				size_t breakPos = globalIndex + i + 1;
-				std::string_view lineView = textView.substr(lineStartIdx, breakPos - lineStartIdx);
+				std::u32string_view lineView = textView.substr(lineStartIdx, breakPos - lineStartIdx);
 				_lines.push_back({lineView, y_offset, currentLineHeight, currentLineWidth});
 
 				accumulatedHeight = currentLineHeight;
@@ -372,7 +387,7 @@ void TextPrimitive::processLineShaping()
 				if (allowedBreakGlobal != std::string_view::npos && allowedBreakGlobal > lineStartIdx)
 				{
 					// Flush the line at the allowed break.
-					std::string_view lineView = textView.substr(lineStartIdx, allowedBreakGlobal - lineStartIdx);
+					std::u32string_view lineView = textView.substr(lineStartIdx, allowedBreakGlobal - lineStartIdx);
 					_lines.push_back({lineView, y_offset, currentLineHeight, allowedBreakLineWidth});
 
 					accumulatedHeight = currentLineHeight;
@@ -390,7 +405,7 @@ void TextPrimitive::processLineShaping()
 				{
 					// Otherwise, force a break at the current character.
 					size_t breakPos = globalIndex + i;
-					std::string_view lineView = textView.substr(lineStartIdx, breakPos - lineStartIdx);
+					std::u32string_view lineView = textView.substr(lineStartIdx, breakPos - lineStartIdx);
 					_lines.push_back({lineView, y_offset, currentLineHeight, prevExtents.x});
 
 					accumulatedHeight = currentLineHeight;
@@ -409,7 +424,7 @@ void TextPrimitive::processLineShaping()
 		// At the end of the section, add the width of any remaining run from localRunStart.
 		if (secLen > localRunStart)
 		{
-			std::string_view remainder = section.text.substr(localRunStart);
+			std::u32string_view remainder = section.text.substr(localRunStart);
 			accumulatedWidth += font.getTextExtents(remainder).x;
 		}
 		globalIndex += secLen;
@@ -418,27 +433,27 @@ void TextPrimitive::processLineShaping()
 	// Flush any remaining text as the final line.
 	if (globalIndex > lineStartIdx)
 	{
-		std::string_view lineView = textView.substr(lineStartIdx, globalIndex - lineStartIdx);
+		std::u32string_view lineView = textView.substr(lineStartIdx, globalIndex - lineStartIdx);
 		_lines.push_back({lineView, y_offset, accumulatedHeight, accumulatedWidth});
 	}
 }
 
-std::string_view intersectViews(std::string_view a, std::string_view b)
+std::u32string_view intersectViews(std::u32string_view a, std::u32string_view b)
 {
-	const char* a_start = a.data();
-	const char* a_end = a_start + a.size();
-	const char* b_start = b.data();
-	const char* b_end = b_start + b.size();
+	const char32_t* a_start = a.data();
+	const char32_t* a_end = a_start + a.size();
+	const char32_t* b_start = b.data();
+	const char32_t* b_end = b_start + b.size();
 
 	// The intersection starts at the later of the two start pointers...
-	const char* inter_start = std::max(a_start, b_start);
+	const char32_t* inter_start = std::max(a_start, b_start);
 	// ...and ends at the earlier of the two end pointers.
-	const char* inter_end = std::min(a_end, b_end);
+	const char32_t* inter_end = std::min(a_end, b_end);
 
 	if (inter_start < inter_end)
-		return std::string_view(inter_start, inter_end - inter_start);
+		return std::u32string_view(inter_start, inter_end - inter_start);
 	else
-		return std::string_view(); // empty view if no overlap
+		return std::u32string_view(); // empty view if no overlap
 }
 
 void TextPrimitive::processGlyphs()
@@ -483,11 +498,19 @@ void TextPrimitive::processGlyphs()
 		section.pipelineBinding->setPushConstant(ShaderStage::Fragment, pushConstants);
 
 		// Get the intersection of the section and the line
-		for (std::string_view intersection = intersectViews(section.text, lineIter->line);
+		for (std::u32string_view intersection = intersectViews(section.text, lineIter->line);
 			 intersection.length() != 0;
 			 intersection = intersectViews(section.text, lineIter->line))
 		{
 			std::vector<PositionedGlyph> glyphs = font.shapeText(intersection, position);
+
+			if (glyphs.empty())
+			{
+				// No glyphs to render
+				break;
+			}
+
+			// Update the glyph positions to account for the line alignment
 			section.glyphs.insert(section.glyphs.end(), glyphs.begin(), glyphs.end());
 
 			bool endOfSection = intersection.data() + intersection.size() == section.text.data() + section.text.size();

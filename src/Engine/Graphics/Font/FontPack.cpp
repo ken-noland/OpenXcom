@@ -144,12 +144,44 @@ void FontPack::load(const std::filesystem::path& path)
 	FileEntry::IStreamPtr stream = file->openRead();
 	std::string contents(std::istreambuf_iterator<char>(*stream), {});
 
-	// read the file into memory
+	// Read the file into memory
 	ryml::substr substr(contents.data(), contents.size());
 	ryml::Tree tree = ryml::parse_in_place(substr);
 
+	// Parse the YAML document
 	FileFont fileFonts;
 	fromYaml(tree.rootref(), fileFonts);
+
+	// Load the fonts
+	for (const FileFontDefinition& fontDef : fileFonts.fonts)
+	{
+		//// Load the font images
+		//std::array<Glyph, 128> asciiGlyphs;
+		//std::unordered_map<char32_t, Glyph> extendedGlyphs;
+		//for (const FileFontImageDefinition& imageDef : fontDef.images)
+		//{
+		//	// Load the image
+		//	std::filesystem::path imagePath = path.parent_path() / imageDef.file;
+		//	OwningHandle<DeviceImage> image = _context.getResourceSystem().getImageManager().load(imagePath);
+
+		//	// Load the glyphs
+		//	for (char c : imageDef.chars)
+		//	{
+		//		if (c < 128)
+		//		{
+		//			asciiGlyphs[c] = Glyph{image, c};
+		//		}
+		//		else
+		//		{
+		//			extendedGlyphs[c] = Glyph{image, c};
+		//		}
+		//	}
+		//}
+		//// Load the font
+		//OwningHandle<Font> font = _context.getResourceManager().getFontManager().load(fontDef.id, asciiGlyphs, extendedGlyphs);
+		//_fontPackHandles.push_back(font);
+	}
+
 }
 
 } // namespace OpenXcom

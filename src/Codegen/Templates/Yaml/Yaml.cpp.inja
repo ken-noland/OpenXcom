@@ -7,6 +7,8 @@
 
 {% include "header_template" %}
 
+#include <utf8.h>
+
 namespace OpenXcom {
 
 // A lightweight assertion handler that collects an error message via operator<<.
@@ -223,15 +225,20 @@ bool toYaml<std::string>(const std::string& type, ryml::NodeRef& yaml)
 //	yaml << type;
 //	return true;
 //}
-//
-//template <>
-//bool fromYaml<std::u32string>(ryml::ConstNodeRef const& yaml, std::u32string& type)
-//{
-//	assert(yaml.is_val());
-//	yaml >> type;
-//	return true;
-//}
-//
+
+template <>
+bool fromYaml<std::u32string>(ryml::ConstNodeRef const& yaml, std::u32string& type)
+{
+	YAML_ASSERT_MSG(yaml.has_val());
+
+	std::string str;
+	fromYaml<std::string>(yaml, str);
+
+	utf8::utf8to32(str.begin(), str.end(), std::back_inserter(type));
+
+	return true;
+}
+
 //template <>
 //bool toYaml<std::u32string>(const std::u32string& type, ryml::NodeRef& yaml)
 //{

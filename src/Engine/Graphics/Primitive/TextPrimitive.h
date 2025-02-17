@@ -80,7 +80,7 @@ struct TextSettings
 
 struct TextSection
 {
-	std::string_view text;
+	std::u32string_view text;
 	TextStyle style;
 	ResourceHandle<Font> font;
 
@@ -91,7 +91,7 @@ struct TextSection
 
 struct TextLine
 {
-	std::string_view line;
+	std::u32string_view line;
 
 	int32_t yOffset;
 	int32_t yHeight;
@@ -116,6 +116,8 @@ protected:
 	RenderTarget& _surface;
 
 	std::string _text;
+	std::u32string _utf32Text; // UTF-32 encoded text
+
 	TextSettings _settings;
 
 	std::vector<TextSection> _sections;

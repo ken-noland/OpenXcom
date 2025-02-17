@@ -78,16 +78,20 @@ public:
 
 	const Glyph* getGlyph(char32_t codepoint) const;
 
-	glm::ivec2 getTextExtents(const std::string& text) const;
-	glm::ivec2 getTextExtents(const std::string_view& text) const;
-
 	void setLineSpacing(uint32_t lineSpacing) { _lineSpacing = lineSpacing; }
 	uint32_t getLineSpacing() const { return _lineSpacing; }
 
 	const DeviceImage& getDeviceImage() const;
 	const DeviceBuffer& getDeviceFontData() const;
 
+	glm::ivec2 getTextExtents(const std::string& text) const;
+	glm::ivec2 getTextExtents(const std::string_view& text) const;
+
+	glm::ivec2 getTextExtents(const std::u32string& text) const;
+	glm::ivec2 getTextExtents(const std::u32string_view& text) const;
+
 	std::vector<PositionedGlyph> shapeText(const std::string_view& text, glm::ivec2 position) const;
+	std::vector<PositionedGlyph> shapeText(const std::u32string_view& text, glm::ivec2 position) const;
 };
 
 } // namespace OpenXcom
