@@ -416,10 +416,14 @@ class GraphicsInGameFontTextTest : public TestEngineSuite
 {
 protected:
 	std::unique_ptr<FontPack> _fontPack;
+	OwningHandle<Palette> _ansiPaletteHandle;
 
 	void SetUp() override
 	{
+		_ansiPaletteHandle = createAnsiColorPalette();
 		_fontPack = std::make_unique<FontPack>(_engine->getEngineContext(), "Common/Font/Font.yml");
+
+		ASSERT_EQ(4, _fontPack->getFonts().size()) << "Expected four fonts in the font pack";
 	}
 
 	void TearDown() override
@@ -429,5 +433,40 @@ protected:
 
 TEST_F(GraphicsInGameFontTextTest, TestBasic)
 {
-	throw std::runtime_error("GraphicsInGameFontTextTest::TestBasic not implemented");
+	std::string text = "Hello World!";
+
+	PrimitiveFactory& factory = _gameSurface->getRenderTarget().getPrimitiveFactory();
+	TextSettings settings;
+
+	settings.alignment = TextAlignment::Left;
+	settings.fontHandle = _fontPack->getFonts()[0].getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
+	settings.extents = {0, 0};
+	settings.offset = {2, 0};
+	settings.defaultStyle.colorIndex = 1;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
+
+	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
+	ASSERT_TRUE(textPrimitive);
+
+	const std::vector<TextLine>& lines = textPrimitive->getLines();
+	EXPECT_EQ(1, lines.size()); // 1 line
+
+	const std::vector<TextSection>& sections = textPrimitive->getSections();
+	ASSERT_EQ(1, sections.size()); // 1 section
+
+	const TextSection& section = sections[0];
+	EXPECT_EQ(text.size(), section.glyphs.size()); // we should have the same number of glyphs as characters in the text
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "101_hello_world.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
 }

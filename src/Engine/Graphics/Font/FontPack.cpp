@@ -92,50 +92,11 @@ FontPack::~FontPack()
 {
 }
 
-// Recursive function to walk through a YAML document
-void traverse_node(ryml::ConstNodeRef node, int indent = 0)
-{
-	// Create an indentation string based on the depth
-	std::string indentation(indent * 2, ' ');
-
-	// Check if the current node is a map
-	if (node.is_map())
-	{
-		// Iterate over each key-value pair in the map
-		for (ryml::ConstNodeRef child : node.children())
-		{
-			if (child.has_val())
-			{
-				Log(LOG_DEBUG) << indentation << child.key() << ": " << child.val();
-			}
-			else
-			{
-				Log(LOG_DEBUG) << indentation << child.key() << ": ";
-				traverse_node(child, indent + 1);
-			}
-		}
-	}
-	// Check if the current node is a sequence (list)
-	else if (node.is_seq())
-	{
-		// Iterate over each element in the sequence
-		for (ryml::ConstNodeRef child : node.children())
-		{
-			// For nested sequences or maps, print a newline and recurse
-			traverse_node(child, indent + 1);
-		}
-	}
-	// If the node is a scalar (a leaf), simply print it
-	else if (node.is_val())
-	{
-		Log(LOG_DEBUG) << std::string(indentation, '\t') << node << "\n";
-	}
-}
-
 // Load the font pack
 void FontPack::load(const std::filesystem::path& path)
 {
 	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	FontManager& fontManager = resourceSystem.getFontManager();
 	ImageManager& imageManager = resourceSystem.getImageManager();
 	ImageFileProcessor& imageFileProcessor = resourceSystem.getImageFileProcessor();
 
@@ -252,6 +213,8 @@ void FontPack::load(const std::filesystem::path& path)
 				glyph.width = (right - left + 1);
 				glyph.height = cellHeight;
 				glyph.xAdvance = glyph.width + fontDef.spacing;
+				glyph.xOffset = 0;
+				glyph.yOffset = 0;
 
 				// Add the glyph to the appropriate map
 				if (character < 128)
@@ -265,20 +228,22 @@ void FontPack::load(const std::filesystem::path& path)
 
 				++glyphIndex;
 			}
+			hostImage->unmap();
 
 			images.push_back(std::move(deviceImage));
-
-
-
-			// take ownership of the image
-			//images.push_back(imageFile.takeImage());
-
-			// Load the glyphs
-
 		}
 
-	}
+		asciiGlyphs[' '] = Glyph{0, 0, 0, 0, 0, 0, static_cast<char>(fontDef.width + fontDef.spacing), images[0].getHandle()};
 
+		// Load the font
+		OwningHandle<Font> font = fontManager.load(fontDef.id, std::move(images), asciiGlyphs, extendedGlyphs);
+		_fontPackHandles.push_back(std::move(font));
+	}
+}
+
+const std::vector<OwningHandle<Font>>& FontPack::getFonts() const
+{
+	return _fontPackHandles;
 }
 
 } // namespace OpenXcom

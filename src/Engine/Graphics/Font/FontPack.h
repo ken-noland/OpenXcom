@@ -65,6 +65,8 @@ public:
 	[[deprecated("Font packs are the old way of loading fonts. Explicit ownership of individual fonts is the preferred way. This feature will go away in future releases")]]
 	FontPack(EngineContext& context, const std::filesystem::path& fontPackPath);
 	~FontPack();
+
+	const std::vector<OwningHandle<Font>>& getFonts() const;
 };
 
 } // namespace OpenXcom

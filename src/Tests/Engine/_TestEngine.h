@@ -49,7 +49,7 @@ namespace
 class TestEngineSuite : public ::testing::Test
 {
 protected:
-	bool FORCE_REGENERATE_BASELINE = false;
+	bool FORCE_REGENERATE_BASELINE = true;
 
 	static std::unique_ptr<OpenXcom::Engine> _engine;
 
@@ -410,9 +410,12 @@ public:
 
 		// Transfer the host image to device so we can use it as a font texture
 		OpenXcom::OwningHandle<OpenXcom::DeviceImage> deviceFontTexture = resourceSystem.getImageManager().createDeviceImage(*hostFontTexture);
+		OpenXcom::ResourceHandle<OpenXcom::DeviceImage> fontTextureHandle = deviceFontTexture.getHandle();
+		std::vector<OpenXcom::OwningHandle<OpenXcom::DeviceImage>> textures;
+		textures.push_back(std::move(deviceFontTexture));
 
 		// Create the font object
-		OpenXcom::OwningHandle<OpenXcom::Font> font = resourceSystem.getFontManager().load("dosFont", std::move(deviceFontTexture), getAsciiGlyphs(deviceFontTexture.getHandle()));
+		OpenXcom::OwningHandle<OpenXcom::Font> font = resourceSystem.getFontManager().load("dosFont", std::move(textures), getAsciiGlyphs(fontTextureHandle));
 		font->setLineSpacing(0);
 
 		return font;

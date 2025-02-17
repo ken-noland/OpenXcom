@@ -231,7 +231,7 @@ const char* defaultFontFragmentShaderSource = R"(
 		// Sample the indexed image. For an R8 texture, the red channel will contain the index
 		// in normalized form (i.e. in the range [0.0, 1.0]).
 		float indexNormalized = texture(uImage, fragUV).r;
-    
+
 		// Convert the normalized value to an integer index.
 		// For an 8-bit channel, multiply by 255 and round.
 		uint index = uint(round(indexNormalized * 255.0));

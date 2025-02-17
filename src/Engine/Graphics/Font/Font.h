@@ -84,9 +84,9 @@ public:
 	uint32_t getLineSpacing() const { return _lineSpacing; }
 
 	glm::ivec2 getTextExtents(const std::string& text) const;
-	glm::ivec2 getTextExtents(const std::string_view& text) const;
-
 	glm::ivec2 getTextExtents(const std::u32string& text) const;
+
+	glm::ivec2 getTextExtents(const std::string_view& text) const;
 	glm::ivec2 getTextExtents(const std::u32string_view& text) const;
 
 	std::vector<PositionedGlyph> shapeText(const std::string_view& text, glm::ivec2 position) const;

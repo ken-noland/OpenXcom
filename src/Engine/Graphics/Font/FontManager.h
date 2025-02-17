@@ -37,7 +37,7 @@ public:
 	virtual ~FontManager();
 
 	// load font from memory
-	OwningHandle<Font> load(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
+	OwningHandle<Font> load(const std::string& name, std::vector<OwningHandle<DeviceImage>> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
 
 	// load font from file
 	OwningHandle<Font> load(const std::string& name, const std::filesystem::path& filename);

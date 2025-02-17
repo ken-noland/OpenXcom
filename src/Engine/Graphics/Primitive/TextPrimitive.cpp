@@ -146,14 +146,20 @@ void TextPrimitive::processTextSections()
 		Font& font = fontManager.get(currentFont);
 		const Glyph* glyph = font.getGlyph(*it); // we need to get the glyph to find the image, which, if it differs from the previous image, we need to split the section
 
+		assert(glyph != nullptr);
+		assert(glyph->image.isValid());
+
 		if(!currentImage.isValid())
 		{
+			// first glyph, set the current image
 			currentImage = glyph->image;
 		}
 		else if (currentImage != glyph->image)
 		{
 			std::u32string_view view(&*sectionStart, static_cast<size_t>(it - sectionStart));
 			_sections.emplace_back(TextSection{view, currentStyle, currentFont, currentImage});
+			currentImage = glyph->image;
+			sectionStart = it;
 		}
 
 		if (*it == '\x1B') // ESC character found.
@@ -355,6 +361,12 @@ void TextPrimitive::processLineShaping()
 			// The current line width is the sum of the accumulated width (from previous sections)
 			// and the measured width in the current section’s run.
 			int currentLineWidth = accumulatedWidth + runExtents.x;
+
+			if(runExtents.x < 0)
+			{
+				//Log(LOG_DEBUG) << "Negative width for run segment: " << runSegment;
+				Log(LOG_DEBUG) << "Current line width: " << currentLineWidth;
+			}
 
 			//Log(LOG_DEBUG) << "Current line width: " << currentLineWidth;
 

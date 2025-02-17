@@ -101,6 +101,11 @@ glm::ivec2 Font::getTextExtents(const std::string& text) const
 	return getTextExtents(std::string_view(text));
 }
 
+glm::ivec2 Font::getTextExtents(const std::u32string& text) const
+{
+	return getTextExtents(std::u32string_view(text));
+}
+
 glm::ivec2 Font::getTextExtents(const std::string_view& text) const
 {
 	// Create a HarfBuzz buffer and add the UTF-8 text.
@@ -128,11 +133,6 @@ glm::ivec2 Font::getTextExtents(const std::string_view& text) const
 
 	// For this bitmap font, the height is constant (e.g., 16 pixels).
 	return glm::ivec2(width, 16);
-}
-
-glm::ivec2 Font::getTextExtents(const std::u32string& text) const
-{
-	return getTextExtents(std::u32string_view(text));
 }
 
 glm::ivec2 Font::getTextExtents(const std::u32string_view& text) const
