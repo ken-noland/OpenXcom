@@ -471,6 +471,73 @@ TEST_F(GraphicsInGameFontTextTest, TestHelloWorldFont0)
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
+
+TEST_F(GraphicsInGameFontTextTest, TestColorSectionsFont0)
+{
+	// Using ANSI escape characters to change text color
+	std::string text = "\x1b[31mRed\x1b[0m \x1b[32mGreen\x1b[0m \x1b[34mBlue\x1b[0m";
+
+	PrimitiveFactory& factory = _gameSurface->getRenderTarget().getPrimitiveFactory();
+	TextSettings settings;
+
+	settings.alignment = TextAlignment::Left;
+	settings.fontHandle = _fontPack->getFonts()[0].getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
+	settings.extents = {0, 0};
+	settings.offset = {2, 2};
+	settings.defaultStyle.colorIndex = 7; // white
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
+
+	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
+	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
+
+	const std::vector<TextSection>& sections = textPrimitive->getSections();
+	ASSERT_EQ(5, sections.size()) << "Expected five sections";
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "102_multi_color.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
+}
+
+TEST_F(GraphicsInGameFontTextTest, TestMultiLineQuickBrownFoxFont0)
+{
+	std::string text = "The quick brown fox jumps over the lazy dog";
+
+	PrimitiveFactory& factory = _gameSurface->getRenderTarget().getPrimitiveFactory();
+	TextSettings settings;
+
+	settings.alignment = TextAlignment::Left;
+	settings.fontHandle = _fontPack->getFonts()[0].getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
+	settings.extents = {200, 0};
+	settings.offset = {0, 0};
+	settings.defaultStyle.colorIndex = 7;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
+
+	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
+	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "103_quick_brown_fox_wrapping.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
+}
+
 TEST_F(GraphicsInGameFontTextTest, TestHelloWorldFont1)
 {
 	std::string text = "Hello World!";
@@ -505,5 +572,68 @@ TEST_F(GraphicsInGameFontTextTest, TestHelloWorldFont1)
 	ASSERT_TRUE(hostImageHandle.isValid());
 
 	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "201_hello_world.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
+}
+
+TEST_F(GraphicsInGameFontTextTest, TestColorSectionsFont1)
+{
+	// Using ANSI escape characters to change text color
+	std::string text = "\x1b[31mRed\x1b[0m \x1b[32mGreen\x1b[0m \x1b[34mBlue\x1b[0m";
+
+	PrimitiveFactory& factory = _gameSurface->getRenderTarget().getPrimitiveFactory();
+	TextSettings settings;
+
+	settings.alignment = TextAlignment::Left;
+	settings.fontHandle = _fontPack->getFonts()[1].getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
+	settings.extents = {0, 0};
+	settings.offset = {2, 2};
+	settings.defaultStyle.colorIndex = 7; // white
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
+
+	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
+	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "202_multi_color.png";
+	compareWithBaseline(hostImageHandle, baselinePath);
+}
+
+TEST_F(GraphicsInGameFontTextTest, TestMultiLineQuickBrownFoxFont1)
+{
+	std::string text = "The quick brown fox jumps over the lazy dog";
+
+	PrimitiveFactory& factory = _gameSurface->getRenderTarget().getPrimitiveFactory();
+	TextSettings settings;
+
+	settings.alignment = TextAlignment::Left;
+	settings.fontHandle = _fontPack->getFonts()[1].getHandle();
+	settings.paletteHandle = _ansiPaletteHandle.getHandle();
+	settings.extents = {150, 0};
+	settings.offset = {0, 0};
+	settings.defaultStyle.colorIndex = 7;
+	settings.defaultStyle.backgroundColorIndex = 0;
+	settings.defaultStyle.underline = false;
+
+	std::unique_ptr<TextPrimitive> textPrimitive = factory.createTextPrimitive(text, settings);
+	ASSERT_TRUE(textPrimitive) << "Failed to create text primitive";
+
+	// draw the text
+	MulticastDelegate<void(GraphicsCommand&)>::Handle onRender = _gameSurface->onRender().add([&textPrimitive](GraphicsCommand& command) {
+		textPrimitive->draw(command);
+	});
+
+	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
+	ASSERT_TRUE(hostImageHandle.isValid());
+
+	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "203_quick_brown_fox_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
