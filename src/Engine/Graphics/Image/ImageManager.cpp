@@ -23,6 +23,16 @@
 namespace OpenXcom
 {
 
+bool ImageManager::exists(const ResourceHandle<HostImage>& handle) const
+{
+	return _hostImageManager.exists(handle);
+}
+
+bool ImageManager::exists(const ResourceHandle<DeviceImage>& handle) const
+{
+	return _deviceImageManager.exists(handle);
+}
+
 HostImage& ImageManager::get(const ResourceHandle<HostImage>& handle)
 {
 	return _hostImageManager.get(handle);

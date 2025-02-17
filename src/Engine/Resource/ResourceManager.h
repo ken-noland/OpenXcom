@@ -72,12 +72,12 @@ public:
 		return get<Type>(handle.getHandle());
 	}
 
-	bool exists(const ResourceHandle<ResourceType>& handle)
+	bool exists(const ResourceHandle<ResourceType>& handle) const
 	{
 		return _resources.find(handle) != _resources.end();
 	}
 
-	bool exists(const OwningHandle<ResourceType>& handle)
+	bool exists(const OwningHandle<ResourceType>& handle) const
 	{
 		return exists(handle.getHandle());
 	}

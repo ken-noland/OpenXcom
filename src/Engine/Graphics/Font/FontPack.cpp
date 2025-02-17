@@ -232,11 +232,18 @@ void FontPack::load(const std::filesystem::path& path)
 
 			images.push_back(std::move(deviceImage));
 		}
-
-		asciiGlyphs[' '] = Glyph{0, 0, 0, 0, 0, 0, static_cast<char>(fontDef.width + fontDef.spacing), images[0].getHandle()};
+		// special case for space
+		asciiGlyphs[' '] = Glyph{0, 0, 0, 0, 0, 0, static_cast<char>(fontDef.width/2 + fontDef.spacing), images[0].getHandle()};
 
 		// Load the font
-		OwningHandle<Font> font = fontManager.load(fontDef.id, std::move(images), asciiGlyphs, extendedGlyphs);
+		FontSettings settings;
+		settings.width = fontDef.width;
+		settings.height = fontDef.height;
+		settings.spacing = fontDef.spacing;
+		settings.defaultPaletteIndex = 1;
+		settings.numPaletteEntries = 5;
+
+		OwningHandle<Font> font = fontManager.load(fontDef.id, settings, std::move(images), asciiGlyphs, extendedGlyphs);
 		_fontPackHandles.push_back(std::move(font));
 	}
 }

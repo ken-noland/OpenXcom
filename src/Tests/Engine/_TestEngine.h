@@ -143,6 +143,59 @@ public:
 		return paletteManager.createPalette("16colors", paletteData, 16);
 	}
 
+	// Helper function to interpolate between two colors.
+	OpenXcom::PackedColor lerpColor(OpenXcom::PackedColor start, OpenXcom::PackedColor end, float t)
+	{
+		// Interpolate each channel
+		uint8_t r = static_cast<uint8_t>(start.r() + t * (end.r() - start.r()));
+		uint8_t g = static_cast<uint8_t>(start.g() + t * (end.g() - start.g()));
+		uint8_t b = static_cast<uint8_t>(start.b() + t * (end.b() - start.b()));
+		uint8_t a = static_cast<uint8_t>(start.a() + t * (end.a() - start.a()));
+
+		// Pack channels back into a color.
+		return (r << 24) | (g << 16) | (b << 8) | a;
+	}
+
+	OpenXcom::OwningHandle<OpenXcom::Palette> createAnsiColorPalette81()
+	{
+		// set up the palette targets(targets for the lerp function)
+		OpenXcom::PackedColor paletteTargets[] = {
+			0x000000FF, // 0: Black       (0,0,0)
+			0xAA0000FF, // 1: Red         (170,0,0)
+			0x00AA00FF, // 2: Green       (0,170,0)
+			0xAA5500FF, // 3: Yellow      (170,85,0)
+			0x0000AAFF, // 4: Blue        (0,0,170)
+			0xAA00AAFF, // 5: Magenta     (170,0,170)
+			0x00AAAAFF, // 6: Cyan        (0,170,170)
+			0xAAAAAAFF, // 7: White       (170,170,170)
+			0x555555FF, // 8: Bright Black (Gray) (85,85,85)
+			0xFF5555FF, // 9: Bright Red  (255,85,85)
+			0x55FF55FF, // 10: Bright Green (85,255,85)
+			0xFFFF55FF, // 11: Bright Yellow (255,255,85)
+			0x5555FFFF, // 12: Bright Blue (85,85,255)
+			0xFF55FFFF, // 13: Bright Magenta (255,85,255)
+			0x55FFFFFF, // 14: Bright Cyan (85,255,255)
+			0xFFFFFFFF  // 15: Bright White (255,255,255)
+		};
+
+		// set up the palette
+		OpenXcom::PackedColor paletteData[81];
+		paletteData[0] = 0x000000FF;
+		for (int i = 0; i < 15; i++)
+		{
+			for (int j = 0; j < 5; j++)
+			{
+				float t = (5.f-j) / 4.0f;
+				paletteData[1 + ((i * 5) + j)] = lerpColor(paletteTargets[0], paletteTargets[i + 1], t);
+			}
+		}
+
+		
+		OpenXcom::PaletteManager& paletteManager = _engine->getEngineContext().getResourceSystem().getPaletteManager();
+		return paletteManager.createPalette("81colors", paletteData, 81);
+	}
+
+
 	/**
 	 * Captures the game surface into a HostImage.
 	 */
@@ -415,7 +468,14 @@ public:
 		textures.push_back(std::move(deviceFontTexture));
 
 		// Create the font object
-		OpenXcom::OwningHandle<OpenXcom::Font> font = resourceSystem.getFontManager().load("dosFont", std::move(textures), getAsciiGlyphs(fontTextureHandle));
+		OpenXcom::FontSettings settings;
+		settings.width = 9;
+		settings.height = 16;
+		settings.spacing = 0;
+		settings.defaultPaletteIndex = 1;
+		settings.numPaletteEntries = 1;
+
+		OpenXcom::OwningHandle<OpenXcom::Font> font = resourceSystem.getFontManager().load("dosFont", settings, std::move(textures), getAsciiGlyphs(fontTextureHandle));
 		font->setLineSpacing(0);
 
 		return font;

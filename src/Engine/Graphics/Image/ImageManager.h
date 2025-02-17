@@ -50,6 +50,9 @@ public:
 	ResourceManager<HostImage>& getHostImageManager() { return _hostImageManager; }
 	ResourceManager<DeviceImage>& getDeviceImageManager() { return _deviceImageManager; }
 
+	bool exists(const ResourceHandle<HostImage>& handle) const;
+	bool exists(const ResourceHandle<DeviceImage>& handle) const;
+
 	HostImage& get(const ResourceHandle<HostImage>& handle); 
 	DeviceImage& get(const ResourceHandle<DeviceImage>& handle);
 };

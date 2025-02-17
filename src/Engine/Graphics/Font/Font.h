@@ -52,10 +52,32 @@ struct PositionedGlyph
 	CodePoint glyphID;
 };
 
+struct FontSettings
+{
+	// Default width
+	uint8_t width;
+
+	// Default height
+	uint8_t height;
+
+	// Default spacing
+	uint8_t spacing;
+
+	// The default palette index for the font. This is used when rendering the font with a palette
+	uint8_t defaultPaletteIndex;
+
+	// Some fonts, like the DosFont, only require a single palette entry. Other fonts, like the in-game
+	// fonts, use multiple palette entries. This is the number of palette entries used by a glyph in the
+	// font. It allows us to calculate the correct palette index for a given glyph.
+	uint8_t numPaletteEntries;
+};
+
 class Font
 {
 private:
 	const std::string _name;
+
+	FontSettings _settings;
 
 	std::vector<OwningHandle<DeviceImage>> _fontTextures; // The font atlas
 	hb_face_t* _hbFace = nullptr;
@@ -67,21 +89,22 @@ private:
 	std::array<Glyph, 128> _asciiGlyphs;                 // Fast lookup for Codepage 437
 	std::unordered_map<char32_t, Glyph> _extendedGlyphs; // Fallback for Unicode extensions
 
-	uint32_t _lineSpacing = 0;
-
 	void initializeHarfBuzz();
 
 public:
-	Font(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
-	Font(const std::string& name, std::vector<OwningHandle<DeviceImage>> textures, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
+	Font(const std::string& name, const FontSettings& settings, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
+	Font(const std::string& name, const FontSettings& settings, std::vector<OwningHandle<DeviceImage>> textures, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
 	~Font();
 
 	const std::string& getName() const { return _name; }
 
 	const Glyph* getGlyph(char32_t codepoint) const;
 
-	void setLineSpacing(uint32_t lineSpacing) { _lineSpacing = lineSpacing; }
-	uint32_t getLineSpacing() const { return _lineSpacing; }
+	void setLineSpacing(uint32_t lineSpacing) { _settings.spacing = lineSpacing; }
+	uint32_t getLineSpacing() const { return _settings.spacing; }
+
+	uint8_t getDefaultPaletteIndex() const { return _settings.defaultPaletteIndex; }
+	uint8_t getNumPaletteEntries() const { return _settings.numPaletteEntries; }
 
 	glm::ivec2 getTextExtents(const std::string& text) const;
 	glm::ivec2 getTextExtents(const std::u32string& text) const;

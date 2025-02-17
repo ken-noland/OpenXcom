@@ -28,8 +28,8 @@
 namespace OpenXcom
 {
 
-Font::Font(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
-	: Font(name, [&texture]() {
+Font::Font(const std::string& name, const FontSettings& settings, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
+	: Font(name, settings, [&texture]() {
           std::vector<OwningHandle<DeviceImage>> textures;
           textures.reserve(1);
           textures.emplace_back(std::move(texture));
@@ -37,8 +37,8 @@ Font::Font(const std::string& name, OwningHandle<DeviceImage> texture, const std
 {
 }
 
-Font::Font(const std::string& name, std::vector<OwningHandle<DeviceImage>> textures, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
-	: _name(name), _fontTextures(std::move(textures)), _asciiGlyphs(asciiGlyphs), _extendedGlyphs(extendedGlyphs)
+Font::Font(const std::string& name, const FontSettings& settings, std::vector<OwningHandle<DeviceImage>> textures, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
+	: _name(name), _settings(settings), _fontTextures(std::move(textures)), _asciiGlyphs(asciiGlyphs), _extendedGlyphs(extendedGlyphs)
 {
 	// Initialize HarfBuzz with a dummy face (no TrueType tables needed)
 	_hbFace = hb_face_create_for_tables([](hb_face_t* face, hb_tag_t tag, void* user_data) -> hb_blob_t* {
@@ -132,7 +132,7 @@ glm::ivec2 Font::getTextExtents(const std::string_view& text) const
 	int width = totalAdvance / 64;
 
 	// For this bitmap font, the height is constant (e.g., 16 pixels).
-	return glm::ivec2(width, 16);
+	return glm::ivec2(width, _settings.height);
 }
 
 glm::ivec2 Font::getTextExtents(const std::u32string_view& text) const
@@ -161,7 +161,7 @@ glm::ivec2 Font::getTextExtents(const std::u32string_view& text) const
 	int width = totalAdvance / 64;
 
 	// For this bitmap font, the height is constant (e.g., 16 pixels).
-	return glm::ivec2(width, 16);
+	return glm::ivec2(width, _settings.height);
 }
 
 // Generates positioned glyphs for rendering

@@ -507,6 +507,13 @@ void TextPrimitive::processGlyphs()
 	for(TextSection& section : _sections)
 	{
 		Font& font = fontManager.get(section.font);
+
+		if (!imageManager.exists(section.texture))
+		{
+			Log(LOG_ERROR) << "TextPrimitive: Missing texture for section";
+			continue;
+		}
+
 		DeviceImage& image = imageManager.get(section.texture);
 
 		// initialize the pipeline binding
@@ -524,7 +531,7 @@ void TextPrimitive::processGlyphs()
 		section.pipelineBinding->setUniformBuffer(ShaderStage::Fragment, 3, palette.getDeviceBuffer());
 
 		// bind the push constants
-		TextPushConstant pushConstants{section.style.colorIndex, section.style.backgroundColorIndex, 1};
+		TextPushConstant pushConstants{section.style.colorIndex, section.style.backgroundColorIndex, font.getNumPaletteEntries()};
 		section.pipelineBinding->setPushConstant(ShaderStage::Fragment, pushConstants);
 
 		// Get the intersection of the section and the line

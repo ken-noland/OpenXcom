@@ -137,7 +137,14 @@ protected:
 		OwningHandle<DeviceImage> deviceFontTexture = resourceSystem.getImageManager().createDeviceImage(*hostFontTexture);
 
 		// Create the font object
-		_font = std::make_unique<Font>("dosFont", std::move(deviceFontTexture), getAsciiGlyphs(deviceFontTexture.getHandle()));
+		OpenXcom::FontSettings settings;
+		settings.width = 9;
+		settings.height = 16;
+		settings.spacing = 0;
+		settings.defaultPaletteIndex = 1;
+		settings.numPaletteEntries = 1;
+
+		_font = std::make_unique<Font>("dosFont", settings, std::move(deviceFontTexture), getAsciiGlyphs(deviceFontTexture.getHandle()));
 		_font->setLineSpacing(0);
 	}
 

@@ -36,9 +36,9 @@ FontManager::~FontManager()
 {
 }
 
-OwningHandle<Font> FontManager::load(const std::string& name, std::vector<OwningHandle<DeviceImage>> textures, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
+OwningHandle<Font> FontManager::load(const std::string& name, const FontSettings& settings, std::vector<OwningHandle<DeviceImage>> textures, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
 {
-	return add(std::make_unique<Font>(name, std::move(textures), asciiGlyphs, extendedGlyphs));
+	return add(std::make_unique<Font>(name, settings, std::move(textures), asciiGlyphs, extendedGlyphs));
 }
 
 OwningHandle<Font> FontManager::load(const std::string& name, const std::filesystem::path& filename)
