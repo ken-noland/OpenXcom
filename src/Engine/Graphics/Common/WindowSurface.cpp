@@ -123,8 +123,6 @@ WindowSurface::WindowSurface(EngineContext& engine, GameSurface& gameSurface)
 
 WindowSurface::~WindowSurface()
 {
-	_onClose.release();
-	_onResize.release();
 }
 
 void WindowSurface::createWindowed(GameSurface& gameSurface)
@@ -201,6 +199,10 @@ void WindowSurface::update()
 		// Windowed rendering
 		if (!_isRunning)
 		{
+			_onClose.release();
+			_onResize.release();
+
+			_windowSurface.reset();
 			_window.reset();
 			return;
 		}

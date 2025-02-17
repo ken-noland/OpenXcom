@@ -19,6 +19,8 @@
  */
 #include <vector>
 #include <functional>
+#include <stdexcept>
+#include <cassert>
 
 namespace OpenXcom
 {
@@ -82,9 +84,9 @@ public:
 		// Only MulticastDelegate can create a valid handle.
 		friend class MulticastDelegate<FunctionSignature>;
 		MulticastDelegate* delegate_ = nullptr;
-		typename std::vector<Function>::iterator it_;
+		typename std::list<Function>::iterator it_;
 
-		OwningFunctionHandle(MulticastDelegate* delegate, typename std::vector<Function>::iterator it)
+		OwningFunctionHandle(MulticastDelegate* delegate, typename std::list<Function>::iterator it)
 			: delegate_(delegate), it_(it)
 		{
 		}
@@ -94,9 +96,13 @@ public:
     using Handle = OwningFunctionHandle;
 
 private:
-	std::vector<Function> functions;
+	std::list<Function> functions;
 
 public:
+	MulticastDelegate() = default;
+	~MulticastDelegate() {
+		assert(functions.empty());
+	}
 
 	// Add a function to the delegate.
 	// Returns a RAII handle that will remove the function on destruction.
@@ -115,7 +121,7 @@ public:
 	}
 
 	// Remove a function from the delegate given its iterator.
-	void remove(typename std::vector<Function>::iterator it)
+	void remove(typename std::list<Function>::iterator it)
 	{
 		functions.erase(it);
 	}

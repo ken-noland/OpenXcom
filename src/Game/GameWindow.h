@@ -22,13 +22,6 @@
 #include <glm/vec2.hpp>
 #include "../Engine/Utility/Delegate.h"
 
-/////////////////////////////////////////////
-// TEMP
-#include "../Engine/Resource/Handle.h"
-
-/////////////////////////////////////////////
-
-
 namespace OpenXcom
 {
 
@@ -37,34 +30,17 @@ class GameSurface;
 class WindowSurface;
 class GraphicsCommand;
 
-class BoxOutlinePrimitive;
-class LineStripPrimitive;
-class PointColorListPrimitive;
-class ImagePrimitive;
-
-class Palette;
-class DeviceImage;
-
 class GameWindow
 {
 protected:
 	std::unique_ptr<GameSurface> _gameSurface;
 	std::unique_ptr<WindowSurface> _windowSurface;
 
-	OwningHandle<Palette> _paletteHandle;
-	OwningHandle<DeviceImage> _image;
-	std::unique_ptr<ImagePrimitive> _thingToDraw;
-	std::unique_ptr<BoxOutlinePrimitive> _thingToDraw2;
-
 	MulticastDelegate<void(GraphicsCommand&)>::Handle _onWindowRender;
 	MulticastDelegate<void(GraphicsCommand&)>::Handle _onGameRender;
-	MulticastDelegate<void(glm::ivec2)>::Handle _onResize;
-
 
 	void onWindowRender(GraphicsCommand& command);
 	void onGameRender(GraphicsCommand& command);
-
-	void onWindowResize(glm::ivec2);
 
 public:
 	GameWindow(EngineContext& engine);

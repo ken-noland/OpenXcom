@@ -32,7 +32,7 @@ public:
 	DbgBreakAlloc()
 	{
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF /*| _CRTDBG_CHECK_EVERY_16_DF*/);
-		_crtBreakAlloc = -1;
+		_crtBreakAlloc = 470921;
 	}
 };
 
@@ -50,13 +50,18 @@ namespace OpenXcom
 int run(const std::vector<std::string>& args)
 {
 	// Create the engine
-	Engine engine(args);
+	std::unique_ptr<Engine> engine = std::make_unique<Engine>(args);
 
 	// Create the game
-	Game game(engine);
+	std::unique_ptr<Game> game = std::make_unique<Game>(*engine);
 
 	// Run the game
-	return game.run();
+	int ret = game->run();
+
+	game.reset();
+	engine.reset();
+
+	return ret;
 }
 
 } // namespace OpenXcom

@@ -171,6 +171,8 @@ VulkanContext::VulkanContext(EngineContext& context)
 
 VulkanContext::~VulkanContext()
 {
+	_device.waitIdle();
+
 	// destroy the pipeline factory
 	_pipelineFactory.reset();
 

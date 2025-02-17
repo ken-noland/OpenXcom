@@ -241,6 +241,8 @@ void VulkanRenderTarget::create()
 
 void VulkanRenderTarget::destroy()
 {
+	_context.getDevice().waitIdle();
+
 	_context.getDevice().destroyFramebuffer(_framebuffer);
 	_context.getDevice().destroyRenderPass(_renderPass);
 

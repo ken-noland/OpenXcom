@@ -49,7 +49,7 @@ namespace
 class TestEngineSuite : public ::testing::Test
 {
 protected:
-	bool FORCE_REGENERATE_BASELINE = true;
+	bool FORCE_REGENERATE_BASELINE = false;
 
 	static std::unique_ptr<OpenXcom::Engine> _engine;
 

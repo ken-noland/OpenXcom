@@ -179,58 +179,15 @@ GameWindow::GameWindow(EngineContext& engine)
 	_onGameRender = _gameSurface->onRender().add([this](GraphicsCommand& command) {
 		this->onGameRender(command);
 	});
-
-	_onResize = _windowSurface->getWindow().onResize().add([this](glm::ivec2 size) {
-		this->onWindowResize(size);
-	});
-
-	// set up the palette
-	PackedColor paletteData[] = {
-		0x000000FF, // 0 - Black:   (R=00, G=00, B=00, A=FF)
-		0xFFFFFFFF, // 1 - White:   (R=FF, G=FF, B=FF, A=FF)
-		0x808080FF, // 2 - Gray:    (R=80, G=80, B=80, A=FF)
-		0xFF0000FF, // 3 - Red:     (R=FF, G=00, B=00, A=FF)
-		0x00FF00FF, // 4 - Green:   (R=00, G=FF, B=00, A=FF)
-		0x0000FFFF, // 5 - Blue:    (R=00, G=00, B=FF, A=FF)
-		0xFFFF00FF, // 6 - Yellow:  (R=FF, G=FF, B=00, A=FF)  // red + green
-		0xFF00FFFF, // 7 - Magenta: (R=FF, G=00, B=FF, A=FF)  // red + blue
-		0xCCCCCCFF, // 8 - Light Gray: (R=CC, G=CC, B=CC, A=FF)
-		0x444444FF, // 9 - Dark Gray:  (R=44, G=44, B=44, A=FF)
-		0xFFA500FF, // 10 - Orange:   (R=FF, G=A5, B=00, A=FF)  // red + part green
-		0x800080FF, // 11 - Purple:   (R=80, G=00, B=80, A=FF)
-		0xA54220FF, // 12 - Brown:    (R=A5, G=42, B=20, A=FF)
-		0xFFC0CBFF, // 13 - Pink:     (R=FF, G=C0, B=CB, A=FF)
-		0x008080FF, // 14 - Teal:     (R=00, G=80, B=80, A=FF)
-		0xFFD400FF  // 15 - Gold:     (R=FF, G=D4, B=00, A=FF)
-	};
-
-	PaletteManager& paletteManager = engine.getResourceSystem().getPaletteManager();
-	_paletteHandle = paletteManager.createPalette("16colors", paletteData, 16);
-
-	// load an image
-	ResourceSystem& resourceSystem = engine.getResourceSystem();
-	ImageBMPFileProcessor& imageProcessor = resourceSystem.getImageBMPFileProcessor();
-
-	ImageFile loadedImage;
-	ImageLoadParams loadParams;
-	imageProcessor.load(loadedImage, "dosFont", tempDosFont, DOSFONT_SIZE, loadParams);
-
-	_image = resourceSystem.getImageManager().createDeviceImage(loadedImage.getImage());	//move to device
-
-	// create an image primitive
-	PrimitiveFactory& windowPrimitiveFactory = _windowSurface->getRenderTarget().getPrimitiveFactory();
-	_thingToDraw = windowPrimitiveFactory.createImagePrimitive({10, 10}, {16, 0}, {16, 16}, _image.getHandle(), _paletteHandle.getHandle());
-
-	//create a box outline primitive
-	PrimitiveFactory& gamePrimitiveFactory = _gameSurface->getRenderTarget().getPrimitiveFactory();
-	_thingToDraw2 = gamePrimitiveFactory.createOutlineBoxPrimitive({10, 10}, {40, 40}, 1, _paletteHandle.getHandle());
 }
 
 GameWindow::~GameWindow()
 {
 	_onWindowRender.release();
 	_onGameRender.release();
-	_onResize.release();
+
+	_windowSurface.reset();
+	_gameSurface.reset();
 }
 
 void GameWindow::update()
@@ -245,15 +202,9 @@ bool GameWindow::isRunning() const
 
 void GameWindow::onWindowRender(GraphicsCommand& command)
 {
-	_thingToDraw->draw(command);
 }
 
 void GameWindow::onGameRender(GraphicsCommand& command)
-{
-	_thingToDraw2->draw(command);
-}
-
-void GameWindow::onWindowResize(glm::ivec2 size)
 {
 }
 

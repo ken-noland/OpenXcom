@@ -46,6 +46,7 @@ VulkanSampler::VulkanSampler(VulkanContext& context)
 
 VulkanSampler::~VulkanSampler()
 {
+	_context.getDevice().waitIdle();
 	_context.getDevice().destroySampler(_sampler);
 }
 

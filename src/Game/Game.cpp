@@ -52,15 +52,6 @@ Game::Game(Engine& engine)
 {
 	_gameWindow = std::make_unique<GameWindow>(_engine.getEngineContext());
 
-	//Engine& engine = getEngine();
-	//_window = engine.getPlatformWindowSystem().createWindow(title, 1024, 768);
-	//std::shared_ptr<PlatformWindow> window = _window.lock();
-
-
-
-	// TODO: when the game window closes, send the application termination message
-	// window->setCloseCallback([this]() { getEngine->exit() });
-
 	// set the initial game state
 	setState(std::make_unique<StartState>(_engine.getEngineContext()));
 }
@@ -70,6 +61,9 @@ Game::Game(Engine& engine)
  */
 Game::~Game()
 {
+	_states.clear();
+	_deleted.clear();
+
 	_gameWindow.reset();
 }
 
