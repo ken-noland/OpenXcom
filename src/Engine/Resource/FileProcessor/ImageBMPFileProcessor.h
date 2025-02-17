@@ -27,6 +27,7 @@ class EngineContext;
 class HostImage;
 class Palette;
 class ImageFile;
+struct ImageLoadParams;
 
 class ImageBMPFileProcessor
 {
@@ -37,8 +38,8 @@ public:
 	ImageBMPFileProcessor(EngineContext& context);
 	~ImageBMPFileProcessor();
 
-	ImageFile load(const std::string& name, const std::filesystem::path& filename, bool loadPalette = false);
-	ImageFile load(const std::string& name, const uint8_t* buffer, std::size_t size, bool loadPalette = false);
+	bool load(ImageFile& out, const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params);
+	bool load(ImageFile& out, const std::string& name, const uint8_t* buffer, std::size_t size, ImageLoadParams& params);
 
 	bool save(const std::filesystem::path& filename, ImageFile& imageData);
 };

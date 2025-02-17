@@ -20,9 +20,12 @@
 
 #include "FontManager.h"
 
-#include "../../Filesystem/VirtualFileSystem.h"
 #include "../../EngineContext.h"
 #include "../../Logger.h"
+#include "../../Filesystem/VirtualFileSystem.h"
+#include "../../Resource/ResourceSystem.h"
+#include "../../Resource/FileProcessor/ImageFile.h"
+#include "../../Resource/FileProcessor/ImageFileProcessor.h"
 
 #include <ryml.hpp>
 
@@ -155,13 +158,16 @@ void FontPack::load(const std::filesystem::path& path)
 	// Load the fonts
 	for (const FileFontDefinition& fontDef : fileFonts.fonts)
 	{
-		//// Load the font images
-		//std::array<Glyph, 128> asciiGlyphs;
-		//std::unordered_map<char32_t, Glyph> extendedGlyphs;
-		//for (const FileFontImageDefinition& imageDef : fontDef.images)
-		//{
-		//	// Load the image
-		//	std::filesystem::path imagePath = path.parent_path() / imageDef.file;
+		// Load the font images
+		std::array<Glyph, 128> asciiGlyphs;
+		std::unordered_map<char32_t, Glyph> extendedGlyphs;
+		for (const FileFontImageDefinition& imageDef : fontDef.images)
+		{
+			// Load the image
+			std::filesystem::path imagePath = path.parent_path() / imageDef.file;
+			ImageFile imageFile;
+			_context.getResourceSystem().getImageFileProcessor().load(imageFile, "", imagePath);
+
 		//	OwningHandle<DeviceImage> image = _context.getResourceSystem().getImageManager().load(imagePath);
 
 		//	// Load the glyphs
@@ -176,7 +182,8 @@ void FontPack::load(const std::filesystem::path& path)
 		//			extendedGlyphs[c] = Glyph{image, c};
 		//		}
 		//	}
-		//}
+		}
+
 		//// Load the font
 		//OwningHandle<Font> font = _context.getResourceManager().getFontManager().load(fontDef.id, asciiGlyphs, extendedGlyphs);
 		//_fontPackHandles.push_back(font);

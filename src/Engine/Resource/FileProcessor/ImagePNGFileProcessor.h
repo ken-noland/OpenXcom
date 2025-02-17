@@ -27,6 +27,7 @@ class EngineContext;
 class HostImage;
 class Palette;
 class ImageFile;
+struct ImageLoadParams;
 
 class ImagePNGFileProcessor
 {
@@ -37,7 +38,7 @@ public:
 	ImagePNGFileProcessor(EngineContext& context);
 	~ImagePNGFileProcessor();
 
-	ImageFile load(const std::string& name, const std::filesystem::path& filename, bool loadPalette = false);
+	bool load(ImageFile& out, const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params);
 
 	bool save(const std::filesystem::path& filename, ImageFile& imageData);
 };

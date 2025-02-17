@@ -24,13 +24,44 @@
 namespace OpenXcom
 {
 
+// Blank constructor: Invalid handle
+ImageFile::ImageFile()
+{
+}
+
+// Constructor with image and palette handles
 ImageFile::ImageFile(OwningHandle<HostImage> image, OwningHandle<Palette> palette)
 	: _image(std::move(image)), _palette(std::move(palette))
 {
 }
 
+// Move constructor: Transfers ownership
+ImageFile::ImageFile(ImageFile&& other)
+{
+	_image = std::move(other._image);
+	_palette = std::move(other._palette);
+}
+
 ImageFile ::~ImageFile()
 {
+}
+
+// Move assignment: Transfers ownership
+ImageFile& ImageFile::operator=(ImageFile&& other)
+{
+	_image = std::move(other._image);
+	_palette = std::move(other._palette);
+	return *this;
+}
+
+bool ImageFile::hasImage() const
+{
+	return _image.isValid();
+}
+
+bool ImageFile::hasPalette() const
+{
+	return _palette.isValid();
 }
 
 HostImage& ImageFile::getImage()

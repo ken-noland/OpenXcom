@@ -49,7 +49,7 @@ ResourceSystem::ResourceSystem(EngineContext& context)
 	_fontManager = std::make_unique<FontManager>(context);
 	_imageManager = graphicsSystem.createImageManager();
 
-	_imageFileProcessor = std::make_unique<ImageFileProcessor>();
+	_imageFileProcessor = std::make_unique<ImageFileProcessor>(context);
 	_imageBMPFileProcessor = std::make_unique<ImageBMPFileProcessor>(context);
 	_imagePNGFileProcessor = std::make_unique<ImagePNGFileProcessor>(context);
 }

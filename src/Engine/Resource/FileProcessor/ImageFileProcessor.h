@@ -17,12 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <filesystem>
 
 namespace OpenXcom
 {
 
+class EngineContext;
+class ImageFile;
+struct ImageLoadParams;
+
+// This class just serves as a router for basic file types to their respective
+// handlers. It allows us to parse the extension and then call the appropriate
+// handler.
 class ImageFileProcessor
 {
+protected:
+	EngineContext& _context;
+
+public:
+	ImageFileProcessor(EngineContext& context);
+	virtual ~ImageFileProcessor();
+
+	bool load(ImageFile& out, const std::string& name, std::filesystem::path file, ImageLoadParams& params);
+	bool load(ImageFile& out, const std::string& name, std::filesystem::path file);
 };
 
 } // namespace OpenXcom

@@ -25,6 +25,15 @@ namespace OpenXcom
 class HostImage;
 class Palette;
 
+struct ImageLoadParams
+{
+	bool loadPalette = false;
+};
+;
+
+// This class represents an image that is being read from disk. It contains the image
+// and palette handles, and is used to transfer ownership of these resources between
+// the file processor and the resource manager.
 class ImageFile
 {
 protected:
@@ -32,9 +41,27 @@ protected:
 	OwningHandle<Palette> _palette;
 
 public:
+	// Blank constructor: Invalid handle
+	ImageFile();
 
+	// Constructor with image and palette handles
 	ImageFile(OwningHandle<HostImage> image, OwningHandle<Palette> palette);
+
+	// Move constructor: Transfers ownership
+	ImageFile(ImageFile&& other);
+
+	// Destructor
 	~ImageFile();
+
+	// Move assignment: Transfers ownership
+	ImageFile& operator=(ImageFile&& other);
+
+	// Delete copy constructor and copy assignment
+	ImageFile(const ImageFile&) = delete;
+	ImageFile& operator=(const ImageFile&) = delete;
+
+	bool hasImage() const;
+	bool hasPalette() const;
 
 	HostImage& getImage();
 	Palette& getPalette();

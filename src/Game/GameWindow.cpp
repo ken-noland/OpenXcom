@@ -210,7 +210,11 @@ GameWindow::GameWindow(EngineContext& engine)
 	// load an image
 	ResourceSystem& resourceSystem = engine.getResourceSystem();
 	ImageBMPFileProcessor& imageProcessor = resourceSystem.getImageBMPFileProcessor();
-	ImageFile loadedImage = imageProcessor.load("dosFont", tempDosFont, DOSFONT_SIZE, false);
+
+	ImageFile loadedImage;
+	ImageLoadParams loadParams;
+	imageProcessor.load(loadedImage, "dosFont", tempDosFont, DOSFONT_SIZE, loadParams);
+
 	_image = resourceSystem.getImageManager().createDeviceImage(loadedImage.getImage());	//move to device
 
 	// create an image primitive

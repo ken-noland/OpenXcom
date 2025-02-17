@@ -125,7 +125,11 @@ protected:
 		ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();
 
 		// Load the DOS font
-		ImageFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, false);
+		ImageFile fontTextureFile;
+		ImageLoadParams params;
+
+		ASSERT_TRUE(resourceSystem.getImageBMPFileProcessor().load(fontTextureFile, "DosFont", dosFont, DOSFONT_SIZE, params)) << "Failed to load DOS font bitmap";
+
 		OwningHandle<HostImage> hostFontTexture = fontTextureFile.takeImage();
 		ASSERT_TRUE(hostFontTexture.isValid()) << "Failed to load DOS font";
 

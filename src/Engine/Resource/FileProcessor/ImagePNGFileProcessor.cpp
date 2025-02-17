@@ -46,7 +46,7 @@ ImagePNGFileProcessor::~ImagePNGFileProcessor()
 {
 }
 
-ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesystem::path& filename, bool loadPalette)
+bool ImagePNGFileProcessor::load(ImageFile& out, const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params)
 {
 	ResourceSystem& resourceSystem = _context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
@@ -64,6 +64,7 @@ ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesy
 	if (error)
 	{
 		throw std::runtime_error("Failed to load PNG file \"" + filename.string() + "\" with error: " + lodepng_error_text(error));
+		return false;
 	}
 
 	// --- Decode the PNG ---
@@ -73,6 +74,7 @@ ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesy
 	if (error)
 	{
 		throw std::runtime_error("Failed to decode PNG file \"" + filename.string() + "\" with error: " + lodepng_error_text(error));
+		return false;
 	}
 
 	// For now, only support 8-bit (R8) images.
@@ -90,7 +92,7 @@ ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesy
 	// --- Create the Palette ---
 	OwningHandle<Palette> paletteHandle;
 
-	if(loadPalette)
+	if (params.loadPalette)
 	{
 		std::vector<PackedColor> paletteData;
 		paletteData.resize(state.info_png.color.palettesize);
@@ -105,7 +107,8 @@ ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesy
 		paletteHandle = paletteManager.createPalette(name + "_png_palette", paletteData.data(), paletteData.size());
 	}
 
-	return ImageFile(std::move(hostImageHandle), std::move(paletteHandle));
+	out = ImageFile(std::move(hostImageHandle), std::move(paletteHandle));
+	return true;
 }
 
 bool ImagePNGFileProcessor::save(const std::filesystem::path& filename, ImageFile& imageData)

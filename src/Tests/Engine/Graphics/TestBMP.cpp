@@ -205,7 +205,9 @@ protected:
 TEST_F(BMPTest, TestLoadBMP)
 {
 	// Specify the BMP file path; assume it’s located in the Data directory
-	ImageFile imageFile = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load("dosFont", dosFont, DOSFONT_SIZE, false);
+	ImageFile imageFile;
+	ImageLoadParams params;
+	ASSERT_TRUE(_engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load(imageFile, "dosFont", dosFont, DOSFONT_SIZE, params)) << "Image should be able to load";
 
 	OwningHandle<HostImage> hostImage = imageFile.takeImage();
 	ASSERT_TRUE(hostImage.isValid()) << "Failed to load BMP file.";
@@ -222,7 +224,9 @@ TEST_F(BMPTest, TestLoadBMP)
 TEST_F(BMPTest, TestLoadBMP1)
 {
 	// Specify the BMP file path; assume it’s located in the Data directory
-	ImageFile imageFile = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load("dosFont", dosFont, DOSFONT_SIZE, false);
+	ImageFile imageFile;
+	ImageLoadParams params;
+	ASSERT_TRUE(_engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load(imageFile, "dosFont", dosFont, DOSFONT_SIZE, params)) << "Image should be able to load";
 
 	OwningHandle<HostImage> hostImage = imageFile.takeImage();
 	ASSERT_TRUE(hostImage.isValid()) << "Failed to load BMP file.";
