@@ -30,17 +30,17 @@ public:
 	PhysicalFileEntry(const std::filesystem::path& path) : _path(path) { }
 	virtual ~PhysicalFileEntry() override = default;
 
-	virtual IStreamPtr openRead() override
+	virtual std::unique_ptr<std::istream> openRead() override
 	{
-		return std::unique_ptr<std::istream>(static_cast<std::istream*>(new std::ifstream(_path)));
+		return std::unique_ptr<std::istream>(static_cast<std::istream*>(new std::ifstream(_path, std::ios::binary)));
 	}
 
-	virtual OStreamPtr openWrite() override
+	virtual std::unique_ptr<std::ostream> openWrite() override
 	{
 		return std::unique_ptr<std::ostream>(static_cast<std::ostream*>(std::make_unique<std::ofstream>(_path).release()));
 	}
 
-	virtual IOStreamPtr open() override
+	virtual std::unique_ptr<std::iostream> open() override
 	{
 		return std::unique_ptr<std::iostream>(static_cast<std::iostream*>(std::make_unique<std::fstream>(_path).release()));
 	}

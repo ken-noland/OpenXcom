@@ -137,7 +137,7 @@ protected:
 		OwningHandle<DeviceImage> deviceFontTexture = resourceSystem.getImageManager().createDeviceImage(*hostFontTexture);
 
 		// Create the font object
-		_font = std::make_unique<Font>("dosFont", std::move(deviceFontTexture), getAsciiGlyphs());
+		_font = std::make_unique<Font>("dosFont", std::move(deviceFontTexture), getAsciiGlyphs(deviceFontTexture.getHandle()));
 		_font->setLineSpacing(0);
 	}
 

@@ -19,6 +19,7 @@
  */
 #include <filesystem>
 #include <vector>
+#include <numeric>
 
 #include "../../Resource/Handle.h"
 
@@ -26,14 +27,14 @@ namespace OpenXcom
 {
 
 class EngineContext;
-
+class Font;
 
 struct FileFontImageDefinition
 {
 	std::filesystem::path file;
 	std::u32string chars;
-	uint32_t width;
-	int32_t spacing;
+	uint32_t width = std::numeric_limits<uint32_t>::max(); // optional
+	int32_t spacing = std::numeric_limits<int32_t>::max(); // optional
 };
 
 struct FileFontDefinition
@@ -56,7 +57,7 @@ class FontPack
 {
 protected:
 	EngineContext& _context;
-	std::vector<OwningHandle<FontPack>> _fontPackHandles;
+	std::vector<OwningHandle<Font>> _fontPackHandles;
 
 	void load(const std::filesystem::path& fontPackPath);
 

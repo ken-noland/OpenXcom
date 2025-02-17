@@ -30,6 +30,8 @@
 
 #include "../Font/Font.h"
 #include "../Font/FontManager.h"
+#include "../Image/Image.h"
+#include "../Image/ImageManager.h"
 
 #include "../../EngineContext.h"
 #include "../../Resource/ResourceSystem.h"
@@ -128,6 +130,7 @@ void TextPrimitive::processTextSections()
 	_sections.clear();
 	ResourceHandle<Font> currentFont = _settings.fontHandle;
 	TextStyle currentStyle(_settings.defaultStyle);
+	ResourceHandle<DeviceImage> currentImage;
 
 	// Use the member _utf32Text as the source string.
 	const std::u32string& rawText = _utf32Text;
@@ -140,13 +143,26 @@ void TextPrimitive::processTextSections()
 
 	while (it != end)
 	{
+		Font& font = fontManager.get(currentFont);
+		const Glyph* glyph = font.getGlyph(*it); // we need to get the glyph to find the image, which, if it differs from the previous image, we need to split the section
+
+		if(!currentImage.isValid())
+		{
+			currentImage = glyph->image;
+		}
+		else if (currentImage != glyph->image)
+		{
+			std::u32string_view view(&*sectionStart, static_cast<size_t>(it - sectionStart));
+			_sections.emplace_back(TextSection{view, currentStyle, currentFont, currentImage});
+		}
+
 		if (*it == '\x1B') // ESC character found.
 		{
 			// Flush any plain text from sectionStart up to (but not including) this ESC.
 			if (it != sectionStart)
 			{
 				std::u32string_view view(&*sectionStart, static_cast<size_t>(it - sectionStart));
-				_sections.emplace_back(TextSection{view, currentStyle, currentFont});
+				_sections.emplace_back(TextSection{view, currentStyle, currentFont, currentImage});
 			}
 
 			// Verify that the character following ESC is '['.
@@ -264,7 +280,7 @@ void TextPrimitive::processTextSections()
 	if (it != sectionStart)
 	{
 		std::u32string_view view(&*sectionStart, static_cast<size_t>(it - sectionStart));
-		_sections.emplace_back(TextSection{view, currentStyle, currentFont});
+		_sections.emplace_back(TextSection{view, currentStyle, currentFont, currentImage});
 	}
 }
 
@@ -462,6 +478,7 @@ void TextPrimitive::processGlyphs()
 
 	ResourceSystem& resourceSystem = _context.getResourceSystem();
 	FontManager& fontManager = resourceSystem.getFontManager();
+	ImageManager& imageManager = resourceSystem.getImageManager();
 	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
 
 	for(TextSection& section : _sections)
@@ -478,6 +495,7 @@ void TextPrimitive::processGlyphs()
 	for(TextSection& section : _sections)
 	{
 		Font& font = fontManager.get(section.font);
+		DeviceImage& image = imageManager.get(section.texture);
 
 		// initialize the pipeline binding
 		section.pipelineBinding = _pipeline.createBinding();
@@ -486,8 +504,8 @@ void TextPrimitive::processGlyphs()
 		section.pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 0, _surface.getDeviceImageData()); 
 
 		// bind the section font
-		section.pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, font.getDeviceFontData());
-		section.pipelineBinding->setTexture(ShaderStage::Fragment, 2, font.getDeviceImage());
+		section.pipelineBinding->setUniformBuffer(ShaderStage::Vertex, 1, image.getDeviceImageData());
+		section.pipelineBinding->setTexture(ShaderStage::Fragment, 2, image);
 
 		// bind the palette
 		Palette& palette = paletteManager.get(_settings.paletteHandle);

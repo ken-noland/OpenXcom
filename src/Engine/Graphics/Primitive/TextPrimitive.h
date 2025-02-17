@@ -83,6 +83,7 @@ struct TextSection
 	std::u32string_view text;
 	TextStyle style;
 	ResourceHandle<Font> font;
+	ResourceHandle<DeviceImage> texture;
 
 	std::vector<PositionedGlyph> glyphs;
 

@@ -29,9 +29,17 @@ namespace OpenXcom
 {
 
 Font::Font(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
-	: _name(name), _fontTexture(std::move(texture)), _asciiGlyphs(asciiGlyphs), _extendedGlyphs(extendedGlyphs)
+	: Font(name, [&texture]() {
+          std::vector<OwningHandle<DeviceImage>> textures;
+          textures.reserve(1);
+          textures.emplace_back(std::move(texture));
+          return textures; }(), asciiGlyphs, extendedGlyphs)
 {
+}
 
+Font::Font(const std::string& name, std::vector<OwningHandle<DeviceImage>> textures, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
+	: _name(name), _fontTextures(std::move(textures)), _asciiGlyphs(asciiGlyphs), _extendedGlyphs(extendedGlyphs)
+{
 	// Initialize HarfBuzz with a dummy face (no TrueType tables needed)
 	_hbFace = hb_face_create_for_tables([](hb_face_t* face, hb_tag_t tag, void* user_data) -> hb_blob_t* {
 		return nullptr;
@@ -239,17 +247,6 @@ std::vector<PositionedGlyph> Font::shapeText(const std::u32string_view& text, gl
 
 	hb_buffer_destroy(buffer);
 	return positionedGlyphs;
-}
-
-
-const DeviceImage& Font::getDeviceImage() const
-{
-	return *_fontTexture;
-}
-
-const DeviceBuffer& Font::getDeviceFontData() const
-{
-	return _fontTexture->getDeviceImageData();
 }
 
 } // namespace OpenXcom

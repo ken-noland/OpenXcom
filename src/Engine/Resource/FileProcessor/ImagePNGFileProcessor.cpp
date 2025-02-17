@@ -21,7 +21,6 @@
 #include "ImageFile.h"
 
 #include "../../EngineContext.h"
-
 #include "../ResourceSystem.h"
 #include "../../Graphics/Palette/Palette.h"
 #include "../../Graphics/Palette/PaletteManager.h"
@@ -29,6 +28,7 @@
 #include "../../Graphics/Image/ImageManager.h"
 #include "../../Graphics/Buffer/Buffer.h"
 #include "../../Graphics/Buffer/BufferManager.h"
+#include "../../Filesystem/VirtualFileSystem.h"
 
 
 #include <lodepng.h>
@@ -53,24 +53,29 @@ bool ImagePNGFileProcessor::load(ImageFile& out, const std::string& name, const 
 	PaletteManager& paletteManager = resourceSystem.getPaletteManager();
 	ImageManager& imageManager = resourceSystem.getImageManager();
 
+	// find the file in the VFS
+	VirtualFileSystem& vfs = _context.getVirtualFileSystem();
+
+	std::unique_ptr<FileEntry> file = vfs.getDataFileSystem().getFile(filename);
+	if (!file)
+	{
+		throw std::runtime_error("Failed to load PNG file \"" + filename.string() + "\". File not found.");
+		return false;
+	}
+
+	// load into a buffer
+	std::unique_ptr<std::istream> stream = file->openRead();
+	std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(*stream)), std::istreambuf_iterator<char>());
+
 	// --- lodepng Setup ---
 	// We use the C++ interface and set up a State object.
 	lodepng::State state;
 	state.decoder.color_convert = 0;
 
-	// --- Load the PNG ---
-	std::vector<unsigned char> buffer;
-	unsigned error = lodepng::load_file(buffer, filename.string());
-	if (error)
-	{
-		throw std::runtime_error("Failed to load PNG file \"" + filename.string() + "\" with error: " + lodepng_error_text(error));
-		return false;
-	}
-
 	// --- Decode the PNG ---
 	std::vector<unsigned char> image;
 	unsigned width, height;
-	error = lodepng::decode(image, width, height, state, buffer);
+	unsigned error = lodepng::decode(image, width, height, state, buffer);
 	if (error)
 	{
 		throw std::runtime_error("Failed to decode PNG file \"" + filename.string() + "\" with error: " + lodepng_error_text(error));

@@ -360,7 +360,7 @@ public:
 	}
 
 	// helper function to get the glyph from the font
-	std::array<OpenXcom::Glyph, 128> getAsciiGlyphs()
+	std::array<OpenXcom::Glyph, 128> getAsciiGlyphs(OpenXcom::ResourceHandle<OpenXcom::DeviceImage> image)
 	{
 		std::array<OpenXcom::Glyph, 128> asciiGlyphs;
 		memset(asciiGlyphs.data(), 0, asciiGlyphs.size() * sizeof(OpenXcom::Glyph));
@@ -389,7 +389,8 @@ public:
 				static_cast<uint16_t>(charWidth),
 				static_cast<uint16_t>(charHeight),
 				0, 0,
-				static_cast<int8_t>(charWidth) // Fixed width spacing
+				static_cast<int8_t>(charWidth), // Fixed width spacing
+				image
 			};
 		}
 
@@ -411,7 +412,7 @@ public:
 		OpenXcom::OwningHandle<OpenXcom::DeviceImage> deviceFontTexture = resourceSystem.getImageManager().createDeviceImage(*hostFontTexture);
 
 		// Create the font object
-		OpenXcom::OwningHandle<OpenXcom::Font> font = resourceSystem.getFontManager().load("dosFont", std::move(deviceFontTexture), getAsciiGlyphs());
+		OpenXcom::OwningHandle<OpenXcom::Font> font = resourceSystem.getFontManager().load("dosFont", std::move(deviceFontTexture), getAsciiGlyphs(deviceFontTexture.getHandle()));
 		font->setLineSpacing(0);
 
 		return font;

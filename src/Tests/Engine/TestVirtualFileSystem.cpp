@@ -39,7 +39,7 @@ TEST(VirtualFileSystemTest, TestPhysicalFileEntry)
 	std::unique_ptr<FileEntry> entry = data.getFile("test.txt");
 	EXPECT_TRUE(entry);
 
-	FileEntry::IStreamPtr stream = entry->openRead();
+	std::unique_ptr<std::istream> stream = entry->openRead();
 	EXPECT_TRUE(stream);
 	EXPECT_TRUE(*stream);
 

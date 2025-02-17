@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="1" failures="1" disabled="0" errors="0" time="60.684" timestamp="2025-02-17T17:33:29.985" name="AllTests">
+  <testsuite name="GraphicsInGameFontTextTest" tests="1" failures="1" disabled="0" skipped="0" errors="0" time="59.487" timestamp="2025-02-17T17:33:31.097">
+    <testcase name="TestBasic" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp" line="430" status="run" result="completed" time="59.485" timestamp="2025-02-17T17:33:31.098" classname="GraphicsInGameFontTextTest">
+      <failure message="unknown file&#x0A;C++ exception with description &quot;Failed to decode PNG file &quot;Common/Font\FontBig.png&quot; with error: PNG file is smaller than a PNG header&quot; thrown in SetUp()." type=""><![CDATA[unknown file
+C++ exception with description "Failed to decode PNG file "Common/Font\FontBig.png" with error: PNG file is smaller than a PNG header" thrown in SetUp().]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

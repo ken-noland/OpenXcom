@@ -37,19 +37,19 @@ class EmbeddedFileEntry : public FileEntry
 public:
 	EmbeddedFileEntry(const std::filesystem::path& path) { _path = path; }
 
-	virtual IStreamPtr openRead() override
+	virtual std::unique_ptr<std::istream> openRead() override
 	{
 		throw std::runtime_error("IStreamPtr EmbeddedFileEntry::openRead() Not implemented");
 		return nullptr;
 	}
 
-	virtual OStreamPtr openWrite() override
+	virtual std::unique_ptr<std::ostream> openWrite() override
 	{
 		throw std::runtime_error("OStreamPtr EmbeddedFileEntry::openWrite() Not implemented");
 		return nullptr;
 	}
 
-	virtual IOStreamPtr open() override
+	virtual std::unique_ptr<std::iostream> open() override
 	{
 		throw std::runtime_error("IOStreamPtr EmbeddedFileEntry::open() Not implemented");
 		return nullptr;

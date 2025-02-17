@@ -40,6 +40,7 @@ struct Glyph
 {
 	uint16_t x, y, width, height;
 	int8_t xOffset, yOffset, xAdvance;
+	ResourceHandle<DeviceImage> image;
 };
 
 struct PositionedGlyph
@@ -56,7 +57,7 @@ class Font
 private:
 	const std::string _name;
 
-	OwningHandle<DeviceImage> _fontTexture; // The font atlas
+	std::vector<OwningHandle<DeviceImage>> _fontTextures; // The font atlas
 	hb_face_t* _hbFace = nullptr;
 	hb_font_t* _hbFont = nullptr;
 
@@ -72,6 +73,7 @@ private:
 
 public:
 	Font(const std::string& name, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
+	Font(const std::string& name, std::vector<OwningHandle<DeviceImage>> textures, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
 	~Font();
 
 	const std::string& getName() const { return _name; }
@@ -80,9 +82,6 @@ public:
 
 	void setLineSpacing(uint32_t lineSpacing) { _lineSpacing = lineSpacing; }
 	uint32_t getLineSpacing() const { return _lineSpacing; }
-
-	const DeviceImage& getDeviceImage() const;
-	const DeviceBuffer& getDeviceFontData() const;
 
 	glm::ivec2 getTextExtents(const std::string& text) const;
 	glm::ivec2 getTextExtents(const std::string_view& text) const;

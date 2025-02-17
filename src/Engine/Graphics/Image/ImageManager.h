@@ -49,6 +49,9 @@ public:
 
 	ResourceManager<HostImage>& getHostImageManager() { return _hostImageManager; }
 	ResourceManager<DeviceImage>& getDeviceImageManager() { return _deviceImageManager; }
+
+	HostImage& get(const ResourceHandle<HostImage>& handle); 
+	DeviceImage& get(const ResourceHandle<DeviceImage>& handle);
 };
 
 } // namespace OpenXcom

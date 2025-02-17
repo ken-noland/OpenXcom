@@ -20,6 +20,9 @@
 
 #include "FontManager.h"
 
+#include "../Image/Image.h"
+#include "../Image/ImageManager.h"
+
 #include "../../EngineContext.h"
 #include "../../Logger.h"
 #include "../../Filesystem/VirtualFileSystem.h"
@@ -129,10 +132,12 @@ void traverse_node(ryml::ConstNodeRef node, int indent = 0)
 	}
 }
 
-
+// Load the font pack
 void FontPack::load(const std::filesystem::path& path)
 {
-	// Load the font pack
+	ResourceSystem& resourceSystem = _context.getResourceSystem();
+	ImageManager& imageManager = resourceSystem.getImageManager();
+	ImageFileProcessor& imageFileProcessor = resourceSystem.getImageFileProcessor();
 
 	// use the virtual file system to find the font file
 	FileSystem& vfs = _context.getVirtualFileSystem().getDataFileSystem();
@@ -144,7 +149,7 @@ void FontPack::load(const std::filesystem::path& path)
 		return;
 	}
 
-	FileEntry::IStreamPtr stream = file->openRead();
+	std::unique_ptr<std::istream> stream = file->openRead();
 	std::string contents(std::istreambuf_iterator<char>(*stream), {});
 
 	// Read the file into memory
@@ -158,35 +163,120 @@ void FontPack::load(const std::filesystem::path& path)
 	// Load the fonts
 	for (const FileFontDefinition& fontDef : fileFonts.fonts)
 	{
+		std::vector<OwningHandle<DeviceImage>> images;
+
 		// Load the font images
 		std::array<Glyph, 128> asciiGlyphs;
 		std::unordered_map<char32_t, Glyph> extendedGlyphs;
+
 		for (const FileFontImageDefinition& imageDef : fontDef.images)
 		{
 			// Load the image
 			std::filesystem::path imagePath = path.parent_path() / imageDef.file;
+			std::string name = fontDef.id + "_FontImage";
+
 			ImageFile imageFile;
-			_context.getResourceSystem().getImageFileProcessor().load(imageFile, "", imagePath);
+			imageFileProcessor.load(imageFile, name, imagePath);
 
-		//	OwningHandle<DeviceImage> image = _context.getResourceSystem().getImageManager().load(imagePath);
+			// We still need to keep the host image around for this function because we parse out the width of
+			// each char from the actual image data itself.
+			OwningHandle<HostImage> hostImage = imageFile.takeImage();
 
-		//	// Load the glyphs
-		//	for (char c : imageDef.chars)
-		//	{
-		//		if (c < 128)
-		//		{
-		//			asciiGlyphs[c] = Glyph{image, c};
-		//		}
-		//		else
-		//		{
-		//			extendedGlyphs[c] = Glyph{image, c};
-		//		}
-		//	}
+			if (hostImage->getFormat() != ImageFormat::R8)
+			{
+				Log(LOG_ERROR) << "FontPack: Font image must be R8 format: " << imagePath.string();
+				continue;
+			}
+
+			// Move HostImage to device, which is necessary in order to get the resource handle for the glyph rendering
+			OwningHandle<DeviceImage> deviceImage = imageManager.createDeviceImage(*hostImage);
+
+			const uint8_t* pixels = static_cast<const uint8_t*>(hostImage->map());
+			uint32_t imageWidth = hostImage->getExtent().x; // total width of the image
+			uint32_t cellWidth = fontDef.width;            // defined in your YAML file
+			uint32_t cellHeight = fontDef.height;          // defined in your YAML file
+
+			// Calculate how many glyphs fit in one row:
+			uint32_t columns = imageWidth / cellWidth;
+
+			size_t glyphIndex = 0;
+			for(char32_t character : imageDef.chars)
+			{
+				// Parse out the actual width and spacing
+				//	KN NOTE: The old system for loading fonts used this as a means to define the width of individual
+				// characters. This is no longer necessary, as the width of each character is defined in the font file
+				// itself, but we need to retain backwards compatibility.
+
+				 
+				// Determine cell starting position
+				int startX = static_cast<int>((glyphIndex % columns) * cellWidth);
+				int startY = static_cast<int>((glyphIndex / columns) * cellHeight);
+
+				// For non-monospace, scan for the actual glyph boundaries.
+				int left = -1, right = -1;
+
+				// Find the left boundary
+				for(int x = startX; x < startX + static_cast<int>(cellWidth) && left == -1; ++x)
+				{
+					for (int y = startY; y < startY + static_cast<int>(cellHeight); ++y)
+					{
+						size_t index = ((y * imageWidth) + x);
+						if (pixels[index] != 0)
+						{ // non-zero pixel found
+							left = x;
+							break;
+						}
+					}
+				}
+
+				// Find the right boundary
+				for (int x = startX + cellWidth - 1; x >= startX && right == -1; --x)
+				{
+					for (int y = startY; y < startY + static_cast<int>(cellHeight); ++y)
+					{
+						size_t index = ((y * imageWidth) + x);
+						if (pixels[index] != 0)
+						{
+							right = x;
+							break;
+						}
+					}
+				}
+
+				// Set the glyph rectangle
+				Glyph glyph;
+				glyph.image = deviceImage.getHandle();
+
+				glyph.x = left;
+				glyph.y = startY;
+				glyph.width = (right - left + 1);
+				glyph.height = cellHeight;
+				glyph.xAdvance = glyph.width + fontDef.spacing;
+
+				// Add the glyph to the appropriate map
+				if (character < 128)
+				{
+					asciiGlyphs[character] = glyph;
+				}
+				else
+				{
+					extendedGlyphs[character] = glyph;
+				}
+
+				++glyphIndex;
+			}
+
+			images.push_back(std::move(deviceImage));
+
+
+
+			// take ownership of the image
+			//images.push_back(imageFile.takeImage());
+
+			// Load the glyphs
+
 		}
 
-		//// Load the font
-		//OwningHandle<Font> font = _context.getResourceManager().getFontManager().load(fontDef.id, asciiGlyphs, extendedGlyphs);
-		//_fontPackHandles.push_back(font);
 	}
 
 }

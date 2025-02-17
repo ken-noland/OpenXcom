@@ -60,13 +60,9 @@ public:
 
 	virtual EntryType getType() const override { return EntryType::File; }
 
-	using IStreamPtr = std::shared_ptr<std::istream>;
-	using OStreamPtr = std::shared_ptr<std::ostream>;
-	using IOStreamPtr = std::shared_ptr<std::iostream>;
-
-	virtual IStreamPtr openRead() = 0;
-	virtual OStreamPtr openWrite() = 0;
-	virtual IOStreamPtr open() = 0;
+	virtual std::unique_ptr<std::istream> openRead() = 0;
+	virtual std::unique_ptr<std::ostream> openWrite() = 0;
+	virtual std::unique_ptr<std::iostream> open() = 0;
 
 protected:
 

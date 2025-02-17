@@ -17,3 +17,21 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "ImageManager.h"
+
+#include "Image.h"
+
+namespace OpenXcom
+{
+
+HostImage& ImageManager::get(const ResourceHandle<HostImage>& handle)
+{
+	return _hostImageManager.get(handle);
+}
+
+DeviceImage& ImageManager::get(const ResourceHandle<DeviceImage>& handle)
+{
+	return _deviceImageManager.get(handle);
+}
+
+
+} // namespace OpenXcom
