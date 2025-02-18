@@ -44,6 +44,10 @@
 #define DEBUG_BREAK() raise(SIGTRAP)
 #endif
 
+#define DUMP_VULKAN_INSTANCE_EXTENSIONS
+#define DUMP_VULKAN_INSTANCE_LAYERS
+#define DUMP_VULKAN_DEVICE_EXTENSIONS
+
 namespace OpenXcom
 {
 
@@ -244,8 +248,11 @@ void VulkanContext::initializeInstance(bool isHeadless)
 								VK_API_VERSION_1_0);
 
 
-	std::vector<const char*> extensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
-	std::vector<const char*> layers = {"VK_LAYER_KHRONOS_validation"};
+	std::vector<const char*> extensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAME, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME};
+	std::vector<const char*> required_layers = {};
+	std::vector<const char*> optional_layers = {"VK_LAYER_KHRONOS_validation"};
+
+	std::vector<const char*> layers = required_layers;
 
 	if (!isHeadless)
 	{
@@ -261,6 +268,14 @@ void VulkanContext::initializeInstance(bool isHeadless)
 
 	std::vector<vk::ExtensionProperties> availableExtensions = vk::enumerateInstanceExtensionProperties();
 
+#if defined(DUMP_VULKAN_INSTANCE_EXTENSIONS)
+	Log(LOG_INFO) << "Available extensions: ";
+	for (vk::ExtensionProperties extension : availableExtensions)
+	{
+		Log(LOG_INFO) << "  " << extension.extensionName;
+	}
+#endif
+
 	for (const char* ext : extensions)
 	{
 		if (std::none_of(availableExtensions.begin(), availableExtensions.end(),
@@ -268,6 +283,41 @@ void VulkanContext::initializeInstance(bool isHeadless)
 		{
 			Log(LOG_ERROR) << "Required extension not available: " << ext;
 			throw new std::runtime_error("Required extension not available.");
+		}
+	}
+
+	// Enumerate available instance layers
+	std::vector<vk::LayerProperties> availableLayers = vk::enumerateInstanceLayerProperties();
+
+#if defined(DUMP_VULKAN_INSTANCE_LAYERS)
+	Log(LOG_INFO) << "Available layers: ";
+	for (vk::LayerProperties layer : availableLayers)
+	{
+		Log(LOG_INFO) << "  " << layer.layerName << "(" << layer.description << ")";
+	}
+#endif
+
+	for (const char* layer : required_layers)
+	{
+		if (std::none_of(availableExtensions.begin(), availableExtensions.end(),
+						 [layer](const vk::ExtensionProperties& prop) { return strcmp(prop.extensionName, layer) == 0; }))
+		{
+			Log(LOG_ERROR) << "Required layer not available: " << layer;
+			throw new std::runtime_error("Required layer not available.");
+		}
+	}
+
+	// Check for optional layers
+	for (const char* layer : optional_layers)
+	{
+		if (std::none_of(availableExtensions.begin(), availableExtensions.end(),
+						 [layer](const vk::ExtensionProperties& prop) { return strcmp(prop.extensionName, layer) == 0; }))
+		{
+			Log(LOG_WARNING) << "Optional layer not available: " << layer;
+		}
+		else
+		{
+			layers.push_back(layer);
 		}
 	}
 
@@ -456,7 +506,15 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 		deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 	}
 
-	deviceExtensions.push_back(VK_EXT_CONSERVATIVE_RASTERIZATION_EXTENSION_NAME);
+
+#if defined(DUMP_VULKAN_DEVICE_EXTENSIONS)
+	std::vector<vk::ExtensionProperties> availableExtensions = _physicalDevice.enumerateDeviceExtensionProperties();
+	Log(LOG_INFO) << "Available device extensions: ";
+	for (vk::ExtensionProperties extension : availableExtensions)
+	{
+		Log(LOG_INFO) << "  " << extension.extensionName;
+	}
+#endif
 
 	// Finally, create the logical device
 	vk::DeviceCreateInfo deviceCreateInfo{};
@@ -469,6 +527,7 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	deviceCreateInfo.pNext = &lineRasterizationFeatures;
 
 	_device = _physicalDevice.createDevice(deviceCreateInfo);
+	Log(LOG_INFO) << "Vulkan Device created";
 
 	_graphicsQueue.create(_device, graphicsQueueFamilyIndex, true);
 	_transferQueue.create(_device, transferQueueFamilyIndex, true);
@@ -477,6 +536,7 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	{
 		_presentQueue.create(_device, presentQueueFamilyIndex, false);
 	}
+	Log(LOG_INFO) << "Are we getting here?";
 }
 
 vk::BufferUsageFlags VulkanContext::getBufferUsageFlags(BufferUsage usage)

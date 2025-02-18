@@ -319,25 +319,6 @@ void VulkanRenderTarget::beginRenderPass(GraphicsCommand& command)
 {
 	vk::CommandBuffer& vkCommand = static_cast<VulkanCommand&>(command).getCommandBuffer();
 
-	int width = getWidth();
-	int height = getHeight();
-
-	vk::Viewport viewport = {};
-	viewport.x = 0.0f;
-	viewport.y = 0.0f;
-	viewport.width = static_cast<float>(width);
-	viewport.height = static_cast<float>(height);
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-
-	vkCommand.setViewport(0, 1, &viewport);
-
-	vk::Rect2D scissor = {};
-	scissor.offset = vk::Offset2D(0, 0);
-	scissor.extent = vk::Extent2D(width, height);
-
-	vkCommand.setScissor(0, 1, &scissor);
-
 	vk::ClearValue clearColor = vk::ClearColorValue(std::array<float, 4>{_color.r, _color.g, _color.b, _color.a});
 
 	vk::RenderPassBeginInfo renderPassInfo{};

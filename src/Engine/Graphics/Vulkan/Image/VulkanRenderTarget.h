@@ -68,7 +68,9 @@ public:
 	virtual uint32_t getHeight() const override { return _extent.y; }
 	virtual glm::ivec2 getExtent() const override { return _extent; }
 	virtual ImageFormat getFormat() const override { return ImageFormat::UNKNOWN; }
+
 	virtual uint32_t getMultisampleCount() const override { return 1; }
+	virtual bool getUseDynamicStates() const override { return false; }
 		
 	virtual void copyFrom(HostImage& hostImage) override;
 	virtual void copyTo(HostImage& hostImage) override;

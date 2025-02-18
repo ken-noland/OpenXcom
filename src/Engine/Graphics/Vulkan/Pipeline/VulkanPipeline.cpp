@@ -71,11 +71,6 @@ VulkanPipeline::VulkanPipeline(VulkanContext& context, const PipelineDefinition&
 	lineRasterizationState.lineRasterizationMode = vk::LineRasterizationModeEXT::eBresenham;
 	rasterizer.pNext = &lineRasterizationState;
 
-	if (pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineStrip || pipelineDefinition.getResourceLayout().getTopology() == PrimitiveTopology::LineList)
-	{
-		rasterizer.polygonMode = vk::PolygonMode::ePoint;
-	}
-
 	createPipelineLayout();
 
 	createPipeline(shaderStages, vertexInputInfo, inputAssembly, viewportState, rasterizer, multisampling, colorBlending, renderTarget);
@@ -286,11 +281,14 @@ void VulkanPipeline::createPipeline(
 			assert(false && "Attempting to create renderpass on headless surface is not allowed");
 		}
 		break;
-
 	}
 	case ImageType::RenderTarget:
 	{
 		renderPass = static_cast<const VulkanRenderTarget&>(surface).getRenderPass();
+		break;
+	}
+	case ImageType::Texture: {
+		assert(false && "Attempting to create renderpass on texture is not allowed");
 		break;
 	}
 	}
@@ -308,20 +306,34 @@ void VulkanPipeline::createPipeline(
 	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
 
-	// Declare the dynamic states
-	std::vector<vk::DynamicState> dynamicStates = {
-		vk::DynamicState::eViewport,
-		vk::DynamicState::eScissor
-	};	//TODO: Some pipelines need this, others do not. Need to find a way to signal if that is the case!
+	if (surface.getUseDynamicStates())
+	{
+		// Declare the dynamic states
+		std::vector<vk::DynamicState> dynamicStates = {
+			vk::DynamicState::eViewport,
+			vk::DynamicState::eScissor};
 
-	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
-	dynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
-	dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
+		vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
+		dynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
+		dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
 
-	pipelineInfo.pDynamicState = &dynamicStateCreateInfo;
+		pipelineInfo.pDynamicState = &dynamicStateCreateInfo;
+	}
+	else
+	{
+		pipelineInfo.pDynamicState = nullptr;
+	}
 
 	// Create the pipeline
-	_pipeline = _context.getDevice().createGraphicsPipeline(nullptr, pipelineInfo).value;
+	vk::ResultValue<vk::Pipeline> result = _context.getDevice().createGraphicsPipeline(nullptr, pipelineInfo);
+	if (result.result == vk::Result::eSuccess)
+	{
+		_pipeline = result.value;
+	}
+	else
+	{
+		throw std::runtime_error("Failed to create graphics pipeline");
+	}
 }
 
 vk::Format VulkanPipeline::determineFormat(const SimpleRTTR::Type& type)

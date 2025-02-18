@@ -1,3 +1,11 @@
+# CMakeLists.txt
+
+# CMake build type
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "No build type specified. Defaulting to Debug build.")
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type (Debug, Release, etc.)" FORCE)
+endif()
+
 # Define option to enable or disable the EntityInspector
 option(ENABLE_ENTITY_INSPECTOR "Enable the EntityInspector for debugging and editing entities." ON)
 
@@ -590,6 +598,13 @@ set_property ( SOURCE ${c_src} APPEND PROPERTY COMPILE_DEFINITIONS MINIZ_NO_STDI
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# GCC/Clang specific compiler flags
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    message(STATUS "Configuring for GCC/Clang in Debug mode")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+endif()
+
 #--------------------------------
 # External libraries
 include(FetchContent)
@@ -761,6 +776,14 @@ add_custom_command(
     DEPENDS create_generated_dir codegen ${yaml_codegen_templates}
     COMMENT "Generating Yaml source files with codegen"
 )
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    set_source_files_properties(
+        ${CMAKE_BINARY_DIR}/generated/json.cpp
+        ${CMAKE_BINARY_DIR}/generated/yaml.cpp
+        PROPERTIES COMPILE_FLAGS "-Wno-extra-qualification"
+    )
+endif()
 
 # openxcom_lib: Library compiled from generated source files, depends on openxcom_base_lib
 add_library(openxcom_lib STATIC ${generated_sources} $<TARGET_OBJECTS:openxcom_base_lib>)

@@ -490,6 +490,7 @@ void VulkanWindowedSurface::beginRenderPass(GraphicsCommand& command)
 {
 	vk::CommandBuffer& commandBuffer = _commandContext->getCommandBuffer();
 
+	
 	vk::Viewport viewport = {};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;

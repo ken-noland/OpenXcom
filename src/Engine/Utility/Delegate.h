@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <vector>
+#include <list>
 #include <functional>
 #include <stdexcept>
 #include <cassert>
@@ -101,6 +101,7 @@ private:
 public:
 	MulticastDelegate() = default;
 	~MulticastDelegate() {
+		// Ensure all functions are removed before destruction.
 		assert(functions.empty());
 	}
 

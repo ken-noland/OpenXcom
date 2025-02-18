@@ -101,7 +101,9 @@ public:
 	virtual uint32_t getHeight() const override;
 	virtual glm::ivec2 getExtent() const override;
 	virtual ImageFormat getFormat() const override;
+
 	virtual uint32_t getMultisampleCount() const override { return 1; }
+	virtual bool getUseDynamicStates() const override { return true; }
 		
 	// device image data for a render surface contains the extents of the framebuffer
 	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }; 
