@@ -30,6 +30,9 @@ PlatformWindow::PlatformWindow(const std::string& title, int width, int height)
 	platformSpecificCreateWindow(title, width, height);
 
 	_running = true;
+	_minimized = false;
+	_maximized = false;
+	_restored = false;
 }
 
 PlatformWindow::~PlatformWindow()

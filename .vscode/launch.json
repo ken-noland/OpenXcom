@@ -5,13 +5,52 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch OpenXcom",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/src/openxcom",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build openxcom"
+        },
+        {
             "name": "OpenXcom Tests",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/src/Tests/Debug/openxcom_tests.exe",
+            "program": "${workspaceFolder}/build/src/Tests/openxcom_tests",
             "cwd": "${workspaceFolder}",
             "environment": [
                 {"SKIP_SLOW_TESTS": "1"}
+            ]
+        },       
+        {
+            "name": "Codegen",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/src/codegen",
+            "cwd": "${workspaceFolder}",
+            "args":[ "-template", 
+                     "${workspaceFolder}/Codegen/Templates/Json/JsonTemplate.json", 
+                     "-output",
+                     "temp/json.cpp" ],
+            "environment": [
+                { "name": "SKIP_SLOW_TESTS", "value": "1" }
             ]
         }
     ]

@@ -70,7 +70,7 @@ void PlatformWindow::platformSpecificUpdateWindow()
 	if (_handle.display)
 	{
 		XEvent event;
-		while (XPending(static_cast<Display*>(_handle.display)))
+		while (_running && XPending(static_cast<Display*>(_handle.display)))
 		{
 			XNextEvent(static_cast<Display*>(_handle.display), &event);
 
@@ -80,8 +80,7 @@ void PlatformWindow::platformSpecificUpdateWindow()
 				// Handle window close event (e.g., "WM_DELETE_WINDOW")
 				if (event.xclient.data.l[0] == _handle.wmDeleteMessage)
 				{
-					_running = false; // Set flag to indicate window close
-					platformSpecificDestroyWindow();
+					close();
 				}
 				break;
 			// Add other event handling cases as needed

@@ -395,6 +395,18 @@ GraphicsCommand& VulkanWindowedSurface::beginCommandPass()
 	// Acquire an image from the swap chain
 	vk::Result result = vk::Result::eErrorUnknown;
 
+	result = _context.getDevice().waitForFences(1, &_frames[_currentFrame].inFlightFence, VK_TRUE, UINT64_MAX);
+	if(result != vk::Result::eSuccess)
+	{
+		throw std::runtime_error("Failed to wait for fence!");
+	}
+
+	result = _context.getDevice().resetFences(1, &_frames[_currentFrame].inFlightFence);
+	if(result != vk::Result::eSuccess)
+	{
+		throw std::runtime_error("Failed to reset fence!");
+	}
+
     // Retry loop for acquireNextImageKHR
 	while (true)
 	{
@@ -424,9 +436,6 @@ GraphicsCommand& VulkanWindowedSurface::beginCommandPass()
 			throw std::runtime_error("Failed to acquire swap chain image!");
 		}
 	}
-
-	result = _context.getDevice().waitForFences(1, &_frames[_currentFrame].inFlightFence, VK_TRUE, UINT64_MAX);
-	result = _context.getDevice().resetFences(1, &_frames[_currentFrame].inFlightFence);
 
 	vk::CommandBuffer& commandBuffer = _frames[_currentFrame].commandBuffer;
 

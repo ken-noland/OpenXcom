@@ -306,14 +306,15 @@ void VulkanPipeline::createPipeline(
 	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
 
+	// Declare the dynamic states
+	std::vector<vk::DynamicState> dynamicStates = {
+		vk::DynamicState::eViewport,
+		vk::DynamicState::eScissor};
+
+	vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
+
 	if (surface.getUseDynamicStates())
 	{
-		// Declare the dynamic states
-		std::vector<vk::DynamicState> dynamicStates = {
-			vk::DynamicState::eViewport,
-			vk::DynamicState::eScissor};
-
-		vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
 		dynamicStateCreateInfo.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
 		dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
 

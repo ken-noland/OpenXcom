@@ -299,8 +299,8 @@ void VulkanContext::initializeInstance(bool isHeadless)
 
 	for (const char* layer : required_layers)
 	{
-		if (std::none_of(availableExtensions.begin(), availableExtensions.end(),
-						 [layer](const vk::ExtensionProperties& prop) { return strcmp(prop.extensionName, layer) == 0; }))
+		if (std::none_of(availableLayers.begin(), availableLayers.end(),
+						 [layer](const vk::LayerProperties& layerProp) { return strcmp(layerProp.layerName, layer) == 0; }))
 		{
 			Log(LOG_ERROR) << "Required layer not available: " << layer;
 			throw new std::runtime_error("Required layer not available.");
@@ -310,8 +310,8 @@ void VulkanContext::initializeInstance(bool isHeadless)
 	// Check for optional layers
 	for (const char* layer : optional_layers)
 	{
-		if (std::none_of(availableExtensions.begin(), availableExtensions.end(),
-						 [layer](const vk::ExtensionProperties& prop) { return strcmp(prop.extensionName, layer) == 0; }))
+		if (std::none_of(availableLayers.begin(), availableLayers.end(),
+						 [layer](const vk::LayerProperties& layerProp) { return strcmp(layerProp.layerName, layer) == 0; }))
 		{
 			Log(LOG_WARNING) << "Optional layer not available: " << layer;
 		}

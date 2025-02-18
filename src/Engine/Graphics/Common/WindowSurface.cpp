@@ -195,20 +195,24 @@ void WindowSurface::update()
 {
 	if (!_isHeadless)
 	{
-		//---
-		// Windowed rendering
+		// update the window
+		_window->update();
+		
 		if (!_isRunning)
 		{
 			_onClose.release();
 			_onResize.release();
 
-			_windowSurface.reset();
-			_window.reset();
+			if(_window)
+			{
+				_window.reset();
+			}
+
 			return;
 		}
-
-		// update the window
-		_window->update();
+		
+		//---
+		// Windowed rendering
 
 		if (!_window->isMinimized())
 		{
@@ -264,6 +268,11 @@ void WindowSurface::onResize(glm::ivec2 size)
 
 void WindowSurface::onClose()
 {
+	if(_windowSurface)
+	{
+		_windowSurface.reset();
+	}
+
 	_engine.getEngine().exit();
 	_isRunning = false;
 }
