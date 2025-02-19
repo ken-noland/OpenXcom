@@ -580,22 +580,12 @@ set ( cxx_src
     ${entity_interface_src}
 )
 
-set ( c_src
-  ../libs/miniz/miniz.c
-)
-set_property ( SOURCE ${c_src} APPEND PROPERTY COMPILE_DEFINITIONS MINIZ_NO_STDIO )
-
 if(ENABLE_ENTITY_INSPECTOR)
   list(APPEND cxx_src ${inspector_src})
 endif()
 
 # All the source files that are necessary to build the project, excluding the main.cpp file
 set ( openxcom_src ${c_src} ${cxx_src} ${embed_src} )
-
-set ( c_src
-  ../libs/miniz/miniz.c
-)
-set_property ( SOURCE ${c_src} APPEND PROPERTY COMPILE_DEFINITIONS MINIZ_NO_STDIO )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 

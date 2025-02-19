@@ -4,6 +4,12 @@ CMakeSettings.json
 /.github
 /.tx
 
+# game files
+/data/data/TFTD/*
+!/data/data/TFTD/README.txt
+/data/data/UFO/*
+!/data/data/UFO/README.txt
+
 # visual studio 2022
 /.vs/CMake Overview
 /.vs/CMakeWorkspaceSettings.json
