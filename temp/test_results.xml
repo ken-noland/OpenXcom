@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="1" failures="0" disabled="0" errors="0" time="7.123" timestamp="2025-02-17T22:22:02.456" name="AllTests">
-  <testsuite name="GraphicsInGameFontTextTest" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="5.843" timestamp="2025-02-17T22:22:03.655">
-    <testcase name="TestBasic" file="D:\Dev\Personal\OpenXcom\src\Tests\Engine\Graphics\Primitives\TestText.cpp" line="434" status="run" result="completed" time="5.842" timestamp="2025-02-17T22:22:03.655" classname="GraphicsInGameFontTextTest" />
-  </testsuite>
-</testsuites>

@@ -210,6 +210,7 @@ set ( engine_src
   "Engine/Resource/FileProcessor/ImageFile.cpp"
   "Engine/Resource/FileProcessor/ImageFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"
+  "Engine/Resource/FileProcessor/Xcom1MasterFileProcessor.cpp"
   "Engine/Resource/ResourceSystem.cpp"
   "Engine/Utility/RTTRGlm.cpp"
 #  "Engine/Action.cpp"

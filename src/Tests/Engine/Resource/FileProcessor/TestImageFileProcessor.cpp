@@ -40,7 +40,14 @@ TEST_F(ImageFileProcessorTest, TestBmp8bit)
 	ImageBMPFileProcessor& bmpProcessor = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor();
 
 	// Save the image
-	std::filesystem::path path = _dataPath / "Test" / "BMP" / "001_generated.bmp";
+	std::filesystem::path path = _dataPath / "generated" / "BMP" / "001_generated.bmp";
+
+	// recursively generate the path
+	if (!std::filesystem::exists(path.parent_path()))
+	{
+		std::filesystem::create_directories(path.parent_path());
+	}
+
 	bmpProcessor.save(path, generatedImage);
 
 	// Load the image back
@@ -84,7 +91,14 @@ TEST_F(ImageFileProcessorTest, TestPng8bit)
 	ImagePNGFileProcessor& pngProcessor = _engine->getEngineContext().getResourceSystem().getImagePNGFileProcessor();
 
 	// Save the image
-	std::filesystem::path path = _dataPath / "Test" / "BMP" / "001_generated.png";
+	std::filesystem::path path = _dataPath / "generated" / "PNG" / "001_generated.png";
+
+	// recursively generate the path
+	if (!std::filesystem::exists(path.parent_path()))
+	{
+		std::filesystem::create_directories(path.parent_path());
+	}
+
 	pngProcessor.save(path, generatedImage);
 
 	// Load the image back

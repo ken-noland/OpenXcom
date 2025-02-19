@@ -1,3 +1,14 @@
 CMakeSettings.json
 /out
 /build
+/.github
+/.tx
+
+# visual studio 2022
+/.vs/CMake Overview
+/.vs/CMakeWorkspaceSettings.json
+/.vs/cmake.db
+/.vs/OpenXcom
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json

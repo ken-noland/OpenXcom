@@ -44,9 +44,10 @@
 #define DEBUG_BREAK() raise(SIGTRAP)
 #endif
 
-#define DUMP_VULKAN_INSTANCE_EXTENSIONS
-#define DUMP_VULKAN_INSTANCE_LAYERS
-#define DUMP_VULKAN_DEVICE_EXTENSIONS
+// Enable these to get detailed information about Vulkan extensions and layers
+//#define DUMP_VULKAN_INSTANCE_EXTENSIONS
+//#define DUMP_VULKAN_INSTANCE_LAYERS
+//#define DUMP_VULKAN_DEVICE_EXTENSIONS
 
 namespace OpenXcom
 {
@@ -248,7 +249,7 @@ void VulkanContext::initializeInstance(bool isHeadless)
 								VK_API_VERSION_1_0);
 
 
-	std::vector<const char*> extensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAME, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME};
+	std::vector<const char*> extensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
 	std::vector<const char*> required_layers = {};
 	std::vector<const char*> optional_layers = {"VK_LAYER_KHRONOS_validation"};
 
@@ -536,7 +537,6 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	{
 		_presentQueue.create(_device, presentQueueFamilyIndex, false);
 	}
-	Log(LOG_INFO) << "Are we getting here?";
 }
 
 vk::BufferUsageFlags VulkanContext::getBufferUsageFlags(BufferUsage usage)

@@ -100,7 +100,7 @@ TEST_F(GraphicsTextTest, TestHelloWorld)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "001_hello_world.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "001_hello_world.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -135,7 +135,7 @@ TEST_F(GraphicsTextTest, TestColorSections)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "002_multi_color.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "002_multi_color.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -166,7 +166,7 @@ TEST_F(GraphicsTextTest, TestMultiLineQuickBrownFox)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "003_quick_brown_fox_wrapping.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "003_quick_brown_fox_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -254,7 +254,7 @@ TEST_F(GraphicsTextTest, TestMultiLineLoremIpsum)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "004_lorem_ipsum_wrapping.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "004_lorem_ipsum_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -319,7 +319,7 @@ TEST_F(GraphicsTextTest, TestMultilineReallyLongWord)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "005_really_long_word_wrapping.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "005_really_long_word_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -405,7 +405,7 @@ TEST_F(GraphicsTextTest, TestMultiNewLine)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "006_lorem_ipsum_multiline_wrapping.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "006_lorem_ipsum_multiline_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -421,7 +421,7 @@ protected:
 	void SetUp() override
 	{
 		_ansiPaletteHandle = createAnsiColorPalette81();
-		_fontPack = std::make_unique<FontPack>(_engine->getEngineContext(), "Common/Font/Font.yml");
+		_fontPack = std::make_unique<FontPack>(_engine->getEngineContext(), "font/Font.yml");
 
 		ASSERT_EQ(4, _fontPack->getFonts().size()) << "Expected four fonts in the font pack";
 	}
@@ -467,7 +467,7 @@ TEST_F(GraphicsInGameFontTextTest, TestHelloWorldFont0)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "101_hello_world.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "101_hello_world.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -503,7 +503,7 @@ TEST_F(GraphicsInGameFontTextTest, TestColorSectionsFont0)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "102_multi_color.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "102_multi_color.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -534,7 +534,7 @@ TEST_F(GraphicsInGameFontTextTest, TestMultiLineQuickBrownFoxFont0)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "103_quick_brown_fox_wrapping.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "103_quick_brown_fox_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -571,7 +571,7 @@ TEST_F(GraphicsInGameFontTextTest, TestHelloWorldFont1)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "201_hello_world.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "201_hello_world.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -603,7 +603,7 @@ TEST_F(GraphicsInGameFontTextTest, TestColorSectionsFont1)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "202_multi_color.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "202_multi_color.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -634,6 +634,6 @@ TEST_F(GraphicsInGameFontTextTest, TestMultiLineQuickBrownFoxFont1)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "Text" / "203_quick_brown_fox_wrapping.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "TextPrimitive" / "203_quick_brown_fox_wrapping.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }

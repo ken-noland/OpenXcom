@@ -133,6 +133,12 @@ protected:
 		HostImage& hostImage = hostImageHandle.get();
 		const uint8_t* pixels = static_cast<const uint8_t*>(hostImage.map());
 
+		// recursively generate the path
+		if (!std::filesystem::exists(baselinePath.parent_path()))
+		{
+			std::filesystem::create_directories(baselinePath.parent_path());
+		}
+
 		// Generate a baseline if it doesn't exist
 		if (!std::filesystem::exists(baselinePath) || FORCE_REGENERATE_BASELINE)
 		{
@@ -178,6 +184,6 @@ TEST_F(GraphicsTest, TestGraphicsSurface)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "001_game_surface_blank.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "Surface" / "001_game_surface_blank.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }

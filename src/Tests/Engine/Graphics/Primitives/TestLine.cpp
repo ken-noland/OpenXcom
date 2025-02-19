@@ -56,7 +56,7 @@ TEST_F(GraphicsLineTest, TestLineList)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "002_game_surface_line_1.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "LinePrimitive" / "002_game_surface_line_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -75,7 +75,7 @@ TEST_F(GraphicsLineTest, TestLineListMultiple)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "003_game_surface_line_multiple_1.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "LinePrimitive" / "003_game_surface_line_multiple_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -95,21 +95,21 @@ TEST_F(GraphicsLineTest, TestLineListResize)
 	hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	compareWithBaseline(hostImageHandle, _dataPath / "Test" / "Graphics" / "003_game_surface_line_multiple_1.png");
+	compareWithBaseline(hostImageHandle, _dataPath / "generated" / "Graphics" / "LinePrimitive" / "003_game_surface_line_multiple_1.png");
 
 	lineList->setLines(lines, 4);
 
 	hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	compareWithBaseline(hostImageHandle, _dataPath / "Test" / "Graphics" / "003_game_surface_line_multiple_2.png");
+	compareWithBaseline(hostImageHandle, _dataPath / "generated" / "Graphics" / "LinePrimitive" / "003_game_surface_line_multiple_2.png");
 
 	lineList->setLines(lines, 8);
 
 	hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	compareWithBaseline(hostImageHandle, _dataPath / "Test" / "Graphics" / "003_game_surface_line_multiple_3.png");
+	compareWithBaseline(hostImageHandle, _dataPath / "generated" / "Graphics" / "LinePrimitive" / "003_game_surface_line_multiple_3.png");
 }
 
 TEST_F(GraphicsLineTest, TestLineStrip)
@@ -132,6 +132,6 @@ TEST_F(GraphicsLineTest, TestLineStrip)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "004_game_surface_line_strip_1.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "LinePrimitive" / "004_game_surface_line_strip_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }

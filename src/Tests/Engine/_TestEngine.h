@@ -222,6 +222,12 @@ public:
 		OpenXcom::HostImage& hostImage = hostImageHandle.get();
 		const uint8_t* pixels = static_cast<const uint8_t*>(hostImage.map());
 
+		// recursively generate the path
+		if(!std::filesystem::exists(baselinePath.parent_path()))
+		{
+			std::filesystem::create_directories(baselinePath.parent_path());
+		}
+
 		// Generate a baseline if it doesn't exist
 		if (!std::filesystem::exists(baselinePath) || FORCE_REGENERATE_BASELINE)
 		{

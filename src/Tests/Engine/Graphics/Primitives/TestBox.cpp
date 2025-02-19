@@ -55,7 +55,7 @@ TEST_F(GraphicsBoxTest, TestFilledBox)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "005_game_surface_filled_box_1.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "BoxPrimitive" / "005_game_surface_filled_box_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -72,7 +72,7 @@ TEST_F(GraphicsBoxTest, TestOutlineBox)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "006_game_surface_outline_box_1.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "BoxPrimitive" / "006_game_surface_outline_box_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -99,6 +99,6 @@ TEST_F(GraphicsBoxTest, TestOutlineBoxesCorners)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "007_game_surface_outline_box_corners_1.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "BoxPrimitive" / "007_game_surface_outline_box_corners_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }

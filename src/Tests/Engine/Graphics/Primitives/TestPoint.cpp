@@ -71,7 +71,7 @@ TEST_F(GraphicsPointTest, TestPointListPrimitive16Points)
 	ASSERT_TRUE(hostImageHandle.isValid());
 
 	// Define the baseline image path for comparison.
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "008_game_surface_point_list_1.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "PointPrimitive" / "008_game_surface_point_list_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }
 
@@ -109,6 +109,6 @@ TEST_F(GraphicsPointTest, TestPointColorListPrimitive16Points)
 	ASSERT_TRUE(hostImageHandle.isValid());
 
 	// Define the baseline image path for comparison.
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "009_game_surface_point_color_list_1.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "PointPrimitive" / "009_game_surface_point_color_list_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }

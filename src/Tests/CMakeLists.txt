@@ -44,7 +44,8 @@ add_executable(
 
 # Define the source root and add it as a compile definition
 target_compile_definitions(openxcom_tests PRIVATE 
-    TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/src/Tests/Data"
+    TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/data/test"
+    CORE_DATA_DIR="${CMAKE_SOURCE_DIR}/data"
 )
 
 if (MSVC)

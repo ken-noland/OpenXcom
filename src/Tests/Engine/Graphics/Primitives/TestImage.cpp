@@ -65,6 +65,6 @@ TEST_F(GraphicsImageTest, TestBasicImage)
 	OwningHandle<HostImage> hostImageHandle = captureGameSurface();
 	ASSERT_TRUE(hostImageHandle.isValid());
 
-	std::filesystem::path baselinePath = _dataPath / "Test" / "Graphics" / "010_game_surface_image_1.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "Graphics" / "ImagePrimitive" / "010_game_surface_image_1.png";
 	compareWithBaseline(hostImageHandle, baselinePath);
 }

@@ -118,6 +118,12 @@ protected:
 		HostImage& hostImage = hostImageHandle.get();
 		const uint8_t* pixels = static_cast<const uint8_t*>(hostImage.map());
 
+		// recursively generate the path
+		if (!std::filesystem::exists(baselinePath.parent_path()))
+		{
+			std::filesystem::create_directories(baselinePath.parent_path());
+		}
+
 		// Generate a baseline if it doesn't exist
 		if (!std::filesystem::exists(baselinePath) || FORCE_REGENERATE_BASELINE)
 		{
@@ -216,7 +222,7 @@ TEST_F(BMPTest, TestLoadBMP)
 	ASSERT_FALSE(paletteHandle.isValid()) << "Loaded palette, even though we told it not to";
 
 	// Compare the loaded image with a baseline
-	std::filesystem::path baselinePath = _dataPath / "Test" / "BMP" / "test.bmp.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "BMP" / "test.bmp.png";
 	compareWithBaseline(hostImage, baselinePath);
 }
 
@@ -245,6 +251,6 @@ TEST_F(BMPTest, TestLoadBMP1)
 	hostImage->unmap();
 
 	// Compare the loaded image with a baseline
-	std::filesystem::path baselinePath = _dataPath / "Test" / "BMP" / "test1.bmp.png";
+	std::filesystem::path baselinePath = _dataPath / "generated" / "BMP" / "test1.bmp.png";
 	compareWithBaseline(hostImage, baselinePath);
 }
