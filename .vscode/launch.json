@@ -35,9 +35,6 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/src/Tests/openxcom_tests",
             "cwd": "${workspaceFolder}",
-            "environment": [
-                {"SKIP_SLOW_TESTS": "1"}
-            ]
         },       
         {
             "name": "Codegen",
