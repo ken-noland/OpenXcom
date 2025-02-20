@@ -68,9 +68,9 @@ protected:
 	void SetUp() override
 	{
 		std::filesystem::path path = TEST_DATA_DIR;
-		_dataPath = path / "Data";
-		_configPath = path / "Config";
-		_userPath = path / "User";
+		_dataPath = path / "data";
+		_configPath = path / "config";
+		_userPath = path / "user";
 
 		std::vector<std::string> args = {"-data", _dataPath.string(),
 										 "-config", _configPath.string(),
@@ -210,7 +210,7 @@ protected:
 
 TEST_F(BMPTest, TestLoadBMP)
 {
-	// Specify the BMP file path; assume it’s located in the Data directory
+	// Specify the BMP file path; assume itï¿½s located in the Data directory
 	ImageFile imageFile;
 	ImageLoadParams params;
 	ASSERT_TRUE(_engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load(imageFile, "dosFont", dosFont, DOSFONT_SIZE, params)) << "Image should be able to load";
@@ -229,7 +229,7 @@ TEST_F(BMPTest, TestLoadBMP)
 
 TEST_F(BMPTest, TestLoadBMP1)
 {
-	// Specify the BMP file path; assume it’s located in the Data directory
+	// Specify the BMP file path; assume itï¿½s located in the Data directory
 	ImageFile imageFile;
 	ImageLoadParams params;
 	ASSERT_TRUE(_engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load(imageFile, "dosFont", dosFont, DOSFONT_SIZE, params)) << "Image should be able to load";

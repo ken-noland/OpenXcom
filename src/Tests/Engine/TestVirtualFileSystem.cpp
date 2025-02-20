@@ -57,9 +57,9 @@ TEST(VirtualFileSystemTest, TestPhysicalFileEntry)
 TEST(VirtualFileSystemTest, TestPhysicalFilesystemIterator)
 {
 	std::filesystem::path path = TEST_DATA_DIR;
-	std::filesystem::path dataPath = path / "Data";
-	std::filesystem::path configPath = path / "Config";
-	std::filesystem::path userPath = path / "User";
+	std::filesystem::path dataPath = path / "data";
+	std::filesystem::path configPath = path / "config";
+	std::filesystem::path userPath = path / "user";
 
 	std::vector<std::string> args = {"-data", dataPath.string(), "-config", configPath.string(), "-user", userPath.string(), "-headless"};
 	Options options(args);

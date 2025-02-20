@@ -26,7 +26,7 @@ std::vector<std::string> getTestArgv()
 {
 	std::vector<std::string> argv;
 
-	std::filesystem::path test_path = std::filesystem::path(TEST_DATA_DIR) / "Config";
+	std::filesystem::path test_path = std::filesystem::path(TEST_DATA_DIR) / "config";
 	argv.push_back("-config");
 	argv.push_back(test_path.string());
 
