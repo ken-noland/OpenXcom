@@ -48,7 +48,7 @@ struct GraphButInfo
 	LocalizedText _name;
 	int _color;
 	bool _pushed;
-	GraphButInfo(const LocalizedText& name, Uint8 color): _name(name), _color(color), _pushed(false) {}
+	GraphButInfo(const LocalizedText& name, uint8_t color): _name(name), _color(color), _pushed(false) {}
 };
 /**
  * Initializes all the elements in the Graphs screen.
@@ -94,15 +94,15 @@ GraphsState::GraphsState()
 		_txtScale.push_back(new Text(42, 16, 80, 171 - (scaleText*14)));
 		add(_txtScale.at(scaleText), "scale", "graphs");
 	}
-	Uint8 regionTotalColor = getGame()->getMod()->getInterface("graphs")->getElement("regionTotal")->color;
-	Uint8 countryTotalColor = getGame()->getMod()->getInterface("graphs")->getElement("countryTotal")->color;
+	uint8_t regionTotalColor = getGame()->getMod()->getInterface("graphs")->getElement("regionTotal")->color;
+	uint8_t countryTotalColor = getGame()->getMod()->getInterface("graphs")->getElement("countryTotal")->color;
 
 	//create buttons (sooooo many buttons)
 	size_t offset = 0;
 	for (const Region& region : getRegistry().list<const Region>())
 	{
 		// always save in toggles all the region
-		Uint8 color = 13 + 8 * (offset % GRAPH_MAX_BUTTONS);
+		uint8_t color = 13 + 8 * (offset % GRAPH_MAX_BUTTONS);
 		_regionToggles.push_back(new GraphButInfo(tr(region.getRules()->getType()), color));
 		// initially add the GRAPH_MAX_BUTTONS having the first regions information
 		if (offset < GRAPH_MAX_BUTTONS)
@@ -139,7 +139,7 @@ GraphsState::GraphsState()
 	for (const Country& country : getRegistry().list<const Country>())
 	{
 		// always save in toggles all the countries
-		Uint8 color = 13 + 8 * (offset % GRAPH_MAX_BUTTONS);
+		uint8_t color = 13 + 8 * (offset % GRAPH_MAX_BUTTONS);
 		_countryToggles.push_back(new GraphButInfo(tr(country.getRules()->getType()), color));
 		// initially add the GRAPH_MAX_BUTTONS having the first countries information
 		if (offset < GRAPH_MAX_BUTTONS)
@@ -182,7 +182,7 @@ GraphsState::GraphsState()
 		offset = iter;
 		_btnFinances.push_back(new ToggleTextButton(88, 11, 0, (int)offset * 11));
 		_financeToggles.push_back(false);
-		_btnFinances.at(offset)->setInvertColor(13 + (8 * (Uint8)offset));
+		_btnFinances.at(offset)->setInvertColor(13 + (8 * (uint8_t)offset));
 		_btnFinances.at(offset)->onMousePress((ActionHandler)&GraphsState::btnFinanceListClick);
 		add(_btnFinances.at(offset), "button", "graphs");
 		_financeLines.push_back(new Surface(320,200,0,0));
@@ -223,7 +223,7 @@ GraphsState::GraphsState()
 		_financeToggles[i] = ('0'==graphFinanceToggles[i]) ? false : true;
 		_btnFinances.at(i)->setPressed(_financeToggles[i]);
 	}
-	Uint8 gridColor = getGame()->getMod()->getInterface("graphs")->getElement("graph")->color;
+	uint8_t gridColor = getGame()->getMod()->getInterface("graphs")->getElement("graph")->color;
 	// set up the grid
 	_bg->drawRect(125, 49, 188, 127, gridColor);
 
@@ -233,7 +233,7 @@ GraphsState::GraphsState()
 		{
 			for (int x = 126 + grid; x <= 297 + grid; x += 17)
 			{
-				Uint8 color = gridColor + grid + 1;
+				uint8_t color = gridColor + grid + 1;
 				if (grid == 4)
 				{
 					color = 0;
@@ -796,7 +796,7 @@ void GraphsState::drawCountryLines()
 		_alienCountryLines.at(entry)->clear();
 		_xcomCountryLines.at(entry)->clear();
 		_incomeLines.at(entry)->clear();
-		std::vector<Sint16> newLineVector;
+		std::vector<int16_t> newLineVector;
 		int reduction = 0;
 		for (size_t iter = 0; iter != 12; ++iter)
 		{
@@ -858,8 +858,8 @@ void GraphsState::drawCountryLines()
 		_xcomCountryLines.back()->clear();
 
 	// set up the "total" line
-	std::vector<Sint16> newLineVector;
-	Uint8 color = getGame()->getMod()->getInterface("graphs")->getElement("countryTotal")->color2;
+	std::vector<int16_t> newLineVector;
+	uint8_t color = getGame()->getMod()->getInterface("graphs")->getElement("countryTotal")->color2;
 	for (int iter = 0; iter != 12; ++iter)
 	{
 		int x = 312 - (iter*17);
@@ -982,7 +982,7 @@ void GraphsState::drawRegionLines()
 	{
 		_alienRegionLines.at(entry)->clear();
 		_xcomRegionLines.at(entry)->clear();
-		std::vector<Sint16> newLineVector;
+		std::vector<int16_t> newLineVector;
 		int reduction = 0;
 		for (size_t iter = 0; iter != 12; ++iter)
 		{
@@ -1009,12 +1009,12 @@ void GraphsState::drawRegionLines()
 
 			if (y >=180) y = 180;
 			if (y <= 45) y = 45;
-			newLineVector.push_back((Sint16)y);
+			newLineVector.push_back((int16_t)y);
 
 			if (newLineVector.size() > 1 && _alien)
-				_alienRegionLines.at(entry)->drawLine((Sint16)x, (Sint16)y, (Sint16)x + 17, newLineVector.at(newLineVector.size() - 2), _regionToggles.at(entry)->_color + 4);
+				_alienRegionLines.at(entry)->drawLine((int16_t)x, (int16_t)y, (int16_t)x + 17, newLineVector.at(newLineVector.size() - 2), _regionToggles.at(entry)->_color + 4);
 			else if (newLineVector.size() > 1)
-				_xcomRegionLines.at(entry)->drawLine((Sint16)x, (Sint16)y, (Sint16)x + 17, newLineVector.at(newLineVector.size() - 2), _regionToggles.at(entry)->_color + 4);
+				_xcomRegionLines.at(entry)->drawLine((int16_t)x, (int16_t)y, (int16_t)x + 17, newLineVector.at(newLineVector.size() - 2), _regionToggles.at(entry)->_color + 4);
 		}
 
 		if (_alien)
@@ -1029,8 +1029,8 @@ void GraphsState::drawRegionLines()
 	else
 		_xcomRegionLines.back()->clear();
 
-	Uint8 color = getGame()->getMod()->getInterface("graphs")->getElement("regionTotal")->color2;
-	std::vector<Sint16> newLineVector;
+	uint8_t color = getGame()->getMod()->getInterface("graphs")->getElement("regionTotal")->color2;
+	std::vector<int16_t> newLineVector;
 	for (int iter = 0; iter != 12; ++iter)
 	{
 		int x = 312 - (iter*17);
@@ -1170,7 +1170,7 @@ void GraphsState::drawFinanceLines()
 	double units = range / 126;
 	for (int button = 0; button != 5; ++button)
 	{
-		std::vector<Sint16> newLineVector;
+		std::vector<int16_t> newLineVector;
 		for (int iter = 0; iter != 12; ++iter)
 		{
 			int x = 312 - (iter*17);

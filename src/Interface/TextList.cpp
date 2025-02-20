@@ -156,7 +156,7 @@ void TextList::unpress(State *state)
  * @param column Column number.
  * @param color Text color.
  */
-void TextList::setCellColor(size_t row, size_t column, Uint8 color)
+void TextList::setCellColor(size_t row, size_t column, uint8_t color)
 {
 	_texts[row][column]->setColor(color);
 	_redraw = true;
@@ -167,7 +167,7 @@ void TextList::setCellColor(size_t row, size_t column, Uint8 color)
  * @param row Row number.
  * @param color Text color.
  */
-void TextList::setRowColor(size_t row, Uint8 color)
+void TextList::setRowColor(size_t row, uint8_t color)
 {
 	for (auto* text : _texts[row])
 	{
@@ -555,7 +555,7 @@ void TextList::setHeight(int height)
  * the color of existing text, just the color of text added from then on.
  * @param color Color value.
  */
-void TextList::setColor(Uint8 color)
+void TextList::setColor(uint8_t color)
 {
 	_color = color;
 	_up->setColor(color);
@@ -574,7 +574,7 @@ void TextList::setColor(Uint8 color)
  * Returns the color of the text in the list.
  * @return Color value.
  */
-Uint8 TextList::getColor() const
+uint8_t TextList::getColor() const
 {
 	return _color;
 }
@@ -583,7 +583,7 @@ Uint8 TextList::getColor() const
  * Changes the secondary color of the text in the list.
  * @param color Color value.
  */
-void TextList::setSecondaryColor(Uint8 color)
+void TextList::setSecondaryColor(uint8_t color)
 {
 	_color2 = color;
 }
@@ -592,7 +592,7 @@ void TextList::setSecondaryColor(Uint8 color)
  * Returns the secondary color of the text in the list.
  * @return Color value.
  */
-Uint8 TextList::getSecondaryColor() const
+uint8_t TextList::getSecondaryColor() const
 {
 	return _color2;
 }
@@ -802,7 +802,7 @@ bool TextList::isInsideNoScrollArea(int x)
  * Changes the color of the arrow buttons in the list.
  * @param color Color value.
  */
-void TextList::setArrowColor(Uint8 color)
+void TextList::setArrowColor(uint8_t color)
 {
 	_up->setColor(color);
 	_down->setColor(color);
@@ -1360,7 +1360,7 @@ ComboBox *TextList::getComboBox() const
 	return _comboBox;
 }
 
-void TextList::setBorderColor(Uint8 color)
+void TextList::setBorderColor(uint8_t color)
 {
 	_up->setColor(color);
 	_down->setColor(color);

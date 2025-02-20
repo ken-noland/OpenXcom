@@ -74,8 +74,8 @@ namespace OpenXcom
 
 	// Helper functions
 	template <typename T> T load(char *data) { return *(T*)data; }
-	template <> Uint16 load(char *data) { return SDL_SwapLE16(*(Uint16*)data); }
-	template <> Sint16 load(char *data) { return SDL_SwapLE16(*(Sint16*)data); }
+	template <> uint16_t load(char *data) { return SDL_SwapLE16(*(uint16_t*)data); }
+	template <> int16_t load(char *data) { return SDL_SwapLE16(*(int16_t*)data); }
 	template <> int load(char *data) { return SDL_SwapLE32(*(int*)data); }
 	template <> unsigned int load(char *data) { return SDL_SwapLE32(*(unsigned int*)data); }
 	template <> std::string load(char *data) { return data; }
@@ -128,11 +128,11 @@ namespace OpenXcom
 			char *data = &buffer[0];
 
 			std::string name = load<std::string>(data + 0x02);
-			int year = load<Uint16>(data + 0x1C);
-			int month = load<Uint16>(data + 0x1E);
-			int day = load<Uint16>(data + 0x20);
-			int hour = load<Uint16>(data + 0x22);
-			int minute = load<Uint16>(data + 0x24);
+			int year = load<uint16_t>(data + 0x1C);
+			int month = load<uint16_t>(data + 0x1E);
+			int day = load<uint16_t>(data + 0x20);
+			int hour = load<uint16_t>(data + 0x22);
+			int minute = load<uint16_t>(data + 0x24);
 			bool tactical = load<char>(data + 0x26) != 0;
 
 			GameTime time = GameTime(0, day, month + 1, year, hour, minute, 0);
@@ -331,16 +331,16 @@ namespace OpenXcom
 		std::map<std::string, int> ids;
 		for (size_t i = 0; i < _rules->getMarkers().size(); ++i)
 		{
-			ids[_rules->getMarkers()[i]] = load<Uint16>(data + i * sizeof(Uint16));
+			ids[_rules->getMarkers()[i]] = load<uint16_t>(data + i * sizeof(uint16_t));
 		}
 		ids["STR_CRASH_SITE"] = ids["STR_LANDING_SITE"] = ids["STR_UFO"];
 
-		_year = load<Uint16>(data + 0x16);
+		_year = load<uint16_t>(data + 0x16);
 
 		const size_t MONTHS = 12;
 		for (size_t i = 0; i < MONTHS; ++i)
 		{
-			int score = load<Sint16>(data + 0x18 + i * sizeof(Sint16));
+			int score = load<int16_t>(data + 0x18 + i * sizeof(int16_t));
 			_save->getResearchScores().push_back(score);
 		}
 
@@ -350,7 +350,7 @@ namespace OpenXcom
 		{
 			std::vector<char> sitebuffer;
 			char *sitedata = binaryBuffer("SITE.DAT", sitebuffer);
-			int generatedArtifactSiteMissions = load<Uint16>(sitedata + 0x24);
+			int generatedArtifactSiteMissions = load<uint16_t>(sitedata + 0x24);
 			if (generatedArtifactSiteMissions > 0)
 			{
 				_save->getAlienStrategy().addMissionRun("artifacts", generatedArtifactSiteMissions);
@@ -383,12 +383,12 @@ namespace OpenXcom
 		std::vector<char> buffer;
 		char *data = binaryBuffer("LEASE.DAT", buffer);
 
-		double lat = -Xcom2Rad(load<Sint16>(data + 0x00));
-		double lon = -Xcom2Rad(load<Sint16>(data + 0x06));
+		double lat = -Xcom2Rad(load<int16_t>(data + 0x00));
+		double lon = -Xcom2Rad(load<int16_t>(data + 0x06));
 		_save->setGlobeLongitude(lon);
 		_save->setGlobeLatitude(lat);
 
-		int zoom = load<Sint16>(data + 0x0C);
+		int zoom = load<int16_t>(data + 0x0C);
 		const int DISTANCE[] = { 90, 120, 180, 360, 450, 720 };
 		for (size_t i = 0; i < 6; ++i)
 		{
@@ -475,15 +475,15 @@ namespace OpenXcom
 
 			Country* country = getRegistry().findValueByName<Country>(_rules->getCountries()[i]);
 
-			int satisfaction = load<Sint16>(cdata + 0x02);
+			int satisfaction = load<int16_t>(cdata + 0x02);
 			for (size_t j = 0; j < MONTHS; ++j)
 			{
-				int funding = load<Sint16>(cdata + 0x04 + j * sizeof(Sint16)) * 1000;
+				int funding = load<int16_t>(cdata + 0x04 + j * sizeof(int16_t)) * 1000;
 				_save->getIncomes()[j] += funding;
 				country->getFunding().push_back(funding);
 			}
 			bool pact = satisfaction == 0;
-			bool newPact = load<Sint16>(cdata + 0x1E) != 0;
+			bool newPact = load<int16_t>(cdata + 0x1E) != 0;
 
 			if (pact) { country->setPact(); }
 			if (newPact) { country->setNewPact(); }
@@ -503,7 +503,7 @@ namespace OpenXcom
 		const size_t REGIONS = 12;
 		for (size_t i = 0; i < REGIONS; ++i)
 		{
-			chances[_rules->getRegions()[i]] = load<Uint8>(data + i);
+			chances[_rules->getRegions()[i]] = load<uint8_t>(data + i);
 		}
 		YAML::Node node;
 		node["regions"] = chances;
@@ -527,7 +527,7 @@ namespace OpenXcom
 			size_t mission = i % MISSIONS;
 			size_t region = i / MISSIONS;
 
-			chances[_rules->getRegions()[region]][_rules->getMissions()[mission]] = load<Uint8>(data + i);
+			chances[_rules->getRegions()[region]][_rules->getMissions()[mission]] = load<uint8_t>(data + i);
 		}
 
 		YAML::Node node;
@@ -556,12 +556,12 @@ namespace OpenXcom
 		for (size_t i = 0; i < REGIONS * MISSIONS; ++i)
 		{
 			char *mdata = (data + i * ENTRY_SIZE);
-			int wave = load<Uint16>(mdata + 0x00);
+			int wave = load<uint16_t>(mdata + 0x00);
 			if (wave != 0xFFFF)
 			{
-				int ufoCounter = load<Uint16>(mdata + 0x02);
-				int spawn = load<Uint16>(mdata + 0x04);
-				int race = load<Uint16>(mdata + 0x06);
+				int ufoCounter = load<uint16_t>(mdata + 0x02);
+				int spawn = load<uint16_t>(mdata + 0x04);
+				int race = load<uint16_t>(mdata + 0x06);
 				int mission = i % MISSIONS;
 				int region = static_cast<int>(i / MISSIONS);
 
@@ -605,13 +605,13 @@ namespace OpenXcom
 		for (size_t i = 0; i < ENTRIES; ++i)
 		{
 			char *tdata = (data + i * ENTRY_SIZE);
-			TargetType type = (TargetType)load<Uint8>(tdata);
+			TargetType type = (TargetType)load<uint8_t>(tdata);
 
-			int dat = load<Uint8>(tdata + 0x01);
-			double lon = Xcom2Rad(load<Sint16>(tdata + 0x02));
-			double lat = Xcom2Rad(load<Sint16>(tdata + 0x04));
-			int timer = load<Sint16>(tdata + 0x06);
-			int id = load<Sint16>(tdata + 0x0A);
+			int dat = load<uint8_t>(tdata + 0x01);
+			double lon = Xcom2Rad(load<int16_t>(tdata + 0x02));
+			double lat = Xcom2Rad(load<int16_t>(tdata + 0x04));
+			int timer = load<int16_t>(tdata + 0x06);
+			int id = load<int16_t>(tdata + 0x0A);
 			std::bitset<3> visibility(load<int>(tdata + 0x10));
 			bool detected = !visibility.test(0);
 
@@ -713,25 +713,25 @@ namespace OpenXcom
 				// facilities
 				for (size_t k = 0; k < FACILITIES; ++k)
 				{
-					size_t facilityType = load<Uint8>(bdata + _rules->getOffset("BASE.DAT_FACILITIES") + k);
+					size_t facilityType = load<uint8_t>(bdata + _rules->getOffset("BASE.DAT_FACILITIES") + k);
 					if (facilityType < _rules->getFacilities().size())
 					{
 						BaseFacility *facility = new BaseFacility(_mod->getBaseFacility(_rules->getFacilities()[facilityType], true), base);
 						int x = k % BASE_SIZE;
 						int y = static_cast<int>(k / BASE_SIZE);
-						int days = load<Uint8>(bdata + _rules->getOffset("BASE.DAT_FACILITIES") + FACILITIES + k);
+						int days = load<uint8_t>(bdata + _rules->getOffset("BASE.DAT_FACILITIES") + FACILITIES + k);
 						facility->setX(x);
 						facility->setY(y);
 						facility->setBuildTime(days);
 						base->getFacilities().push_back(facility);
 					}
 				}
-				int engineers = load<Uint8>(bdata + _rules->getOffset("BASE.DAT_ENGINEERS"));
-				int scientists = load<Uint8>(bdata + _rules->getOffset("BASE.DAT_SCIENTISTS"));
+				int engineers = load<uint8_t>(bdata + _rules->getOffset("BASE.DAT_ENGINEERS"));
+				int scientists = load<uint8_t>(bdata + _rules->getOffset("BASE.DAT_SCIENTISTS"));
 				// items
 				for (size_t k = 0; k < _rules->getItems().size(); ++k)
 				{
-					int qty = load<Uint16>(bdata + _rules->getOffset("BASE.DAT_ITEMS") + k * 2);
+					int qty = load<uint16_t>(bdata + _rules->getOffset("BASE.DAT_ITEMS") + k * 2);
 					if (qty != 0 && !_rules->getItems()[k].empty())
 					{
 						const RuleItem *rule = _mod->getItem(_rules->getItems()[k], true);
@@ -765,12 +765,12 @@ namespace OpenXcom
 		for (size_t i = 0; i < ENTRIES; ++i)
 		{
 			char *adata = (data + i * ENTRY_SIZE);
-			int race = load<Uint8>(adata + 0x00);
+			int race = load<uint8_t>(adata + 0x00);
 			std::string liveAlien;
 			if (race != 0)
 			{
-				int rank = load<Uint8>(adata + 0x01);
-				int base = load<Uint8>(adata + 0x02);
+				int rank = load<uint8_t>(adata + 0x01);
+				int base = load<uint8_t>(adata + 0x02);
 				liveAlien = _rules->getAlienRaces()[race];
 				liveAlien += _rules->getAlienRanks()[rank];
 				if (base != 0xFF)
@@ -798,15 +798,15 @@ namespace OpenXcom
 		for (size_t i = 0; i < ENTRIES; ++i)
 		{
 			char *tdata = (data + i * ENTRY_SIZE);
-			int qty = load<Uint8>(tdata + 0x06);
+			int qty = load<uint8_t>(tdata + 0x06);
 			if (qty != 0)
 			{
-				int baseSrc = load<Uint8>(tdata + 0x00);
-				int baseDest = load<Uint8>(tdata + 0x01);
+				int baseSrc = load<uint8_t>(tdata + 0x00);
+				int baseDest = load<uint8_t>(tdata + 0x01);
 				Base *b = dynamic_cast<Base*>(_targets[baseDest]);
-				int hours = load<Uint8>(tdata + 0x02);
-				TransferType type = (TransferType)load<Uint8>(tdata + 0x03);
-				int dat = load<Uint8>(tdata + 0x04);
+				int hours = load<uint8_t>(tdata + 0x02);
+				TransferType type = (TransferType)load<uint8_t>(tdata + 0x03);
+				int dat = load<uint8_t>(tdata + 0x04);
 
 				Transfer *transfer = new Transfer(hours);
 				switch (type)
@@ -859,7 +859,7 @@ namespace OpenXcom
 		{
 			int j = _targetDat[i];
 			char *cdata = (data + j * ENTRY_SIZE);
-			int type = load<Uint8>(cdata);
+			int type = load<uint8_t>(cdata);
 			if (type != 0xFF)
 			{
 				YAML::Node node;
@@ -868,34 +868,34 @@ namespace OpenXcom
 				{
 					craft->changeRules(_mod->getCraft(_rules->getCrafts()[type], true));
 
-					int lweapon = load<Uint8>(cdata + _rules->getOffset("CRAFT.DAT_LEFT_WEAPON"));
-					int lammo = load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_LEFT_AMMO"));
+					int lweapon = load<uint8_t>(cdata + _rules->getOffset("CRAFT.DAT_LEFT_WEAPON"));
+					int lammo = load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_LEFT_AMMO"));
 					if (lweapon != 0xFF)
 					{
 						CraftWeapon *cw = new CraftWeapon(_mod->getCraftWeapon(_rules->getCraftWeapons()[lweapon], true), lammo);
 						craft->getWeapons().at(0) = cw;
 					}
-					int flight = load<Uint8>(cdata + _rules->getOffset("CRAFT.DAT_FLIGHT"));
-					int rweapon = load<Uint8>(cdata + _rules->getOffset("CRAFT.DAT_RIGHT_WEAPON"));
-					int rammo = load<Uint8>(cdata + _rules->getOffset("CRAFT.DAT_RIGHT_AMMO"));
+					int flight = load<uint8_t>(cdata + _rules->getOffset("CRAFT.DAT_FLIGHT"));
+					int rweapon = load<uint8_t>(cdata + _rules->getOffset("CRAFT.DAT_RIGHT_WEAPON"));
+					int rammo = load<uint8_t>(cdata + _rules->getOffset("CRAFT.DAT_RIGHT_AMMO"));
 					if (rweapon != 0xFF)
 					{
 						CraftWeapon *cw = new CraftWeapon(_mod->getCraftWeapon(_rules->getCraftWeapons()[rweapon], true), rammo);
 						craft->getWeapons().at(1) = cw;
 					}
 
-					node["damage"] = (int)load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_DAMAGE"));
-					node["speed"] = (int)load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_SPEED"));
-					int dest = load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_DESTINATION"));
-					node["fuel"] = (int)load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_FUEL"));
-					int base = load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_BASE"));
-					node["status"] = xcomStatus[load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_STATUS"))];
+					node["damage"] = (int)load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_DAMAGE"));
+					node["speed"] = (int)load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_SPEED"));
+					int dest = load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_DESTINATION"));
+					node["fuel"] = (int)load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_FUEL"));
+					int base = load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_BASE"));
+					node["status"] = xcomStatus[load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_STATUS"))];
 
 					// vehicles
 					const size_t VEHICLES = 5;
 					for (size_t k = 0; k < VEHICLES; ++k)
 					{
-						int qty = load<Uint8>(cdata + _rules->getOffset("CRAFT.DAT_ITEMS") + k);
+						int qty = load<uint8_t>(cdata + _rules->getOffset("CRAFT.DAT_ITEMS") + k);
 						for (int v = 0; v < qty; ++v)
 						{
 							const RuleItem *rule = _mod->getItem(_rules->getItems()[k + 10], true);
@@ -906,7 +906,7 @@ namespace OpenXcom
 					const size_t ITEMS = 50;
 					for (size_t k = VEHICLES; k < VEHICLES + ITEMS; ++k)
 					{
-						int qty = load<Uint8>(cdata + _rules->getOffset("CRAFT.DAT_ITEMS") + k);
+						int qty = load<uint8_t>(cdata + _rules->getOffset("CRAFT.DAT_ITEMS") + k);
 						if (qty != 0 && !_rules->getItems()[k + 10].empty())
 						{
 							const RuleItem *rule = _mod->getItem(_rules->getItems()[k + 10], true);
@@ -935,14 +935,14 @@ namespace OpenXcom
 				if (Ufo* ufo = dynamic_cast<Ufo*>(_targets[i]))
 				{
 					ufo->changeRules(_mod->getUfo(_rules->getUfos()[type - 5], true));
-					node["damage"] = (int)load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_DAMAGE"));
-					node["altitude"] = xcomAltitudes[load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_ALTITUDE"))];
-					node["speed"] = (int)load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_SPEED"));
-					node["dest"]["lon"] = Xcom2Rad(load<Sint16>(cdata + _rules->getOffset("CRAFT.DAT_DEST_LON")));
-					node["dest"]["lat"] = Xcom2Rad(load<Sint16>(cdata + _rules->getOffset("CRAFT.DAT_DEST_LAT")));
+					node["damage"] = (int)load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_DAMAGE"));
+					node["altitude"] = xcomAltitudes[load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_ALTITUDE"))];
+					node["speed"] = (int)load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_SPEED"));
+					node["dest"]["lon"] = Xcom2Rad(load<int16_t>(cdata + _rules->getOffset("CRAFT.DAT_DEST_LON")));
+					node["dest"]["lat"] = Xcom2Rad(load<int16_t>(cdata + _rules->getOffset("CRAFT.DAT_DEST_LAT")));
 
-					int mission = load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_MISSION"));
-					int region = load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_REGION"));
+					int mission = load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_MISSION"));
+					int region = load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_REGION"));
 					std::ostringstream trajectory;
 					AlienMission *m = _missions[std::make_pair(mission, region)];
 					if (m == 0)
@@ -950,7 +950,7 @@ namespace OpenXcom
 						YAML::Node subnode;
 						m = new AlienMission(*_mod->getAlienMission(_rules->getMissions()[mission], true));
 						subnode["region"] = _rules->getRegions()[region];
-						subnode["race"] = _rules->getCrews()[load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_RACE"))];
+						subnode["race"] = _rules->getCrews()[load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_RACE"))];
 						subnode["nextWave"] = 1;
 						subnode["nextUfoCounter"] = 0;
 						subnode["spawnCountdown"] = 1000;
@@ -967,10 +967,10 @@ namespace OpenXcom
 					m->increaseLiveUfos();
 					if (trajectory.str().empty())
 					{
-						trajectory << "P" << load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_TRAJECTORY"));
+						trajectory << "P" << load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_TRAJECTORY"));
 					}
 					node["trajectory"] = trajectory.str();
-					node["trajectoryPoint"] = (int)load<Uint16>(cdata + _rules->getOffset("CRAFT.DAT_TRAJECTORY_POINT"));
+					node["trajectoryPoint"] = (int)load<uint16_t>(cdata + _rules->getOffset("CRAFT.DAT_TRAJECTORY_POINT"));
 					std::bitset<7> state(load<int>(cdata + _rules->getOffset("CRAFT.DAT_STATE")));
 					node["hyperDetected"] = state.test(6);
 
@@ -1010,48 +1010,48 @@ namespace OpenXcom
 		for (size_t i = 0; i < SOLDIERS; ++i)
 		{
 			char *sdata = (data + i * ENTRY_SIZE);
-			int rank = load<Uint16>(sdata + _rules->getOffset("SOLDIER.DAT_RANK"));
+			int rank = load<uint16_t>(sdata + _rules->getOffset("SOLDIER.DAT_RANK"));
 			if (rank != 0xFFFF)
 			{
 				YAML::Node node;
-				int base = load<Uint16>(sdata + _rules->getOffset("SOLDIER.DAT_BASE"));
-				int craft = load<Uint16>(sdata + _rules->getOffset("SOLDIER.DAT_CRAFT"));
-				node["missions"] = (int)load<Sint16>(sdata + _rules->getOffset("SOLDIER.DAT_MISSIONS"));
-				node["kills"] = (int)load<Sint16>(sdata + _rules->getOffset("SOLDIER.DAT_KILLS"));
-				node["recovery"] = (int)load<Sint16>(sdata + _rules->getOffset("SOLDIER.DAT_RECOVERY"));
+				int base = load<uint16_t>(sdata + _rules->getOffset("SOLDIER.DAT_BASE"));
+				int craft = load<uint16_t>(sdata + _rules->getOffset("SOLDIER.DAT_CRAFT"));
+				node["missions"] = (int)load<int16_t>(sdata + _rules->getOffset("SOLDIER.DAT_MISSIONS"));
+				node["kills"] = (int)load<int16_t>(sdata + _rules->getOffset("SOLDIER.DAT_KILLS"));
+				node["recovery"] = (int)load<int16_t>(sdata + _rules->getOffset("SOLDIER.DAT_RECOVERY"));
 				node["name"] = load<std::string>(sdata + _rules->getOffset("SOLDIER.DAT_NAME"));
 				node["rank"] = rank;
 
 				UnitStats initial;
-				initial.tu = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_TU"));
-				initial.health = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_HE"));
-				initial.stamina = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_STA"));
-				initial.reactions = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_RE"));
-				initial.strength = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_STR"));
-				initial.firing = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_FA"));
-				initial.throwing = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_TA"));
-				initial.melee = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_ME"));
-				initial.psiStrength = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_PST"));
-				initial.psiSkill = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_PSK"));
-				initial.bravery = 110 - (10 * load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_BR")));
+				initial.tu = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_TU"));
+				initial.health = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_HE"));
+				initial.stamina = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_STA"));
+				initial.reactions = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_RE"));
+				initial.strength = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_STR"));
+				initial.firing = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_FA"));
+				initial.throwing = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_TA"));
+				initial.melee = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_ME"));
+				initial.psiStrength = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_PST"));
+				initial.psiSkill = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_PSK"));
+				initial.bravery = 110 - (10 * load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_INITIAL_BR")));
 				node["initialStats"] = initial;
 
 				UnitStats current;
-				current.tu = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_TU"));
-				current.health = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_HE"));
-				current.stamina = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_STA"));
-				current.reactions = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_RE"));
-				current.strength = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_STR"));
-				current.firing = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_FA"));
-				current.throwing = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_TA"));
-				current.melee = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_ME"));
+				current.tu = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_TU"));
+				current.health = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_HE"));
+				current.stamina = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_STA"));
+				current.reactions = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_RE"));
+				current.strength = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_STR"));
+				current.firing = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_FA"));
+				current.throwing = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_TA"));
+				current.melee = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_ME"));
 				current.psiStrength = 0;
 				current.psiSkill = 0;
-				current.bravery = 10 * load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_BR"));
+				current.bravery = 10 * load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_IMPROVED_BR"));
 				current += initial;
 				node["currentStats"] = current;
 
-				int armor = load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_ARMOR"));
+				int armor = load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_ARMOR"));
 				const std::vector<std::string> &armors = _rules->getArmor();
 				if (armor >= 0 && armor < (int)armors.size())
 				{
@@ -1061,10 +1061,10 @@ namespace OpenXcom
 				{
 					throw Exception("Invalid armor index. Modded saves are not supported.");
 				}
-				node["improvement"] = (int)load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_PSI"));
+				node["improvement"] = (int)load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_PSI"));
 				node["psiTraining"] = (int)load<char>(sdata + _rules->getOffset("SOLDIER.DAT_PSILAB")) != 0;
-				node["gender"] = (int)load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_GENDER"));
-				node["look"] = (int)load<Uint8>(sdata + _rules->getOffset("SOLDIER.DAT_LOOK"));
+				node["gender"] = (int)load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_GENDER"));
+				node["look"] = (int)load<uint8_t>(sdata + _rules->getOffset("SOLDIER.DAT_LOOK"));
 				node["id"] = _save->getId("STR_SOLDIER");
 
 				Soldier *soldier = new Soldier(_mod->getSoldier(_mod->getSoldiersList().front(), true), nullptr, 0 /*nationality*/);
@@ -1106,8 +1106,8 @@ namespace OpenXcom
 				RuleResearch *research = _mod->getResearch(_rules->getResearch()[i]);
 				if (research != 0 && research->getCost() != 0)
 				{
-					bool discovered = load<Uint8>(rdata + 0x0A) != 0;
-					bool popped = load<Uint8>(rdata + 0x12) != 0;
+					bool discovered = load<uint8_t>(rdata + 0x0A) != 0;
+					bool popped = load<uint8_t>(rdata + 0x12) != 0;
 					if (discovered)
 					{
 						_save->addFinishedResearch(research, _mod, 0, false);
@@ -1137,7 +1137,7 @@ namespace OpenXcom
 			ArticleDefinition *article = _mod->getUfopaediaArticle(_rules->getUfopaedia()[i]);
 			if (article != 0 && article->section != UFOPAEDIA_NOT_AVAILABLE)
 			{
-				bool discovered = load<Uint8>(rdata + 0x08) == 2;
+				bool discovered = load<uint8_t>(rdata + 0x08) == 2;
 				if (discovered)
 				{
 					for (const auto& req : article->_requires)
@@ -1163,18 +1163,18 @@ namespace OpenXcom
 		char *data = binaryBuffer("PROJECT.DAT", buffer);
 
 		const size_t ENTRIES = _rules->getResearch().size();
-		// days (Uint16) | scientists (Uint8)
-		const size_t ENTRY_SIZE = ENTRIES * (sizeof(Uint16) + sizeof(Uint8));
+		// days (uint16_t) | scientists (uint8_t)
+		const size_t ENTRY_SIZE = ENTRIES * (sizeof(uint16_t) + sizeof(uint8_t));
 		int index = 0;
 		for (Base& base : getRegistry().list<Base>())
 		{
 			char *pdata = (data + index++ * ENTRY_SIZE);
-			Uint16 *arrRemaining = (Uint16*)pdata;
-			Uint8 *arrScientists = (Uint8*)(&arrRemaining[ENTRIES]);
+			uint16_t *arrRemaining = (uint16_t*)pdata;
+			uint8_t *arrScientists = (uint8_t*)(&arrRemaining[ENTRIES]);
 			for (size_t j = 0; j < _rules->getResearch().size(); ++j)
 			{
-				int remaining = load<Uint16>((char*)&arrRemaining[j]);
-				int scientists = load<Uint8>((char*)&arrScientists[j]);
+				int remaining = load<uint16_t>((char*)&arrRemaining[j]);
+				int scientists = load<uint8_t>((char*)&arrScientists[j]);
 				if (remaining != 0 && !_rules->getResearch()[j].empty())
 				{
 					RuleResearch *research = _mod->getResearch(_rules->getResearch()[j]);
@@ -1201,22 +1201,22 @@ namespace OpenXcom
 		char *data = binaryBuffer("BPROD.DAT", buffer);
 
 		const size_t ENTRIES = _rules->getManufacture().size();
-		// hours (int) | engineers (Uint16) | quantity (Uint16)| produced (Uint16)
-		const size_t ENTRY_SIZE = ENTRIES * (sizeof(int) + 3 * sizeof(Uint16));
+		// hours (int) | engineers (uint16_t) | quantity (uint16_t)| produced (uint16_t)
+		const size_t ENTRY_SIZE = ENTRIES * (sizeof(int) + 3 * sizeof(uint16_t));
 		int index = 0;
 		for (Base& base : getRegistry().list<Base>())
 		{
 			char *pdata = (data + index++ * ENTRY_SIZE);
 			int *arrRemaining = (int*)pdata;
-			Uint16 *arrEngineers = (Uint16*)(&arrRemaining[ENTRIES]);
-			Uint16 *arrTotal = (Uint16*)(&arrEngineers[ENTRIES]);
-			Uint16 *arrProduced = (Uint16*)(&arrTotal[ENTRIES]);
+			uint16_t *arrEngineers = (uint16_t*)(&arrRemaining[ENTRIES]);
+			uint16_t *arrTotal = (uint16_t*)(&arrEngineers[ENTRIES]);
+			uint16_t *arrProduced = (uint16_t*)(&arrTotal[ENTRIES]);
 			for (size_t j = 0; j < _rules->getManufacture().size(); ++j)
 			{
 				int remaining = load<int>((char*)&arrRemaining[j]);
-				int engineers = load<Uint16>((char*)&arrEngineers[j]);
-				int total = load<Uint16>((char*)&arrTotal[j]);
-				int produced = load<Uint16>((char*)&arrProduced[j]);
+				int engineers = load<uint16_t>((char*)&arrEngineers[j]);
+				int total = load<uint16_t>((char*)&arrTotal[j]);
+				int produced = load<uint16_t>((char*)&arrProduced[j]);
 				if (remaining != 0 && !_rules->getManufacture()[j].empty())
 				{
 					RuleManufacture *manufacture = _mod->getManufacture(_rules->getManufacture()[j]);
@@ -1245,10 +1245,10 @@ namespace OpenXcom
 		for (size_t i = 0; i < REGIONS; ++i)
 		{
 			char *bdata = (data + i * 4);
-			bool detected = load<Uint16>(bdata + 0x00) != 0;
+			bool detected = load<uint16_t>(bdata + 0x00) != 0;
 			if (detected)
 			{
-				int loc = load<Uint16>(bdata + 0x02);
+				int loc = load<uint16_t>(bdata + 0x02);
 				Base *base = dynamic_cast<Base*>(_targets[loc]);
 				if (base != 0)
 				{

@@ -33,7 +33,7 @@ class CatFile
 {
 private:
 	std::string _filename;
-	Uint8 *_data;
+	uint8_t *_data;
 	std::vector<std::tuple<void *, size_t>> _items;
 
 public:
@@ -44,7 +44,7 @@ public:
 	/// Get amount of objects.
 	size_t size() const { return _items.size(); }
 	/// Return a pointer to the object data.
-	SDL_RWops *getRWops(Uint32 i);
+	SDL_RWops *getRWops(uint32_t i);
 	/// Return the original file name
 	const std::string& fileName() const { return _filename; }
 };

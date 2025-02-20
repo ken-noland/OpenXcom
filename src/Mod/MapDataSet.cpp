@@ -269,10 +269,10 @@ void MapDataSet::unloadData()
  * @param filename Filename of the DAT file.
  * @param voxelData The ruleset.
  */
-void MapDataSet::loadLOFTEMPS(const std::string &filename, std::vector<Uint16> *voxelData)
+void MapDataSet::loadLOFTEMPS(const std::string &filename, std::vector<uint16_t> *voxelData)
 {
 	auto mapFile = FileMap::getIStream(filename);
-	Uint16 value;
+	uint16_t value;
 
 	while (mapFile->read((char*)&value, sizeof(value)))
 	{

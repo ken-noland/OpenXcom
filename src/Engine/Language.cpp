@@ -100,31 +100,33 @@ Language::Language() : _handler(0), _direction(DIRECTION_LTR), _wrap(WRAP_WORDS)
 		_cjk.push_back("zh-TW");
 	}
 
-	std::string id = Options::language;
+// OPTIONSHACK
+	std::string id;// = Options::language;
 	_handler = LanguagePlurality::create(id);
-	if (std::find(_rtl.begin(), _rtl.end(), id) == _rtl.end())
-	{
+	//if (std::find(_rtl.begin(), _rtl.end(), id) == _rtl.end())
+	//{
 		_direction = DIRECTION_LTR;
-	}
-	else
-	{
-		_direction = DIRECTION_RTL;
-	}
-	if (Options::wordwrap == WRAP_AUTO)
-	{
-		if (std::find(_cjk.begin(), _cjk.end(), id) == _cjk.end())
-		{
+	//}
+	//else
+	//{
+	//	_direction = DIRECTION_RTL;
+	//}
+// OPTIONSHACK
+	//if (Options::wordwrap == WRAP_AUTO)
+	//{
+	//	if (std::find(_cjk.begin(), _cjk.end(), id) == _cjk.end())
+	//	{
 			_wrap = WRAP_WORDS;
-		}
-		else
-		{
-			_wrap = WRAP_LETTERS;
-		}
-	}
-	else
-	{
-		_wrap = Options::wordwrap;
-	}
+	//	}
+	//	else
+	//	{
+	//		_wrap = WRAP_LETTERS;
+	//	}
+	//}
+	//else
+	//{
+	//	_wrap = Options::wordwrap;
+	//}
 }
 
 /**
@@ -160,22 +162,22 @@ static std::string fileNameToId(const std::string& fileName) {
  */
 void Language::getList(std::vector<std::string> &ids, std::vector<std::string> &names)
 {
-	auto nset = FileMap::filterFiles(FileMap::getVFolderContents("Language", 0), "yml");
-	ids.clear();
-	for (const auto& filename : nset) {
-		ids.push_back(fileNameToId(filename));
-	}
-	std::sort(ids.begin(), ids.end());
-	names.clear();
+	//auto nset = FileMap::filterFiles(FileMap::getVFolderContents("Language", 0), "yml");
+	//ids.clear();
+	//for (const auto& filename : nset) {
+	//	ids.push_back(fileNameToId(filename));
+	//}
+	//std::sort(ids.begin(), ids.end());
+	//names.clear();
 
-	for (const auto& id: ids)
-	{
-		if (_names.find(id) != _names.end()) {
-			names.push_back(_names[id]);
-		} else {
-			names.push_back(id);
-		}
-	}
+	//for (const auto& id: ids)
+	//{
+	//	if (_names.find(id) != _names.end()) {
+	//		names.push_back(_names[id]);
+	//	} else {
+	//		names.push_back(id);
+	//	}
+	//}
 }
 
 /**
@@ -186,43 +188,43 @@ void Language::getList(std::vector<std::string> &ids, std::vector<std::string> &
  */
 void Language::loadFile(const FileMap::FileRecord *frec)
 {
-	YAML::Node doc = frec->getYAML();
-	YAML::Node lang;
-	if (doc.begin()->second.IsMap())
-	{
-		lang = doc.begin()->second;
-	}
-	// Fallback when file is missing language specifier
-	else
-	{
-		lang = doc;
-	}
-	for (YAML::const_iterator i = lang.begin(); i != lang.end(); ++i)
-	{
-		// Regular strings
-		if (i->second.IsScalar())
-		{
-			std::string value = i->second.as<std::string>();
-			if (!value.empty())
-			{
-				std::string key = i->first.as<std::string>();
-				_strings[key] = loadString(value);
-			}
-		}
-		// Strings with plurality
-		else if (i->second.IsMap())
-		{
-			for (YAML::const_iterator j = i->second.begin(); j != i->second.end(); ++j)
-			{
-				std::string value = j->second.as<std::string>();
-				if (!value.empty())
-				{
-					std::string key = i->first.as<std::string>() + "_" + j->first.as<std::string>();
-					_strings[key] = loadString(value);
-				}
-			}
-		}
-	}
+	//YAML::Node doc = frec->getYAML();
+	//YAML::Node lang;
+	//if (doc.begin()->second.IsMap())
+	//{
+	//	lang = doc.begin()->second;
+	//}
+	//// Fallback when file is missing language specifier
+	//else
+	//{
+	//	lang = doc;
+	//}
+	//for (YAML::const_iterator i = lang.begin(); i != lang.end(); ++i)
+	//{
+	//	// Regular strings
+	//	if (i->second.IsScalar())
+	//	{
+	//		std::string value = i->second.as<std::string>();
+	//		if (!value.empty())
+	//		{
+	//			std::string key = i->first.as<std::string>();
+	//			_strings[key] = loadString(value);
+	//		}
+	//	}
+	//	// Strings with plurality
+	//	else if (i->second.IsMap())
+	//	{
+	//		for (YAML::const_iterator j = i->second.begin(); j != i->second.end(); ++j)
+	//		{
+	//			std::string value = j->second.as<std::string>();
+	//			if (!value.empty())
+	//			{
+	//				std::string key = i->first.as<std::string>() + "_" + j->first.as<std::string>();
+	//				_strings[key] = loadString(value);
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 /**
@@ -232,14 +234,14 @@ void Language::loadFile(const FileMap::FileRecord *frec)
  */
 void Language::loadRule(const std::map<std::string, ExtraStrings*> &extraStrings, const std::string &id)
 {
-	auto it = extraStrings.find(id);
-	if (it != extraStrings.end())
-	{
-		for (const auto& pair : *it->second->getStrings())
-		{
-			_strings[pair.first] = loadString(pair.second);
-		}
-	}
+	//auto it = extraStrings.find(id);
+	//if (it != extraStrings.end())
+	//{
+	//	for (const auto& pair : *it->second->getStrings())
+	//	{
+	//		_strings[pair.first] = loadString(pair.second);
+	//	}
+	//}
 }
 
 /**
@@ -314,7 +316,8 @@ LocalizedText Language::getString(const std::string &id, unsigned n) const
 		if (notFoundIds.end() == notFoundIds.find(id))
 		{
 			notFoundIds.insert(id);
-			Log(LOG_WARNING) << id << " not found in " << Options::language;
+// OPTIONSHACK
+			//Log(LOG_WARNING) << id << " not found in " << Options::language;
 		}
 		return id;
 	}
@@ -323,7 +326,8 @@ LocalizedText Language::getString(const std::string &id, unsigned n) const
 		if (notFoundIds.end() == notFoundIds.find(id))
 		{
 			notFoundIds.insert(id);
-			Log(LOG_WARNING) << id << " has plural format in ``" << Options::language << "``. Code assumes singular format.";
+// OPTIONSHACK
+			//Log(LOG_WARNING) << id << " has plural format in ``" << Options::language << "``. Code assumes singular format.";
 //		Hint: Change ``getstring(ID).arg(value)`` to ``getString(ID, value)`` in appropriate files.
 		}
 		return s->second;

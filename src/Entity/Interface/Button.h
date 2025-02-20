@@ -33,7 +33,7 @@ class ComboBox;
  */
 struct ButtonComponent
 {
-	Uint8 _color;
+	uint8_t _color;
 
 	bool _contrast, _geoscapeButton;
 	ComboBox* _comboBox;
@@ -49,10 +49,10 @@ public:
 	~ButtonSystem() = default;
 
 	/// Sets the text button's color.
-	void setColor(entt::handle entity, Uint8 color);
+	void setColor(entt::handle entity, uint8_t color);
 
 	/// Gets the text button's color.
-	Uint8 getColor(entt::handle entity) const;
+	uint8_t getColor(entt::handle entity) const;
 		
 	/// Draws the text button.
 	void draw(entt::handle entity);

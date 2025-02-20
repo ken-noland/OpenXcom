@@ -42,18 +42,18 @@ SoundSet::SoundSet() : _sharedSounds(INT_MAX)
  * @param newsound Pointer to converted sample buffer.
  * @return Converted buffer size.
  */
-int SoundSet::convertSampleRate(Uint8 *oldsound, size_t oldsize, Uint8 *newsound) const
+int SoundSet::convertSampleRate(uint8_t *oldsound, size_t oldsize, uint8_t *newsound) const
 {
-	const Uint32 step16 = (8000 << 16) / 11025;
+	const uint32_t step16 = (8000 << 16) / 11025;
 	int newsize = 0;
-	for (Uint32 offset16 = 0; (offset16 >> 16) < oldsize; offset16 += step16, ++newsound, ++newsize)
+	for (uint32_t offset16 = 0; (offset16 >> 16) < oldsize; offset16 += step16, ++newsound, ++newsize)
 	{
 		*newsound = oldsound[offset16 >> 16];
 	}
 	return newsize;
 }
 
-static const Uint8 header[] = {  'R',  'I',  'F',  'F', 0x00, 0x00, 0x00, 0x00,  'W',  'A',  'V',  'E',
+static const uint8_t header[] = {  'R',  'I',  'F',  'F', 0x00, 0x00, 0x00, 0x00,  'W',  'A',  'V',  'E',
 								 'f',  'm',  't',  ' ', 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
 								0x11, 0x2b, 0x00, 0x00, 0x11, 0x2b, 0x00, 0x00, 0x01, 0x00, 0x08, 0x00,
 								 'd',  'a',  't',  'a', 0x00, 0x00, 0x00, 0x00                           };
@@ -64,13 +64,13 @@ static const Uint8 header[] = {  'R',  'I',  'F',  'F', 0x00, 0x00, 0x00, 0x00, 
  * @param size  size of sound data
  * @param resample if resampling is needed.
  */
-void SoundSet::writeWAV(SDL_RWops *dest, Uint8 *sound, size_t size, bool resample) const {
+void SoundSet::writeWAV(SDL_RWops *dest, uint8_t *sound, size_t size, bool resample) const {
 	SDL_RWwrite(dest, header, sizeof(header), 1);
 	int newsize = (int)size;
 
 	if (resample) {
 		auto newsound = SDL_malloc(2*size);
-		newsize = convertSampleRate(sound, size, (Uint8 *)newsound);
+		newsize = convertSampleRate(sound, size, (uint8_t *)newsound);
 		SDL_RWwrite(dest, newsound, newsize, 1);
 		SDL_free(newsound);
 	} else {
@@ -188,7 +188,7 @@ void SoundSet::loadCatByIndex(CatFile &catFile, int index, bool tftd)
 	// comparing what's in the WAV header to cat item size without name.
 
 	size_t size;
-	Uint8 *sound = (Uint8 *)SDL_LoadFile_RW(rwops, &size, SDL_TRUE);
+	uint8_t *sound = (uint8_t *)SDL_LoadFile_RW(rwops, &size, SDL_TRUE);
 
 	// Skip short data
 	if (size < 12) {
@@ -201,18 +201,18 @@ void SoundSet::loadCatByIndex(CatFile &catFile, int index, bool tftd)
 	bool wav = ((sound[0] == 'R') && (sound[1] == 'I') && (sound[2]  == 'F') && (sound[3]  == 'F')
 			 && (sound[8] == 'W') && (sound[9] == 'A') && (sound[10] == 'V') && (sound[11] == 'E'));
 
-	Uint8 *samples;
+	uint8_t *samples;
 	size_t samplecount;
 	bool do_resample = true;
 	if (wav) { // skip WAV header
-		int expected_size = *(Sint32 *)(sound +0x04) + 8;
+		int expected_size = *(int32_t *)(sound +0x04) + 8;
 		int delta = ((int)size) - expected_size;
 		// fix the header if we miss some data.
 		if (delta < 0) {
-			*(Sint32 *)(sound +0x04) += delta; // WAVE chunk size
-			*(Sint32 *)(sound +0x28) += delta; // data chunk size
+			*(int32_t *)(sound +0x04) += delta; // WAVE chunk size
+			*(int32_t *)(sound +0x28) += delta; // data chunk size
 		}
-		int samplerate = *(Sint32 *)(sound + 0x18);
+		int samplerate = *(int32_t *)(sound + 0x18);
 		do_resample  = (samplerate < 11025);
 		samples = sound + 44;
 		samplecount = size - 44;
@@ -228,7 +228,7 @@ void SoundSet::loadCatByIndex(CatFile &catFile, int index, bool tftd)
 		// scale to 8 bits (UFO) or get rid of signedness (TFTD)
 		for (size_t n = 0; n < samplecount; ++n) {
 			int sample = samples[n];
-			samples[n] = (Uint8) (tftd ? sample + 128 : sample * 4);
+			samples[n] = (uint8_t) (tftd ? sample + 128 : sample * 4);
 		}
 	}
 	size_t dest_size = 44 + 2 * size; // worst-case estimation

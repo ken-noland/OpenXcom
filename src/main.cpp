@@ -16,126 +16,187 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <sstream>
-#include <exception>
-#include <cassert>
-#include "version.h"
-#include "Engine/Exception.h"
-#include "Engine/Logger.h"
-#include "Engine/CrossPlatform.h"
-#include "Engine/Game.h"
-#include "Engine/Options.h"
-#include "Engine/FileMap.h"
-#include "Menu/StartState.h"
+#include <simplerttr.h>
 
-/** @mainpage
- * @author OpenXcom Developers
- *
- * OpenXcom is an open-source clone of the original X-Com
- * written entirely in C++ and SDL. This documentation contains info
- * on every class contained in the source code and its public methods.
- * The code itself also contains in-line comments for more complicated
- * code blocks. Hopefully all of this will make the code a lot more
- * readable for you in case you which to learn or make use of it in
- * your own projects, though note that all the source code is licensed
- * under the GNU General Public License. Enjoy!
- */
+#if defined(_DEBUG) && defined(_MSC_VER)
+// The following is used to capture memory allocations to find out where
+// memory leaks are coming from. Since there are statics that allocate
+// memory, and since this is the first file passed to the linker, this
+// is a good way to find out where the memory is being allocated and not
+// deallocated.
+#include  <crtdbg.h>
+
+class DbgBreakAlloc
+{
+public:
+	DbgBreakAlloc()
+	{
+		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF /*| _CRTDBG_CHECK_EVERY_16_DF*/);
+		_crtBreakAlloc = -1;
+	}
+};
+
+DbgBreakAlloc brk;
+#endif
+
+#include "Engine/Engine.h"
+#include "Game/Game.h"
 
 using namespace OpenXcom;
 
-// Crash handling routines
-#ifdef _MSC_VER
-#include <windows.h>
-LONG WINAPI crashLogger(PEXCEPTION_POINTERS exception)
+namespace OpenXcom
 {
-	CrossPlatform::crashDump(exception, "");
-	return EXCEPTION_CONTINUE_SEARCH;
-}
-#else
-#include <signal.h>
-void signalLogger(int sig)
+
+int run(const std::vector<std::string>& args)
 {
-	CrossPlatform::crashDump(&sig, "");
-	exit(EXIT_FAILURE);
+	// Create the engine
+	std::unique_ptr<Engine> engine = std::make_unique<Engine>(args);
+
+	// Create the game
+	std::unique_ptr<Game> game = std::make_unique<Game>(*engine);
+
+	// Run the game
+	int ret = game->run();
+
+	game.reset();
+	engine.reset();
+
+	return ret;
 }
 
+} // namespace OpenXcom
+
+
+#ifdef _MSC_VER
+#include <Windows.h>
+
+
+// some string helpers
+//   trim from start (in place)
+inline void ltrim(std::string& s)
+{
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+				return !std::isspace(ch) && ch != 0;
+			}));
+}
+
+// trim from end (in place)
+inline void rtrim(std::string& s)
+{
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+				return !std::isspace(ch) && ch != 0;
+			}).base(),
+			s.end());
+}
+
+//  trim from both ends (in place)
+inline void trim(std::string& s)
+{
+	rtrim(s);
+	ltrim(s);
+}
+
+// trim from start (copying)
+inline std::string ltrim_copy(std::string s)
+{
+	ltrim(s);
+	return s;
+}
+
+// trim from end (copying)
+inline std::string rtrim_copy(std::string s)
+{
+	rtrim(s);
+	return s;
+}
+
+// trim from both ends (copying)
+inline std::string trim_copy(std::string s)
+{
+	trim(s);
+	return s;
+}
+
+std::string WideStringToString(const std::wstring& wstr)
+{
+	int bufferSize = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	std::string str(bufferSize, 0);
+	WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, &str[0], bufferSize, nullptr, nullptr);
+	return str;
+}
+
+std::vector<std::string> CommandLineToArgvA()
+{
+	int argc;
+	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	if (argv == NULL) {
+		exit(EXIT_FAILURE);
+	}
+
+	std::vector<std::string> args;
+	for (int i = 1; i < argc; i++) {
+		args.push_back(trim_copy(WideStringToString(argv[i])));
+	}
+
+	LocalFree(argv);
+
+	return args;
+}
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+#if defined(_DEBUG)
+    // Initialize CRT memory leak checking
+	_CrtMemState initialState, finalState, diffState;
+	_CrtMemCheckpoint(&initialState); // Take a snapshot of memory state at start of main
 #endif
 
-void exceptionLogger()
-{
-	static bool logged = false;
-	std::string error;
-	try
-	{
-		if (!logged)
-		{
-			logged = true;
-			throw;
-		}
-	}
-	catch (const std::exception &e)
-	{
-		error = e.what();
-	}
-	catch (...)
-	{
-		error = "Unknown exception";
-	}
-	CrossPlatform::crashDump(0, error);
-	exit(EXIT_FAILURE);
-}
+	int ret = 0;
 
-Game *game = 0;
+	// using a scope operator here to ensure that the args are cleaned up before the memory check
+	{
+		std::vector<std::string> args = CommandLineToArgvA();
+#else
+
+std::vector<std::string> CommandLineToArgvA(int argc, char* argv[])
+{
+	// Create a vector and populate it with the arguments
+	std::vector<std::string> args;
+	for (int i = 1; i < argc; i++)
+	{
+		args.push_back(std::string(argv[i]));
+	}
+
+	return args;
+}
 
 // If you can't tell what the main() is for you should have your
 // programming license revoked...
 int main(int argc, char *argv[])
 {
-#ifndef DUMP_CORE
-#ifdef _MSC_VER
-	// Uncomment to check memory leaks in VS
-	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	int ret = 0;
 
-	SetUnhandledExceptionFilter(crashLogger);
-#ifdef __MINGW32__
-	// MinGW can use SJLJ or Dwarf exceptions, because of this SEH can't catch it.
-	std::set_terminate(exceptionLogger);
-#endif
-	// Uncomment to debug crash handler
-	// AddVectoredContinueHandler(1, crashLogger);
-#else
-	signal(SIGSEGV, signalLogger);
-	std::set_terminate(exceptionLogger);
-#endif
-#endif
-
-	CrossPlatform::getErrorDialog();
-	CrossPlatform::processArgs(argc, argv);
-	if (!Options::init())
-		return EXIT_SUCCESS;
-	std::ostringstream title;
-	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
-	Options::baseXResolution = Options::displayWidth;
-	Options::baseYResolution = Options::displayHeight;
-
-	game = new Game(title.str());
-	game->setState(new StartState);
-	game->run();
-
-	bool startUpdate = game->getUpdateFlag();
-
-	// Comment those two for faster exit.
-	delete game;
-	FileMap::clear(true, false); // make valgrind happy
-
-	if (startUpdate)
+	// using a scope operator here to ensure that the args are cleaned up before the memory check
 	{
-		CrossPlatform::startUpdateProcess();
+		std::vector<std::string> args = CommandLineToArgvA(argc, argv);
+
+#endif
+		ret = OpenXcom::run(args);
+
+		SimpleRTTR::shutdown();
 	}
 
-	_CrtDumpMemoryLeaks();
+#if defined(_DEBUG) && defined(_MSC_VER)
+	// Take a snapshot of memory state at the end of main
+	_CrtMemCheckpoint(&finalState);
 
-	return EXIT_SUCCESS;
+	// Compare the memory state at the beginning and end of main
+	if (_CrtMemDifference(&diffState, &initialState, &finalState))
+	{
+		_CrtMemDumpStatistics(&diffState); // Dump only the leaks that occurred after main
+	}
+#endif
+	return ret;
 }
 
 #ifdef __MORPHOS__

@@ -37,8 +37,8 @@ private:
 	std::map<int, Sound> _sounds;
 	int _sharedSounds;
 
-	int convertSampleRate(Uint8 *oldsound, size_t oldsize, Uint8 *newsound) const;
-	void writeWAV(SDL_RWops *dest, Uint8 *sound, size_t size, bool resample) const;
+	int convertSampleRate(uint8_t *oldsound, size_t oldsize, uint8_t *newsound) const;
+	void writeWAV(SDL_RWops *dest, uint8_t *sound, size_t size, bool resample) const;
 
 public:
 	/// Crates a sound set.

@@ -56,7 +56,7 @@ private:
 	std::vector<std::string> _items;
 	int _totalItems;
 	double _totalItemStorageSize;
-	Uint8 _ammoColor;
+	uint8_t _ammoColor;
 	bool _reload;
 	bool _returningFromGlobalTemplates;
 	bool _returningFromInventory;

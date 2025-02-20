@@ -236,7 +236,7 @@ unsigned int NumberText::getValue() const
  * Changes the color used to render the number.
  * @param color Color value.
  */
-void NumberText::setColor(Uint8 color)
+void NumberText::setColor(uint8_t color)
 {
 	_color = color;
 	_redraw = true;
@@ -246,7 +246,7 @@ void NumberText::setColor(Uint8 color)
  * Returns the color used to render the number.
  * @return Color value.
  */
-Uint8 NumberText::getColor() const
+uint8_t NumberText::getColor() const
 {
 	return _color;
 }

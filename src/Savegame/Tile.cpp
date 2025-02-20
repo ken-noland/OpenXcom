@@ -113,7 +113,7 @@ void Tile::load(const YAML::Node &node)
 		for (int i = 0; i < 3; i++)
 		{
 			auto realTilePart = (i == 2 ? 0 : i - 1); //convert old convention to new one
-			_objectsCache[realTilePart].discovered = (Uint8)node["discovered"][i].as<bool>();
+			_objectsCache[realTilePart].discovered = (uint8_t)node["discovered"][i].as<bool>();
 		}
 	}
 	if (node["openDoorWest"])
@@ -135,7 +135,7 @@ void Tile::load(const YAML::Node &node)
  * @param buffer Pointer to buffer.
  * @param serKey Serialization key.
  */
-void Tile::loadBinary(Uint8 *buffer, Tile::SerializationKey& serKey)
+void Tile::loadBinary(uint8_t *buffer, Tile::SerializationKey& serKey)
 {
 	_mapData->ID[0] = unserializeInt(&buffer, serKey._mapDataID);
 	_mapData->ID[1] = unserializeInt(&buffer, serKey._mapDataID);
@@ -149,15 +149,15 @@ void Tile::loadBinary(Uint8 *buffer, Tile::SerializationKey& serKey)
 	_smoke = unserializeInt(&buffer, serKey._smoke);
 	_fire = unserializeInt(&buffer, serKey._fire);
 
-	Uint8 boolFields = unserializeInt(&buffer, serKey.boolFields);
+	uint8_t boolFields = unserializeInt(&buffer, serKey.boolFields);
 	_objectsCache[O_WESTWALL].discovered = (boolFields & 1) ? 1 : 0;
 	_objectsCache[O_NORTHWALL].discovered = (boolFields & 2) ? 1 : 0;
 	_objectsCache[O_FLOOR].discovered = (boolFields & 4) ? 1 : 0;
 	_objectsCache[O_WESTWALL].currentFrame = (boolFields & 8) ? 7 : 0;
 	_objectsCache[O_NORTHWALL].currentFrame = (boolFields & 0x10) ? 7 : 0;
-	_lastExploredByHostile = unserializeInt(&buffer, static_cast < Uint8>(serKey._lastExploredByHostile));
-	_lastExploredByNeutral = unserializeInt(&buffer, static_cast<Uint8>(serKey._lastExploredByNeutral));
-	_lastExploredByPlayer = unserializeInt(&buffer, static_cast<Uint8>(serKey._lastExploredByPlayer));
+	_lastExploredByHostile = unserializeInt(&buffer, static_cast < uint8_t>(serKey._lastExploredByHostile));
+	_lastExploredByNeutral = unserializeInt(&buffer, static_cast<uint8_t>(serKey._lastExploredByNeutral));
+	_lastExploredByPlayer = unserializeInt(&buffer, static_cast<uint8_t>(serKey._lastExploredByPlayer));
 	if (_fire || _smoke)
 	{
 		_animationOffset = RNG::seedless(0, 3);
@@ -211,7 +211,7 @@ YAML::Node Tile::save() const
  * Saves the tile to binary.
  * @param buffer pointer to buffer.
  */
-void Tile::saveBinary(Uint8** buffer) const
+void Tile::saveBinary(uint8_t** buffer) const
 {
 	const Tile::SerializationKey def = Tile::SerializationKey::defaultKey();
 
@@ -227,13 +227,13 @@ void Tile::saveBinary(Uint8** buffer) const
 	serializeInt(buffer, def._smoke, _smoke);
 	serializeInt(buffer, def._fire, _fire);
 
-	Uint8 boolFields = (_objectsCache[O_WESTWALL].discovered?1:0) + (_objectsCache[O_NORTHWALL].discovered?2:0) + (_objectsCache[O_FLOOR].discovered?4:0);
+	uint8_t boolFields = (_objectsCache[O_WESTWALL].discovered?1:0) + (_objectsCache[O_NORTHWALL].discovered?2:0) + (_objectsCache[O_FLOOR].discovered?4:0);
 	boolFields |= isUfoDoorOpen(O_WESTWALL) ? 8 : 0; // west
 	boolFields |= isUfoDoorOpen(O_NORTHWALL) ? 0x10 : 0; // north?
 	serializeInt(buffer, def.boolFields, boolFields);
-	serializeInt(buffer, (Uint8)def._lastExploredByHostile, _lastExploredByHostile);
-	serializeInt(buffer, (Uint8)def._lastExploredByNeutral, _lastExploredByNeutral);
-	serializeInt(buffer, (Uint8)def._lastExploredByPlayer, _lastExploredByPlayer);
+	serializeInt(buffer, (uint8_t)def._lastExploredByHostile, _lastExploredByHostile);
+	serializeInt(buffer, (uint8_t)def._lastExploredByNeutral, _lastExploredByNeutral);
+	serializeInt(buffer, (uint8_t)def._lastExploredByPlayer, _lastExploredByPlayer);
 }
 
 /**
@@ -1271,7 +1271,7 @@ void mulDivByIntScript(Position& a, int v, int d)
 {
 	if (d)
 	{
-		// to avoid overflow on `Sint16` we multiply manually
+		// to avoid overflow on `int16_t` we multiply manually
 		a = { a.x * v / d, a.y * v / d, a.z * v / d };
 	}
 	else

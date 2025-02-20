@@ -78,7 +78,8 @@ CraftEquipmentSaveState::CraftEquipmentSaveState(CraftEquipmentState* parent) : 
 
 	_btnCancel->setText(tr("STR_CANCEL_UC"));
 	_btnCancel->onMouseClick((ActionHandler)&CraftEquipmentSaveState::btnCancelClick);
-	_btnCancel->onKeyboardPress((ActionHandler)&CraftEquipmentSaveState::btnCancelClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnCancel->onKeyboardPress((ActionHandler)&CraftEquipmentSaveState::btnCancelClick, Options::keyCancel);
 
 	_btnSave->setText(tr("STR_SAVE_UC"));
 	_btnSave->onMouseClick((ActionHandler)&CraftEquipmentSaveState::btnSaveClick);
@@ -152,27 +153,28 @@ void CraftEquipmentSaveState::lstLoadoutPress(Action *action)
 	}
 	_selected = _lstLoadout->getCellText(_selectedRow, 0);
 
-	if (action->getDetails()->button.button == SDL_BUTTON_RIGHT && _edtSave->isFocused())
-	{
-		_previousSelectedRow = -1;
-		_selectedRow = -1;
+// SDLHACK
+	// if (action->getDetails()->button.button == SDL_BUTTON_RIGHT && _edtSave->isFocused())
+	//{
+	//	_previousSelectedRow = -1;
+	//	_selectedRow = -1;
 
-		_edtSave->setText("");
-		_edtSave->setVisible(false);
-		_edtSave->setFocus(false, false);
-		_lstLoadout->setScrolling(true);
-	}
-	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
-	{
-		_lstLoadout->setCellText(_selectedRow, 0, "");
+	//	_edtSave->setText("");
+	//	_edtSave->setVisible(false);
+	//	_edtSave->setFocus(false, false);
+	//	_lstLoadout->setScrolling(true);
+	//}
+	//if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
+	//{
+	//	_lstLoadout->setCellText(_selectedRow, 0, "");
 
-		_edtSave->setText(_selected);
-		_edtSave->setX(_lstLoadout->getColumnX(0));
-		_edtSave->setY(_lstLoadout->getRowY(_selectedRow));
-		_edtSave->setVisible(true);
-		_edtSave->setFocus(true, false);
-		_lstLoadout->setScrolling(false);
-	}
+	//	_edtSave->setText(_selected);
+	//	_edtSave->setX(_lstLoadout->getColumnX(0));
+	//	_edtSave->setY(_lstLoadout->getRowY(_selectedRow));
+	//	_edtSave->setVisible(true);
+	//	_edtSave->setFocus(true, false);
+	//	_lstLoadout->setScrolling(false);
+	//}
 }
 
 

@@ -215,7 +215,7 @@ public:
 	/// Removes current state.
 	void popState();
 	/// Sets state think interval.
-	void setStateInterval(Uint32 interval);
+	void setStateInterval(uint32_t interval);
 	/// Checks for casualties in battle.
 	void checkForCasualties(const RuleDamageType *damageType, BattleActionAttack attack, bool hiddenExplosion = false, bool terrainExplosion = false);
 	/// Checks reserved tu and energy.

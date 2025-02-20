@@ -52,7 +52,7 @@ namespace OpenXcom
 		TextList *_lstSelection;
 		ArticleDefinitionList _article_list, _filtered_article_list;
 		size_t _lstScroll;
-		Uint8 _colorNormal, _colorNew, _colorHidden;
+		uint8_t _colorNormal, _colorNew, _colorHidden;
 		bool _isCommendationsSection;
 
 		/// Handler for clicking the OK button

@@ -18,7 +18,7 @@
  */
 #include "Cursor.h"
 #include <cmath>
-#include <SDL.h>
+
 #include "../Engine/Action.h"
 
 namespace OpenXcom
@@ -63,7 +63,7 @@ void Cursor::handle(Action *action)
  * Changes the cursor's base color.
  * @param color Color value.
  */
-void Cursor::setColor(Uint8 color)
+void Cursor::setColor(uint8_t color)
 {
 	_color = color;
 	_redraw = true;
@@ -73,7 +73,7 @@ void Cursor::setColor(Uint8 color)
  * Returns the cursor's base color.
  * @return Color value.
  */
-Uint8 Cursor::getColor() const
+uint8_t Cursor::getColor() const
 {
 	return _color;
 }
@@ -84,7 +84,7 @@ Uint8 Cursor::getColor() const
 void Cursor::draw()
 {
 	Surface::draw();
-	Uint8 color = _color;
+	uint8_t color = _color;
 	int x1 = 0, y1 = 0, x2 = getWidth() - 1, y2 = getHeight() - 1;
 
 	lock();

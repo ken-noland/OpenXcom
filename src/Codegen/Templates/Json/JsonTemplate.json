@@ -1,0 +1,12 @@
+{
+  "main_template": "Json.cpp.inja",
+  "header_template": "JsonHeader.cpp.inja",
+
+  "specializations": {
+    "object_template": "JsonObject.cpp.inja",
+    "option_template": "JsonOption.cpp.inja",
+    "vector_template": "JsonVector.cpp.inja",
+    "map_template": "JsonMap.cpp.inja",
+    "enum_template": "JsonEnum.cpp.inja"
+  }
+}

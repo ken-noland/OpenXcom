@@ -55,7 +55,7 @@ private:
 	static const double ROTATE_LATITUDE;
 
 	RuleGlobe *_rules;
-	Sint16 _cenX, _cenY;
+	int16_t _cenX, _cenY;
 	GeoPosition _cenPosition;
 	double _rotLon, _rotLat, _hoverLon, _hoverLat;
 	double _craftLon, _craftLat, _craftRange;
@@ -77,7 +77,7 @@ private:
 	bool _isMouseScrolling, _isMouseScrolled;
 	int _xBeforeMouseScrolling, _yBeforeMouseScrolling;
 	double _lonBeforeMouseScrolling, _latBeforeMouseScrolling;
-	Uint32 _mouseScrollingStartTime;
+	uint32_t _mouseScrollingStartTime;
 	int _totalMouseMoveX, _totalMouseMoveY;
 	bool _mouseMovedOverThreshold;
 
@@ -98,7 +98,7 @@ private:
 	/// Special "transparent" line.
 	void XuLine(Surface* surface, Surface* src, double x1, double y1, double x2, double y2, int shade);
 	/// Draw line on globe surface.
-	void drawVHLine(Surface *surface, double lon1, double lat1, double lon2, double lat2, Uint8 color);
+	void drawVHLine(Surface *surface, double lon1, double lat1, double lon2, double lat2, uint8_t color);
 	/// Draw flight path.
 	void drawPath(Surface *surface, double lon1, double lat1, double lon2, double lat2);
 	/// Draw target marker.
@@ -106,23 +106,23 @@ private:
 	/// Set up the radius of earth and stuff.
 	void setupRadii(int width, int height);
 public:
-	static Uint8 OCEAN_COLOR;
+	static uint8_t OCEAN_COLOR;
 	static bool OCEAN_SHADING;
-	static Uint8 COUNTRY_LABEL_COLOR;
-	static Uint8 LINE_COLOR;
-	static Uint8 CITY_LABEL_COLOR;
-	static Uint8 BASE_LABEL_COLOR;
+	static uint8_t COUNTRY_LABEL_COLOR;
+	static uint8_t LINE_COLOR;
+	static uint8_t CITY_LABEL_COLOR;
+	static uint8_t BASE_LABEL_COLOR;
 
 	/// Creates a new globe at the specified position and size.
 	Globe(Game* game, int cenX, int cenY, int width, int height, int x = 0, int y = 0);
 	/// Cleans up the globe.
 	~Globe();
 	/// Converts polar coordinates to cartesian coordinates.
-	void polarToCart(double lon, double lat, Sint16 *x, Sint16 *y) const;
+	void polarToCart(double lon, double lat, int16_t *x, int16_t *y) const;
 	/// Converts polar coordinates to cartesian coordinates.
 	void polarToCart(double lon, double lat, double *x, double *y) const;
 	/// Converts cartesian coordinates to polar coordinates.
-	void cartToPolar(Sint16 x, Sint16 y, double *lon, double *lat) const;
+	void cartToPolar(int16_t x, int16_t y, double *lon, double *lat) const;
 	/// Starts rotating the globe left.
 	void rotateLeft();
 	/// Starts rotating the globe right.

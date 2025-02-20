@@ -131,7 +131,7 @@ void Slider::setHighContrast(bool contrast)
  * Changes the color used to render the slider.
  * @param color Color value.
  */
-void Slider::setColor(Uint8 color)
+void Slider::setColor(uint8_t color)
 {
 	_txtMinus->setColor(color);
 	_txtPlus->setColor(color);
@@ -143,7 +143,7 @@ void Slider::setColor(Uint8 color)
  * Returns the color used to render the slider.
  * @return Color value.
  */
-Uint8 Slider::getColor() const
+uint8_t Slider::getColor() const
 {
 	return _button->getColor();
 }

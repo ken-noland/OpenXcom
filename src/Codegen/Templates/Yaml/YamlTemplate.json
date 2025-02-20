@@ -1,0 +1,12 @@
+{
+  "main_template": "Yaml.cpp.inja",
+  "header_template": "YamlHeader.cpp.inja",
+
+  "specializations": {
+    "object_template": "YamlObject.cpp.inja",
+    "option_template": "YamlOption.cpp.inja",
+    "vector_template": "YamlVector.cpp.inja",
+    "map_template": "YamlMap.cpp.inja",
+    "enum_template": "YamlEnum.cpp.inja"
+  }
+}

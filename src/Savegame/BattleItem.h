@@ -36,7 +36,7 @@ class ScriptParserBase;
 class SavedBattleGame;
 struct RuleItemAction;
 
-enum BattleActionType : Uint8;
+enum BattleActionType : uint8_t;
 
 /**
  * Represents a single item in the battlescape.

@@ -37,11 +37,12 @@ namespace FileMap
 	/// Get FileRecord for the fullpath ..
 	const FileRecord *at(const std::string &relativeFilePath);
 
-	/// Gets SDL_RWops for the file data of a data file blah blah read above.
-	SDL_RWops *getRWops(const std::string &relativeFilePath);
+// SDLHACK
+	///// Gets SDL_RWops for the file data of a data file blah blah read above.
+	//SDL_RWops *getRWops(const std::string &relativeFilePath);
 
-	/// Gets SDL_RWops for the file data of a data file blah blah read above. Reads the whole file to memory.
-	SDL_RWops *getRWopsReadAll(const std::string &relativeFilePath);
+	///// Gets SDL_RWops for the file data of a data file blah blah read above. Reads the whole file to memory.
+	//SDL_RWops *getRWopsReadAll(const std::string &relativeFilePath);
 
 	/// Gets an std::istream interface to the file data. Has to be deleted on the caller's end.
 	std::unique_ptr<std::istream>getIStream(const std::string &relativeFilePath);
@@ -92,8 +93,9 @@ namespace FileMap
 	/// scans a moddir for mods, (privately) maps them.
 	void scanModDir(const std::string& dirname, const std::string& basename, bool protectedLocation);
 
-	/// scans a .zip from the rwops for mods
-	void scanModZipRW(SDL_RWops *rwops, const std::string& fullpath);
+// SDLHACK
+	///// scans a .zip from the rwops for mods
+	//void scanModZipRW(SDL_RWops *rwops, const std::string& fullpath);
 
 	/// removes mods that lack extResourses, depend on missing mods
 	/// or participate in dependency loops
@@ -105,8 +107,9 @@ namespace FileMap
 	/// Get mod file based on mod info.
 	const FileRecord* getModRuleFile(const ModInfo* modInfo, const std::filesystem::path& relpath);
 
-	/// Unzip a file from a .zip into memory.
-	SDL_RWops *zipGetFileByName(const std::string& zipfile, const std::string& fullpath);
+// SDLHACK
+	///// Unzip a file from a .zip into memory.
+	//SDL_RWops *zipGetFileByName(const std::string& zipfile, const std::string& fullpath);
 
 }
 

@@ -71,7 +71,7 @@ CatFile::CatFile(const std::string& filename) : _data(0), _items()
 	auto offset0 = SDL_ReadLE32(rwops); // read the first offset; 8 is the sizeof(item) of the header
 	SDL_RWseek(rwops, 0, RW_SEEK_SET);  // reset the rwops pointer back
 	size_t filesize;
-	_data = (Uint8 *)SDL_LoadFile_RW(rwops, &filesize, SDL_FALSE); // read all of the file
+	_data = (uint8_t *)SDL_LoadFile_RW(rwops, &filesize, SDL_FALSE); // read all of the file
 	SDL_RWseek(rwops, 0, RW_SEEK_SET);  // and again reset the rwops pointer back
 
 	if (offset0 >= filesize) {
@@ -79,7 +79,7 @@ CatFile::CatFile(const std::string& filename) : _data(0), _items()
 		SDL_RWclose(rwops);
 		return;
 	}
-	for (Uint32 i = 0; i < offset0 / 8; ++i) {
+	for (uint32_t i = 0; i < offset0 / 8; ++i) {
 		auto offset = SDL_ReadLE32(rwops);
 		SDL_ReadLE32(rwops); // ignore size;
 		// reject bad data
@@ -89,11 +89,11 @@ CatFile::CatFile(const std::string& filename) : _data(0), _items()
 		}
 		_items.push_back(std::make_tuple(_data + offset, offset));
 	}
-	Uint32 last_offset = (Uint32)filesize;
+	uint32_t last_offset = (uint32_t)filesize;
 	for ( auto it = _items.rbegin(); it != _items.rend(); ++it) {
 		auto this_offset = std::get<1>(*it);
 		std::get<1>(*it) = last_offset - this_offset;
-		last_offset = (Uint32)this_offset;
+		last_offset = (uint32_t)this_offset;
 	}
 	SDL_RWclose(rwops);
 }
@@ -112,7 +112,7 @@ CatFile::~CatFile()
  * @param keepname Don't strip internal file name (needed for adlib).
  * @return SDL_RWops for the object data.
  */
-SDL_RWops *CatFile::getRWops(Uint32 i) {
+SDL_RWops *CatFile::getRWops(uint32_t i) {
 	if (i >= _items.size()) {
 		Log(LOG_ERROR) << "Catfile<" << _filename << ">::getRWops("<<i<<"): >= size " << _items.size();
 		return NULL;

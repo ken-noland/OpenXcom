@@ -35,16 +35,16 @@ class WarningMessage : public Surface
 private:
 	Text *_text;
 	Timer *_timer;
-	Uint8 _color, _fade;
+	uint8_t _color, _fade;
 public:
 	/// Creates a new warning message with the specified size and position.
 	WarningMessage(int width, int height, int x = 0, int y = 0);
 	/// Cleans up the warning message.
 	~WarningMessage();
 	/// Sets the color for the warning message.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Sets the text color for the warning message.
-	void setTextColor(Uint8 color);
+	void setTextColor(uint8_t color);
 	/// Initializes the warning message's resources.
 	void initText(Font *big, Font *small, Language *lang) override;
 	/// Sets the warning message's palette.

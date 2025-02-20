@@ -20,7 +20,6 @@
 #include "../Interface/Window.h"
 #include "../Interface/Text.h"
 #include "../Interface/Button.h"
-#include "../../Engine/Game.h"
 #include "../../Engine/Screen.h"
 #include "ECS.h"
 
@@ -43,12 +42,14 @@ DrawableComponent::~DrawableComponent()
 
 void DrawableComponent::addDrawable(const DrawableCallback& drawable)
 {
-	_drawables.push_back(drawable);
+	throw std::runtime_error("DrawableComponent::addDrawable(const DrawableCallback& drawable) Not implemented");
+	//_drawables.push_back(drawable);
 }
 
 void DrawableComponent::draw()
 {
-	_drawables.call();
+	throw std::runtime_error("DrawableComponent::draw() Not implemented");
+	//_drawables.call();
 }
 
 DrawableSystem::DrawableSystem()
@@ -61,42 +62,42 @@ DrawableSystem::~DrawableSystem()
 
 void DrawableSystem::draw(entt::handle& entity)
 {
-	//KN NOTE: Right, so, not everything has been migrated over to ECS yet, so this function is a bit mixed.
+	////KN NOTE: Right, so, not everything has been migrated over to ECS yet, so this function is a bit mixed.
 
-	// KN NOTE: A bit of a hack for now until we have more of the surface stuff
-	//  moved over to ECS. Some are using the old draw method(blitting) whereas
-	//  others are using the new DrawableComponent
+	//// KN NOTE: A bit of a hack for now until we have more of the surface stuff
+	////  moved over to ECS. Some are using the old draw method(blitting) whereas
+	////  others are using the new DrawableComponent
 
-	if (entity.any_of<WindowComponent>())
-	{
-		WindowSystem& windowSystem = getSystem<WindowSystem>();
-		windowSystem.draw(entity);
-	}
-	else if (entity.any_of<ButtonComponent>())
-	{
-		ButtonSystem& buttonSystem = getSystem<ButtonSystem>();
-		buttonSystem.draw(entity);
-	}
-	else if (entity.any_of<TextComponent>())
-	{
-		TextSystem& textSystem = getSystem<TextSystem>();
-		textSystem.draw(entity);
+	//if (entity.any_of<WindowComponent>())
+	//{
+	//	WindowSystem& windowSystem = getSystem<WindowSystem>();
+	//	windowSystem.draw(entity);
+	//}
+	//else if (entity.any_of<ButtonComponent>())
+	//{
+	//	ButtonSystem& buttonSystem = getSystem<ButtonSystem>();
+	//	buttonSystem.draw(entity);
+	//}
+	//else if (entity.any_of<TextComponent>())
+	//{
+	//	TextSystem& textSystem = getSystem<TextSystem>();
+	//	textSystem.draw(entity);
 
-		//DrawableComponent& drawableComponent = entity.get<DrawableComponent>();
-		//drawableComponent.draw();
+	//	//DrawableComponent& drawableComponent = entity.get<DrawableComponent>();
+	//	//drawableComponent.draw();
 
-		//TODO: I'm not sure this is needed once we have the systems up and running
-		//{
-		//	SurfaceComponent& surfaceComponent = entity.get<SurfaceComponent>();
-		//	ScreenRectComponent& screenRectComponent = entity.get<ScreenRectComponent>();
-		//	Surface* surface = surfaceComponent.getSurface();
-		//}
-	}
-	else
-	{
-		Surface* surface = entity.get<SurfaceComponent>().getSurface();
-		surface->blit(getGame()->getScreen()->getSurface());
-	}
+	//	//TODO: I'm not sure this is needed once we have the systems up and running
+	//	//{
+	//	//	SurfaceComponent& surfaceComponent = entity.get<SurfaceComponent>();
+	//	//	ScreenRectComponent& screenRectComponent = entity.get<ScreenRectComponent>();
+	//	//	Surface* surface = surfaceComponent.getSurface();
+	//	//}
+	//}
+	//else
+	//{
+	//	Surface* surface = entity.get<SurfaceComponent>().getSurface();
+	//	surface->blit(getGame()->getScreen()->getSurface());
+	//}
 }
 
 void DrawableSystem::update()

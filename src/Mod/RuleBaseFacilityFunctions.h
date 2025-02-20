@@ -19,7 +19,7 @@
  */
 
 #include <bitset>
-#include <SDL_stdinc.h>
+//#include <SDL_stdinc.h>
 
 namespace OpenXcom
 {
@@ -36,6 +36,6 @@ using RuleBaseFacilityFunctions = std::bitset<128>;
 /**
  * Subset area of base.
  */
-using BaseAreaSubset = AreaSubset<Base, Sint8>;
+using BaseAreaSubset = AreaSubset<Base, int8_t>;
 
 }

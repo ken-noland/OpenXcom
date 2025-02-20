@@ -23,8 +23,6 @@
 #include "../Battlescape/Position.h"
 #include "../Mod/MapData.h"
 
-#include <SDL_types.h> // for Uint8
-
 namespace OpenXcom
 {
 
@@ -35,7 +33,7 @@ class RuleInventory;
 class SavedBattleGame;
 class ScriptParserBase;
 
-enum LightLayers : Uint8 { LL_AMBIENT, LL_FIRE, LL_ITEMS, LL_UNITS, LL_MAX };
+enum LightLayers : uint8_t { LL_AMBIENT, LL_FIRE, LL_ITEMS, LL_UNITS, LL_MAX };
 
 enum TileUnitOverlapping : int
 {
@@ -63,16 +61,16 @@ public:
 	typedef struct SerializationKey
 	{
 
-		Uint8 index; // for indexing the actual tile array
-		Uint8 _mapDataSetID;
-		Uint8 _mapDataID;
-		Uint8 _smoke;
-		Uint8 _fire;
-		Uint8 boolFields;
-		Uint16 _lastExploredByHostile;
-		Uint16 _lastExploredByNeutral;
-		Uint16 _lastExploredByPlayer;
-		Uint32 totalBytes; // per structure, including any data not mentioned here and accounting for all array members!
+		uint8_t index; // for indexing the actual tile array
+		uint8_t _mapDataSetID;
+		uint8_t _mapDataID;
+		uint8_t _smoke;
+		uint8_t _fire;
+		uint8_t boolFields;
+		uint16_t _lastExploredByHostile;
+		uint16_t _lastExploredByNeutral;
+		uint16_t _lastExploredByPlayer;
+		uint32_t totalBytes; // per structure, including any data not mentioned here and accounting for all array members!
 
 		static const SerializationKey defaultKey();
 	} SerializationKey;
@@ -92,26 +90,26 @@ public:
 	 */
 	struct TileObjectCache
 	{
-		Sint8 offsetY;
-		Uint8 currentFrame:4;
-		Uint8 discovered:1;
-		Uint8 isUfoDoor:1;
-		Uint8 isDoor:1;
-		Uint8 isBackTileObject:1;
+		int8_t offsetY;
+		uint8_t currentFrame:4;
+		uint8_t discovered:1;
+		uint8_t isUfoDoor:1;
+		uint8_t isDoor:1;
+		uint8_t isBackTileObject:1;
 	};
 	/**
 	 * Cached data that belongs to whole tile
 	 */
 	struct TileCache
 	{
-		Sint8 terrainLevel = 0;
-		Uint8 isNoFloor:1;
-		Uint8 isGravLift:1;
-		Uint8 isLadderOnObject:1;
-		Uint8 isLadderOnNorth:1;
-		Uint8 isLadderOnWest:1;
-		Uint8 bigWall:1;
-		Uint8 danger:1;
+		int8_t terrainLevel = 0;
+		uint8_t isNoFloor:1;
+		uint8_t isGravLift:1;
+		uint8_t isLadderOnObject:1;
+		uint8_t isLadderOnNorth:1;
+		uint8_t isLadderOnWest:1;
+		uint8_t bigWall:1;
+		uint8_t danger:1;
 	};
 
 protected:
@@ -120,23 +118,23 @@ protected:
 	BattleUnit *_unit = nullptr;
 	std::vector<BattleItem *> _inventory;
 	std::unique_ptr<TileMapDataCache> _mapData = std::make_unique<TileMapDataCache>();
-	SurfaceRaw<const Uint8> _currentSurface[O_MAX] = { };
+	SurfaceRaw<const uint8_t> _currentSurface[O_MAX] = { };
 	TileObjectCache _objectsCache[O_MAX] = { };
 	TileCache _cache = { };
 	Position _pos;
-	Uint8 _light[LL_MAX];
-	Uint8 _fire = 0;
-	Uint8 _smoke = 0;
-	Uint8 _markerColor = 0;
-	Uint8 _animationOffset = 0;
-	Uint8 _obstacle = 0;
-	Uint8 _explosiveType = 0;
-	Sint16 _explosive = 0;
-	Sint16 _visible = 0;
-	Sint16 _TUMarker = -1;
-	Sint16 _EnergyMarker = -1;
-	Sint8 _preview = -1;
-	Uint8 _overlaps = 0;
+	uint8_t _light[LL_MAX];
+	uint8_t _fire = 0;
+	uint8_t _smoke = 0;
+	uint8_t _markerColor = 0;
+	uint8_t _animationOffset = 0;
+	uint8_t _obstacle = 0;
+	uint8_t _explosiveType = 0;
+	int16_t _explosive = 0;
+	int16_t _visible = 0;
+	int16_t _TUMarker = -1;
+	int16_t _EnergyMarker = -1;
+	int8_t _preview = -1;
+	uint8_t _overlaps = 0;
 	int _lastExploredByPlayer = 0;
 	int _lastExploredByHostile = 0;
 	int _lastExploredByNeutral = 0;
@@ -152,11 +150,11 @@ public:
 	/// Load the tile from yaml
 	void load(const YAML::Node &node);
 	/// Load the tile from binary buffer in memory
-	void loadBinary(Uint8 *buffer, Tile::SerializationKey& serializationKey);
+	void loadBinary(uint8_t *buffer, Tile::SerializationKey& serializationKey);
 	/// Saves the tile to yaml
 	YAML::Node save() const;
 	/// Saves the tile to binary
-	void saveBinary(Uint8** buffer) const;
+	void saveBinary(uint8_t** buffer) const;
 
 	/**
 	 * Get the MapData pointer of a part of the tile.
@@ -333,7 +331,7 @@ public:
 	/// Update cached value of sprite.
 	void updateSprite(TilePart part);
 	/// Get object sprites.
-	SurfaceRaw<const Uint8> getSprite(TilePart part) const
+	SurfaceRaw<const uint8_t> getSprite(TilePart part) const
 	{
 		return _currentSurface[part];
 	}

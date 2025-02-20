@@ -124,7 +124,7 @@ bool FlcPlayer::init(const char *filename, void(*frameCallBack)(), Game *game, b
 	file->seekg(0, std::istream::end);
 	auto size = file->tellg();
 	file->seekg(0, std::istream::beg);
-	_fileBuf = new Uint8[size];
+	_fileBuf = new uint8_t[size];
 	_fileSize = (int)size;
 	file->read((char *)_fileBuf, size);
 
@@ -220,9 +220,9 @@ void FlcPlayer::play(bool skipLastFrame)
 
 }
 
-void FlcPlayer::delay(Uint32 milliseconds)
+void FlcPlayer::delay(uint32_t milliseconds)
 {
-	Uint32 pauseStart = SDL_GetTicks();
+	uint32_t pauseStart = SDL_GetTicks();
 	while(_playingState != SKIPPED && SDL_GetTicks() < (pauseStart + milliseconds))
 	{
 		SDLPolling();
@@ -279,7 +279,7 @@ void FlcPlayer::readFileHeader()
 	readU16(_headerSpeed, _fileBuf + 16);
 }
 
-bool FlcPlayer::isValidFrame(Uint8 *frameHeader, Uint32 &frameSize, Uint16 &frameType)
+bool FlcPlayer::isValidFrame(uint8_t *frameHeader, uint32_t &frameSize, uint16_t &frameType)
 {
 	readU32(frameSize, frameHeader);
 	readU16(frameType, frameHeader + 4);
@@ -307,7 +307,7 @@ void FlcPlayer::decodeAudio(int frames)
 				_audioFrameData += _audioFrameSize;
 				break;
 			case AUDIO_CHUNK:
-				Uint16 sampleRate;
+				uint16_t sampleRate;
 
 				readU16(sampleRate, _audioFrameData + 8);
 
@@ -340,14 +340,14 @@ void FlcPlayer::decodeVideo(bool skipLastFrame)
 		{
 		case FRAME_TYPE:
 
-			Uint32 delay;
+			uint32_t delay;
 
 			readU16(_frameChunks, _videoFrameData + 6);
 			readU16(_delayOverride, _videoFrameData + 8);
 
 			if (_headerType == FLI_TYPE)
 			{
-				delay = _delayOverride > 0 ? _delayOverride : (Uint32)(_headerSpeed * (1000.0 / 70.0));
+				delay = _delayOverride > 0 ? _delayOverride : (uint32_t)(_headerSpeed * (1000.0 / 70.0));
 			}
 			else if (_useInternalAudio && !_frameCallBack) // this means TFTD videos are playing
 			{
@@ -441,15 +441,15 @@ void FlcPlayer::playVideoFrame()
 	_realScreen->flip();
 }
 
-void FlcPlayer::playAudioFrame(Uint16 sampleRate)
+void FlcPlayer::playAudioFrame(uint16_t sampleRate)
 {
 	/* TFTD audio header (10 bytes)
-	* Uint16 unknown1 - always 0
-	* Uint16 sampleRate
-	* Uint16 unknown2 - always 1 (Channels? bytes per sample?)
-	* Uint16 unknown3 - always 10 (No idea)
-	* Uint16 unknown4 - always 0
-	* Uint8[] unsigned 1-byte 1-channel PCM data of length _chunkSize_ (so the total chunk is _chunkSize_ + 6-byte flc header + 10 byte audio header */
+	* uint16_t unknown1 - always 0
+	* uint16_t sampleRate
+	* uint16_t unknown2 - always 1 (Channels? bytes per sample?)
+	* uint16_t unknown3 - always 10 (No idea)
+	* uint16_t unknown4 - always 0
+	* uint8_t[] unsigned 1-byte 1-channel PCM data of length _chunkSize_ (so the total chunk is _chunkSize_ + 6-byte flc header + 10 byte audio header */
 
 	if (_useInternalAudio)
 	{
@@ -473,13 +473,13 @@ void FlcPlayer::playAudioFrame(Uint16 sampleRate)
 		{
 			/* If the sample count has changed, we need to reallocate (Handles initial state
 			* of '0' sample count too, as realloc(NULL, size) == malloc(size) */
-			loadingBuff->samples = (Sint16*)realloc(loadingBuff->samples, newSize);
+			loadingBuff->samples = (int16_t*)realloc(loadingBuff->samples, newSize);
 			loadingBuff->sampleBufSize = newSize;
 		}
 
 		for (unsigned int i = 0; i < _audioFrameSize; i++)
 		{
-			loadingBuff->samples[loadingBuff->sampleCount + i] = (Sint16)((float)((_chunkData[i]) -128) * 240 * _volume);
+			loadingBuff->samples[loadingBuff->sampleCount + i] = (int16_t)((float)((_chunkData[i]) -128) * 240 * _volume);
 		}
 		loadingBuff->sampleCount += _audioFrameSize;
 
@@ -493,10 +493,10 @@ void FlcPlayer::playAudioFrame(Uint16 sampleRate)
 
 void FlcPlayer::color256()
 {
-	Uint8 *pSrc;
-	Uint16 numColorPackets;
-	Uint16 numColors = 0;
-	Uint8 numColorsSkip;
+	uint8_t *pSrc;
+	uint16_t numColorPackets;
+	uint16_t numColors = 0;
+	uint8_t numColorsSkip;
 
 	pSrc = _chunkData + 6;
 	readU16(numColorPackets, pSrc);
@@ -531,23 +531,23 @@ void FlcPlayer::color256()
 
 void FlcPlayer::fliSS2()
 {
-	Uint8 *pSrc, *pDst, *pTmpDst;
-	Sint8 countData;
-	Uint8 columSkip, fill1, fill2;
-	Uint16 lines;
-	Sint16 count;
+	uint8_t *pSrc, *pDst, *pTmpDst;
+	int8_t countData;
+	uint8_t columSkip, fill1, fill2;
+	uint16_t lines;
+	int16_t count;
 	bool setLastByte = false;
-	Uint8 lastByte = 0;
+	uint8_t lastByte = 0;
 
 	pSrc = _chunkData + 6;
-	pDst = (Uint8*)_mainScreen->pixels + _offset;
+	pDst = (uint8_t*)_mainScreen->pixels + _offset;
 	readU16(lines, pSrc);
 
 	pSrc += 2;
 
 	while (lines--)
 	{
-		readS16(count, (Sint8 *)pSrc);
+		readS16(count, (int8_t *)pSrc);
 		pSrc += 2;
 
 		if ((count & MASK) == SKIP_LINES)
@@ -561,7 +561,7 @@ void FlcPlayer::fliSS2()
 		{
 			setLastByte = true;
 			lastByte = (count & 0x00FF);
-			readS16(count, (Sint8 *)pSrc);
+			readS16(count, (int8_t *)pSrc);
 			pSrc += 2;
 		}
 
@@ -610,13 +610,13 @@ void FlcPlayer::fliSS2()
 
 void FlcPlayer::fliBRun()
 {
-	Uint8 *pSrc, *pDst, *pTmpDst, fill;
-	Sint8 countData;
+	uint8_t *pSrc, *pDst, *pTmpDst, fill;
+	int8_t countData;
 	int heightCount;
 
 	heightCount = _headerHeight;
 	pSrc = _chunkData + 6; // Skip chunk header
-	pDst = (Uint8*)_mainScreen->pixels + _offset;
+	pDst = (uint8_t*)_mainScreen->pixels + _offset;
 
 	while (heightCount--)
 	{
@@ -655,15 +655,15 @@ void FlcPlayer::fliBRun()
 
 void FlcPlayer::fliLC()
 {
-	Uint8 *pSrc, *pDst, *pTmpDst;
-	Sint8 countData;
-	Uint8 countSkip;
-	Uint8 fill;
-	Uint16 lines, tmp;
+	uint8_t *pSrc, *pDst, *pTmpDst;
+	int8_t countData;
+	uint8_t countSkip;
+	uint8_t fill;
+	uint16_t lines, tmp;
 	int packetsCount;
 
 	pSrc = _chunkData + 6;
-	pDst = (Uint8*)_mainScreen->pixels + _offset;
+	pDst = (uint8_t*)_mainScreen->pixels + _offset;
 
 	readU16(tmp, pSrc);
 	pSrc += 2;
@@ -708,9 +708,9 @@ void FlcPlayer::fliLC()
 
 void FlcPlayer::color64()
 {
-	Uint8 *pSrc;
-	Uint16 NumColors, NumColorPackets;
-	Uint8 NumColorsSkip;
+	uint8_t *pSrc;
+	uint16_t NumColors, NumColorPackets;
+	uint8_t NumColorsSkip;
 
 	pSrc = _chunkData + 6;
 	readU16(NumColorPackets, pSrc);
@@ -741,10 +741,10 @@ void FlcPlayer::color64()
 
 void FlcPlayer::fliCopy()
 {
-	Uint8 *pSrc, *pDst;
+	uint8_t *pSrc, *pDst;
 	int Lines = _screenHeight;
 	pSrc = _chunkData + 6;
-	pDst = (Uint8*)_mainScreen->pixels + _offset;
+	pDst = (uint8_t*)_mainScreen->pixels + _offset;
 
 	while (Lines--)
 	{
@@ -756,9 +756,9 @@ void FlcPlayer::fliCopy()
 
 void FlcPlayer::black()
 {
-	Uint8 *pDst;
+	uint8_t *pDst;
 	int Lines = _screenHeight;
-	pDst = (Uint8*)_mainScreen->pixels + _offset;
+	pDst = (uint8_t*)_mainScreen->pixels + _offset;
 
 	while (Lines-- > 0)
 	{
@@ -767,7 +767,7 @@ void FlcPlayer::black()
 	}
 }
 
-void FlcPlayer::audioCallback(void *userData, Uint8 *stream, int len)
+void FlcPlayer::audioCallback(void *userData, uint8_t *stream, int len)
 {
 	AudioData *audio = (AudioData*)userData;
 
@@ -803,7 +803,7 @@ void FlcPlayer::audioCallback(void *userData, Uint8 *stream, int len)
 	}
 }
 
-void FlcPlayer::initAudio(Uint16 format, Uint8 channels)
+void FlcPlayer::initAudio(uint16_t format, uint8_t channels)
 {
 	_videoDelay = 1000 / (_audioData.sampleRate / _audioFrameSize );
 	if (_useInternalAudio)
@@ -824,13 +824,13 @@ void FlcPlayer::initAudio(Uint16 format, Uint8 channels)
 		_audioData.loadingBuffer = new AudioBuffer();
 		_audioData.loadingBuffer->currSamplePos = 0;
 		_audioData.loadingBuffer->sampleCount = 0;
-		_audioData.loadingBuffer->samples = (Sint16 *)malloc(_audioFrameSize * 2);
+		_audioData.loadingBuffer->samples = (int16_t *)malloc(_audioFrameSize * 2);
 		_audioData.loadingBuffer->sampleBufSize = _audioFrameSize * 2;
 
 		_audioData.playingBuffer = new AudioBuffer();
 		_audioData.playingBuffer->currSamplePos = 0;
 		_audioData.playingBuffer->sampleCount = 0;
-		_audioData.playingBuffer->samples = (Sint16 *)malloc(_audioFrameSize * 2);
+		_audioData.playingBuffer->samples = (int16_t *)malloc(_audioFrameSize * 2);
 		_audioData.playingBuffer->sampleBufSize = _audioFrameSize * 2;
 
 		if (!Options::mute)
@@ -875,7 +875,7 @@ void FlcPlayer::stop()
 	_playingState = FINISHED;
 }
 
-bool FlcPlayer::isEndOfFile(Uint8 *pos)
+bool FlcPlayer::isEndOfFile(uint8_t *pos)
 {
 	return (pos - _fileBuf) == (int)(_fileSize); // should be Sint64, but let's assume the videos won't be 2gb
 }
@@ -895,9 +895,9 @@ bool FlcPlayer::wasSkipped()
 	return _playingState == SKIPPED;
 }
 
-void FlcPlayer::waitForNextFrame(Uint32 delay)
+void FlcPlayer::waitForNextFrame(uint32_t delay)
 {
-	static Uint32 oldTick = 0;
+	static uint32_t oldTick = 0;
 	int newTick;
 	int currentTick;
 
@@ -935,36 +935,36 @@ void FlcPlayer::waitForNextFrame(Uint32 delay)
 }
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-inline void FlcPlayer::readU16(Uint16 &dst, const Uint8 * const src)
+inline void FlcPlayer::readU16(uint16_t &dst, const uint8_t * const src)
 {
 	dst = (src[0] << 8) | src[1];
 }
-inline void FlcPlayer::readU32(Uint32 &dst, const Uint8 * const src)
+inline void FlcPlayer::readU32(uint32_t &dst, const uint8_t * const src)
 {
 	dst = (src[0] << 24) | (src[1] << 16) | (src[2] << 8) | src[3];
 }
-inline void FlcPlayer::readS16(Sint16 &dst, const Sint8 * const src)
+inline void FlcPlayer::readS16(int16_t &dst, const int8_t * const src)
 {
 	dst = (src[0] << 8) | src[1];
 }
-inline void FlcPlayer::readS32(Sint32 &dst, const Sint8 * const src)
+inline void FlcPlayer::readS32(int32_t &dst, const int8_t * const src)
 {
 	dst = (src[0] << 24) | (src[1] << 16) | (src[2] << 8) | src[3];
 }
 #else
-inline void FlcPlayer::readU16(Uint16 &dst, const Uint8 * const src)
+inline void FlcPlayer::readU16(uint16_t &dst, const uint8_t * const src)
 {
 	dst = (src[1] << 8) | src[0];
 }
-inline void FlcPlayer::readU32(Uint32 &dst, const Uint8 * const src)
+inline void FlcPlayer::readU32(uint32_t &dst, const uint8_t * const src)
 {
 	dst = (src[3] << 24) | (src[2] << 16) | (src[1] << 8) | src[0];
 }
-inline void FlcPlayer::readS16(Sint16 &dst, const Sint8 * const src)
+inline void FlcPlayer::readS16(int16_t &dst, const int8_t * const src)
 {
 	dst = (src[1] << 8) | src[0];
 }
-inline void FlcPlayer::readS32(Sint32 &dst, const Sint8 * const src)
+inline void FlcPlayer::readS32(int32_t &dst, const int8_t * const src)
 {
 	dst = (src[3] << 24) | (src[2] << 16) | (src[1] << 8) | src[0];
 }

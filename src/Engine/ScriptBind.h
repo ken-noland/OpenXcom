@@ -204,7 +204,7 @@ struct ParserWriter
 	void pushValue(ScriptValueData v);
 
 	/// Pushing proc operation id on proc vector.
-	ReservedPos<ProcOp> pushProc(Uint8 procId);
+	ReservedPos<ProcOp> pushProc(uint8_t procId);
 
 	/// Updating previously added proc operation id.
 	void updateProc(ReservedPos<ProcOp> pos, int procOffset);
@@ -308,7 +308,7 @@ struct SumListIndexImpl<MaxSize>
 		#else
 		__forceinline
 		#endif
-		static RetEnum func(ScriptWorkerBase &, const Uint8 *, ProgPos &)
+		static RetEnum func(ScriptWorkerBase &, const uint8_t *, ProgPos &)
 		{
 			return RetError;
 		}
@@ -561,7 +561,7 @@ struct ArgContextDef : ArgInternal<ArgContextDef>
 {
 	using ReturnType = ScriptWorkerBase&;
 	static constexpr size_t size = 0;
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return sw;
 	}
@@ -571,7 +571,7 @@ struct ArgProgDef : ArgInternal<ArgProgDef>
 {
 	using ReturnType = ProgPos&;
 	static constexpr size_t size = 0;
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return curr;
 	}
@@ -582,7 +582,7 @@ struct ArgRegDef
 {
 	using ReturnType = T;
 	static constexpr size_t size = sizeof(RegEnum);
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return sw.ref<ReturnType>(sw.const_val<RegEnum>(arg));
 	}
@@ -602,7 +602,7 @@ struct ArgValueDef
 {
 	using ReturnType = T;
 	static constexpr size_t size = sizeof(T);
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return sw.const_val<ReturnType>(arg);
 	}
@@ -622,7 +622,7 @@ struct ArgLabelDef
 {
 	using ReturnType = ProgPos;
 	static constexpr size_t size = sizeof(ReturnType);
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return sw.const_val<ReturnType>(arg);
 	}
@@ -642,7 +642,7 @@ struct ArgTextDef
 {
 	using ReturnType = ScriptText;
 	static constexpr size_t size = sizeof(ReturnType);
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return sw.const_val<ReturnType>(arg);
 	}
@@ -662,7 +662,7 @@ struct ArgFuncDef
 {
 	using ReturnType = ScriptFunc;
 	static constexpr size_t size = sizeof(ReturnType);
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return sw.const_val<ReturnType>(arg);
 	}
@@ -681,9 +681,9 @@ struct ArgFuncDef
 template<int Size>
 struct ArgRawDef
 {
-	using ReturnType = const Uint8*;
+	using ReturnType = const uint8_t*;
 	static constexpr size_t size = Size;
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return arg;
 	}
@@ -704,7 +704,7 @@ struct ArgNullDef
 {
 	using ReturnType = T;
 	static constexpr size_t size = 0;
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return ReturnType{};
 	}
@@ -724,7 +724,7 @@ struct ArgSepDef
 {
 	using ReturnType = ScriptArgSeparator;
 	static constexpr size_t size = 0;
-	static ReturnType get(ScriptWorkerBase& sw, const Uint8* arg, ProgPos& curr)
+	static ReturnType get(ScriptWorkerBase& sw, const uint8_t* arg, ProgPos& curr)
 	{
 		return ReturnType{};
 	}
@@ -864,7 +864,7 @@ struct ArgSelector<ScriptFunc>
 
 
 template<>
-struct ArgSelector<const Uint8*>
+struct ArgSelector<const uint8_t*>
 {
 	using type = Arg<ArgRawDef<64>, ArgRawDef<32>, ArgRawDef<16>, ArgRawDef<8>, ArgRawDef<4>, ArgRawDef<0>>;
 };
@@ -943,7 +943,7 @@ struct FuncVer<Func, Ver, ListTag<Pos...>>
 	#else
 	__forceinline
 	#endif
-	static typename GetTypeAt<CurrPos>::ReturnType get(ScriptWorkerBase& sw, const Uint8* procArgs, ProgPos& curr)
+	static typename GetTypeAt<CurrPos>::ReturnType get(ScriptWorkerBase& sw, const uint8_t* procArgs, ProgPos& curr)
 	{
 		constexpr int offs = Args::offset(Ver, CurrPos);
 		return GetTypeAt<CurrPos>::get(sw, procArgs + offs, curr);
@@ -954,7 +954,7 @@ struct FuncVer<Func, Ver, ListTag<Pos...>>
 	#else
 	__forceinline
 	#endif
-	static RetEnum func(ScriptWorkerBase& sw, const Uint8* procArgs, ProgPos& curr)
+	static RetEnum func(ScriptWorkerBase& sw, const uint8_t* procArgs, ProgPos& curr)
 	{
 		return Func::func(get<Pos>(sw, procArgs, curr)...);
 	}
@@ -1042,25 +1042,25 @@ struct BindMemberOverrideUnsuportedTypeImpl<bool>
 };
 
 template<>
-struct BindMemberOverrideUnsuportedTypeImpl<Uint8>
+struct BindMemberOverrideUnsuportedTypeImpl<uint8_t>
 {
 	using Type = int;
 };
 
 template<>
-struct BindMemberOverrideUnsuportedTypeImpl<Sint8>
+struct BindMemberOverrideUnsuportedTypeImpl<int8_t>
 {
 	using Type = int;
 };
 
 template<>
-struct BindMemberOverrideUnsuportedTypeImpl<Uint16>
+struct BindMemberOverrideUnsuportedTypeImpl<uint16_t>
 {
 	using Type = int;
 };
 
 template<>
-struct BindMemberOverrideUnsuportedTypeImpl<Sint16>
+struct BindMemberOverrideUnsuportedTypeImpl<int16_t>
 {
 	using Type = int;
 };

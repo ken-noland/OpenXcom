@@ -11,7 +11,7 @@
 #ifndef __NO_OPENGL
 
 #include "OpenGL.h"
-#include <SDL.h>
+
 #include <yaml-cpp/yaml.h>
 
 #include "Logger.h"
@@ -101,10 +101,10 @@ PFNGLUNIFORM4FVPROC glUniform4fv = 0;
 #endif
 
 void * (APIENTRYP glXGetCurrentDisplay)() = 0;
-Uint32 (APIENTRYP glXGetCurrentDrawable)() = 0;
-void (APIENTRYP glXSwapIntervalEXT)(void *display, Uint32 GLXDrawable, int interval);
+uint32_t (APIENTRYP glXGetCurrentDrawable)() = 0;
+void (APIENTRYP glXSwapIntervalEXT)(void *display, uint32_t GLXDrawable, int interval);
 
-Uint32 (APIENTRYP wglSwapIntervalEXT)(int interval);
+uint32_t (APIENTRYP wglSwapIntervalEXT)(int interval);
 
 
 
@@ -425,10 +425,10 @@ void OpenGL::init(int w, int h)
 	shader_support = true;
 #endif
 	glXGetCurrentDisplay = (void* (APIENTRYP)())glGetProcAddress("glXGetCurrentDisplay");
-	glXGetCurrentDrawable = (Uint32 (APIENTRYP)())glGetProcAddress("glXGetCurrentDrawable");
-	glXSwapIntervalEXT = (void (APIENTRYP)(void*, Uint32, int))glGetProcAddress("glXSwapIntervalEXT");
+	glXGetCurrentDrawable = (uint32_t (APIENTRYP)())glGetProcAddress("glXGetCurrentDrawable");
+	glXSwapIntervalEXT = (void (APIENTRYP)(void*, uint32_t, int))glGetProcAddress("glXSwapIntervalEXT");
 
-	wglSwapIntervalEXT = (Uint32 (APIENTRYP)(int))glGetProcAddress("wglSwapIntervalEXT");
+	wglSwapIntervalEXT = (uint32_t (APIENTRYP)(int))glGetProcAddress("wglSwapIntervalEXT");
 
 	if (shader_support)
 	{
@@ -454,7 +454,7 @@ void OpenGL::setVSync(bool sync)
 	{
 		void *dpy = glXGetCurrentDisplay();
 		glErrorCheck();
-		Uint32 drawable = glXGetCurrentDrawable();
+		uint32_t drawable = glXGetCurrentDrawable();
 		glErrorCheck();
 
 		if (drawable) {

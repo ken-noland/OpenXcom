@@ -40,6 +40,9 @@ enum SeverityLevel
 	LOG_UNCENSORED  /**< Makes sure everything makes it into log buffer until there's a logfile set up */
 };
 
+/// Log something.
+void log(int, const std::ostringstream& msg);
+
 /**
  * A basic logging and debugging class, prints output to stdout/files.
  * @note Wasn't really satisfied with any of the libraries around
@@ -49,15 +52,15 @@ class Logger
 {
 public:
 	Logger() : _level(LOG_INFO) { };
-	virtual ~Logger() { CrossPlatform::log(_level, os); };
+	virtual ~Logger() { log(_level, os); };
 	std::ostringstream& get(SeverityLevel level = LOG_INFO) { _level = level; return os; };
 
 	static SeverityLevel& reportingLevel() {
 		static SeverityLevel reportingLevel = LOG_UNCENSORED;
 		return reportingLevel;
 	};
-	static const std::string& toString(int level) {
-		static const std::string buffer[] = { "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB", "ALL" };
+	static const char* toString(int level) {
+		static const char* buffer[] = { "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB", "ALL" };
 		return buffer[level];
 	};
 private:
@@ -66,6 +69,11 @@ private:
 	std::ostringstream os;
 };
 
-#define Log(level) if (level > Logger::reportingLevel()) { } else Logger().get(level)
+#define Log(level)                                  \
+	if (level > OpenXcom::Logger::reportingLevel()) \
+	{                                               \
+	}                                               \
+	else                                            \
+		OpenXcom::Logger().get(level)
 
 }

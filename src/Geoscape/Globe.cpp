@@ -60,12 +60,12 @@ namespace OpenXcom
 const double Globe::ROTATE_LONGITUDE = 0.10;
 const double Globe::ROTATE_LATITUDE = 0.06;
 
-Uint8 Globe::OCEAN_COLOR;
+uint8_t Globe::OCEAN_COLOR;
 bool Globe::OCEAN_SHADING;
-Uint8 Globe::COUNTRY_LABEL_COLOR;
-Uint8 Globe::LINE_COLOR;
-Uint8 Globe::CITY_LABEL_COLOR;
-Uint8 Globe::BASE_LABEL_COLOR;
+uint8_t Globe::COUNTRY_LABEL_COLOR;
+uint8_t Globe::LINE_COLOR;
+uint8_t Globe::CITY_LABEL_COLOR;
+uint8_t Globe::BASE_LABEL_COLOR;
 
 namespace
 {
@@ -81,12 +81,12 @@ struct GlobeStaticData
 	static const int shade_gradient_max = 256;
 	static const int shade_step_max = 1 << random_value_noise_bits;
 	///array of shading gradient
-	Sint16 shade_gradient[shade_gradient_max];
-	Sint16 shade_step[shade_gradient_max];
-	Sint16 shade_seq[shade_gradient_max];
-	Sint16 shade_diff[shade_gradient_max];
+	int16_t shade_gradient[shade_gradient_max];
+	int16_t shade_step[shade_gradient_max];
+	int16_t shade_seq[shade_gradient_max];
+	int16_t shade_diff[shade_gradient_max];
 	///size of x & y of noise surface
-	Sint16 random_noise[random_surf_size*random_surf_size];
+	int16_t random_noise[random_surf_size*random_surf_size];
 
 	/**
 	 * Function returning normal vector of sphere surface
@@ -121,7 +121,7 @@ struct GlobeStaticData
 		}
 	}
 
-	static inline Sint16 shadeCurve(int i)
+	static inline int16_t shadeCurve(int i)
 	{
 		const int shadeOffset = 15;
 		const int j = i - shade_gradient_max / 2;
@@ -169,17 +169,17 @@ struct GlobeStaticData
 		return ((1<< i) - 1);
 	}
 
-	int getMultiplierNoise(Sint16 n)
+	int getMultiplierNoise(int16_t n)
 	{
 		return ((n >> (random_value_noise_bits + random_distance_noise_bits)) & bitMask(random_multiplier_noise_bits));
 	}
 
-	int getDistanceNoise(Sint16 n)
+	int getDistanceNoise(int16_t n)
 	{
 		return ((n >> random_value_noise_bits) & bitMask(random_distance_noise_bits)) - random_distance_noise_bits / 2;
 	}
 
-	int getValueNoise(Sint16 n)
+	int getValueNoise(int16_t n)
 	{
 		return n &  bitMask(random_value_noise_bits);
 	}
@@ -225,7 +225,7 @@ GlobeStaticData static_data;
 
 struct Ocean
 {
-	static inline void func(Uint8& dest, const int&, const int&, const int&, const int&)
+	static inline void func(uint8_t& dest, const int&, const int&, const int&, const int&)
 	{
 		dest = Globe::OCEAN_COLOR;
 	}
@@ -233,7 +233,7 @@ struct Ocean
 
 struct CreateShadow
 {
-	static inline Uint8 getShadowValue(const Cord& earth, const Cord& sun, const Sint16& noise)
+	static inline uint8_t getShadowValue(const Cord& earth, const Cord& sun, const int16_t& noise)
 	{
 		Cord temp = earth;
 		//diff
@@ -265,12 +265,12 @@ struct CreateShadow
 		return Clamp(i, 0, 31);
 	}
 
-	static inline Uint8 getOceanShadow(const Uint8& shadow)
+	static inline uint8_t getOceanShadow(const uint8_t& shadow)
 	{
 		return Globe::OCEAN_COLOR + shadow;
 	}
 
-	static inline Uint8 getLandShadow(const Uint8& dest, const Uint8& shadow)
+	static inline uint8_t getLandShadow(const uint8_t& dest, const uint8_t& shadow)
 	{
 		if (shadow == 0) return dest;
 		const int s = shadow / 3;
@@ -281,16 +281,16 @@ struct CreateShadow
 		return e;
 	}
 
-	static inline bool isOcean(const Uint8& dest)
+	static inline bool isOcean(const uint8_t& dest)
 	{
 		return Globe::OCEAN_SHADING && dest >= Globe::OCEAN_COLOR && dest < Globe::OCEAN_COLOR + 32;
 	}
 
-	static inline void func(Uint8& dest, const Cord& earth, const Cord& sun, const Sint16& noise)
+	static inline void func(uint8_t& dest, const Cord& earth, const Cord& sun, const int16_t& noise)
 	{
 		if (dest && earth.z)
 		{
-			const Uint8 shadow = getShadowValue(earth, sun, noise);
+			const uint8_t shadow = getShadowValue(earth, sun, noise);
 			//this pixel is ocean
 			if (isOcean(dest))
 			{
@@ -311,7 +311,7 @@ struct CreateShadow
 
 struct CreateShadowWithoutCache
 {
-	static inline void func(Uint8& dest, const helper::Offset& offset, const Cord& sun, const Sint16& noise, const double& radius)
+	static inline void func(uint8_t& dest, const helper::Offset& offset, const Cord& sun, const int16_t& noise, const double& radius)
 	{
 		Cord earth = static_data.circle_norm(0., 0., radius, offset.x, offset.y);
 		CreateShadow::func(dest, earth, sun, noise);
@@ -388,11 +388,11 @@ Globe::~Globe()
  * @param x Pointer to the output X position.
  * @param y Pointer to the output Y position.
  */
-void Globe::polarToCart(double lon, double lat, Sint16 *x, Sint16 *y) const
+void Globe::polarToCart(double lon, double lat, int16_t *x, int16_t *y) const
 {
 	// Orthographic projection
-	*x = _cenX + (Sint16)floor(_radius * cos(lat) * sin(lon - _cenPosition.longitude));
-	*y = _cenY + (Sint16)floor(_radius * (cos(_cenPosition.latitude) * sin(lat) - sin(_cenPosition.latitude) * cos(lat) * cos(lon - _cenPosition.longitude)));
+	*x = _cenX + (int16_t)floor(_radius * cos(lat) * sin(lon - _cenPosition.longitude));
+	*y = _cenY + (int16_t)floor(_radius * (cos(_cenPosition.latitude) * sin(lat) - sin(_cenPosition.latitude) * cos(lat) * cos(lon - _cenPosition.longitude)));
 }
 
 void Globe::polarToCart(double lon, double lat, double *x, double *y) const
@@ -411,7 +411,7 @@ void Globe::polarToCart(double lon, double lat, double *x, double *y) const
  * @param lon Pointer to the output longitude.
  * @param lat Pointer to the output latitude.
  */
-void Globe::cartToPolar(Sint16 x, Sint16 y, double *lon, double *lat) const
+void Globe::cartToPolar(int16_t x, int16_t y, double *lon, double *lat) const
 {
 	// Orthographic projection
 	x -= _cenX;
@@ -767,7 +767,7 @@ void Globe::toggleDetail()
  */
 bool Globe::targetNear(const Target* target, int x, int y) const
 {
-	Sint16 tx, ty;
+	int16_t tx, ty;
 	if (pointBack(target->getLongitude(), target->getLatitude()))
 		return false;
 	polarToCart(target->getLongitude(), target->getLatitude(), &tx, &ty);
@@ -891,7 +891,7 @@ void Globe::cache(std::list<Polygon*> *polygons, std::list<Polygon*> *cache)
 		// Convert coordinates
 		for (int j = 0; j < p->getPoints(); ++j)
 		{
-			Sint16 x, y;
+			int16_t x, y;
 			polarToCart(p->getLongitude(j), p->getLatitude(j), &x, &y);
 			p->setX(j, x);
 			p->setY(j, y);
@@ -977,7 +977,7 @@ void Globe::draw()
 void Globe::drawOcean()
 {
 	lock();
-	drawCircle(_cenX+1, _cenY, (Sint16)(_radius+20), OCEAN_COLOR);
+	drawCircle(_cenX+1, _cenY, (int16_t)(_radius+20), OCEAN_COLOR);
 //	ShaderDraw<Ocean>(ShaderSurface(this));
 	unlock();
 }
@@ -991,7 +991,7 @@ void Globe::drawOcean()
  */
 void Globe::drawLand()
 {
-	Sint16 x[4], y[4];
+	int16_t x[4], y[4];
 
 	for (auto* polygon : _cacheLand)
 	{
@@ -1068,7 +1068,7 @@ void Globe::drawShadow()
 	if (Options::globeSurfaceCache)
 	{
 		ShaderMove<Cord> earth = ShaderMove<Cord>(SurfaceRaw<Cord>(_earthData[_zoom], getWidth(), getHeight()));
-		ShaderRepeat<Sint16> noise = ShaderRepeat<Sint16>(SurfaceRaw<Sint16>(static_data.random_noise, static_data.random_surf_size, static_data.random_surf_size));
+		ShaderRepeat<int16_t> noise = ShaderRepeat<int16_t>(SurfaceRaw<int16_t>(static_data.random_noise, static_data.random_surf_size, static_data.random_surf_size));
 
 		earth.setMove(_cenX-getWidth()/2, _cenY-getHeight()/2);
 
@@ -1078,7 +1078,7 @@ void Globe::drawShadow()
 	}
 	else
 	{
-		ShaderRepeat<Sint16> noise = ShaderRepeat<Sint16>(SurfaceRaw<Sint16>(static_data.random_noise, static_data.random_surf_size, static_data.random_surf_size));
+		ShaderRepeat<int16_t> noise = ShaderRepeat<int16_t>(SurfaceRaw<int16_t>(static_data.random_noise, static_data.random_surf_size, static_data.random_surf_size));
 
 		lock();
 		ShaderDraw<CreateShadowWithoutCache>(ShaderSurface(this), helper::Offset(_cenX, _cenY), ShaderScalar(getSunDirection(_cenPosition.longitude, _cenPosition.latitude)), noise, ShaderScalar(_zoomRadius[_zoom]));
@@ -1094,7 +1094,7 @@ void Globe::XuLine(Surface* surface, Surface* src, double x1, double y1, double 
 
 	double deltax = x2-x1, deltay = y2-y1;
 	bool inv;
-	Sint16 tcol;
+	int16_t tcol;
 	double len,x0,y0,SX,SY;
 	if (abs((int)y2-(int)y1) > abs((int)x2-(int)x1))
 	{
@@ -1138,15 +1138,15 @@ void Globe::XuLine(Surface* surface, Surface* src, double x1, double y1, double 
 		tcol=src->getPixel((int)x0,(int)y0);
 		if (tcol)
 		{
-			if (CreateShadow::isOcean((Uint8)tcol))
+			if (CreateShadow::isOcean((uint8_t)tcol))
 			{
-				tcol = CreateShadow::getOceanShadow((Uint8)(shade + 8));
+				tcol = CreateShadow::getOceanShadow((uint8_t)(shade + 8));
 			}
 			else
 			{
-				tcol = CreateShadow::getLandShadow((Uint8)tcol, (Uint8)(shade * 3));
+				tcol = CreateShadow::getLandShadow((uint8_t)tcol, (uint8_t)(shade * 3));
 			}
-			surface->setPixel((int)x0,(int)y0,(Uint8)tcol);
+			surface->setPixel((int)x0,(int)y0,(uint8_t)tcol);
 		}
 		x0+=SX;
 		y0+=SY;
@@ -1304,13 +1304,13 @@ void Globe::setNewBaseHoverPos(double lon, double lat)
 	_hoverLat=lat;
 }
 
-void Globe::drawVHLine(Surface *surface, double lon1, double lat1, double lon2, double lat2, Uint8 color)
+void Globe::drawVHLine(Surface *surface, double lon1, double lat1, double lon2, double lat2, uint8_t color)
 {
 	double sx = lon2 - lon1;
 	double sy = lat2 - lat1;
 	double ln1, lt1, ln2, lt2;
 	int seg;
-	Sint16 x1, y1, x2, y2;
+	int16_t x1, y1, x2, y2;
 
 	if (sx<0) sx += 2*M_PI;
 
@@ -1364,7 +1364,7 @@ void Globe::drawDetail()
 
 		for (auto* polyline : *_rules->getPolylines())
 		{
-			Sint16 x[2], y[2];
+			int16_t x[2], y[2];
 			for (int j = 0; j < polyline->getPoints() - 1; ++j)
 			{
 				// Don't draw if polyline is facing back
@@ -1391,7 +1391,7 @@ void Globe::drawDetail()
 		label->initText(_game->getMod()->getFont("FONT_BIG"), _game->getMod()->getFont("FONT_SMALL"), _game->getLanguage());
 		label->setAlign(TextHAlign::ALIGN_CENTER);
 
-		Sint16 x, y;
+		int16_t x, y;
 		for (const Country& country : getRegistry().list<const Country>())
 		{
 			// Don't draw if label is facing back
@@ -1422,7 +1422,7 @@ void Globe::drawDetail()
 		label->initText(_game->getMod()->getFont("FONT_BIG"), _game->getMod()->getFont("FONT_SMALL"), _game->getLanguage());
 		label->setAlign(TextHAlign::ALIGN_CENTER);
 
-		Sint16 x, y;
+		int16_t x, y;
 		for (auto& extraLabelType : _game->getMod()->getExtraGlobeLabelsList())
 		{
 			RuleCountry *rule = _game->getMod()->getExtraGlobeLabel(extraLabelType, true);
@@ -1458,7 +1458,7 @@ void Globe::drawDetail()
 		label->setAlign(TextHAlign::ALIGN_CENTER);
 		label->setColor(CITY_LABEL_COLOR);
 
-		Sint16 x, y;
+		int16_t x, y;
 		for (const Region& region : getRegistry().list<const Region>())
 		{
 			for (City* city : region.getRules()->getCities())
@@ -1595,7 +1595,7 @@ void Globe::drawDetail()
 void Globe::drawPath(Surface *surface, double lon1, double lat1, double lon2, double lat2)
 {
 	double length;
-	Sint16 count;
+	int16_t count;
 	double x1, y1, x2, y2;
 	CordPolar p1, p2;
 	Cord a(CordPolar(lon1, lat1));
@@ -1609,7 +1609,7 @@ void Globe::drawPath(Surface *surface, double lon1, double lat1, double lon2, do
 	//longer path have more parts
 	length = b.norm();
 	length *= length*15;
-	count = (Sint16)(length + 1);
+	count = (int16_t)(length + 1);
 	b /= count;
 	p1 = CordPolar(a);
 	polarToCart(p1.lon, p1.lat, &x1, &y1);
@@ -1698,17 +1698,17 @@ void Globe::drawTarget(const Target *target, Surface *surface)
 {
 	if (target->getMarker() != -1 && !pointBack(target->getLongitude(), target->getLatitude()))
 	{
-		Sint16 x, y;
+		int16_t x, y;
 		polarToCart(target->getLongitude(), target->getLatitude(), &x, &y);
 		auto i = target->getMarker();
 		auto marker = _markerSet->getFrame(i);
-		ShaderMove<const Uint8> surf{ marker, x - marker->getWidth() / 2, y - marker->getHeight() / 2 };
-		ShaderMove<Uint8> dest{ surface };
+		ShaderMove<const uint8_t> surf{ marker, x - marker->getWidth() / 2, y - marker->getHeight() / 2 };
+		ShaderMove<uint8_t> dest{ surface };
 
 		if (i == CITY_MARKER || _blink > 0)
 		{
 			ShaderDrawFunc(
-				[](Uint8& destStuff, Uint8 srcStuff)
+				[](uint8_t& destStuff, uint8_t srcStuff)
 				{
 					if (srcStuff)
 					{
@@ -1722,7 +1722,7 @@ void Globe::drawTarget(const Target *target, Surface *surface)
 		else
 		{
 			ShaderDrawFunc(
-				[](Uint8& destStuff, Uint8 srcStuff)
+				[](uint8_t& destStuff, uint8_t srcStuff)
 				{
 					if (srcStuff)
 					{
@@ -1805,7 +1805,7 @@ void Globe::blit(SDL_Surface *surface)
 void Globe::mouseOver(Action *action, State *state)
 {
 	double lon, lat;
-	cartToPolar((Sint16)floor(action->getAbsoluteXMouse()), (Sint16)floor(action->getAbsoluteYMouse()), &lon, &lat);
+	cartToPolar((int16_t)floor(action->getAbsoluteXMouse()), (int16_t)floor(action->getAbsoluteYMouse()), &lon, &lat);
 
 	if (_isMouseScrolling && action->getDetails()->type == SDL_MOUSEMOTION)
 	{
@@ -1889,7 +1889,7 @@ void Globe::mouseOver(Action *action, State *state)
 void Globe::mousePress(Action *action, State *state)
 {
 	double lon, lat;
-	cartToPolar((Sint16)floor(action->getAbsoluteXMouse()), (Sint16)floor(action->getAbsoluteYMouse()), &lon, &lat);
+	cartToPolar((int16_t)floor(action->getAbsoluteXMouse()), (int16_t)floor(action->getAbsoluteYMouse()), &lon, &lat);
 
 	if (action->getDetails()->button.button == Options::geoDragScrollButton)
 	{
@@ -1917,7 +1917,7 @@ void Globe::mousePress(Action *action, State *state)
 void Globe::mouseRelease(Action *action, State *state)
 {
 	double lon, lat;
-	cartToPolar((Sint16)floor(action->getAbsoluteXMouse()), (Sint16)floor(action->getAbsoluteYMouse()), &lon, &lat);
+	cartToPolar((int16_t)floor(action->getAbsoluteXMouse()), (int16_t)floor(action->getAbsoluteYMouse()), &lon, &lat);
 	if (action->getDetails()->button.button == Options::geoDragScrollButton)
 	{
 		stopScrolling(action);
@@ -1947,7 +1947,7 @@ void Globe::mouseClick(Action *action, State *state)
 	}
 
 	double lon, lat;
-	cartToPolar((Sint16)floor(action->getAbsoluteXMouse()), (Sint16)floor(action->getAbsoluteYMouse()), &lon, &lat);
+	cartToPolar((int16_t)floor(action->getAbsoluteXMouse()), (int16_t)floor(action->getAbsoluteYMouse()), &lon, &lat);
 
 	// The following is the workaround for a rare problem where sometimes
 	// the mouse-release event is missed for any reason.

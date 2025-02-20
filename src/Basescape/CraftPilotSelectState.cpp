@@ -74,7 +74,8 @@ CraftPilotSelectState::CraftPilotSelectState(Base *base, size_t craft)
 
 	_btnCancel->setText(tr("STR_CANCEL_UC"));
 	_btnCancel->onMouseClick((ActionHandler)&CraftPilotSelectState::btnCancelClick);
-	_btnCancel->onKeyboardPress((ActionHandler)&CraftPilotSelectState::btnCancelClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnCancel->onKeyboardPress((ActionHandler)&CraftPilotSelectState::btnCancelClick, Options::keyCancel);
 
 	Craft *c = _base->getCrafts().at(_craft);
 

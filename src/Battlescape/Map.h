@@ -113,7 +113,7 @@ private:
 	int getWallShade(TilePart part, Tile* tileFrot);
 	int _iconHeight, _iconWidth, _messageColor;
 	int _hostileBarColor, _neutralBarColor, _borderBarColor;
-	const std::vector<Uint8> *_transparencies;
+	const std::vector<uint8_t> *_transparencies;
 	bool _showObstacles;
 public:
 	/// Creates a new map at the specified position and size.
@@ -181,7 +181,7 @@ public:
 	/// Get waypoints vector.
 	std::vector<Position> *getWaypoints();
 	/// Set mouse-buttons' pressed state.
-	void setButtonsPressed(Uint8 button, bool pressed);
+	void setButtonsPressed(uint8_t button, bool pressed);
 	/// Sets the unitDying flag.
 	void setUnitDying(bool flag);
 	/// Refreshes the battlescape selector after scrolling.

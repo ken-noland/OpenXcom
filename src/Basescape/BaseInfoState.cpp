@@ -84,31 +84,33 @@ BaseInfoState::BaseInfoState(BasescapeSystem& basescapeSystem)
 	_txtWorkshops = new Text(114, 9, 8, 113);
 	_numWorkshops = new Text(40, 9, 126, 113);
 	_barWorkshops = new Bar(150, 5, 166, 115);
-	if (Options::storageLimitsEnforced)
-	{
-		_txtContainment = new Text(114, 9, 8, 123);
-		_numContainment = new Text(40, 9, 126, 123);
-		_barContainment = new Bar(150, 5, 166, 125);
-	}
-	else
+// OPTIONSHACK
+	//if (Options::storageLimitsEnforced)
+	//{
+	//	_txtContainment = new Text(114, 9, 8, 123);
+	//	_numContainment = new Text(40, 9, 126, 123);
+	//	_barContainment = new Bar(150, 5, 166, 125);
+	//}
+	//else
 	{
 		_txtContainment = nullptr;
 		_numContainment = nullptr;
 		_barContainment = nullptr;
 	}
-	_txtHangars = new Text(114, 9, 8, Options::storageLimitsEnforced ? 133 : 123);
-	_numHangars = new Text(40, 9, 126, Options::storageLimitsEnforced ? 133 : 123);
-	_barHangars = new Bar(150, 5, 166, Options::storageLimitsEnforced ? 135 : 125);
+// OPTIONSHACK
+	//_txtHangars = new Text(114, 9, 8, Options::storageLimitsEnforced ? 133 : 123);
+	//_numHangars = new Text(40, 9, 126, Options::storageLimitsEnforced ? 133 : 123);
+	//_barHangars = new Bar(150, 5, 166, Options::storageLimitsEnforced ? 135 : 125);
 
-	_txtDefense = new Text(114, 9, 8, Options::storageLimitsEnforced ? 147 : 138);
-	_numDefense = new Text(36, 9, 126, Options::storageLimitsEnforced ? 147 : 138);
-	_barDefense = new Bar(150, 5, 166, Options::storageLimitsEnforced ? 149 : 140);
-	_txtShortRange = new Text(114, 9, 8, Options::storageLimitsEnforced ? 157 : 153);
-	_numShortRange = new Text(36, 9, 126, Options::storageLimitsEnforced ? 157 : 153);
-	_barShortRange = new Bar(150, 5, 166, Options::storageLimitsEnforced ? 159 : 155);
-	_txtLongRange = new Text(114, 9, 8, Options::storageLimitsEnforced ? 167 : 163);
-	_numLongRange = new Text(36, 9, 126, Options::storageLimitsEnforced ? 167 : 163);
-	_barLongRange = new Bar(150, 5, 166, Options::storageLimitsEnforced ? 169 : 165);
+	//_txtDefense = new Text(114, 9, 8, Options::storageLimitsEnforced ? 147 : 138);
+	//_numDefense = new Text(36, 9, 126, Options::storageLimitsEnforced ? 147 : 138);
+	//_barDefense = new Bar(150, 5, 166, Options::storageLimitsEnforced ? 149 : 140);
+	//_txtShortRange = new Text(114, 9, 8, Options::storageLimitsEnforced ? 157 : 153);
+	//_numShortRange = new Text(36, 9, 126, Options::storageLimitsEnforced ? 157 : 153);
+	//_barShortRange = new Bar(150, 5, 166, Options::storageLimitsEnforced ? 159 : 155);
+	//_txtLongRange = new Text(114, 9, 8, Options::storageLimitsEnforced ? 167 : 163);
+	//_numLongRange = new Text(36, 9, 126, Options::storageLimitsEnforced ? 167 : 163);
+	//_barLongRange = new Bar(150, 5, 166, Options::storageLimitsEnforced ? 169 : 165);
 
 	// Set palette
 	setInterface("baseInfo");
@@ -145,12 +147,13 @@ BaseInfoState::BaseInfoState(BasescapeSystem& basescapeSystem)
 	add(_txtWorkshops, "text2", "baseInfo");
 	add(_numWorkshops, "numbers", "baseInfo");
 	add(_barWorkshops, "facilityBars", "baseInfo");
-	if (Options::storageLimitsEnforced)
-	{
-		add(_txtContainment, "text2", "baseInfo");
-		add(_numContainment, "numbers", "baseInfo");
-		add(_barContainment, "facilityBars", "baseInfo");
-	}
+// OPTIONSHACK
+	//if (Options::storageLimitsEnforced)
+	//{
+	//	add(_txtContainment, "text2", "baseInfo");
+	//	add(_numContainment, "numbers", "baseInfo");
+	//	add(_barContainment, "facilityBars", "baseInfo");
+	//}
 	add(_txtHangars, "text2", "baseInfo");
 	add(_numHangars, "numbers", "baseInfo");
 	add(_barHangars, "facilityBars", "baseInfo");
@@ -169,10 +172,11 @@ BaseInfoState::BaseInfoState(BasescapeSystem& basescapeSystem)
 
 	// Set up objects
 	std::ostringstream ss;
-	if (Options::storageLimitsEnforced)
-	{
-		ss << "ALT";
-	}
+// OPTIONSHACK
+	//if (Options::storageLimitsEnforced)
+	//{
+	//	ss << "ALT";
+	//}
 	ss << "BACK07.SCR";
 	getGame()->getMod()->getSurface(ss.str())->blitNShade(_bg, 0, 0);
 
@@ -180,7 +184,8 @@ BaseInfoState::BaseInfoState(BasescapeSystem& basescapeSystem)
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&BaseInfoState::btnOkClick);
-	_btnOk->onKeyboardPress((ActionHandler)&BaseInfoState::btnOkClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnOk->onKeyboardPress((ActionHandler)&BaseInfoState::btnOkClick, Options::keyCancel);
 
 	_btnTransfers->setText(tr("STR_TRANSFERS_UC"));
 	_btnTransfers->onMouseClick((ActionHandler)&BaseInfoState::btnTransfersClick);
@@ -227,12 +232,13 @@ BaseInfoState::BaseInfoState(BasescapeSystem& basescapeSystem)
 
 	_barWorkshops->setScale(0.5);
 
-	if (Options::storageLimitsEnforced)
-	{
-		_txtContainment->setText(tr("STR_ALIEN_CONTAINMENT"));
+// OPTIONSHACK
+	//if (Options::storageLimitsEnforced)
+	//{
+	//	_txtContainment->setText(tr("STR_ALIEN_CONTAINMENT"));
 
-		_barContainment->setScale(0.5);
-	}
+	//	_barContainment->setScale(0.5);
+	//}
 
 	_txtHangars->setText(tr("STR_HANGARS"));
 
@@ -261,12 +267,13 @@ static void setBarState(Text& barText, Bar& bar, int count, int max, double maxB
 {
 	barText.setText(std::format("{}:{}", count, max));
 
-	if (!Options::oxceBaseInfoScaleEnabled || count * bar.getScale() < maxBarWidth)
-	{
-		bar.setMax(max);
-		bar.setValue(count);
-	}
-	else
+// OPTIONSHACK
+	//if (!Options::oxceBaseInfoScaleEnabled || count * bar.getScale() < maxBarWidth)
+	//{
+	//	bar.setMax(max);
+	//	bar.setValue(count);
+	//}
+	//else
 	{
 		bar.setMax(maxBarWidth);
 		bar.setValue(count * maxBarWidth / max);
@@ -291,15 +298,16 @@ void BaseInfoState::init()
 	setBarState(*_numLaboratories, *_barLaboratories, base.getUsedLaboratories(), base.getAvailableLaboratories(), MAX_BAR_WIDTH);
 	setBarState(*_numWorkshops, *_barWorkshops, base.getUsedWorkshops(), base.getAvailableWorkshops(), MAX_BAR_WIDTH);
 
-	if (Options::storageLimitsEnforced)
-	{
-		std::ostringstream ss72;
-		ss72 << base.getUsedContainment(0) << ":" << base.getAvailableContainment(0);
-		_numContainment->setText(ss72.str());
+// OPTIONSHACK
+	//if (Options::storageLimitsEnforced)
+	//{
+	//	std::ostringstream ss72;
+	//	ss72 << base.getUsedContainment(0) << ":" << base.getAvailableContainment(0);
+	//	_numContainment->setText(ss72.str());
 
-		_barContainment->setMax(base.getAvailableContainment(0));
-		_barContainment->setValue(base.getUsedContainment(0));
-	}
+	//	_barContainment->setMax(base.getAvailableContainment(0));
+	//	_barContainment->setValue(base.getUsedContainment(0));
+	//}
 
 	std::ostringstream ss8;
 	ss8 << base.getUsedHangars() << ":" << base.getAvailableHangars();
@@ -319,29 +327,30 @@ void BaseInfoState::init()
 		_barHangars->setScale(1.0);
 	}
 
-	if (Options::baseDefenseProbability)
-	{
-		// display base defense percentage
-		int defenseProbabilityPercentage = base.getDefenseProbabilityPercentage();
-		_barDefense->setMax(base.getDefenseValue());
-		_barDefense->setValue(base.getDefenseValue());
-		if (Options::oxceBaseInfoDefenseScaleMultiplier != 100)
-		{
-			_barDefense->setScale(0.125 * Options::oxceBaseInfoDefenseScaleMultiplier / 100.0);
-		}
+// OPTIONSHACK
+	//if (Options::baseDefenseProbability)
+	//{
+	//	// display base defense percentage
+	//	int defenseProbabilityPercentage = base.getDefenseProbabilityPercentage();
+	//	_barDefense->setMax(base.getDefenseValue());
+	//	_barDefense->setValue(base.getDefenseValue());
+	//	if (Options::oxceBaseInfoDefenseScaleMultiplier != 100)
+	//	{
+	//		_barDefense->setScale(0.125 * Options::oxceBaseInfoDefenseScaleMultiplier / 100.0);
+	//	}
 
-		std::ostringstream ss9;
-		ss9 << defenseProbabilityPercentage;
-		ss9 << " %";
-		_numDefense->setText(ss9.str());
-		_numDefense->setAlign(TextHAlign::ALIGN_RIGHT);
+	//	std::ostringstream ss9;
+	//	ss9 << defenseProbabilityPercentage;
+	//	ss9 << " %";
+	//	_numDefense->setText(ss9.str());
+	//	_numDefense->setAlign(TextHAlign::ALIGN_RIGHT);
 
-		_barDefense->setScale(1.0);
-		_barDefense->setMax(100);
-		_barDefense->setValue(defenseProbabilityPercentage);
+	//	_barDefense->setScale(1.0);
+	//	_barDefense->setMax(100);
+	//	_barDefense->setValue(defenseProbabilityPercentage);
 
-	}
-	else
+	//}
+	//else
 	{
 		// display base defense strength (vanilla)
 
@@ -354,34 +363,35 @@ void BaseInfoState::init()
 
 	}
 
-	if (Options::baseDetectionProbability)
-	{
-		// display base detection probability percentage
+// OPTIONSHACK
+	//if (Options::baseDetectionProbability)
+	//{
+	//	// display base detection probability percentage
 
-		std::ostringstream ss10;
-		int shortRangeDetectionProbabilityPercentage = base.getShortRangeDetectionProbabilityPercentage();
-		ss10 << shortRangeDetectionProbabilityPercentage;
-		ss10 << " %";
-		_numShortRange->setText(ss10.str());
-		_numShortRange->setAlign(TextHAlign::ALIGN_RIGHT);
+	//	std::ostringstream ss10;
+	//	int shortRangeDetectionProbabilityPercentage = base.getShortRangeDetectionProbabilityPercentage();
+	//	ss10 << shortRangeDetectionProbabilityPercentage;
+	//	ss10 << " %";
+	//	_numShortRange->setText(ss10.str());
+	//	_numShortRange->setAlign(TextHAlign::ALIGN_RIGHT);
 
-		_barShortRange->setScale(1.0);
-		_barShortRange->setMax(100);
-		_barShortRange->setValue(shortRangeDetectionProbabilityPercentage);
+	//	_barShortRange->setScale(1.0);
+	//	_barShortRange->setMax(100);
+	//	_barShortRange->setValue(shortRangeDetectionProbabilityPercentage);
 
-		std::ostringstream ss11;
-		int longRangeDetectionProbabilityPercentage = base.getLongRangeDetectionProbabilityPercentage();
-		ss11 << longRangeDetectionProbabilityPercentage;
-		ss11 << " %";
-		_numLongRange->setText(ss11.str());
-		_numLongRange->setAlign(TextHAlign::ALIGN_RIGHT);
+	//	std::ostringstream ss11;
+	//	int longRangeDetectionProbabilityPercentage = base.getLongRangeDetectionProbabilityPercentage();
+	//	ss11 << longRangeDetectionProbabilityPercentage;
+	//	ss11 << " %";
+	//	_numLongRange->setText(ss11.str());
+	//	_numLongRange->setAlign(TextHAlign::ALIGN_RIGHT);
 
-		_barLongRange->setScale(1.0);
-		_barLongRange->setMax(100);
-		_barLongRange->setValue(longRangeDetectionProbabilityPercentage);
+	//	_barLongRange->setScale(1.0);
+	//	_barLongRange->setMax(100);
+	//	_barLongRange->setValue(longRangeDetectionProbabilityPercentage);
 
-	}
-	else
+	//}
+	//else
 	{
 		// display base detection count (vanilla)
 

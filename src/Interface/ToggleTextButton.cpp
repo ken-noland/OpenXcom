@@ -60,14 +60,14 @@ void ToggleTextButton::setPressed(bool pressed)
 	_redraw = true;
 }
 
-void ToggleTextButton::setColor(Uint8 color)
+void ToggleTextButton::setColor(uint8_t color)
 {
 	_originalColor = color;
 	TextButton::setColor(color);
 }
 
 /// When this is set, Surface::invert() is called with the value from mid when it's time to invert the button
-void ToggleTextButton::setInvertColor(Uint8 color)
+void ToggleTextButton::setInvertColor(uint8_t color)
 {
 	_invertedColor = color;
 	_fakeGroup = 0;

@@ -67,12 +67,12 @@ inline int GetPitch(int bpp, int width)
 inline void RawCopySurf(const Surface::UniqueSurfacePtr& dest, const Surface::UniqueSurfacePtr& src)
 {
 	ShaderDrawFunc(
-		[](Uint8& destStuff, Uint8& srcStuff)
+		[](uint8_t& destStuff, uint8_t& srcStuff)
 		{
 			destStuff = srcStuff;
 		},
-		ShaderMove<Uint8>(dest.get()),
-		ShaderMove<Uint8>(src.get())
+		ShaderMove<uint8_t>(dest.get()),
+		ShaderMove<uint8_t>(src.get())
 	);
 }
 
@@ -89,14 +89,14 @@ inline void FixTransparent(const Surface::UniqueSurfacePtr& dest, int currentTra
 	if (currentTransColor != 0)
 	{
 		ShaderDrawFunc(
-			[&](Uint8& destStuff)
+			[&](uint8_t& destStuff)
 			{
 				if (destStuff == currentTransColor)
 				{
 					destStuff = 0;
 				}
 			},
-			ShaderMove<Uint8>(dest.get())
+			ShaderMove<uint8_t>(dest.get())
 		);
 	}
 }
@@ -146,7 +146,7 @@ Surface::UniqueBufferPtr Surface::NewAlignedBuffer(int bpp, int width, int heigh
 #endif
 
 	memset(buffer, 0, total);
-	return Surface::UniqueBufferPtr((Uint8*)buffer);
+	return Surface::UniqueBufferPtr((uint8_t*)buffer);
 }
 
 /**
@@ -201,7 +201,7 @@ void Surface::CleanSdlSurface(SDL_Surface* surface)
  * Default deleter for alignment buffer
  * @param buffer
  */
-void Surface::UniqueBufferDeleter::operator ()(Uint8* buffer)
+void Surface::UniqueBufferDeleter::operator ()(uint8_t* buffer)
 {
 	if (buffer)
 	{
@@ -392,7 +392,7 @@ void Surface::loadImage(const std::string &filename)
 					setPalette((SDL_Color*)color->palette, 0, (int)color->palettesize);
 
 					ShaderDrawFunc(
-						[](Uint8& dest, unsigned char& src)
+						[](uint8_t& dest, unsigned char& src)
 						{
 							dest = src;
 						},
@@ -460,7 +460,7 @@ void Surface::loadImage(const std::string &filename)
  */
 void Surface::loadSpk(const std::string& filename)
 {
-	Uint16 flag;
+	uint16_t flag;
 	int x = 0, y = 0;
 	auto rw = FileMap::getRWopsReadAll(filename);
 	auto rwsize = SDL_RWsize(rw);
@@ -490,7 +490,7 @@ void Surface::loadSpk(const std::string& filename)
  */
 void Surface::loadBdy(const std::string &filename)
 {
-	Uint8 dataByte;
+	uint8_t dataByte;
 	int pixelCnt;
 	int x = 0, y = 0;
 	int currentRow = 0;
@@ -558,7 +558,7 @@ void Surface::offset(int off, int min, int max, int mul)
 
 	for (int x = 0, y = 0; x < getWidth() && y < getHeight();)
 	{
-		Uint8 pixel = getPixel(x, y);
+		uint8_t pixel = getPixel(x, y);
 		int p;
 		if (off > 0)
 		{
@@ -608,7 +608,7 @@ void Surface::offsetBlock(int off, int blk, int mul)
 
 	for (int x = 0, y = 0; x < getWidth() && y < getHeight();)
 	{
-		Uint8 pixel = getPixel(x, y);
+		uint8_t pixel = getPixel(x, y);
 		int min = pixel / blk * blk;
 		int max = min + blk;
 		int p;
@@ -648,14 +648,14 @@ void Surface::offsetBlock(int off, int blk, int mul)
  * Used for effects like shifting a button between pressed and unpressed.
  * @param mid Middle point.
  */
-void Surface::invert(Uint8 mid)
+void Surface::invert(uint8_t mid)
 {
 	// Lock the surface
 	lock();
 
 	for (int x = 0, y = 0; x < getWidth() && y < getHeight();)
 	{
-		Uint8 pixel = getPixel(x, y);
+		uint8_t pixel = getPixel(x, y);
 		if (pixel > 0)
 		{
 			setPixelIterative(&x, &y, pixel + 2 * ((int)mid - (int)pixel));
@@ -740,12 +740,12 @@ void Surface::copy(Surface *surface)
 	lock();
 
 	ShaderDrawFunc(
-		[](Uint8& dest, const Uint8& src)
+		[](uint8_t& dest, const uint8_t& src)
 		{
 			dest = src;
 		},
-		ShaderMove<Uint8>(_surface.get(), from_x, from_y),
-		ShaderMove<Uint8>(surface, 0, 0)
+		ShaderMove<uint8_t>(_surface.get(), from_x, from_y),
+		ShaderMove<uint8_t>(surface, 0, 0)
 	);
 
 	unlock();
@@ -756,7 +756,7 @@ void Surface::copy(Surface *surface)
  * @param rect Pointer to Rect.
  * @param color Color of the rectangle.
  */
-void Surface::drawRect(SDL_Rect *rect, Uint8 color)
+void Surface::drawRect(SDL_Rect *rect, uint8_t color)
 {
 	SDL_FillRect(_surface.get(), rect, color);
 }
@@ -769,7 +769,7 @@ void Surface::drawRect(SDL_Rect *rect, Uint8 color)
  * @param h Height in pixels.
  * @param color Color of the rectangle.
  */
-void Surface::drawRect(Sint16 x, Sint16 y, Sint16 w, Sint16 h, Uint8 color)
+void Surface::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t color)
 {
 	SDL_Rect rect;
 	rect.w = w;
@@ -787,7 +787,7 @@ void Surface::drawRect(Sint16 x, Sint16 y, Sint16 w, Sint16 h, Uint8 color)
  * @param y2 End y coordinate in pixels.
  * @param color Color of the line.
  */
-void Surface::drawLine(Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint8 color)
+void Surface::drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color)
 {
 	lineColor(_surface.get(), x1, y1, x2, y2, Palette::getRGBA(getPalette(), color));
 }
@@ -799,7 +799,7 @@ void Surface::drawLine(Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint8 color)
  * @param r Radius in pixels.
  * @param color Color of the circle.
  */
-void Surface::drawCircle(Sint16 x, Sint16 y, Sint16 r, Uint8 color)
+void Surface::drawCircle(int16_t x, int16_t y, int16_t r, uint8_t color)
 {
 	filledCircleColor(_surface.get(), x, y, r, Palette::getRGBA(getPalette(), color));
 }
@@ -811,7 +811,7 @@ void Surface::drawCircle(Sint16 x, Sint16 y, Sint16 r, Uint8 color)
  * @param n Number of points.
  * @param color Color of the polygon.
  */
-void Surface::drawPolygon(Sint16 *x, Sint16 *y, int n, Uint8 color)
+void Surface::drawPolygon(int16_t *x, int16_t *y, int n, uint8_t color)
 {
 	filledPolygonColor(_surface.get(), x, y, n, Palette::getRGBA(getPalette(), color));
 }
@@ -825,7 +825,7 @@ void Surface::drawPolygon(Sint16 *x, Sint16 *y, int n, Uint8 color)
  * @param dx X offset of texture relative to the screen.
  * @param dy Y offset of texture relative to the screen.
  */
-void Surface::drawTexturedPolygon(Sint16 *x, Sint16 *y, int n, Surface *texture, int dx, int dy)
+void Surface::drawTexturedPolygon(int16_t *x, int16_t *y, int n, Surface *texture, int dx, int dy)
 {
 	texturedPolygon(_surface.get(), x, y, n, texture->getSurface(), dx, dy);
 }
@@ -837,7 +837,7 @@ void Surface::drawTexturedPolygon(Sint16 *x, Sint16 *y, int n, Surface *texture,
  * @param s Character string to draw.
  * @param color Color of string.
  */
-void Surface::drawString(Sint16 x, Sint16 y, const char *s, Uint8 color)
+void Surface::drawString(int16_t x, int16_t y, const char *s, uint8_t color)
 {
 	stringColor(_surface.get(), x, y, s, Palette::getRGBA(getPalette(), color));
 }
@@ -936,9 +936,9 @@ void Surface::unlock()
 /**
  * Specific blit function to blit battlescape terrain data in different shades in a fast way.
  */
-void Surface::blitRaw(SurfaceRaw<Uint8> destSurf, SurfaceRaw<const Uint8> srcSurf, int x, int y, int shade, bool half, int newBaseColor)
+void Surface::blitRaw(SurfaceRaw<uint8_t> destSurf, SurfaceRaw<const uint8_t> srcSurf, int x, int y, int shade, bool half, int newBaseColor)
 {
-	ShaderMove<const Uint8> src(srcSurf, x, y);
+	ShaderMove<const uint8_t> src(srcSurf, x, y);
 	if (half)
 	{
 		GraphSubset g = src.getDomain();
@@ -968,9 +968,9 @@ void Surface::blitRaw(SurfaceRaw<Uint8> destSurf, SurfaceRaw<const Uint8> srcSur
  * @param half some tiles are blitted only the right half
  * @param newBaseColor Attention: the actual color + 1, because 0 is no new base color.
  */
-void Surface::blitNShade(SurfaceRaw<Uint8> surface, int x, int y, int shade, bool half, int newBaseColor) const
+void Surface::blitNShade(SurfaceRaw<uint8_t> surface, int x, int y, int shade, bool half, int newBaseColor) const
 {
-	blitRaw(surface, SurfaceRaw<const Uint8>(this), x, y, shade, half, newBaseColor);
+	blitRaw(surface, SurfaceRaw<const uint8_t>(this), x, y, shade, half, newBaseColor);
 }
 
 /**
@@ -981,10 +981,10 @@ void Surface::blitNShade(SurfaceRaw<Uint8> surface, int x, int y, int shade, boo
  * @param shade shade offset
  * @param range area that limit draw surface
  */
-void Surface::blitNShade(SurfaceRaw<Uint8> surface, int x, int y, int shade, GraphSubset range) const
+void Surface::blitNShade(SurfaceRaw<uint8_t> surface, int x, int y, int shade, GraphSubset range) const
 {
-	ShaderMove<const Uint8> src(this, x, y);
-	ShaderMove<Uint8> dest(surface);
+	ShaderMove<const uint8_t> src(this, x, y);
+	ShaderMove<uint8_t> dest(surface);
 
 	dest.setDomain(range);
 
@@ -1010,7 +1010,7 @@ void Surface::invalidate(bool valid)
 void Surface::resize(int width, int height)
 {
 	// Set up new surface
-	Uint8 bpp = _surface->format->BitsPerPixel;
+	uint8_t bpp = _surface->format->BitsPerPixel;
 	auto alignedBuffer = NewAlignedBuffer(bpp, width, height);
 	auto surface = NewSdlSurface(alignedBuffer, bpp, width, height);
 
@@ -1061,10 +1061,10 @@ void SurfaceCrop::blit(Surface* dest)
 	if (_surface)
 	{
 		auto srcShader = ShaderCrop(*this, _x, _y);
-		auto destShader = ShaderMove<Uint8>(dest, 0, 0);
+		auto destShader = ShaderMove<uint8_t>(dest, 0, 0);
 
 		ShaderDrawFunc(
-			[](Uint8& d, Uint8 s)
+			[](uint8_t& d, uint8_t s)
 			{
 				if (s) d = s;
 			},

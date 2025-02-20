@@ -82,7 +82,9 @@ CraftWeaponsState::CraftWeaponsState(Base* base, size_t craft, size_t weapon) : 
 
 	_btnCancel->setText(tr("STR_CANCEL_UC"));
 	_btnCancel->onMouseClick((ActionHandler)&CraftWeaponsState::btnCancelClick);
-	_btnCancel->onKeyboardPress((ActionHandler)&CraftWeaponsState::btnCancelClick, Options::keyCancel);
+
+// OPTIONSHACK
+	//_btnCancel->onKeyboardPress((ActionHandler)&CraftWeaponsState::btnCancelClick, Options::keyCancel);
 
 	_txtTitle->setBig();
 	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
@@ -142,7 +144,8 @@ CraftWeaponsState::CraftWeaponsState(Base* base, size_t craft, size_t weapon) : 
 		}
 	}
 	_lstWeapons->onMouseClick((ActionHandler)&CraftWeaponsState::lstWeaponsClick);
-	_lstWeapons->onMouseClick((ActionHandler)&CraftWeaponsState::lstWeaponsMiddleClick, SDL_BUTTON_MIDDLE);
+// SDLHACK
+	//_lstWeapons->onMouseClick((ActionHandler)&CraftWeaponsState::lstWeaponsMiddleClick, SDL_BUTTON_MIDDLE);
 }
 
 /**

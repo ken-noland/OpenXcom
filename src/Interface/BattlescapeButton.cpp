@@ -45,7 +45,7 @@ BattlescapeButton::~BattlescapeButton()
  * Changes the color for the battlescape button.
  * @param color Color value.
  */
-void BattlescapeButton::setColor(Uint8 color)
+void BattlescapeButton::setColor(uint8_t color)
 {
 	_color = color;
 }
@@ -54,7 +54,7 @@ void BattlescapeButton::setColor(Uint8 color)
  * Returns the color for the battlescape button.
  * @return Color value.
  */
-Uint8 BattlescapeButton::getColor() const
+uint8_t BattlescapeButton::getColor() const
 {
 	return _color;
 }
@@ -167,7 +167,7 @@ void BattlescapeButton::initSurfaces(Surface* custom)
 
 		for (int x = 0, y = 0; x < getWidth() && y < getHeight();)
 		{
-			Uint8 pixel = getPixel(x, y);
+			uint8_t pixel = getPixel(x, y);
 			for (size_t i = 0; i != std::size(colorFrom); ++i)
 			{
 				if (pixel == colorFrom[i])
@@ -183,7 +183,7 @@ void BattlescapeButton::initSurfaces(Surface* custom)
 	{
 		for (int x = 0, y = 0; x < getWidth() && y < getHeight();)
 		{
-			Uint8 pixel = getPixel(x, y);
+			uint8_t pixel = getPixel(x, y);
 			if (pixel > 0)
 			{
 				_altSurface->setPixelIterative(&x, &y, pixel + 2 * ((int)_color + 3 - (int)pixel));

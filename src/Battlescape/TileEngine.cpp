@@ -245,8 +245,8 @@ MapSubset mapAreaExpand(MapSubset gs, int radius)
 
 
 
-constexpr static Uint32 MaskBlockDirMul = 9;
-constexpr static Uint32 MaskBlockDirOffset = MaskBlockDirMul + 1;
+constexpr static uint32_t MaskBlockDirMul = 9;
+constexpr static uint32_t MaskBlockDirOffset = MaskBlockDirMul + 1;
 
 /**
  * Calculate byte mask that is used to access cached data.
@@ -254,16 +254,16 @@ constexpr static Uint32 MaskBlockDirOffset = MaskBlockDirMul + 1;
  * @param z Value +1 as up, -1 as down, 0 as same level
  * @return Mask corresponding given direction and level.
  */
-constexpr static Uint32 selectBit(int dir, int z)
+constexpr static uint32_t selectBit(int dir, int z)
 {
 	return 1u << (MaskBlockDirOffset + MaskBlockDirMul * z + dir);
 }
 
-constexpr static Uint32 MaskBlockDown = selectBit(-1, -1);
-constexpr static Uint32 MaskBlockUp = selectBit(-1, +1);
+constexpr static uint32_t MaskBlockDown = selectBit(-1, -1);
+constexpr static uint32_t MaskBlockUp = selectBit(-1, +1);
 
-constexpr static Uint32 MaskFire = selectBit(+7, +1) << 1;
-constexpr static Uint32 MaskSmoke =  selectBit(+7, +1) << 2;
+constexpr static uint32_t MaskFire = selectBit(+7, +1) << 1;
+constexpr static uint32_t MaskSmoke =  selectBit(+7, +1) << 2;
 
 
 
@@ -482,12 +482,12 @@ struct ConfigSide
 	struct Direction
 	{
 		Axis axis = {};
-		Sint8 dir = {};
+		int8_t dir = {};
 		BoxAxis first = {};
 		BoxAxis last = {};
 
-		constexpr static Sint8 Plus = +1;
-		constexpr static Sint8 Minus = -1;
+		constexpr static int8_t Plus = +1;
+		constexpr static int8_t Minus = -1;
 
 		constexpr static Direction fill(BoxVertex from, BoxVertex to)
 		{
@@ -1200,8 +1200,8 @@ void TileEngine::addLight(MapSubset gs, Position center, int power, LightLayers 
 	const auto offsetCenter = (accuracy / 2 + Position(-1, -1, (ground ? 0 : accuracy.z/4) - tileHeight * accuracy.z / 24));
 	const auto offsetTarget = (accuracy / 2 + Position(-1, -1, 0));
 	const auto clasicLighting = !(getEnhancedLighting() & ((fire ? 1 : 0) | (items ? 2 : 0) | (units ? 4 : 0)));
-	const auto topTargetVoxel = static_cast<Sint16>(_save->getMapSizeZ() * accuracy.z - 1);
-	const auto topCenterVoxel = static_cast<Sint16>((getBlockUp(_blockVisibility[_save->getTileIndex(center)]) ? (center.z + 1) : _save->getMapSizeZ()) * accuracy.z - 1);
+	const auto topTargetVoxel = static_cast<int16_t>(_save->getMapSizeZ() * accuracy.z - 1);
+	const auto topCenterVoxel = static_cast<int16_t>((getBlockUp(_blockVisibility[_save->getTileIndex(center)]) ? (center.z + 1) : _save->getMapSizeZ()) * accuracy.z - 1);
 	const auto maxFirePower = std::min(15, getMaxStaticLightDistance() - 1);
 
 	iterateTiles(
@@ -1351,10 +1351,10 @@ bool TileEngine::setupEventVisibilitySector(const Position &observerPos, const P
 		float t1 = b - a;
 		float t2 = b + a;
 		//Define the points where the lines tangent to the circle intersect it. Note: resulting positions are relative to observer, not in direct tile space.
-		_eventVisibilitySectorL.x = (Sint16)roundf(eventPos.x + eventRadius * sinf(t1)) - observerPos.x;
-		_eventVisibilitySectorL.y = (Sint16)roundf(eventPos.y - eventRadius * cosf(t1)) - observerPos.y;
-		_eventVisibilitySectorR.x = (Sint16)roundf(eventPos.x - eventRadius * sinf(t2)) - observerPos.x;
-		_eventVisibilitySectorR.y = (Sint16)roundf(eventPos.y + eventRadius * cosf(t2)) - observerPos.y;
+		_eventVisibilitySectorL.x = (int16_t)roundf(eventPos.x + eventRadius * sinf(t1)) - observerPos.x;
+		_eventVisibilitySectorL.y = (int16_t)roundf(eventPos.y - eventRadius * cosf(t1)) - observerPos.y;
+		_eventVisibilitySectorR.x = (int16_t)roundf(eventPos.x - eventRadius * sinf(t2)) - observerPos.x;
+		_eventVisibilitySectorR.y = (int16_t)roundf(eventPos.y + eventRadius * cosf(t2)) - observerPos.y;
 		_eventVisibilityObserverPos = observerPos;
 		return false;
 	}

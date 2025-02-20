@@ -53,7 +53,7 @@ bool InputHandlerSystem::handle(const entt::handle& entity, Action* action) cons
 	//		if (_listButton && action->getDetails()->type == SDL_MOUSEMOTION)
 	//		{
 	//			_buttonsPressed = SDL_GetMouseState(0, 0);
-	//			for (Uint8 i = 1; i <= NUM_BUTTONS; ++i)
+	//			for (uint8_t i = 1; i <= NUM_BUTTONS; ++i)
 	//			{
 	//				if (isButtonPressed(i))
 	//				{
@@ -72,7 +72,7 @@ bool InputHandlerSystem::handle(const entt::handle& entity, Action* action) cons
 	//			mouseOut(action, state);
 	//			if (_listButton && action->getDetails()->type == SDL_MOUSEMOTION)
 	//			{
-	//				for (Uint8 i = 1; i <= NUM_BUTTONS; ++i)
+	//				for (uint8_t i = 1; i <= NUM_BUTTONS; ++i)
 	//				{
 	//					if (isButtonPressed(i))
 	//					{

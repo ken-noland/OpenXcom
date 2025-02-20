@@ -13,13 +13,13 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *e
+ *
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <string>
 #include <stdint.h>
-#include <SDL.h>
+
 
 namespace OpenXcom
 {
@@ -28,7 +28,7 @@ namespace OpenXcom
  * Represents a 32-bit Unicode codepoint.
  * Not technically a character, but close enough for our purposes.
  */
-typedef Uint32 UCode;
+typedef uint32_t UCode;
 /**
  * Represents a string where each character
  * is a Unicode codepoint. Used for rendering text.

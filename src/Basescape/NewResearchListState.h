@@ -49,7 +49,7 @@ private:
 	Text *_txtTitle;
 	TextList *_lstResearch;
 	size_t _lstScroll;
-	Uint8 _colorNormal, _colorNew, _colorHidden;
+	uint8_t _colorNormal, _colorNew, _colorHidden;
 	bool _isSortingEnabled;
 	void onSelectProject(Action *action);
 	void onToggleProjectStatus(Action *action);

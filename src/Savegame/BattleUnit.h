@@ -171,7 +171,7 @@ private:
 	ArmorMoveCost _moveCostBaseFly = { 0, 0 };
 	ArmorMoveCost _moveCostBaseClimb = { 0, 0 };
 	ArmorMoveCost _moveCostBaseNormal = { 0, 0 };
-	std::vector<std::pair<Uint8, Uint8> > _recolor;
+	std::vector<std::pair<uint8_t, uint8_t> > _recolor;
 	std::map<Position, int, PositionComparator> _reachablePositions;
 	Position _positionWhenReachableWasUpdated = Position(-1, -1, -1);
 	bool _maxTUsWhenReachableWasUpdated;
@@ -297,7 +297,7 @@ public:
 	/// Gets the unit's faction.
 	UnitFaction getFaction() const;
 	/// Gets unit sprite recolors values.
-	const std::vector<std::pair<Uint8, Uint8> > &getRecolor() const;
+	const std::vector<std::pair<uint8_t, uint8_t> > &getRecolor() const;
 	/// Kneel down.
 	void kneel(bool kneeled);
 	/// Is kneeled?

@@ -26,7 +26,7 @@
 namespace OpenXcom
 {
 
-enum BattleActionType : Uint8;
+enum BattleActionType : uint8_t;
 
 class RuleSkill
 {

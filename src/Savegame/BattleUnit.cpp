@@ -1535,7 +1535,7 @@ UnitFaction BattleUnit::getFaction() const
  * @param i what value choose.
  * @return Pairs of value, where first is color group to replace and second is new color group with shade.
  */
-const std::vector<std::pair<Uint8, Uint8> > &BattleUnit::getRecolor() const
+const std::vector<std::pair<uint8_t, uint8_t> > &BattleUnit::getRecolor() const
 {
 	return _recolor;
 }
@@ -6510,8 +6510,8 @@ struct burnShadeScript
 {
 	static RetEnum func(int &curr, int burn, int shade)
 	{
-		Uint8 d = curr;
-		Uint8 s = curr;
+		uint8_t d = curr;
+		uint8_t s = curr;
 		helper::BurnShade::func(d, s, burn, shade);
 		curr = d;
 		return RetContinue;

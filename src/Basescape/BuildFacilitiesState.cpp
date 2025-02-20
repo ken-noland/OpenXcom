@@ -69,7 +69,8 @@ BuildFacilitiesState::BuildFacilitiesState(entt::handle baseId, State *state)
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&BuildFacilitiesState::btnOkClick);
-	_btnOk->onKeyboardPress((ActionHandler)&BuildFacilitiesState::btnOkClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnOk->onKeyboardPress((ActionHandler)&BuildFacilitiesState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
 	_txtTitle->setAlign(TextHAlign::ALIGN_CENTER);
@@ -82,7 +83,8 @@ BuildFacilitiesState::BuildFacilitiesState(entt::handle baseId, State *state)
 	_lstFacilities->setWordWrap(true);
 	_lstFacilities->setScrolling(true, 0);
 	_lstFacilities->onMouseClick((ActionHandler)&BuildFacilitiesState::lstFacilitiesClick);
-	_lstFacilities->onMouseClick((ActionHandler)&BuildFacilitiesState::lstFacilitiesClick, SDL_BUTTON_MIDDLE);
+// SDLHACK
+	//_lstFacilities->onMouseClick((ActionHandler)&BuildFacilitiesState::lstFacilitiesClick, SDL_BUTTON_MIDDLE);
 
 }
 
@@ -152,7 +154,7 @@ void BuildFacilitiesState::populateBuildList()
 
 	if (!_disabledFacilities.empty())
 	{
-		Uint8 disabledColor = _lstFacilities->getSecondaryColor();
+		uint8_t disabledColor = _lstFacilities->getSecondaryColor();
 		for (const auto* facRule : _disabledFacilities)
 		{
 			_lstFacilities->addRow(1, tr(facRule->getType()).c_str());

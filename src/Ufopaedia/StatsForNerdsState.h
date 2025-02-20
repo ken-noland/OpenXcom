@@ -56,7 +56,7 @@ private:
 	TextButton *_btnOk;
 	TextButton *_btnPreview;
 
-	Uint8 _purple, _pink, _blue, _white, _gold;
+	uint8_t _purple, _pink, _blue, _white, _gold;
 
 	UfopaediaTypeId _typeId;
 	std::string _topicId;
@@ -73,7 +73,7 @@ private:
 	void resetStream(std::ostringstream &ss);
 	void addTranslation(std::ostringstream &ss, const std::string &id);
 	std::string trp(const std::string &propertyName);
-	void addSection(const std::string &name, const std::string &desc, Uint8 color, bool forceShow = false);
+	void addSection(const std::string &name, const std::string &desc, uint8_t color, bool forceShow = false);
 	void addHeading(const std::string &propertyName, const std::string &moreDetail = "", bool addDifficulty = false);
 	void endHeading();
 

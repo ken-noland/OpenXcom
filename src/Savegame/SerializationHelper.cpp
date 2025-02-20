@@ -27,7 +27,7 @@
 namespace OpenXcom
 {
 
-int unserializeInt(Uint8 **buffer, Uint8 sizeKey)
+int unserializeInt(uint8_t **buffer, uint8_t sizeKey)
 {
 	/* The C spec explicitly requires *(Type*) pointer accesses to be
 	 * sizeof(Type) aligned, which is not guaranteed by the UInt8** buffer
@@ -38,20 +38,20 @@ int unserializeInt(Uint8 **buffer, Uint8 sizeKey)
 	switch(sizeKey)
 	{
 	case 1:
-		Uint8 tmp;
+		uint8_t tmp;
 		memcpy(&tmp, *buffer, sizeof(tmp));
 		ret = tmp;
 		break;
 	case 2:
 	{
-		Sint16 tmp;
+		int16_t tmp;
 		memcpy(&tmp, *buffer, sizeof(tmp));
 		ret = tmp;
 		break;
 	}
 	case 4:
 	{
-		Uint32 tmp;
+		uint32_t tmp;
 		memcpy(&tmp, *buffer, sizeof(tmp));
 		ret = tmp;
 		break;
@@ -74,7 +74,7 @@ int unserializeInt(Uint8 **buffer, Uint8 sizeKey)
 	return ret;
 }
 
-void serializeInt(Uint8 **buffer, Uint8 sizeKey, int value)
+void serializeInt(uint8_t **buffer, uint8_t sizeKey, int value)
 {
 	/* The C spec explicitly requires *(Type*) pointer accesses to be
 	 * sizeof(Type) aligned, which is not guaranteed by the UInt8** buffer
@@ -85,22 +85,22 @@ void serializeInt(Uint8 **buffer, Uint8 sizeKey, int value)
 	{
 	case 1:
 	{
-		Uint8 u8Value = value;
+		uint8_t u8Value = value;
 		assert(value < 256);
-		memcpy(*buffer, &u8Value, sizeof(Uint8));
+		memcpy(*buffer, &u8Value, sizeof(uint8_t));
 		break;
 	}
 	case 2:
 	{
-		Sint16 s16Value = value;
+		int16_t s16Value = value;
 		assert(value < 65536);
-		memcpy(*buffer, &s16Value, sizeof(Sint16));
+		memcpy(*buffer, &s16Value, sizeof(int16_t));
 		break;
 	}
 	case 4:
 	{
-		Uint32 u32Value = value;
-		memcpy(*buffer, &u32Value, sizeof(Uint32));
+		uint32_t u32Value = value;
+		memcpy(*buffer, &u32Value, sizeof(uint32_t));
 		break;
 	}
 	default:

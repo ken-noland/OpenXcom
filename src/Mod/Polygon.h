@@ -32,7 +32,7 @@ class Polygon
 {
 private:
 	double *_lat, *_lon;
-	Sint16 *_x, *_y;
+	int16_t *_x, *_y;
 	int _points, _texture;
 public:
 	/// Creates a polygon with a number of points.
@@ -52,13 +52,13 @@ public:
 	/// Sets the longitude of a point.
 	void setLongitude(int i, double lon);
 	/// Gets the X coordinate of a point.
-	Sint16 getX(int i) const;
+	int16_t getX(int i) const;
 	/// Sets the X coordinate of a point.
-	void setX(int i, Sint16 x);
+	void setX(int i, int16_t x);
 	/// Gets the Y coordinate of a point.
-	Sint16 getY(int i) const;
+	int16_t getY(int i) const;
 	/// Sets the Y coordinate of a point.
-	void setY(int i, Sint16 y);
+	void setY(int i, int16_t y);
 	/// Gets the texture of the polygon.
 	int getTexture() const;
 	/// Sets the texture of the polygon.

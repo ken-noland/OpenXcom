@@ -211,7 +211,7 @@ static RetEnum wavegen_cos_h(int& reg, const int& period, const int& size)
 }
 
 FORCE_INLINE
-static RetEnum call_func_h(ScriptWorkerBase& c, ScriptFunc func, const Uint8* d, ProgPos& p)
+static RetEnum call_func_h(ScriptWorkerBase& c, ScriptFunc func, const uint8_t* d, ProgPos& p)
 {
 	auto t = p;
 	auto r = func(c, d, t);
@@ -290,7 +290,7 @@ static RetEnum bit_popcount_h(int& reg)
 	IMPL(set_shade,		MACRO_QUOTE({ Reg0 = (Reg0 & 0xF0) | (Data1 & 0xF);			return RetContinue; }),		(int& Reg0, int Data1),		"Set color part to pixel color in arg1") \
 	IMPL(add_shade,		MACRO_QUOTE({ addShade_h(Reg0, Data1);						return RetContinue; }),		(int& Reg0, int Data1),		"Add value of shade to pixel color in arg1") \
 	\
-	IMPL(call,			MACRO_QUOTE({ return call_func_h(c, func, d, p);								}),		(ScriptFunc func, const Uint8* d, ScriptWorkerBase& c, ProgPos& p),		"") \
+	IMPL(call,			MACRO_QUOTE({ return call_func_h(c, func, d, p);								}),		(ScriptFunc func, const uint8_t* d, ScriptWorkerBase& c, ProgPos& p),		"") \
 
 
 ////////////////////////////////////////////////////////////
@@ -435,7 +435,7 @@ struct Func_test_eq_text
 /**
  * Enum storing id of all available operations in script engine
  */
-enum ProcEnum : Uint8
+enum ProcEnum : uint8_t
 {
 	MACRO_PROC_DEFINITION(MACRO_CREATE_PROC_ENUM)
 	Proc_EnumMax,
@@ -452,7 +452,7 @@ enum ProcEnum : Uint8
  * @param proc array storing operation of script
  * @return Result of executing script
  */
-static inline void scriptExe(ScriptWorkerBase& data, const Uint8* proc)
+static inline void scriptExe(ScriptWorkerBase& data, const uint8_t* proc)
 {
 	ProgPos curr = ProgPos::Start;
 	//--------------------------------------------------
@@ -527,8 +527,8 @@ void ScriptWorkerBlit::executeBlit(const Surface* src, Surface* dest, int x, int
  */
 void ScriptWorkerBlit::executeBlit(const Surface* src, Surface* dest, int x, int y, int shade, GraphSubset mask)
 {
-	ShaderMove<const Uint8> srcShader(src, x, y);
-	ShaderMove<Uint8> destShader(dest, 0, 0);
+	ShaderMove<const uint8_t> srcShader(src, x, y);
+	ShaderMove<uint8_t> destShader(dest, 0, 0);
 
 	destShader.setDomain(mask);
 
@@ -537,7 +537,7 @@ void ScriptWorkerBlit::executeBlit(const Surface* src, Surface* dest, int x, int
 		if (_events)
 		{
 			ShaderDrawFunc(
-				[&](Uint8& destStuff, const Uint8& srcStuff)
+				[&](uint8_t& destStuff, const uint8_t& srcStuff)
 				{
 					if (srcStuff)
 					{
@@ -574,7 +574,7 @@ void ScriptWorkerBlit::executeBlit(const Surface* src, Surface* dest, int x, int
 		else
 		{
 			ShaderDrawFunc(
-				[&](Uint8& destStuff, const Uint8& srcStuff)
+				[&](uint8_t& destStuff, const uint8_t& srcStuff)
 				{
 					if (srcStuff)
 					{
@@ -600,7 +600,7 @@ void ScriptWorkerBlit::executeBlit(const Surface* src, Surface* dest, int x, int
  * Execute script with two arguments.
  * @return Result value from script.
  */
-void ScriptWorkerBase::executeBase(const Uint8* proc)
+void ScriptWorkerBase::executeBase(const uint8_t* proc)
 {
 	if (proc)
 	{
@@ -1007,7 +1007,7 @@ public:
 SelectedToken ScriptRefTokens::getNextToken(TokenEnum excepted)
 {
 	//groups of different types of ASCII characters
-	using CharClasses = Uint8;
+	using CharClasses = uint8_t;
 	struct Array // workaround for MSVC v19.20 bug where `std::array` is not `constexpr`
 	{
 		CharClasses arr[256];
@@ -1069,7 +1069,7 @@ SelectedToken ScriptRefTokens::getNextToken(TokenEnum excepted)
 		if (_begin != _end)
 		{
 			const auto c = *_begin;
-			return NextSymbol{ c, charDecoder[(Uint8)c] };
+			return NextSymbol{ c, charDecoder[(uint8_t)c] };
 		}
 		else
 		{
@@ -1694,7 +1694,7 @@ bool parseOverloadProc(ParserWriter& ph, const ScriptRange<ScriptProcData>& proc
 /**
  * Helper used to parse line for build in function.
  */
-template<Uint8 procId, typename FuncGroup>
+template<uint8_t procId, typename FuncGroup>
 bool parseBuildinProc(const ScriptProcData& spd, ParserWriter& ph, const ScriptRefData* begin, const ScriptRefData* end)
 {
 	auto opPos = ph.pushProc(procId);
@@ -1716,7 +1716,7 @@ bool parseBuildinProc(const ScriptProcData& spd, ParserWriter& ph, const ScriptR
 bool parseCustomProc(const ScriptProcData& spd, ParserWriter& ph, const ScriptRefData* begin, const ScriptRefData* end)
 {
 	using argFunc = typename helper::ArgSelector<ScriptFunc>::type;
-	using argRaw = typename helper::ArgSelector<const Uint8*>::type;
+	using argRaw = typename helper::ArgSelector<const uint8_t*>::type;
 	static_assert(helper::FuncGroup<Func_call>::ver() == argRaw::ver(), "Invalid size");
 	static_assert(std::is_same<helper::GetType<helper::FuncGroup<Func_call>, 0>, argFunc>::value, "Invalid first argument");
 	static_assert(std::is_same<helper::GetType<helper::FuncGroup<Func_call>, 1>, argRaw>::value, "Invalid second argument");
@@ -2948,7 +2948,7 @@ void ParserWriter::pushValue(ScriptValueData v)
 /**
  * Pushing proc operation id on proc vector.
  */
-ParserWriter::ReservedPos<ParserWriter::ProcOp> ParserWriter::pushProc(Uint8 procId)
+ParserWriter::ReservedPos<ParserWriter::ProcOp> ParserWriter::pushProc(uint8_t procId)
 {
 	auto curr = getCurrPos();
 	container._proc.push_back(procId);
@@ -4851,7 +4851,7 @@ static auto dummyTestScriptOverloadSeperator = ([]
 		}
 		auto func = p->parserGet(0);
 
-		Uint8 dummy[64] = { };
+		uint8_t dummy[64] = { };
 		ScriptWorkerBase wb;
 		ProgPos pos;
 

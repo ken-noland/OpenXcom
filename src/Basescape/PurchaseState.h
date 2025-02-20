@@ -63,7 +63,7 @@ private:
 	std::map<int,int> _tCQty;
 	double _iQty;
 	std::map<int, int> _iPrisonQty;
-	Uint8 _ammoColor;
+	uint8_t _ammoColor;
 	Timer *_timerInc, *_timerDec;
 	/// Gets the category of the current selection.
 	std::string getCategory(int sel) const;

@@ -205,7 +205,7 @@ void BattlescapeMessage::setHeight(int height)
  * Sets the text color of the battlescape message.
  * @param color the new color.
  */
-void BattlescapeMessage::setTextColor(Uint8 color)
+void BattlescapeMessage::setTextColor(uint8_t color)
 {
 	_text->setColor(color);
 	_txtThinking->setColor(color);
@@ -216,7 +216,7 @@ void BattlescapeMessage::setTextColor(Uint8 color)
  * @param color the new color.
  * @param borderColor the new border color.
  */
-void BattlescapeMessage::setProgressBarColor(Uint8 color, Uint8 borderColor)
+void BattlescapeMessage::setProgressBarColor(uint8_t color, uint8_t borderColor)
 {
 	_progressBar->setColor(color);
 	_progressBar->setBorderColor(borderColor);

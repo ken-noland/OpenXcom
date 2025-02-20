@@ -109,9 +109,9 @@ inline ShaderMove<T> ShaderSurface(SurfaceRaw<T> s)
  * @param s standard 8bit OpenXcom surface
  * @return
  */
-inline ShaderMove<Uint8> ShaderSurface(SurfaceRaw<Uint8> s)
+inline ShaderMove<uint8_t> ShaderSurface(SurfaceRaw<uint8_t> s)
 {
-	return ShaderMove<Uint8>(s);
+	return ShaderMove<uint8_t>(s);
 }
 
 /**
@@ -121,9 +121,9 @@ inline ShaderMove<Uint8> ShaderSurface(SurfaceRaw<Uint8> s)
  * @param y offset on y
  * @return
  */
-inline ShaderMove<Uint8> ShaderSurface(SurfaceRaw<Uint8> s, int x, int y)
+inline ShaderMove<uint8_t> ShaderSurface(SurfaceRaw<uint8_t> s, int x, int y)
 {
-	return ShaderMove<Uint8>(s, x, y);
+	return ShaderMove<uint8_t>(s, x, y);
 }
 
 /**
@@ -133,16 +133,17 @@ inline ShaderMove<Uint8> ShaderSurface(SurfaceRaw<Uint8> s, int x, int y)
  * @param y offset on y
  * @return
  */
-inline ShaderMove<const Uint8> ShaderCrop(SurfaceCrop s, int x, int y)
+inline ShaderMove<const uint8_t> ShaderCrop(SurfaceCrop s, int x, int y)
 {
-	ShaderMove<const Uint8> ret(s.getSurface(), x, y);
-	SDL_Rect* s_crop = s.getCrop();
-	if (s_crop->w || s_crop->h)
-	{
-		GraphSubset crop(std::make_pair(s_crop->x, s_crop->x + s_crop->w), std::make_pair(s_crop->y, s_crop->y + s_crop->h));
-		ret.setDomain(crop);
-		ret.addMove(-s_crop->x, -s_crop->y);
-	}
+	ShaderMove<const uint8_t> ret(s.getSurface(), x, y);
+// SDLHACK
+	//SDL_Rect* s_crop = s.getCrop();
+	//if (s_crop->w || s_crop->h)
+	//{
+	//	GraphSubset crop(std::make_pair(s_crop->x, s_crop->x + s_crop->w), std::make_pair(s_crop->y, s_crop->y + s_crop->h));
+	//	ret.setDomain(crop);
+	//	ret.addMove(-s_crop->x, -s_crop->y);
+	//}
 	return ret;
 }
 
@@ -151,7 +152,7 @@ inline ShaderMove<const Uint8> ShaderCrop(SurfaceCrop s, int x, int y)
  * @param s standard 8bit OpenXcom surface
  * @return
  */
-inline ShaderMove<const Uint8> ShaderCrop(SurfaceCrop s)
+inline ShaderMove<const uint8_t> ShaderCrop(SurfaceCrop s)
 {
 	return ShaderCrop(s, s.getX(), s.getY());
 }

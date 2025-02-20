@@ -1,0 +1,43 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "openxcom_tests.exe (src\\Tests\\openxcom_tests.exe)",
+      "name": "openxcom_tests.exe (src\\Tests\\openxcom_tests.exe)",
+      "args": [
+        "--gtest_output=xml:${ProjectDir}\\temp\\test_results.xml",
+        "--gtest_filter=GraphicsInGameFontTextTest.*"
+      ]
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "codegen.exe (src\\codegen.exe)",
+      "name": "codegen.exe (src\\codegen.exe)",
+      "args": [
+        "-template \u0022${ProjectDir}\\src\\Codegen\\Templates\\Yaml\\YamlTemplate.json\u0022",
+        "-output \u0022${ProjectDir}\\temp\\FromYaml.cpp\u0022"
+      ]
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "openxcom.exe (src\\openxcom.exe)",
+      "name": "openxcom.exe (src\\openxcom.exe)",
+      "args": [
+        "-data ${ProjectDir}\\bin\\",
+        "-user ${ProjectDir}\\data\\user\\",
+        "-config ${ProjectDir}\\data\\config\\"
+      ],
+      "environment": [
+        {
+          "name": "ASAN_OPTIONS",
+          "value": "detect_leaks=1"
+        }
+      ]
+    }
+  ]
+}

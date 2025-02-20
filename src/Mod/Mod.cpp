@@ -1054,7 +1054,7 @@ Palette *Mod::getPalette(const std::string &name, bool error) const
  * Returns the list of voxeldata in the mod.
  * @return Pointer to the list of voxeldata.
  */
-const std::vector<Uint16> *Mod::getVoxelData() const
+const std::vector<uint16_t> *Mod::getVoxelData() const
 {
 	return &_voxelData;
 }
@@ -1077,7 +1077,7 @@ Sound *Mod::getSoundByDepth(unsigned int depth, unsigned int sound) const
  * Returns the list of color LUTs in the mod.
  * @return Pointer to the list of LUTs.
  */
-const std::vector<std::vector<Uint8> > *Mod::getLUTs() const
+const std::vector<std::vector<uint8_t> > *Mod::getLUTs() const
 {
 	return &_transparencyLUTs;
 }
@@ -2553,7 +2553,7 @@ void Mod::loadResourceConfigFile(const FileMap::FileRecord &filerec)
 							taint.r = Clamp((int)(color.r * to), 0, 255);
 							taint.g = Clamp((int)(color.g * to), 0, 255);
 							taint.b = Clamp((int)(color.b * to), 0, 255);
-							taint.unused = (Uint8)(255 * co);
+							taint.unused = (uint8_t)(255 * co);
 							_transparencies[start + curr][opacity] = taint;
 						};
 					}
@@ -5195,15 +5195,15 @@ const std::vector<int> &Mod::getFlagByKills() const
 
 namespace
 {
-	const Uint8 ShadeMax = 15;
+	const uint8_t ShadeMax = 15;
 	/**
 	* Recolor class used in UFO
 	*/
 	struct HairXCOM1
 	{
-		static const Uint8 Hair = 9 << 4;
-		static const Uint8 Face = 6 << 4;
-		static inline void func(Uint8& src, const Uint8& cutoff)
+		static const uint8_t Hair = 9 << 4;
+		static const uint8_t Face = 6 << 4;
+		static inline void func(uint8_t& src, const uint8_t& cutoff)
 		{
 			if (src > cutoff && src <= Face + ShadeMax)
 			{
@@ -5217,9 +5217,9 @@ namespace
 	*/
 	struct HairXCOM2
 	{
-		static const Uint8 ManHairColor = 4 << 4;
-		static const Uint8 WomanHairColor = 1 << 4;
-		static inline void func(Uint8& src)
+		static const uint8_t ManHairColor = 4 << 4;
+		static const uint8_t WomanHairColor = 1 << 4;
+		static inline void func(uint8_t& src)
 		{
 			if (src >= WomanHairColor && src <= WomanHairColor + ShadeMax)
 			{
@@ -5233,9 +5233,9 @@ namespace
 	*/
 	struct FaceXCOM2
 	{
-		static const Uint8 FaceColor = 10 << 4;
-		static const Uint8 PinkColor = 14 << 4;
-		static inline void func(Uint8& src)
+		static const uint8_t FaceColor = 10 << 4;
+		static const uint8_t PinkColor = 14 << 4;
+		static inline void func(uint8_t& src)
 		{
 			if (src >= FaceColor && src <= FaceColor + ShadeMax)
 			{
@@ -5249,8 +5249,8 @@ namespace
 	*/
 	struct BodyXCOM2
 	{
-		static const Uint8 IonArmorColor = 8 << 4;
-		static inline void func(Uint8& src)
+		static const uint8_t IonArmorColor = 8 << 4;
+		static inline void func(uint8_t& src)
 		{
 			if (src == 153)
 			{
@@ -5279,8 +5279,8 @@ namespace
 	*/
 	struct FallXCOM2
 	{
-		static const Uint8 RoguePixel = 151;
-		static inline void func(Uint8& src)
+		static const uint8_t RoguePixel = 151;
+		static inline void func(uint8_t& src)
 		{
 			if (src == RoguePixel)
 			{
@@ -5779,17 +5779,17 @@ void Mod::loadBattlescapeResources()
 			{
 				//chest frame
 				Surface *surf = xcom_1->getFrame(4 * 8 + i);
-				ShaderMove<Uint8> head = ShaderMove<Uint8>(surf);
+				ShaderMove<uint8_t> head = ShaderMove<uint8_t>(surf);
 				GraphSubset dim = head.getBaseDomain();
 				surf->lock();
 				dim.beg_y = 6;
 				dim.end_y = 9;
 				head.setDomain(dim);
-				ShaderDraw<HairXCOM1>(head, ShaderScalar<Uint8>(HairXCOM1::Face + 5));
+				ShaderDraw<HairXCOM1>(head, ShaderScalar<uint8_t>(HairXCOM1::Face + 5));
 				dim.beg_y = 9;
 				dim.end_y = 10;
 				head.setDomain(dim);
-				ShaderDraw<HairXCOM1>(head, ShaderScalar<Uint8>(HairXCOM1::Face + 6));
+				ShaderDraw<HairXCOM1>(head, ShaderScalar<uint8_t>(HairXCOM1::Face + 6));
 				surf->unlock();
 			}
 
@@ -5797,7 +5797,7 @@ void Mod::loadBattlescapeResources()
 			{
 				//fall frame
 				Surface *surf = xcom_1->getFrame(264 + i);
-				ShaderMove<Uint8> head = ShaderMove<Uint8>(surf);
+				ShaderMove<uint8_t> head = ShaderMove<uint8_t>(surf);
 				GraphSubset dim = head.getBaseDomain();
 				dim.beg_y = 0;
 				dim.end_y = 24;
@@ -5805,7 +5805,7 @@ void Mod::loadBattlescapeResources()
 				dim.end_x = 20;
 				head.setDomain(dim);
 				surf->lock();
-				ShaderDraw<HairXCOM1>(head, ShaderScalar<Uint8>(HairXCOM1::Face + 6));
+				ShaderDraw<HairXCOM1>(head, ShaderScalar<uint8_t>(HairXCOM1::Face + 6));
 				surf->unlock();
 			}
 		}
@@ -5826,7 +5826,7 @@ void Mod::loadBattlescapeResources()
 					if (i < 8)
 					{
 						//female chest frame
-						ShaderMove<Uint8> head = ShaderMove<Uint8>(surf);
+						ShaderMove<uint8_t> head = ShaderMove<uint8_t>(surf);
 						GraphSubset dim = head.getBaseDomain();
 						dim.beg_y = 6;
 						dim.end_y = 18;
@@ -5852,7 +5852,7 @@ void Mod::loadBattlescapeResources()
 					}
 
 					//we change face to pink, to prevent mixup with ION armor backpack that have same color group.
-					ShaderDraw<FaceXCOM2>(ShaderMove<Uint8>(surf));
+					ShaderDraw<FaceXCOM2>(ShaderMove<uint8_t>(surf));
 					surf->unlock();
 				}
 
@@ -5862,7 +5862,7 @@ void Mod::loadBattlescapeResources()
 					Surface *surf = xcom_2->getFrame(256 + i);
 					surf->lock();
 
-					ShaderMove<Uint8> head = ShaderMove<Uint8>(surf);
+					ShaderMove<uint8_t> head = ShaderMove<uint8_t>(surf);
 					GraphSubset dim = head.getBaseDomain();
 					dim.beg_y = 0;
 					if (j == 3)
@@ -5877,7 +5877,7 @@ void Mod::loadBattlescapeResources()
 					ShaderDraw<FallXCOM2>(head);
 
 					//we change face to pink, to prevent mixup with ION armor backpack that have same color group.
-					ShaderDraw<FaceXCOM2>(ShaderMove<Uint8>(surf));
+					ShaderDraw<FaceXCOM2>(ShaderMove<uint8_t>(surf));
 					surf->unlock();
 				}
 
@@ -5889,7 +5889,7 @@ void Mod::loadBattlescapeResources()
 					{
 						Surface *surf = xcom_2->getFrame(i);
 						surf->lock();
-						ShaderDraw<BodyXCOM2>(ShaderMove<Uint8>(surf));
+						ShaderDraw<BodyXCOM2>(ShaderMove<uint8_t>(surf));
 						surf->unlock();
 					}
 				}
@@ -6270,7 +6270,7 @@ Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFi
 				if (track < adlibcat->size())
 				{
 					music = new AdlibMusic(rule->getNormalization());
-					music->load(adlibcat->getRWops((Uint32)track));
+					music->load(adlibcat->getRWops((uint32_t)track));
 				}
 				// separate intro music
 				else if (aintrocat)
@@ -6279,7 +6279,7 @@ Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFi
 					if (track < aintrocat->size())
 					{
 						music = new AdlibMusic(rule->getNormalization());
-						music->load(aintrocat->getRWops((Uint32)track));
+						music->load(aintrocat->getRWops((uint32_t)track));
 					}
 					else
 					{
@@ -6332,7 +6332,7 @@ Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFi
 void Mod::createTransparencyLUT(Palette *pal)
 {
 	const SDL_Color* palColors = pal->getColors(0);
-	std::vector<Uint8> lookUpTable;
+	std::vector<uint8_t> lookUpTable;
 	// start with the color sets
 	lookUpTable.reserve(_transparencies.size() * TransparenciesPaletteColors * TransparenciesOpacityLevels);
 	for (const auto& tintLevels : _transparencies)
@@ -6349,7 +6349,7 @@ void Mod::createTransparencyLUT(Palette *pal)
 				desiredColor.g = std::min(255, (palColors[currentColor].g * tint.unused / 255) + tint.g);
 				desiredColor.b = std::min(255, (palColors[currentColor].b * tint.unused / 255) + tint.b);
 
-				Uint8 closest = currentColor;
+				uint8_t closest = currentColor;
 				int lowestDifference = INT_MAX;
 				// if opacity is zero then we stay with current color, transparent color will stay same too
 				if (tint.unused != 0 && currentColor != 0)

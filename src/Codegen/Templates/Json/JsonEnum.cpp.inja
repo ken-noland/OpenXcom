@@ -1,0 +1,32 @@
+// BEGIN JsonEnum.cpp.inja
+
+template<>
+bool OpenXcom::fromJson<{{type.fullName}}>(const nlohmann::json& json, {{type.fullName}}& object)
+{
+	if (json.is_string())
+	{
+		std::string value = json.get<std::string>();
+		{% for value in type.values %}if (value == "{{value.name}}")
+		{
+			object = {{type.fullName}}::{{value.name}};
+			return true;
+		}
+		{% endfor %}
+	}
+	return false;
+}
+
+template<>
+bool OpenXcom::toJson<{{type.fullName}}>(const {{type.fullName}}& object, nlohmann::json& json)
+{
+	switch (object)
+	{
+	{% for value in type.values %}case {{type.fullName}}::{{value.name}}:
+			json = "{{value.name}}";
+			return true;
+	{% endfor %}
+	}
+	return false;
+}
+
+// END JsonEnum.cpp.inja

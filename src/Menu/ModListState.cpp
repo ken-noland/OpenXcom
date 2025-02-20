@@ -353,13 +353,13 @@ void ModListState::moveModUp(Action *action, unsigned int row, bool max)
 		{
 			int ydiff = _lstMods->getTextHeight(row - 1);
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(),
-				 action->getTopBlackBand() + action->getYMouse() - static_cast<Uint16>(ydiff * action->getYScale()));
+				 action->getTopBlackBand() + action->getYMouse() - static_cast<uint16_t>(ydiff * action->getYScale()));
 		}
 		else
 		{
 			int ydiff = _lstMods->getRowY(row) - _lstMods->getY();
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(),
-				 action->getTopBlackBand() + action->getYMouse() - static_cast<Uint16>(ydiff * action->getYScale()));
+				 action->getTopBlackBand() + action->getYMouse() - static_cast<uint16_t>(ydiff * action->getYScale()));
 			_lstMods->scrollTo(targetScrollPos);
 		}
 
@@ -437,13 +437,13 @@ void ModListState::moveModDown(Action *action, unsigned int row, bool max)
 		{
 			int ydiff = _lstMods->getTextHeight(row + 1);
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(),
-				 action->getTopBlackBand() + action->getYMouse() + static_cast<Uint16>(ydiff * action->getYScale()));
+				 action->getTopBlackBand() + action->getYMouse() + static_cast<uint16_t>(ydiff * action->getYScale()));
 		}
 		else
 		{
 			int ydiff = _lstMods->getY() + _lstMods->getHeight() - (_lstMods->getRowY(row) + _lstMods->getTextHeight(row));
 			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(),
-				 action->getTopBlackBand() + action->getYMouse() + static_cast<Uint16>(ydiff * action->getYScale()));
+				 action->getTopBlackBand() + action->getYMouse() + static_cast<uint16_t>(ydiff * action->getYScale()));
 			_lstMods->scrollTo(targetScrollPos - _lstMods->getVisibleRows() + 1);
 		}
 

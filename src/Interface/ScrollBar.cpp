@@ -92,7 +92,7 @@ void ScrollBar::setHeight(int height)
  * Changes the color used to render the scrollbar.
  * @param color Color value.
  */
-void ScrollBar::setColor(Uint8 color)
+void ScrollBar::setColor(uint8_t color)
 {
 	_color = color;
 }
@@ -101,7 +101,7 @@ void ScrollBar::setColor(Uint8 color)
  * Returns the color used to render the scrollbar.
  * @return Color value.
  */
-Uint8 ScrollBar::getColor() const
+uint8_t ScrollBar::getColor() const
 {
 	return _color;
 }

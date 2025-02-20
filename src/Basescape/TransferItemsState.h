@@ -60,7 +60,7 @@ private:
 	std::map<int,int> _tCQty;	// map of crafts to transfers, as different types must be considered separate
 	double _iQty;
 	double _distance;
-	Uint8 _ammoColor;
+	uint8_t _ammoColor;
 	Timer *_timerInc, *_timerDec;
 	TransferSortDirection _previousSort, _currentSort;
 	bool _errorShown;

@@ -17,65 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../Engine/InteractiveSurface.h"
 
 namespace OpenXcom
 {
 
-class TextList;
-
 /**
  * Horizontal scrollbar control to select from a range of values.
  */
-class ScrollBar : public InteractiveSurface
+class ScrollBar
 {
-private:
-	TextList *_list;
-	Uint8 _color;
-	bool _pressed, _contrast;
-	Surface *_track, *_thumb;
-	SDL_Rect _thumbRect;
-	int _offset;
-	Surface *_bg;
-	/// Draws the scrollbar track.
-	void drawTrack();
-	/// Draws the scrollbar thumb.
-	void drawThumb();
-public:
-	/// Creates a new scrollbar with the specified size and position.
-	ScrollBar(int width, int height, int x = 0, int y = 0);
-	/// Cleans up the scrollbar.
-	~ScrollBar();
-	/// Sets the X position of the surface.
-	void setX(int x) override;
-	/// Sets the Y position of the surface.
-	void setY(int y) override;
-	/// Sets the height of the surface.
-	void setHeight(int height) override;
-	/// Sets the scrollbar's color.
-	void setColor(Uint8 color) override;
-	/// Gets the scrollbar's color.
-	Uint8 getColor() const;
-	/// Sets the scrollbar's high contrast color setting.
-	void setHighContrast(bool contrast) override;
-	/// Sets the scrollbar's list.
-	void setTextList(TextList *list);
-	/// Sets the background for the track.
-	/*[[deprecated]]*/ void setBackground(Surface* bg);
-	/// Sets the background for the track.
-	void setBackground(entt::entity& bgEntity);
-	/// Sets the scrollbar's palette.
-	void setPalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256) override;
-	/// Blits the scrollbar onto another surface.
-	void blit(SDL_Surface *surface) override;
-	/// Moves the scrollbar.
-	void handle(Action *action, State *state) override;
-	/// Special handling for mouse presses.
-	void mousePress(Action *action, State *state) override;
-	/// Special handling for mouse releases.
-	void mouseRelease(Action *action, State *state) override;
-	/// Draws the scrollbar contents.
-	void draw() override;
 };
 
 }

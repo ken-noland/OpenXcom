@@ -18,7 +18,6 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <string>
-#include <SDL_mixer.h>
 
 namespace OpenXcom
 {
@@ -30,8 +29,8 @@ namespace OpenXcom
 class Music
 {
 private:
-	Mix_Music *_music;
-	SDL_RWops *_rwops;
+//	Mix_Music *_music;
+//	SDL_RWops *_rwops;
 public:
 	/// Creates a blank music track.
 	Music();
@@ -40,7 +39,7 @@ public:
 	/// Loads music from the specified file.
 	virtual void load(const std::string &filename);
 	/// Loads music from the specified rwops.
-	virtual void load(SDL_RWops *rwops);
+//	virtual void load(SDL_RWops *rwops);
 	/// Plays the music.
 	virtual void play(int loop = -1) const;
 	/// Stops all music.

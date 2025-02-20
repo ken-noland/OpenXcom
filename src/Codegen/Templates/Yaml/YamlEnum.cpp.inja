@@ -1,0 +1,15 @@
+// BEGIN YamlEnum.cpp.inja
+
+template<>
+bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, ryml::Parser const& parser)
+{
+	throw OpenXcom::YamlException(yaml, parser, "Enum not yet supported!");
+}
+
+template<>
+bool OpenXcom::toYaml<{{type.fullName}}>(const {{type.fullName}}& object, ryml::NodeRef& yaml)
+{
+	return false;
+}
+
+// END YamlEnum.cpp.inja

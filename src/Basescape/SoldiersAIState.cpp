@@ -184,7 +184,7 @@ void SoldiersAIState::initList(size_t scrl)
 	
 	for (int row = 0; row < allows.size(); row++)
 	{
-		Uint8 color;
+		uint8_t color;
 		if (allows[row])
 		{
 			color = _lstUnits->getSecondaryColor();
@@ -227,7 +227,7 @@ void SoldiersAIState::lstSoldiersClick(Action *action)
 	if (action->getDetails()->button.button == SDL_BUTTON_LEFT)
 	{
 		const bool newAI = _soldiers.empty() ? toggleAIBattleUnit() : toggleAISoldier();
-		Uint8 color = _lstUnits->getColor();
+		uint8_t color = _lstUnits->getColor();
 		if (newAI)
 		{
 			color = _lstUnits->getSecondaryColor();

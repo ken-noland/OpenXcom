@@ -1,0 +1,14 @@
+{
+"gameOptions": {
+"_locale": "",
+"_logLevel": "LOG_INFO",
+"_master": "xcom1",
+"_mods": []
+},
+"graphicsOptions": {
+"_fullscreen": false,
+"_headless": false,
+"_screenHeight": 480,
+"_screenWidth": 640
+}
+}

@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "ProgressBar.h"
-#include <SDL.h>
+
 
 namespace OpenXcom
 {
@@ -45,7 +45,7 @@ ProgressBar::~ProgressBar()
  * Changes the color used to draw the border and contents.
  * @param color Color value.
  */
-void ProgressBar::setColor(Uint8 color)
+void ProgressBar::setColor(uint8_t color)
 {
 	_color = color;
 	_redraw = true;
@@ -55,7 +55,7 @@ void ProgressBar::setColor(Uint8 color)
  * Returns the color used to draw the ProgressBar.
  * @return Color value.
  */
-Uint8 ProgressBar::getColor() const
+uint8_t ProgressBar::getColor() const
 {
 	return _color;
 }
@@ -65,7 +65,7 @@ Uint8 ProgressBar::getColor() const
  * @param bc the color for the outline of the ProgressBar.
  * @note will use base colour + 4 if none is defined here.
  */
-void ProgressBar::setBorderColor(Uint8 bc)
+void ProgressBar::setBorderColor(uint8_t bc)
 {
 	_borderColor = bc;
 }

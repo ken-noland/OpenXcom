@@ -116,7 +116,7 @@ void AlienInventory::drawGrid()
 {
 	_grid->clear();
 	RuleInterface *rule = _game->getMod()->getInterface("inventory");
-	Uint8 color = rule->getElement("grid")->color;
+	uint8_t color = rule->getElement("grid")->color;
 
 	for (const auto& pair : *_game->getMod()->getInventories())
 	{

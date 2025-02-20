@@ -38,7 +38,7 @@ private:
 	TextButton *_owner;
 	TextList *_lstOptions;
 	bool _isTFTD;
-	Uint8 _colorGroup, _greyedOutColor;
+	uint8_t _colorGroup, _greyedOutColor;
 	std::vector<OptionInfo> _settingsGeneral[OPTION_OWNER_MAX];
 	std::vector<OptionInfo> _settingsGeo[OPTION_OWNER_MAX];
 	std::vector<OptionInfo> _settingsBase[OPTION_OWNER_MAX];

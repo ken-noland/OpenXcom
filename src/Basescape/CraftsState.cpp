@@ -83,7 +83,8 @@ CraftsState::CraftsState(Base* base) : State("CraftsState", true), _base(base)
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&CraftsState::btnOkClick);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftsState::btnOkClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftsState::btnOkClick, Options::keyCancel);
 
 	_txtTitle->setBig();
 	_txtTitle->setText(tr("STR_INTERCEPTION_CRAFT"));
@@ -107,8 +108,9 @@ CraftsState::CraftsState(Base* base) : State("CraftsState", true), _base(base)
 
 	_lstCrafts->setMargin(8);
 	_lstCrafts->onMouseClick((ActionHandler)&CraftsState::lstCraftsClick);
-	_lstCrafts->onMouseClick((ActionHandler)&CraftsState::lstCraftsClick, SDL_BUTTON_RIGHT);
-	_lstCrafts->onMouseClick((ActionHandler)&CraftsState::lstCraftsClick, SDL_BUTTON_MIDDLE);
+// SDLHACK
+	//_lstCrafts->onMouseClick((ActionHandler)&CraftsState::lstCraftsClick, SDL_BUTTON_RIGHT);
+	//_lstCrafts->onMouseClick((ActionHandler)&CraftsState::lstCraftsClick, SDL_BUTTON_MIDDLE);
 }
 
 /**
@@ -178,7 +180,7 @@ void CraftsState::lstCraftsClick(Action *action)
 			// warp mouse
 			if (row != _lstCrafts->getScroll() && _lstCrafts->getScroll() == 0)
 			{
-				SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<Uint16>(8 * action->getYScale()));
+				SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<uint16_t>(8 * action->getYScale()));
 			}
 
 			// reload the UI

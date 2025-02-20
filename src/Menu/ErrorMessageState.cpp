@@ -38,7 +38,7 @@ namespace OpenXcom
  * @param bg Background image.
  * @param bgColor Background color (-1 for Battlescape).
  */
-ErrorMessageState::ErrorMessageState(const std::string &msg, SDL_Color *palette, Uint8 color, const std::string &bg, int bgColor)
+ErrorMessageState::ErrorMessageState(const std::string &msg, SDL_Color *palette, uint8_t color, const std::string &bg, int bgColor)
 	: State("ErrorMessageState", true)
 {
 	create(msg, palette, color, bg, bgColor);
@@ -60,7 +60,7 @@ ErrorMessageState::~ErrorMessageState()
  * @param bg Background image.
  * @param bgColor Background color (-1 for Battlescape).
  */
-void ErrorMessageState::create(const std::string &str, SDL_Color *palette, Uint8 color, const std::string &bg, int bgColor)
+void ErrorMessageState::create(const std::string &str, SDL_Color *palette, uint8_t color, const std::string &bg, int bgColor)
 {
 	InterfaceFactory& factory = getGame()->getECS().getFactory<InterfaceFactory>();
 

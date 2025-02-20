@@ -44,7 +44,7 @@ Frame::~Frame()
  * Changes the color used to draw the shaded border.
  * @param color Color value.
  */
-void Frame::setColor(Uint8 color)
+void Frame::setColor(uint8_t color)
 {
 	_color = color;
 	_redraw = true;
@@ -57,7 +57,7 @@ void Frame::setColor(Uint8 color)
  * better to have them here!
  * @param color Color value.
  */
-void Frame::setBorderColor(Uint8 color)
+void Frame::setBorderColor(uint8_t color)
 {
 	setColor(color);
 }
@@ -66,7 +66,7 @@ void Frame::setBorderColor(Uint8 color)
  * Returns the color used to draw the shaded border.
  * @return Color value.
  */
-Uint8 Frame::getColor() const
+uint8_t Frame::getColor() const
 {
 	return _color;
 }
@@ -75,7 +75,7 @@ Uint8 Frame::getColor() const
  * Changes the color used to draw the background.
  * @param bg Color value.
  */
-void Frame::setSecondaryColor(Uint8 bg)
+void Frame::setSecondaryColor(uint8_t bg)
 {
 	_bg = bg;
 	_redraw = true;
@@ -85,7 +85,7 @@ void Frame::setSecondaryColor(Uint8 bg)
  * Returns the color used to draw the background.
  * @return Color value.
  */
-Uint8 Frame::getSecondaryColor() const
+uint8_t Frame::getSecondaryColor() const
 {
 	return _bg;
 }
@@ -134,9 +134,9 @@ void Frame::draw()
 	}
 
 	// _color denotes our middle line color, so we start (half the thickness times the multiplier) steps darker and build up
-	Uint8 color = _color + ((1 + _thickness) * mul) / 2;
+	uint8_t color = _color + ((1 + _thickness) * mul) / 2;
 	// we want the darkest version of this colour to outline any thick borders
-	Uint8 darkest = Palette::blockOffset(_color / 16) + 15;
+	uint8_t darkest = Palette::blockOffset(_color / 16) + 15;
 	for (int i = 0; i < _thickness; ++i)
 	{
 		if (_thickness > 5 && (!i || i == _thickness -1))

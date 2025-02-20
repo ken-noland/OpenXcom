@@ -1,0 +1,1209 @@
+name: Initial Save
+version: Extended Brutal 7.12.8 8.5.5
+engine: Extended
+build: " (v2024-05-31)"
+time: {second: 45, minute: 3, hour: 12, weekday: 1, day: 1, month: 1, year: 2040}
+mods:
+  - "xcom2 ver: 1.0"
+  - "lua_test ver: 1.0"
+  - "lua_test_callbacks ver: 1.0"
+---
+difficulty: 0
+end: 0
+monthsPassed: 0
+graphRegionToggles: ""
+graphCountryToggles: ""
+graphFinanceToggles: ""
+rng: 9545378223328089982
+funds:
+  - 4116000
+maintenance:
+  - 0
+userNotes:
+  []
+geoscapeDebugLog:
+  - "month: 0 script: gameStart id: 1 type: STR_ALIEN_PROBE_MISSION race: STR_AQUATOID region: STR_SOUTH_ATLANTIC targetZone: -1 targetArea: -1"
+  - "month: 0 script: recurringTerror id: 2 type: STR_ALIEN_SURFACE_ATTACK race: STR_GILLMAN region: STR_NORTH_ATLANTIC targetZone: 3 targetArea: 1"
+researchScores:
+  - 0
+incomes:
+  - 5985000
+expenditures:
+  - 1869000
+warned: false
+togglePersonalLight: true
+toggleNightVision: false
+toggleBrightness: 0
+globeLon: 5.5241495642057341
+globeLat: -0.48049929319606555
+globeZoom: 0
+ids:
+  ALIEN_MISSIONS: 3
+  STR_BARRACUDA: 3
+  STR_SOLDIER: 9
+  STR_TRITON: 2
+countries:
+  - type: STR_USA
+    funding:
+      - 732000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_ALASKA
+    funding:
+      - 307000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_EU_SYNDICATE
+    funding:
+      - 380000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_ARABIAN_BLOC
+    funding:
+      - 522000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_EGYPTIAN_CARTEL
+    funding:
+      - 336000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_AFRICA_CORP
+    funding:
+      - 338000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_BRAZILIAN_UNION
+    funding:
+      - 215000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_NEW_MEXICO
+    funding:
+      - 322000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_ASIAN_COALITION
+    funding:
+      - 455000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_SCANDINAVIA
+    funding:
+      - 215000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_NEO_JAPAN
+    funding:
+      - 433000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_FREE_CHINA
+    funding:
+      - 340000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_AUSTRALASIA
+    funding:
+      - 395000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_FED_KOREA
+    funding:
+      - 537000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_EURASIA_UC
+    funding:
+      - 264000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_ICELANDIC_UNION
+    funding:
+      - 194000
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+regions:
+  - type: STR_NORTH_ATLANTIC
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_SOUTH_ATLANTIC
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_NORTH_PACIFIC
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_SOUTH_PACIFIC
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_MEDITERRANEAN
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_SOUTH_CHINA_SEA
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_INDIAN_OCEAN
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_THE_EAST_SEA
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_NORTH_SEA
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_CARRIBEAN
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_ANTARCTIC
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_ARCTIC
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_EURASIA
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_NORTH_AMERICA
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+  - type: STR_AFRICA
+    activityXcom:
+      - 0
+    activityAlien:
+      - 0
+bases:
+  - lon: 5.5365391850484622
+    lat: -0.45824341799434082
+    name: North Atlantic
+    facilities:
+      - type: STR_AIR_LOCK
+        x: 2
+        y: 2
+      - type: STR_SUB_PEN
+        x: 2
+        y: 0
+      - type: STR_SUB_PEN
+        x: 0
+        y: 4
+      - type: STR_SUB_PEN
+        x: 4
+        y: 4
+      - type: STR_LIVING_QUARTERS
+        x: 3
+        y: 2
+      - type: STR_GENERAL_STORES
+        x: 2
+        y: 3
+      - type: STR_LABORATORY
+        x: 3
+        y: 3
+      - type: STR_WORKSHOP
+        x: 4
+        y: 3
+      - type: STR_STANDARD_SONAR
+        x: 1
+        y: 3
+    soldiers:
+      - type: STR_SOLDIER
+        id: 1
+        name: Gerrit de Graaf
+        nationality: 10
+        initialStats:
+          tu: 51
+          stamina: 41
+          health: 33
+          bravery: 50
+          reactions: 51
+          firing: 70
+          throwing: 73
+          strength: 34
+          psiStrength: 9
+          psiSkill: 0
+          melee: 27
+          mana: 0
+        currentStats:
+          tu: 51
+          stamina: 41
+          health: 33
+          bravery: 50
+          reactions: 51
+          firing: 70
+          throwing: 73
+          strength: 34
+          psiStrength: 9
+          psiSkill: 0
+          melee: 27
+          mana: 0
+        rank: 0
+        craft:
+          lon: 5.5365391850484622
+          lat: -0.45824341799434082
+          type: STR_TRITON
+          id: 1
+        gender: 0
+        look: 0
+        lookVariant: 41
+        missions: 0
+        kills: 0
+        stuns: 0
+        armor: STR_NONE_UC
+        improvement: 0
+        psiStrImprovement: 0
+        allowAutoCombat: true
+        aggression: 3
+      - type: STR_SOLDIER
+        id: 2
+        name: Emmi Huttunen
+        nationality: 12
+        initialStats:
+          tu: 50
+          stamina: 44
+          health: 33
+          bravery: 30
+          reactions: 44
+          firing: 47
+          throwing: 74
+          strength: 34
+          psiStrength: 38
+          psiSkill: 0
+          melee: 38
+          mana: 0
+        currentStats:
+          tu: 50
+          stamina: 44
+          health: 33
+          bravery: 30
+          reactions: 44
+          firing: 47
+          throwing: 74
+          strength: 34
+          psiStrength: 38
+          psiSkill: 0
+          melee: 38
+          mana: 0
+        rank: 0
+        craft:
+          lon: 5.5365391850484622
+          lat: -0.45824341799434082
+          type: STR_TRITON
+          id: 1
+        gender: 1
+        look: 0
+        lookVariant: 24
+        missions: 0
+        kills: 0
+        stuns: 0
+        armor: STR_NONE_UC
+        improvement: 0
+        psiStrImprovement: 0
+        allowAutoCombat: true
+        aggression: 3
+      - type: STR_SOLDIER
+        id: 3
+        name: Felix Dominguez
+        nationality: 31
+        initialStats:
+          tu: 53
+          stamina: 52
+          health: 27
+          bravery: 20
+          reactions: 39
+          firing: 63
+          throwing: 57
+          strength: 27
+          psiStrength: 83
+          psiSkill: 0
+          melee: 34
+          mana: 0
+        currentStats:
+          tu: 53
+          stamina: 52
+          health: 27
+          bravery: 20
+          reactions: 39
+          firing: 63
+          throwing: 57
+          strength: 27
+          psiStrength: 83
+          psiSkill: 0
+          melee: 34
+          mana: 0
+        rank: 0
+        craft:
+          lon: 5.5365391850484622
+          lat: -0.45824341799434082
+          type: STR_TRITON
+          id: 1
+        gender: 0
+        look: 1
+        lookVariant: 16
+        missions: 0
+        kills: 0
+        stuns: 0
+        armor: STR_NONE_UC
+        improvement: 0
+        psiStrImprovement: 0
+        allowAutoCombat: true
+        aggression: 3
+      - type: STR_SOLDIER
+        id: 4
+        name: Dong-hyun Gam
+        nationality: 22
+        initialStats:
+          tu: 57
+          stamina: 60
+          health: 29
+          bravery: 30
+          reactions: 30
+          firing: 55
+          throwing: 50
+          strength: 38
+          psiStrength: 96
+          psiSkill: 0
+          melee: 36
+          mana: 0
+        currentStats:
+          tu: 57
+          stamina: 60
+          health: 29
+          bravery: 30
+          reactions: 30
+          firing: 55
+          throwing: 50
+          strength: 38
+          psiStrength: 96
+          psiSkill: 0
+          melee: 36
+          mana: 0
+        rank: 0
+        craft:
+          lon: 5.5365391850484622
+          lat: -0.45824341799434082
+          type: STR_TRITON
+          id: 1
+        gender: 0
+        look: 2
+        lookVariant: 1
+        missions: 0
+        kills: 0
+        stuns: 0
+        armor: STR_NONE_UC
+        improvement: 0
+        psiStrImprovement: 0
+        allowAutoCombat: true
+        aggression: 3
+      - type: STR_SOLDIER
+        id: 5
+        name: James McGrath
+        nationality: 18
+        initialStats:
+          tu: 53
+          stamina: 62
+          health: 28
+          bravery: 30
+          reactions: 36
+          firing: 53
+          throwing: 68
+          strength: 34
+          psiStrength: 5
+          psiSkill: 0
+          melee: 28
+          mana: 0
+        currentStats:
+          tu: 53
+          stamina: 62
+          health: 28
+          bravery: 30
+          reactions: 36
+          firing: 53
+          throwing: 68
+          strength: 34
+          psiStrength: 5
+          psiSkill: 0
+          melee: 28
+          mana: 0
+        rank: 0
+        craft:
+          lon: 5.5365391850484622
+          lat: -0.45824341799434082
+          type: STR_TRITON
+          id: 1
+        gender: 0
+        look: 0
+        lookVariant: 1
+        missions: 0
+        kills: 0
+        stuns: 0
+        armor: STR_NONE_UC
+        improvement: 0
+        psiStrImprovement: 0
+        allowAutoCombat: true
+        aggression: 3
+      - type: STR_SOLDIER
+        id: 6
+        name: Laszlo Czako
+        nationality: 17
+        initialStats:
+          tu: 52
+          stamina: 57
+          health: 36
+          bravery: 30
+          reactions: 50
+          firing: 56
+          throwing: 78
+          strength: 24
+          psiStrength: 67
+          psiSkill: 0
+          melee: 32
+          mana: 0
+        currentStats:
+          tu: 52
+          stamina: 57
+          health: 36
+          bravery: 30
+          reactions: 50
+          firing: 56
+          throwing: 78
+          strength: 24
+          psiStrength: 67
+          psiSkill: 0
+          melee: 32
+          mana: 0
+        rank: 0
+        craft:
+          lon: 5.5365391850484622
+          lat: -0.45824341799434082
+          type: STR_TRITON
+          id: 1
+        gender: 0
+        look: 0
+        lookVariant: 48
+        missions: 0
+        kills: 0
+        stuns: 0
+        armor: STR_NONE_UC
+        improvement: 0
+        psiStrImprovement: 0
+        allowAutoCombat: true
+        aggression: 3
+      - type: STR_SOLDIER
+        id: 7
+        name: Anders Nielsen
+        nationality: 9
+        initialStats:
+          tu: 56
+          stamina: 57
+          health: 39
+          bravery: 50
+          reactions: 38
+          firing: 43
+          throwing: 68
+          strength: 35
+          psiStrength: 67
+          psiSkill: 0
+          melee: 40
+          mana: 0
+        currentStats:
+          tu: 56
+          stamina: 57
+          health: 39
+          bravery: 50
+          reactions: 38
+          firing: 43
+          throwing: 68
+          strength: 35
+          psiStrength: 67
+          psiSkill: 0
+          melee: 40
+          mana: 0
+        rank: 0
+        craft:
+          lon: 5.5365391850484622
+          lat: -0.45824341799434082
+          type: STR_TRITON
+          id: 1
+        gender: 0
+        look: 0
+        lookVariant: 3
+        missions: 0
+        kills: 0
+        stuns: 0
+        armor: STR_NONE_UC
+        improvement: 0
+        psiStrImprovement: 0
+        allowAutoCombat: true
+        aggression: 3
+      - type: STR_SOLDIER
+        id: 8
+        name: Oudry Tshitoko
+        nationality: 7
+        initialStats:
+          tu: 51
+          stamina: 59
+          health: 33
+          bravery: 30
+          reactions: 50
+          firing: 56
+          throwing: 66
+          strength: 33
+          psiStrength: 13
+          psiSkill: 0
+          melee: 31
+          mana: 0
+        currentStats:
+          tu: 51
+          stamina: 59
+          health: 33
+          bravery: 30
+          reactions: 50
+          firing: 56
+          throwing: 66
+          strength: 33
+          psiStrength: 13
+          psiSkill: 0
+          melee: 31
+          mana: 0
+        rank: 0
+        craft:
+          lon: 5.5365391850484622
+          lat: -0.45824341799434082
+          type: STR_TRITON
+          id: 1
+        gender: 0
+        look: 3
+        lookVariant: 30
+        missions: 0
+        kills: 0
+        stuns: 0
+        armor: STR_NONE_UC
+        improvement: 0
+        psiStrImprovement: 0
+        allowAutoCombat: true
+        aggression: 3
+    crafts:
+      - lon: 5.5365391850484622
+        lat: -0.45824341799434082
+        id: 1
+        speedLon: 0
+        speedLat: 0
+        speedRadian: 0
+        speed: 0
+        type: STR_TRITON
+        fuel: 1400
+        damage: 0
+        shield: 0
+        items:
+          STR_DART_PISTOL: 3
+          STR_DART_POD: 5
+          STR_GAS_CANNON: 1
+          STR_GC_AP_AMMO: 2
+          STR_GC_HE_AMMO: 2
+          STR_HARPOON_POD: 12
+          STR_JET_HARPOON: 6
+          STR_MAGNA_BLAST_GRENADE: 8
+        status: STR_READY
+        lonAuto: 0
+        latAuto: 0
+      - lon: 5.5365391850484622
+        lat: -0.45824341799434082
+        id: 1
+        speedLon: 0
+        speedLat: 0
+        speedRadian: 0
+        speed: 0
+        type: STR_BARRACUDA
+        fuel: 800
+        damage: 0
+        shield: 0
+        weapons:
+          - type: STR_AJAX
+            ammo: 6
+          - type: STR_CRAFT_GAS_CANNON_UC
+            ammo: 200
+        items:
+          {}
+        status: STR_READY
+        lonAuto: 0
+        latAuto: 0
+      - lon: 5.5365391850484622
+        lat: -0.45824341799434082
+        id: 2
+        speedLon: 0
+        speedLat: 0
+        speedRadian: 0
+        speed: 0
+        type: STR_BARRACUDA
+        fuel: 800
+        damage: 0
+        shield: 0
+        weapons:
+          - type: STR_AJAX
+            ammo: 6
+          - type: STR_CRAFT_GAS_CANNON_UC
+            ammo: 200
+        items:
+          {}
+        status: STR_READY
+        lonAuto: 0
+        latAuto: 0
+    items:
+      STR_AJAX_LAUNCHER: 1
+      STR_AJAX_TORPEDOES: 25
+      STR_CRAFT_GAS_CANNON: 2
+      STR_CRAFT_GAS_CANNON_ROUNDS_X50: 1
+      STR_DART_PISTOL: 2
+      STR_DART_POD: 8
+      STR_DUP_HEAD_LAUNCHER: 1
+      STR_DUP_HEAD_TORPEDOES: 10
+      STR_DYE_GRENADE: 5
+      STR_GAS_CANNON: 1
+      STR_GC_AP_AMMO: 6
+      STR_HARPOON_POD: 8
+      STR_HJC_AP_AMMO: 6
+      STR_HYDRO_JET_CANNON: 1
+      STR_JET_HARPOON: 2
+      STR_MAGNA_BLAST_GRENADE: 5
+      STR_SMALL_TORPEDO: 4
+      STR_TORPEDO_LAUNCHER: 1
+    scientists: 10
+    engineers: 10
+alienMissions:
+  - type: STR_ALIEN_PROBE_MISSION
+    region: STR_SOUTH_ATLANTIC
+    race: STR_AQUATOID
+    nextWave: 0
+    nextUfoCounter: 0
+    spawnCountdown: 120
+    liveUfos: 0
+    uniqueID: 1
+    missionSiteZone: -1
+  - type: STR_ALIEN_SURFACE_ATTACK
+    region: STR_NORTH_ATLANTIC
+    race: STR_GILLMAN
+    nextWave: 0
+    nextUfoCounter: 0
+    spawnCountdown: 150
+    liveUfos: 0
+    uniqueID: 2
+    missionSiteZone: 1
+generatedEvents:
+  {}
+ufopediaRuleStatus:
+  {}
+manufactureRuleStatus:
+  {}
+researchRuleStatus:
+  {}
+monthlyPurchaseLimitLog:
+  {}
+hiddenPurchaseItems:
+  {}
+customRuleCraftDeployments:
+  {}
+alienStrategy:
+  regions:
+    STR_ANTARCTIC: 10
+    STR_ARCTIC: 5
+    STR_CARRIBEAN: 10
+    STR_INDIAN_OCEAN: 8
+    STR_MEDITERRANEAN: 16
+    STR_NORTH_ATLANTIC: 18
+    STR_NORTH_PACIFIC: 4
+    STR_NORTH_SEA: 15
+    STR_SOUTH_ATLANTIC: 4
+    STR_SOUTH_CHINA_SEA: 12
+    STR_SOUTH_PACIFIC: 10
+    STR_THE_EAST_SEA: 12
+  possibleMissions:
+    - region: ARTIFACT_SITES
+      missions: ~
+    - region: SHIPPING_LANES
+      missions: ~
+    - region: STR_AFRICA
+      missions: ~
+    - region: STR_ANTARCTIC
+      missions:
+        STR_ALIEN_BASE: 22
+        STR_ALIEN_PROBE_MISSION: 15
+    - region: STR_ARCTIC
+      missions:
+        STR_ALIEN_BASE: 28
+        STR_ALIEN_PROBE_MISSION: 15
+    - region: STR_CARRIBEAN
+      missions:
+        STR_ALIEN_BASE: 9
+        STR_ALIEN_PROBE_MISSION: 6
+        STR_ALIEN_RESOURCE_RAID: 4
+    - region: STR_EURASIA
+      missions: ~
+    - region: STR_INDIAN_OCEAN
+      missions:
+        STR_ALIEN_BASE: 9
+        STR_ALIEN_INFILTRATION: 8
+        STR_ALIEN_INTERDICTION: 8
+        STR_ALIEN_PROBE_MISSION: 7
+        STR_ALIEN_RESOURCE_RAID: 8
+    - region: STR_MEDITERRANEAN
+      missions:
+        STR_ALIEN_BASE: 6
+        STR_ALIEN_INFILTRATION: 20
+        STR_ALIEN_INTERDICTION: 10
+        STR_ALIEN_PROBE_MISSION: 10
+        STR_ALIEN_RESOURCE_RAID: 15
+    - region: STR_NORTH_AMERICA
+      missions: ~
+    - region: STR_NORTH_ATLANTIC
+      missions:
+        STR_ALIEN_BASE: 20
+        STR_ALIEN_INFILTRATION: 20
+        STR_ALIEN_INTERDICTION: 16
+        STR_ALIEN_PROBE_MISSION: 14
+        STR_ALIEN_RESOURCE_RAID: 20
+    - region: STR_NORTH_PACIFIC
+      missions:
+        STR_ALIEN_BASE: 18
+        STR_ALIEN_INFILTRATION: 18
+        STR_ALIEN_INTERDICTION: 16
+        STR_ALIEN_PROBE_MISSION: 25
+        STR_ALIEN_RESOURCE_RAID: 21
+    - region: STR_NORTH_SEA
+      missions:
+        STR_ALIEN_BASE: 8
+        STR_ALIEN_INFILTRATION: 13
+        STR_ALIEN_INTERDICTION: 13
+        STR_ALIEN_PROBE_MISSION: 8
+        STR_ALIEN_RESOURCE_RAID: 21
+    - region: STR_SOUTH_ATLANTIC
+      missions:
+        STR_ALIEN_BASE: 25
+        STR_ALIEN_INFILTRATION: 20
+        STR_ALIEN_INTERDICTION: 22
+        STR_ALIEN_RESOURCE_RAID: 12
+    - region: STR_SOUTH_CHINA_SEA
+      missions:
+        STR_ALIEN_BASE: 19
+        STR_ALIEN_INFILTRATION: 8
+        STR_ALIEN_INTERDICTION: 8
+        STR_ALIEN_PROBE_MISSION: 8
+        STR_ALIEN_RESOURCE_RAID: 8
+    - region: STR_SOUTH_PACIFIC
+      missions:
+        STR_ALIEN_BASE: 20
+        STR_ALIEN_INFILTRATION: 18
+        STR_ALIEN_INTERDICTION: 24
+        STR_ALIEN_PROBE_MISSION: 10
+        STR_ALIEN_RESOURCE_RAID: 12
+    - region: STR_THE_EAST_SEA
+      missions:
+        STR_ALIEN_BASE: 8
+        STR_ALIEN_INFILTRATION: 10
+        STR_ALIEN_INTERDICTION: 5
+        STR_ALIEN_PROBE_MISSION: 5
+        STR_ALIEN_RESOURCE_RAID: 6
+  missionLocations:
+    {}
+  missionsRun:
+    {}
+options:
+  displayWidth: 640
+  displayHeight: 400
+  fullscreen: false
+  asyncBlit: true
+  keyboardMode: 1
+  maxFrameSkip: 0
+  traceAI: false
+  verboseLogging: false
+  StereoSound: true
+  geoscapeScale: 0
+  battlescapeScale: 0
+  useScaleFilter: false
+  useHQXFilter: false
+  useXBRZFilter: false
+  useOpenGL: false
+  checkOpenGLErrors: false
+  useOpenGLShader: Shaders/Raw.OpenGL.shader
+  useOpenGLSmoothing: true
+  debug: false
+  debugUi: false
+  soundVolume: 84
+  musicVolume: 84
+  uiVolume: 42
+  language: en-GB
+  battleScrollSpeed: 8
+  battleEdgeScroll: 2
+  battleDragScrollButton: 0
+  dragScrollTimeTolerance: 300
+  dragScrollPixelTolerance: 10
+  battleFireSpeed: 6
+  battleXcomSpeed: 30
+  battleAlienSpeed: 30
+  battleNewPreviewPath: 0
+  fpsCounter: false
+  globeDetail: true
+  globeRadarLines: true
+  globeFlightPaths: true
+  globeAllRadarsOnBaseBuild: true
+  audioSampleRate: 22050
+  audioBitDepth: 16
+  audioChunkSize: 1024
+  pauseMode: 0
+  battleNotifyDeath: false
+  showFundsOnGeoscape: false
+  allowResize: false
+  windowedModePositionX: 0
+  windowedModePositionY: 0
+  borderless: false
+  captureMouse: false
+  battleTooltips: true
+  keepAspectRatio: true
+  nonSquarePixelRatio: false
+  cursorInBlackBandsInFullscreen: false
+  cursorInBlackBandsInWindow: true
+  cursorInBlackBandsInBorderlessWindow: false
+  saveOrder: 3
+  geoClockSpeed: 80
+  dogfightSpeed: 30
+  geoScrollSpeed: 20
+  geoDragScrollButton: 2
+  preferredMusic: 0
+  preferredSound: 0
+  preferredVideo: 0
+  wordwrap: 0
+  musicAlwaysLoop: false
+  touchEnabled: false
+  rootWindowedMode: false
+  backgroundMute: false
+  soldierDiaries: true
+  playIntro: true
+  autosave: true
+  autosaveFrequency: 5
+  newSeedOnLoad: false
+  lazyLoadResources: true
+  mousewheelSpeed: 3
+  changeValueByMouseWheel: 0
+  maximizeInfoScreens: false
+  FPS: 60
+  FPSInactive: 30
+  vSyncForOpenGL: true
+  geoDragScrollInvert: false
+  aggressiveRetaliation: false
+  customInitialBase: false
+  allowBuildingQueue: false
+  craftLaunchAlways: false
+  storageLimitsEnforced: false
+  canSellLiveAliens: false
+  anytimePsiTraining: false
+  globeSeasons: false
+  globeSurfaceCache: true
+  psiStrengthEval: false
+  canTransferCraftsWhileAirborne: false
+  retainCorpses: false
+  fieldPromotions: false
+  battleDragScrollInvert: false
+  sneakyAI: false
+  battleUFOExtenderAccuracy: false
+  showMoreStatsInInventoryView: false
+  battleHairBleach: true
+  battleInstantGrenade: false
+  includePrimeStateInSavedLayout: false
+  battleExplosionHeight: 0
+  battleAutoEnd: false
+  battleSmoothCamera: false
+  disableAutoEquip: false
+  battleConfirmFireMode: false
+  weaponSelfDestruction: false
+  allowPsionicCapture: false
+  allowPsiStrengthImprovement: false
+  strafe: false
+  forceFire: true
+  skipNextTurnScreen: false
+  noAlienPanicMessages: false
+  alienBleeding: false
+  keyOk: 13
+  keyCancel: 27
+  keyScreenshot: 293
+  keyFps: 288
+  keyQuickSave: 286
+  keyQuickLoad: 290
+  keyGeoLeft: 276
+  keyGeoRight: 275
+  keyGeoUp: 273
+  keyGeoDown: 274
+  keyGeoZoomIn: 43
+  keyGeoZoomOut: 45
+  keyGeoSpeed1: 49
+  keyGeoSpeed2: 50
+  keyGeoSpeed3: 51
+  keyGeoSpeed4: 52
+  keyGeoSpeed5: 53
+  keyGeoSpeed6: 54
+  keyGeoIntercept: 105
+  keyGeoBases: 98
+  keyGeoGraphs: 103
+  keyGeoUfopedia: 117
+  keyGeoOptions: 27
+  keyGeoFunding: 102
+  keyGeoToggleDetail: 9
+  keyGeoToggleRadar: 114
+  keyBaseSelect1: 49
+  keyBaseSelect2: 50
+  keyBaseSelect3: 51
+  keyBaseSelect4: 52
+  keyBaseSelect5: 53
+  keyBaseSelect6: 54
+  keyBaseSelect7: 55
+  keyBaseSelect8: 56
+  keyBattleLeft: 276
+  keyBattleRight: 275
+  keyBattleUp: 273
+  keyBattleDown: 274
+  keyBattleLevelUp: 280
+  keyBattleLevelDown: 281
+  keyBattleCenterUnit: 278
+  keyBattlePrevUnit: 0
+  keyBattleNextUnit: 9
+  keyBattleDeselectUnit: 92
+  keyBattleUseLeftHand: 113
+  keyBattleUseRightHand: 101
+  keyBattleInventory: 105
+  keyBattleMap: 109
+  keyBattleOptions: 27
+  keyBattleEndTurn: 8
+  keyBattleAbort: 97
+  keyBattleStats: 115
+  keyBattleKneel: 107
+  keyBattleReload: 114
+  keyBattlePersonalLighting: 108
+  keyBattleReserveNone: 282
+  keyBattleReserveSnap: 283
+  keyBattleReserveAimed: 284
+  keyBattleReserveAuto: 285
+  keyBattleReserveKneel: 106
+  keyBattleZeroTUs: 127
+  keyBattleCenterEnemy1: 49
+  keyBattleCenterEnemy2: 50
+  keyBattleCenterEnemy3: 51
+  keyBattleCenterEnemy4: 52
+  keyBattleCenterEnemy5: 53
+  keyBattleCenterEnemy6: 54
+  keyBattleCenterEnemy7: 55
+  keyBattleCenterEnemy8: 56
+  keyBattleCenterEnemy9: 57
+  keyBattleCenterEnemy10: 48
+  keyBattleVoxelView: 291
+  keyInvCreateTemplate: 99
+  keyInvApplyTemplate: 118
+  keyInvClear: 120
+  keyInvAutoEquip: 122
+  oxceModValidationLevel: 2
+  oxceRawScreenShots: false
+  oxceFirstPersonViewFisheyeProjection: false
+  oxceThumbButtons: true
+  oxceThrottleMouseMoveEvent: 0
+  oxceEmbeddedOnly: false
+  oxceListVFSContents: false
+  oxceEnablePaletteFlickerFix: false
+  oxceRecommendedOptionsWereSet: false
+  password: secret
+  oxceStartUpTextMode: 0
+  oxceGeoscapeDebugLogMaxEntries: 1000
+  oxceGeoSlowdownFactor: 1
+  oxceBaseInfoDefenseScaleMultiplier: 100
+  oxceBaseManufactureInfinityButton: 0
+  oxceDisableAlienInventory: false
+  oxceDisableHitLog: false
+  oxceDisableInventoryTuCost: false
+  oxceDisableProductionDependencyTree: false
+  oxceDisableStatsForNerds: false
+  oxceDisableTechTreeViewer: false
+  oxceTogglePersonalLightType: 1
+  oxceToggleNightVisionType: 1
+  oxceToggleBrightnessType: 0
+  oxceEnableUnitResponseSounds: true
+  oxceHiddenMovementBackgroundChangeFrequency: 1
+  oxceMaxEquipmentLayoutTemplates: 20
+  oxceUpdateCheck: false
+  autosaveSlots: 1
+  oxceLinks: false
+  oxceFatFingerLinks: false
+  oxceHighlightNewTopics: true
+  oxcePediaShowClipSize: false
+  oxceEnableSlackingIndicator: true
+  oxceInterceptGuiMaintenanceTime: 2
+  oxceShowETAMode: 0
+  oxceUfoLandingAlert: false
+  oxceRememberDisabledCraftWeapons: false
+  oxceGeoscapeEventsInstantDelivery: true
+  oxceShowBaseNameInPopups: false
+  oxceAlternateCraftEquipmentManagement: false
+  oxceBaseInfoScaleEnabled: false
+  oxceResearchScrollSpeed: 1
+  oxceResearchScrollSpeedWithCtrl: 10
+  oxceManufactureFilterSuppliesOK: false
+  oxceManufactureScrollSpeed: 1
+  oxceManufactureScrollSpeedWithCtrl: 10
+  oxcePersonalLayoutIncludingArmor: true
+  oxceManualPromotions: false
+  oxceWoundedDefendBaseIf: 100
+  oxcePlayBriefingMusicDuringEquipment: false
+  oxceNightVisionColor: 5
+  oxceAutoNightVisionThreshold: 15
+  oxceAutoSell: false
+  oxceAutomaticPromotions: true
+  oxceEnableOffCentreShooting: false
+  keyToggleQuickSearch: 113
+  keyGeoUfoTracker: 116
+  keyGeoTechTreeViewer: 113
+  keyGeoGlobalProduction: 112
+  keyGeoGlobalResearch: 99
+  keyGeoGlobalAlienContainment: 106
+  keyGeoDailyPilotExperience: 101
+  keyGraphsZoomIn: 270
+  keyGraphsZoomOut: 269
+  keyBasescapeBuildNewBase: 110
+  keyBasescapeBaseInformation: 105
+  keyBasescapeSoldiers: 115
+  keyBasescapeEquipCraft: 101
+  keyBasescapeBuildFacilities: 102
+  keyBasescapeResearch: 114
+  keyBasescapeManufacture: 109
+  keyBasescapeTransfer: 116
+  keyBasescapePurchase: 112
+  keyBasescapeSell: 108
+  keyRemoveSoldiersFromTraining: 120
+  keyAddSoldiersToTraining: 122
+  keyCraftLoadoutSave: 286
+  keyCraftLoadoutLoad: 290
+  keyRemoveSoldiersFromAllCrafts: 120
+  keyRemoveSoldiersFromCraft: 122
+  keyRemoveEquipmentFromCraft: 120
+  keyRemoveArmorFromAllCrafts: 120
+  keyRemoveArmorFromCraft: 122
+  keyInventorySave: 286
+  keyInventoryLoad: 290
+  keyInvSavePersonalEquipment: 115
+  keyInvLoadPersonalEquipment: 108
+  keyInvShowPersonalEquipment: 112
+  keyInventoryArmor: 97
+  keyInventoryAvatar: 109
+  keySellAll: 120
+  keySellAllButOne: 122
+  keyTransferAll: 120
+  keyMarkAllAsSeen: 120
+  keyBattleShowLayers: 0
+  keyBattleUseSpecial: 119
+  keyBattleActionItem1: 49
+  keyBattleActionItem2: 50
+  keyBattleActionItem3: 51
+  keyBattleActionItem4: 52
+  keyBattleActionItem5: 53
+  keyNightVisionToggle: 302
+  keyNightVisionHold: 32
+  keySelectMusicTrack: 279
+  oxceMaxBases: 8
+  showCraftHangar: false
+  dogfightAI: true
+  displayHiddenAlienActivity: 0
+  baseDefenseProbability: false
+  baseDetectionProbability: false
+  battleRealisticAccuracy: false
+  battleRealisticImprovedSnap: true
+  battleRealisticShotDispersion: 1
+  battleRealisticDisplayRolls: false
+  battleAltGrenades: false
+  instantPrime: false
+  strictBlockedChecking: false
+  battleTerrainSquishyness: 1
+  oxceFOW: 0
+  oxceFOWColor: 1
+  oxceSmartCtrlEquip: true
+  updateTurnsSinceSeenByClue: true
+  brutalAI: true
+  brutalCivilians: false
+  ignoreDelay: true
+  cheatOnMovement: false
+  allowPreprime: true
+  avoidMines: true
+  avoidCuddle: true
+  aiPeformance: false
+  aiTargetMode: 3
+  aggressionMode: 0
+  intelligenceMode: 0
+  autoCombat: false
+  autoCombatEachCombat: true
+  autoCombatEachTurn: true
+  autoCombatControlPerUnit: true
+  autoCombatDefaultSoldier: true
+  autoCombatDefaultHWP: true
+  autoCombatDefaultMindControl: true
+  autoCombatDefaultRemain: true
+  keyAIList: 99
+  keyToggleAutoPlay: 97
+  keyReadyLightGrenade: 44
+  keyReadyHeavyGrenade: 46
+  keyReadyProximityGrenade: 47
+  keyReadySmokeGrenade: 59
+  keyReadyFlare: 39
+  keyReadyScanner: 93
+  keyReadyMedikit: 91
+  keyClearLeftHand: 45

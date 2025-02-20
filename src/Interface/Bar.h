@@ -31,7 +31,7 @@ namespace OpenXcom
 class Bar : public Surface
 {
 private:
-	Uint8 _color, _color2, _borderColor;
+	uint8_t _color, _color2, _borderColor;
 	double _scale, _max, _value, _value2;
 	bool _secondOnTop;
 public:
@@ -40,13 +40,13 @@ public:
 	/// Cleans up the bar.
 	~Bar();
 	/// Sets the bar's color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the bar's color.
-	Uint8 getColor() const;
+	uint8_t getColor() const;
 	/// Sets the bar's second color.
-	void setSecondaryColor(Uint8 color) override;
+	void setSecondaryColor(uint8_t color) override;
 	/// Gets the bar's second color.
-	Uint8 getSecondaryColor() const;
+	uint8_t getSecondaryColor() const;
 	/// Sets the bar's scale.
 	void setScale(double scale);
 	/// Gets the bar's scale.
@@ -68,7 +68,7 @@ public:
 	/// Draws the bar.
 	void draw() override;
 	/// set the outline color for the bar.
-	void setBorderColor(Uint8 bc) override;
+	void setBorderColor(uint8_t bc) override;
 };
 
 }

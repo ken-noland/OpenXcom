@@ -56,22 +56,28 @@ public:
 	Language();
 	/// Cleans up the language.
 	~Language();
+
 	/// Gets list of available languages.
 	static void getList(std::vector<std::string> &ids, std::vector<std::string> &names);
+
 	/// Checks if a language is in the supported name list.
 	static bool isSupported(const std::string& lang) { return _names.find(lang) != _names.end(); }
+
 	/// Loads the language from an external file.
 	void loadFile(const FileMap::FileRecord *frec);
 	/// Loads the language from a ruleset file.
 	void loadRule(const std::map<std::string, ExtraStrings*> &extraStrings, const std::string &id);
+
 	/// Outputs the language to a HTML file.
 	void toHtml(const std::string &filename) const;
+
 	/// Get a localized text.
 	LocalizedText getString(const std::string &id) const;
 	/// Get a quantity-depended localized text.
 	LocalizedText getString(const std::string &id, unsigned n) const;
 	/// Get a gender-depended localized text.
 	LocalizedText getString(const std::string &id, SoldierGender gender) const;
+
 	/// Gets the direction of text in this language.
 	TextDirection getTextDirection() const;
 	/// Gets the wrapping of text in this language.

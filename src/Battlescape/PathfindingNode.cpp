@@ -98,7 +98,7 @@ void PathfindingNode::connect(PathfindingCost cost, PathfindingNode* prevNode, i
 	_prevDir = prevDir;
 	if (!inOpenSet()) // Otherwise we have this already.
 	{
-		_tuGuess = (Sint16)(4 * Position::distance(target, _pos));
+		_tuGuess = (int16_t)(4 * Position::distance(target, _pos));
 	}
 }
 

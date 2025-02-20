@@ -72,22 +72,24 @@ ManufactureDependenciesTreeState::ManufactureDependenciesTreeState(const std::st
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&ManufactureDependenciesTreeState::btnOkClick);
-	_btnOk->onKeyboardPress((ActionHandler)&ManufactureDependenciesTreeState::btnOkClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnOk->onKeyboardPress((ActionHandler)&ManufactureDependenciesTreeState::btnOkClick, Options::keyCancel);
 
 	_lstTopics->setColumns(1, 182);
 	_lstTopics->setBackground(_window);
 	_lstTopics->setMargin(0);
 	_lstTopics->setAlign(TextHAlign::ALIGN_CENTER);
 
-	if (Options::oxceDisableProductionDependencyTree)
-	{
-		_txtTitle->setHeight(_txtTitle->getHeight() * 11);
-		_txtTitle->setWordWrap(true);
-		_txtTitle->setText(tr("STR_THIS_FEATURE_IS_DISABLED_3"));
-		_btnShowAll->setVisible(false);
-		_lstTopics->setVisible(false);
-		return;
-	}
+// OPTIONSHACK
+	//if (Options::oxceDisableProductionDependencyTree)
+	//{
+	//	_txtTitle->setHeight(_txtTitle->getHeight() * 11);
+	//	_txtTitle->setWordWrap(true);
+	//	_txtTitle->setText(tr("STR_THIS_FEATURE_IS_DISABLED_3"));
+	//	_btnShowAll->setVisible(false);
+	//	_lstTopics->setVisible(false);
+	//	return;
+	//}
 }
 
 ManufactureDependenciesTreeState::~ManufactureDependenciesTreeState()

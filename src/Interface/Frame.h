@@ -28,7 +28,7 @@ namespace OpenXcom
 class Frame : public Surface
 {
 private:
-	Uint8 _color, _bg;
+	uint8_t _color, _bg;
 	int _thickness;
 	bool _contrast;
 public:
@@ -37,14 +37,14 @@ public:
 	/// Cleans up the frame.
 	~Frame();
 	/// Sets the border color.
-	void setColor(Uint8 color) override;
+	void setColor(uint8_t color) override;
 	/// Gets the border color.
-	Uint8 getColor() const;
-	void setBorderColor(Uint8 color) override;
+	uint8_t getColor() const;
+	void setBorderColor(uint8_t color) override;
 	/// Sets the background color.
-	void setSecondaryColor(Uint8 bg) override;
+	void setSecondaryColor(uint8_t bg) override;
 	/// Gets the background color.
-	Uint8 getSecondaryColor() const;
+	uint8_t getSecondaryColor() const;
 	/// Sets the high contrast color setting.
 	void setHighContrast(bool contrast) override;
 	/// Sets the border thickness.

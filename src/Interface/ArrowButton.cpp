@@ -46,7 +46,7 @@ ArrowButton::~ArrowButton()
 	delete _timer;
 }
 
-bool ArrowButton::isButtonHandled(Uint8 button)
+bool ArrowButton::isButtonHandled(uint8_t button)
 {
 	if (_list != 0)
 	{
@@ -62,7 +62,7 @@ bool ArrowButton::isButtonHandled(Uint8 button)
  * Changes the color for the image button.
  * @param color Color value.
  */
-void ArrowButton::setColor(Uint8 color)
+void ArrowButton::setColor(uint8_t color)
 {
 	ImageButton::setColor(color);
 	_redraw = true;

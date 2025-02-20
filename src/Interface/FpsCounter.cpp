@@ -70,7 +70,7 @@ void FpsCounter::setPalette(const SDL_Color *colors, int firstcolor, int ncolors
  * Sets the text color of the counter.
  * @param color The color to set.
  */
-void FpsCounter::setColor(Uint8 color)
+void FpsCounter::setColor(uint8_t color)
 {
 	_text->setColor(color);
 }

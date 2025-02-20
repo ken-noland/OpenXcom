@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Window.h"
-#include <SDL.h>
+
 #include <SDL_mixer.h>
 #include "../fmath.h"
 #include "../Engine/Timer.h"
@@ -86,7 +86,7 @@ namespace OpenXcom
 // * Changes the color used to draw the shaded border.
 // * @param color Color value.
 // */
-//void Window::setColor(Uint8 color)
+//void Window::setColor(uint8_t color)
 //{
 //	_color = color;
 //	_redraw = true;
@@ -96,7 +96,7 @@ namespace OpenXcom
 // * Returns the color used to draw the shaded border.
 // * @return Color value.
 // */
-//Uint8 Window::getColor() const
+//uint8_t Window::getColor() const
 //{
 //	return _color;
 //}
@@ -193,7 +193,7 @@ namespace OpenXcom
 //	{
 //		mul = 2;
 //	}
-//	Uint8 color = _color + 3 * mul;
+//	uint8_t color = _color + 3 * mul;
 //
 //	if (_thinBorder)
 //	{
@@ -298,7 +298,7 @@ namespace OpenXcom
 ///**
 // * Changes the window to have a custom inner color.
 // */
-//void Window::setInnerColor(Uint8 innerColor)
+//void Window::setInnerColor(uint8_t innerColor)
 //{
 //	_innerColor = innerColor;
 //}

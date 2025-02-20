@@ -114,14 +114,14 @@ inline FactoryType& ECS::getFactory()
 ///-----------------------------------------------------------------------------
 /// Global functions
 
-class Game;
-extern Game* getGame();
-
-/// Return a system
-template <typename SystemType>
-inline SystemType& getSystem()
-{
-	return getGame()->getECS().getSystem<SystemType>();
-}
+//class Game;
+//extern Game* getGame();
+//
+///// Return a system
+//template <typename SystemType>
+//inline SystemType& getSystem()
+//{
+//	return getGame()->getECS().getSystem<SystemType>();
+//}
 
 } // namespace OpenXcom

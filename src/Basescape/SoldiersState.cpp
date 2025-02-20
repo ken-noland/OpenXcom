@@ -510,7 +510,7 @@ void SoldiersState::moveSoldierUp(Action *action, unsigned int row, bool max)
 		_base->getSoldiers().at(baseIndexNext) = s;
 		if (row != _lstSoldiers->getScroll())
 		{
-			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<Uint16>(8 * action->getYScale()));
+			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() - static_cast<uint16_t>(8 * action->getYScale()));
 		}
 		else
 		{
@@ -565,7 +565,7 @@ void SoldiersState::moveSoldierDown(Action *action, unsigned int row, bool max)
 		_base->getSoldiers().at(baseIndexNext) = s;
 		if (row != _lstSoldiers->getVisibleRows() - 1 + _lstSoldiers->getScroll())
 		{
-			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<Uint16>(8 * action->getYScale()));
+			SDL_WarpMouse(action->getLeftBlackBand() + action->getXMouse(), action->getTopBlackBand() + action->getYMouse() + static_cast<uint16_t>(8 * action->getYScale()));
 		}
 		else
 		{

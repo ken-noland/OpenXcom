@@ -94,8 +94,9 @@ CraftPilotsState::CraftPilotsState(Base* base, size_t craft) : State("CraftPilot
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&CraftPilotsState::btnOkClick);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftPilotsState::btnOkClick, Options::keyOk);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftPilotsState::btnOkClick, Options::keyCancel);
+// OPTIONSHACK
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftPilotsState::btnOkClick, Options::keyOk);
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftPilotsState::btnOkClick, Options::keyCancel);
 
 	Craft *c = _base->getCrafts().at(_craft);
 

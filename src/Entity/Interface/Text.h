@@ -20,9 +20,6 @@
 #include "../Engine/Surface.h"
 #include "../../Engine/Unicode.h"
 
-//KN NOTE: temp - until I move the rest of the definitions here
-#include "../../Interface/Text.h"
-
 namespace OpenXcom
 {
 
@@ -41,7 +38,7 @@ struct TextComponent
 	std::vector<int> _lineWidth, _lineHeight;
 	bool _wrap, _invert, _contrast, _indent, _scroll, _ignoreSeparators;
 
-	Uint8 _color, _color2;
+	uint8_t _color, _color2;
 
 	int _scrollY;
 };
@@ -68,13 +65,13 @@ struct TextFontComponent
 
 struct TextAlignmentComponent
 {
-	TextAlignmentComponent(TextHAlign align, TextVAlign valign)
-		: _align(align), _valign(valign)
-	{
-	}
+	//TextAlignmentComponent(TextHAlign align, TextVAlign valign)
+	//	: _align(align), _valign(valign)
+	//{
+	//}
 
-	TextHAlign _align;
-	TextVAlign _valign;
+	//TextHAlign _align;
+	//TextVAlign _valign;
 };
 
 struct TextLangComponent
@@ -123,25 +120,25 @@ public:
 	/// Sets the text's high contrast color setting.
 	void setHighContrast(entt::handle textHandle, bool contrast); // override;
 
-	/// Sets the text's horizontal alignment.
-	void setAlign(entt::handle textHandle, TextHAlign align);
-	/// Gets the text's horizontal alignment.
-	TextHAlign getAlign(entt::handle textHandle) const;
+	///// Sets the text's horizontal alignment.
+	//void setAlign(entt::handle textHandle, TextHAlign align);
+	///// Gets the text's horizontal alignment.
+	//TextHAlign getAlign(entt::handle textHandle) const;
 
-	/// Sets the text's vertical alignment.
-	void setVerticalAlign(entt::handle textHandle, TextVAlign valign);
-	/// Gets the text's vertical alignment.
-	TextVAlign getVerticalAlign(entt::handle textHandle) const;
+	///// Sets the text's vertical alignment.
+	//void setVerticalAlign(entt::handle textHandle, TextVAlign valign);
+	///// Gets the text's vertical alignment.
+	//TextVAlign getVerticalAlign(entt::handle textHandle) const;
 
 	/// Sets the text's color.
-	void setColor(entt::handle textHandle, Uint8 color); // override;
+	void setColor(entt::handle textHandle, uint8_t color); // override;
 	/// Gets the text's color.
-	Uint8 getColor(entt::handle textHandle) const;
+	uint8_t getColor(entt::handle textHandle) const;
 
 	/// Sets the text's secondary color.
-	void setSecondaryColor(entt::handle textHandle, Uint8 color);
+	void setSecondaryColor(entt::handle textHandle, uint8_t color);
 	/// Gets the text's secondary color.
-	Uint8 getSecondaryColor(entt::handle textHandle) const;
+	uint8_t getSecondaryColor(entt::handle textHandle) const;
 
 	/// Gets the number of lines in the (wrapped, if wrapping is enabled) text
 	int getNumLines(entt::handle textHandle) const;

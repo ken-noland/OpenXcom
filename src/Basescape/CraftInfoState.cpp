@@ -163,9 +163,10 @@ CraftInfoState::CraftInfoState(Base* base, size_t craftId) : State("CraftInfoSta
 
 	_btnOk->setText(tr("STR_OK"));
 	_btnOk->onMouseClick((ActionHandler)&CraftInfoState::btnOkClick);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftInfoState::btnOkClick, Options::keyCancel);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftInfoState::btnUfopediaClick, Options::keyGeoUfopedia);
-	_btnOk->onKeyboardPress((ActionHandler)&CraftInfoState::btnAIClick, Options::keyAIList);
+// OPTIONSHACK
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftInfoState::btnOkClick, Options::keyCancel);
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftInfoState::btnUfopediaClick, Options::keyGeoUfopedia);
+	//_btnOk->onKeyboardPress((ActionHandler)&CraftInfoState::btnAIClick, Options::keyAIList);
 
 	_btnNewBattle->setText(tr("STR_NEW_BATTLE"));
 	_btnNewBattle->onMouseClick((ActionHandler)&CraftInfoState::btnNewBattleClick);
@@ -510,69 +511,69 @@ void CraftInfoState::btnNewBattleClick(Action *)
 	size_t difficulty = 0;
 	size_t alienTech = 0;
 
-	std::string s = Options::getMasterUserFolder() + "battle.cfg";
-	if (!CrossPlatform::fileExists(s))
-	{
-		// nothing
-	}
-	else
-	{
-		try
-		{
-			YAML::Node doc = YAML::Load(*CrossPlatform::readFile(s));
-			mission = doc["mission"].as<size_t>(0);
-			//craft = doc["craft"].as<size_t>(0);
-			darkness = doc["darkness"].as<size_t>(0);
-			terrain = doc["terrain"].as<size_t>(0);
-			alienRace = doc["alienRace"].as<size_t>(0);
-			//difficulty = doc["difficulty"].as<size_t>(0);
-			alienTech = doc["alienTech"].as<size_t>(0);
-		}
-		catch (YAML::Exception& e)
-		{
-			Log(LOG_WARNING) << e.what();
-		}
-	}
+	//std::string s = Options::getMasterUserFolder() + "battle.cfg";
+	//if (!CrossPlatform::fileExists(s))
+	//{
+	//	// nothing
+	//}
+	//else
+	//{
+	//	try
+	//	{
+	//		YAML::Node doc = YAML::Load(*CrossPlatform::readFile(s));
+	//		mission = doc["mission"].as<size_t>(0);
+	//		//craft = doc["craft"].as<size_t>(0);
+	//		darkness = doc["darkness"].as<size_t>(0);
+	//		terrain = doc["terrain"].as<size_t>(0);
+	//		alienRace = doc["alienRace"].as<size_t>(0);
+	//		//difficulty = doc["difficulty"].as<size_t>(0);
+	//		alienTech = doc["alienTech"].as<size_t>(0);
+	//	}
+	//	catch (YAML::Exception& e)
+	//	{
+	//		Log(LOG_WARNING) << e.what();
+	//	}
+	//}
 
-	// index of the craft type in the New Battle combobox
-	size_t idx = 0;
-	for (auto& craftType : getGame()->getMod()->getCraftsList())
-	{
-		const RuleCraft* rule = getGame()->getMod()->getCraft(craftType);
-		if (rule->isForNewBattle())
-		{
-			if (rule == _craft->getRules())
-			{
-				craft = idx;
-				break;
-			}
-			++idx;
-		}
-		else
-		{
-			// don't increase the index, these crafts are not in the New Battle combobox
-		}
-	}
+	//// index of the craft type in the New Battle combobox
+	//size_t idx = 0;
+	//for (auto& craftType : getGame()->getMod()->getCraftsList())
+	//{
+	//	const RuleCraft* rule = getGame()->getMod()->getCraft(craftType);
+	//	if (rule->isForNewBattle())
+	//	{
+	//		if (rule == _craft->getRules())
+	//		{
+	//			craft = idx;
+	//			break;
+	//		}
+	//		++idx;
+	//	}
+	//	else
+	//	{
+	//		// don't increase the index, these crafts are not in the New Battle combobox
+	//	}
+	//}
 
-	// transfer also the difficulty
-	difficulty = getGame()->getSavedGame()->getDifficulty();
+	//// transfer also the difficulty
+	//difficulty = getGame()->getSavedGame()->getDifficulty();
 
-	YAML::Emitter out;
-	YAML::Node node;
-	node["mission"] = mission;
-	node["craft"] = craft;
-	node["darkness"] = darkness;
-	node["terrain"] = terrain;
-	node["alienRace"] = alienRace;
-	node["difficulty"] = difficulty;
-	node["alienTech"] = alienTech;
-	node["base"] = _base->save();
-	out << node;
+	//YAML::Emitter out;
+	//YAML::Node node;
+	//node["mission"] = mission;
+	//node["craft"] = craft;
+	//node["darkness"] = darkness;
+	//node["terrain"] = terrain;
+	//node["alienRace"] = alienRace;
+	//node["difficulty"] = difficulty;
+	//node["alienTech"] = alienTech;
+	//node["base"] = _base->save();
+	//out << node;
 
-	if (!CrossPlatform::writeFile(s, out.c_str()))
-	{
-		Log(LOG_WARNING) << "Failed to save " << s;
-	}
+	//if (!CrossPlatform::writeFile(s, out.c_str()))
+	//{
+	//	Log(LOG_WARNING) << "Failed to save " << s;
+	//}
 }
 
 /**
@@ -695,11 +696,12 @@ void CraftInfoState::edtCraftChange(Action *action)
 	{
 		_craft->setName(_edtCraft->getText());
 	}
-	if (action->getDetails()->key.keysym.sym == SDLK_RETURN ||
-		action->getDetails()->key.keysym.sym == SDLK_KP_ENTER)
-	{
-		_edtCraft->setText(_craft->getName(getGame()->getLanguage()));
-	}
+// SDLHACK
+	//if (action->getDetails()->key.keysym.sym == SDLK_RETURN ||
+	//	action->getDetails()->key.keysym.sym == SDLK_KP_ENTER)
+	//{
+	//	_edtCraft->setText(_craft->getName(getGame()->getLanguage()));
+	//}
 }
 
 /// Handler for clicking the AI button.

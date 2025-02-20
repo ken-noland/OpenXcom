@@ -45,7 +45,7 @@ ImageButton::~ImageButton()
  * Changes the color for the image button.
  * @param color Color value.
  */
-void ImageButton::setColor(Uint8 color)
+void ImageButton::setColor(uint8_t color)
 {
 	_color = color;
 }
@@ -54,7 +54,7 @@ void ImageButton::setColor(Uint8 color)
  * Returns the color for the image button.
  * @return Color value.
  */
-Uint8 ImageButton::getColor() const
+uint8_t ImageButton::getColor() const
 {
 	return _color;
 }

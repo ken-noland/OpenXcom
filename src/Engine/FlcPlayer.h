@@ -22,7 +22,7 @@
 /*
  * Based on http://www.libsdl.org/projects/flxplay/
  */
-#include <SDL.h>
+
 
 namespace OpenXcom
 {
@@ -34,27 +34,27 @@ class FlcPlayer
 {
 private:
 
-	Uint8 *_fileBuf;
-	Uint32 _fileSize;
-	Uint8 *_videoFrameData;
-	Uint8 *_chunkData;
-	Uint8 *_audioFrameData;
-	Uint16 _frameCount;    /* Frame Counter */
-	Uint32 _headerSize;    /* Fli file size */
-	Uint16 _headerType;    /* Fli header check */
-	Uint16 _headerFrames;  /* Number of frames in flic */
-	Uint16 _headerWidth;   /* Fli width */
-	Uint16 _headerHeight;  /* Fli height */
-	Uint16 _headerDepth;   /* Color depth */
-	Uint16 _headerSpeed;   /* Number of video ticks between frame */
-	Uint32 _videoFrameSize;     /* Frame size in bytes */
-	Uint16 _videoFrameType;
-	Uint16 _frameChunks;   /* Number of chunks in frame */
-	Uint32 _chunkSize;     /* Size of chunk */
-	Uint16 _chunkType;     /* Type of chunk */
-	Uint16 _delayOverride; /* FRAME_TYPE extension */
-	Uint32 _audioFrameSize;
-	Uint16 _audioFrameType;
+	uint8_t *_fileBuf;
+	uint32_t _fileSize;
+	uint8_t *_videoFrameData;
+	uint8_t *_chunkData;
+	uint8_t *_audioFrameData;
+	uint16_t _frameCount;    /* Frame Counter */
+	uint32_t _headerSize;    /* Fli file size */
+	uint16_t _headerType;    /* Fli header check */
+	uint16_t _headerFrames;  /* Number of frames in flic */
+	uint16_t _headerWidth;   /* Fli width */
+	uint16_t _headerHeight;  /* Fli height */
+	uint16_t _headerDepth;   /* Color depth */
+	uint16_t _headerSpeed;   /* Number of video ticks between frame */
+	uint32_t _videoFrameSize;     /* Frame size in bytes */
+	uint16_t _videoFrameType;
+	uint16_t _frameChunks;   /* Number of chunks in frame */
+	uint32_t _chunkSize;     /* Size of chunk */
+	uint16_t _chunkType;     /* Type of chunk */
+	uint16_t _delayOverride; /* FRAME_TYPE extension */
+	uint32_t _audioFrameSize;
+	uint16_t _audioFrameType;
 
 	void (*_frameCallBack)();
 
@@ -73,7 +73,7 @@ private:
 
 	typedef struct AudioBuffer
 	{
-		Sint16 *samples;
+		int16_t *samples;
 		int sampleCount;
 		int sampleBufSize;
 		int currSamplePos;
@@ -93,16 +93,16 @@ private:
 
 	Game *_game;
 
-	void readU16(Uint16 &dst, const Uint8 *const src);
-	void readU32(Uint32 &dst, const Uint8 *const src);
-	void readS16(Sint16 &dst, const Sint8 *const src);
-	void readS32(Sint32 &dst, const Sint8 *const src);
+	void readU16(uint16_t &dst, const uint8_t *const src);
+	void readU32(uint32_t &dst, const uint8_t *const src);
+	void readS16(int16_t &dst, const int8_t *const src);
+	void readS32(int32_t &dst, const int8_t *const src);
 	void readFileHeader();
 
-	bool isValidFrame(Uint8 *frameHeader, Uint32 &frameSize, Uint16 &frameType);
+	bool isValidFrame(uint8_t *frameHeader, uint32_t &frameSize, uint16_t &frameType);
 	void decodeVideo(bool skipLastFrame);
 	void decodeAudio(int frames);
-	void waitForNextFrame(Uint32 delay);
+	void waitForNextFrame(uint32_t delay);
 	void SDLPolling();
 	bool shouldQuit();
 
@@ -115,13 +115,13 @@ private:
 	void color64();
 	void black();
 
-	void playAudioFrame(Uint16 sampleRate);
-	void initAudio(Uint16 format, Uint8 channels);
+	void playAudioFrame(uint16_t sampleRate);
+	void initAudio(uint16_t format, uint8_t channels);
 	void deInitAudio();
 
-	bool isEndOfFile(Uint8 *pos);
+	bool isEndOfFile(uint8_t *pos);
 
-	static void audioCallback(void *userData, Uint8 *stream, int len);
+	static void audioCallback(void *userData, uint8_t *stream, int len);
 
 public:
 
@@ -137,7 +137,7 @@ public:
 	// Stop FLC Player
 	void stop();
 	/// Delay player at the end
-	void delay(Uint32 milliseconds);
+	void delay(uint32_t milliseconds);
 	void setHeaderSpeed(int speed);
 	int getFrameCount();
 	bool wasSkipped();

@@ -28,8 +28,8 @@ class PathfindingNode;
 struct OpenSetEntry
 {
 	PathfindingNode *_node;
-	Sint16 _cost;
-	Uint8 _openentry;
+	int16_t _cost;
+	uint8_t _openentry;
 };
 
 /**

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <SDL.h>
 #include <string>
 #include "OpenGL.h"
 #include "Surface.h"
@@ -44,7 +43,7 @@ private:
 	int _baseWidth, _baseHeight;
 	double _scaleX, _scaleY;
 	int _topBlackBand, _bottomBlackBand, _leftBlackBand, _rightBlackBand, _cursorTopBlackBand, _cursorLeftBlackBand;
-	Uint32 _flags;
+	uint32_t _flags;
 	SDL_Color deferredPalette[256];
 	int _numColors, _firstColor;
 	bool _pushPalette;

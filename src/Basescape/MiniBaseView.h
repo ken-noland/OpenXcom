@@ -35,7 +35,7 @@ class SurfaceSet;
 class MiniBaseView : public InteractiveSurface
 {
 private:
-	static const Sint16 MINI_SIZE = 14;
+	static const int16_t MINI_SIZE = 14;
 
 	BasescapeSystem& _basescapeSystem;
 	size_t _unsubscribeId;
@@ -44,7 +44,7 @@ private:
 
 	SurfaceSet* _texture = nullptr;
 
-	Uint8 _red = 0, _green = 0, _blue = 0;
+	uint8_t _red = 0, _green = 0, _blue = 0;
 
 public:
 	/// Creates a new mini base view at the specified position and size.
@@ -62,9 +62,9 @@ public:
 
 	void draw() override;
 
-	void setColor(Uint8 color) override { _green = color; }
-	void setSecondaryColor(Uint8 color) override { _red = color; }
-	void setBorderColor(Uint8 color) override { _blue = color; }
+	void setColor(uint8_t color) override { _green = color; }
+	void setSecondaryColor(uint8_t color) override { _red = color; }
+	void setBorderColor(uint8_t color) override { _blue = color; }
 };
 
 }
