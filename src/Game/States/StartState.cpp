@@ -37,6 +37,7 @@
 #include "../../Engine/Resource/FileProcessor/ImageFile.h"
 
 #include <glm/vec4.hpp>
+#include <cstring>
 
 // wrap in an anonymous namespace to avoid name conflicts
 namespace
