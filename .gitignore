@@ -19,3 +19,7 @@ CMakeSettings.json
 /.vs/slnx.sqlite
 /.vs/VSWorkspaceState.json
 /vc140.pdb
+/.vs/*
+/obj/*
+/src/.vs/*
+/src/build/x64
