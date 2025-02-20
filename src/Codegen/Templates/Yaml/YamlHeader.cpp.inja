@@ -9,7 +9,7 @@ namespace OpenXcom {
 
 // forward declarations of template specializations
 {% for type in types %}template <>
-bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object);
+bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, ryml::Parser const& parser);
 template <>
 bool OpenXcom::toYaml<{{type.fullName}}>(const {{type.fullName}}& object, ryml::NodeRef& yaml);
 {% endfor %}

@@ -34,6 +34,7 @@
 
 #include "../../Utility/RTTR.h"
 #include "../../Yaml.h"
+#include "../../YamlContext.h"
 
 namespace OpenXcom
 {
@@ -100,26 +101,8 @@ void FontPack::load(const std::filesystem::path& path)
 	ImageManager& imageManager = resourceSystem.getImageManager();
 	ImageFileProcessor& imageFileProcessor = resourceSystem.getImageFileProcessor();
 
-	// use the virtual file system to find the font file
-	FileSystem& vfs = _context.getVirtualFileSystem().getDataFileSystem();
-	std::unique_ptr<FileEntry> file = vfs.getFile(path);
-
-	if (!file)
-	{
-		Log(LOG_ERROR) << "FontPack: Could not find font file: " << path.string();
-		return;
-	}
-
-	std::unique_ptr<std::istream> stream = file->openRead();
-	std::string contents(std::istreambuf_iterator<char>(*stream), {});
-
-	// Read the file into memory
-	ryml::substr substr(contents.data(), contents.size());
-	ryml::Tree tree = ryml::parse_in_place(substr);
-
-	// Parse the YAML document
-	FileFont fileFonts;
-	fromYaml(tree.rootref(), fileFonts);
+	YamlContext yamlContext{_context};
+	const FileFont fileFonts = yamlContext.LoadAndParse<FileFont>(path);
 
 	// Load the fonts
 	for (const FileFontDefinition& fontDef : fileFonts.fonts)
