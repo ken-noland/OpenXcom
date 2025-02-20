@@ -33,45 +33,45 @@ namespace OpenXcom
 
 SIMPLERTTR
 {
-	SimpleRTTR::registration().type<TextHAlign>()
-		.value(TextHAlign::ALIGN_LEFT, "ALIGN_LEFT")
-		.value(TextHAlign::ALIGN_CENTER, "ALIGN_CENTER")
-		.value(TextHAlign::ALIGN_RIGHT, "ALIGN_RIGHT");
+	//SimpleRTTR::registration().type<TextHAlign>()
+	//	.value(TextHAlign::ALIGN_LEFT, "ALIGN_LEFT")
+	//	.value(TextHAlign::ALIGN_CENTER, "ALIGN_CENTER")
+	//	.value(TextHAlign::ALIGN_RIGHT, "ALIGN_RIGHT");
 
-	SimpleRTTR::registration().type<TextVAlign>()
-		.value(TextVAlign::ALIGN_TOP, "ALIGN_TOP")
-		.value(TextVAlign::ALIGN_MIDDLE, "ALIGN_MIDDLE")
-		.value(TextVAlign::ALIGN_BOTTOM, "ALIGN_BOTTOM");
+	//SimpleRTTR::registration().type<TextVAlign>()
+	//	.value(TextVAlign::ALIGN_TOP, "ALIGN_TOP")
+	//	.value(TextVAlign::ALIGN_MIDDLE, "ALIGN_MIDDLE")
+	//	.value(TextVAlign::ALIGN_BOTTOM, "ALIGN_BOTTOM");
 
-	/// RTTR Registration for TextComponent
-	SimpleRTTR::registration().type<TextComponent>()
-		.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
-		.property(&TextComponent::_text, "text")
-		.property(&TextComponent::_wrap, "wrap")
-		.property(&TextComponent::_invert, "invert")
-		.property(&TextComponent::_contrast, "contrast")
-		.property(&TextComponent::_indent, "indent")
-		.property(&TextComponent::_scroll, "scroll")
-		.property(&TextComponent::_scrollY, "scrollY")
-		.property(&TextComponent::_ignoreSeparators, "ignoreSeparators")
-		.property(&TextComponent::_color, "color")
-		.property(&TextComponent::_color2, "color2");
+	///// RTTR Registration for TextComponent
+	//SimpleRTTR::registration().type<TextComponent>()
+	//	.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+	//	.property(&TextComponent::_text, "text")
+	//	.property(&TextComponent::_wrap, "wrap")
+	//	.property(&TextComponent::_invert, "invert")
+	//	.property(&TextComponent::_contrast, "contrast")
+	//	.property(&TextComponent::_indent, "indent")
+	//	.property(&TextComponent::_scroll, "scroll")
+	//	.property(&TextComponent::_scrollY, "scrollY")
+	//	.property(&TextComponent::_ignoreSeparators, "ignoreSeparators")
+	//	.property(&TextComponent::_color, "color")
+	//	.property(&TextComponent::_color2, "color2");
 
-	/// RTTR Registration for TextFontComponent
-	SimpleRTTR::registration().type<TextFontComponent>()
-		.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
-		.property(&TextFontComponent::_font, "font");
+	///// RTTR Registration for TextFontComponent
+	//SimpleRTTR::registration().type<TextFontComponent>()
+	//	.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+	//	.property(&TextFontComponent::_font, "font");
 
-	/// RTTR Registration for TextAlignmentComponentt
-	SimpleRTTR::registration().type<TextAlignmentComponent>()
-		.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
-		.property(&TextAlignmentComponent::_align, "align")
-		.property(&TextAlignmentComponent::_valign, "valign");
+	///// RTTR Registration for TextAlignmentComponentt
+	//SimpleRTTR::registration().type<TextAlignmentComponent>()
+	//	.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+	//	.property(&TextAlignmentComponent::_align, "align")
+	//	.property(&TextAlignmentComponent::_valign, "valign");
 
-	/// RTTR Registration for TextLangComponent
-	SimpleRTTR::registration().type<TextLangComponent>()
-		.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
-		.property(&TextLangComponent::_lang, "lang");
+	///// RTTR Registration for TextLangComponent
+	//SimpleRTTR::registration().type<TextLangComponent>()
+	//	.meta(GetComponentFuncName, &GetComponentRawPointer<TextComponent>)
+	//	.property(&TextLangComponent::_lang, "lang");
 }
 
 TextSystem::TextSystem()
@@ -116,23 +116,23 @@ void TextSystem::setHighContrast(entt::handle textHandle, bool contrast)
 {
 }
 
-void TextSystem::setAlign(entt::handle textHandle, TextHAlign align)
-{
-}
-
-TextHAlign TextSystem::getAlign(entt::handle textHandle) const
-{
-	return TextHAlign();
-}
-
-void TextSystem::setVerticalAlign(entt::handle textHandle, TextVAlign valign)
-{
-}
-
-TextVAlign TextSystem::getVerticalAlign(entt::handle textHandle) const
-{
-	return TextVAlign();
-}
+//void TextSystem::setAlign(entt::handle textHandle, TextHAlign align)
+//{
+//}
+//
+//TextHAlign TextSystem::getAlign(entt::handle textHandle) const
+//{
+//	return TextHAlign();
+//}
+//
+//void TextSystem::setVerticalAlign(entt::handle textHandle, TextVAlign valign)
+//{
+//}
+//
+//TextVAlign TextSystem::getVerticalAlign(entt::handle textHandle) const
+//{
+//	return TextVAlign();
+//}
 
 void TextSystem::setColor(entt::handle textHandle, uint8_t color)
 {

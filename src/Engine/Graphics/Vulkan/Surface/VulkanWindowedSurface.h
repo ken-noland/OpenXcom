@@ -104,6 +104,8 @@ public:
 
 	virtual uint32_t getMultisampleCount() const override { return 1; }
 	virtual bool getUseDynamicStates() const override { return true; }
+	
+	virtual void setExtent(const glm::ivec2& size) override { throw std::runtime_error("You can not set the size of a windowed surface. That is determined by the OS."); };
 		
 	// device image data for a render surface contains the extents of the framebuffer
 	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }; 

@@ -210,7 +210,6 @@ set ( engine_src
   "Engine/Resource/FileProcessor/ImageFile.cpp"
   "Engine/Resource/FileProcessor/ImageFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"
-  "Engine/Resource/FileProcessor/Xcom1MasterFileProcessor.cpp"
   "Engine/Resource/ResourceSystem.cpp"
   "Engine/Utility/RTTRGlm.cpp"
 #  "Engine/Action.cpp"
@@ -250,7 +249,6 @@ set ( engine_src
 #  "Engine/Script.cpp"
 #  "Engine/Sound.cpp"
 #  "Engine/SoundSet.cpp"
-   "Engine/State.cpp"
 #  "Engine/Surface.cpp"
 #  "Engine/SurfaceSet.cpp"
   "Engine/Timer.cpp"
@@ -262,6 +260,9 @@ set ( engine_src
 set( game_src
   "Game/Game.cpp"
   "Game/GameWindow.cpp"
+  "Game/Resource/Xcom1MasterFileProcessor.cpp"
+  "Game/States/StartState.cpp"
+  "Game/States/State.cpp"
 )
 
 set ( geoscape_src
@@ -368,7 +369,6 @@ set ( menu_src
 #  "Menu/SaveGameState.cpp"
 #  "Menu/SetWindowedRootState.cpp"
 #  "Menu/SlideshowState.cpp"
-  "Menu/StartState.cpp"
 #  "Menu/StatisticsState.cpp"
 #  "Menu/TestPaletteState.cpp"
 #  "Menu/TestState.cpp"

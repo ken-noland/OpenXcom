@@ -55,6 +55,8 @@ public:
 	virtual uint32_t getMultisampleCount() const override { return 1; }
 	virtual bool getUseDynamicStates() const override { return false; }
 
+	virtual void setExtent(const glm::ivec2& size) override { /* do nothing, you're headless */ };
+
 	// device image data for a render surface contains the extents of the framebuffer
 	virtual const DeviceBuffer& getDeviceImageData() const override { return *_deviceImageData; }
 

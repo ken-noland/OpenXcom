@@ -35,7 +35,6 @@
 #include "../../Interface/ProgressBar.h"
 #include "../../Interface/ScrollBar.h"
 #include "../../Interface/Slider.h"
-#include "../../Interface/Text.h"
 #include "../../Interface/TextButton.h"
 #include "../../Interface/TextEdit.h"
 #include "../../Interface/TextList.h"
@@ -85,27 +84,27 @@ public:
 
 	struct CreateTextParams
 	{
-		std::string name;
-		std::string text;
-		int x;
-		int y;
-		int width;
-		int height;
+		//std::string name;
+		//std::string text;
+		//int x;
+		//int y;
+		//int width;
+		//int height;
 
-		TextHAlign align = TextHAlign::ALIGN_LEFT;
-		TextVAlign verticalAlign = TextVAlign::ALIGN_TOP;
-		bool wordWrap = false;
+		//TextHAlign align = TextHAlign::ALIGN_LEFT;
+		//TextVAlign verticalAlign = TextVAlign::ALIGN_TOP;
+		//bool wordWrap = false;
 
-		PaletteHandle palette = PaletteHandle::Invalid;
+		//PaletteHandle palette = PaletteHandle::Invalid;
 
-		Font* bigFont = nullptr;
-		Font* smallFont = nullptr;
-		bool isSmall = true;
+		//Font* bigFont = nullptr;
+		//Font* smallFont = nullptr;
+		//bool isSmall = true;
 
-		std::string ruleCategory = "";
-		std::string ruleID = "";
+		//std::string ruleCategory = "";
+		//std::string ruleID = "";
 
-		entt::handle parent;
+		//entt::handle parent;
 	};
 	entt::handle createText(const CreateTextParams& params);
 

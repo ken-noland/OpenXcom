@@ -60,10 +60,10 @@ ECS::ECS()
 	registerSystem<PaletteSystem>();
 
 	// Timers get processed last
-	const TimeSystem& timeSystem = registerSystem<TimeSystem>();
+	//const TimeSystem& timeSystem = registerSystem<TimeSystem>();
 
-	registerSystem<ProgressTimerSystem>(getRegistry().raw(), timeSystem);
-	registerSystem<IntervalTimerSystem>();
+	//registerSystem<ProgressTimerSystem>(getRegistry().raw(), timeSystem);
+	//registerSystem<IntervalTimerSystem>();
 
 	// ---
 	// Factories

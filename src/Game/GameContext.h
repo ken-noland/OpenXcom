@@ -17,26 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <filesystem>
 
 namespace OpenXcom
 {
 
-class Xcom1MasterFileProcessor
+class EngineContext;
+class GameWindow;
+
+class GameContext
 {
-public:
-	Xcom1MasterFileProcessor();
-	~Xcom1MasterFileProcessor();
-
-	bool load(const std::filesystem::path& path);
-
-	bool isValid(const std::filesystem::path& path);
-
 protected:
-	// These helper methods mirror functionality previously in mod.cpp.
-	bool loadVanillaResources();
-	bool loadBattlescapeResources();
-	bool loadExtraResources();
+	EngineContext& _engine;
+	GameWindow& _gameWindow;
+
+public:
+	GameContext(EngineContext& engine, GameWindow& window) : _engine(engine), _gameWindow(window) {}
+	~GameContext() {}
+
+	EngineContext& getEngine() { return _engine; }
+	GameWindow& getGameWindow() { return _gameWindow; }
+
 };
 
 } // namespace OpenXcom

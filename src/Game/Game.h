@@ -21,6 +21,8 @@
 #include <string>
 #include <memory>
 
+#include "GameContext.h"
+
 #include "../Engine/Filesystem/VirtualFileSystem.h"
 #include "../Engine/Platform/Window.h"
 #include "../Entity/Engine/ECS.h"
@@ -36,6 +38,7 @@ class Engine;
 class State;
 class Options;
 class GameWindow;
+class GraphicsCommand;
 
 /**
  * The core of the game engine, manages the game's entire contents and structure.
@@ -46,9 +49,12 @@ class GameWindow;
 class Game
 {
 private:
-	/// Game engine
+	// Game engine
 	Engine& _engine;
 
+	std::unique_ptr<GameContext> _gameContext;
+	MulticastDelegate<void(GraphicsCommand&)>::Handle _onWindowRenderHandle;
+	MulticastDelegate<void(GraphicsCommand&)>::Handle _onGameRenderHandle;
 
 	/// central entity component system
 	ECS _ecs;
@@ -65,6 +71,8 @@ private:
 	Inspector _inspector;
 	#endif
 
+
+
 public:
 	/// Creates a new game.
 	Game(Engine& engine);
@@ -74,6 +82,10 @@ public:
 	int run();
 
 	bool isRunning() const;
+
+	void onGameRender(GraphicsCommand& command);
+	void onWindowRender(GraphicsCommand& command);
+
 
 	/// Update the game.
 	void update();

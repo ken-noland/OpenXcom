@@ -43,6 +43,9 @@ public:
 	virtual uint32_t getMultisampleCount() const = 0;
 	virtual bool getUseDynamicStates() const = 0;
 
+	// Warning: This function invalidates all primitives created from this surface
+	virtual void setExtent(const glm::ivec2& size) = 0;
+
 	// device buffer for a render target contains the extents of the render target
 	virtual const DeviceBuffer& getDeviceImageData() const = 0;
 

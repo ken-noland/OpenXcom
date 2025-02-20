@@ -44,9 +44,9 @@ protected:
 
 	void TearDown() override
 	{
-		_fontHandle.release();
-		_ansiPaletteHandle.release();
-		_paletteHandle.release();
+		_fontHandle.reset();
+		_ansiPaletteHandle.reset();
+		_paletteHandle.reset();
 	}
 };
 

@@ -38,7 +38,7 @@ protected:
 
 	void TearDown() override
 	{
-		_paletteHandle.release();
+		_paletteHandle.reset();
 	}
 };
 

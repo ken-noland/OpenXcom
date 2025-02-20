@@ -54,6 +54,10 @@ void GameSurface::captureFrame(HostImage& image)
 	_renderTarget->copyTo(image);
 }
 
+void GameSurface::setScreenSize(const glm::ivec2& size)
+{
+	_renderTarget->setExtent(size);
+}
 
 glm::ivec2 GameSurface::getScreenSize() const
 {

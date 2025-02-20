@@ -86,6 +86,9 @@ public:
 	RenderTarget& getRenderTarget();
 	PlatformWindow& getWindow();
 
+	//(re)binds the game surface to the pipeline
+	void bindGameSurface(GameSurface& gameSurface);
+
 	MulticastDelegate<void(GraphicsCommand&)>& onRender() { return _onRender; }
 };
 

@@ -100,7 +100,7 @@ public:
 	{
 		if (this != &other)
 		{
-			release(); // Release current resource
+			reset(); // Release current resource
 			_handle = other._handle;
 			_manager = other._manager;
 			other._handle = 0; // Invalidate the old handle
@@ -112,7 +112,7 @@ public:
 	// Destructor: Releases the resource if valid
 	~OwningHandle()
 	{
-		release();
+		reset();
 	}
 
 	// Delete copy constructor and copy assignment
@@ -120,7 +120,7 @@ public:
 	OwningHandle& operator=(const OwningHandle&) = delete;
 
 	// Release the resource explicitly
-	void release()
+	void reset()
 	{
 		if (_handle != ResourceHandle<ResourceType>::Invalid_Handle && _manager != nullptr)
 		{

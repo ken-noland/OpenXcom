@@ -17,15 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "State.h"
+#include "../../Engine/Resource/Handle.h"
+#include <string>
+#include <sstream>
 
 namespace OpenXcom
 {
 
-class State
+class GameContext;
+class RenderTarget;
+class Font;
+class Palette;
+class TextPrimitive;
+
+class StartState : public State
 {
+protected:
+	GameContext& _game;
+
+	OwningHandle<Font> _dosFont;
+	OwningHandle<Palette> _dosFontPalette;
+
+	std::unique_ptr<TextPrimitive> _text;
+	std::unique_ptr<TextPrimitive> _cursor;
+
+	void createDosFont();
+
 public:
-	State() = default;
-	virtual ~State() = default;
+	StartState(GameContext& game);
+	virtual ~StartState();
+
+	virtual void onRender(GraphicsCommand& command) override;
 };
 
 }

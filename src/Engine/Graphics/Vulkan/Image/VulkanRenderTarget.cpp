@@ -264,9 +264,17 @@ void VulkanRenderTarget::destroy()
 	}
 }
 
+void VulkanRenderTarget::setExtent(const glm::ivec2& size)
+{
+	destroy();
+
+	_extent = size;
+	create();
+}
+
 void VulkanRenderTarget::copyFrom(HostImage& hostImage)
 {
-	throw new std::runtime_error("ulkanRenderTarget::copyFrom(HostImage& hostImage) Not implemented");
+	throw new std::runtime_error("VulkanRenderTarget::copyFrom(HostImage& hostImage) Not implemented");
 }
 
 void VulkanRenderTarget::copyTo(HostImage& image)
