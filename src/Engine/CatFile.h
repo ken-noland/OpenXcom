@@ -20,7 +20,6 @@
 #include <vector>
 #include <string>
 #include <tuple>
-#include <SDL_rwops.h>
 
 
 namespace OpenXcom
@@ -43,8 +42,6 @@ public:
 	~CatFile();
 	/// Get amount of objects.
 	size_t size() const { return _items.size(); }
-	/// Return a pointer to the object data.
-	SDL_RWops *getRWops(uint32_t i);
 	/// Return the original file name
 	const std::string& fileName() const { return _filename; }
 };

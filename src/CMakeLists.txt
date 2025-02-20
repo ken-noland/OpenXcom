@@ -788,3 +788,6 @@ target_link_libraries(openxcom PUBLIC openxcom_lib)
 
 # Add the tests subdirectory
 add_subdirectory(Tests)
+
+# Add the tools subdirectory
+add_subdirectory(Tools)

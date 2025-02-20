@@ -59,6 +59,7 @@ SIMPLERTTR
 			.meta("Serialize", PropertySerialize::ALWAYS)
 		.property(REGISTER_PROPERTY(FileFontImageDefinition, width))
 			.meta("Serialize", PropertySerialize::OPTIONAL)
+			.meta("DefaultValueFunc", []() { })
 		.property(REGISTER_PROPERTY(FileFontImageDefinition, spacing))
 			.meta("Serialize", PropertySerialize::OPTIONAL);
 

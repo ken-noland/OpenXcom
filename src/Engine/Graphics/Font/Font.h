@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../../Resource/Handle.h"
+#include "../../Json.h"
 
 #include <string>
 #include <array>
@@ -38,8 +39,8 @@ class DeviceBuffer;
 
 struct Glyph
 {
-	uint16_t x, y, width, height;
-	int8_t xOffset, yOffset, xAdvance;
+	int16_t x = -1, y = -1, width = -1, height = -1;
+	int8_t xOffset = -1, yOffset = -1, xAdvance = -1;
 	ResourceHandle<DeviceImage> image;
 };
 
@@ -74,22 +75,28 @@ struct FontSettings
 
 class Font
 {
-private:
+protected:
 	const std::string _name;
 
 	FontSettings _settings;
 
 	std::vector<OwningHandle<DeviceImage>> _fontTextures; // The font atlas
+
+	std::array<Glyph, 128> _asciiGlyphs;                  // Fast lookup for Codepage 437
+	std::unordered_map<char32_t, Glyph> _extendedGlyphs;  // Fallback for Unicode extensions
+
+	// HarfBuzz font and face
 	hb_face_t* _hbFace = nullptr;
 	hb_font_t* _hbFont = nullptr;
 
 	// Temporary buffer for HarfBuzz text shaping
 	mutable hb_buffer_t* _tempBuffer = nullptr;
 
-	std::array<Glyph, 128> _asciiGlyphs;                 // Fast lookup for Codepage 437
-	std::unordered_map<char32_t, Glyph> _extendedGlyphs; // Fallback for Unicode extensions
-
 	void initializeHarfBuzz();
+
+	// allow serialization to access the protected members
+	friend bool fromJson<>(const nlohmann::json& json, Font& font);
+	friend bool toJson<>(const Font& font, nlohmann::json& json);
 
 public:
 	Font(const std::string& name, const FontSettings& settings, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs = {});
@@ -99,6 +106,8 @@ public:
 	const std::string& getName() const { return _name; }
 
 	const Glyph* getGlyph(char32_t codepoint) const;
+
+	const FontSettings& getSettings() const { return _settings; }
 
 	void setLineSpacing(uint32_t lineSpacing) { _settings.spacing = lineSpacing; }
 	uint32_t getLineSpacing() const { return _settings.spacing; }

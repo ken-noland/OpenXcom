@@ -1,8 +1,5 @@
-
 # Include FetchContent module
 include(FetchContent)
-
-
 
 # Fetch GoogleTest
 FetchContent_Declare(
@@ -65,6 +62,3 @@ add_custom_target(run_tests_after_build ALL
     DEPENDS openxcom openxcom_tests
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src/Tests
 )
-
-# Ensure tests run after the main executable is built
-#add_dependencies(run_tests_after_build openxcom)

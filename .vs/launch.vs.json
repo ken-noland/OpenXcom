@@ -5,6 +5,17 @@
     {
       "type": "default",
       "project": "CMakeLists.txt",
+      "projectTarget": "openxcom.exe (src\\openxcom.exe)",
+      "name": "openxcom.exe (src\\openxcom.exe)",
+      "args": [
+        "-data ${ProjectDir}\\data\\data\\",
+        "-user ${ProjectDir}\\data\\user\\",
+        "-config ${ProjectDir}\\data\\config\\"
+      ]
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
       "projectTarget": "openxcom_tests.exe (src\\Tests\\openxcom_tests.exe)",
       "name": "openxcom_tests.exe (src\\Tests\\openxcom_tests.exe)",
       "args": [
@@ -25,18 +36,12 @@
     {
       "type": "default",
       "project": "CMakeLists.txt",
-      "projectTarget": "openxcom.exe (src\\openxcom.exe)",
-      "name": "openxcom.exe (src\\openxcom.exe)",
+      "projectTarget": "fontconv.exe (src\\Tools\\FontConverter\\fontconv.exe)",
+      "name": "fontconv.exe (src\\Tools\\FontConverter\\fontconv.exe)",
+      "cwd": "${ProjectDir}\\data",
       "args": [
-        "-data ${ProjectDir}\\bin\\",
-        "-user ${ProjectDir}\\data\\user\\",
-        "-config ${ProjectDir}\\data\\config\\"
-      ],
-      "environment": [
-        {
-          "name": "ASAN_OPTIONS",
-          "value": "detect_leaks=1"
-        }
+        "-font ${ProjectDir}\\data\\test\\data\\font\\Font.yml",
+        "-output ${ProjectDir}\\data\\test\\data\\font"
       ]
     }
   ]

@@ -42,181 +42,181 @@ class Craft;
  * polar coordinates and renders it as a 3D-looking globe
  * with cartesian coordinates that the player can interact with.
  */
-class Globe : public InteractiveSurface
+class Globe //: public InteractiveSurface
 {
-private:
-	static const int NUM_LANDSHADES = 48;
-	static const int NUM_SEASHADES = 72;
-	static const int NEAR_RADIUS = 25;
-	static const int MAX_DRAW_RADAR_CIRCLE_RADIUS = 10000;
-	static const size_t DOGFIGHT_ZOOM = 3;
-	static const int CITY_MARKER = 8;
-	static const double ROTATE_LONGITUDE;
-	static const double ROTATE_LATITUDE;
-
-	RuleGlobe *_rules;
-	int16_t _cenX, _cenY;
-	GeoPosition _cenPosition;
-	double _rotLon, _rotLat, _hoverLon, _hoverLat;
-	double _craftLon, _craftLat, _craftRange;
-	size_t _zoom, _zoomOld, _zoomTexture;
-	SurfaceSet *_texture, *_markerSet;
-	Game *_game;
-	Surface *_markers, *_countries, *_radars;
-	bool _hover, _craft;
-	int _blink;
-	Timer *_blinkTimer, *_rotTimer;
-	std::list<Polygon*> _cacheLand;
-	FastLineClip *_clipper;
-	double _radius, _radiusStep;
-	///normal of each pixel in earth globe per zoom level
-	std::vector<std::vector<Cord> > _earthData;
-	///list of dimension of earth on screen per zoom level
-	std::vector<double> _zoomRadius;
-
-	bool _isMouseScrolling, _isMouseScrolled;
-	int _xBeforeMouseScrolling, _yBeforeMouseScrolling;
-	double _lonBeforeMouseScrolling, _latBeforeMouseScrolling;
-	uint32_t _mouseScrollingStartTime;
-	int _totalMouseMoveX, _totalMouseMoveY;
-	bool _mouseMovedOverThreshold;
-
-	/// Sets the globe zoom factor.
-	void setZoom(size_t zoom);
-	/// Checks if a point is behind the globe.
-	bool pointBack(double lon, double lat) const;
-	/// Get polygon pointer
-	Polygon* getPolygonFromLonLat(double lon, double lat) const;
-	/// Checks if a target is near a point.
-	bool targetNear(const Target* target, int x, int y) const;
-	/// Caches a set of polygons.
-	void cache(std::list<Polygon*> *polygons, std::list<Polygon*> *cache);
-	/// Get position of sun relative to given position in polar cords and date.
-	Cord getSunDirection(double lon, double lat) const;
-	/// Draw globe range circle.
-	void drawGlobeCircle(double lat, double lon, double radius, int segments, int frac = 1);
-	/// Special "transparent" line.
-	void XuLine(Surface* surface, Surface* src, double x1, double y1, double x2, double y2, int shade);
-	/// Draw line on globe surface.
-	void drawVHLine(Surface *surface, double lon1, double lat1, double lon2, double lat2, uint8_t color);
-	/// Draw flight path.
-	void drawPath(Surface *surface, double lon1, double lat1, double lon2, double lat2);
-	/// Draw target marker.
-	void drawTarget(const Target *target, Surface *surface);
-	/// Set up the radius of earth and stuff.
-	void setupRadii(int width, int height);
-public:
-	static uint8_t OCEAN_COLOR;
-	static bool OCEAN_SHADING;
-	static uint8_t COUNTRY_LABEL_COLOR;
-	static uint8_t LINE_COLOR;
-	static uint8_t CITY_LABEL_COLOR;
-	static uint8_t BASE_LABEL_COLOR;
-
-	/// Creates a new globe at the specified position and size.
-	Globe(Game* game, int cenX, int cenY, int width, int height, int x = 0, int y = 0);
-	/// Cleans up the globe.
-	~Globe();
-	/// Converts polar coordinates to cartesian coordinates.
-	void polarToCart(double lon, double lat, int16_t *x, int16_t *y) const;
-	/// Converts polar coordinates to cartesian coordinates.
-	void polarToCart(double lon, double lat, double *x, double *y) const;
-	/// Converts cartesian coordinates to polar coordinates.
-	void cartToPolar(int16_t x, int16_t y, double *lon, double *lat) const;
-	/// Starts rotating the globe left.
-	void rotateLeft();
-	/// Starts rotating the globe right.
-	void rotateRight();
-	/// Starts rotating the globe up.
-	void rotateUp();
-	/// Starts rotating the globe down.
-	void rotateDown();
-	/// Stops rotating the globe.
-	void rotateStop();
-	/// Stops longitude rotation of the globe.
-	void rotateStopLon();
-	/// Stops latitude rotation of the globe.
-	void rotateStopLat();
-	/// Zooms the globe in.
-	void zoomIn();
-	/// Zooms the globe out.
-	void zoomOut();
-	/// Zooms the globe minimum.
-	void zoomMin();
-	/// Zooms the globe maximum.
-	void zoomMax();
-	/// Saves the zoom level for dogfights.
-	void saveZoomDogfight();
-	/// Zooms the globe in for dogfights.
-	bool zoomDogfightIn();
-	/// Zooms the globe out for dogfights.
-	bool zoomDogfightOut();
-	/// Gets the current zoom.
-	size_t getZoom() const;
-	/// Centers the globe on a point.
-	[[deprecated("Move to position based")]] void center(double lon, double lat);
-	/// Centers the globe on a point.
-	void center(GeoPosition position);
-	/// Checks if a point is inside land.
-	bool insideLand(double lon, double lat) const;
-	/// Checks if a point is inside fakeUnderwater texture.
-	bool insideFakeUnderwaterTexture(double lon, double lat) const;
-	/// Turns on/off the globe detail.
-	void toggleDetail();
-	/// Gets all the targets near a point on the globe.
-	std::vector<Target*> getTargets(int x, int y, bool craft, Craft *currentCraft) const;
-	/// Caches visible globe polygons.
-	void cachePolygons();
-	/// Sets the palette of the globe.
-	void setPalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256) override;
-	/// Handles the timers.
-	void think() override;
-	/// Blinks the markers.
-	void blink();
-	/// Rotates the globe.
-	void rotate();
-	/// Draws the whole globe.
-	void draw() override;
-	/// Draws the ocean of the globe.
-	void drawOcean();
-	/// Draws the land of the globe.
-	void drawLand();
-	/// Draws the shadow.
-	void drawShadow();
-	/// Draws the radar ranges of the globe.
-	void drawRadars();
-	/// Draws the flight paths of the globe.
-	void drawFlights();
-	/// Draws the country details of the globe.
-	void drawDetail();
-	/// Draws all the markers over the globe.
-	void drawMarkers();
-	/// Blits the globe onto another surface.
-	void blit(SDL_Surface *surface) override;
-	/// Special handling for mouse hover.
-	void mouseOver(Action *action, State *state) override;
-	/// Special handling for mouse presses.
-	void mousePress(Action *action, State *state) override;
-	/// Special handling for mouse releases.
-	void mouseRelease(Action *action, State *state) override;
-	/// Special handling for mouse clicks.
-	void mouseClick(Action *action, State *state) override;
-	/// Special handling for key presses.
-	void keyboardPress(Action *action, State *state) override;
-	/// Get the polygons texture and shade at the given point.
-	void getPolygonTextureAndShade(double lon, double lat, int *texture, int *shade) const;
-	/// Sets hover base position.
-	void setNewBaseHoverPos(double lon, double lat);
-	/// Turns on new base hover mode.
-	void setNewBaseHover(bool hover);
-	/// Sets craft range mode.
-	void setCraftRange(double lon, double lat, double range);
-	/// set the _radarLines variable
-	void toggleRadarLines();
-	/// Update the resolution settings, we just resized the window.
-	void resize();
-	/// Move the mouse back to where it started after we finish drag scrolling.
-	void stopScrolling(Action *action);
+//private:
+//	static const int NUM_LANDSHADES = 48;
+//	static const int NUM_SEASHADES = 72;
+//	static const int NEAR_RADIUS = 25;
+//	static const int MAX_DRAW_RADAR_CIRCLE_RADIUS = 10000;
+//	static const size_t DOGFIGHT_ZOOM = 3;
+//	static const int CITY_MARKER = 8;
+//	static const double ROTATE_LONGITUDE;
+//	static const double ROTATE_LATITUDE;
+//
+//	RuleGlobe *_rules;
+//	int16_t _cenX, _cenY;
+//	GeoPosition _cenPosition;
+//	double _rotLon, _rotLat, _hoverLon, _hoverLat;
+//	double _craftLon, _craftLat, _craftRange;
+//	size_t _zoom, _zoomOld, _zoomTexture;
+//	SurfaceSet *_texture, *_markerSet;
+//	Game *_game;
+//	Surface *_markers, *_countries, *_radars;
+//	bool _hover, _craft;
+//	int _blink;
+//	Timer *_blinkTimer, *_rotTimer;
+//	std::list<Polygon*> _cacheLand;
+//	FastLineClip *_clipper;
+//	double _radius, _radiusStep;
+//	///normal of each pixel in earth globe per zoom level
+//	std::vector<std::vector<Cord> > _earthData;
+//	///list of dimension of earth on screen per zoom level
+//	std::vector<double> _zoomRadius;
+//
+//	bool _isMouseScrolling, _isMouseScrolled;
+//	int _xBeforeMouseScrolling, _yBeforeMouseScrolling;
+//	double _lonBeforeMouseScrolling, _latBeforeMouseScrolling;
+//	uint32_t _mouseScrollingStartTime;
+//	int _totalMouseMoveX, _totalMouseMoveY;
+//	bool _mouseMovedOverThreshold;
+//
+//	/// Sets the globe zoom factor.
+//	void setZoom(size_t zoom);
+//	/// Checks if a point is behind the globe.
+//	bool pointBack(double lon, double lat) const;
+//	/// Get polygon pointer
+//	Polygon* getPolygonFromLonLat(double lon, double lat) const;
+//	/// Checks if a target is near a point.
+//	bool targetNear(const Target* target, int x, int y) const;
+//	/// Caches a set of polygons.
+//	void cache(std::list<Polygon*> *polygons, std::list<Polygon*> *cache);
+//	/// Get position of sun relative to given position in polar cords and date.
+//	Cord getSunDirection(double lon, double lat) const;
+//	/// Draw globe range circle.
+//	void drawGlobeCircle(double lat, double lon, double radius, int segments, int frac = 1);
+//	/// Special "transparent" line.
+//	void XuLine(Surface* surface, Surface* src, double x1, double y1, double x2, double y2, int shade);
+//	/// Draw line on globe surface.
+//	void drawVHLine(Surface *surface, double lon1, double lat1, double lon2, double lat2, uint8_t color);
+//	/// Draw flight path.
+//	void drawPath(Surface *surface, double lon1, double lat1, double lon2, double lat2);
+//	/// Draw target marker.
+//	void drawTarget(const Target *target, Surface *surface);
+//	/// Set up the radius of earth and stuff.
+//	void setupRadii(int width, int height);
+//public:
+//	static uint8_t OCEAN_COLOR;
+//	static bool OCEAN_SHADING;
+//	static uint8_t COUNTRY_LABEL_COLOR;
+//	static uint8_t LINE_COLOR;
+//	static uint8_t CITY_LABEL_COLOR;
+//	static uint8_t BASE_LABEL_COLOR;
+//
+//	/// Creates a new globe at the specified position and size.
+//	Globe(Game* game, int cenX, int cenY, int width, int height, int x = 0, int y = 0);
+//	/// Cleans up the globe.
+//	~Globe();
+//	/// Converts polar coordinates to cartesian coordinates.
+//	void polarToCart(double lon, double lat, int16_t *x, int16_t *y) const;
+//	/// Converts polar coordinates to cartesian coordinates.
+//	void polarToCart(double lon, double lat, double *x, double *y) const;
+//	/// Converts cartesian coordinates to polar coordinates.
+//	void cartToPolar(int16_t x, int16_t y, double *lon, double *lat) const;
+//	/// Starts rotating the globe left.
+//	void rotateLeft();
+//	/// Starts rotating the globe right.
+//	void rotateRight();
+//	/// Starts rotating the globe up.
+//	void rotateUp();
+//	/// Starts rotating the globe down.
+//	void rotateDown();
+//	/// Stops rotating the globe.
+//	void rotateStop();
+//	/// Stops longitude rotation of the globe.
+//	void rotateStopLon();
+//	/// Stops latitude rotation of the globe.
+//	void rotateStopLat();
+//	/// Zooms the globe in.
+//	void zoomIn();
+//	/// Zooms the globe out.
+//	void zoomOut();
+//	/// Zooms the globe minimum.
+//	void zoomMin();
+//	/// Zooms the globe maximum.
+//	void zoomMax();
+//	/// Saves the zoom level for dogfights.
+//	void saveZoomDogfight();
+//	/// Zooms the globe in for dogfights.
+//	bool zoomDogfightIn();
+//	/// Zooms the globe out for dogfights.
+//	bool zoomDogfightOut();
+//	/// Gets the current zoom.
+//	size_t getZoom() const;
+//	/// Centers the globe on a point.
+//	[[deprecated("Move to position based")]] void center(double lon, double lat);
+//	/// Centers the globe on a point.
+//	void center(GeoPosition position);
+//	/// Checks if a point is inside land.
+//	bool insideLand(double lon, double lat) const;
+//	/// Checks if a point is inside fakeUnderwater texture.
+//	bool insideFakeUnderwaterTexture(double lon, double lat) const;
+//	/// Turns on/off the globe detail.
+//	void toggleDetail();
+//	/// Gets all the targets near a point on the globe.
+//	std::vector<Target*> getTargets(int x, int y, bool craft, Craft *currentCraft) const;
+//	/// Caches visible globe polygons.
+//	void cachePolygons();
+//	/// Sets the palette of the globe.
+//	void setPalette(const SDL_Color *colors, int firstcolor = 0, int ncolors = 256) override;
+//	/// Handles the timers.
+//	void think() override;
+//	/// Blinks the markers.
+//	void blink();
+//	/// Rotates the globe.
+//	void rotate();
+//	/// Draws the whole globe.
+//	void draw() override;
+//	/// Draws the ocean of the globe.
+//	void drawOcean();
+//	/// Draws the land of the globe.
+//	void drawLand();
+//	/// Draws the shadow.
+//	void drawShadow();
+//	/// Draws the radar ranges of the globe.
+//	void drawRadars();
+//	/// Draws the flight paths of the globe.
+//	void drawFlights();
+//	/// Draws the country details of the globe.
+//	void drawDetail();
+//	/// Draws all the markers over the globe.
+//	void drawMarkers();
+//	/// Blits the globe onto another surface.
+//	void blit(SDL_Surface *surface) override;
+//	/// Special handling for mouse hover.
+//	void mouseOver(Action *action, State *state) override;
+//	/// Special handling for mouse presses.
+//	void mousePress(Action *action, State *state) override;
+//	/// Special handling for mouse releases.
+//	void mouseRelease(Action *action, State *state) override;
+//	/// Special handling for mouse clicks.
+//	void mouseClick(Action *action, State *state) override;
+//	/// Special handling for key presses.
+//	void keyboardPress(Action *action, State *state) override;
+//	/// Get the polygons texture and shade at the given point.
+//	void getPolygonTextureAndShade(double lon, double lat, int *texture, int *shade) const;
+//	/// Sets hover base position.
+//	void setNewBaseHoverPos(double lon, double lat);
+//	/// Turns on new base hover mode.
+//	void setNewBaseHover(bool hover);
+//	/// Sets craft range mode.
+//	void setCraftRange(double lon, double lat, double range);
+//	/// set the _radarLines variable
+//	void toggleRadarLines();
+//	/// Update the resolution settings, we just resized the window.
+//	void resize();
+//	/// Move the mouse back to where it started after we finish drag scrolling.
+//	void stopScrolling(Action *action);
 };
 
 }

@@ -466,8 +466,6 @@ public:
 	void playMusic(const std::string &name, int id = 0);
 	/// Gets a particular sound.
 	Sound *getSound(const std::string &set, int sound) const;
-	/// Gets a particular palette.
-	[[deprecated("Use PaletteSystem::getPalette")]] Palette *getPalette(const std::string &name, bool error = true) const;
 	/// Gets list of voxel data.
 	const std::vector<uint16_t> *getVoxelData() const;
 	/// Returns a specific sound from either the land or underwater sound set.

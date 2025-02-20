@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <SDL_mixer.h>
 #include <map>
 
 namespace OpenXcom
@@ -38,7 +37,7 @@ private:
 	int _sharedSounds;
 
 	int convertSampleRate(uint8_t *oldsound, size_t oldsize, uint8_t *newsound) const;
-	void writeWAV(SDL_RWops *dest, uint8_t *sound, size_t size, bool resample) const;
+//	void writeWAV(SDL_RWops *dest, uint8_t *sound, size_t size, bool resample) const;
 
 public:
 	/// Crates a sound set.

@@ -443,10 +443,10 @@ public:
 			assert(characters[i] < 127);
 
 			asciiGlyphs[characters[i]] = {
-				static_cast<uint16_t>(x),
-				static_cast<uint16_t>(y),
-				static_cast<uint16_t>(charWidth),
-				static_cast<uint16_t>(charHeight),
+				static_cast<int16_t>(x),
+				static_cast<int16_t>(y),
+				static_cast<int16_t>(charWidth),
+				static_cast<int16_t>(charHeight),
 				0, 0,
 				static_cast<int8_t>(charWidth), // Fixed width spacing
 				image

@@ -74,13 +74,15 @@
 #include "../Engine/CrossPlatform.h"
 #include "../Engine/Exception.h"
 #include "../Engine/FileMap.h"
-#include "../Engine/Font.h"
+#include "../Engine/Graphics/Font/Font.h"
+#include "../Engine/Graphics/Font/FontManager.h"
 #include "../Engine/GMCat.h"
-#include "../Engine/Game.h"
+#include "../Game/Game.h"
 #include "../Engine/Logger.h"
 #include "../Engine/Music.h"
 #include "../Engine/Options.h"
-#include "../Engine/Palette.h"
+#include "../Engine/Graphics/Palette/Palette.h"
+#include "../Engine/Graphics/Palette/PaletteManager.h"
 #include "../Engine/Registry.h"
 #include "../Engine/RNG.h"
 #include "../Engine/ScriptBind.h"
@@ -260,12 +262,12 @@ void Mod::resetGlobalStatics()
 	DEBRIEF_MUSIC_GOOD = "GMMARS";
 	DEBRIEF_MUSIC_BAD = "GMMARS";
 
-	Globe::OCEAN_COLOR = Palette::blockOffset(12);
-	Globe::OCEAN_SHADING = true;
-	Globe::COUNTRY_LABEL_COLOR = 239;
-	Globe::LINE_COLOR = 162;
-	Globe::CITY_LABEL_COLOR = 138;
-	Globe::BASE_LABEL_COLOR = 133;
+	//Globe::OCEAN_COLOR = Palette::blockOffset(12);
+	//Globe::OCEAN_SHADING = true;
+	//Globe::COUNTRY_LABEL_COLOR = 239;
+	//Globe::LINE_COLOR = 162;
+	//Globe::CITY_LABEL_COLOR = 138;
+	//Globe::BASE_LABEL_COLOR = 133;
 
 	TextButton::soundPress = 0;
 
@@ -450,7 +452,7 @@ Mod::Mod(const ModFile& modFiles) :
 	_baseDefenseMapFromLocation(0), _disableUnderwaterSounds(false), _enableUnitResponseSounds(false), _pediaReplaceCraftFuelWithRangeType(-1),
 	_facilityListOrder(0), _craftListOrder(0), _itemCategoryListOrder(0), _itemListOrder(0),
 	_researchListOrder(0),  _manufactureListOrder(0), _soldierBonusListOrder(0), _transformationListOrder(0), _ufopaediaListOrder(0), _invListOrder(0), _soldierListOrder(0),
-	_modCurrent(0), _statePalette(0)
+	_modCurrent(0)//, _statePalette(0)
 {
 	_muteMusic = new Music();
 	_muteSound = new Sound();
@@ -857,17 +859,17 @@ Font *Mod::getFont(const std::string &name, bool error) const
  */
 void Mod::lazyLoadSurface(const std::string &name)
 {
-	if (Options::lazyLoadResources)
-	{
-		auto i = _extraSprites.find(name);
-		if (i != _extraSprites.end())
-		{
-			for (auto* extraSprites : i->second)
-			{
-				loadExtraSprite(extraSprites);
-			}
-		}
-	}
+	//if (Options::lazyLoadResources)
+	//{
+	//	auto i = _extraSprites.find(name);
+	//	if (i != _extraSprites.end())
+	//	{
+	//		for (auto* extraSprites : i->second)
+	//		{
+	//			loadExtraSprite(extraSprites);
+	//		}
+	//	}
+	//}
 }
 
 /**
@@ -899,14 +901,14 @@ SurfaceSet *Mod::getSurfaceSet(const std::string &name, bool error)
  */
 Music *Mod::getMusic(const std::string &name, bool error) const
 {
-	if (Options::mute)
-	{
-		return _muteMusic;
-	}
-	else
-	{
+	//if (Options::mute)
+	//{
+	//	return _muteMusic;
+	//}
+	//else
+	//{
 		return getRule(name, "Music", _musics, error);
-	}
+	//}
 }
 
 /**
@@ -926,12 +928,12 @@ const std::map<std::string, Music*> &Mod::getMusicTrackList() const
  */
 Music *Mod::getRandomMusic(const std::string &name) const
 {
-	if (Options::mute)
-	{
-		return _muteMusic;
-	}
-	else
-	{
+	//if (Options::mute)
+	//{
+	//	return _muteMusic;
+	//}
+	//else
+	//{
 		std::vector<Music*> music;
 		for (auto& pair : _musics)
 		{
@@ -948,7 +950,7 @@ Music *Mod::getRandomMusic(const std::string &name) const
 		{
 			return music[RNG::seedless(0, static_cast<int>(music.size() - 1))];
 		}
-	}
+	//}
 }
 
 /**
@@ -958,11 +960,13 @@ Music *Mod::getRandomMusic(const std::string &name) const
  */
 void Mod::playMusic(const std::string &name, int id)
 {
-	if (!Options::mute && _playingMusic != name)
+	//if (!Options::mute && _playingMusic != name)
+	if (_playingMusic != name)
 	{
 		int loop = -1;
 		// hacks
-		if (!Options::musicAlwaysLoop && (name == "GMSTORY" || name == "GMWIN" || name == "GMLOSE"))
+		//if (!Options::musicAlwaysLoop && (name == "GMSTORY" || name == "GMWIN" || name == "GMLOSE"))
+		if ((name == "GMSTORY" || name == "GMWIN" || name == "GMLOSE"))
 		{
 			loop = 0;
 		}
@@ -1013,12 +1017,12 @@ SoundSet *Mod::getSoundSet(const std::string &name, bool error) const
  */
 Sound *Mod::getSound(const std::string &set, int sound) const
 {
-	if (Options::mute)
-	{
-		return _muteSound;
-	}
-	else
-	{
+	//if (Options::mute)
+	//{
+	//	return _muteSound;
+	//}
+	//else
+	//{
 		SoundSet *ss = getSoundSet(set, false);
 		if (ss != 0)
 		{
@@ -1035,19 +1039,7 @@ Sound *Mod::getSound(const std::string &set, int sound) const
 			Log(LOG_ERROR) << "SoundSet " << set << " not found";
 			return _muteSound;
 		}
-	}
-}
-
-/**
- * Returns a specific palette from the mod.
- * @param name Name of the palette.
- * @return Pointer to the palette.
- */
-Palette *Mod::getPalette(const std::string &name, bool error) const
-{
-	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
-	PaletteHandle paletteHandle = paletteSystem.getPaletteByName(name);
-	return paletteSystem.getPalette(paletteHandle);
+	//}
 }
 
 /**
@@ -1120,11 +1112,11 @@ bool Mod::checkForObsoleteErrorByYear(const std::string &parent, const YAML::Nod
  */
 void Mod::verifySpriteOffset(const std::string &parent, const int& sprite, const std::string &set) const
 {
-	if (Options::lazyLoadResources)
-	{
-		// we can't check if index is correct when set is loaded
-		return;
-	}
+	//if (Options::lazyLoadResources)
+	//{
+	//	// we can't check if index is correct when set is loaded
+	//	return;
+	//}
 
 	auto* s = getRule(set, "Sprite Set", _sets, true);
 
@@ -1150,11 +1142,11 @@ void Mod::verifySpriteOffset(const std::string &parent, const int& sprite, const
  */
 void Mod::verifySpriteOffset(const std::string &parent, const std::vector<int>& sprites, const std::string &set) const
 {
-	if (Options::lazyLoadResources)
-	{
-		// we can't check if index is correct when set is loaded
-		return;
-	}
+	//if (Options::lazyLoadResources)
+	//{
+	//	// we can't check if index is correct when set is loaded
+	//	return;
+	//}
 
 	auto* s = getRule(set, "Sprite Set", _sets, true);
 
@@ -1183,11 +1175,11 @@ void Mod::verifySpriteOffset(const std::string &parent, const std::vector<int>& 
  */
 void Mod::verifySoundOffset(const std::string &parent, const int& sound, const std::string &set) const
 {
-	if (Options::mute)
-	{
-		// when mute is set not sound data is loaded and we can't check for correct data
-		return;
-	}
+	//if (Options::mute)
+	//{
+	//	// when mute is set not sound data is loaded and we can't check for correct data
+	//	return;
+	//}
 
 	auto* s = getSoundSet(set);
 
@@ -1204,11 +1196,11 @@ void Mod::verifySoundOffset(const std::string &parent, const int& sound, const s
  */
 void Mod::verifySoundOffset(const std::string &parent, const std::vector<int>& sounds, const std::string &set) const
 {
-	if (Options::mute)
-	{
-		// when mute is set not sound data is loaded and we can't check for correct data
-		return;
-	}
+	//if (Options::mute)
+	//{
+	//	// when mute is set not sound data is loaded and we can't check for correct data
+	//	return;
+	//}
 
 	auto* s = getSoundSet(set);
 
@@ -2089,31 +2081,31 @@ static void throwModOnErrorHelper(const std::string& modId, const std::string& e
 {
 	std::ostringstream errorStream;
 
-	errorStream << "failed to load '"
-		<< Options::getModInfos().at(modId).getName()
-		<< "'";
+	//errorStream << "failed to load '"
+	//	<< Options::getModInfos().at(modId).getName()
+	//	<< "'";
 
-	if (!Options::debug)
-	{
-		Log(LOG_WARNING) << "disabling mod with invalid ruleset: " << modId;
+	//if (!Options::debug)
+	//{
+	//	Log(LOG_WARNING) << "disabling mod with invalid ruleset: " << modId;
 
-		std::vector<Options::ModSettings>::iterator found = std::find_if(Options::mods.begin(), Options::mods.end(), [modId](const Options::ModSettings& m) -> bool
-																{ return m.name == modId; });
+	//	std::vector<Options::ModSettings>::iterator found = std::find_if(Options::mods.begin(), Options::mods.end(), [modId](const Options::ModSettings& m) -> bool
+	//															{ return m.name == modId; });
 
-		if (found == Options::mods.end())
-		{
-			Log(LOG_ERROR) << "cannot find broken mod in mods list: " << modId;
-			Log(LOG_ERROR) << "clearing mods list";
-			Options::mods.clear();
-		}
-		else
-		{
-			found->active = false;
-		}
-		Options::save();
+	//	if (found == Options::mods.end())
+	//	{
+	//		Log(LOG_ERROR) << "cannot find broken mod in mods list: " << modId;
+	//		Log(LOG_ERROR) << "clearing mods list";
+	//		Options::mods.clear();
+	//	}
+	//	else
+	//	{
+	//		found->active = false;
+	//	}
+	//	Options::save();
 
-		errorStream << "; mod disabled";
-	}
+	//	errorStream << "; mod disabled";
+	//}
 	errorStream << std::endl << error;
 
 	throw Exception(errorStream.str());
@@ -2128,14 +2120,14 @@ void Mod::loadAll()
 {
 	ModScript parser{ _scriptGlobal, this };
 
-	if (Options::oxceModValidationLevel < LOG_ERROR)
-	{
-		Log(LOG_ERROR) << "Validation of mod data disabled, game can crash when run";
-	}
-	else if (Options::oxceModValidationLevel < LOG_WARNING)
-	{
-		Log(LOG_WARNING) << "Validation of mod data reduced, game can behave incorrectly";
-	}
+	//if (Options::oxceModValidationLevel < LOG_ERROR)
+	//{
+	//	Log(LOG_ERROR) << "Validation of mod data disabled, game can crash when run";
+	//}
+	//else if (Options::oxceModValidationLevel < LOG_WARNING)
+	//{
+	//	Log(LOG_WARNING) << "Validation of mod data reduced, game can behave incorrectly";
+	//}
 	_scriptGlobal->beginLoad();
 
 	Log(LOG_INFO) << "Pre-loading rulesets...";
@@ -5915,56 +5907,56 @@ void Mod::loadExtraResources()
 	}
 
 #ifndef __NO_MUSIC
-	// Load musics
-	if (!Options::mute)
-	{
-		const auto& soundFiles = FileMap::getVFolderContents("SOUND");
+	//// Load musics
+	//if (!Options::mute)
+	//{
+	//	const auto& soundFiles = FileMap::getVFolderContents("SOUND");
 
-		// Check which music version is available
-		CatFile *adlibcat = 0, *aintrocat = 0;
-		GMCatFile *gmcat = 0;
+	//	// Check which music version is available
+	//	CatFile *adlibcat = 0, *aintrocat = 0;
+	//	GMCatFile *gmcat = 0;
 
-		for (const auto& name : soundFiles)
-		{
-			if (0 == name.compare("adlib.cat"))
-			{
-				adlibcat = new CatFile("SOUND/" + name);
-			}
-			else if (0 == name.compare("aintro.cat"))
-			{
-				aintrocat = new CatFile("SOUND/" + name);
-			}
-			else if (0 == name.compare("gm.cat"))
-			{
-				gmcat = new GMCatFile("SOUND/" + name);
-			}
-		}
+	//	for (const auto& name : soundFiles)
+	//	{
+	//		if (0 == name.compare("adlib.cat"))
+	//		{
+	//			adlibcat = new CatFile("SOUND/" + name);
+	//		}
+	//		else if (0 == name.compare("aintro.cat"))
+	//		{
+	//			aintrocat = new CatFile("SOUND/" + name);
+	//		}
+	//		else if (0 == name.compare("gm.cat"))
+	//		{
+	//			gmcat = new GMCatFile("SOUND/" + name);
+	//		}
+	//	}
 
-		// Try the preferred format first, otherwise use the default priority
-		MusicFormat priority[] = { Options::preferredMusic, MUSIC_FLAC, MUSIC_OGG, MUSIC_MP3, MUSIC_MOD, MUSIC_WAV, MUSIC_ADLIB, MUSIC_GM, MUSIC_MIDI };
-		for (auto& pair : _musicDefs)
-		{
-			Music *music = 0;
-			for (size_t j = 0; j < ARRAYLEN(priority) && music == 0; ++j)
-			{
-				music = loadMusic(priority[j], pair.second, adlibcat, aintrocat, gmcat);
-			}
-			if (music)
-			{
-				_musics[pair.first] = music;
-			}
+	//	// Try the preferred format first, otherwise use the default priority
+	//	MusicFormat priority[] = { Options::preferredMusic, MUSIC_FLAC, MUSIC_OGG, MUSIC_MP3, MUSIC_MOD, MUSIC_WAV, MUSIC_ADLIB, MUSIC_GM, MUSIC_MIDI };
+	//	for (auto& pair : _musicDefs)
+	//	{
+	//		Music *music = 0;
+	//		for (size_t j = 0; j < ARRAYLEN(priority) && music == 0; ++j)
+	//		{
+	//			music = loadMusic(priority[j], pair.second, adlibcat, aintrocat, gmcat);
+	//		}
+	//		if (music)
+	//		{
+	//			_musics[pair.first] = music;
+	//		}
 
-		}
+	//	}
 
-		delete gmcat;
-		delete adlibcat;
-		delete aintrocat;
-	}
+	//	delete gmcat;
+	//	delete adlibcat;
+	//	delete aintrocat;
+	//}
 #endif
 
-	Log(LOG_INFO) << "Lazy loading: " << Options::lazyLoadResources;
-	if (!Options::lazyLoadResources)
-	{
+	//Log(LOG_INFO) << "Lazy loading: " << Options::lazyLoadResources;
+	//if (!Options::lazyLoadResources)
+	//{
 		Log(LOG_INFO) << "Loading extra resources from ruleset...";
 		for (auto& pair : _extraSprites)
 		{
@@ -5973,10 +5965,10 @@ void Mod::loadExtraResources()
 				loadExtraSprite(extraSprites);
 			}
 		}
-	}
+	//}
 
-	if (!Options::mute)
-	{
+	//if (!Options::mute)
+	//{
 		for (const auto& pair : _extraSounds)
 		{
 			const auto& setName = pair.first;
@@ -5990,56 +5982,56 @@ void Mod::loadExtraResources()
 			}
 			_sounds[setName] = soundPack->loadSoundSet(set);
 		}
-	}
+	//}
 
-	Log(LOG_INFO) << "Loading custom palettes from ruleset...";
-	PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
+	//Log(LOG_INFO) << "Loading custom palettes from ruleset...";
+	//PaletteSystem& paletteSystem = getSystem<PaletteSystem>();
 
-	for (const auto& pair : _customPalettes)
-	{
-		CustomPalettes *palDef = pair.second;
-		std::string palTargetName = palDef->getTarget();
+	//for (const auto& pair : _customPalettes)
+	//{
+	//	CustomPalettes *palDef = pair.second;
+	//	std::string palTargetName = palDef->getTarget();
 
-		PaletteHandle paletteHandle = paletteSystem.getPaletteByName(palTargetName);
+	//	PaletteHandle paletteHandle = paletteSystem.getPaletteByName(palTargetName);
 
-		if (paletteHandle == PaletteHandle::Invalid)
-		{
-			Log(LOG_INFO) << "Creating a new palette: " << palTargetName;
-			paletteHandle = paletteSystem.addPalette(palTargetName);
-		}
-		else
-		{
-			Log(LOG_VERBOSE) << "Replacing items in target palette: " << palTargetName;
-		}
+	//	if (paletteHandle == PaletteHandle::Invalid)
+	//	{
+	//		Log(LOG_INFO) << "Creating a new palette: " << palTargetName;
+	//		paletteHandle = paletteSystem.addPalette(palTargetName);
+	//	}
+	//	else
+	//	{
+	//		Log(LOG_VERBOSE) << "Replacing items in target palette: " << palTargetName;
+	//	}
 
-		Palette* target = paletteSystem.getPalette(paletteHandle);
-		const auto& fileName = palDef->getFile();
-		if (fileName.empty())
-		{
-			for (const auto& def : *palDef->getPalette())
-			{
-				target->setColor(def.first, def.second.x, def.second.y, def.second.z);
-			}
-		}
-		else
-		{
-			// Load from JASC file
-			auto palFile = FileMap::getIStream(fileName);
-			std::string line;
-			std::getline(*palFile, line); // header
-			std::getline(*palFile, line); // file format
-			std::getline(*palFile, line); // number of colors
-			int r = 0, g = 0, b = 0;
-			for (int j = 0; j < 256; ++j)
-			{
-				std::getline(*palFile, line); // j-th color index
-				std::stringstream ss(line);
-				ss >> r;
-				ss >> g;
-				ss >> b;
-				target->setColor(j, r, g, b);
-			}
-		}
+	//	Palette* target = paletteSystem.getPalette(paletteHandle);
+	//	const auto& fileName = palDef->getFile();
+	//	if (fileName.empty())
+	//	{
+	//		for (const auto& def : *palDef->getPalette())
+	//		{
+	//			target->setColor(def.first, def.second.x, def.second.y, def.second.z);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		// Load from JASC file
+	//		auto palFile = FileMap::getIStream(fileName);
+	//		std::string line;
+	//		std::getline(*palFile, line); // header
+	//		std::getline(*palFile, line); // file format
+	//		std::getline(*palFile, line); // number of colors
+	//		int r = 0, g = 0, b = 0;
+	//		for (int j = 0; j < 256; ++j)
+	//		{
+	//			std::getline(*palFile, line); // j-th color index
+	//			std::stringstream ss(line);
+	//			ss >> r;
+	//			ss >> g;
+	//			ss >> b;
+	//			target->setColor(j, r, g, b);
+	//		}
+	//	}
 	}
 
 	// KN NOTE: why are we making palette backups?
@@ -6057,35 +6049,35 @@ void Mod::loadExtraResources()
 	//	}
 	//}
 
-	// Support for UFO-based mods and hybrid mods
-	if (_transparencyLUTs.empty() && !_transparencies.empty())
-	{
-		PaletteHandle palBattlescapeHandle = paletteSystem.getPaletteByName("PAL_BATTLESCAPE");
-		if (palBattlescapeHandle != PaletteHandle::Invalid)
-		{
-			Log(LOG_INFO) << "Creating transparency LUTs for PAL_BATTLESCAPE...";
-			createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle));
-		}
-		PaletteHandle palBattlescapeHandle1 = paletteSystem.getPaletteByName("PAL_BATTLESCAPE_1");
-		PaletteHandle palBattlescapeHandle2 = paletteSystem.getPaletteByName("PAL_BATTLESCAPE_2");
-		PaletteHandle palBattlescapeHandle3 = paletteSystem.getPaletteByName("PAL_BATTLESCAPE_3");
-		if (palBattlescapeHandle1 != PaletteHandle::Invalid &&
-			palBattlescapeHandle2 != PaletteHandle::Invalid &&
-			palBattlescapeHandle3 != PaletteHandle::Invalid)
-		{
-			Log(LOG_INFO) << "Creating transparency LUTs for hybrid custom palettes...";
-			createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle1));
-			createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle2));
-			createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle3));
-		}
-	}
+	//// Support for UFO-based mods and hybrid mods
+	//if (_transparencyLUTs.empty() && !_transparencies.empty())
+	//{
+	//	PaletteHandle palBattlescapeHandle = paletteSystem.getPaletteByName("PAL_BATTLESCAPE");
+	//	if (palBattlescapeHandle != PaletteHandle::Invalid)
+	//	{
+	//		Log(LOG_INFO) << "Creating transparency LUTs for PAL_BATTLESCAPE...";
+	//		createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle));
+	//	}
+	//	PaletteHandle palBattlescapeHandle1 = paletteSystem.getPaletteByName("PAL_BATTLESCAPE_1");
+	//	PaletteHandle palBattlescapeHandle2 = paletteSystem.getPaletteByName("PAL_BATTLESCAPE_2");
+	//	PaletteHandle palBattlescapeHandle3 = paletteSystem.getPaletteByName("PAL_BATTLESCAPE_3");
+	//	if (palBattlescapeHandle1 != PaletteHandle::Invalid &&
+	//		palBattlescapeHandle2 != PaletteHandle::Invalid &&
+	//		palBattlescapeHandle3 != PaletteHandle::Invalid)
+	//	{
+	//		Log(LOG_INFO) << "Creating transparency LUTs for hybrid custom palettes...";
+	//		createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle1));
+	//		createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle2));
+	//		createTransparencyLUT(paletteSystem.getPalette(palBattlescapeHandle3));
+	//	}
+	//}
 
-	TextButton::soundPress = getSound("GEO.CAT", Mod::BUTTON_PRESS);
+	//TextButton::soundPress = getSound("GEO.CAT", Mod::BUTTON_PRESS);
 
-	WindowSystem& windowSystem = getSystem<WindowSystem>();
-	windowSystem.addPopupSound(getSound("GEO.CAT", Mod::WINDOW_POPUP[0]));
-	windowSystem.addPopupSound(getSound("GEO.CAT", Mod::WINDOW_POPUP[1]));
-	windowSystem.addPopupSound(getSound("GEO.CAT", Mod::WINDOW_POPUP[2]));
+	//WindowSystem& windowSystem = getSystem<WindowSystem>();
+	//windowSystem.addPopupSound(getSound("GEO.CAT", Mod::WINDOW_POPUP[0]));
+	//windowSystem.addPopupSound(getSound("GEO.CAT", Mod::WINDOW_POPUP[1]));
+	//windowSystem.addPopupSound(getSound("GEO.CAT", Mod::WINDOW_POPUP[2]));
 }
 
 void Mod::loadExtraSprite(ExtraSprites *spritePack)
@@ -6136,112 +6128,112 @@ void Mod::loadExtraSprite(ExtraSprites *spritePack)
  */
 void Mod::modResources()
 {
-	// we're gonna need these
-	getSurface("GEOBORD.SCR");
-	getSurface("ALTGEOBORD.SCR", false);
-	getSurface("BACK07.SCR");
-	getSurface("ALTBACK07.SCR", false);
-	getSurface("BACK06.SCR");
-	getSurface("UNIBORD.PCK");
-	getSurfaceSet("HANDOB.PCK");
-	getSurfaceSet("FLOOROB.PCK");
-	getSurfaceSet("BIGOBS.PCK");
+	//// we're gonna need these
+	//getSurface("GEOBORD.SCR");
+	//getSurface("ALTGEOBORD.SCR", false);
+	//getSurface("BACK07.SCR");
+	//getSurface("ALTBACK07.SCR", false);
+	//getSurface("BACK06.SCR");
+	//getSurface("UNIBORD.PCK");
+	//getSurfaceSet("HANDOB.PCK");
+	//getSurfaceSet("FLOOROB.PCK");
+	//getSurfaceSet("BIGOBS.PCK");
 
-	// embiggen the geoscape background by mirroring the contents
-	// modders can provide their own backgrounds via ALTGEOBORD.SCR
-	if (_surfaces.find("ALTGEOBORD.SCR") == _surfaces.end())
-	{
-		int newWidth = 320 - 64, newHeight = 200;
-		Surface *newGeo = new Surface(newWidth * 3, newHeight * 3);
-		Surface *oldGeo = _surfaces["GEOBORD.SCR"];
-		for (int x = 0; x < newWidth; ++x)
-		{
-			for (int y = 0; y < newHeight; ++y)
-			{
-				newGeo->setPixel(newWidth + x, newHeight + y, oldGeo->getPixel(x, y));
-				newGeo->setPixel(newWidth - x - 1, newHeight + y, oldGeo->getPixel(x, y));
-				newGeo->setPixel(newWidth * 3 - x - 1, newHeight + y, oldGeo->getPixel(x, y));
+	//// embiggen the geoscape background by mirroring the contents
+	//// modders can provide their own backgrounds via ALTGEOBORD.SCR
+	//if (_surfaces.find("ALTGEOBORD.SCR") == _surfaces.end())
+	//{
+	//	int newWidth = 320 - 64, newHeight = 200;
+	//	Surface *newGeo = new Surface(newWidth * 3, newHeight * 3);
+	//	Surface *oldGeo = _surfaces["GEOBORD.SCR"];
+	//	for (int x = 0; x < newWidth; ++x)
+	//	{
+	//		for (int y = 0; y < newHeight; ++y)
+	//		{
+	//			newGeo->setPixel(newWidth + x, newHeight + y, oldGeo->getPixel(x, y));
+	//			newGeo->setPixel(newWidth - x - 1, newHeight + y, oldGeo->getPixel(x, y));
+	//			newGeo->setPixel(newWidth * 3 - x - 1, newHeight + y, oldGeo->getPixel(x, y));
 
-				newGeo->setPixel(newWidth + x, newHeight - y - 1, oldGeo->getPixel(x, y));
-				newGeo->setPixel(newWidth - x - 1, newHeight - y - 1, oldGeo->getPixel(x, y));
-				newGeo->setPixel(newWidth * 3 - x - 1, newHeight - y - 1, oldGeo->getPixel(x, y));
+	//			newGeo->setPixel(newWidth + x, newHeight - y - 1, oldGeo->getPixel(x, y));
+	//			newGeo->setPixel(newWidth - x - 1, newHeight - y - 1, oldGeo->getPixel(x, y));
+	//			newGeo->setPixel(newWidth * 3 - x - 1, newHeight - y - 1, oldGeo->getPixel(x, y));
 
-				newGeo->setPixel(newWidth + x, newHeight * 3 - y - 1, oldGeo->getPixel(x, y));
-				newGeo->setPixel(newWidth - x - 1, newHeight * 3 - y - 1, oldGeo->getPixel(x, y));
-				newGeo->setPixel(newWidth * 3 - x - 1, newHeight * 3 - y - 1, oldGeo->getPixel(x, y));
-			}
-		}
-		_surfaces["ALTGEOBORD.SCR"] = newGeo;
-	}
+	//			newGeo->setPixel(newWidth + x, newHeight * 3 - y - 1, oldGeo->getPixel(x, y));
+	//			newGeo->setPixel(newWidth - x - 1, newHeight * 3 - y - 1, oldGeo->getPixel(x, y));
+	//			newGeo->setPixel(newWidth * 3 - x - 1, newHeight * 3 - y - 1, oldGeo->getPixel(x, y));
+	//		}
+	//	}
+	//	_surfaces["ALTGEOBORD.SCR"] = newGeo;
+	//}
 
-	// here we create an "alternate" background surface for the base info screen.
-	if (_surfaces.find("ALTBACK07.SCR") == _surfaces.end())
-	{
-		_surfaces["ALTBACK07.SCR"] = new Surface(320, 200);
-		_surfaces["ALTBACK07.SCR"]->loadScr("GEOGRAPH/BACK07.SCR");
-		for (int y = 172; y >= 152; --y)
-			for (int x = 5; x <= 314; ++x)
-				_surfaces["ALTBACK07.SCR"]->setPixel(x, y + 4, _surfaces["ALTBACK07.SCR"]->getPixel(x, y));
-		for (int y = 147; y >= 134; --y)
-			for (int x = 5; x <= 314; ++x)
-				_surfaces["ALTBACK07.SCR"]->setPixel(x, y + 9, _surfaces["ALTBACK07.SCR"]->getPixel(x, y));
-		for (int y = 132; y >= 109; --y)
-			for (int x = 5; x <= 314; ++x)
-				_surfaces["ALTBACK07.SCR"]->setPixel(x, y + 10, _surfaces["ALTBACK07.SCR"]->getPixel(x, y));
-	}
+	//// here we create an "alternate" background surface for the base info screen.
+	//if (_surfaces.find("ALTBACK07.SCR") == _surfaces.end())
+	//{
+	//	_surfaces["ALTBACK07.SCR"] = new Surface(320, 200);
+	//	_surfaces["ALTBACK07.SCR"]->loadScr("GEOGRAPH/BACK07.SCR");
+	//	for (int y = 172; y >= 152; --y)
+	//		for (int x = 5; x <= 314; ++x)
+	//			_surfaces["ALTBACK07.SCR"]->setPixel(x, y + 4, _surfaces["ALTBACK07.SCR"]->getPixel(x, y));
+	//	for (int y = 147; y >= 134; --y)
+	//		for (int x = 5; x <= 314; ++x)
+	//			_surfaces["ALTBACK07.SCR"]->setPixel(x, y + 9, _surfaces["ALTBACK07.SCR"]->getPixel(x, y));
+	//	for (int y = 132; y >= 109; --y)
+	//		for (int x = 5; x <= 314; ++x)
+	//			_surfaces["ALTBACK07.SCR"]->setPixel(x, y + 10, _surfaces["ALTBACK07.SCR"]->getPixel(x, y));
+	//}
 
-	// we create extra rows on the soldier stat screens by shrinking them all down one pixel/two pixels.
-	int rowHeight = _manaEnabled ? 10 : 11;
-	bool moveOnePixelUp = _manaEnabled ? false : true;
+	//// we create extra rows on the soldier stat screens by shrinking them all down one pixel/two pixels.
+	//int rowHeight = _manaEnabled ? 10 : 11;
+	//bool moveOnePixelUp = _manaEnabled ? false : true;
 
-	// first, let's do the base info screen
-	// erase the old lines, copying from a +2 offset to account for the dithering
-	for (int y = 91; y < 199; y += 12)
-		for (int x = 0; x < 149; ++x)
-			_surfaces["BACK06.SCR"]->setPixel(x, y, _surfaces["BACK06.SCR"]->getPixel(x, y + 2));
-	// drawn new lines, use the bottom row of pixels as a basis
-	for (int y = 89; y < 199; y += rowHeight)
-		for (int x = 0; x < 149; ++x)
-			_surfaces["BACK06.SCR"]->setPixel(x, y, _surfaces["BACK06.SCR"]->getPixel(x, 199));
-	// finally, move the top of the graph up by one pixel, offset for the last iteration again due to dithering.
-	if (moveOnePixelUp)
-	{
-		for (int y = 72; y < 80; ++y)
-			for (int x = 0; x < 320; ++x)
-			{
-				_surfaces["BACK06.SCR"]->setPixel(x, y, _surfaces["BACK06.SCR"]->getPixel(x, y + (y == 79 ? 2 : 1)));
-			}
-	}
+	//// first, let's do the base info screen
+	//// erase the old lines, copying from a +2 offset to account for the dithering
+	//for (int y = 91; y < 199; y += 12)
+	//	for (int x = 0; x < 149; ++x)
+	//		_surfaces["BACK06.SCR"]->setPixel(x, y, _surfaces["BACK06.SCR"]->getPixel(x, y + 2));
+	//// drawn new lines, use the bottom row of pixels as a basis
+	//for (int y = 89; y < 199; y += rowHeight)
+	//	for (int x = 0; x < 149; ++x)
+	//		_surfaces["BACK06.SCR"]->setPixel(x, y, _surfaces["BACK06.SCR"]->getPixel(x, 199));
+	//// finally, move the top of the graph up by one pixel, offset for the last iteration again due to dithering.
+	//if (moveOnePixelUp)
+	//{
+	//	for (int y = 72; y < 80; ++y)
+	//		for (int x = 0; x < 320; ++x)
+	//		{
+	//			_surfaces["BACK06.SCR"]->setPixel(x, y, _surfaces["BACK06.SCR"]->getPixel(x, y + (y == 79 ? 2 : 1)));
+	//		}
+	//}
 
-	// now, let's adjust the battlescape info screen.
-	int startHere = _manaEnabled ? 191 : 190;
-	int stopHere = _manaEnabled ? 28 : 37;
-	bool moveDown = _manaEnabled ? false : true;
+	//// now, let's adjust the battlescape info screen.
+	//int startHere = _manaEnabled ? 191 : 190;
+	//int stopHere = _manaEnabled ? 28 : 37;
+	//bool moveDown = _manaEnabled ? false : true;
 
-	// erase the old lines, no need to worry about dithering on this one.
-	for (int y = 39; y < 199; y += 10)
-		for (int x = 0; x < 169; ++x)
-			_surfaces["UNIBORD.PCK"]->setPixel(x, y, _surfaces["UNIBORD.PCK"]->getPixel(x, 30));
-	// drawn new lines, use the bottom row of pixels as a basis
-	for (int y = startHere; y > stopHere; y -= 9)
-		for (int x = 0; x < 169; ++x)
-			_surfaces["UNIBORD.PCK"]->setPixel(x, y, _surfaces["UNIBORD.PCK"]->getPixel(x, 199));
-	// move the top of the graph down by eight pixels to erase the row we don't need (we actually created ~1.8 extra rows earlier)
-	if (moveDown)
-	{
-		for (int y = 37; y > 29; --y)
-			for (int x = 0; x < 320; ++x)
-			{
-				_surfaces["UNIBORD.PCK"]->setPixel(x, y, _surfaces["UNIBORD.PCK"]->getPixel(x, y - 8));
-				_surfaces["UNIBORD.PCK"]->setPixel(x, y - 8, 0);
-			}
-	}
-	else
-	{
-		// remove bottom line of the (entire) last row
-		for (int x = 0; x < 320; ++x)
-			_surfaces["UNIBORD.PCK"]->setPixel(x, 199, _surfaces["UNIBORD.PCK"]->getPixel(x, 30));
-	}
+	//// erase the old lines, no need to worry about dithering on this one.
+	//for (int y = 39; y < 199; y += 10)
+	//	for (int x = 0; x < 169; ++x)
+	//		_surfaces["UNIBORD.PCK"]->setPixel(x, y, _surfaces["UNIBORD.PCK"]->getPixel(x, 30));
+	//// drawn new lines, use the bottom row of pixels as a basis
+	//for (int y = startHere; y > stopHere; y -= 9)
+	//	for (int x = 0; x < 169; ++x)
+	//		_surfaces["UNIBORD.PCK"]->setPixel(x, y, _surfaces["UNIBORD.PCK"]->getPixel(x, 199));
+	//// move the top of the graph down by eight pixels to erase the row we don't need (we actually created ~1.8 extra rows earlier)
+	//if (moveDown)
+	//{
+	//	for (int y = 37; y > 29; --y)
+	//		for (int x = 0; x < 320; ++x)
+	//		{
+	//			_surfaces["UNIBORD.PCK"]->setPixel(x, y, _surfaces["UNIBORD.PCK"]->getPixel(x, y - 8));
+	//			_surfaces["UNIBORD.PCK"]->setPixel(x, y - 8, 0);
+	//		}
+	//}
+	//else
+	//{
+	//	// remove bottom line of the (entire) last row
+	//	for (int x = 0; x < 320; ++x)
+	//		_surfaces["UNIBORD.PCK"]->setPixel(x, 199, _surfaces["UNIBORD.PCK"]->getPixel(x, 30));
+	//}
 }
 
 /**
@@ -6255,69 +6247,70 @@ void Mod::modResources()
  */
 Music* Mod::loadMusic(MusicFormat fmt, RuleMusic* rule, CatFile* adlibcat, CatFile* aintrocat, GMCatFile* gmcat) const
 {
-	/* MUSIC_AUTO, MUSIC_FLAC, MUSIC_OGG, MUSIC_MP3, MUSIC_MOD, MUSIC_WAV, MUSIC_ADLIB, MUSIC_GM, MUSIC_MIDI */
-	static const std::string exts[] = { "", ".flac", ".ogg", ".mp3", ".mod", ".wav", "", "", ".mid" };
-	Music *music = 0;
-	const auto& soundContents = FileMap::getVFolderContents("SOUND");
-	size_t track = rule->getCatPos();
-	try
-	{
-		// Try Adlib music
-		if (fmt == MUSIC_ADLIB)
-		{
-			if (adlibcat && Options::audioBitDepth == 16)
-			{
-				if (track < adlibcat->size())
-				{
-					music = new AdlibMusic(rule->getNormalization());
-					music->load(adlibcat->getRWops((uint32_t)track));
-				}
-				// separate intro music
-				else if (aintrocat)
-				{
-					track -= adlibcat->size();
-					if (track < aintrocat->size())
-					{
-						music = new AdlibMusic(rule->getNormalization());
-						music->load(aintrocat->getRWops((uint32_t)track));
-					}
-					else
-					{
-						delete music;
-						music = 0;
-					}
-				}
-			}
-		}
-		// Try MIDI music (from GM.CAT)
-		else if (fmt == MUSIC_GM)
-		{
-			// DOS MIDI
-			if (gmcat && track < gmcat->size())
-			{
-				music = gmcat->loadMIDI((unsigned int)track);
-			}
-		}
-		// Try digital tracks
-		else
-		{
-			std::string fname = rule->getName() + exts[fmt];
-			std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
+	///* MUSIC_AUTO, MUSIC_FLAC, MUSIC_OGG, MUSIC_MP3, MUSIC_MOD, MUSIC_WAV, MUSIC_ADLIB, MUSIC_GM, MUSIC_MIDI */
+	//static const std::string exts[] = { "", ".flac", ".ogg", ".mp3", ".mod", ".wav", "", "", ".mid" };
+	//Music *music = 0;
+	//const auto& soundContents = FileMap::getVFolderContents("SOUND");
+	//size_t track = rule->getCatPos();
+	//try
+	//{
+	//	// Try Adlib music
+	//	if (fmt == MUSIC_ADLIB)
+	//	{
+	//		if (adlibcat && Options::audioBitDepth == 16)
+	//		{
+	//			if (track < adlibcat->size())
+	//			{
+	//				music = new AdlibMusic(rule->getNormalization());
+	//				music->load(adlibcat->getRWops((uint32_t)track));
+	//			}
+	//			// separate intro music
+	//			else if (aintrocat)
+	//			{
+	//				track -= adlibcat->size();
+	//				if (track < aintrocat->size())
+	//				{
+	//					music = new AdlibMusic(rule->getNormalization());
+	//					music->load(aintrocat->getRWops((uint32_t)track));
+	//				}
+	//				else
+	//				{
+	//					delete music;
+	//					music = 0;
+	//				}
+	//			}
+	//		}
+	//	}
+	//	// Try MIDI music (from GM.CAT)
+	//	else if (fmt == MUSIC_GM)
+	//	{
+	//		// DOS MIDI
+	//		if (gmcat && track < gmcat->size())
+	//		{
+	//			music = gmcat->loadMIDI((unsigned int)track);
+	//		}
+	//	}
+	//	// Try digital tracks
+	//	else
+	//	{
+	//		std::string fname = rule->getName() + exts[fmt];
+	//		std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
 
-			if (soundContents.find(fname) != soundContents.end())
-			{
-				music = new Music();
-				music->load("SOUND/" + fname);
-			}
-		}
-	}
-	catch (Exception &e)
-	{
-		Log(LOG_INFO) << e.what();
-		if (music) delete music;
-		music = 0;
-	}
-	return music;
+	//		if (soundContents.find(fname) != soundContents.end())
+	//		{
+	//			music = new Music();
+	//			music->load("SOUND/" + fname);
+	//		}
+	//	}
+	//}
+	//catch (Exception &e)
+	//{
+	//	Log(LOG_INFO) << e.what();
+	//	if (music) delete music;
+	//	music = 0;
+	//}
+	//return music;
+	return nullptr;
 }
 
 /**

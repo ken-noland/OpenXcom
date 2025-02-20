@@ -1,0 +1,2 @@
+add_executable(fontconv FontConverter.cpp)
+target_link_libraries(fontconv PUBLIC openxcom_lib)
