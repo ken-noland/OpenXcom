@@ -57,41 +57,10 @@ private:
 #define YAML_ASSERT_MSG(condition) \
 	YamlAssertHandler(!(condition), #condition, __FILE__, __LINE__)
 
-// helper function to handle reading optional and required values
-template <class Type, bool optional>
-bool readYaml(ryml::ConstNodeRef const& yaml, const std::string& key, Type& object)
-{
-	// check if key is valid
-	bool hasKey = yaml.has_child(key.data());
-
-	if constexpr (!optional) // Required key: must exist.
-	{
-		YAML_ASSERT_MSG(hasKey) << "Missing required key: " << key;
-
-		// Look up the child node with the provided key.
-		ryml::ConstNodeRef node = yaml[key.c_str()];
-
-		return fromYaml<Type>(node, object);
-	}
-	else // Optional key: check for existence.
-	{
-		if (hasKey)
-		{
-			// Look up the child node with the provided key.
-			ryml::ConstNodeRef node = yaml[key.c_str()];
-
-			return fromYaml<Type>(node, object);
-		}
-		// we're returning true because the key is optional, even though it wasn't found
-		return true;	
-	}
-}
-
-
 template <>
-bool fromYaml<bool>(ryml::ConstNodeRef const& yaml, bool& type)
+bool fromYaml<bool>(ryml::ConstNodeRef const& yaml, bool& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 	yaml >> type;
 	return true;
 }
@@ -104,9 +73,9 @@ bool toYaml<bool>(const bool& type, ryml::NodeRef& yaml)
 }
 
 template <>
-bool fromYaml<char>(ryml::ConstNodeRef const& yaml, char& type)
+bool fromYaml<char>(ryml::ConstNodeRef const& yaml, char& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 	yaml >> type;
 	return true;
 }
@@ -119,9 +88,9 @@ bool toYaml<char>(const char& type, ryml::NodeRef& yaml)
 }
 
 template <>
-bool fromYaml<unsigned char>(ryml::ConstNodeRef const& yaml, unsigned char& type)
+bool fromYaml<unsigned char>(ryml::ConstNodeRef const& yaml, unsigned char& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 	yaml >> type;
 	return true;
 }
@@ -134,9 +103,9 @@ bool toYaml<unsigned char>(const unsigned char& type, ryml::NodeRef& yaml)
 }
 
 template <>
-bool fromYaml<short>(ryml::ConstNodeRef const& yaml, short& type)
+bool fromYaml<short>(ryml::ConstNodeRef const& yaml, short& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 	yaml >> type;
 	return true;
 }
@@ -149,9 +118,9 @@ bool toYaml<short>(const short& type, ryml::NodeRef& yaml)
 }
 
 template <>
-bool fromYaml<unsigned short>(ryml::ConstNodeRef const& yaml, unsigned short& type)
+bool fromYaml<unsigned short>(ryml::ConstNodeRef const& yaml, unsigned short& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 	yaml >> type;
 	return true;
 }
@@ -164,9 +133,9 @@ bool toYaml<unsigned short>(const unsigned short& type, ryml::NodeRef& yaml)
 }
 
 template <>
-bool fromYaml<int>(ryml::ConstNodeRef const& yaml, int& type)
+bool fromYaml<int>(ryml::ConstNodeRef const& yaml, int& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 	yaml >> type;
 	return true;
 }
@@ -179,9 +148,9 @@ bool toYaml<int>(const int& type, ryml::NodeRef& yaml)
 }
 
 template <>
-bool fromYaml<unsigned int>(ryml::ConstNodeRef const& yaml, unsigned int& type)
+bool fromYaml<unsigned int>(ryml::ConstNodeRef const& yaml, unsigned int& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 	yaml >> type;
 	return true;
 }
@@ -196,9 +165,9 @@ bool toYaml<unsigned int>(const unsigned int& type, ryml::NodeRef& yaml)
 // std specializations
 
 template <>
-bool fromYaml<std::string>(ryml::ConstNodeRef const& yaml, std::string& type)
+bool fromYaml<std::string>(ryml::ConstNodeRef const& yaml, std::string& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 	ryml::csubstr str(yaml.val());
 	type = std::string(str.begin(), str.end());
 	return true;
@@ -227,12 +196,12 @@ bool toYaml<std::string>(const std::string& type, ryml::NodeRef& yaml)
 //}
 
 template <>
-bool fromYaml<std::u32string>(ryml::ConstNodeRef const& yaml, std::u32string& type)
+bool fromYaml<std::u32string>(ryml::ConstNodeRef const& yaml, std::u32string& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 
 	std::string str;
-	fromYaml<std::string>(yaml, str);
+	fromYaml<std::string>(yaml, str, parser);
 
 	utf8::utf8to32(str.begin(), str.end(), std::back_inserter(type));
 
@@ -247,12 +216,12 @@ bool fromYaml<std::u32string>(ryml::ConstNodeRef const& yaml, std::u32string& ty
 //}
 
 template <>
-bool fromYaml<std::filesystem::path>(ryml::ConstNodeRef const& yaml, std::filesystem::path& type)
+bool fromYaml<std::filesystem::path>(ryml::ConstNodeRef const& yaml, std::filesystem::path& type, ryml::Parser const& parser)
 {
-	YAML_ASSERT_MSG(yaml.has_val());
+	YamlException::throwIfNoValue(yaml, parser);
 
 	std::string path;
-	fromYaml<std::string>(yaml, path);
+	fromYaml<std::string>(yaml, path, parser);
 	type = path;
 
 	return true;

@@ -1,12 +1,12 @@
 // BEGIN YamlObject.cpp.inja
 
 template<>
-bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object)
+bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, ryml::Parser const& parser)
 {
 	//ensure the node type is "map"
-	YAML_ASSERT_MSG(yaml.is_map()) << "Expected map type";
+	if (!yaml.is_map()) { throw OpenXcom::YamlException(yaml, parser, "Expected map type."); }
 
-	{% for property in type.properties %}if(!OpenXcom::readYaml<{{property.fulltype}}, {{property.optional}}>(yaml, "{{property.name}}", object.{{property.name}})) { return false; }
+	{% for property in type.properties %}if(!OpenXcom::readYaml<{{property.fulltype}}, {{property.optional}}>(yaml, "{{property.name}}", object.{{property.name}}, parser)) { return false; }
 	{% endfor %}
 	return true;
 }

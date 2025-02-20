@@ -1,10 +1,9 @@
 // BEGIN YamlVector.cpp.inja
 
 template<>
-bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object)
+bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, ryml::Parser const& parser)
 {
-	//ensure the node type is "sequence"
-	YAML_ASSERT_MSG(yaml.is_seq()) << "Expected sequence type";
+	if (!yaml.is_seq()) { throw OpenXcom::YamlException(yaml, parser, "Expected sequence type."); }
 
 	object.clear();
 	object.reserve(yaml.num_children());
@@ -13,9 +12,9 @@ bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{typ
 	for (ryml::ConstNodeRef child : yaml.children())
 	{
 		{{type.fullName}}::value_type value;
-		if (!fromYaml(child, value))
+		if (!fromYaml(child, value, parser))
 		{
-			return false;
+			throw OpenXcom::YamlException(child, parser, "Error parsing node.");
 		}
 		object.push_back(value);
 	}
