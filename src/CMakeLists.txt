@@ -212,7 +212,6 @@ set ( engine_src
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"
   "Engine/Resource/ResourceSystem.cpp"
   "Engine/Utility/RTTRGlm.cpp"
-#  "Engine/Action.cpp"
 #  "Engine/AdlibMusic.cpp"
 #  "Engine/CatFile.cpp"
   "Engine/CrossPlatform.cpp"
