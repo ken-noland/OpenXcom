@@ -32,7 +32,7 @@ public:
 	DbgBreakAlloc()
 	{
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF /*| _CRTDBG_CHECK_EVERY_16_DF*/);
-		_crtBreakAlloc = -1;
+		_crtBreakAlloc = 673339;
 	}
 };
 

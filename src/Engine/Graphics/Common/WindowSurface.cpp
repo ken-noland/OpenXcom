@@ -200,8 +200,8 @@ void WindowSurface::update()
 		
 		if (!_isRunning)
 		{
-			_onClose.release();
-			_onResize.release();
+			_onClose.reset();
+			_onResize.reset();
 
 			if(_window)
 			{
@@ -260,6 +260,13 @@ PlatformWindow& WindowSurface::getWindow()
 {
 	return *_window;
 }
+
+void WindowSurface::bindGameSurface(GameSurface& gameSurface)
+{
+	const DeviceImage& gameRenderTarget = gameSurface.getRenderTarget();
+	_pipelineBinding->setTexture(ShaderStage::Fragment, 0, gameRenderTarget);
+}
+
 
 void WindowSurface::onResize(glm::ivec2 size)
 {

@@ -17,35 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../Engine/State.h"
-#include "../Engine/Resource/Handle.h"
-#include <string>
-#include <sstream>
+#include <filesystem>
 
 namespace OpenXcom
 {
 
-class EngineContext;
-class Text;
-class Font;
-class Timer;
-class Language;
-class Palette;
-
-enum LoadingPhase { LOADING_STARTED, LOADING_FAILED, LOADING_SUCCESSFUL, LOADING_DONE };
-
-/**
- * Initializes the game and loads all required content.
- */
-class StartState : public State
+struct ModInfo
 {
-private:
-	OwningHandle<Font> _terminalFontHandle;
-	OwningHandle<Palette> _terminalPaletteHandle;
 
-public:
-	StartState(EngineContext& engine);
-	virtual ~StartState();
 };
 
-}
+class Xcom1MasterFileProcessor
+{
+public:
+	Xcom1MasterFileProcessor();
+	~Xcom1MasterFileProcessor();
+
+	bool load(const std::filesystem::path& path);
+
+	bool isValid(const std::filesystem::path& path);
+
+protected:
+	// These helper methods mirror functionality previously in mod.cpp.
+	bool loadVanillaResources();
+	bool loadBattlescapeResources();
+	bool loadExtraResources();
+};
+
+} // namespace OpenXcom

@@ -102,7 +102,7 @@ protected:
 
 	void TearDown() override
 	{
-		_paletteHandle.release();
+		_paletteHandle.reset();
 		_windowSurface.reset();
 		_gameSurface.reset();
 	}

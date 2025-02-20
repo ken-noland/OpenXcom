@@ -17,41 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../Engine/InteractiveSurface.h"
 
 namespace OpenXcom
 {
 
-/**
- * Regular image that works like a button.
- * Unlike the TextButton, this button doesn't draw
- * anything on its own. It takes an existing graphic and
- * treats it as a button, inverting colors when necessary.
- * This is necessary for special buttons like in the Geoscape.
- */
-class ImageButton : public InteractiveSurface
+class ImageButton
 {
 protected:
-	uint8_t _color;
-	ImageButton **_group;
-	bool _inverted;
+
 public:
-	/// Creates a new image button with the specified size and position.
-	ImageButton(int width, int height, int x = 0, int y = 0);
-	/// Cleans up the image button.
-	virtual ~ImageButton();
-	/// Sets the image button's color.
-	void setColor(uint8_t color) override;
-	/// Gets the image button's color.
-	uint8_t getColor() const;
-	/// Sets the image button's group.
-	void setGroup(ImageButton **group);
-	/// Special handling for mouse presses.
-//	void mousePress(Action *action, State *state) override;
-	/// Special handling for mouse releases.
-//	void mouseRelease(Action *action, State *state) override;
-	/// Invert a button explicitly either ON or OFF.
-	void toggle(bool invert);
+
 };
 
 }

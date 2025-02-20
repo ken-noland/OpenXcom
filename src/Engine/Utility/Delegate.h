@@ -55,7 +55,7 @@ public:
 		{
 			if (this != &other)
 			{
-				release();
+				reset();
 				delegate_ = other.delegate_;
 				it_ = other.it_;
 				other.delegate_ = nullptr;
@@ -66,11 +66,11 @@ public:
 		// Destructor automatically unregisters the callback.
 		~OwningFunctionHandle()
 		{
-			release();
+			reset();
 		}
 
 		// Optionally, allow manual release of the registration.
-		void release()
+		void reset()
 		{
 			if (delegate_)
 			{

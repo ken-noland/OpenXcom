@@ -71,6 +71,8 @@ public:
 
 	virtual uint32_t getMultisampleCount() const override { return 1; }
 	virtual bool getUseDynamicStates() const override { return false; }
+
+	virtual void setExtent(const glm::ivec2& size);
 		
 	virtual void copyFrom(HostImage& hostImage) override;
 	virtual void copyTo(HostImage& hostImage) override;

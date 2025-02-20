@@ -72,7 +72,7 @@ VulkanWindowedSurface::VulkanWindowedSurface(VulkanContext& context, PlatformWin
 
 VulkanWindowedSurface::~VulkanWindowedSurface()
 {
-	_onResize.release();
+	_onResize.reset();
 
 	// Wait for the device to finish
 	_context.getDevice().waitIdle();

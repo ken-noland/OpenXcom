@@ -21,8 +21,15 @@
 namespace OpenXcom
 {
 
-class ToggleTextButton
+class GraphicsCommand;
+
+class State
 {
+public:
+	State() = default;
+	virtual ~State() = default;
+
+	virtual void onRender(GraphicsCommand& command) { }
 };
 
 }

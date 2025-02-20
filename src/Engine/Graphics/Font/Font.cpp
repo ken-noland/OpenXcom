@@ -25,8 +25,31 @@
 #include <hb.h>
 #include <linebreak.h>
 
+#include "../../Utility/RTTR.h"
+
 namespace OpenXcom
 {
+
+
+SIMPLERTTR
+{
+	// Font class will be handled independently
+
+	// Glyph class will be handled independently
+
+	SimpleRTTR::registration().type<FontSettings>()
+		.meta("Serialize", ObjectSerialize::ALWAYS) // always serialize this
+		.property(REGISTER_PROPERTY(FontSettings, width))
+			.meta("Serialize", PropertySerialize::ALWAYS)
+		.property(REGISTER_PROPERTY(FontSettings, height))
+			.meta("Serialize", PropertySerialize::ALWAYS)
+		.property(REGISTER_PROPERTY(FontSettings, spacing))
+			.meta("Serialize", PropertySerialize::ALWAYS)
+		.property(REGISTER_PROPERTY(FontSettings, defaultPaletteIndex))
+			.meta("Serialize", PropertySerialize::ALWAYS)
+		.property(REGISTER_PROPERTY(FontSettings, numPaletteEntries))
+			.meta("Serialize", PropertySerialize::ALWAYS);
+}
 
 Font::Font(const std::string& name, const FontSettings& settings, OwningHandle<DeviceImage> texture, const std::array<Glyph, 128>& asciiGlyphs, const std::unordered_map<char32_t, Glyph>& extendedGlyphs)
 	: Font(name, settings, [&texture]() {

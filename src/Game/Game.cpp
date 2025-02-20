@@ -1,3 +1,4 @@
+#include "Game.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,15 +18,18 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Game.h"
+#include "../Engine/Graphics/Common/GameSurface.h"
+#include "../Engine/Graphics/Common/WindowSurface.h"
+
 #include "../Engine/Engine.h"
 #include "../Engine/Options.h"
 #include "../Engine/Platform/ProcessSystem.h"
 
-#include "../Engine/State.h"
+#include "States/State.h"
+#include "States/StartState.h"
 
 #include "GameWindow.h"
 
-#include "../Menu/StartState.h"
 
 namespace OpenXcom
 {
@@ -52,8 +56,20 @@ Game::Game(Engine& engine)
 {
 	_gameWindow = std::make_unique<GameWindow>(_engine.getEngineContext());
 
+	_gameContext = std::make_unique<GameContext>(_engine.getEngineContext(), *_gameWindow);
+
+
+	_onGameRenderHandle = _gameWindow->getGameSurface().onRender().add([this](GraphicsCommand& command) {
+		this->onGameRender(command);
+	});
+
+	_onWindowRenderHandle = _gameWindow->getGameSurface().onRender().add([this](GraphicsCommand& command) {
+		this->onWindowRender(command);
+	});
+
+
 	// set the initial game state
-	setState(std::make_unique<StartState>(_engine.getEngineContext()));
+	setState(std::make_unique<StartState>(*_gameContext));
 }
 
 /**
@@ -61,6 +77,9 @@ Game::Game(Engine& engine)
  */
 Game::~Game()
 {
+	_onGameRenderHandle.reset();
+	_onWindowRenderHandle.reset();
+
 	_states.clear();
 	_deleted.clear();
 
@@ -93,24 +112,25 @@ bool Game::isRunning() const
 	return _gameWindow->isRunning();
 }
 
+void Game::onGameRender(GraphicsCommand& command)
+{
+	// treat the states as a stack and iterate through them
+	for(const std::unique_ptr<State>& state : _states)
+	{
+		state->onRender(command);
+	}
+}
+
+void Game::onWindowRender(GraphicsCommand& command)
+{
+}
+
 void Game::update()
 {
 	_gameWindow->update();
 
-	//while (_window.isRunning())
-	//{
-	//	_window.processEvents();
-	//	//for (State* state : _states)
-	//	//{
-	//	//	state->update();
-	//	//}
-	//	//// clear the deleted states
-	//	//_deleted.clear();
+	// render the game states
 
-	//	#if defined(ENABLE_ENTITY_INSPECTOR)
-	//	_inspector.update();
-	//	#endif
-	//}
 }
 
 /**

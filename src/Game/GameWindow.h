@@ -48,6 +48,11 @@ public:
 
 	void update();
 
+	GameSurface& getGameSurface();
+	WindowSurface& getWindowSurface();
+
+	void setGameSurfaceSize(const glm::ivec2& size);
+
 	bool isRunning() const;
 };
 
