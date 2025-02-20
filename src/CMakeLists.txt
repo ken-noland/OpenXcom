@@ -7,7 +7,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Define option to enable or disable the EntityInspector
-option(ENABLE_ENTITY_INSPECTOR "Enable the EntityInspector for debugging and editing entities." ON)
+option(ENABLE_ENTITY_INSPECTOR "Enable the EntityInspector for debugging and editing entities." OFF)
 
 # Force fetch of github dependencies
 option(FORCE_FETCH "Force re-download of FetchContent dependencies" OFF)
@@ -747,6 +747,7 @@ add_custom_target(create_generated_dir ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/generated"
     COMMENT "Creating generated directory"
 )
+
 
 # Custom command to generate the source files using codegen
 
