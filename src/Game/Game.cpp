@@ -29,35 +29,18 @@
 #include "States/StartState.h"
 
 #include "GameWindow.h"
-
+#include "GameStates.h"
 
 namespace OpenXcom
 {
-
-// Function that returns a reference to a thread-local Game* pointer
-Game*& _GamePtr()
-{
-	static thread_local Game* ptr = nullptr;
-	return ptr;
-}
-
-void setThreadLocalGame(Game* gameInstance)
-{
-	_GamePtr() = gameInstance;
-}
-
-Game* getGame()
-{
-	return _GamePtr();
-}
 
 Game::Game(Engine& engine)
 	: _engine(engine)
 {
 	_gameWindow = std::make_unique<GameWindow>(_engine.getEngineContext());
+	_gameStates = std::make_unique<GameStates>();
 
-	_gameContext = std::make_unique<GameContext>(_engine.getEngineContext(), *_gameWindow);
-
+	_gameContext = std::make_unique<GameContext>(_engine.getEngineContext(), *_gameWindow, *_gameStates);
 
 	_onGameRenderHandle = _gameWindow->getGameSurface().onRender().add([this](GraphicsCommand& command) {
 		this->onGameRender(command);
@@ -68,8 +51,8 @@ Game::Game(Engine& engine)
 	});
 
 
-	// set the initial game state
-	setState(std::make_unique<StartState>(*_gameContext));
+	// Set the initial game state to the start state
+	_gameStates->set(std::make_unique<StartState>(*_gameContext));
 }
 
 /**
@@ -80,8 +63,7 @@ Game::~Game()
 	_onGameRenderHandle.reset();
 	_onWindowRenderHandle.reset();
 
-	_states.clear();
-	_deleted.clear();
+	_gameStates->clear();
 
 	_gameWindow.reset();
 }
@@ -107,18 +89,9 @@ int Game::run()
 
 }
 
-bool Game::isRunning() const
-{
-	return _gameWindow->isRunning();
-}
-
 void Game::onGameRender(GraphicsCommand& command)
 {
-	// treat the states as a stack and iterate through them
-	for(const std::unique_ptr<State>& state : _states)
-	{
-		state->onRender(command);
-	}
+	_gameStates->render(command);
 }
 
 void Game::onWindowRender(GraphicsCommand& command)
@@ -128,9 +101,7 @@ void Game::onWindowRender(GraphicsCommand& command)
 void Game::update()
 {
 	_gameWindow->update();
-
-	// render the game states
-
+	_gameStates->update();
 }
 
 /**
@@ -140,46 +111,14 @@ void Game::quit()
 {
 }
 
-/**
- * Pops all the states currently in stack and pushes in the new state.
- * A shortcut for cleaning up all the old states when they're not necessary
- * like in one-way transitions.
- * @param state Pointer to the new state.
- */
-void Game::setState(std::unique_ptr<State> state)
+bool Game::isRunning() const
 {
-	while (!_states.empty())
-	{
-		popState();
-	}
-	pushState(std::move(state));
+	return _gameWindow->isRunning();
 }
 
-/**
- * Pushes a new state into the top of the stack and initializes it.
- * The new state will be used once the next game cycle starts.
- * @param state Pointer to the new state.
- */
-void Game::pushState(std::unique_ptr<State> state)
+GameContext& Game::getGameContext()
 {
-	_states.push_back(std::move(state));
-}
-
-/**
- * Pops the last state from the top of the stack. Since states
- * can't actually be deleted mid-cycle, it's moved into a separate queue
- * which is cleared at the start of every cycle, so the transition
- * is seamless.
- */
-void Game::popState()
-{
-	_deleted.push_back(std::move(_states.back()));
-	_states.pop_back();
-}
-
-State* Game::getState()
-{
-	return _states.back().get();
+	return *_gameContext;
 }
 
 }

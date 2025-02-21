@@ -20,12 +20,12 @@
 #include "../../Game/GameContext.h"
 #include "../../Game/GameWindow.h"
 #include "../../Engine/EngineContext.h"
+#include "../../Engine/Logger.h"
 #include "../../Engine/Graphics/GraphicsSystem.h"
 #include "../../Engine/Graphics/GraphicsSurface.h"
 #include "../../Engine/Graphics/Common/GameSurface.h"
 #include "../../Engine/Graphics/Primitive/PrimitiveFactory.h"
 #include "../../Engine/Graphics/Primitive/TextPrimitive.h"
-#include "../../Engine/Graphics/Primitive/TextPrimitiveFactory.h"
 #include "../../Engine/Graphics/Palette/Palette.h"
 #include "../../Engine/Graphics/Palette/PaletteManager.h"
 #include "../../Engine/Graphics/Font/Font.h"
@@ -39,6 +39,10 @@
 #include <glm/vec4.hpp>
 #include <cstring>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 // wrap in an anonymous namespace to avoid name conflicts
 namespace
 {
@@ -48,14 +52,64 @@ namespace
 namespace OpenXcom
 {
 
+/**
+ * Gets the executable path in DOS-style (short) form.
+ * For non-Windows systems, just use a dummy path.
+ * @return Executable path.
+ */
+std::string getDosPath()
+{
+#ifdef _WIN32
+	std::string path, bufstr;
+	char buf[MAX_PATH];
+	if (GetModuleFileNameA(0, buf, MAX_PATH) != 0)
+	{
+		bufstr = buf;
+		size_t c1 = bufstr.find_first_of('\\');
+		path += bufstr.substr(0, c1 + 1);
+		size_t c2 = bufstr.find_first_of('\\', c1 + 1);
+		while (c2 != std::string::npos)
+		{
+			std::string dirname = bufstr.substr(c1 + 1, c2 - c1 - 1);
+			if (dirname == "..")
+			{
+				path = path.substr(0, path.find_last_of('\\', path.length() - 2));
+			}
+			else
+			{
+				if (dirname.length() > 8)
+					dirname = dirname.substr(0, 6) + "~1";
+				std::transform(dirname.begin(), dirname.end(), dirname.begin(), toupper);
+				path += dirname;
+			}
+			c1 = c2;
+			c2 = bufstr.find_first_of('\\', c1 + 1);
+			if (c2 != std::string::npos)
+				path += '\\';
+		}
+	}
+	else
+	{
+		path = "C:\\GAMES\\OPENXCOM";
+	}
+	return path;
+#else
+	return "C:\\GAMES\\OPENXCOM";
+#endif
+}
+
 StartState::StartState(GameContext& game)
 	: _game(game)
 {
+	// Set the size to 720x400 terminal surface
+
+	// We do this first because resizing a surface invalidates the primitive factory and
+	// all the primitives created from it.
+	glm::ivec2 extents = glm::ivec2(720, 400); // 720 x 400 because that's the size of the DOS terminal
+	_game.getGameWindow().setGameSurfaceSize(extents); 
+
 	EngineContext& engine = _game.getEngine();
 	GraphicsSystem& graphics = engine.getGraphicsSystem();
-
-	// set the size to 720x400 terminal surface
-	_game.getGameWindow().setGameSurfaceSize(glm::ivec2(720, 400));
 
 	// get the game surface
 	GameSurface& gameSurface = _game.getGameWindow().getGameSurface();
@@ -64,24 +118,26 @@ StartState::StartState(GameContext& game)
 		
 	createDosFont();
 
-	std::string text = "Hello World!\n\n" 
-					   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \n"
-					   "Sed do eiusmod tempor incididunt ut labore et dolore magna \n"
-					   "aliqua.";
-
 	// create the text
+	std::string text = getDosPath() + ">openxcom";
 
 	TextSettings textSettings;
 	textSettings.alignment = TextAlignment::Left;
 	textSettings.offset = glm::vec2(0, 0);
-	textSettings.extents = glm::vec2(720, 400);
+	textSettings.extents = extents;
 	textSettings.fontHandle = _dosFont.getHandle();
 	textSettings.paletteHandle = _dosFontPalette.getHandle();
 	textSettings.defaultStyle.backgroundColorIndex = 0;
-	textSettings.defaultStyle.colorIndex = 7;
+	textSettings.defaultStyle.colorIndex = 7; // ANSI escape code for white
 	textSettings.defaultStyle.underline = false;
 
 	_text = primitiveFactory.createTextPrimitive(text, textSettings);
+
+	//create the thread
+	std::promise<bool> prom;
+	_result = prom.get_future();
+	_workerThread = std::thread(&StartState::loadResources, this, std::move(prom));
+
 }
 
 /**
@@ -94,6 +150,26 @@ StartState::~StartState()
 
 	_dosFont.reset();
 	_dosFontPalette.reset();
+}
+
+void StartState::onUpdate()
+{
+	// Check if future is ready without blocking
+	if (_result.valid() && _result.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
+	{
+		try
+		{
+			bool result = _result.get();
+			Log(LOG_INFO) << "Worker thread completed. Success: " << std::boolalpha << result << std::endl;
+		}
+		catch (const std::exception& e)
+		{
+			Log(LOG_INFO) << "Worker thread threw an exception: " << e.what() << std::endl;
+		}
+		// Mark as done and join the thread.
+		if (_workerThread.joinable())
+			_workerThread.join();
+	}
 }
 
 // helper function to get the glyph from the font
@@ -185,6 +261,22 @@ void StartState::createDosFont()
 	settings.numPaletteEntries = 1;
 
 	_dosFont = fontManager.load("dosFont", settings, std::move(textures), getAsciiGlyphs(textures[0].getHandle()));
+}
+
+void StartState::loadResources(std::promise<bool> prom)
+{
+	try
+	{
+		// Simulate some lengthy work (e.g., initialization, loading resources, etc.)
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+		// Report success by setting the promise value.
+		prom.set_value(true);
+	}
+	catch (...)
+	{
+		// In case of an exception, pass it along to the main thread.
+		prom.set_exception(std::current_exception());
+	}
 }
 
 void StartState::onRender(GraphicsCommand& command)

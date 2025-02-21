@@ -22,10 +22,37 @@
 namespace OpenXcom
 {
 
+struct Version
+{
+	int major;
+	int minor;
+	int patch;
+};
+
 struct ModInfo
 {
+	std::string id;
+	std::string name;
+	std::string description;
+	std::string author;
+	Version version;
 
+	std::string requiredEngine;
+	Version requiredVersion;
+
+	std::vector<std::string> dependencies;
+	std::vector<std::string> conflicts;
+
+	std::vector<std::filesystem::path> resourceDirectories;
 };
+
+namespace OXCE_8_0_0
+{
+
+struct ModInfo : public ::OpenXcom::ModInfo { };
+
+} // namespace OXCE_8_0_0
+
 
 class Xcom1MasterFileProcessor
 {

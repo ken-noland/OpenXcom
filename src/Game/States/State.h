@@ -29,6 +29,8 @@ public:
 	State() = default;
 	virtual ~State() = default;
 
+	virtual void onUpdate() { };
+
 	virtual void onRender(GraphicsCommand& command) { }
 };
 

@@ -258,6 +258,7 @@ set ( engine_src
 
 set( game_src
   "Game/Game.cpp"
+  "Game/GameStates.cpp"
   "Game/GameWindow.cpp"
   "Game/Resource/Xcom1MasterFileProcessor.cpp"
   "Game/States/StartState.cpp"

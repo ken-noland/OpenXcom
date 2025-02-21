@@ -21,6 +21,10 @@
 #include "../../Engine/Resource/Handle.h"
 #include <string>
 #include <sstream>
+#include <thread>
+#include <atomic>
+#include <future>
+#include <chrono>
 
 namespace OpenXcom
 {
@@ -42,11 +46,18 @@ protected:
 	std::unique_ptr<TextPrimitive> _text;
 	std::unique_ptr<TextPrimitive> _cursor;
 
+	//thread
+	std::future<bool> _result;
+	std::thread _workerThread;
+
 	void createDosFont();
+	void loadResources(std::promise<bool> prom);
 
 public:
 	StartState(GameContext& game);
 	virtual ~StartState();
+
+	virtual void onUpdate() override;
 
 	virtual void onRender(GraphicsCommand& command) override;
 };

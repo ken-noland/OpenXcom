@@ -28,7 +28,7 @@
       "projectTarget": "openxcom.exe (src\\openxcom.exe)",
       "name": "openxcom.exe (src\\openxcom.exe)",
       "args": [
-        "-data ${ProjectDir}\\bin\\",
+        "-data ${ProjectDir}\\data\\data\\",
         "-user ${ProjectDir}\\data\\user\\",
         "-config ${ProjectDir}\\data\\config\\"
       ],
