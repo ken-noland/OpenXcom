@@ -126,23 +126,31 @@ StartState::StartState(GameContext& game)
 		{[&]() {
 			addLine("DOS/4GW Protected Mode Run-time  Version 1.9");
 			addLine("Copyright (c) Rational Systems, Inc. 1990-1993");
-		}, std::chrono::milliseconds(15)},
+		}, std::chrono::milliseconds(10)},
 		{[&]() {
 			addLine("");
 			addLine("OpenXcom initialisation");
-		}, std::chrono::milliseconds(40)},
+		}, std::chrono::milliseconds(30)},
 		{[&]() {
 			 addLine("");
-			 addLine("No Sound Detected (FIXME)");
-		}, std::chrono::milliseconds(20)},
+			 addLine("!Sound Not Implemented!"); // when we finally do get around to implementing sound, this will be removed
+												 // and the other options (like Adlib, SoundBlaster, etc.) will be added
+			 addLine("SoundBlaster Sound Effects");
+			 addLine("SoundBlaster Music"); // need to check options if the preferred music is MIDI or Adlib
+			 addLine("Base Port 220  Irq 7  Dma 1");
+		}, std::chrono::milliseconds(15)},
 		{[&]() {
 			 addLine("");
-			 addLine("Loading OpenXcom " OPENXCOM_VERSION_SHORT);
+			 addLine("Loading OpenXcom " OPENXCOM_VERSION_SHORT "...");
 		}, std::chrono::milliseconds(5)},
 	};
 
 	_textAnimationTimer.setFrames(frames);
 	_textAnimationTimer.start();
+
+	_cursorAnimationTimer.setCallback([&]() { _cursorVisible = !_cursorVisible; });
+	_cursorAnimationTimer.setInterval(std::chrono::milliseconds(4));
+	_cursorAnimationTimer.start();
 
 	TextSettings textSettings;
 	textSettings.alignment = TextAlignment::Left;
@@ -155,6 +163,7 @@ StartState::StartState(GameContext& game)
 	textSettings.defaultStyle.underline = false;
 
 	_text = primitiveFactory.createTextPrimitive(_textBuffer, textSettings);
+	_cursor = primitiveFactory.createTextPrimitive("_", textSettings);
 
 	//create the thread
 	std::promise<bool> prom;
@@ -178,6 +187,7 @@ StartState::~StartState()
 void StartState::onUpdate()
 {
 	_textAnimationTimer.update();
+	_cursorAnimationTimer.update();
 
 	// Check if future is ready without blocking
 	if (_result.valid() && _result.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
@@ -310,11 +320,23 @@ void StartState::addLine(const std::string& line)
 
 	_textBuffer += line + '\n';
 	_text->setText(_textBuffer);
+
+	// find the last glyph in the text
+	const TextSection& section = _text->getSections().back();
+	const PositionedGlyph& glyph = section.glyphs.back();
+
+	glm::ivec2 cursorPos = glm::ivec2(glyph.position.x + glyph.advance, glyph.position.y);
+	_cursor->setPosition(cursorPos);
 }
 
 void StartState::onRender(GraphicsCommand& command)
 {
 	_text->draw(command);
+
+	if(_cursorVisible)
+	{
+		_cursor->draw(command);
+	}
 }
 
 } // namespace OpenXcom

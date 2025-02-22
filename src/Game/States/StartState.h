@@ -19,13 +19,16 @@
  */
 #include "State.h"
 #include "../../Engine/Resource/Handle.h"
-#include "../../Engine/Utility/Timers/KeyframeAnimationTimer.h"
 #include <string>
 #include <sstream>
 #include <thread>
 #include <atomic>
 #include <future>
 #include <chrono>
+
+#include "../../Engine/Utility/Timers/KeyframeAnimationTimer.h"
+#include "../../Engine/Utility/Timers/RepeatAnimationTimer.h"
+
 
 namespace OpenXcom
 {
@@ -48,7 +51,9 @@ protected:
 	std::unique_ptr<TextPrimitive> _text;
 	std::unique_ptr<TextPrimitive> _cursor;
 
+	bool _cursorVisible = true;
 	KeyframeAnimationTimer _textAnimationTimer;
+	RepeatAnimationTimer _cursorAnimationTimer;
 
 	std::vector<std::pair<std::string, std::chrono::milliseconds>> _loadingMessages;
 	std::chrono::milliseconds _loadingMessageTime;
