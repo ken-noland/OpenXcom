@@ -19,6 +19,7 @@
  */
 #include "State.h"
 #include "../../Engine/Resource/Handle.h"
+#include "../../Engine/Utility/Timers/KeyframeAnimationTimer.h"
 #include <string>
 #include <sstream>
 #include <thread>
@@ -43,8 +44,14 @@ protected:
 	OwningHandle<Font> _dosFont;
 	OwningHandle<Palette> _dosFontPalette;
 
+	std::string _textBuffer;
 	std::unique_ptr<TextPrimitive> _text;
 	std::unique_ptr<TextPrimitive> _cursor;
+
+	KeyframeAnimationTimer _textAnimationTimer;
+
+	std::vector<std::pair<std::string, std::chrono::milliseconds>> _loadingMessages;
+	std::chrono::milliseconds _loadingMessageTime;
 
 	//thread
 	std::future<bool> _result;
@@ -52,6 +59,8 @@ protected:
 
 	void createDosFont();
 	void loadResources(std::promise<bool> prom);
+
+	void addLine(const std::string& line);
 
 public:
 	StartState(GameContext& game);

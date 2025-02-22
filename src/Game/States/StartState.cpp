@@ -35,6 +35,7 @@
 #include "../../Engine/Resource/ResourceSystem.h"
 #include "../../Engine/Resource/FileProcessor/ImageBMPFileProcessor.h"
 #include "../../Engine/Resource/FileProcessor/ImageFile.h"
+#include "../../version.h"
 
 #include <glm/vec4.hpp>
 #include <cstring>
@@ -119,7 +120,29 @@ StartState::StartState(GameContext& game)
 	createDosFont();
 
 	// create the text
-	std::string text = getDosPath() + ">openxcom";
+	_textBuffer = getDosPath() + ">openxcom\n";
+
+	std::vector<KeyframeAnimationFrame> frames = {
+		{[&]() {
+			addLine("DOS/4GW Protected Mode Run-time  Version 1.9");
+			addLine("Copyright (c) Rational Systems, Inc. 1990-1993");
+		}, std::chrono::milliseconds(15)},
+		{[&]() {
+			addLine("");
+			addLine("OpenXcom initialisation");
+		}, std::chrono::milliseconds(40)},
+		{[&]() {
+			 addLine("");
+			 addLine("No Sound Detected (FIXME)");
+		}, std::chrono::milliseconds(20)},
+		{[&]() {
+			 addLine("");
+			 addLine("Loading OpenXcom " OPENXCOM_VERSION_SHORT);
+		}, std::chrono::milliseconds(5)},
+	};
+
+	_textAnimationTimer.setFrames(frames);
+	_textAnimationTimer.start();
 
 	TextSettings textSettings;
 	textSettings.alignment = TextAlignment::Left;
@@ -131,7 +154,7 @@ StartState::StartState(GameContext& game)
 	textSettings.defaultStyle.colorIndex = 7; // ANSI escape code for white
 	textSettings.defaultStyle.underline = false;
 
-	_text = primitiveFactory.createTextPrimitive(text, textSettings);
+	_text = primitiveFactory.createTextPrimitive(_textBuffer, textSettings);
 
 	//create the thread
 	std::promise<bool> prom;
@@ -154,6 +177,8 @@ StartState::~StartState()
 
 void StartState::onUpdate()
 {
+	_textAnimationTimer.update();
+
 	// Check if future is ready without blocking
 	if (_result.valid() && _result.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
 	{
@@ -268,7 +293,7 @@ void StartState::loadResources(std::promise<bool> prom)
 	try
 	{
 		// Simulate some lengthy work (e.g., initialization, loading resources, etc.)
-		std::this_thread::sleep_for(std::chrono::seconds(2));
+		std::this_thread::sleep_for(std::chrono::seconds(6));
 		// Report success by setting the promise value.
 		prom.set_value(true);
 	}
@@ -277,6 +302,14 @@ void StartState::loadResources(std::promise<bool> prom)
 		// In case of an exception, pass it along to the main thread.
 		prom.set_exception(std::current_exception());
 	}
+}
+
+void StartState::addLine(const std::string& line)
+{
+	Log(LOG_INFO) << line;
+
+	_textBuffer += line + '\n';
+	_text->setText(_textBuffer);
 }
 
 void StartState::onRender(GraphicsCommand& command)
