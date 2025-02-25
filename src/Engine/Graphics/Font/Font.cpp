@@ -83,16 +83,17 @@ Font::~Font()
 		_tempBuffer = nullptr;
 	}
 
+	hb_font_funcs_destroy(_funcs);
 	hb_font_destroy(_hbFont);
 	hb_face_destroy(_hbFace);
 }
 
 void Font::initializeHarfBuzz()
 {
-	hb_font_funcs_t* funcs = hb_font_funcs_create();
+	_funcs = hb_font_funcs_create();
 
 	// Override HarfBuzz's glyph retrieval with our bitmap font data
-	hb_font_funcs_set_nominal_glyph_func(funcs, [](hb_font_t*, void*, hb_codepoint_t unicode, hb_codepoint_t* glyph, void* userData) -> hb_bool_t {
+	hb_font_funcs_set_nominal_glyph_func(_funcs, [](hb_font_t*, void*, hb_codepoint_t unicode, hb_codepoint_t* glyph, void* userData) -> hb_bool_t {
 		if (unicode < 128)
 		{
 			*glyph = unicode; // Direct ASCII mapping
@@ -102,13 +103,13 @@ void Font::initializeHarfBuzz()
 	}, nullptr, nullptr);
 
 	// Override advance width function
-	hb_font_funcs_set_glyph_h_advance_func(funcs, [](hb_font_t*, void* fontData, hb_codepoint_t glyph, void* userData) -> hb_position_t {
+	hb_font_funcs_set_glyph_h_advance_func(_funcs, [](hb_font_t*, void* fontData, hb_codepoint_t glyph, void* userData) -> hb_position_t {
 		Font* font = static_cast<Font*>(userData);
 		const Glyph* g = font->getGlyph(glyph);
 		return g ? g->xAdvance * 64 : 9 * 64; // Default to 9 pixels advance
 	}, this, nullptr);
 
-	hb_font_set_funcs(_hbFont, funcs, this, [](void*) -> void {});	//empty destroy function since we don't want to destroy "this".
+	hb_font_set_funcs(_hbFont, _funcs, this, nullptr);
 	//hb_font_set_scale(_hbFont, 9 * 64, 16 * 64); // Fixed 26.6 format
 }
 

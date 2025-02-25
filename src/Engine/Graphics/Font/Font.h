@@ -28,6 +28,7 @@
 struct hb_face_t;
 struct hb_font_t;
 struct hb_buffer_t;
+struct hb_font_funcs_t;
 
 namespace OpenXcom
 {
@@ -82,6 +83,7 @@ private:
 	std::vector<OwningHandle<DeviceImage>> _fontTextures; // The font atlas
 	hb_face_t* _hbFace = nullptr;
 	hb_font_t* _hbFont = nullptr;
+	hb_font_funcs_t* _funcs = nullptr;
 
 	// Temporary buffer for HarfBuzz text shaping
 	mutable hb_buffer_t* _tempBuffer = nullptr;

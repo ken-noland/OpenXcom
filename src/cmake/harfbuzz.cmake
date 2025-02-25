@@ -4,7 +4,7 @@ message(STATUS "Fetching HarfBuzz")
 FetchContent_Declare(
   harfbuzz
   GIT_REPOSITORY https://github.com/harfbuzz/harfbuzz.git
-  GIT_TAG 10.2.0
+  GIT_TAG 10.3.0
   SOURCE_DIR  "${CMAKE_BINARY_DIR}/_deps/harfbuzz-src"
 )
 
