@@ -36,8 +36,43 @@ public:
 	}
 };
 
+class DbgCheckMem;
+extern DbgCheckMem dbgCheckMem;
+
+class DbgCheckMem
+{
+public:
+	// Initialize CRT memory leak checking
+	_CrtMemState initialState;
+	_CrtMemState finalState;
+	_CrtMemState diffState;
+
+	DbgCheckMem()
+	{
+		_CrtMemCheckpoint(&initialState); // Take a snapshot of memory state at start of main
+		std::atexit(exit);
+	}
+
+	void check()
+	{
+		// Take a snapshot of memory state at the end of main
+		_CrtMemCheckpoint(&finalState);
+		// Compare the memory state at the beginning and end of main
+		if (_CrtMemDifference(&diffState, &initialState, &finalState))
+		{
+			_CrtMemDumpStatistics(&diffState); // Dump only the leaks that occurred after main
+		}
+	}
+
+	static void exit()
+	{
+		dbgCheckMem.check();
+	}
+};
+
 DbgBreakAlloc brk;
-#endif
+DbgCheckMem dbgCheckMem;
+#endif // _DEBUG && _MSC_VER
 
 #include "Engine/Engine.h"
 #include "Game/Game.h"
@@ -145,12 +180,6 @@ std::vector<std::string> CommandLineToArgvA()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-#if defined(_DEBUG)
-    // Initialize CRT memory leak checking
-	_CrtMemState initialState, finalState, diffState;
-	_CrtMemCheckpoint(&initialState); // Take a snapshot of memory state at start of main
-#endif
-
 	int ret = 0;
 
 	// using a scope operator here to ensure that the args are cleaned up before the memory check
@@ -186,17 +215,6 @@ int main(int argc, char *argv[])
 		SimpleRTTR::shutdown();
 	}
 
-
-#if defined(_DEBUG) && defined(_MSC_VER)
-	// Take a snapshot of memory state at the end of main
-	_CrtMemCheckpoint(&finalState);
-
-	// Compare the memory state at the beginning and end of main
-	if (_CrtMemDifference(&diffState, &initialState, &finalState))
-	{
-		_CrtMemDumpStatistics(&diffState); // Dump only the leaks that occurred after main
-	}
-#endif
 	return ret;
 }
 
