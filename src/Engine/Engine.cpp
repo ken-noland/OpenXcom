@@ -23,6 +23,7 @@
 #include "Platform/ProcessSystem.h"
 #include "Graphics/GraphicsSystem.h"
 #include "Resource/ResourceSystem.h"
+#include "Utility/Time/TimeSystem.h"
 #include "../version.h"
 
 #include <simplerttr.h>
@@ -62,6 +63,10 @@ Engine::Engine(const std::vector<std::string>& args)
 	_resourceSystem = std::make_unique<ResourceSystem>(*_engineContext);
 	_engineContext->setResourceSystem(_resourceSystem.get());
 
+	// Initialize the time system
+	_timeSystem = std::make_unique<TimeSystem>();
+	_engineContext->setTimeSystem(_timeSystem.get());
+
 	std::ostringstream title;
 	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
 	_engineContext->setTitle(title.str());
@@ -78,6 +83,7 @@ Engine::~Engine()
 
 void Engine::update()
 {
+	_timeSystem->update();
 	_platformProcessSystem->update();
 }
 

@@ -100,7 +100,9 @@ std::string getDosPath()
 }
 
 StartState::StartState(GameContext& game)
-	: _game(game)
+	: _game(game),
+	  _textAnimationTimer(game.getEngineContext().getTimeSystem()),
+	  _cursorAnimationTimer(game.getEngineContext().getTimeSystem())
 {
 	// Set the size to 720x400 terminal surface
 
@@ -109,7 +111,7 @@ StartState::StartState(GameContext& game)
 	glm::ivec2 extents = glm::ivec2(720, 400); // 720 x 400 because that's the size of the DOS terminal
 	_game.getGameWindow().setGameSurfaceSize(extents); 
 
-	EngineContext& engine = _game.getEngine();
+	EngineContext& engine = _game.getEngineContext();
 	GraphicsSystem& graphics = engine.getGraphicsSystem();
 
 	// get the game surface
@@ -126,11 +128,11 @@ StartState::StartState(GameContext& game)
 		{[&]() {
 			addLine("DOS/4GW Protected Mode Run-time  Version 1.9");
 			addLine("Copyright (c) Rational Systems, Inc. 1990-1993");
-		}, std::chrono::milliseconds(10)},
+		}, std::chrono::milliseconds(1000)},
 		{[&]() {
 			addLine("");
 			addLine("OpenXcom initialisation");
-		}, std::chrono::milliseconds(30)},
+		}, std::chrono::milliseconds(1500)},
 		{[&]() {
 			 addLine("");
 			 addLine("!Sound Not Implemented!"); // when we finally do get around to implementing sound, this will be removed
@@ -138,18 +140,18 @@ StartState::StartState(GameContext& game)
 			 addLine("SoundBlaster Sound Effects");
 			 addLine("SoundBlaster Music"); // need to check options if the preferred music is MIDI or Adlib
 			 addLine("Base Port 220  Irq 7  Dma 1");
-		}, std::chrono::milliseconds(15)},
+		}, std::chrono::milliseconds(700)},
 		{[&]() {
 			 addLine("");
 			 addLine("Loading OpenXcom " OPENXCOM_VERSION_SHORT "...");
-		}, std::chrono::milliseconds(5)},
+		}, std::chrono::milliseconds(500)},
 	};
 
 	_textAnimationTimer.setFrames(frames);
 	_textAnimationTimer.start();
 
 	_cursorAnimationTimer.setCallback([&]() { _cursorVisible = !_cursorVisible; });
-	_cursorAnimationTimer.setInterval(std::chrono::milliseconds(4));
+	_cursorAnimationTimer.setInterval(std::chrono::milliseconds(350));
 	_cursorAnimationTimer.start();
 
 	TextSettings textSettings;
@@ -177,6 +179,11 @@ StartState::StartState(GameContext& game)
  */
 StartState::~StartState()
 {
+	if(_workerThread.joinable())
+	{
+		_workerThread.join();
+	}
+
 	_text.reset();
 	_cursor.reset();
 
@@ -246,7 +253,7 @@ std::array<OpenXcom::Glyph, 128> getAsciiGlyphs(OpenXcom::ResourceHandle<OpenXco
 
 void StartState::createDosFont()
 {
-	EngineContext& engine = _game.getEngine();
+	EngineContext& engine = _game.getEngineContext();
 
 	ResourceSystem& resourceSystem = engine.getResourceSystem();
 	ImageManager& imageManager = resourceSystem.getImageManager();

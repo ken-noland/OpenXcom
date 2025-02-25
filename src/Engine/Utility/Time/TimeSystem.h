@@ -17,28 +17,42 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <chrono>
 
 namespace OpenXcom
 {
 
-class EngineContext;
-class GameWindow;
-class GameStates;
 
-class GameContext
+
+class TimeSystem
 {
-protected:
-	EngineContext& _engine;
-	GameWindow& _gameWindow;
-	GameStates& _gameStates;
 public:
-	GameContext(EngineContext& engine, GameWindow& window, GameStates& states)
-		: _engine(engine), _gameWindow(window), _gameStates(states) {}
-	~GameContext() {}
+    // Define the clock type and related types for clarity.
+    using Clock = std::chrono::high_resolution_clock;
+    using TimePoint = Clock::time_point;
+    using Duration  = std::chrono::duration<double>; // seconds precision as a double
 
-	EngineContext& getEngineContext() { return _engine; }
-	GameWindow& getGameWindow() { return _gameWindow; }
-	GameStates& getGameStates() { return _gameStates; }
+protected:
+	TimePoint _lastTimePoint; // Time point of the last update.
+	Duration _deltaTime;      // Elapsed time between the current and last update.
+
+public:
+	TimeSystem() : _lastTimePoint(Clock::now()), _deltaTime(Duration::zero()) {};
+	~TimeSystem() = default;
+
+	void update();
+
+	// Return delta time as a double in seconds
+	double getDeltaTime() const
+	{
+		return _deltaTime.count();
+	}
+
+	// Alternatively, if you want to return a chrono duration:
+	Duration getDeltaTimeDuration() const
+	{
+		return _deltaTime;
+	}
 };
 
 } // namespace OpenXcom

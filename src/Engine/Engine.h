@@ -52,6 +52,9 @@ class Engine
 	// Resource system
 	std::unique_ptr<ResourceSystem> _resourceSystem;
 
+	// Time system
+	std::unique_ptr<TimeSystem> _timeSystem;
+
 	// Engine context
 	std::unique_ptr<EngineContext> _engineContext;
 
@@ -71,6 +74,7 @@ public:
 	PlatformProcessSystem& getPlatformProcessSystem() { return *_platformProcessSystem; }
 	GraphicsSystem& getGraphicsSystem() { return *_graphicsSystem; }
 	ResourceSystem& getResourceSystem() { return *_resourceSystem; }
+	TimeSystem& getTimeSystem() { return *_timeSystem; }
 };
 
 } // namespace OpenXcom

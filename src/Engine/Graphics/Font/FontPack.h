@@ -62,7 +62,7 @@ protected:
 	void load(const std::filesystem::path& fontPackPath);
 
 public:
-	[[deprecated("Font packs are the old way of loading fonts. Explicit ownership of individual fonts is the preferred way. This feature will go away in future releases")]]
+	//[[deprecated("Font packs are the old way of loading fonts. Explicit ownership of individual fonts is the preferred way. This feature will go away in future releases")]]
 	FontPack(EngineContext& context, const std::filesystem::path& fontPackPath);
 	~FontPack();
 

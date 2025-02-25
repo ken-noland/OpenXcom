@@ -186,6 +186,7 @@ int main(int argc, char *argv[])
 		SimpleRTTR::shutdown();
 	}
 
+
 #if defined(_DEBUG) && defined(_MSC_VER)
 	// Take a snapshot of memory state at the end of main
 	_CrtMemCheckpoint(&finalState);

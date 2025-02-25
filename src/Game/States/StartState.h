@@ -26,8 +26,8 @@
 #include <future>
 #include <chrono>
 
-#include "../../Engine/Utility/Timers/KeyframeAnimationTimer.h"
-#include "../../Engine/Utility/Timers/RepeatAnimationTimer.h"
+#include "../../Engine/Utility/Time/KeyframeAnimationTimer.h"
+#include "../../Engine/Utility/Time/RepeatAnimationTimer.h"
 
 
 namespace OpenXcom

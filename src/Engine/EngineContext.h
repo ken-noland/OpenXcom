@@ -28,6 +28,7 @@ class VirtualFileSystem;
 class PlatformProcessSystem;
 class GraphicsSystem;
 class ResourceSystem;
+class TimeSystem;
 
 class EngineContext
 {
@@ -39,6 +40,7 @@ protected:
 	PlatformProcessSystem* _platformProcessSystem;
 	GraphicsSystem* _graphicsSystem;
 	ResourceSystem* _resourceSystem;
+	TimeSystem* _timeSystem;
 
 	std::string _title;
 
@@ -67,6 +69,9 @@ public:
 
 	void setResourceSystem(ResourceSystem* resourceSystem) { _resourceSystem = resourceSystem; }
 	ResourceSystem& getResourceSystem() { return *_resourceSystem; }
+
+	void setTimeSystem(TimeSystem* timeSystem) { _timeSystem = timeSystem; }
+	TimeSystem& getTimeSystem() { return *_timeSystem; }
 };
 
 
