@@ -37,10 +37,16 @@ namespace OpenXcom
 Game::Game(Engine& engine)
 	: _engine(engine)
 {
-	_gameWindow = std::make_unique<GameWindow>(_engine.getEngineContext());
-	_gameStates = std::make_unique<GameStates>();
 
-	_gameContext = std::make_unique<GameContext>(_engine.getEngineContext(), *_gameWindow, *_gameStates);
+	_gameContext = std::make_unique<GameContext>(_engine.getEngineContext());
+
+	_gameWindow = std::make_unique<GameWindow>(_engine.getEngineContext());
+	_gameContext->setGameWindow(*_gameWindow);
+
+	_gameStates = std::make_unique<GameStates>();
+	_gameContext->setGameStates(*_gameStates);
+
+
 
 	_onGameRenderHandle = _gameWindow->getGameSurface().onRender().add([this](GraphicsCommand& command) {
 		this->onGameRender(command);

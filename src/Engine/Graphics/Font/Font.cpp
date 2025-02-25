@@ -108,7 +108,7 @@ void Font::initializeHarfBuzz()
 		return g ? g->xAdvance * 64 : 9 * 64; // Default to 9 pixels advance
 	}, this, nullptr);
 
-	hb_font_set_funcs(_hbFont, funcs, this, nullptr);
+	hb_font_set_funcs(_hbFont, funcs, this, [](void*) -> void {});	//empty destroy function since we don't want to destroy "this".
 	//hb_font_set_scale(_hbFont, 9 * 64, 16 * 64); // Fixed 26.6 format
 }
 
