@@ -68,7 +68,7 @@ TEST(VirtualFileSystemTest, TestPhysicalFilesystemIterator)
 
 	FileSystem& data = vfs.getDataFileSystem();
 
-	for(const VFSEntryPtr& entry : data)
+	for(const std::unique_ptr<VFSEntry>& entry : data)
 	{
 		EXPECT_TRUE(entry);
 	}

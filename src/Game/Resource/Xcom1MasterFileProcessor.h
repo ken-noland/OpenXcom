@@ -22,6 +22,8 @@
 namespace OpenXcom
 {
 
+class EngineContext;
+
 struct Version
 {
 	int major;
@@ -46,29 +48,23 @@ struct ModInfo
 	std::vector<std::filesystem::path> resourceDirectories;
 };
 
-namespace OXCE_8_0_0
-{
-
-struct ModInfo : public ::OpenXcom::ModInfo { };
-
-} // namespace OXCE_8_0_0
-
-
 class Xcom1MasterFileProcessor
 {
+protected:
+	EngineContext& _engine;
+
+	// These helper methods mirror functionality previously in mod.cpp.
+	bool loadVanillaResources();
+	bool loadBattlescapeResources();
+	bool loadExtraResources();
+
 public:
-	Xcom1MasterFileProcessor();
+	Xcom1MasterFileProcessor(EngineContext& engine);
 	~Xcom1MasterFileProcessor();
 
 	bool load(const std::filesystem::path& path);
 
 	bool isValid(const std::filesystem::path& path);
-
-protected:
-	// These helper methods mirror functionality previously in mod.cpp.
-	bool loadVanillaResources();
-	bool loadBattlescapeResources();
-	bool loadExtraResources();
 };
 
 } // namespace OpenXcom

@@ -23,6 +23,7 @@
 #include <ryml.hpp>
 
 #include "Exception.h"
+#include "YamlContext.h"
 
 template <>
 struct std::formatter<ryml::csubstr> : std::formatter<std::string_view>
@@ -48,9 +49,9 @@ namespace OpenXcom
 class YamlException : public Exception
 {
 public:
-	explicit YamlException(const ryml::ConstNodeRef& yaml, const ryml::Parser& parser, const std::string& message)
+	explicit YamlException(const ryml::ConstNodeRef& yaml, YamlContext& context, const std::string& message)
 		: Exception([&]() {
-			  const ryml::Location& location = parser.location(yaml);
+			  const ryml::Location& location = context.getParser().location(yaml);
 			  return std::format(
 				  "YAML Error parsing node {} in file {} at line {}, col {}: {}",
 				  yaml.key(),
@@ -60,9 +61,9 @@ public:
 				  message);
 		  }()) {}
 
-	static void throwIfNoValue(const ryml::ConstNodeRef& yaml, const ryml::Parser& parser)
+	static void throwIfNoValue(const ryml::ConstNodeRef& yaml, YamlContext& context)
 	{
-		if (!yaml.has_val()) { throw YamlException(yaml, parser, "No value found."); }
+		if (!yaml.has_val()) { throw YamlException(yaml, context, "No value found."); }
 	}
 };
 

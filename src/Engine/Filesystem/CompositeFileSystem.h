@@ -13,44 +13,37 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ *e
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "FileSystem.h"
+#include <map>
 
 namespace OpenXcom
 {
 
-class EngineContext;
-class GameWindow;
-class GameStates;
-class Game;
-
-class GameContext
+// for files that could be stored in multiple filesystems
+class CompositeFilesystem : public FileSystem
 {
-protected:
-	EngineContext& _engine;
-	Game* _game;
-
-	GameWindow* _gameWindow;
-	GameStates* _gameStates;
-
-	friend class Game;
-	void setGameWindow(GameWindow& gameWindow) { _gameWindow = &gameWindow; }
-	void setGameStates(GameStates& gameStates) { _gameStates = &gameStates; }
-
 public:
-	GameContext(EngineContext& engine, Game* game)
-		: _engine(engine), _game(game) { }
-	~GameContext() {}
+	// Used for iterating over the filesystems
+	using EntryMap = std::map<std::filesystem::path, std::unique_ptr<VFSEntry>>;
+	using EntryMapPtr = std::unique_ptr<EntryMap>;
 
-	EngineContext& getEngineContext() { return _engine; }
-	Game& getGame() { return *_game; }
+	CompositeFilesystem();
+	virtual ~CompositeFilesystem() override;
 
-	GameWindow& getGameWindow() { return *_gameWindow; }
-	GameStates& getGameStates() { return *_gameStates; }
+	void addFileSystem(std::unique_ptr<FileSystem> fs);
 
+	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) override;
+	virtual std::unique_ptr<FolderEntry> getFolder(const std::filesystem::path& path) override;
 
+	virtual FileSystemIterator begin() override;
+	virtual FileSystemIterator end() override;
+
+private:
+	std::vector<std::unique_ptr<FileSystem>> _filesystems;
 };
 
 } // namespace OpenXcom

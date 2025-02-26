@@ -39,9 +39,9 @@ std::unique_ptr<FileEntry> ZipFileSystem::getFile(const std::filesystem::path& p
 	return std::unique_ptr<FileEntry>();
 }
 
-FolderPtr ZipFileSystem::getFolder(const std::filesystem::path& path)
+std::unique_ptr<FolderEntry> ZipFileSystem::getFolder(const std::filesystem::path& path)
 {
-	return FolderPtr();
+	return std::unique_ptr<FolderEntry>();
 }
 
 FileSystemIterator ZipFileSystem::begin()

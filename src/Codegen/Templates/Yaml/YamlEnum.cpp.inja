@@ -1,9 +1,9 @@
 // BEGIN YamlEnum.cpp.inja
 
 template<>
-bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, ryml::Parser const& parser)
+bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, YamlContext& context)
 {
-	throw OpenXcom::YamlException(yaml, parser, "Enum not yet supported!");
+	throw OpenXcom::YamlException(yaml, context, "Enum not yet supported!");
 }
 
 template<>

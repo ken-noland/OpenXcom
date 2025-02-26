@@ -38,7 +38,7 @@ public:
 	virtual ~CompositeFileIteratorImpl() override = default;
 
 
-	virtual VFSEntryPtr dereference() const override
+	virtual std::unique_ptr<VFSEntry> dereference() const override
 	{
 		if (_currentIt != _endIt)
 		{
@@ -65,6 +65,33 @@ public:
 		return otherImpl && _currentIt == otherImpl->_currentIt;
 	}
 
+	virtual std::unique_ptr<FileSystemIteratorImpl> clone() const override
+	{
+		// Clone the entries map
+		auto clonedEntries = std::make_unique<CompositeFilesystem::EntryMap>();
+
+		// Deep clone each entry in the map
+		for (const auto& [key, entry] : *_entries)
+		{
+			(*clonedEntries)[key] = entry ? entry->clone() : nullptr;
+		}
+
+		// Create a new iterator with the cloned map
+		auto clonedIterator = std::make_unique<CompositeFileIteratorImpl>(std::move(clonedEntries));
+
+		// Restore the iterator's position
+		clonedIterator->_currentIt = clonedIterator->_entries->find(_currentIt->first);
+		clonedIterator->_endIt = clonedIterator->_entries->end();
+
+		// Clone the current entry if it exists
+		if (_currentEntry)
+		{
+			clonedIterator->_currentEntry = _currentEntry->clone();
+		}
+
+		return clonedIterator;
+	}
+
 	virtual bool isEnd() const override
 	{
 		return _currentIt == _endIt;
@@ -74,7 +101,7 @@ private:
 	CompositeFilesystem::EntryMapPtr _entries; // Store the map as a unique_ptr
 
 	CompositeFilesystem::EntryMap::iterator _currentIt;
-	mutable VFSEntryPtr _currentEntry;
+	mutable std::unique_ptr<VFSEntry> _currentEntry;
 
 	CompositeFilesystem::EntryMap::iterator _endIt;
 };
@@ -107,9 +134,18 @@ std::unique_ptr<FileEntry> CompositeFilesystem::getFile(const std::filesystem::p
 	return std::unique_ptr<FileEntry>();
 }
 
-FolderPtr CompositeFilesystem::getFolder(const std::filesystem::path& path)
+std::unique_ptr<FolderEntry> CompositeFilesystem::getFolder(const std::filesystem::path& path)
 {
-	return FolderPtr();
+	// first come, first serve
+	for (const auto& fs : _filesystems)
+	{
+		std::unique_ptr<FolderEntry> folder = fs->getFolder(path);
+		if (folder)
+		{
+			return folder;
+		}
+	}
+	return std::unique_ptr<FolderEntry>();
 }
 
 FileSystemIterator CompositeFilesystem::begin()
@@ -118,14 +154,14 @@ FileSystemIterator CompositeFilesystem::begin()
 
 	for (std::unique_ptr<FileSystem>& fs : _filesystems)
 	{
-		for(VFSEntryPtr vfsPtr : *fs)
+		for (std::unique_ptr<VFSEntry> vfsPtr : *fs)
 		{
 			std::filesystem::path path = vfsPtr->getPath();
 			entries->insert(std::make_pair(path, std::move(vfsPtr)));
 		}
 	}
 
-	return FileSystemIterator(std::make_shared<CompositeFileIteratorImpl>(std::move(entries)));
+	return FileSystemIterator(std::make_unique<CompositeFileIteratorImpl>(std::move(entries)));
 }
 
 FileSystemIterator CompositeFilesystem::end()

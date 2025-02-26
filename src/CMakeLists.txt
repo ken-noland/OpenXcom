@@ -253,6 +253,7 @@ set ( engine_src
   "Engine/Timer.cpp"
   "Engine/Unicode.cpp"
   "Engine/Yaml.cpp"
+  "Engine/YamlAssert.cpp"
 #  "Engine/Zoom.cpp
 )
 
@@ -700,7 +701,7 @@ endif()
 # Codegen: Executable that generates additional source files, depends on openxcom_base_lib
 add_executable(codegen "Codegen/Codegen.cpp" $<TARGET_OBJECTS:openxcom_base_lib>)
 target_include_directories(codegen PUBLIC ${openxcom_includes})
-target_compile_definitions(codegen PUBLIC ${openxcom_defines})
+target_compile_definitions(codegen PUBLIC ${openxcom_defines} SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 target_link_libraries(codegen PUBLIC ${openxcom_libs})
 
 # Allow undefined symbols for codegen

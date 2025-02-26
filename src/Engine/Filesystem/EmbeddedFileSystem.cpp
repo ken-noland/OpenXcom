@@ -71,7 +71,7 @@ public:
 	{
 	}
 
-	virtual VFSEntryPtr dereference() const override
+	virtual std::unique_ptr<VFSEntry> dereference() const override
 	{
 		throw std::runtime_error("VFSEntryPtr EmbeddedFileIteratorImpl::dereference() Not implemented");
 		return nullptr;
@@ -91,7 +91,7 @@ private:
 	std::filesystem::directory_iterator _currentIt;
 
 	const PhysicalFileSystem& _filesystem;
-	mutable VFSEntryPtr _currentEntry;
+	mutable std::unique_ptr<VFSEntry> _currentEntry;
 };
 
 EmbeddedFileSystem::EmbeddedFileSystem()
@@ -107,9 +107,9 @@ std::unique_ptr<FileEntry> EmbeddedFileSystem::getFile(const std::filesystem::pa
 	return std::unique_ptr<FileEntry>();
 }
 
-FolderPtr EmbeddedFileSystem::getFolder(const std::filesystem::path& path)
+std::unique_ptr<FolderEntry> EmbeddedFileSystem::getFolder(const std::filesystem::path& path)
 {
-	return FolderPtr();
+	return std::unique_ptr<FolderEntry>();
 }
 
 FileSystemIterator EmbeddedFileSystem::begin()

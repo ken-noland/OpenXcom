@@ -31,6 +31,18 @@
 #include "../Inspector/Inspector.h"
 #endif
 
+
+////////////////////////////////////////
+// Begin Temp
+//
+// putting this here for now, but the file processor should be moved to a real loader
+////////////////////////////////////////
+#include "Resource/Xcom1MasterFileProcessor.h"
+////////////////////////////////////////
+// End Temp
+////////////////////////////////////////
+
+
 namespace OpenXcom
 {
 
@@ -73,6 +85,15 @@ protected:
 	void onGameRender(GraphicsCommand& command);
 	void onWindowRender(GraphicsCommand& command);
 
+	////////////////////////////////////////
+	// Begin Temp
+	////////////////////////////////////////
+	Xcom1MasterFileProcessor _masterFileProcessor;
+	////////////////////////////////////////
+	// End Temp
+	////////////////////////////////////////
+
+
 public:
 	/// Creates a new game.
 	Game(Engine& engine);
@@ -82,6 +103,8 @@ public:
 	int run();
 	void update();
 	void quit();
+
+	bool load();
 
 	bool isRunning() const;
 	GameContext& getGameContext();

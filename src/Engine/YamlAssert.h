@@ -17,25 +17,43 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "EngineContext.h"
-#include "Filesystem/VirtualFileSystem.h"
-#include <ryml.hpp>
+#include <sstream>
 
 namespace OpenXcom
 {
 
-class YamlContext
+// A lightweight assertion handler that collects an error message via operator<<.
+class YamlAssertHandler
 {
-	ryml::Parser& _parser;
+private:
+	bool _active;
+	const char* _expr;
+	const char* _file;
+	int _line;
+	std::ostringstream _ss;
 
 public:
-	YamlContext(ryml::Parser& parser) : _parser(parser) {}
+	// If 'active' is true, the assertion failed.
+	YamlAssertHandler(bool active, const char* expr, const char* file, int line)
+		: _active(active), _expr(expr), _file(file), _line(line) {}
 
-	YamlContext(const YamlContext&) = delete;
-	YamlContext& operator=(const YamlContext&) = delete;
+	// When the handler is destroyed, if it is active, print the message and abort.
+	~YamlAssertHandler();
 
-	ryml::Parser& getParser() { return _parser; }
+	// Allow streaming additional message text.
+	template <typename T>
+	YamlAssertHandler& operator<<(const T& value)
+	{
+		if (_active)
+		{
+			_ss << value;
+		}
+		return *this;
+	}
 };
+
+#define YAML_ASSERT_MSG(condition) \
+	YamlAssertHandler(!(condition), #condition, __FILE__, __LINE__)
+
 
 } // namespace OpenXcom

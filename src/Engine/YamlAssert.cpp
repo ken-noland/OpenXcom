@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,40 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#include "YamlAssert.h"
+#include "Logger.h"
 namespace OpenXcom
 {
 
-class EngineContext;
-class GameWindow;
-class GameStates;
-class Game;
-
-class GameContext
+YamlAssertHandler::~YamlAssertHandler()
 {
-protected:
-	EngineContext& _engine;
-	Game* _game;
-
-	GameWindow* _gameWindow;
-	GameStates* _gameStates;
-
-	friend class Game;
-	void setGameWindow(GameWindow& gameWindow) { _gameWindow = &gameWindow; }
-	void setGameStates(GameStates& gameStates) { _gameStates = &gameStates; }
-
-public:
-	GameContext(EngineContext& engine, Game* game)
-		: _engine(engine), _game(game) { }
-	~GameContext() {}
-
-	EngineContext& getEngineContext() { return _engine; }
-	Game& getGame() { return *_game; }
-
-	GameWindow& getGameWindow() { return *_gameWindow; }
-	GameStates& getGameStates() { return *_gameStates; }
-
-
-};
+	if (_active)
+	{
+		Log(LOG_ERROR) << "Assertion failed: " << _expr
+				  << ", file " << _file << ", line " << _line << ". ";
+		if (!_ss.str().empty())
+			Log(LOG_ERROR) << _ss.str();
+		Log(LOG_ERROR) << std::endl;
+		std::abort();
+	}
+}
 
 } // namespace OpenXcom

@@ -17,6 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "StartState.h"
+#include "../../Game/Game.h"
 #include "../../Game/GameContext.h"
 #include "../../Game/GameWindow.h"
 #include "../../Engine/EngineContext.h"
@@ -309,10 +310,11 @@ void StartState::loadResources(std::promise<bool> prom)
 {
 	try
 	{
-		// Simulate some lengthy work (e.g., initialization, loading resources, etc.)
-		std::this_thread::sleep_for(std::chrono::seconds(6));
+		// Load the game!
+		bool result = _game.getGame().load();
+
 		// Report success by setting the promise value.
-		prom.set_value(true);
+		prom.set_value(result);
 	}
 	catch (...)
 	{

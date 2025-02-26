@@ -17,22 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#include "YamlContext.h"
 #include <ryml.hpp>
-
-// this include is present for recursive inclusion in the inja templates.
-#include "YamlException.h"
 
 namespace OpenXcom
 {
 
-class YamlContext;
+class YamlFile
+{
+	ryml::EventHandlerTree evtentHandler = {};
+	ryml::Parser parser = ryml::Parser(&evtentHandler, ryml::ParserOptions().locations(true));
 
-// forward declarations
-template <typename ClassType>
-bool fromYaml(ryml::ConstNodeRef const& yaml, ClassType& type, YamlContext& context);
+public:
+	YamlFile() = default;
 
-template <typename ClassType>
-bool toYaml(const ClassType& type, ryml::NodeRef& yaml);
+	YamlFile(const YamlFile&) = delete;
+	YamlFile& operator=(const YamlFile&) = delete;
 
+	template <typename T>
+	T load(std::unique_ptr<FileEntry>& fileEntry)
+	{
+		std::unique_ptr<std::istream> fileStream = fileEntry->openRead();
+		std::string contents((std::istreambuf_iterator<char>(*fileStream)), std::istreambuf_iterator<char>());
+
+		ryml::Tree tree = ryml::parse_in_arena(&parser, fileEntry->getPath().string().c_str(), contents.c_str());
+
+		YamlContext context(parser);
+
+		T result{};
+		fromYaml(tree.rootref(), result, context);
+
+		return result;
+	}
+};
+	
 } // namespace OpenXcom

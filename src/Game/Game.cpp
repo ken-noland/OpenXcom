@@ -35,18 +35,17 @@ namespace OpenXcom
 {
 
 Game::Game(Engine& engine)
-	: _engine(engine)
+	: _engine(engine), _masterFileProcessor(engine.getEngineContext())
 {
+	EngineContext& engineContext = _engine.getEngineContext();
 
-	_gameContext = std::make_unique<GameContext>(_engine.getEngineContext());
+	_gameContext = std::make_unique<GameContext>(engineContext, this);
 
-	_gameWindow = std::make_unique<GameWindow>(_engine.getEngineContext());
+	_gameWindow = std::make_unique<GameWindow>(engineContext);
 	_gameContext->setGameWindow(*_gameWindow);
 
 	_gameStates = std::make_unique<GameStates>();
 	_gameContext->setGameStates(*_gameStates);
-
-
 
 	_onGameRenderHandle = _gameWindow->getGameSurface().onRender().add([this](GraphicsCommand& command) {
 		this->onGameRender(command);
@@ -115,6 +114,11 @@ void Game::update()
  */
 void Game::quit()
 {
+}
+
+bool Game::load()
+{
+	return _masterFileProcessor.load("./");
 }
 
 bool Game::isRunning() const

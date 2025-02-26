@@ -667,6 +667,7 @@ bool generateCode(const CommandLineArguments& args)
 	nlohmann::json data;
 	data["headers"] = headers;
 	convertTypesToJson(data["types"], types);
+	data["source_path"] = SOURCE_DIR;
 
 	// render the main template
 	std::string result;
