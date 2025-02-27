@@ -620,6 +620,7 @@ include(cmake/libbmp.cmake)
 include(cmake/harfbuzz.cmake)
 include(cmake/libunibreak.cmake)
 include(cmake/utfcpp.cmake)
+include(cmake/semver.cmake)
 
 #--------------------------------
 # set up the defines and includes
@@ -669,6 +670,7 @@ set(openxcom_libs
   libbmp
   harfbuzz
   libunibreak
+  semver
 )
 
 if(UNIX)

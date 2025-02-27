@@ -19,16 +19,58 @@
  */
 #include <filesystem>
 
+#include <semver/semver.hpp>
+
 namespace OpenXcom
 {
 
 class EngineContext;
 
-struct Version
+enum class ModType
 {
-	int major;
-	int minor;
-	int patch;
+	Master,
+	Mod
+};
+
+enum class VersionOperator
+{
+	Equal,            // ==
+	GreaterThan,      // >
+	GreaterThanEqual, // >=
+	LessThan,         // <
+	LessThanEqual,    // <=
+	// You can add more operators as needed
+};
+
+struct VersionConstraint
+{
+	VersionOperator op;
+	semver::version version;
+};
+
+struct DependencyExpression
+{
+	enum class LogicalOperator
+	{
+		None, // for leaf nodes
+		And,
+		Or,
+	};
+
+	std::string mod;
+
+	// A dependency might include multiple constraints (e.g. >=1.0.0 and <2.0.0)
+	std::vector<VersionConstraint> constraints;
+
+	// For a composite dependency (AND/OR):
+	LogicalOperator op = LogicalOperator::None;
+	std::vector<DependencyExpression> children;
+
+	// Helper to check if this node is a leaf.
+	bool isLeaf() const
+	{
+		return op == LogicalOperator::None && children.empty();
+	}
 };
 
 struct ModInfo
@@ -37,14 +79,17 @@ struct ModInfo
 	std::string name;
 	std::string description;
 	std::string author;
-	Version version;
+	semver::version version = semver::version();
+
+	ModType type = ModType::Mod;
 
 	std::string requiredEngine;
-	Version requiredVersion;
+	semver::version requiredVersion = semver::version();
 
-	std::vector<std::string> dependencies;
-	std::vector<std::string> conflicts;
+	std::vector<DependencyExpression> dependencies;
+	std::vector<DependencyExpression> conflicts;
 
+	std::filesystem::path resourceConfigFile;
 	std::vector<std::filesystem::path> resourceDirectories;
 };
 

@@ -25,8 +25,8 @@ namespace OpenXcom
 
 class YamlFile
 {
-	ryml::EventHandlerTree evtentHandler = {};
-	ryml::Parser parser = ryml::Parser(&evtentHandler, ryml::ParserOptions().locations(true));
+	ryml::EventHandlerTree eventHandler = {};
+	ryml::Parser parser = ryml::Parser(&eventHandler, ryml::ParserOptions().locations(true));
 
 public:
 	YamlFile() = default;
@@ -41,7 +41,6 @@ public:
 		std::string contents((std::istreambuf_iterator<char>(*fileStream)), std::istreambuf_iterator<char>());
 
 		ryml::Tree tree = ryml::parse_in_arena(&parser, fileEntry->getPath().string().c_str(), contents.c_str());
-
 		YamlContext context(parser);
 
 		T result{};

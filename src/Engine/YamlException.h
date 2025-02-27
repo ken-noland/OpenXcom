@@ -54,7 +54,7 @@ public:
 			  const ryml::Location& location = context.getParser().location(yaml);
 			  return std::format(
 				  "YAML Error parsing node {} in file {} at line {}, col {}: {}",
-				  yaml.key(),
+				  yaml.has_key() ? yaml.key() : "<root>",
 				  location.name,
 				  location.line,
 				  location.col,
