@@ -18,7 +18,7 @@
  */
 #include <gtest/gtest.h>
 
-#include "../../Game/Resource/Xcom1MasterFileProcessor.h"
+#include "../../Engine/Mod/ModInfo.h"
 #include "../../Engine/Yaml.h"
 #include "../../Engine/YamlContext.h"
 #include "../../Engine/YamlException.h"
@@ -110,3 +110,4 @@ dependencies:
 		fromYaml(tree, info, context);
 	}, YamlException);
 }
+

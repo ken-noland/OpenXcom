@@ -22,6 +22,7 @@
 #include <memory>
 
 #include "GameContext.h"
+#include "GameMods.h"
 
 #include "../Engine/Filesystem/VirtualFileSystem.h"
 #include "../Engine/Platform/Window.h"
@@ -31,18 +32,6 @@
 #include "../Inspector/Inspector.h"
 #endif
 
-
-////////////////////////////////////////
-// Begin Temp
-//
-// putting this here for now, but the file processor should be moved to a real loader
-////////////////////////////////////////
-#include "Resource/Xcom1MasterFileProcessor.h"
-////////////////////////////////////////
-// End Temp
-////////////////////////////////////////
-
-
 namespace OpenXcom
 {
 
@@ -51,6 +40,7 @@ class State;
 class Options;
 class GameWindow;
 class GameStates;
+class GameMods;
 class GraphicsCommand;
 
 /**
@@ -74,6 +64,9 @@ protected:
 	// The game's window.
 	std::unique_ptr<GameWindow> _gameWindow;
 
+	// The game's mods
+	std::unique_ptr<GameMods> _gameMods;
+
 	// Handles to delegates for rendering
 	MulticastDelegate<void(GraphicsCommand&)>::Handle _onWindowRenderHandle;
 	MulticastDelegate<void(GraphicsCommand&)>::Handle _onGameRenderHandle;
@@ -84,15 +77,6 @@ protected:
 
 	void onGameRender(GraphicsCommand& command);
 	void onWindowRender(GraphicsCommand& command);
-
-	////////////////////////////////////////
-	// Begin Temp
-	////////////////////////////////////////
-	Xcom1MasterFileProcessor _masterFileProcessor;
-	////////////////////////////////////////
-	// End Temp
-	////////////////////////////////////////
-
 
 public:
 	/// Creates a new game.

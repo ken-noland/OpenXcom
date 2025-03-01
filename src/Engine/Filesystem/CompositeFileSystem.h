@@ -24,15 +24,15 @@ namespace OpenXcom
 {
 
 // for files that could be stored in multiple filesystems
-class CompositeFilesystem : public FileSystem
+class CompositeFileSystem : public FileSystem
 {
 public:
 	// Used for iterating over the filesystems
 	using EntryMap = std::map<std::filesystem::path, std::unique_ptr<VFSEntry>>;
 	using EntryMapPtr = std::unique_ptr<EntryMap>;
 
-	CompositeFilesystem();
-	virtual ~CompositeFilesystem() override;
+	CompositeFileSystem();
+	virtual ~CompositeFileSystem() override;
 
 	void addFileSystem(std::unique_ptr<FileSystem> fs);
 

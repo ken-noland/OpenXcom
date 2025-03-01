@@ -257,26 +257,25 @@ bool ImageBMPFileProcessor::load(ImageFile& out, const std::string& name, const 
 	glm::ivec2 imageSize(width, height);
 	ImageManager& imageManager = _context.getResourceSystem().getImageManager();
 	ImageFormat format;
-	int bytesPerPixelFile = 0;
 	switch (header.biBitCount)
 	{
 	case 1:
 	case 4:
 	case 8:
 		format = ImageFormat::R8;
-		bytesPerPixelFile = 1; // Not per-pixel in the file, but we'll unpack into one byte per pixel.
 		break;
 	case 24:
 		format = ImageFormat::R8G8B8;
-		bytesPerPixelFile = 3;
 		break;
 	case 32:
 		format = ImageFormat::R8G8B8A8;
-		bytesPerPixelFile = 4;
 		break;
 	default:
 		throw std::runtime_error("Unsupported bit depth");
 	}
+
+	int bytesPerPixelFile = bytesPerPixel(format);
+
 	OwningHandle<HostImage> hostImageHandle = imageManager.createHostImage(name, imageSize, format);
 	if (!hostImageHandle.isValid())
 	{
@@ -286,6 +285,10 @@ bool ImageBMPFileProcessor::load(ImageFile& out, const std::string& name, const 
 	HostImage& hostImage = hostImageHandle.get();
 
 	uint8_t* dstImageData = static_cast<uint8_t*>(hostImage.map());
+	if(dstImageData == nullptr)
+	{
+		throw std::runtime_error("Unable to map host image");
+	}
 
 	// Compute row sizes and padding from the file.
 	int rowBytesFile = 0;

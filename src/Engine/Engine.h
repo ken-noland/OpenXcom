@@ -37,6 +37,7 @@ class ResourceSystem;
 // systems, allowing for easier testing and debugging.
 class Engine
 {
+protected:
 	// Options
 	std::unique_ptr<Options> _options;
 
@@ -58,8 +59,11 @@ class Engine
 	// Engine context
 	std::unique_ptr<EngineContext> _engineContext;
 
+	// Empty constructor for unit tests
+	Engine();
+
 public:
-	Engine(const std::vector<std::string>& args = {});
+	Engine(const std::vector<std::string>& args);
 	~Engine();
 
 	void update();

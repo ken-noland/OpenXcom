@@ -35,6 +35,12 @@ namespace OpenXcom
 extern int FORCE_LINK_RTTRGLM;
 extern int FORCE_LINK_RTTRPACKEDCOLOR;
 
+// Empty constructor for unit tests
+Engine::Engine()
+{
+
+}
+
 Engine::Engine(const std::vector<std::string>& args)
 {
 	// hack to force the linker to include the RTTR stuff

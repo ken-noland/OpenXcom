@@ -24,6 +24,7 @@ namespace OpenXcom
 class EngineContext;
 class GameWindow;
 class GameStates;
+class GameMods;
 class Game;
 
 class GameContext
@@ -34,10 +35,12 @@ protected:
 
 	GameWindow* _gameWindow;
 	GameStates* _gameStates;
+	GameMods* _gameMods;
 
 	friend class Game;
 	void setGameWindow(GameWindow& gameWindow) { _gameWindow = &gameWindow; }
 	void setGameStates(GameStates& gameStates) { _gameStates = &gameStates; }
+	void setGameMods(GameMods& gameMods) { _gameMods = &gameMods; }
 
 public:
 	GameContext(EngineContext& engine, Game* game)
@@ -49,8 +52,7 @@ public:
 
 	GameWindow& getGameWindow() { return *_gameWindow; }
 	GameStates& getGameStates() { return *_gameStates; }
-
-
+	GameMods& getGameMods() { return *_gameMods; }
 };
 
 } // namespace OpenXcom

@@ -20,309 +20,12 @@
 #include "../../Engine/EngineContext.h"
 #include "../../Engine/Logger.h"
 #include "../../Engine/Filesystem/VirtualFileSystem.h"
-#include "../../Engine/Utility/RTTR.h"
 #include "../../Engine/Yaml.h"
 #include "../../Engine/YamlFile.h"
-#include "../../Engine/YamlException.h"
-#include "../../version.h"
+#include "../../Engine/Mod/ModInfo.h"
 
 namespace OpenXcom
 {
-
-SIMPLERTTR
-{
-	SimpleRTTR::registration().type<ModType>()
-		.meta("Serialize", ObjectSerialize::ALWAYS) // always serialize this
-		.value(ENUM_VALUE_REGISTRATION(ModType, Master))
-		.value(ENUM_VALUE_REGISTRATION(ModType, Mod));
-}
-
-VersionConstraint parseVersionConstraint(std::string_view input)
-{
-	// Skip leading whitespace.
-	while (!input.empty() && std::isspace(input.front()))
-	{
-		input.remove_prefix(1);
-	}
-
-	// Extract the operator.
-	std::string_view op;
-	if (input.size() >= 2)
-	{
-		auto twoChars = input.substr(0, 2);
-		if (twoChars == "==" || twoChars == ">=" || twoChars == "<=")
-		{
-			op = twoChars;
-			input.remove_prefix(2);
-		}
-	}
-	if (op.empty() && !input.empty())
-	{
-		char c = input.front();
-		if (c == '>' || c == '<')
-		{
-			op = input.substr(0, 1);
-			input.remove_prefix(1);
-		}
-	}
-	if (op.empty())
-	{
-		throw std::invalid_argument("Invalid version constraint: no valid operator found");
-	}
-
-	// Skip any whitespace between the operator and the version number.
-	while (!input.empty() && std::isspace(input.front()))
-	{
-		input.remove_prefix(1);
-	}
-	if (input.empty())
-	{
-		throw std::invalid_argument("Invalid version constraint: missing version number");
-	}
-
-	// The remainder is the version string.
-	std::string_view versionStr = input;
-
-	// Map the operator string to our enum.
-	VersionOperator versionOp;
-	if (op == "==")
-	{
-		versionOp = VersionOperator::Equal;
-	}
-	else if (op == ">=")
-	{
-		versionOp = VersionOperator::GreaterThanEqual;
-	}
-	else if (op == ">")
-	{
-		versionOp = VersionOperator::GreaterThan;
-	}
-	else if (op == "<=")
-	{
-		versionOp = VersionOperator::LessThanEqual;
-	}
-	else if (op == "<")
-	{
-		versionOp = VersionOperator::LessThan;
-	}
-	else
-	{
-		throw std::invalid_argument("Unknown operator: " + std::string(op));
-	}
-
-	// Convert versionStr to a std::string for the semver parser.
-	semver::version ver = semver::version::parse(std::string(versionStr), false);
-
-	return VersionConstraint{versionOp, ver};
-}
-
-
-template <>
-bool fromYaml<DependencyExpression>(ryml::ConstNodeRef const& yaml, DependencyExpression& expr, YamlContext& context)
-{
-	if(yaml.has_child("mod"))
-	{
-		// Treat this node as a leaf dependency.
-		ryml::ConstNodeRef modNode = yaml["mod"];
-		expr.mod = std::string(modNode.val().begin(), modNode.val().end());
-
-		if(yaml.has_child("version"))
-		{
-			// read the version constraints as a string
-			ryml::ConstNodeRef versionNode = yaml["version"];
-			std::string versionStr(versionNode.val().begin(), versionNode.val().end());
-
-			// parse the version constraints
-			expr.constraints.push_back(parseVersionConstraint(versionStr));
-		}
-
-		return true;
-	}
-	else if (yaml.has_child("and"))
-	{
-		// Check for a composite dependency using "and"
-		expr.op = DependencyExpression::LogicalOperator::And;
-
-		ryml::ConstNodeRef andNode = yaml["and"];
-		for (auto child : andNode.children())
-		{
-			DependencyExpression childExpr;
-			if(!fromYaml(child, childExpr, context)) { return false; }
-			expr.children.push_back(childExpr);
-		}
-		return true;
-	}
-	else if (yaml.has_child("or"))
-	{
-		// Check if the node defines a composite dependency using "or"
-		expr.op = DependencyExpression::LogicalOperator::Or;
-
-		ryml::ConstNodeRef orNode = yaml["or"];
-		for (auto child : orNode.children())
-		{
-			DependencyExpression childExpr;
-			if (!fromYaml(child, childExpr, context)) { return false; }
-			expr.children.push_back(childExpr);
-		}
-		return true;
-	}
-	else if (yaml.is_seq())
-	{
-		// If the node is a sequence (and not wrapped in a map), process each element as an implicit "and" group.
-		expr.op = DependencyExpression::LogicalOperator::And;
-		for (auto child : yaml.children())
-		{
-			DependencyExpression childExpr;
-			if (!fromYaml(child, childExpr, context)) { return false; }
-			expr.children.push_back(childExpr);
-		}
-		return true;
-	}
-	else
-	{
-		throw OpenXcom::YamlException(yaml, context, "Expected 'mod', 'and', or 'or' field.");
-	}
-	return false;
-}
-
-// we have a custom specialization of the ModInfo so we can figure out the version and do custom overrides later
-template <>
-bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlContext& context)
-{
-	// ensure the node type is "map"
-	if (!yaml.is_map()) { throw OpenXcom::YamlException(yaml, context, "Expected map type."); }
-
-	if (!yaml.has_child("name")) { throw OpenXcom::YamlException(yaml, context, "Missing required 'name' field."); }
-	if (!yaml.has_child("id")) { throw OpenXcom::YamlException(yaml, context, "Missing required 'id' field."); }
-	if (!yaml.has_child("description")) { throw OpenXcom::YamlException(yaml, context, "Missing required 'description' field."); }
-	if (!yaml.has_child("author")) { throw OpenXcom::YamlException(yaml, context, "Missing required 'author' field."); }
-
-	if (!fromYaml(yaml["name"], modInfo.name, context)) { return false; }
-	if (!fromYaml(yaml["id"], modInfo.id, context)) { return false; }
-	if (!fromYaml(yaml["description"], modInfo.description, context)) { return false; }
-	if (!fromYaml(yaml["author"], modInfo.author, context)) { return false; }
-
-	// try reading the version
-	if (yaml.has_child("version"))
-	{
-		ryml::ConstNodeRef versionNode = yaml["version"];
-		std::string versionStr(versionNode.val().begin(), versionNode.val().end());
-		modInfo.version = semver::version::parse(versionStr, false);
-	}
-	else
-	{
-		Log(LOG_WARNING) << "Missing 'version' field";
-		modInfo.version = semver::version(1, 0, 0);
-	}
-
-	// try reading the type
-	bool typeIsSet = false;
-	if (yaml.has_child("type"))
-	{
-		if (!fromYaml(yaml["type"], modInfo.type, context))
-		{
-			return false;
-		}
-		typeIsSet = true;
-	}
-
-	// try reading the requiredEngine
-	modInfo.requiredEngine = OPENXCOM_VERSION_ENGINE;
-	if (yaml.has_child("requiredEngine"))
-	{
-		if (!fromYaml(yaml["requiredEngine"], modInfo.requiredEngine, context))
-		{
-			return false;
-		}
-	}
-
-	// try reading the requiredVersion
-	if (yaml.has_child("requiredVersion"))
-	{
-		ryml::ConstNodeRef requiredVersionNode = yaml["requiredVersion"];
-		std::string versionStr(requiredVersionNode.val().begin(), requiredVersionNode.val().end());
-		modInfo.requiredVersion = semver::version::parse(versionStr, false);
-	}
-
-	// try reading the dependencies
-	if(yaml.has_child("dependencies"))
-	{
-		ryml::ConstNodeRef dependenciesNode = yaml["dependencies"];
-		for (auto child : dependenciesNode.children())
-		{
-			DependencyExpression dep;
-			if (!fromYaml(child, dep, context)) { return false; }
-			modInfo.dependencies.push_back(dep);
-		}
-	}
-
-	// try reading the conflicts
-	if (yaml.has_child("conflicts"))
-	{
-		ryml::ConstNodeRef conflictsNode = yaml["conflicts"];
-		for (auto child : yaml.children())
-		{
-			DependencyExpression dep;
-			if (!fromYaml(child, dep, context)) { return false; }
-			modInfo.conflicts.push_back(dep);
-		}
-	}
-
-	//---
-	// The following are deprecated fields, but still useful to parse so we know how to deal with deserializing values going forward
-
-	// try reading the version display
-	if(yaml.has_child("versionDisplay"))
-	{
-		Log(LOG_WARNING) << "The versionDisplay field is deprecated. Please use the 'version' field instead.";
-		// TODO: put in documentation link here
-	}
-
-	// try reading the "isMaster" field
-	if (yaml.has_child("isMaster"))
-	{
-		Log(LOG_WARNING) << "The isMaster field is deprecated. Please use the 'type' field instead.";
-		// TODO: put in documentation link here
-
-		if(typeIsSet)
-		{
-			Log(LOG_ERROR) << "You can't specify 'type' and 'isMaster' in the same file." <<
-				"'isMaster' is the old way, and 'type' is the new way. Using both just confuses me.";
-			return false;
-		}
-
-		// we still need to set the type to master
-		bool isMaster = false;
-		yaml["isMaster"] >> isMaster;
-		if(isMaster)
-		{
-			modInfo.type = ModType::Master;
-		}
-	}
-
-	// try reading "master" field
-	if (yaml.has_child("master"))
-	{
-		Log(LOG_WARNING) << "The master field is deprecated. Please use the 'type' field instead.";
-
-		// well, we might as well read it it and record it as a dependency
-		ryml::ConstNodeRef masterNode = yaml["master"];
-		std::string master(masterNode.val().begin(), masterNode.val().end());
-		modInfo.dependencies.push_back(DependencyExpression{master});
-	}
-
-	// try reading the "reservedSpace" field
-	if (yaml.has_child("reservedSpace"))
-	{
-		Log(LOG_WARNING) << "The reservedSpace field is deprecated. It is now ignored.";
-	}
-
-	//---
-	// With the deprecated fields now parsed, we can now see if we need to parse 
-
-	return true;
-}
-
 
 Xcom1MasterFileProcessor::Xcom1MasterFileProcessor(EngineContext& engine)
 	: _engine(engine)
@@ -341,28 +44,27 @@ bool Xcom1MasterFileProcessor::load(const std::filesystem::path& path)
 
 	// From the VFS, get the folder entry for the xcom1 master file
 	VirtualFileSystem& vfs = _engine.getVirtualFileSystem();
-	std::unique_ptr<FolderEntry> masterFolder = vfs.getDataFileSystem().getFolder(masterPath);
-	if (!masterFolder)
+	std::unique_ptr<FolderEntry> folder = vfs.getDataFileSystem().getFolder(masterPath);
+	if (!folder)
 	{
 		Log(LOG_ERROR) << "Failed to load xcom1 master file. Could not find directory: " << masterPath;
 		return false;
 	}
 
 	// Get the metadata file from the master folder
-	std::unique_ptr<FileEntry> masterFile = masterFolder->getFile("metadata.yml");
-	if (!masterFile)
+	std::unique_ptr<FileEntry> metadataFile = folder->getFile("metadata.yml");
+	if (!metadataFile)
 	{
+		// TODO: check for json file
 		Log(LOG_ERROR) << "Failed to load xcom1 master file. Could not find metadata.yml in directory: " << masterPath;
 		return false;
 	}
 
-	// load the metadata file
+	// Load the metadata file
 	YamlFile masterYamlFile;
-	ModInfo masterInfo = masterYamlFile.load<ModInfo>(masterFile);
+	ModInfo masterInfo = masterYamlFile.load<ModInfo>(metadataFile);
 
-
-
-	return false;
+	return true;
 }
 
 bool Xcom1MasterFileProcessor::isValid(const std::filesystem::path& path)

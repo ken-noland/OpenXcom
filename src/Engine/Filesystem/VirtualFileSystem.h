@@ -65,7 +65,7 @@ public:
 	~VirtualFileSystem();
 
 	FileSystem& getDataFileSystem();
-	FileSystem& getModFileSystem();
+	FileSystem& getUserFileSystem();
 
 protected:
 	// there can only be one embedded filesystem
@@ -73,8 +73,9 @@ protected:
 
 	// data and mods are composite filesystems, meaning they can contain
 	// multiple filesystems(embedded, physical and zip filesystems)
-	CompositeFilesystem _data;
-	CompositeFilesystem _mods;
+	CompositeFileSystem _data;
+
+	PhysicalFileSystem _user;
 };
 
 } // namespace OpenXcom

@@ -22,6 +22,8 @@
 namespace OpenXcom
 {
 
+class FileSystem;
+
 // Virtual File System Entry. Could be either a file or a directory
 class VFSEntry
 {
@@ -67,6 +69,9 @@ public:
 	virtual EntryType getType() const override { return EntryType::Directory; }
 
 	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) = 0;
+
+	// create a filesystem for the folder
+	virtual std::unique_ptr<FileSystem> createFileSystem() const = 0;
 };
 
 class FileSystemIteratorImpl

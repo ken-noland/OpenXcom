@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "YamlContext.h"
+#include "Yaml.h"
 #include <ryml.hpp>
 
 namespace OpenXcom

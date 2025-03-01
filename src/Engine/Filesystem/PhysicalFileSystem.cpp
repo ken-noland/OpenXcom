@@ -81,6 +81,12 @@ public:
 		return std::unique_ptr<FileEntry>();
 	}
 
+	// create a filesystem for the folder
+	virtual std::unique_ptr<FileSystem> createFileSystem() const override
+	{
+		return std::make_unique<PhysicalFileSystem>(_path);
+	}
+
 	virtual std::filesystem::path getPath() const override
 	{
 		return _path;
@@ -104,8 +110,14 @@ public:
 
 	virtual std::unique_ptr<VFSEntry> dereference() const override
 	{
-		// from a full path, we want to get a relative path to the root of the filesystem
-		return std::make_unique<PhysicalFileEntry>(_filesystem.fullPathToRelative(*_currentIt));
+		if (std::filesystem::is_directory(*_currentIt))
+		{
+			return std::make_unique<PhysicalFolderEntry>(*_currentIt);
+		}
+		else
+		{
+			return std::make_unique<PhysicalFileEntry>(*_currentIt);
+		}
 	}
 
 	virtual void increment() override

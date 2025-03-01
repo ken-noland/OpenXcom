@@ -30,12 +30,13 @@
 
 #include "GameWindow.h"
 #include "GameStates.h"
+#include "GameMods.h"
 
 namespace OpenXcom
 {
 
 Game::Game(Engine& engine)
-	: _engine(engine), _masterFileProcessor(engine.getEngineContext())
+	: _engine(engine)
 {
 	EngineContext& engineContext = _engine.getEngineContext();
 
@@ -47,6 +48,9 @@ Game::Game(Engine& engine)
 	_gameStates = std::make_unique<GameStates>();
 	_gameContext->setGameStates(*_gameStates);
 
+	_gameMods = std::make_unique<GameMods>(*_gameContext);
+	_gameContext->setGameMods(*_gameMods);
+
 	_onGameRenderHandle = _gameWindow->getGameSurface().onRender().add([this](GraphicsCommand& command) {
 		this->onGameRender(command);
 	});
@@ -54,7 +58,6 @@ Game::Game(Engine& engine)
 	_onWindowRenderHandle = _gameWindow->getGameSurface().onRender().add([this](GraphicsCommand& command) {
 		this->onWindowRender(command);
 	});
-
 
 	// Set the initial game state to the start state
 	_gameStates->set(std::make_unique<StartState>(*_gameContext));
@@ -118,7 +121,7 @@ void Game::quit()
 
 bool Game::load()
 {
-	return _masterFileProcessor.load("./");
+	return _gameMods->load();
 }
 
 bool Game::isRunning() const

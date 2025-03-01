@@ -199,6 +199,8 @@ set ( engine_src
   "Engine/Graphics/Shader.cpp"
   "Engine/Graphics/ShaderManager.cpp"
   "Engine/Graphics/GraphicsSystem.cpp"
+  "Engine/Mod/ModInfo.cpp"
+  "Engine/Mod/ModScanner.cpp"
   "Engine/Platform/Linux/LinuxProcess.cpp"
   "Engine/Platform/Linux/LinuxWindow.cpp"
   "Engine/Platform/Win32/Win32Process.cpp"
@@ -259,6 +261,7 @@ set ( engine_src
 
 set( game_src
   "Game/Game.cpp"
+  "Game/GameMods.cpp"
   "Game/GameStates.cpp"
   "Game/GameWindow.cpp"
   "Game/Resource/Xcom1MasterFileProcessor.cpp"
