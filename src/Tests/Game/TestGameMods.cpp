@@ -26,24 +26,20 @@
 
 #include "../../Engine/Options.h"
 #include "../../Engine/Filesystem/VirtualFileSystem.h"
-#include "../../Engine/Platform/ProcessSystem.h"
+#include "../../Engine/Platform/PlatformProcessSystem.h"
+#include "../../Engine/Platform/PlatformWindowSystem.h"
 #include "../../Engine/Graphics/Null/NullGraphicsSystem.h"
 #include "../../Engine/Resource/ResourceSystem.h"
 #include "../../Engine/Utility/Time/TimeSystem.h"
 
 using namespace OpenXcom;
 
-class TestEngineContext : public EngineContext
-{
-public:
-};
-
 class TestEngine : public Engine
 {
 public:
 	TestEngine()
 	{
-		_engineContext = std::make_unique<TestEngineContext>(*this);
+		_engineContext = std::make_unique<EngineContext>(*this);
 
 		// empty options
 		_options = std::make_unique<Options>();
@@ -59,6 +55,10 @@ public:
 		_platformProcessSystem = std::make_unique<PlatformProcessSystem>();
 		_engineContext->setPlatformProcessSystem(_platformProcessSystem.get());
 
+		// null window system
+		_platformWindowSystem = std::make_unique<PlatformWindowSystem>();
+		_engineContext->setPlatformWindowSystem(_platformWindowSystem.get());
+
 		// null graphics system
 		_graphicsSystem = std::make_unique<NullGraphicsSystem>(*_engineContext);
 		_engineContext->setGraphicsSystem(_graphicsSystem.get());
@@ -70,10 +70,12 @@ public:
 
 	void selectOptions()
 	{
-		std::filesystem::path path = TEST_DATA_DIR;
-		std::vector<std::filesystem::path> dataPaths = {path / "data"};
-		std::filesystem::path configPath = path / "config";
-		std::filesystem::path userPath = path / "user";
+		std::filesystem::path core_path = CORE_DATA_DIR;
+		std::filesystem::path test_path = TEST_DATA_DIR;
+
+		std::vector<std::filesystem::path> dataPaths = { core_path / "data", test_path / "data" };
+		std::filesystem::path configPath = test_path / "config";
+		std::filesystem::path userPath = test_path / "user";
 
 		// set some test options
 		_options->set<&GameOptions::_dataPath>(OptionLevel::COMMAND, dataPaths);
@@ -84,25 +86,27 @@ public:
 	~TestEngine() = default;
 };
 
-class TestGameContext : public GameContext
+// trimmed up version of the base game
+class TestGame
 {
-public:
-	TestGameContext(EngineContext& engine, Game* game) : GameContext(engine, game) {}
-	~TestGameContext() = default;
+protected:
+	GameContext _gameContext;
 
-	void setGameWindow(GameWindow& gameWindow) { _gameWindow = &gameWindow; }
-	void setGameStates(GameStates& gameStates) { _gameStates = &gameStates; }
-	void setGameMods(GameMods& gameMods) { _gameMods = &gameMods; }
-};
+	std::unique_ptr<GameMods> _gameMods;
 
-class TestGame : public Game
-{
 public:
-	TestGame(Engine& engine) : Game(engine)
+	TestGame(Engine& engine)
+		: _gameContext(engine.getEngineContext())
 	{
+		_gameMods = std::make_unique<GameMods>(_gameContext);
+		_gameContext.setGameMods(*_gameMods);
 	}
-
 	~TestGame() = default;
+
+	bool load()
+	{
+		return _gameMods->load();
+	}
 };
 
 
@@ -111,5 +115,5 @@ TEST(TestGameMods, TestGameMods)
 	TestEngine engine;
 	TestGame game(engine);
 
-//	GameMods gameMods(gameContext);
+	ASSERT_TRUE(game.load());
 }

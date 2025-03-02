@@ -2,8 +2,10 @@
 # metadata.yaml for XcomUtil Improved Heavy Laser
 
 name: "XcomUtil: Improved Heavy Laser"
+id: "Improved_Heavy_Laser"
 version: 1.0
 description: "Increases the damage and accuracy of the Heavy Laser."
 author: the OpenXcom team
 
-master: xcom1
+dependencies:
+  - mod: "xcom1"

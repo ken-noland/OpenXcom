@@ -2,8 +2,10 @@
 # metadata.yaml for Unlimited Waypoints
 
 name: "OpenXCom: Unlimited Waypoints"
+id: "Unlimited_Waypoints"
 version: 1.0
 description: "Allows unlimited waypoints, Aliens will be limited by difficulty."
 author: the OpenXcom team
 
-master: xcom2
+dependencies:
+  - mod: "xcom2"

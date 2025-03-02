@@ -25,24 +25,6 @@
 #include "Exception.h"
 #include "YamlContext.h"
 
-template <>
-struct std::formatter<ryml::csubstr> : std::formatter<std::string_view>
-{
-	auto format(const ryml::csubstr& s, std::format_context& ctx) const
-	{
-		return std::formatter<std::string_view>::format(std::string_view(s.str, s.len), ctx);
-	}
-};
-
-template <>
-struct std::formatter<ryml::substr> : std::formatter<ryml::csubstr>
-{
-	auto format(const ryml::substr& s, std::format_context& ctx) const
-	{
-		return std::formatter<ryml::csubstr>::format(s, ctx);
-	}
-};
-
 namespace OpenXcom
 {
 
@@ -54,7 +36,7 @@ public:
 			  const ryml::Location& location = context.getParser().location(yaml);
 			  return std::format(
 				  "YAML Error parsing node {} in file {} at line {}, col {}: {}",
-				  yaml.has_key() ? yaml.key() : "<root>",
+				  yaml.has_key() ? yaml.key() : "<unknown>",
 				  location.name,
 				  location.line,
 				  location.col,

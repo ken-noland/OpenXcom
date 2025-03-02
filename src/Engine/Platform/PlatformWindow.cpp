@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Window.h"
+#include "PlatformWindow.h"
 #include "../Engine.h"
 #include "../Options.h"
 
@@ -25,6 +25,7 @@
 
 namespace OpenXcom
 {
+
 PlatformWindow::PlatformWindow(const std::string& title, int width, int height)
 {
 	platformSpecificCreateWindow(title, width, height);

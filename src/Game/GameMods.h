@@ -29,9 +29,11 @@ class GameMods
 protected:
 	GameContext& _context;
 
-	ModScanner _scanner;
+	std::vector<ScannedMod> _masters;
+	std::vector<ScannedMod> _activeMods;
+	std::vector<ScannedMod> _inactiveMods;
 
-	bool setupScanner();
+	bool setupScanner(ModScanner& scanner);
 
 public:
 	GameMods(GameContext& context);

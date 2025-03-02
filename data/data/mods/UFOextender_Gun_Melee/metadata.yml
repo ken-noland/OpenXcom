@@ -2,8 +2,10 @@
 # metadata.yaml for UFOextender Gun Melee
 
 name: "UFOextender: Gun Melee"
+id: "Gun_Melee"
 version: 1.0
 description: "Adds a stun melee attack to every weapon (called Stun Fest in UFOextender). The TU/Damage is based on the weapon's class."
 author: the OpenXcom team
 
-master: xcom1
+dependencies:
+  - mod: "xcom1"

@@ -25,3 +25,6 @@ CMakeSettings.json
 /src/.vs/*
 /src/build/*
 
+# user(and dev) specific files
+data/user/download/*
+data/user/mods/*

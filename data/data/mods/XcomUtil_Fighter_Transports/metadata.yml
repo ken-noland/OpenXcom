@@ -2,8 +2,10 @@
 # metadata.yaml for XcomUtil Fighter Transports
 
 name: "XcomUtil: Fighter Transports"
+id: "Fighter_Transports"
 version: 1.0
 description: "Allows fighter craft (Interceptor and Firestorm) to carry soldiers and tanks to ground missions."
 author: the OpenXcom team
 
-master: xcom1
+dependencies:
+  - mod: "xcom1"

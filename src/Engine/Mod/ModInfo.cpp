@@ -35,7 +35,7 @@ SIMPLERTTR
 		.value(ENUM_VALUE_REGISTRATION(ModType, Mod));
 }
 
-VersionConstraint parseVersionConstraint(std::string_view input)
+VersionConstraint parseVersionConstraint(std::string_view input, const ryml::ConstNodeRef& yaml, YamlContext& context)
 {
 	// Skip leading whitespace.
 	while (!input.empty() && std::isspace(input.front()))
@@ -65,7 +65,7 @@ VersionConstraint parseVersionConstraint(std::string_view input)
 	}
 	if (op.empty())
 	{
-		throw std::invalid_argument("Invalid version constraint: no valid operator found");
+		throw std::invalid_argument("Invalid version constraint: no valid operator found. " + context.toString(yaml));
 	}
 
 	// Skip any whitespace between the operator and the version number.
@@ -75,7 +75,7 @@ VersionConstraint parseVersionConstraint(std::string_view input)
 	}
 	if (input.empty())
 	{
-		throw std::invalid_argument("Invalid version constraint: missing version number");
+		throw std::invalid_argument("Invalid version constraint: missing version number" + context.toString(yaml));
 	}
 
 	// The remainder is the version string.
@@ -105,11 +105,20 @@ VersionConstraint parseVersionConstraint(std::string_view input)
 	}
 	else
 	{
-		throw std::invalid_argument("Unknown operator: " + std::string(op));
+		throw std::invalid_argument("Unknown operator: " + std::string(op) + ": " + context.toString(yaml));
 	}
 
 	// Convert versionStr to a std::string for the semver parser.
-	semver::version ver = semver::version::parse(std::string(versionStr), false);
+	semver::version ver(0,1,0);
+	try
+	{
+		ver = semver::version::parse(std::string(versionStr), false);
+	}
+	catch (semver::semver_exception& e)
+	{
+		Log(LOG_WARNING) << "Invalid version constraint: " << e.what();
+		Log(LOG_WARNING) << context.toString(yaml);
+	}
 
 	return VersionConstraint{versionOp, ver};
 }
@@ -130,7 +139,7 @@ bool fromYaml<DependencyExpression>(ryml::ConstNodeRef const& yaml, DependencyEx
 			std::string versionStr(versionNode.val().begin(), versionNode.val().end());
 
 			// parse the version constraints
-			expr.constraints.push_back(parseVersionConstraint(versionStr));
+			expr.constraints.push_back(parseVersionConstraint(versionStr, versionNode, context));
 		}
 
 		return true;
@@ -213,6 +222,7 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 	else
 	{
 		Log(LOG_WARNING) << "Missing 'id' field";
+		Log(LOG_WARNING) << context.toString(yaml);
 		modInfo.id = modInfo.name;
 	}
 
@@ -222,11 +232,22 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 	{
 		ryml::ConstNodeRef versionNode = yaml["version"];
 		std::string versionStr(versionNode.val().begin(), versionNode.val().end());
-		modInfo.version = semver::version::parse(versionStr, false);
+		semver::version ver(0, 1, 0);
+		try
+		{
+			ver = semver::version::parse(std::string(versionStr), false);
+		}
+		catch (semver::semver_exception& e)
+		{
+			Log(LOG_WARNING) << "Invalid version constraint: " << e.what();
+			Log(LOG_WARNING) << context.toString(yaml);
+		}
+		modInfo.version = ver;
 	}
 	else
 	{
 		Log(LOG_WARNING) << "Missing 'version' field";
+		Log(LOG_WARNING) << context.toString(yaml);
 		modInfo.version = semver::version(1, 0, 0);
 	}
 
@@ -315,6 +336,7 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 	if (yaml.has_child("versionDisplay"))
 	{
 		Log(LOG_WARNING) << "The versionDisplay field is deprecated. Please use the 'version' field instead.";
+		Log(LOG_WARNING) << context.toString(yaml);
 		// TODO: put in documentation link here
 	}
 
@@ -322,11 +344,15 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 	if (yaml.has_child("isMaster"))
 	{
 		Log(LOG_WARNING) << "The isMaster field is deprecated. Please use the 'type' field instead.";
+		Log(LOG_WARNING) << context.toString(yaml);
 		// TODO: put in documentation link here
 
 		if (typeIsSet)
 		{
-			Log(LOG_ERROR) << "You can't specify 'type' and 'isMaster' in the same file." << "'isMaster' is the old way, and 'type' is the new way. Using both just confuses me.";
+			Log(LOG_ERROR) << "You can't specify 'type' and 'isMaster' in the same file."
+				"'isMaster' is the old way, and 'type' is the new way. Using both just confuses me.";
+			Log(LOG_ERROR) << context.toString(yaml);
+
 			return false;
 		}
 
@@ -343,6 +369,7 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 	if (yaml.has_child("master"))
 	{
 		Log(LOG_WARNING) << "The master field is deprecated. Please use the 'type' field instead.";
+		Log(LOG_WARNING) << context.toString(yaml);
 
 		// well, we might as well read it it and record it as a dependency
 		ryml::ConstNodeRef masterNode = yaml["master"];
@@ -354,6 +381,7 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 	if (yaml.has_child("reservedSpace"))
 	{
 		Log(LOG_WARNING) << "The reservedSpace field is deprecated. It is now ignored.";
+		Log(LOG_WARNING) << context.toString(yaml);
 	}
 
 	return true;

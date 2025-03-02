@@ -20,7 +20,8 @@
 #include "Engine.h"
 #include "Options.h"
 #include "Filesystem/VirtualFileSystem.h"
-#include "Platform/ProcessSystem.h"
+#include "Platform/PlatformProcessSystem.h"
+#include "Platform/PlatformWindowSystem.h"
 #include "Graphics/GraphicsSystem.h"
 #include "Resource/ResourceSystem.h"
 #include "Utility/Time/TimeSystem.h"
@@ -60,6 +61,10 @@ Engine::Engine(const std::vector<std::string>& args)
 	// Initialize the process system
 	_platformProcessSystem = std::make_unique<PlatformProcessSystem>();
 	_engineContext->setPlatformProcessSystem(_platformProcessSystem.get());
+
+	// Initialize the window system
+	_platformWindowSystem = std::make_unique<PlatformWindowSystem>();
+	_engineContext->setPlatformWindowSystem(_platformWindowSystem.get());
 
 	// Initialize the graphics system
 	_graphicsSystem = createGraphicsSystem(*_engineContext);

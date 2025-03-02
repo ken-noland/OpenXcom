@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,38 +18,23 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined(_WIN32) || defined(_WIN64)
-
-#include "../PlatformProcessSystem.h"
-#include <windows.h>
+#include "PlatformWindow.h"
+#include "../Resource/ResourceManager.h"
 
 namespace OpenXcom
 {
 
-void PlatformProcessSystem::platformSpecificUpdate()
+class PlatformWindowSystem : public ResourceManager<PlatformWindow>
 {
-	MSG msg;
-	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+public:
+	PlatformWindowSystem() = default;
+	virtual ~PlatformWindowSystem() = default;
+
+	virtual OwningHandle<PlatformWindow> create(const std::string& title, int width, int height)
 	{
-		if (msg.message == WM_QUIT)
-		{
-			_isRunning = false; // Signal to Engine that the application should stop
-			return;      // Exit processing after handling WM_QUIT
-		}
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		std::unique_ptr<PlatformWindow> window(new PlatformWindow(title, width, height));
+		return add(std::move(window));
 	}
-}
-
-void PlatformProcessSystem::platformSpecificExit(int exitCode)
-{
-	// Signal to Engine that the application should stop
-	_isRunning = false; 
-
-	// Post a quit message to the message queue which will get picked up by the main loop(see above)
-	PostQuitMessage(exitCode);
-}
+};
 
 } // namespace OpenXcom
-
-#endif // defined(_WIN32) || defined(_WIN64)

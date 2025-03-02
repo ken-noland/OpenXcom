@@ -2,8 +2,10 @@
 # metadata.yaml for XcomUtil Skyranger Weapon Slot
 
 name: "XcomUtil: Skyranger Weapon Slot"
+id: "Skyranger_Weapon_Slot"
 version: 1.0
 description: "Gives the Skyranger a craft weapon slot."
 author: the OpenXcom team
 
-master: xcom1
+dependencies:
+  - mod: "xcom1"

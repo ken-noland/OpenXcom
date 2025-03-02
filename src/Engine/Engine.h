@@ -47,6 +47,9 @@ protected:
 	// Platform Process System
 	std::unique_ptr<PlatformProcessSystem> _platformProcessSystem;
 
+	// Platform Window System
+	std::unique_ptr<PlatformWindowSystem> _platformWindowSystem;
+
 	// Graphics system
 	std::unique_ptr<GraphicsSystem> _graphicsSystem;
 

@@ -19,8 +19,29 @@
  */
 
 #include "EngineContext.h"
+#include "Logger.h"
 #include "Filesystem/VirtualFileSystem.h"
+
 #include <ryml.hpp>
+
+
+template <>
+struct std::formatter<ryml::csubstr> : std::formatter<std::string_view>
+{
+	auto format(const ryml::csubstr& s, std::format_context& ctx) const
+	{
+		return std::formatter<std::string_view>::format(std::string_view(s.str, s.len), ctx);
+	}
+};
+
+template <>
+struct std::formatter<ryml::substr> : std::formatter<ryml::csubstr>
+{
+	auto format(const ryml::substr& s, std::format_context& ctx) const
+	{
+		return std::formatter<ryml::csubstr>::format(s, ctx);
+	}
+};
 
 namespace OpenXcom
 {
@@ -36,6 +57,17 @@ public:
 	YamlContext& operator=(const YamlContext&) = delete;
 
 	ryml::Parser& getParser() { return _parser; }
+
+	std::string toString(const ryml::ConstNodeRef& yaml) const
+	{
+		const ryml::Location& location = _parser.location(yaml);
+		return std::format(
+			"parsing node '{}' in file '{}' at line {}, col {}",
+			yaml.has_key() ? yaml.key() : "<unknown key>",
+			location.name,
+			location.line,
+			location.col);
+	}
 };
 
 } // namespace OpenXcom

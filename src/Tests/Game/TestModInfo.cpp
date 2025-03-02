@@ -25,7 +25,7 @@
 
 using namespace OpenXcom;
 
-void yaml_error(const char* msg, size_t msg_len, c4::yml::Location location, void* user_data)
+void test_yaml_error(const char* msg, size_t msg_len, c4::yml::Location location, void* user_data)
 {
 	std::string message(msg, msg_len);
 	FAIL() << "Error: " << message << std::endl;
@@ -53,7 +53,7 @@ dependencies:
 	ryml::set_callbacks(ryml::Callbacks(nullptr,
 		[](size_t len, void* hint, void* user_data) { return malloc(len); },
 		[](void* mem, size_t size, void* user_data) { free(mem); },
-		[](const char* msg, size_t msg_len, c4::yml::Location location, void *user_data) { yaml_error(msg, msg_len, location, user_data); }));
+		[](const char* msg, size_t msg_len, c4::yml::Location location, void *user_data) { test_yaml_error(msg, msg_len, location, user_data); }));
 
 	ryml::EventHandlerTree eventHandler = {};
 
@@ -97,7 +97,7 @@ dependencies:
 
 	c4::yml::pfn_allocate allocFunc = [](size_t len, void* hint, void* user_data) { return malloc(len); };
 	c4::yml::pfn_free freeFunc = [](void* mem, size_t size, void* user_data) { free(mem); };
-	c4::yml::pfn_error errorFunc = [](const char* msg, size_t msg_len, c4::yml::Location location, void* user_data) { yaml_error(msg, msg_len, location, user_data); };
+	c4::yml::pfn_error errorFunc = [](const char* msg, size_t msg_len, c4::yml::Location location, void* user_data) { test_yaml_error(msg, msg_len, location, user_data); };
 	ryml::set_callbacks(ryml::Callbacks(nullptr, allocFunc, freeFunc, errorFunc));
 
 	ryml::EventHandlerTree eventHandler = {};

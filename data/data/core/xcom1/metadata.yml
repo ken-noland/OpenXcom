@@ -7,6 +7,7 @@ description: "The original UFO: Enemy Unknown / X-Com: UFO Defense"
 author: Microprose
 id: xcom1
 
-isMaster: true
+type: Master
+
 loadResources:
   - UFO

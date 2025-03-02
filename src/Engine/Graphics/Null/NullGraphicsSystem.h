@@ -27,11 +27,28 @@
 #include "../Buffer/BufferManager.h"
 #include "../Image/ImageManager.h"
 
+// Null Graphics System
+//
+// This is a null implementation of the GraphicsSystem interface. Null graphics
+// system should not be confused with headless mode, as running in headless mode
+// still allows you to render to the game surface to capture the output. Null
+// graphics system is a complete no-op, and is used for testing and debugging
+// purposes.
+
 namespace OpenXcom
 {
 
-class NullDeviceBuffer;
+class NullGraphicsCommand : public GraphicsCommand
+{
+public:
+	NullGraphicsCommand() : GraphicsCommand() {};
+	virtual ~NullGraphicsCommand() = default;
 
+	virtual void beginRenderPass(RenderTarget& surface) override {}
+	virtual void endRenderPass() override {}
+};
+
+class NullDeviceBuffer;
 class NullHostBuffer : public HostBuffer
 {
 public:
@@ -60,15 +77,49 @@ public:
 	virtual void copy(const HostBuffer& buffer) override {}
 };
 
-
-class NullGraphicsCommand : public GraphicsCommand
+class NullHostImage : public HostImage
 {
-public:
-	NullGraphicsCommand() : GraphicsCommand() {};
-	virtual ~NullGraphicsCommand() = default;
+	void* image;
 
-	virtual void beginRenderPass(RenderTarget& surface) override {}
-	virtual void endRenderPass() override {}
+public:
+	NullHostImage(glm::ivec2 size, ImageFormat format) : HostImage(ImageType::Texture)
+	{
+		image = malloc(size.x * size.y * bytesPerPixel(format));
+	}
+	virtual ~NullHostImage()
+	{
+		free(image);
+	}
+
+	virtual ImageFormat getFormat() const override { return ImageFormat::R8G8B8A8; }
+	virtual glm::ivec2 getExtent() const override { return {-1, -1}; }
+	virtual uint32_t getWidth() const override { return std::numeric_limits<uint32_t>::max(); }
+	virtual uint32_t getHeight() const override { return std::numeric_limits<uint32_t>::max(); }
+
+	ImageType getType() const { return _type; }
+
+	virtual void* map() override { return image; }
+	virtual void unmap() override {}
+};
+
+class NullDeviceImage : public DeviceImage
+{
+protected:
+	NullDeviceBuffer _deviceBuffer;
+
+public:
+	NullDeviceImage(glm::ivec2 size, ImageFormat format) : DeviceImage(ImageType::Texture), _deviceBuffer(BufferUsage::Uniform, 1) {};
+	virtual ~NullDeviceImage() = default;
+
+	virtual ImageFormat getFormat() const override { return ImageFormat::R8G8B8A8; }
+	virtual glm::ivec2 getExtent() const override { return {-1, -1}; }
+	virtual uint32_t getWidth() const override { return std::numeric_limits<uint32_t>::max(); }
+	virtual uint32_t getHeight() const override { return std::numeric_limits<uint32_t>::max(); }
+
+	virtual void copyFrom(HostImage& hostImage) override {}
+	virtual void copyTo(HostImage& hostImage) override {}
+
+	virtual const DeviceBuffer& getDeviceImageData() const override { return _deviceBuffer; }
 };
 
 class NullGraphicsSurface : public GraphicsSurface
@@ -227,51 +278,6 @@ public:
 	{
 		return std::make_unique<NullDeviceBuffer>(hostBuffer.getUsage() , hostBuffer.getElementSize());
 	}
-};
-
-class NullHostImage : public HostImage
-{
-	void* image;
-
-public:
-	NullHostImage(glm::ivec2 size, ImageFormat format) : HostImage(ImageType::Texture)
-	{
-		image = malloc(size.x * size.y * bytesPerPixel(format));
-	}
-	virtual ~NullHostImage()
-	{
-		free(image);
-	}
-
-	virtual ImageFormat getFormat() const override { return ImageFormat::R8G8B8A8; }
-	virtual glm::ivec2 getExtent() const override { return {-1, -1}; }
-	virtual uint32_t getWidth() const override { return std::numeric_limits<uint32_t>::max(); }
-	virtual uint32_t getHeight() const override { return std::numeric_limits<uint32_t>::max(); }
-
-	ImageType getType() const { return _type; }
-
-	virtual void* map() override { return image; }
-	virtual void unmap() override {}
-};
-
-class NullDeviceImage : public DeviceImage
-{
-protected:
-	NullDeviceBuffer _deviceBuffer;
-
-public:
-	NullDeviceImage(glm::ivec2 size, ImageFormat format) : DeviceImage(ImageType::Texture), _deviceBuffer(BufferUsage::Uniform, 1) {};
-	virtual ~NullDeviceImage() = default;
-	
-	virtual ImageFormat getFormat() const override { return ImageFormat::R8G8B8A8; }
-	virtual glm::ivec2 getExtent() const override { return {-1, -1}; }
-	virtual uint32_t getWidth() const override { return std::numeric_limits<uint32_t>::max(); }
-	virtual uint32_t getHeight() const override { return std::numeric_limits<uint32_t>::max(); }
-
-	virtual void copyFrom(HostImage& hostImage) override {}
-	virtual void copyTo(HostImage& hostImage) override {}
-		
-	virtual const DeviceBuffer& getDeviceImageData() const override { return _deviceBuffer; }
 };
 
 class NullImageManager : public ImageManager

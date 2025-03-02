@@ -311,7 +311,7 @@ void StartState::loadResources(std::promise<bool> prom)
 	try
 	{
 		// Load the game!
-		bool result = _game.getGame().load();
+		bool result = _game.getGameMods().load();
 
 		// Report success by setting the promise value.
 		prom.set_value(result);
@@ -325,8 +325,6 @@ void StartState::loadResources(std::promise<bool> prom)
 
 void StartState::addLine(const std::string& line)
 {
-	Log(LOG_INFO) << line;
-
 	_textBuffer += line + '\n';
 	_text->setText(_textBuffer);
 

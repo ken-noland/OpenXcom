@@ -2,8 +2,10 @@
 # metadata.yaml for XcomUtil Pistol Auto Shot
 
 name: "XcomUtil: Pistol Auto Shot"
+id: "Pistol_Auto_Shot"
 version: 1.0
 description: "Gives the standard-issue Pistol an auto shot."
 author: the OpenXcom team
 
-master: xcom1
+dependencies:
+  - mod: "xcom1"

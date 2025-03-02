@@ -26,6 +26,7 @@ class Engine;
 class Options;
 class VirtualFileSystem;
 class PlatformProcessSystem;
+class PlatformWindowSystem;
 class GraphicsSystem;
 class ResourceSystem;
 class TimeSystem;
@@ -38,6 +39,7 @@ protected:
 	Options* _options;
 	VirtualFileSystem* _virtualFileSystem;
 	PlatformProcessSystem* _platformProcessSystem;
+	PlatformWindowSystem* _platformWindowSystem;
 	GraphicsSystem* _graphicsSystem;
 	ResourceSystem* _resourceSystem;
 	TimeSystem* _timeSystem;
@@ -63,6 +65,9 @@ public:
 
 	void setPlatformProcessSystem(PlatformProcessSystem* platformProcessSystem) { _platformProcessSystem = platformProcessSystem; }
 	PlatformProcessSystem& getPlatformProcessSystem() { return *_platformProcessSystem; }
+
+	void setPlatformWindowSystem(PlatformWindowSystem* platformWindowSystem) { _platformWindowSystem = platformWindowSystem; }
+	PlatformWindowSystem& getPlatformWindowSystem() { return *_platformWindowSystem; }
 
 	void setGraphicsSystem(GraphicsSystem* graphicsSystem) { _graphicsSystem = graphicsSystem; }
 	GraphicsSystem& getGraphicsSystem() { return *_graphicsSystem; }

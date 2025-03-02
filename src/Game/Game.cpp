@@ -23,7 +23,7 @@
 
 #include "../Engine/Engine.h"
 #include "../Engine/Options.h"
-#include "../Engine/Platform/ProcessSystem.h"
+#include "../Engine/Platform/PlatformProcessSystem.h"
 
 #include "States/State.h"
 #include "States/StartState.h"
@@ -40,7 +40,7 @@ Game::Game(Engine& engine)
 {
 	EngineContext& engineContext = _engine.getEngineContext();
 
-	_gameContext = std::make_unique<GameContext>(engineContext, this);
+	_gameContext = std::make_unique<GameContext>(engineContext);
 
 	_gameWindow = std::make_unique<GameWindow>(engineContext);
 	_gameContext->setGameWindow(*_gameWindow);
@@ -105,8 +105,7 @@ void Game::onGameRender(GraphicsCommand& command)
 void Game::onWindowRender(GraphicsCommand& command)
 {
 }
-
-void Game::update()
+void Game::update()
 {
 	_gameWindow->update();
 	_gameStates->update();

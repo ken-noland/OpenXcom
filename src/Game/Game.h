@@ -25,7 +25,7 @@
 #include "GameMods.h"
 
 #include "../Engine/Filesystem/VirtualFileSystem.h"
-#include "../Engine/Platform/Window.h"
+#include "../Engine/Platform/PlatformWindow.h"
 #include "../Entity/Engine/ECS.h"
 
 #if defined(ENABLE_ENTITY_INSPECTOR)
@@ -82,7 +82,7 @@ public:
 	/// Creates a new game.
 	Game(Engine& engine);
 	/// Cleans up all the game's resources.
-	~Game();
+	virtual ~Game();
 
 	int run();
 	void update();
@@ -94,4 +94,4 @@ public:
 	GameContext& getGameContext();
 };
 
-}
+} // namespace OpenXcom

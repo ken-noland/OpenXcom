@@ -83,8 +83,10 @@ protected:
 	bool _maximized;
 	bool _restored;
 
-public:
+	friend class PlatformWindowSystem;
 	PlatformWindow(const std::string& title, int width, int height);
+
+public:
 	~PlatformWindow();
 
 	void update();

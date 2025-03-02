@@ -40,15 +40,6 @@ bool ModScanner::addModFolder(const std::unique_ptr<FolderEntry>& folder)
 		return false;
 	}
 
-	//validate the folder is a folder and that it exists
-	std::filesystem::path path = folder->getPath();
-
-	if (!std::filesystem::is_directory(path))
-	{
-		Log(LOG_WARNING) << "Mod folder '" << path << "' does not exist or is not a directory";
-		return false;
-	}
-
 	std::unique_ptr<FileEntry> metadataFile = folder->getFile("metadata.yml");
 
 	ScannedMod mod;
@@ -57,7 +48,7 @@ bool ModScanner::addModFolder(const std::unique_ptr<FolderEntry>& folder)
 	YamlFile metadataYmlFile;
 	mod.info = metadataYmlFile.load<ModInfo>(metadataFile);
 
-	mod.path = path;
+	mod.path = folder->getPath();
 	mod.filesystem = std::make_unique<CompositeFileSystem>();
 	mod.filesystem->addFileSystem(folder->createFileSystem());
 

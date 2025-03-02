@@ -7,7 +7,8 @@ description: "The original X-Com: Terror From the Deep"
 author: Microprose
 id: xcom2
 
-isMaster: true
+type: Master
+
 resourceConfig: vars.rul
 loadResources:
   - TFTD

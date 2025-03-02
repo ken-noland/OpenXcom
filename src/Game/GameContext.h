@@ -31,27 +31,25 @@ class GameContext
 {
 protected:
 	EngineContext& _engine;
-	Game* _game;
 
 	GameWindow* _gameWindow;
 	GameStates* _gameStates;
 	GameMods* _gameMods;
 
-	friend class Game;
-	void setGameWindow(GameWindow& gameWindow) { _gameWindow = &gameWindow; }
-	void setGameStates(GameStates& gameStates) { _gameStates = &gameStates; }
-	void setGameMods(GameMods& gameMods) { _gameMods = &gameMods; }
-
 public:
-	GameContext(EngineContext& engine, Game* game)
-		: _engine(engine), _game(game) { }
+	GameContext(EngineContext& engine)
+		: _engine(engine), _gameWindow(nullptr), _gameStates(nullptr), _gameMods(nullptr) { }
 	~GameContext() {}
 
 	EngineContext& getEngineContext() { return _engine; }
-	Game& getGame() { return *_game; }
 
+	void setGameWindow(GameWindow& gameWindow) { _gameWindow = &gameWindow; }
 	GameWindow& getGameWindow() { return *_gameWindow; }
+
+	void setGameStates(GameStates& gameStates) { _gameStates = &gameStates; }
 	GameStates& getGameStates() { return *_gameStates; }
+
+	void setGameMods(GameMods& gameMods) { _gameMods = &gameMods; }
 	GameMods& getGameMods() { return *_gameMods; }
 };
 
