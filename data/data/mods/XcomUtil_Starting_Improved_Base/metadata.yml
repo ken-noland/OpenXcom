@@ -1,0 +1,11 @@
+#
+# metadata.yaml for XcomUtil Starting Improved Base
+
+name: "XcomUtil: Starting Improved Base"
+id: "Starting_Improved_Base"
+version: 1.0
+description: "Gives the starting base a Large Radar, Alien Containment, 50 scientists and 20 engineers."
+author: the OpenXcom team
+
+dependencies:
+  - mod: "xcom1"

@@ -111,6 +111,21 @@ void TextPrimitive::setText(const std::string& text)
 	processVertexBuffer();
 }
 
+// TODO: We should move this to a vertex shader and use a uniform buffer for the offsets
+void TextPrimitive::setPosition(const glm::ivec2& position)
+{
+	_settings.offset = position;
+
+	// Step 3: Process line shaping and word wrapping
+	processLineShaping();
+
+	// Step 4: Generate glyphs (text alignment and placement)
+	processGlyphs();
+
+	// Step 5: Generate vertices
+	processVertexBuffer();
+}
+
 void TextPrimitive::initializeVertexBuffer(Pipeline& pipeline)
 {
 	ResourceSystem& resourceSystem = _context.getResourceSystem();

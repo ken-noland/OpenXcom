@@ -1,0 +1,11 @@
+#
+# metadata.yaml for XcomUtil Improved Ground Tanks
+
+name: "XcomUtil: Improved Ground Tanks"
+id: "Improved_Ground_Tanks"
+version: 1.0
+description: "Gives ground Tanks the same stats as Hovertanks."
+author: the OpenXcom team
+
+dependencies:
+  - mod: "xcom1"

@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "VirtualFileSystem.h"
+#include "PhysicalFileSystem.h"
 
 #include <fstream>
 
@@ -26,6 +26,9 @@ namespace OpenXcom
 
 class PhysicalFileEntry : public FileEntry
 {
+private:
+	std::filesystem::path _path;
+
 public:
 	PhysicalFileEntry(const std::filesystem::path& path) : _path(path) { }
 	virtual ~PhysicalFileEntry() override = default;
@@ -50,8 +53,49 @@ public:
 		return _path;
 	}
 
+	virtual std::unique_ptr<VFSEntry> clone() const override
+	{
+		return std::make_unique<PhysicalFileEntry>(_path);
+	}
+};
+
+class PhysicalFolderEntry : public FolderEntry
+{
 private:
 	std::filesystem::path _path;
+
+public:
+	PhysicalFolderEntry(const std::filesystem::path& path) : _path(path) {}
+	virtual ~PhysicalFolderEntry() override = default;
+
+	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) override
+	{
+		std::filesystem::path fullPath = _path / path;
+
+		// check if file exists and is a file type
+		if (std::filesystem::exists(fullPath) && std::filesystem::status(fullPath).type() == std::filesystem::file_type::regular)
+		{
+			return std::make_unique<PhysicalFileEntry>(fullPath);
+		}
+
+		return std::unique_ptr<FileEntry>();
+	}
+
+	// create a filesystem for the folder
+	virtual std::unique_ptr<FileSystem> createFileSystem() const override
+	{
+		return std::make_unique<PhysicalFileSystem>(_path);
+	}
+
+	virtual std::filesystem::path getPath() const override
+	{
+		return _path;
+	}
+
+	virtual std::unique_ptr<VFSEntry> clone() const override
+	{
+		return std::make_unique<PhysicalFolderEntry>(_path);
+	}
 };
 
 class PhysicalFileIteratorImpl : public FileSystemIteratorImpl
@@ -64,10 +108,16 @@ public:
 	virtual ~PhysicalFileIteratorImpl() override = default;
 
 
-	virtual VFSEntryPtr dereference() const override
+	virtual std::unique_ptr<VFSEntry> dereference() const override
 	{
-		// from a full path, we want to get a relative path to the root of the filesystem
-		return std::make_unique<PhysicalFileEntry>(_filesystem.fullPathToRelative(*_currentIt));
+		if (std::filesystem::is_directory(*_currentIt))
+		{
+			return std::make_unique<PhysicalFolderEntry>(*_currentIt);
+		}
+		else
+		{
+			return std::make_unique<PhysicalFileEntry>(*_currentIt);
+		}
 	}
 
 	virtual void increment() override
@@ -81,6 +131,22 @@ public:
 		return otherImpl && _currentIt == otherImpl->_currentIt;
 	}
 
+	virtual std::unique_ptr<FileSystemIteratorImpl> clone() const override
+	{
+		auto cloned = std::make_unique<PhysicalFileIteratorImpl>(_currentIt->path(), _filesystem);
+		cloned->_currentIt = _currentIt;
+		cloned->_endIt = _endIt;
+
+		if (_currentEntry)
+		{
+			// Assuming VFSEntry has a clone method
+			cloned->_currentEntry = _currentEntry->clone();
+		}
+
+		return cloned;
+	}
+
+
 	virtual bool isEnd() const override
 	{
 		return _currentIt == _endIt;
@@ -91,7 +157,7 @@ private:
 	std::filesystem::directory_iterator _endIt;
 
 	const PhysicalFileSystem& _filesystem;
-	mutable VFSEntryPtr _currentEntry;
+	mutable std::unique_ptr<VFSEntry> _currentEntry;
 };
 
 PhysicalFileSystem::PhysicalFileSystem(const std::filesystem::path& path) : _path(path)
@@ -115,14 +181,22 @@ std::unique_ptr<FileEntry> PhysicalFileSystem::getFile(const std::filesystem::pa
 	return std::unique_ptr<FileEntry>();
 }
 
-FolderPtr PhysicalFileSystem::getFolder(const std::filesystem::path& path)
+std::unique_ptr<FolderEntry> PhysicalFileSystem::getFolder(const std::filesystem::path& path)
 {
-	return FolderPtr();
+	std::filesystem::path fullPath = _path / path;
+
+	// check if file exists and is a file type
+	if (std::filesystem::exists(fullPath) && std::filesystem::status(fullPath).type() == std::filesystem::file_type::directory)
+	{
+		return std::make_unique<PhysicalFolderEntry>(fullPath);
+	}
+
+	return std::unique_ptr<FolderEntry>();
 }
 
 FileSystemIterator PhysicalFileSystem::begin()
 {
-	return FileSystemIterator(std::make_shared<PhysicalFileIteratorImpl>(_path, *this));
+	return FileSystemIterator(std::make_unique<PhysicalFileIteratorImpl>(_path, *this));
 }
 
 FileSystemIterator PhysicalFileSystem::end()

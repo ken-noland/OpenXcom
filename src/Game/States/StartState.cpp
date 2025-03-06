@@ -17,15 +17,16 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "StartState.h"
+#include "../../Game/Game.h"
 #include "../../Game/GameContext.h"
 #include "../../Game/GameWindow.h"
 #include "../../Engine/EngineContext.h"
+#include "../../Engine/Logger.h"
 #include "../../Engine/Graphics/GraphicsSystem.h"
 #include "../../Engine/Graphics/GraphicsSurface.h"
 #include "../../Engine/Graphics/Common/GameSurface.h"
 #include "../../Engine/Graphics/Primitive/PrimitiveFactory.h"
 #include "../../Engine/Graphics/Primitive/TextPrimitive.h"
-#include "../../Engine/Graphics/Primitive/TextPrimitiveFactory.h"
 #include "../../Engine/Graphics/Palette/Palette.h"
 #include "../../Engine/Graphics/Palette/PaletteManager.h"
 #include "../../Engine/Graphics/Font/Font.h"
@@ -35,9 +36,14 @@
 #include "../../Engine/Resource/ResourceSystem.h"
 #include "../../Engine/Resource/FileProcessor/ImageBMPFileProcessor.h"
 #include "../../Engine/Resource/FileProcessor/ImageFile.h"
+#include "../../version.h"
 
 #include <glm/vec4.hpp>
 #include <cstring>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 // wrap in an anonymous namespace to avoid name conflicts
 namespace
@@ -48,14 +54,66 @@ namespace
 namespace OpenXcom
 {
 
-StartState::StartState(GameContext& game)
-	: _game(game)
+/**
+ * Gets the executable path in DOS-style (short) form.
+ * For non-Windows systems, just use a dummy path.
+ * @return Executable path.
+ */
+std::string getDosPath()
 {
-	EngineContext& engine = _game.getEngine();
-	GraphicsSystem& graphics = engine.getGraphicsSystem();
+#ifdef _WIN32
+	std::string path, bufstr;
+	char buf[MAX_PATH];
+	if (GetModuleFileNameA(0, buf, MAX_PATH) != 0)
+	{
+		bufstr = buf;
+		size_t c1 = bufstr.find_first_of('\\');
+		path += bufstr.substr(0, c1 + 1);
+		size_t c2 = bufstr.find_first_of('\\', c1 + 1);
+		while (c2 != std::string::npos)
+		{
+			std::string dirname = bufstr.substr(c1 + 1, c2 - c1 - 1);
+			if (dirname == "..")
+			{
+				path = path.substr(0, path.find_last_of('\\', path.length() - 2));
+			}
+			else
+			{
+				if (dirname.length() > 8)
+					dirname = dirname.substr(0, 6) + "~1";
+				std::transform(dirname.begin(), dirname.end(), dirname.begin(), toupper);
+				path += dirname;
+			}
+			c1 = c2;
+			c2 = bufstr.find_first_of('\\', c1 + 1);
+			if (c2 != std::string::npos)
+				path += '\\';
+		}
+	}
+	else
+	{
+		path = "C:\\GAMES\\OPENXCOM";
+	}
+	return path;
+#else
+	return "C:\\GAMES\\OPENXCOM";
+#endif
+}
 
-	// set the size to 720x400 terminal surface
-	_game.getGameWindow().setGameSurfaceSize(glm::ivec2(720, 400));
+StartState::StartState(GameContext& game)
+	: _game(game),
+	  _textAnimationTimer(game.getEngineContext().getTimeSystem()),
+	  _cursorAnimationTimer(game.getEngineContext().getTimeSystem())
+{
+	// Set the size to 720x400 terminal surface
+
+	// We do this first because resizing a surface invalidates the primitive factory and
+	// all the primitives created from it.
+	glm::ivec2 extents = glm::ivec2(720, 400); // 720 x 400 because that's the size of the DOS terminal
+	_game.getGameWindow().setGameSurfaceSize(extents); 
+
+	EngineContext& engine = _game.getEngineContext();
+	GraphicsSystem& graphics = engine.getGraphicsSystem();
 
 	// get the game surface
 	GameSurface& gameSurface = _game.getGameWindow().getGameSurface();
@@ -64,24 +122,57 @@ StartState::StartState(GameContext& game)
 		
 	createDosFont();
 
-	std::string text = "Hello World!\n\n" 
-					   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \n"
-					   "Sed do eiusmod tempor incididunt ut labore et dolore magna \n"
-					   "aliqua.";
-
 	// create the text
+	_textBuffer = getDosPath() + ">openxcom\n";
+
+	std::vector<KeyframeAnimationFrame> frames = {
+		{[&]() {
+			addLine("DOS/4GW Protected Mode Run-time  Version 1.9");
+			addLine("Copyright (c) Rational Systems, Inc. 1990-1993");
+		}, std::chrono::milliseconds(1000)},
+		{[&]() {
+			addLine("");
+			addLine("OpenXcom initialisation");
+		}, std::chrono::milliseconds(1500)},
+		{[&]() {
+			 addLine("");
+			 addLine("!Sound Not Implemented!"); // when we finally do get around to implementing sound, this will be removed
+												 // and the other options (like Adlib, SoundBlaster, etc.) will be added
+			 addLine("SoundBlaster Sound Effects");
+			 addLine("SoundBlaster Music"); // need to check options if the preferred music is MIDI or Adlib
+			 addLine("Base Port 220  Irq 7  Dma 1");
+		}, std::chrono::milliseconds(700)},
+		{[&]() {
+			 addLine("");
+			 addLine("Loading OpenXcom " OPENXCOM_VERSION_SHORT "...");
+		}, std::chrono::milliseconds(500)},
+	};
+
+	_textAnimationTimer.setFrames(frames);
+	_textAnimationTimer.start();
+
+	_cursorAnimationTimer.setCallback([&]() { _cursorVisible = !_cursorVisible; });
+	_cursorAnimationTimer.setInterval(std::chrono::milliseconds(350));
+	_cursorAnimationTimer.start();
 
 	TextSettings textSettings;
 	textSettings.alignment = TextAlignment::Left;
 	textSettings.offset = glm::vec2(0, 0);
-	textSettings.extents = glm::vec2(720, 400);
+	textSettings.extents = extents;
 	textSettings.fontHandle = _dosFont.getHandle();
 	textSettings.paletteHandle = _dosFontPalette.getHandle();
 	textSettings.defaultStyle.backgroundColorIndex = 0;
-	textSettings.defaultStyle.colorIndex = 7;
+	textSettings.defaultStyle.colorIndex = 7; // ANSI escape code for white
 	textSettings.defaultStyle.underline = false;
 
-	_text = primitiveFactory.createTextPrimitive(text, textSettings);
+	_text = primitiveFactory.createTextPrimitive(_textBuffer, textSettings);
+	_cursor = primitiveFactory.createTextPrimitive("_", textSettings);
+
+	//create the thread
+	std::promise<bool> prom;
+	_result = prom.get_future();
+	_workerThread = std::thread(&StartState::loadResources, this, std::move(prom));
+
 }
 
 /**
@@ -89,11 +180,39 @@ StartState::StartState(GameContext& game)
  */
 StartState::~StartState()
 {
+	if(_workerThread.joinable())
+	{
+		_workerThread.join();
+	}
+
 	_text.reset();
 	_cursor.reset();
 
 	_dosFont.reset();
 	_dosFontPalette.reset();
+}
+
+void StartState::onUpdate()
+{
+	_textAnimationTimer.update();
+	_cursorAnimationTimer.update();
+
+	// Check if future is ready without blocking
+	if (_result.valid() && _result.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
+	{
+		try
+		{
+			bool result = _result.get();
+			Log(LOG_INFO) << "Worker thread completed. Success: " << std::boolalpha << result << std::endl;
+		}
+		catch (const std::exception& e)
+		{
+			Log(LOG_INFO) << "Worker thread threw an exception: " << e.what() << std::endl;
+		}
+		// Mark as done and join the thread.
+		if (_workerThread.joinable())
+			_workerThread.join();
+	}
 }
 
 // helper function to get the glyph from the font
@@ -135,7 +254,7 @@ std::array<OpenXcom::Glyph, 128> getAsciiGlyphs(OpenXcom::ResourceHandle<OpenXco
 
 void StartState::createDosFont()
 {
-	EngineContext& engine = _game.getEngine();
+	EngineContext& engine = _game.getEngineContext();
 
 	ResourceSystem& resourceSystem = engine.getResourceSystem();
 	ImageManager& imageManager = resourceSystem.getImageManager();
@@ -187,9 +306,44 @@ void StartState::createDosFont()
 	_dosFont = fontManager.load("dosFont", settings, std::move(textures), getAsciiGlyphs(textures[0].getHandle()));
 }
 
+void StartState::loadResources(std::promise<bool> prom)
+{
+	try
+	{
+		// Load the game!
+		bool result = _game.getGameMods().load();
+
+		// Report success by setting the promise value.
+		prom.set_value(result);
+	}
+	catch (...)
+	{
+		// In case of an exception, pass it along to the main thread.
+		prom.set_exception(std::current_exception());
+	}
+}
+
+void StartState::addLine(const std::string& line)
+{
+	_textBuffer += line + '\n';
+	_text->setText(_textBuffer);
+
+	// find the last glyph in the text
+	const TextSection& section = _text->getSections().back();
+	const PositionedGlyph& glyph = section.glyphs.back();
+
+	glm::ivec2 cursorPos = glm::ivec2(glyph.position.x + glyph.advance, glyph.position.y);
+	_cursor->setPosition(cursorPos);
+}
+
 void StartState::onRender(GraphicsCommand& command)
 {
 	_text->draw(command);
+
+	if(_cursorVisible)
+	{
+		_cursor->draw(command);
+	}
 }
 
 } // namespace OpenXcom

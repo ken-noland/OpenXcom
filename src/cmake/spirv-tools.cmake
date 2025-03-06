@@ -14,3 +14,7 @@ FetchContent_Declare(
 
 # Enable building of SPIRV-Tools as Shaderc requires it
 FetchContent_MakeAvailable(spirv-tools)
+
+target_compile_options(SPIRV-Tools-shared PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4996 /wd4251 /D_CRT_SECURE_NO_WARNINGS>
+)

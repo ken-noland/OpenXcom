@@ -23,24 +23,7 @@
 #include <ryml.hpp>
 
 #include "Exception.h"
-
-template <>
-struct std::formatter<ryml::csubstr> : std::formatter<std::string_view>
-{
-	auto format(const ryml::csubstr& s, std::format_context& ctx) const
-	{
-		return std::formatter<std::string_view>::format(std::string_view(s.str, s.len), ctx);
-	}
-};
-
-template <>
-struct std::formatter<ryml::substr> : std::formatter<ryml::csubstr>
-{
-	auto format(const ryml::substr& s, std::format_context& ctx) const
-	{
-		return std::formatter<ryml::csubstr>::format(s, ctx);
-	}
-};
+#include "YamlContext.h"
 
 namespace OpenXcom
 {
@@ -48,21 +31,21 @@ namespace OpenXcom
 class YamlException : public Exception
 {
 public:
-	explicit YamlException(const ryml::ConstNodeRef& yaml, const ryml::Parser& parser, const std::string& message)
+	explicit YamlException(const ryml::ConstNodeRef& yaml, YamlContext& context, const std::string& message)
 		: Exception([&]() {
-			  const ryml::Location& location = parser.location(yaml);
+			  const ryml::Location& location = context.getParser().location(yaml);
 			  return std::format(
 				  "YAML Error parsing node {} in file {} at line {}, col {}: {}",
-				  yaml.key(),
+				  yaml.has_key() ? yaml.key() : "<unknown>",
 				  location.name,
 				  location.line,
 				  location.col,
 				  message);
 		  }()) {}
 
-	static void throwIfNoValue(const ryml::ConstNodeRef& yaml, const ryml::Parser& parser)
+	static void throwIfNoValue(const ryml::ConstNodeRef& yaml, YamlContext& context)
 	{
-		if (!yaml.has_val()) { throw YamlException(yaml, parser, "No value found."); }
+		if (!yaml.has_val()) { throw YamlException(yaml, context, "No value found."); }
 	}
 };
 

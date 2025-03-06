@@ -21,6 +21,14 @@
 #include "../../Engine/Resource/Handle.h"
 #include <string>
 #include <sstream>
+#include <thread>
+#include <atomic>
+#include <future>
+#include <chrono>
+
+#include "../../Engine/Utility/Time/KeyframeAnimationTimer.h"
+#include "../../Engine/Utility/Time/RepeatAnimationTimer.h"
+
 
 namespace OpenXcom
 {
@@ -39,14 +47,31 @@ protected:
 	OwningHandle<Font> _dosFont;
 	OwningHandle<Palette> _dosFontPalette;
 
+	std::string _textBuffer;
 	std::unique_ptr<TextPrimitive> _text;
 	std::unique_ptr<TextPrimitive> _cursor;
 
+	bool _cursorVisible = true;
+	KeyframeAnimationTimer _textAnimationTimer;
+	RepeatAnimationTimer _cursorAnimationTimer;
+
+	std::vector<std::pair<std::string, std::chrono::milliseconds>> _loadingMessages;
+	std::chrono::milliseconds _loadingMessageTime;
+
+	//thread
+	std::future<bool> _result;
+	std::thread _workerThread;
+
 	void createDosFont();
+	void loadResources(std::promise<bool> prom);
+
+	void addLine(const std::string& line);
 
 public:
 	StartState(GameContext& game);
 	virtual ~StartState();
+
+	virtual void onUpdate() override;
 
 	virtual void onRender(GraphicsCommand& command) override;
 };

@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../../Utility/Delegate.h"
+#include "../../Resource/Handle.h"
 
 #include <memory>
 #include <string>
@@ -45,7 +46,7 @@ protected:
 
 	GameSurface& _gameSurface;
 
-	std::unique_ptr<PlatformWindow> _window;
+	OwningHandle<PlatformWindow> _window;
 	std::unique_ptr<GraphicsSurface> _windowSurface;
 
 	MulticastDelegate<void()>::Handle _onClose;

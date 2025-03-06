@@ -1,9 +1,0 @@
-#
-# metadata.yaml for PSX Static Cydonia Map
-
-name: "Lua_Test_Callbacks"
-version: 1.0
-description: "Verifying the callback mechanism works"
-author: Ken Noland
-master: xcom2
-lua: bootstrap.lua

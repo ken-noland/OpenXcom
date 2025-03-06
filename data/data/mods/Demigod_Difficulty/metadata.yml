@@ -1,0 +1,11 @@
+#
+# metadata.yaml for Demigod Difficulty
+
+name: "Demigod Difficulty"
+id: "Demigod_Difficulty"
+version: 1.0
+description: "Force maximum alien spawns"
+author: the OpenXcom team
+
+dependencies:
+  - mod: "xcom1"

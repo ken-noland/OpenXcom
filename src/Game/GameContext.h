@@ -23,20 +23,34 @@ namespace OpenXcom
 
 class EngineContext;
 class GameWindow;
+class GameStates;
+class GameMods;
+class Game;
 
 class GameContext
 {
 protected:
 	EngineContext& _engine;
-	GameWindow& _gameWindow;
+
+	GameWindow* _gameWindow;
+	GameStates* _gameStates;
+	GameMods* _gameMods;
 
 public:
-	GameContext(EngineContext& engine, GameWindow& window) : _engine(engine), _gameWindow(window) {}
+	GameContext(EngineContext& engine)
+		: _engine(engine), _gameWindow(nullptr), _gameStates(nullptr), _gameMods(nullptr) { }
 	~GameContext() {}
 
-	EngineContext& getEngine() { return _engine; }
-	GameWindow& getGameWindow() { return _gameWindow; }
+	EngineContext& getEngineContext() { return _engine; }
 
+	void setGameWindow(GameWindow& gameWindow) { _gameWindow = &gameWindow; }
+	GameWindow& getGameWindow() { return *_gameWindow; }
+
+	void setGameStates(GameStates& gameStates) { _gameStates = &gameStates; }
+	GameStates& getGameStates() { return *_gameStates; }
+
+	void setGameMods(GameMods& gameMods) { _gameMods = &gameMods; }
+	GameMods& getGameMods() { return *_gameMods; }
 };
 
 } // namespace OpenXcom

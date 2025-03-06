@@ -4,12 +4,14 @@
 {% endfor %}
 
 #include <ryml.hpp>
+#include "{{ source_path }}/src/Engine/YamlAssert.h"
+#include "{{ source_path }}/src/Engine/YamlBaseTypes.h"
 
 namespace OpenXcom {
 
 // forward declarations of template specializations
 {% for type in types %}template <>
-bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, ryml::Parser const& parser);
+bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, YamlContext& context);
 template <>
 bool OpenXcom::toYaml<{{type.fullName}}>(const {{type.fullName}}& object, ryml::NodeRef& yaml);
 {% endfor %}

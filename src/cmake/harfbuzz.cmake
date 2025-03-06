@@ -4,7 +4,7 @@ message(STATUS "Fetching HarfBuzz")
 FetchContent_Declare(
   harfbuzz
   GIT_REPOSITORY https://github.com/harfbuzz/harfbuzz.git
-  GIT_TAG 10.2.0
+  GIT_TAG 10.3.0
   SOURCE_DIR  "${CMAKE_BINARY_DIR}/_deps/harfbuzz-src"
 )
 
@@ -18,7 +18,7 @@ add_library(harfbuzz STATIC
 )
 
 target_include_directories(harfbuzz PUBLIC ${harfbuzz_SOURCE_DIR}/src)
-target_compile_definitions(harfbuzz PRIVATE HB_NO_FREETYPE=1)
+target_compile_definitions(harfbuzz PRIVATE HB_NO_FREETYPE=1 HB_USE_ATEXIT=1)
 
 # Disable warnings for HarfBuzz
 target_compile_options(harfbuzz PRIVATE

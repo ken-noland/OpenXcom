@@ -19,43 +19,55 @@
  */
 
 #include "EngineContext.h"
+#include "Logger.h"
 #include "Filesystem/VirtualFileSystem.h"
+
 #include <ryml.hpp>
+
+
+template <>
+struct std::formatter<ryml::csubstr> : std::formatter<std::string_view>
+{
+	auto format(const ryml::csubstr& s, std::format_context& ctx) const
+	{
+		return std::formatter<std::string_view>::format(std::string_view(s.str, s.len), ctx);
+	}
+};
+
+template <>
+struct std::formatter<ryml::substr> : std::formatter<ryml::csubstr>
+{
+	auto format(const ryml::substr& s, std::format_context& ctx) const
+	{
+		return std::formatter<ryml::csubstr>::format(s, ctx);
+	}
+};
 
 namespace OpenXcom
 {
 
 class YamlContext
 {
-	ryml::EventHandlerTree evtentHandler = {};
-	ryml::Parser parser = ryml::Parser(&evtentHandler, ryml::ParserOptions().locations(true));
-	EngineContext& context;
+	ryml::Parser& _parser;
 
 public:
-	YamlContext(EngineContext& ctx) : context(ctx) {}
+	YamlContext(ryml::Parser& parser) : _parser(parser) {}
 
 	YamlContext(const YamlContext&) = delete;
 	YamlContext& operator=(const YamlContext&) = delete;
 
-	template <typename T>
-	T LoadAndParse(const std::filesystem::path& yamlPath)
+	ryml::Parser& getParser() { return _parser; }
+
+	std::string toString(const ryml::ConstNodeRef& yaml) const
 	{
-		std::unique_ptr<FileEntry> file = context.getVirtualFileSystem().getDataFileSystem().getFile(yamlPath);
-
-		if (!file)
-		{
-			throw std::runtime_error(std::format("FontPack: Could not find font file: {}", yamlPath.string()));
-		}
-
-		std::string contents(std::istreambuf_iterator<char>(*file->openRead()), {});
-
-		ryml::Tree tree = ryml::parse_in_arena(&parser, yamlPath.string().c_str(), contents.c_str());
-
-		T result{};
-		fromYaml(tree.rootref(), result, parser);
-
-		return result;
+		const ryml::Location& location = _parser.location(yaml);
+		return std::format(
+			"parsing node '{}' in file '{}' at line {}, col {}",
+			yaml.has_key() ? yaml.key() : "<unknown key>",
+			location.name,
+			location.line,
+			location.col);
 	}
 };
 
-}
+} // namespace OpenXcom

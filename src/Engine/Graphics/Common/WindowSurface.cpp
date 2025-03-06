@@ -36,7 +36,8 @@
 #include "../../EngineContext.h"
 #include "../../Options.h"
 #include "../../Resource/ResourceSystem.h"
-#include "../../Platform/Window.h"
+#include "../../Platform/PlatformWindow.h"
+#include "../../Platform/PlatformWindowSystem.h"
 
 #include <simplerttr.h>
 
@@ -128,7 +129,7 @@ WindowSurface::~WindowSurface()
 void WindowSurface::createWindowed(GameSurface& gameSurface)
 {
 	// create the window
-	_window = std::make_unique<PlatformWindow>(_engine.getTitle(), 1024, 768); // TODO: use game options to set the window parameters
+	_window = _engine.getPlatformWindowSystem().create(_engine.getTitle(), 1024, 768); // TODO: use game options to set the window parameters
 
 	// create a graphics surface for the window
 	GraphicsSystem& graphicsSystem = _engine.getGraphicsSystem();

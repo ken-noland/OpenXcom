@@ -1,9 +1,19 @@
 // BEGIN YamlEnum.cpp.inja
 
 template<>
-bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, ryml::Parser const& parser)
+bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, YamlContext& context)
 {
-	throw OpenXcom::YamlException(yaml, parser, "Enum not yet supported!");
+	YamlException::throwIfNoValue(yaml, context);
+
+	ryml::csubstr str(yaml.val());
+	std::string strValue = std::string(str.begin(), str.end());
+
+	{% for value in type.values %}if(strValue == "{{value.name}}") { object = {{type.fullName}}::{{value.name}}; return true; }
+	else {% endfor %}{
+		throw YamlException(yaml, context, "Invalid value for {{type.fullName}}.");
+	}
+
+	return true;
 }
 
 template<>

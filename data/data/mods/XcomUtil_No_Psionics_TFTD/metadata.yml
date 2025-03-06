@@ -1,0 +1,11 @@
+#
+# metadata.yaml for XcomUtil No Psionics
+
+name: "XcomUtil: No Psionics"
+id: "No_Psionics"
+version: 1.0
+description: "Removes all Psi tech and items from the game, both X-COM and alien."
+author: the OpenXcom team
+
+dependencies:
+  - mod: "xcom2"

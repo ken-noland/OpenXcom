@@ -141,6 +141,8 @@ public:
 
 	void setText(const std::string& text);
 
+	void setPosition(const glm::ivec2& position);
+
 	const std::vector<TextSection>& getSections() const { return _sections; }
 	const std::vector<TextLine>& getLines() const { return _lines; }
 

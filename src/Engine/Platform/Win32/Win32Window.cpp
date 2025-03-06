@@ -17,7 +17,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #if defined(_WIN32) || defined(_WIN64)
-#include "../Window.h"
+#include "../PlatformWindow.h"
 #include "../../Engine.h"
 
 #include <windows.h>

@@ -20,9 +20,11 @@
 #include "Engine.h"
 #include "Options.h"
 #include "Filesystem/VirtualFileSystem.h"
-#include "Platform/ProcessSystem.h"
+#include "Platform/PlatformProcessSystem.h"
+#include "Platform/PlatformWindowSystem.h"
 #include "Graphics/GraphicsSystem.h"
 #include "Resource/ResourceSystem.h"
+#include "Utility/Time/TimeSystem.h"
 #include "../version.h"
 
 #include <simplerttr.h>
@@ -33,6 +35,12 @@ namespace OpenXcom
 // annoyingly, I have to put this in somewhere so it correctly links the RTTR stuff
 extern int FORCE_LINK_RTTRGLM;
 extern int FORCE_LINK_RTTRPACKEDCOLOR;
+
+// Empty constructor for unit tests
+Engine::Engine()
+{
+
+}
 
 Engine::Engine(const std::vector<std::string>& args)
 {
@@ -54,6 +62,10 @@ Engine::Engine(const std::vector<std::string>& args)
 	_platformProcessSystem = std::make_unique<PlatformProcessSystem>();
 	_engineContext->setPlatformProcessSystem(_platformProcessSystem.get());
 
+	// Initialize the window system
+	_platformWindowSystem = std::make_unique<PlatformWindowSystem>();
+	_engineContext->setPlatformWindowSystem(_platformWindowSystem.get());
+
 	// Initialize the graphics system
 	_graphicsSystem = createGraphicsSystem(*_engineContext);
 	_engineContext->setGraphicsSystem(_graphicsSystem.get());
@@ -61,6 +73,10 @@ Engine::Engine(const std::vector<std::string>& args)
 	// Initialize the resource system
 	_resourceSystem = std::make_unique<ResourceSystem>(*_engineContext);
 	_engineContext->setResourceSystem(_resourceSystem.get());
+
+	// Initialize the time system
+	_timeSystem = std::make_unique<TimeSystem>();
+	_engineContext->setTimeSystem(_timeSystem.get());
 
 	std::ostringstream title;
 	title << "OpenXcom " << OPENXCOM_VERSION_SHORT << OPENXCOM_VERSION_GIT;
@@ -78,6 +94,7 @@ Engine::~Engine()
 
 void Engine::update()
 {
+	_timeSystem->update();
 	_platformProcessSystem->update();
 }
 

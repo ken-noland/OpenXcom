@@ -1,0 +1,11 @@
+#
+# metadata.yaml for XcomUtil Infinite Gauss
+
+name: "XcomUtil: Infinite Gauss"
+id: "Infinite_Gauss"
+version: 1.0
+description: "Removes ammo limit for Gauss weapons, increases Heavy Gauss damage to 80"
+author: the OpenXcom team
+
+dependencies:
+  - mod: "xcom2"

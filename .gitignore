@@ -1,6 +1,7 @@
 CMakeSettings.json
 /out
 /build
+/temp
 /.github
 /.tx
 
@@ -23,3 +24,7 @@ CMakeSettings.json
 /obj/*
 /src/.vs/*
 /src/build/*
+
+# user(and dev) specific files
+data/user/download/*
+data/user/mods/*

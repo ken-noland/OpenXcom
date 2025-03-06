@@ -39,9 +39,9 @@ std::unique_ptr<FileEntry> ZipFileSystem::getFile(const std::filesystem::path& p
 	return std::unique_ptr<FileEntry>();
 }
 
-FolderPtr ZipFileSystem::getFolder(const std::filesystem::path& path)
+std::unique_ptr<FolderEntry> ZipFileSystem::getFolder(const std::filesystem::path& path)
 {
-	return FolderPtr();
+	return std::unique_ptr<FolderEntry>();
 }
 
 FileSystemIterator ZipFileSystem::begin()
@@ -56,7 +56,7 @@ FileSystemIterator ZipFileSystem::end()
 
 
 VirtualFileSystem::VirtualFileSystem(const Options& options)
-	: _data(), _mods()
+	: _data(), _user(options.get<&GameOptions::_userPath>())
 {
 	// use the paths provided by the game options to set up the initial file systems
 	for (const std::filesystem::path& path : options.get<&GameOptions::_dataPath>())
@@ -91,11 +91,6 @@ VirtualFileSystem::VirtualFileSystem(const Options& options)
 
 	// TODO: Commenting this out for now until I have time to implement embedded files
 	//_data.addFileSystem(std::make_unique<EmbeddedFileSystem>());
-
-	// we need to use the data filesystem in order to get the path to the built-in mods
-
-	std::filesystem::path modPath = options.get<&GameOptions::_userPath>() / "mods";
-	_mods.addFileSystem(std::make_unique<PhysicalFileSystem>(modPath));
 }
 
 VirtualFileSystem::~VirtualFileSystem()
@@ -107,9 +102,9 @@ FileSystem& VirtualFileSystem::getDataFileSystem()
 	return _data;
 }
 
-FileSystem& VirtualFileSystem::getModFileSystem()
+FileSystem& VirtualFileSystem::getUserFileSystem()
 {
-	return _mods;
+	return _user;
 }
 
 } // namespace OpenXcom

@@ -22,9 +22,10 @@
 #include <memory>
 
 #include "GameContext.h"
+#include "GameMods.h"
 
 #include "../Engine/Filesystem/VirtualFileSystem.h"
-#include "../Engine/Platform/Window.h"
+#include "../Engine/Platform/PlatformWindow.h"
 #include "../Entity/Engine/ECS.h"
 
 #if defined(ENABLE_ENTITY_INSPECTOR)
@@ -38,6 +39,8 @@ class Engine;
 class State;
 class Options;
 class GameWindow;
+class GameStates;
+class GameMods;
 class GraphicsCommand;
 
 /**
@@ -48,68 +51,47 @@ class GraphicsCommand;
  */
 class Game
 {
-private:
+protected:
 	// Game engine
 	Engine& _engine;
 
+	// The game's context.
 	std::unique_ptr<GameContext> _gameContext;
+
+	// The game's states.
+	std::unique_ptr<GameStates> _gameStates;
+
+	// The game's window.
+	std::unique_ptr<GameWindow> _gameWindow;
+
+	// The game's mods
+	std::unique_ptr<GameMods> _gameMods;
+
+	// Handles to delegates for rendering
 	MulticastDelegate<void(GraphicsCommand&)>::Handle _onWindowRenderHandle;
 	MulticastDelegate<void(GraphicsCommand&)>::Handle _onGameRenderHandle;
 
-	/// central entity component system
-	ECS _ecs;
-
-
-	/// The game's state stack.
-	std::list<std::unique_ptr<State>> _states, _deleted;
-
-
-	/// The game's window.
-	std::unique_ptr<GameWindow> _gameWindow;
-
-	#if defined(ENABLE_ENTITY_INSPECTOR)
+#if defined(ENABLE_ENTITY_INSPECTOR)
 	Inspector _inspector;
-	#endif
+#endif
 
-
+	void onGameRender(GraphicsCommand& command);
+	void onWindowRender(GraphicsCommand& command);
 
 public:
 	/// Creates a new game.
 	Game(Engine& engine);
 	/// Cleans up all the game's resources.
-	~Game();
+	virtual ~Game();
 
 	int run();
-
-	bool isRunning() const;
-
-	void onGameRender(GraphicsCommand& command);
-	void onWindowRender(GraphicsCommand& command);
-
-
-	/// Update the game.
 	void update();
-	/// Quits the game.
 	void quit();
 
-	/// Resets the state stack to a new state.
-	void setState(std::unique_ptr<State> state);
-	/// Pushes a new state into the state stack.
-	void pushState(std::unique_ptr<State> state);
-	/// Pops the last state from the state stack.
-	void popState();
-	/// Gets the last state from the state stack
-	State* getState();
+	bool load();
 
-	// the following will be moved to GameContext
-
-	/// Gets the registry container
-	const ECS& getECS() const { return _ecs; }
-	/// Gets the registry container
-	ECS& getECS() { return _ecs; }
+	bool isRunning() const;
+	GameContext& getGameContext();
 };
 
-/// Global function that retrieve a thread local Game object.
-Game* getGame();
-
-}
+} // namespace OpenXcom

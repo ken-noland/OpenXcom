@@ -29,7 +29,7 @@
 #include "Pipeline/VulkanPipelineFactory.h"
 
 #include "../../Engine.h"
-#include "../../Platform/Window.h"
+#include "../../Platform/PlatformWindowSystem.h"
 #include "../../../version.h"
 
 #include <glslang/Public/ShaderLang.h>
@@ -342,7 +342,7 @@ void VulkanContext::initializeInstance(bool isHeadless)
 	vk::SurfaceKHR surface;
 	if (!isHeadless)
 	{
-		std::unique_ptr<PlatformWindow> window = std::make_unique<PlatformWindow>("VulkanSurfaceCapWindow", 100, 100);
+		OwningHandle<PlatformWindow> window = _engineContext.getPlatformWindowSystem().create("VulkanSurfaceCapWindow", 100, 100);
 		surface = VulkanWindowedSurface::createSurface(_instance, *window);
 
 		selectPhysicalDevice(surface);

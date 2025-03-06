@@ -25,7 +25,7 @@
 
 #include "../Pipeline/VulkanPipeline.h"
 
-#include "../../../Platform/Window.h"
+#include "../../../Platform/PlatformWindow.h"
 #include "../../../Engine.h"
 #include "../../../Resource/ResourceSystem.h"
 #include "../../../Utility/RTTR.h"

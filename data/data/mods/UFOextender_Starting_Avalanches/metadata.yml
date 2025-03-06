@@ -1,0 +1,11 @@
+#
+# metadata.yaml for UFOextender Starting Avalanches
+
+name: "UFOextender: Starting Avalanches"
+id: "Starting_Avalanches"
+version: 1.0
+description: "All starting X-COM craft come with Avalanche Missiles equipped."
+author: the OpenXcom team
+
+dependencies:
+  - mod: "xcom1"

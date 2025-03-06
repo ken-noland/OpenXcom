@@ -154,6 +154,24 @@ public:
 		return &get();
 	}
 
+	// Provide an explicit bool conversion: "if (myHandle) { ... }" means "if valid..."
+	explicit operator bool() const noexcept
+	{
+		return isValid();
+	}
+
+	// Equality operator: true if both handle ID and manager pointer match
+	friend bool operator==(const OwningHandle& lhs, const OwningHandle& rhs) noexcept
+	{
+		return lhs._handle == rhs._handle && lhs._manager == rhs._manager;
+	}
+
+	// Inequality operator
+	friend bool operator!=(const OwningHandle& lhs, const OwningHandle& rhs) noexcept
+	{
+		return !(lhs == rhs);
+	}
+
 	// Get a non-owning handle
 	ResourceHandle<ResourceType> getHandle() const
 	{

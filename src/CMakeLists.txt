@@ -194,25 +194,27 @@ set ( engine_src
   "Engine/Graphics/Vulkan/VulkanCommand.cpp"
   "Engine/Graphics/Vulkan/VulkanContext.cpp"
   "Engine/Graphics/Vulkan/VulkanDescriptorSet.cpp"
-  "Engine/Graphics/Vulkan/VulkanResource.cpp"
   "Engine/Graphics/Vulkan/VulkanSampler.cpp"
   "Engine/Graphics/Vulkan/VulkanSystem.cpp"
   "Engine/Graphics/Shader.cpp"
   "Engine/Graphics/ShaderManager.cpp"
   "Engine/Graphics/GraphicsSystem.cpp"
+  "Engine/Mod/ModInfo.cpp"
+  "Engine/Mod/ModScanner.cpp"
   "Engine/Platform/Linux/LinuxProcess.cpp"
   "Engine/Platform/Linux/LinuxWindow.cpp"
   "Engine/Platform/Win32/Win32Process.cpp"
   "Engine/Platform/Win32/Win32Window.cpp"
-  "Engine/Platform/ProcessSystem.cpp"
-  "Engine/Platform/Window.cpp"
+  "Engine/Platform/PlatformProcessSystem.cpp"
+  "Engine/Platform/PlatformWindow.cpp"
+  "Engine/Platform/PlatformWindowSystem.cpp"
   "Engine/Resource/FileProcessor/ImageBMPFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImageFile.cpp"
   "Engine/Resource/FileProcessor/ImageFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"
   "Engine/Resource/ResourceSystem.cpp"
+  "Engine/Utility/Time/TimeSystem.cpp"
   "Engine/Utility/RTTRGlm.cpp"
-#  "Engine/Action.cpp"
 #  "Engine/AdlibMusic.cpp"
 #  "Engine/CatFile.cpp"
   "Engine/CrossPlatform.cpp"
@@ -254,11 +256,14 @@ set ( engine_src
   "Engine/Timer.cpp"
   "Engine/Unicode.cpp"
   "Engine/Yaml.cpp"
+  "Engine/YamlAssert.cpp"
 #  "Engine/Zoom.cpp
 )
 
 set( game_src
   "Game/Game.cpp"
+  "Game/GameMods.cpp"
+  "Game/GameStates.cpp"
   "Game/GameWindow.cpp"
   "Game/Resource/Xcom1MasterFileProcessor.cpp"
   "Game/States/StartState.cpp"
@@ -619,6 +624,7 @@ include(cmake/libbmp.cmake)
 include(cmake/harfbuzz.cmake)
 include(cmake/libunibreak.cmake)
 include(cmake/utfcpp.cmake)
+include(cmake/semver.cmake)
 
 #--------------------------------
 # set up the defines and includes
@@ -668,6 +674,7 @@ set(openxcom_libs
   libbmp
   harfbuzz
   libunibreak
+  semver
 )
 
 if(UNIX)
@@ -700,7 +707,7 @@ endif()
 # Codegen: Executable that generates additional source files, depends on openxcom_base_lib
 add_executable(codegen "Codegen/Codegen.cpp" $<TARGET_OBJECTS:openxcom_base_lib>)
 target_include_directories(codegen PUBLIC ${openxcom_includes})
-target_compile_definitions(codegen PUBLIC ${openxcom_defines})
+target_compile_definitions(codegen PUBLIC ${openxcom_defines} SOURCE_DIR="${CMAKE_SOURCE_DIR}")
 target_link_libraries(codegen PUBLIC ${openxcom_libs})
 
 # Allow undefined symbols for codegen

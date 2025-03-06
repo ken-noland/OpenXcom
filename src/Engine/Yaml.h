@@ -26,32 +26,13 @@
 namespace OpenXcom
 {
 
+class YamlContext;
+
 // forward declarations
 template <typename ClassType>
-bool fromYaml(ryml::ConstNodeRef const& yaml, ClassType& type, ryml::Parser const& parser);
+bool fromYaml(ryml::ConstNodeRef const& yaml, ClassType& type, YamlContext& context);
 
 template <typename ClassType>
 bool toYaml(const ClassType& type, ryml::NodeRef& yaml);
-
-// helper function to handle reading optional and required values
-template <class Type, bool optional>
-bool readYaml(const ryml::ConstNodeRef& yaml, const std::string& key, Type& object, const ryml::Parser& parser)
-{
-	if constexpr (!optional) // Required key: must exist.
-	{
-		return yaml.has_child(key.data()) ? fromYaml<Type>(yaml[key.c_str()], object, parser)
-										  : throw OpenXcom::YamlException(yaml, parser, std::format("Missing required key: {}", key));
-	}
-	else // Optional key: check for existence.
-	{
-		if (yaml.has_child(key.data()))
-		{
-			// Look up the child node with the provided key.
-			return fromYaml<Type>(yaml[key.c_str()], object, parser);
-		}
-		// we're returning true because the key is optional, even though it wasn't found
-		return true;
-	}
-}
 
 } // namespace OpenXcom

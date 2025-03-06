@@ -9,7 +9,7 @@
       "name": "openxcom_tests.exe (src\\Tests\\openxcom_tests.exe)",
       "args": [
         "--gtest_output=xml:${ProjectDir}\\temp\\test_results.xml",
-        "--gtest_filter=GraphicsInGameFontTextTest.*"
+        "--gtest_filter=TestModInfo.*"
       ]
     },
     {
@@ -28,7 +28,7 @@
       "projectTarget": "openxcom.exe (src\\openxcom.exe)",
       "name": "openxcom.exe (src\\openxcom.exe)",
       "args": [
-        "-data ${ProjectDir}\\bin\\",
+        "-data ${ProjectDir}\\data\\data\\",
         "-user ${ProjectDir}\\data\\user\\",
         "-config ${ProjectDir}\\data\\config\\"
       ],

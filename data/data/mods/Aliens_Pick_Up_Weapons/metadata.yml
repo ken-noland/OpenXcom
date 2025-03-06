@@ -1,0 +1,11 @@
+#
+# metadata.yaml for Aliens Pick Up Weapons
+
+name: "Aliens Pick Up Weapons"
+id: "Aliens_Pick_Up_Weapons"
+version: 1.0
+description: "The AI will try to pick up weapons they dropped if they find themselves unarmed (e.g. from panic or mind control)."
+author: the OpenXcom team
+
+dependencies:
+  - mod: "xcom1"

@@ -37,6 +37,7 @@ class ResourceSystem;
 // systems, allowing for easier testing and debugging.
 class Engine
 {
+protected:
 	// Options
 	std::unique_ptr<Options> _options;
 
@@ -46,17 +47,26 @@ class Engine
 	// Platform Process System
 	std::unique_ptr<PlatformProcessSystem> _platformProcessSystem;
 
+	// Platform Window System
+	std::unique_ptr<PlatformWindowSystem> _platformWindowSystem;
+
 	// Graphics system
 	std::unique_ptr<GraphicsSystem> _graphicsSystem;
 
 	// Resource system
 	std::unique_ptr<ResourceSystem> _resourceSystem;
 
+	// Time system
+	std::unique_ptr<TimeSystem> _timeSystem;
+
 	// Engine context
 	std::unique_ptr<EngineContext> _engineContext;
 
+	// Empty constructor for unit tests
+	Engine();
+
 public:
-	Engine(const std::vector<std::string>& args = {});
+	Engine(const std::vector<std::string>& args);
 	~Engine();
 
 	void update();
@@ -71,6 +81,7 @@ public:
 	PlatformProcessSystem& getPlatformProcessSystem() { return *_platformProcessSystem; }
 	GraphicsSystem& getGraphicsSystem() { return *_graphicsSystem; }
 	ResourceSystem& getResourceSystem() { return *_resourceSystem; }
+	TimeSystem& getTimeSystem() { return *_timeSystem; }
 };
 
 } // namespace OpenXcom

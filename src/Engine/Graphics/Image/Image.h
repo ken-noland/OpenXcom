@@ -33,6 +33,22 @@ enum class ImageFormat
 	UNKNOWN
 };
 
+constexpr int bytesPerPixel(ImageFormat format)
+{
+	switch (format)
+	{
+	case ImageFormat::R8:
+		return 1;
+	case ImageFormat::R8G8B8:
+		return 3;
+	case ImageFormat::R8G8B8A8:
+		return 4;
+	default:
+		return 0;
+	}
+}
+
+
 enum class ImageType
 {
 	Texture,

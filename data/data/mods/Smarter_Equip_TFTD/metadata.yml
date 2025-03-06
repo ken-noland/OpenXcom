@@ -1,0 +1,11 @@
+#
+# metadata.yaml for Smarter Equip
+
+name: "Smarter Equip"
+id: "Smarter_Equip"
+version: 1.0
+description: "Custom priority order of inventory slots for auto-equip and ctrl-click-equip."
+author: Meridian
+
+dependencies:
+  - mod: "xcom2"

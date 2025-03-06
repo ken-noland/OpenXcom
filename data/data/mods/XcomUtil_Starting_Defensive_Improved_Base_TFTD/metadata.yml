@@ -1,0 +1,11 @@
+#
+# metadata.yaml for XcomUtil Starting Defensive Improved Base
+
+name: "XcomUtil: Starting Defensive Improved Base"
+id: "Starting_Defensive_Improved_Base"
+version: 1.0
+description: "Combines the Starting Defensive Base mod with the Starting Improved Base mod."
+author: the OpenXcom team
+
+dependencies:
+  - mod: "xcom2"

@@ -91,7 +91,10 @@ struct CommandLineArguments
 {
 	std::filesystem::path templatePath;
 	std::filesystem::path outputPath;
+
+	bool verbose = false;
 };
+CommandLineArguments args;
 
 using TypeSet = std::list<SimpleRTTR::Type>;
 
@@ -234,6 +237,7 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 		{
 			if (type.type_index() == excludeType)
 			{
+				if (args.verbose) std::cout << "Type discarded because it is implicitly handled: " << type.fully_qualified_name() << std::endl; 
 				return false;
 			}
 		}
@@ -249,6 +253,7 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 			{
 				if (type.name() == "allocator")
 				{
+					if (args.verbose) std::cout << "Type discarded because it is an allocator: " << type.fully_qualified_name() << std::endl;
 					return false;
 				}
 			}
@@ -301,15 +306,17 @@ bool collectTypeInfo(TypeSet& types, const std::string& metaKey)
 				}
 			}
 		}
+		if (args.verbose) std::cout << "Type discarded because it is not in the OpenXcom namespace: " << type.fully_qualified_name() << std::endl;
 		return false;
 	});
 
 	// Add a filter to check if the type has any properties
 	filters.push_back([](const SimpleRTTR::Type& type) {
-		if (type.properties().size() > 0)
+		if (type.properties().size() > 0 || type.values().size() > 0)
 		{
 			return true;
 		}
+		if (args.verbose) std::cout << "Type discarded because it has no properties: " << type.fully_qualified_name() << std::endl;
 		return false;
 	});
 
@@ -320,6 +327,7 @@ bool collectTypeInfo(TypeSet& types, const std::string& metaKey)
 			OpenXcom::ObjectSerialize serialize = type.meta().get(metaKey.c_str()).value().get_as<OpenXcom::ObjectSerialize>();
 			return serialize == OpenXcom::ObjectSerialize::ALWAYS;
 		}
+		if (args.verbose) std::cout << "Type discarded because it is not serializable: " << type.fully_qualified_name() << std::endl;
 		return false;
 	});
 
@@ -667,6 +675,7 @@ bool generateCode(const CommandLineArguments& args)
 	nlohmann::json data;
 	data["headers"] = headers;
 	convertTypesToJson(data["types"], types);
+	data["source_path"] = SOURCE_DIR;
 
 	// render the main template
 	std::string result;
@@ -718,7 +727,7 @@ std::vector<std::string>::const_iterator getCommandLineArgument(const std::vecto
 
 void printUsage()
 {
-	std::cout << "Usage: Codegen -template <template definition file> -output <output file>" << std::endl;
+	std::cout << "Usage: Codegen -template <template definition file> -output <output file> -(v)erbose" << std::endl;
 }
 
 bool parseCommandLine(CommandLineArguments& args, int argc, char* argv[])
@@ -751,6 +760,13 @@ bool parseCommandLine(CommandLineArguments& args, int argc, char* argv[])
 				}
 			}
 		}
+
+		if (*it == "-v" || *it == "-verbose")
+		{
+			args.verbose = true;
+			handlerFound = true;
+		}
+
 		if (!handlerFound)
 		{
 			std::cerr << "Unknown argument \"" << *it << "\"." << std::endl;
@@ -793,9 +809,10 @@ bool parseCommandLine(CommandLineArguments& args, int argc, char* argv[])
 	return true;
 }
 
+
+
 int main(int argc, char* argv[])
-{
-	CommandLineArguments args;
+{	
 	if (!parseCommandLine(args, argc, argv))
 	{
 		printUsage();

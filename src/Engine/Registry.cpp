@@ -22,9 +22,4 @@
 namespace OpenXcom
 {
 
-Registry& getRegistry()
-{
-	return getGame()->getECS().getRegistry();
-}
-
 }

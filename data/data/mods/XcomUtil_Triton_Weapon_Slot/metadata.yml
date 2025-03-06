@@ -1,0 +1,11 @@
+#
+# metadata.yaml for XcomUtil Triton Weapon Slot
+
+name: "XcomUtil: Triton Weapon Slot"
+id: "Triton_Weapon_Slot"
+version: 1.0
+description: "Gives the Triton a craft weapon slot."
+author: the OpenXcom team
+
+dependencies:
+  - mod: "xcom2"

@@ -190,39 +190,7 @@ PaletteHandle PaletteSystem::getPaletteByID(const std::string& id, bool alterPal
 
 void PaletteSystem::setSurfacePalette(Surface* surface, PaletteHandle paletteHandle)
 {
-	if (paletteHandle == PaletteHandle::Invalid)
-	{
-		return;
-	}
 
-	Palette* pal = getPaletteByHandle(paletteHandle);
-	if (pal != nullptr)
-	{
-// SDLHACK
-//		SDL_SetColors(surface->getSDLSurface(), pal->getColors(), 0, pal->getColorCount());
-	}
-
-	// KN NOTE: All of this is only used (as far as I can tell) for background images. It would
-	// make more sense to move this logic to the background component, but I'm also trying to keep
-	// as close to the original source as possible.
-
-	// background images need a separate palette to override the main palette, so that is done here
-	int chunk = getPaletteChunk(paletteHandle);
-	if (chunk >= 0)
-	{
-		if (_backpal == nullptr)
-		{
-			_backpal = getPalette(getPaletteByName("BACKPALS.DAT"));
-			if (_backpal == nullptr)
-			{
-				// no backpal, so just return
-				return;
-			}
-		}
-
-// SDLHACK
-		//SDL_SetColors(surface->getSDLSurface(), _backpal->getColors() + Palette::blockOffset(chunk), Palette::backPos, 16);
-	}
 }
 
 }

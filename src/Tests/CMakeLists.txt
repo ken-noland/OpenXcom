@@ -1,8 +1,5 @@
-
 # Include FetchContent module
 include(FetchContent)
-
-
 
 # Fetch GoogleTest
 FetchContent_Declare(
@@ -40,6 +37,8 @@ add_executable(
   "Engine/_TestEngine.cpp"
   "Entity/Interface/WindowTest.cpp"
   "Entity/Interface/ButtonTest.cpp"
+  "Game/TestGameMods.cpp"
+  "Game/TestModInfo.cpp"
 )
 
 # Define the source root and add it as a compile definition

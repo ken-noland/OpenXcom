@@ -1,9 +1,0 @@
-#
-# metadata.yaml for PSX Static Cydonia Map
-
-name: "Lua_Test"
-version: 1.0
-description: "Just a quick test of a few lua features"
-author: Ken Noland
-master: xcom2
-lua: bootstrap.lua
