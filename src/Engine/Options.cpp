@@ -57,6 +57,9 @@ SIMPLERTTR
 			.meta("FriendlyName", "locale")
 			.meta("Serialize", PropertySerialize::ALWAYS) // always serialize this
 			.meta("Description", "The locale used for translations.")
+		.property(REGISTER_PROPERTY(GameOptions, _safeMode))
+			.meta("FriendlyName", "safeMode")
+			.meta("Description", "Load only the master, ignoring any mods")
 		.property(REGISTER_PROPERTY(GameOptions, _continueSave))
 			.meta("FriendlyName", "continueSave")
 			.meta("Description", "If the game should load the last save")
@@ -302,6 +305,14 @@ Options::Options(const std::vector<std::string>& argv)
 			[this](const std::string&) -> bool {
 				set<&GraphicsOptions::_headless>(OptionLevel::COMMAND, true);
 				return true;
+			}
+		}},
+		{{"-safemode"}, {
+			false, "",
+			"Loads only the master, but not any mods",
+			[this](const std::string&) -> bool {
+				set<&GameOptions::_safeMode>(OptionLevel::COMMAND, true);
+				return false;
 			}
 		}}
 	};

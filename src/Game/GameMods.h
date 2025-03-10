@@ -18,20 +18,59 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../Engine/Mod/ModScanner.h"
+#include "../Engine/Mod/Mod.h"
 
 namespace OpenXcom
 {
 
 class GameContext;
 
+// helper struct to get some context when canActivateMod or activateMod is called
+struct ActivateModResult
+{
+	enum class ResultType
+	{
+		Success,
+		AlreadyActive,
+		Failed_CouldNotLocate,
+		Failed_MissingDependencies,
+		Failed_Conflicts
+	};
+
+	ResultType result;
+	std::string failReason; // or empty if succeeded
+
+	// Dependencies that couldn't be satisfied
+	// (nonexistent, conflicting, etc.).
+	std::vector<std::string> errorDeps;
+};
+
+
 class GameMods
 {
 protected:
 	GameContext& _context;
 
-	std::vector<ScannedMod> _masters;
-	std::vector<ScannedMod> _activeMods;
-	std::vector<ScannedMod> _inactiveMods;
+	// little struct to keep track of mods that have been scanned and activated
+	struct ScannedMods
+	{
+		std::vector<ScannedMod> masters;
+		std::vector<ScannedMod> activeMods;
+		std::vector<ScannedMod> inactiveMods;
+
+		ScannedMod* activeMaster = nullptr;
+	};
+
+	ScannedMods _scannedMods;
+
+	// the mods that have been loaded
+	struct LoadedMods
+	{
+		std::vector<Mod> mods;
+		Mod* activeMaster;
+	};
+
+	LoadedMods _loadedMods;
 
 	bool setupScanner(ModScanner& scanner);
 
@@ -40,6 +79,12 @@ public:
 	~GameMods();
 
 	bool load();
+
+	// note: this moves the mod to the active list, but does not load its resources.
+	ActivateModResult canActivateMod(const std::string& id) const;
+	ActivateModResult activateMod(const std::string& id);
+
+	bool activateMaster(const std::string& id);
 };
 
 } // namespace OpenXcom

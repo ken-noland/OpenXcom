@@ -1,3 +1,4 @@
+#include "GameMods.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -36,24 +37,39 @@ GameMods::~GameMods()
 
 bool GameMods::load()
 {
-	ModScanner scanner(_context.getEngineContext());
+	Options& options = _context.getEngineContext().getOptions();
 
-	// register all the required and optional game directories in the mod scanner
-	if (!setupScanner(scanner)) { return false; }
+	if(options.get<&GameOptions::_scanFilesystem>())
+	{
+		ModScanner scanner(_context.getEngineContext());
 
-	// scan all the directories
-	if (!scanner.scan()) { return false; }
-	_inactiveMods = scanner.takeScannedMods();
+		// register all the required and optional game directories in the mod scanner
+		if (!setupScanner(scanner))
+		{
+			return false;
+		}
+
+		// scan all the directories
+		if (!scanner.scan())
+		{
+			return false;
+		}
+		_scannedMods.inactiveMods = scanner.takeScannedMods();
+	}
+	else
+	{
+		//TODO: if we're not scanning the filesystem for mods, we should probably add in the xcom1 and xcom2 masters?
+	}
 
 	// Okay, we now have a list of mods to work with. Now we need to filter them.
 
 	// Step 1: move the masters to their own list
-	for (std::vector<ScannedMod>::iterator it = _inactiveMods.begin(); it != _inactiveMods.end();)
+	for (std::vector<ScannedMod>::iterator it = _scannedMods.inactiveMods.begin(); it != _scannedMods.inactiveMods.end();)
 	{
 		if (it->info.type == ModType::Master)
 		{
-			_masters.push_back(std::move(*it));
-			it = _inactiveMods.erase(it);
+			_scannedMods.masters.push_back(std::move(*it));
+			it = _scannedMods.inactiveMods.erase(it);
 		}
 		else
 		{
@@ -61,63 +77,234 @@ bool GameMods::load()
 		}
 	}
 
-	// Step 2: move active mods to their own list
-	std::vector<std::string> configActiveMods = _context.getEngineContext().getOptions().get<&GameOptions::_mods>();
-	for (std::vector<ScannedMod>::iterator it = _inactiveMods.begin(); it != _inactiveMods.end();)
-	{
-		// find mod in config list
-		std::vector<std::string>::iterator configIt = std::find(configActiveMods.begin(), configActiveMods.end(), it->info.id);
-		if (configIt != configActiveMods.end())
-		{
-			_activeMods.push_back(std::move(*it));
-			// remove it from the config list so we don't search for it again.
-			configActiveMods.erase(configIt);
-			it = _inactiveMods.erase(it);
-		}
-		else
-		{
-			++it;
-		}
-	}
-	for (const std::string& modId : configActiveMods)
-	{
-		Log(LOG_WARNING) << "Mod " << modId << " is in the active mods list but was not found in the scanned mods list. Could not load the mod";
-	}
+	// Step 2: Activate the master
+	std::string masterId = options.get<&GameOptions::_master>();
+	if (!activateMaster(masterId)) { return false; }
 
-	// Step 3: verify that all active mods have their dependencies met
-	for (std::vector<ScannedMod>::iterator it = _activeMods.begin(); it != _activeMods.end();)
+	// Step 3: Attempt to activate the mods
+	std::vector<std::string> configActiveMods = options.get<&GameOptions::_mods>();
+	std::vector<std::string> requeue;
+	bool madeProgress = true;
+	size_t maxPasses = configActiveMods.size() * 5;
+	size_t passCount = 0;
+
+	while(!configActiveMods.empty() && madeProgress && passCount < maxPasses)
 	{
-		// TODO: have a separate function for this. One that could be used in game when trying to activate mods using the UI as well.
-		bool dependenciesMet = true;
-		for (DependencyExpression& dep : it->info.dependencies)
+		madeProgress = false;
+		for (std::vector<std::string>::iterator it = configActiveMods.begin(); it != configActiveMods.end();)
 		{
-			// check if the mod is loaded
-			std::vector<ScannedMod>::iterator depIt = std::find_if(_activeMods.begin(), _activeMods.end(), [&dep](const ScannedMod& mod) { return mod.info.id == dep.mod; });
-			if (depIt == _activeMods.end())
+			ActivateModResult result = activateMod(*it);
+			if (result.result == ActivateModResult::ResultType::Success)
 			{
-				// check if the mod is a master
-				depIt = std::find_if(_masters.begin(), _masters.end(), [&dep](const ScannedMod& mod) { return mod.info.id == dep.mod; });
-				if (depIt == _masters.end())
+				it = configActiveMods.erase(it);
+				madeProgress = true;
+				continue;
+			}
+
+			if(result.result == ActivateModResult::ResultType::Failed_MissingDependencies)
+			{
+				// This mod's dependencies aren't satisfied yet,
+				// so we place it at the end of the list to try again later.
+				// We'll keep going to the next mod, so we do:
+				requeue.push_back(std::move(*it));
+				it = configActiveMods.erase(it);
+			}
+			else
+			{
+				if (it != configActiveMods.end())
+					++it;
+			}
+		}
+
+		//requeue any mods with missing dependencies to allow other mods to load first
+		configActiveMods.insert(configActiveMods.end(),
+								std::make_move_iterator(requeue.begin()),
+								std::make_move_iterator(requeue.end()));
+		requeue.clear();
+
+		++passCount;
+	}
+	// if there are any mods left, there must be an error
+	if(!configActiveMods.empty())
+	{
+		Log(LOG_WARNING) << "Some mods could not be activated: " << configActiveMods.size();
+		for (const std::string& modId : configActiveMods)
+		{
+			Log(LOG_WARNING) << "  " << modId;
+			ActivateModResult result = activateMod(modId);
+			if (result.result != ActivateModResult::ResultType::Success)
+			{
+				Log(LOG_WARNING) << "    " << result.failReason;
+
+				if (result.result == ActivateModResult::ResultType::Failed_MissingDependencies)
 				{
-					// dependency not met
-					dependenciesMet = false;
-					break;
+					for (const std::string& dep : result.errorDeps)
+					{
+						Log(LOG_WARNING) << "      " << dep;
+					}
+				}
+				else if (result.result == ActivateModResult::ResultType::Failed_Conflicts)
+				{
+					for (const std::string& dep : result.errorDeps)
+					{
+						Log(LOG_WARNING) << "      " << dep;
+					}
 				}
 			}
 		}
-		if (!dependenciesMet)
-		{
-			// re-add the mod to the scanned mods list
-			_inactiveMods.push_back(std::move(*it));
+		return false;
+	}
 
-			// remove the mod from the active list
-			it = _activeMods.erase(it);
-		}
-		else
+	// Step 4: Load the mods
+	Mod masterMod(*_scannedMods.activeMaster);
+	for(ScannedMod& scannedMod : _scannedMods.activeMods)
+	{
+		Mod mod(scannedMod);
+	}
+
+	return true;
+}
+
+ActivateModResult GameMods::canActivateMod(const std::string& id) const
+{
+	ActivateModResult result;
+
+	// Step 1: Already active?
+	if (std::find_if(_scannedMods.activeMods.begin(), _scannedMods.activeMods.end(),
+					 [&id](const ScannedMod& mod) { return mod.info.id == id; }) != _scannedMods.activeMods.end())
+	{
+		result.result = ActivateModResult::ResultType::AlreadyActive;
+		return result;
+	}
+
+	// Step 2: Existence check
+	std::vector<ScannedMod>::const_iterator it = std::find_if(_scannedMods.inactiveMods.begin(), _scannedMods.inactiveMods.end(),
+														[&id](const ScannedMod& mod) { return mod.info.id == id; });
+	if (it == _scannedMods.inactiveMods.end())
+	{
+		std::ostringstream os;
+		os << "Mod " << id << " could not be located";
+		result.result = ActivateModResult::ResultType::Failed_CouldNotLocate;
+		result.failReason = os.str();
+		return result;
+	}
+
+	// Step 3: Dependencies check
+	const std::vector<DependencyExpression>& dependencies = it->info.dependencies;
+	for (const DependencyExpression& dep : dependencies)
+	{
+		// TODO: Version check!
+
+		// check if the requested mod is loaded
+		std::vector<ScannedMod>::const_iterator depIt = std::find_if(_scannedMods.activeMods.begin(), _scannedMods.activeMods.end(),
+															   [&dep](const ScannedMod& mod) { return mod.info.id == dep.mod; });
+		if (depIt == _scannedMods.activeMods.end())
 		{
-			++it;
+			// check if the requested mod is the master
+			assert(_scannedMods.activeMaster != nullptr);
+			if (dep.mod != _scannedMods.activeMaster->info.id)
+			{
+				// dependency not met
+				result.result = ActivateModResult::ResultType::Failed_MissingDependencies;
+				result.errorDeps.push_back(dep.mod);
+			}
 		}
 	}
+	if (result.result == ActivateModResult::ResultType::Failed_MissingDependencies)
+	{
+		std::ostringstream os;
+		os << "Mod " << id << " has unmet dependencies:";
+		result.failReason = os.str();
+		return result;
+	}
+
+	// Step 4: Conflicts check(check active mods)
+	for (std::vector<ScannedMod>::const_iterator activeModIt = _scannedMods.activeMods.begin(); activeModIt != _scannedMods.activeMods.end(); ++activeModIt)
+	{
+		const std::vector<DependencyExpression>& conflicts = activeModIt->info.conflicts;
+		for (const DependencyExpression& conflict : conflicts)
+		{
+			// check if the requested mod is loaded
+			if (conflict.mod == id)
+			{
+				// conflict found
+				result.result = ActivateModResult::ResultType::Failed_Conflicts;
+				result.errorDeps.push_back((*activeModIt).info.id);
+			}
+		}
+	}
+	if (result.result == ActivateModResult::ResultType::Failed_Conflicts)
+	{
+		std::ostringstream os;
+		os << "Mod " << id << " conflicts with the following mods:";
+		result.failReason = os.str();
+		return result;
+	}
+
+	// Step 5: Conflicts check(check inactive mods)
+	const std::vector<DependencyExpression>& conflicts = it->info.conflicts;
+	for (const DependencyExpression& conflict : conflicts)
+	{
+		// check if the requested mod is loaded
+		std::vector<ScannedMod>::const_iterator conflictIt = std::find_if(_scannedMods.activeMods.begin(), _scannedMods.activeMods.end(),
+																		  [&conflict](const ScannedMod& mod) { return mod.info.id == conflict.mod; });
+		if (conflictIt != _scannedMods.activeMods.end())
+		{
+			// conflict found
+			result.result = ActivateModResult::ResultType::Failed_Conflicts;
+			result.errorDeps.push_back((*conflictIt).info.id);
+		}
+	}
+	if (result.result == ActivateModResult::ResultType::Failed_Conflicts)
+	{
+		std::ostringstream os;
+		os << "Mod " << id << " conflicts with the following mods:";
+		result.failReason = os.str();
+		return result;
+	}
+
+	// Step 6: All good!
+	result.result = ActivateModResult::ResultType::Success;
+	return result;
+}
+
+ActivateModResult GameMods::activateMod(const std::string& id)
+{
+	ActivateModResult result = canActivateMod(id);
+
+	if(result.result == ActivateModResult::ResultType::Success)
+	{
+		std::vector<ScannedMod>::iterator it = std::find_if(_scannedMods.inactiveMods.begin(), _scannedMods.inactiveMods.end(),
+															[&id](const ScannedMod& mod) { return mod.info.id == id; });
+
+		// Activate the mod
+		_scannedMods.activeMods.push_back(std::move(*it));
+		_scannedMods.inactiveMods.erase(it);
+	}
+
+	return result;
+}
+
+bool GameMods::activateMaster(const std::string& id)
+{
+	// Step 1: Already active?
+	if(_scannedMods.activeMaster != nullptr)
+	{
+		Log(LOG_ERROR) << "Master mod already active";
+		return false;
+	}
+
+	// Step 2: Find the master
+	std::vector<ScannedMod>::iterator it = std::find_if(_scannedMods.masters.begin(), _scannedMods.masters.end(),
+														[&id](const ScannedMod& mod) { return mod.info.id == id; });
+	if (it == _scannedMods.masters.end())
+	{
+		Log(LOG_ERROR) << "Master mod '" + id + "' not found";
+		return false;
+	}
+
+	// Step 3: Activate the master
+	_scannedMods.activeMaster = &(*it);
 
 	return true;
 }
@@ -169,7 +356,7 @@ bool GameMods::setupScanner(ModScanner& scanner)
 			// convert to FolderEntry
 			std::unique_ptr<FolderEntry> folderPtr(static_cast<FolderEntry*>(entry.release()));
 
-			// check the directory name to see if it is "mod"
+			// check the directory name to see if it is "mods"
 			if (folderPtr->getPath().filename() == "mods")
 			{
 				scanner.addScanFolder(folderPtr);

@@ -34,6 +34,7 @@ struct ScannedMod
 	ModInfo info;
 	std::filesystem::path path;
 
+	// Once the mod has been loaded, this pointer will be invalid. Storing it here to cache the filesystem
 	std::unique_ptr<CompositeFileSystem> filesystem;
 };
 

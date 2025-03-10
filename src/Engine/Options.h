@@ -191,12 +191,14 @@ struct GameOptions
 
 	Option<std::string> _locale;
 
-	Option<bool> _continueSave								= false;
-	Option<std::filesystem::path> _lastSave					= std::filesystem::path();
+	Option<bool> _safeMode = false;
+	Option<bool> _continueSave = false;
+	Option<std::filesystem::path> _lastSave = std::filesystem::path();
 
 	Option<std::filesystem::path> _logPath;
 	Option<SeverityLevel> _logLevel							= SeverityLevel::LOG_INFO;
 
+	Option<bool> _scanFilesystem							= true;
 	Option<std::vector<std::string>> _mods					= {};
 
 	Option<std::string> _master								= std::string("xcom1");

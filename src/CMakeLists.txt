@@ -199,6 +199,7 @@ set ( engine_src
   "Engine/Graphics/Shader.cpp"
   "Engine/Graphics/ShaderManager.cpp"
   "Engine/Graphics/GraphicsSystem.cpp"
+  "Engine/Mod/Mod.cpp"
   "Engine/Mod/ModInfo.cpp"
   "Engine/Mod/ModScanner.cpp"
   "Engine/Platform/Linux/LinuxProcess.cpp"

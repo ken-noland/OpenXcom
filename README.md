@@ -40,12 +40,9 @@ modern C++ (C++20) and Vulkan support. Below are the general steps to build the 
 Ensure you have the following dependencies installed:
 
 - **C++ Compiler**:
-  - Windows: Microsoft Visual Studio 2022 (Preview)
+  - Windows: Microsoft Visual Studio
   - Linux/macOS: Clang or GCC (minimum version supporting C++20)
 - **CMake** (version 3.20 or later)
-- **Vulkan SDK** (latest version recommended)
-- **Ninja** (recommended for faster builds)
-- **zlib** (for ZIP file support)
 
 ### Build Steps
 
@@ -107,7 +104,7 @@ With Lua, modders can:
 - Implement **custom events and interactions**
 - Manage **resource loading and unloading dynamically**
 
-Modders can define **custom surfaces, blocks, and entities**, giving them unprecedented
+Modders can define **custom surfaces and entities**, giving them unprecedented
 control over how the game behaves. The goal is to provide a scripting interface that is
 both **powerful** and **easy to use**, without requiring C++ modifications.
 
