@@ -18,7 +18,8 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include "ModInfo.h"
+#include "../FileSystem/CompositeFileSystem.h"
 
 namespace OpenXcom
 {
@@ -29,9 +30,18 @@ class Mod
 {
 protected:
 
+	ModInfo _info;
+
+	std::unique_ptr<CompositeFileSystem> _filesystem;
+
 public:
 	Mod(ScannedMod& scannedModInfo);
+	Mod(Mod&& other) noexcept;
 	~Mod();
+
+	const ModInfo& getInfo() const { return _info; }
+
+	CompositeFileSystem& getFileSystem() { return *_filesystem; }
 };
 
 } // namespace OpenXcom

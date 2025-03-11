@@ -3,10 +3,11 @@
   "header_template": "JsonHeader.cpp.inja",
 
   "specializations": {
+    "enum_template": "JsonEnum.cpp.inja",
+    "map_template": "JsonMap.cpp.inja",
     "object_template": "JsonObject.cpp.inja",
     "option_template": "JsonOption.cpp.inja",
-    "vector_template": "JsonVector.cpp.inja",
-    "map_template": "JsonMap.cpp.inja",
-    "enum_template": "JsonEnum.cpp.inja"
+    "pair_template": "JsonPair.cpp.inja",
+    "vector_template": "JsonVector.cpp.inja"
   }
 }

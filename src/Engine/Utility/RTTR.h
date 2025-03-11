@@ -62,6 +62,6 @@ enum class PropertySerialize
 };
 
 #define ENUM_VALUE_REGISTRATION(type, value) type::value, #value
-
+#define PROPERTY_REGISTRATION(type, name) &type::name, #name
 
 } // OpenXcom

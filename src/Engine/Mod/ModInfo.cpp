@@ -214,6 +214,8 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 	if (!fromYaml(yaml["description"], modInfo.description, context)) { return false; }
 	if (!fromYaml(yaml["author"], modInfo.author, context)) { return false; }
 
+	bool legacyLoader = false;
+
 	//try reading the id
 	if (yaml.has_child("id"))
 	{
@@ -310,10 +312,14 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 		}
 	}
 
-	// try reading the "resourceConfigFile" field
-	if (yaml.has_child("resourceConfigFile"))
+	// try reading the "resourceConfig" field
+	if (yaml.has_child("resourceConfig"))
 	{
-		ryml::ConstNodeRef resourceConfigFileNode = yaml["resourceConfigFile"];
+		Log(LOG_WARNING) << "The resourceConfig field is deprecated.";
+		Log(LOG_WARNING) << context.toString(yaml);
+		legacyLoader = true;
+
+		ryml::ConstNodeRef resourceConfigFileNode = yaml["resourceConfig"];
 		std::string resourceConfigFileStr(resourceConfigFileNode.val().begin(), resourceConfigFileNode.val().end());
 		modInfo.resourceConfigFile = std::filesystem::path(resourceConfigFileStr);
 	}
@@ -321,6 +327,10 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 	// try reading the "loadResources" field
 	if (yaml.has_child("loadResources"))
 	{
+		Log(LOG_WARNING) << "The loadResources field is deprecated.";
+		Log(LOG_WARNING) << context.toString(yaml);
+		legacyLoader = true;
+
 		ryml::ConstNodeRef loadNode = yaml["loadResources"];
 		for (auto child : loadNode.children())
 		{
@@ -338,6 +348,8 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 		Log(LOG_WARNING) << "The versionDisplay field is deprecated. Please use the 'version' field instead.";
 		Log(LOG_WARNING) << context.toString(yaml);
 		// TODO: put in documentation link here
+
+		legacyLoader = true;
 	}
 
 	// try reading the "isMaster" field
@@ -346,6 +358,8 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 		Log(LOG_WARNING) << "The isMaster field is deprecated. Please use the 'type' field instead.";
 		Log(LOG_WARNING) << context.toString(yaml);
 		// TODO: put in documentation link here
+
+		legacyLoader = true;
 
 		if (typeIsSet)
 		{
@@ -371,6 +385,8 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 		Log(LOG_WARNING) << "The master field is deprecated. Please use the 'type' field instead.";
 		Log(LOG_WARNING) << context.toString(yaml);
 
+		legacyLoader = true;
+
 		// well, we might as well read it it and record it as a dependency
 		ryml::ConstNodeRef masterNode = yaml["master"];
 		std::string master(masterNode.val().begin(), masterNode.val().end());
@@ -382,6 +398,22 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 	{
 		Log(LOG_WARNING) << "The reservedSpace field is deprecated. It is now ignored.";
 		Log(LOG_WARNING) << context.toString(yaml);
+
+		legacyLoader = true;
+	}
+
+	if(legacyLoader)
+	{
+		Log(LOG_WARNING) << "This mod file uses deprecated fields. Please update it to use the new fields.";
+		Log(LOG_WARNING) << context.toString(yaml);
+
+		// we forked off the loader at 8.1.2, so we'll set the loader version to that
+		modInfo.loaderVersion = semver::version(8, 1, 2);
+	}
+	else
+	{
+		// we're using the new loader, so we'll set the version to the current version
+		modInfo.loaderVersion = semver::version(OPENXCOM_VERSION_MAJOR, OPENXCOM_VERSION_MINOR, OPENXCOM_VERSION_PATCH);
 	}
 
 	return true;

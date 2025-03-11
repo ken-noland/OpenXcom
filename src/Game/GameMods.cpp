@@ -157,9 +157,13 @@ bool GameMods::load()
 
 	// Step 4: Load the mods
 	Mod masterMod(*_scannedMods.activeMaster);
+	_loadedMods.mods.push_back(std::move(masterMod));
+	_loadedMods.activeMaster = &_loadedMods.mods.back();
+
 	for(ScannedMod& scannedMod : _scannedMods.activeMods)
 	{
 		Mod mod(scannedMod);
+		_loadedMods.mods.push_back(std::move(mod));
 	}
 
 	return true;

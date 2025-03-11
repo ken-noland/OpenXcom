@@ -129,10 +129,26 @@ public:
 
 };
 
-TEST(TestGameMods, TestGameMods)
+TEST(TestGameMods, TestGameXcom1)
 {
 	TestEngine engine;
 	TestGame<TestGameMods> game(engine);
+
+	// set the master and mods to load in the config
+	Options& options = engine.getOptions();
+	options.set<&GameOptions::_master>(OptionLevel::COMMAND, "xcom1");
+
+	ASSERT_TRUE(game.load());
+}
+
+TEST(TestGameMods, TestGameXcom2)
+{
+	TestEngine engine;
+	TestGame<TestGameMods> game(engine);
+
+	// set the master and mods to load in the config
+	Options& options = engine.getOptions();
+	options.set<&GameOptions::_master>(OptionLevel::COMMAND, "xcom2");
 
 	ASSERT_TRUE(game.load());
 }
@@ -144,11 +160,14 @@ TEST(TestGameMods, TestGameModDependencies)
 
 	// Add three mods. The first is a master, the second depends on the first, and the third depends on the first.
 	game.getGameMods().addScannedMod(ModInfo{"master1_id", "master1 name", "master1 description", "master1 author",
-		semver::version(0, 1, 0), ModType::Master, "required_engine", semver::version(0, 1, 0), {/* dependencies */}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Master, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{/* dependencies */}, {/* conflicts */}, "", {""}});
 	game.getGameMods().addScannedMod(ModInfo{"mod1_id", "mod1 name", "mod1 description", "mod1 author",
-		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), {DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
 	game.getGameMods().addScannedMod(ModInfo{"mod2_id", "mod2 name", "mod2 description", "mod2 author",
-		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), {DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
 
 	// set the master and mods to load in the config
 	Options& options = engine.getOptions();
@@ -167,11 +186,14 @@ TEST(TestGameMods, TestMissingDependencies)
 
 	// Add three mods. The first is a master, the second depends on the first, and the third depends on the first.
 	game.getGameMods().addScannedMod(ModInfo{"master1_id", "master1 name", "master1 description", "master1 author",
-		semver::version(0, 1, 0), ModType::Master, "required_engine", semver::version(0, 1, 0), {/* dependencies */}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Master, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{/* dependencies */}, {/* conflicts */}, "", {""}});
 	game.getGameMods().addScannedMod(ModInfo{"mod1_id", "mod1 name", "mod1 description", "mod1 author",
-		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), {DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
 	game.getGameMods().addScannedMod(ModInfo{"mod2_id", "mod2 name", "mod2 description", "mod2 author",
-		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), {DependencyExpression{"master1_id"}, DependencyExpression{"missing_mod_id"}}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{DependencyExpression{"master1_id"}, DependencyExpression{"missing_mod_id"}}, {/* conflicts */}, "", {""}});
 
 	// set the master and mods to load in the config
 	Options& options = engine.getOptions();
@@ -190,11 +212,14 @@ TEST(TestGameMods, TestConflictingDependencies1)
 
 	// Add three mods. The first is a master, the second depends on the first, and the third depends on the first.
 	game.getGameMods().addScannedMod(ModInfo{"master1_id", "master1 name", "master1 description", "master1 author",
-		semver::version(0, 1, 0), ModType::Master, "required_engine", semver::version(0, 1, 0), {/* dependencies */}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Master, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{/* dependencies */}, {/* conflicts */}, "", {""}});
 	game.getGameMods().addScannedMod(ModInfo{"mod1_id", "mod1 name", "mod1 description", "mod1 author",
-		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), {DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
 	game.getGameMods().addScannedMod(ModInfo{"mod2_id", "mod2 name", "mod2 description", "mod2 author",
-		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), {DependencyExpression{"master1_id"}}, {DependencyExpression{"mod1_id"}}, "", {""}});
+		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{DependencyExpression{"master1_id"}}, {DependencyExpression{"mod1_id"}}, "", {""}});
 
 	// set the master and mods to load in the config
 	Options& options = engine.getOptions();
@@ -213,11 +238,14 @@ TEST(TestGameMods, TestConflictingDependencies2)
 
 	// Add three mods. The first is a master, the second depends on the first, and the third depends on the first.
 	game.getGameMods().addScannedMod(ModInfo{"master1_id", "master1 name", "master1 description", "master1 author",
-		semver::version(0, 1, 0), ModType::Master, "required_engine", semver::version(0, 1, 0), {/* dependencies */}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Master, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{/* dependencies */}, {/* conflicts */}, "", {""}});
 	game.getGameMods().addScannedMod(ModInfo{"mod1_id", "mod1 name", "mod1 description", "mod1 author",
-		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), {DependencyExpression{"master1_id"}}, {DependencyExpression{"mod2_id"}}, "", {""}});
+		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{DependencyExpression{"master1_id"}}, {DependencyExpression{"mod2_id"}}, "", {""}});
 	game.getGameMods().addScannedMod(ModInfo{"mod2_id", "mod2 name", "mod2 description", "mod2 author",
-		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), {DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
+		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
+		{DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});
 
 	// set the master and mods to load in the config
 	Options& options = engine.getOptions();

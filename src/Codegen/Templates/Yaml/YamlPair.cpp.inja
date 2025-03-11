@@ -1,0 +1,43 @@
+// BEGIN YamlPair.cpp.inja
+
+template<>
+bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{type.fullName}}& object, YamlContext& context)
+{
+    // Check that the YAML node is a sequence
+    if (!yaml.is_seq())
+    {
+        throw YamlException(yaml, context, "Expected a sequence for std::pair.");
+    }
+
+    // Verify that the sequence contains exactly 2 elements
+    if (yaml.num_children() != 2)
+    {
+        throw YamlException(yaml, context, "Expected a sequence of 2 elements for std::pair, but got " + std::to_string(yaml.num_children()));
+    }
+
+	{{type.fullName}}::first_type first;
+	{{type.fullName}}::second_type second;
+
+	// Parse the first element of the pair
+	if (!fromYaml(yaml[0], first, context))
+	{
+		throw YamlException(yaml[0], context, "Error parsing first element of std::pair.");
+	}
+
+	// Parse the second element of the pair
+	if (!fromYaml(yaml[1], second, context))
+	{
+		throw YamlException(yaml[1], context, "Error parsing second element of std::pair.");
+	}
+
+	object = {{type.fullName}}(first, second);
+	return true;
+}
+
+template<>
+bool OpenXcom::toYaml<{{type.fullName}}>(const {{type.fullName}}& object, ryml::NodeRef& yaml)
+{
+	return false;
+}
+
+// END YamlPair.cpp.inja

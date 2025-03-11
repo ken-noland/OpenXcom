@@ -17,12 +17,51 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Mod.h"
+#include "ModScanner.h"
+#include "../../version.h"
+#include "../Logger.h"
+
+#include "Loader/Current/ModLoader.h"
+#include "Loader/8.1.2/ModLoader.h"
 
 namespace OpenXcom
 {
 
 Mod::Mod(ScannedMod& scannedModInfo)
+	: _info(scannedModInfo.info),						// copy the ModInfo
+	  _filesystem(std::move(scannedModInfo.filesystem))	// move the filesystem
 {
+	// check the loader version
+	if (_info.loaderVersion >= semver::version(OPENXCOM_VERSION_MAJOR, OPENXCOM_VERSION_MINOR, OPENXCOM_VERSION_PATCH))
+	{
+		if (!ModLoader_Current::load(this))
+		{
+			std::ostringstream os;
+			os << "Failed to load mod '" << _info.id << "' with current loader version";
+			throw std::runtime_error(os.str());
+		}
+	}
+	else if (_info.loaderVersion == semver::version(8, 1, 2))
+	{
+		if (!ModLoader_8_1_2::load(this))
+		{
+			std::ostringstream os;
+			os << "Failed to load mod '" << _info.id << "' with loader version 8.1.2.";
+			throw std::runtime_error(os.str());
+		}
+	}
+	else
+	{
+		std::ostringstream os;
+		os << "Mod '" << _info.id << "' has unsupported loader version.";
+		throw std::runtime_error(os.str());
+	}
+}
+
+Mod::Mod(Mod&& other) noexcept
+{
+	_info = std::move(other._info);
+	_filesystem = std::move(other._filesystem);
 }
 
 Mod::~Mod()

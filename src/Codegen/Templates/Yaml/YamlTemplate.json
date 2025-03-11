@@ -3,10 +3,11 @@
   "header_template": "YamlHeader.cpp.inja",
 
   "specializations": {
+    "enum_template": "YamlEnum.cpp.inja",
+    "map_template": "YamlMap.cpp.inja",
     "object_template": "YamlObject.cpp.inja",
     "option_template": "YamlOption.cpp.inja",
-    "vector_template": "YamlVector.cpp.inja",
-    "map_template": "YamlMap.cpp.inja",
-    "enum_template": "YamlEnum.cpp.inja"
+    "pair_template": "YamlPair.cpp.inja",
+    "vector_template": "YamlVector.cpp.inja"
   }
 }

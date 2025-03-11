@@ -84,10 +84,14 @@ struct ModInfo
 	std::string requiredEngine;
 	semver::version requiredVersion = semver::version();
 
+	// This tells us the correct mod loader to use for this mod. It
+	// is auto-detected during the loading of metadata.yml.
+	semver::version loaderVersion = semver::version();
+
 	std::vector<DependencyExpression> dependencies;
 	std::vector<DependencyExpression> conflicts;
 
-	std::filesystem::path resourceConfigFile;
+	std::filesystem::path resourceConfigFile; // legacy resource config file
 	std::vector<std::filesystem::path> resourceDirectories;
 };
 

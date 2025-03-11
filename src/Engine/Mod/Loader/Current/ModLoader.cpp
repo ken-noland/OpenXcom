@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -17,13 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "ModLoader.h"
+#include "../../Mod.h"
+#include "../../../Logger.h"
+#include "../../../Filesystem/CompositeFileSystem.h"
 
 namespace OpenXcom
 {
 
-class ActiveModList
+namespace ModLoader_Current
 {
 
-};
+// global function to load current version mods
+bool load(Mod* mod)
+{
+	return false;
+}
+
+} // namespace ModLoader_Current
 
 } // namespace OpenXcom

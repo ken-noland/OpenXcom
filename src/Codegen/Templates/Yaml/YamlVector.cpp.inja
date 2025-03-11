@@ -14,7 +14,7 @@ bool OpenXcom::fromYaml<{{type.fullName}}>(ryml::ConstNodeRef const& yaml, {{typ
 		{{type.fullName}}::value_type value;
 		if (!fromYaml(child, value, context))
 		{
-			throw OpenXcom::YamlException(child, context, "Error parsing node.");
+			throw OpenXcom::YamlException(child, context, "Error parsing node. 'fromYaml()' returned false.");
 		}
 		object.push_back(value);
 	}

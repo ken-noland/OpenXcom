@@ -21,13 +21,14 @@
 namespace OpenXcom
 {
 
-class AvailableModList
-{
-public:
-	AvailableModList();
-	~AvailableModList();
+class Mod;
 
-	void refresh();
-};
+namespace ModLoader_Current
+{
+
+// global function to load current version mods
+bool load(Mod* mod);
+
+} // namespace ModLoader_Current
 
 } // namespace OpenXcom

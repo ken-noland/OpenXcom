@@ -132,9 +132,9 @@ void collectTemplateTypes(TypeSet& types, const SimpleRTTR::Type& type, const st
 	if (type.template_params().size() > 0)
 	{
 		// Get the template arguments
-		for (const SimpleRTTR::TypeReference& templateRefArg : type.template_params())
+		for (const SimpleRTTR::TemplateParameter& templateRefArg : type.template_params())
 		{
-			const SimpleRTTR::Type& templateArg = templateRefArg.type();
+			const SimpleRTTR::Type& templateArg = templateRefArg.type().type();
 
 			bool passesAllFilters = true;
 
@@ -214,10 +214,10 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 		}
 	}
 
-	std::vector<std::function<bool(const SimpleRTTR::Type&)>> typeFilters;
+	std::vector<std::function<bool(const SimpleRTTR::Type&)>> propertyTypeFilters;
 
 	//exclude std::string, std::filesystem::path, and others that we will be implicitly handling
-	typeFilters.push_back([](const SimpleRTTR::Type& type) {
+	propertyTypeFilters.push_back([](const SimpleRTTR::Type& type) {
 		static std::vector<std::type_index> typesToExclude = {
 			typeid(std::string),
 			typeid(std::u16string),
@@ -246,7 +246,7 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 	});
 
 	//exclude std::allocator
-	typeFilters.push_back([](const SimpleRTTR::Type& type) {
+	propertyTypeFilters.push_back([](const SimpleRTTR::Type& type) {
 		if (type.namespaces().size() > 0)
 		{
 			if (type.namespaces().back() == "std")
@@ -262,14 +262,28 @@ void collectTypes(TypeSet& types, const std::vector<std::function<bool(const Sim
 		return true;
 	});
 
+	//exclude types that are explicitly set to never serialize
+	propertyTypeFilters.push_back([](const SimpleRTTR::Type& type) {
+		if (type.meta().has("Serialize"))
+		{
+			OpenXcom::ObjectSerialize serialize = type.meta().get("Serialize").value().get_as<OpenXcom::ObjectSerialize>();
+			if(serialize == OpenXcom::ObjectSerialize::NEVER)
+			{
+				if (args.verbose) std::cout << "Type discarded because it is not serializable: " << type.fully_qualified_name() << std::endl;
+				return false;
+			}
+		}
+		return true;
+	});
+
 	for (const SimpleRTTR::Type& type : types)
 	{
-		collectProperties(types, type, typeFilters);
+		collectProperties(types, type, propertyTypeFilters);
 	}
 
 	for (const SimpleRTTR::Type& type : types)
 	{
-		collectTemplateTypes(types, type, typeFilters);
+		collectTemplateTypes(types, type, propertyTypeFilters);
 	}
 
 	// remove duplicates from unsorted list
@@ -491,6 +505,10 @@ std::string getTemplateForType(const SimpleRTTR::Type& type)
 		{
 			return "array_template";
 		}
+		else if(type.name() == "pair")
+		{
+			return "pair_template";
+		}
 		else
 		{
 			std::cerr << "No template for std type: " << type.fully_qualified_name() << std::endl;
@@ -504,33 +522,50 @@ std::string getFullNameForType(const SimpleRTTR::Type& type)
 {
 	std::string fullName;
 
-	// add namespace
-	if (type.namespaces().size() > 0)
+	// check if type has a name override
+	if(type.meta().has("Name"))
 	{
-		for (const std::string& ns : type.namespaces())
-		{
-			fullName += ns + "::";
-		}
+		return type.meta().get("Name").value().get_as<const char*>();
 	}
-
-	fullName += type.name();
-
-	// add template parameters
-	if (type.template_params().size() > 0)
+	else
 	{
-		fullName += "<";
-		for (size_t i = 0; i < type.template_params().size(); ++i)
+		// add namespace
+		if (type.namespaces().size() > 0)
 		{
-			if (i > 0)
+			for (const std::string& ns : type.namespaces())
 			{
-				fullName += ", ";
+				fullName += ns + "::";
 			}
-
-			fullName += getFullNameForType(type.template_params()[i].type());
 		}
-		fullName += ">";
+
+		fullName += type.name();
+
+		// add template parameters
+		if (type.template_params().size() > 0)
+		{
+			fullName += "<";
+			for (size_t i = 0; i < type.template_params().size(); ++i)
+			{
+				if (i > 0)
+				{
+					fullName += ", ";
+				}
+
+				const SimpleRTTR::TemplateParameter& templateParam = type.template_params()[i];
+
+				if(templateParam.has_value())
+				{
+					fullName += templateParam.value().get_as<const char*>();
+				}
+				else
+				{
+					fullName += getFullNameForType(templateParam.type().type());
+				}
+			}
+			fullName += ">";
+		}
+		return fullName;
 	}
-	return fullName;
 }
 
 bool convertTypesToJson(nlohmann::json::reference typesJson, const TypeSet& types)
@@ -576,9 +611,9 @@ bool convertTypesToJson(nlohmann::json::reference typesJson, const TypeSet& type
 		if (type.template_params().size() > 0)
 		{
 			typeJson["template_params"] = nlohmann::json::array();
-			for (const SimpleRTTR::TypeReference& templateRefArg : type.template_params())
+			for (const SimpleRTTR::TemplateParameter& templateRefArg : type.template_params())
 			{
-				const SimpleRTTR::Type& templateArg = templateRefArg.type();
+				const SimpleRTTR::Type& templateArg = templateRefArg.type().type();
 				nlohmann::json templateArgJson;
 				templateArgJson["name"] = templateArg.name();
 				templateArgJson["fulltype"] = getFullNameForType(templateArg);

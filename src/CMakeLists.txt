@@ -149,6 +149,9 @@ set ( battlescape_src
 )
 
 set ( engine_src
+  # need to include this first so that the definitions for glm are available
+  "Engine/Utility/RTTRGlm.cpp"
+
 #  "Engine/Adlib/adlplayer.cpp"
 #  "Engine/Adlib/fmopl.cpp"
   "Engine/Filesystem/CompositeFileSystem.cpp"
@@ -199,6 +202,8 @@ set ( engine_src
   "Engine/Graphics/Shader.cpp"
   "Engine/Graphics/ShaderManager.cpp"
   "Engine/Graphics/GraphicsSystem.cpp"
+  "Engine/Mod/Loader/Current/ModLoader.cpp"
+  "Engine/Mod/Loader/8.1.2/ModLoader.cpp"
   "Engine/Mod/Mod.cpp"
   "Engine/Mod/ModInfo.cpp"
   "Engine/Mod/ModScanner.cpp"
@@ -215,7 +220,6 @@ set ( engine_src
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"
   "Engine/Resource/ResourceSystem.cpp"
   "Engine/Utility/Time/TimeSystem.cpp"
-  "Engine/Utility/RTTRGlm.cpp"
 #  "Engine/AdlibMusic.cpp"
 #  "Engine/CatFile.cpp"
   "Engine/CrossPlatform.cpp"
@@ -736,6 +740,7 @@ set(json_codegen_templates
     "Codegen/Templates/Json/JsonMap.cpp.inja"
     "Codegen/Templates/Json/JsonObject.cpp.inja"
     "Codegen/Templates/Json/JsonOption.cpp.inja"
+    "Codegen/Templates/Json/JsonPair.cpp.inja"
     "Codegen/Templates/Json/JsonVector.cpp.inja"
     "Codegen/Templates/Json/JsonTemplate.json"
 )
@@ -747,6 +752,7 @@ set(yaml_codegen_templates
     "Codegen/Templates/Yaml/YamlMap.cpp.inja"
     "Codegen/Templates/Yaml/YamlObject.cpp.inja"
     "Codegen/Templates/Yaml/YamlOption.cpp.inja"
+    "Codegen/Templates/Yaml/YamlPair.cpp.inja"
     "Codegen/Templates/Yaml/YamlVector.cpp.inja"
     "Codegen/Templates/Yaml/YamlTemplate.json"
 )

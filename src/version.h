@@ -18,9 +18,9 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define OPENXCOM_VERSION_MAJOR 0
+#define OPENXCOM_VERSION_MAJOR 9
 #define OPENXCOM_VERSION_MINOR 0
-#define OPENXCOM_VERSION_PATCH 1
+#define OPENXCOM_VERSION_PATCH 0
 
 #define OPENXCOM_VERSION_STRINGIFY(x) #x
 #define OPENXCOM_VERSION_XSTRINGIFY(x) OPENXCOM_VERSION_STRINGIFY(x)
