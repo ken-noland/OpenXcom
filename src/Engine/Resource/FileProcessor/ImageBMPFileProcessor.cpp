@@ -189,14 +189,14 @@ ImageBMPFileProcessor::~ImageBMPFileProcessor()
 {
 }
 
-bool ImageBMPFileProcessor::load(ImageFile& out, const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params)
+ImageFile ImageBMPFileProcessor::load(const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params)
 {
 	// Open the file in binary mode and position at the end.
 	std::ifstream file(filename, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 	{
 		throw std::runtime_error("Failed to open file: " + filename.string());
-		return false;
+		return ImageFile();
 	}
 
 	// Get the file size by checking the current position (at the end).
@@ -208,13 +208,13 @@ bool ImageBMPFileProcessor::load(ImageFile& out, const std::string& name, const 
 	if (!file.read(buffer.data(), size))
 	{
 		throw std::runtime_error("Failed to read file: " + filename.string());
-		return false;
+		return ImageFile();
 	}
 
-	return load(out, name, reinterpret_cast<const uint8_t*>(buffer.data()), static_cast<std::size_t>(size), params);
+	return load(name, reinterpret_cast<const uint8_t*>(buffer.data()), static_cast<std::size_t>(size), params);
 }
 
-bool ImageBMPFileProcessor::load(ImageFile& out, const std::string& name, const uint8_t* bmpBuffer, std::size_t size, ImageLoadParams& params)
+ImageFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bmpBuffer, std::size_t size, ImageLoadParams& params)
 {
 	// Verify magic.
 	unsigned short magic;
@@ -222,7 +222,7 @@ bool ImageBMPFileProcessor::load(ImageFile& out, const std::string& name, const 
 	if (magic != BMP_MAGIC)
 	{
 		throw std::runtime_error("Failed to open BMP file due to invalid header");
-		return false;
+		return ImageFile();
 	}
 
 	// Read header.
@@ -280,7 +280,7 @@ bool ImageBMPFileProcessor::load(ImageFile& out, const std::string& name, const 
 	if (!hostImageHandle.isValid())
 	{
 		throw std::runtime_error("Unable to create host image");
-		return false;
+		return ImageFile();
 	}
 	HostImage& hostImage = hostImageHandle.get();
 
@@ -333,8 +333,7 @@ bool ImageBMPFileProcessor::load(ImageFile& out, const std::string& name, const 
 	}
 	hostImage.unmap();
 
-	out = ImageFile(std::move(hostImageHandle), std::move(paletteHandle));
-	return true;
+	return ImageFile(std::move(hostImageHandle), std::move(paletteHandle));
 }
 
 bool ImageBMPFileProcessor::save(const std::filesystem::path& filename, ImageFile& imageData)

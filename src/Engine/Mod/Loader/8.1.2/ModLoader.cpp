@@ -69,6 +69,8 @@ bool load(Mod* mod)
 
 	ResourceConfigFile resourceConfig;
 
+	Log(LOG_INFO) << "Pre-loading rulesets...";
+
 	// if the mod has a resourceConfigFile, we need to extract the sounds and transparency LUTs
 	if(!mod->getInfo().resourceConfigFile.empty())
 	{
@@ -84,6 +86,8 @@ bool load(Mod* mod)
 		resourceConfig = yamlFile.load<ResourceConfigFile>(resourceConfigFile);
 	}
 
+	Log(LOG_INFO) << "Loading vanilla resources...";
+
 	// now we can load the vanilla resources
 	if(!loadVanillaResources(mod, resourceConfig))
 	{
@@ -95,6 +99,17 @@ bool load(Mod* mod)
 
 bool loadVanillaResources(Mod* mod, ResourceConfigFile& resourceConfig)
 {
+	// Load palettes
+	const char *pal[] = { "PAL_GEOSCAPE", "PAL_BASESCAPE", "PAL_GRAPHS", "PAL_UFOPAEDIA", "PAL_BATTLEPEDIA" };
+
+	// Load surfaces
+
+
+	// Load surface sets
+	std::string sets[] = { "BASEBITS.PCK", "INTICON.PCK", "TEXTURE.DAT" };
+
+	// Construct sound sets
+
 
 	return true;
 }

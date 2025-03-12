@@ -51,9 +51,9 @@ TEST_F(ImageFileProcessorTest, TestBmp8bit)
 	bmpProcessor.save(path, generatedImage);
 
 	// Load the image back
-	ImageFile loadedImage;
 	ImageLoadParams params;
-	ASSERT_TRUE(bmpProcessor.load(loadedImage, "loaded_bmp_bitmap", path, params)) << "Unable to load bitmap";
+	ImageFile loadedImage = bmpProcessor.load("loaded_bmp_bitmap", path, params);
+	ASSERT_TRUE(loadedImage.hasImage()) << "Unable to load bitmap";
 
 	ASSERT_TRUE(loadedImage.getImageHandle().isValid()) << "Image handle should be valid";
 	ASSERT_NE(&loadedImage.getImage(), nullptr) << "Image should not be null";
@@ -102,9 +102,9 @@ TEST_F(ImageFileProcessorTest, TestPng8bit)
 	pngProcessor.save(path, generatedImage);
 
 	// Load the image back
-	ImageFile loadedImage;
 	ImageLoadParams params;
-	ASSERT_TRUE(pngProcessor.load(loadedImage, "loaded_bmp_bitmap", path, params)) << "Unable to load bitmap";
+	ImageFile loadedImage = pngProcessor.load("loaded_bmp_bitmap", path, params);
+	ASSERT_TRUE(loadedImage.hasImage()) << "Unable to load bitmap";
 
 	ASSERT_TRUE(loadedImage.getImageHandle().isValid()) << "Image handle should be valid";
 	ASSERT_NE(&loadedImage.getImage(), nullptr) << "Image should not be null";

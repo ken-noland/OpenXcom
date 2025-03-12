@@ -17,30 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../Handle.h"
 #include <filesystem>
 
 namespace OpenXcom
 {
 
-class EngineContext;
-class HostImage;
-class Palette;
-class ImageFile;
-struct ImageLoadParams;
-
-class ImagePNGFileProcessor
+class PaletteDATFileProcessor
 {
-protected:
-	EngineContext& _context;
 
 public:
-	ImagePNGFileProcessor(EngineContext& context);
-	~ImagePNGFileProcessor();
+	PaletteDATFileProcessor() = default;
+	~PaletteDATFileProcessor() = default;
 
-	ImageFile load(const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params);
+	void load(const std::filesystem::path& path);
 
-	bool save(const std::filesystem::path& filename, ImageFile& imageData);
 };
 
 } // namespace OpenXcom

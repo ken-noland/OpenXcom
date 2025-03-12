@@ -40,7 +40,7 @@ ImageFileProcessor::~ImageFileProcessor()
 {
 }
 
-bool ImageFileProcessor::load(ImageFile& out, const std::string& name, std::filesystem::path file, ImageLoadParams& params)
+ImageFile ImageFileProcessor::load(const std::string& name, std::filesystem::path file, ImageLoadParams& params)
 {
 	// Extract the extension, remove the leading dot, and convert to lowercase
 	std::string ext = file.extension().string();
@@ -54,24 +54,24 @@ bool ImageFileProcessor::load(ImageFile& out, const std::string& name, std::file
 	if (ext == "png")
 	{
 		ImagePNGFileProcessor& pngProcessor = resourceSystem.getImagePNGFileProcessor();
-		return pngProcessor.load(out, name, file, params);
+		return pngProcessor.load(name, file, params);
 	}
 	else if (ext == "bmp")
 	{
 		ImageBMPFileProcessor& bmpProcessor = resourceSystem.getImageBMPFileProcessor();
-		return bmpProcessor.load(out, name, file, params);
+		return bmpProcessor.load(name, file, params);
 	}
 	else
 	{
 		Log(LOG_ERROR) << "Unsupported extension: " << ext << "\n";
-		return false;
+		return ImageFile();
 	}
 }
 
-bool ImageFileProcessor::load(ImageFile& out, const std::string& name, std::filesystem::path file)
+ImageFile ImageFileProcessor::load(const std::string& name, std::filesystem::path file)
 {
 	ImageLoadParams params;
-	return load(out, name, file, params);
+	return load(name, file, params);
 }
 
 

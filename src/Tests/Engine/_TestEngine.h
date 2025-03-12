@@ -461,10 +461,9 @@ public:
 		OpenXcom::ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();
 
 		// Load the DOS font
-		OpenXcom::ImageFile fontTextureFile;
 		OpenXcom::ImageLoadParams params;
+		OpenXcom::ImageFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, params);
 
-		resourceSystem.getImageBMPFileProcessor().load(fontTextureFile, "DosFont", dosFont, DOSFONT_SIZE, params);
 		OpenXcom::OwningHandle<OpenXcom::HostImage> hostFontTexture = fontTextureFile.takeImage();
 
 		// Transfer the host image to device so we can use it as a font texture

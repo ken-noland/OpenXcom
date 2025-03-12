@@ -218,6 +218,7 @@ set ( engine_src
   "Engine/Resource/FileProcessor/ImageFile.cpp"
   "Engine/Resource/FileProcessor/ImageFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"
+  "Engine/Resource/FileProcessor/PaletteDATFileProcessor.cpp"
   "Engine/Resource/ResourceSystem.cpp"
   "Engine/Utility/Time/TimeSystem.cpp"
 #  "Engine/AdlibMusic.cpp"

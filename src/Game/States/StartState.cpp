@@ -284,10 +284,8 @@ void StartState::createDosFont()
 	_dosFontPalette = paletteManager.createPalette("Ansi16Colors", paletteData, 16);
 
 	// Load the DOS font image
-	ImageFile fontTextureFile;
 	ImageLoadParams params;
-
-	resourceSystem.getImageBMPFileProcessor().load(fontTextureFile, "DosFont", dosFont, DOSFONT_SIZE, params);
+	ImageFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, params);
 	OpenXcom::OwningHandle<OpenXcom::HostImage> hostFontTexture = fontTextureFile.takeImage();
 
 	// Move to device

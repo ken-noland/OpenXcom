@@ -38,8 +38,8 @@ public:
 	ImageBMPFileProcessor(EngineContext& context);
 	~ImageBMPFileProcessor();
 
-	bool load(ImageFile& out, const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params);
-	bool load(ImageFile& out, const std::string& name, const uint8_t* buffer, std::size_t size, ImageLoadParams& params);
+	ImageFile load(const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params);
+	ImageFile load(const std::string& name, const uint8_t* buffer, std::size_t size, ImageLoadParams& params);
 
 	bool save(const std::filesystem::path& filename, ImageFile& imageData);
 };

@@ -53,7 +53,8 @@ struct TransparencyLUTDefinition
 // The resource config file is a yaml file that contains definitions for sounds and transparency LUTs. The old way of
 // loading mods used these values to extract the sound files and the transparency LUTs prior to the loading of the
 // vanilla resources. In the case of soundDefs, it uses the definition to know which sound files to load. In the case
-// of the transparencyLUTs, it uses the look up table to pre-compute the transparency values for the palette.
+// of the transparencyLUTs, it used the look up table to pre-compute the transparency values for the palette(which we
+// don't do anymore because that is handled in the shader now). We're keeping this here for backwards compatibility.
 struct ResourceConfigFile
 {
 	std::vector<SoundDefinition> soundDefs;

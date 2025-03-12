@@ -38,8 +38,8 @@ public:
 	ImageFileProcessor(EngineContext& context);
 	virtual ~ImageFileProcessor();
 
-	bool load(ImageFile& out, const std::string& name, std::filesystem::path file, ImageLoadParams& params);
-	bool load(ImageFile& out, const std::string& name, std::filesystem::path file);
+	ImageFile load(const std::string& name, std::filesystem::path file, ImageLoadParams& params);
+	ImageFile load(const std::string& name, std::filesystem::path file);
 };
 
 } // namespace OpenXcom
