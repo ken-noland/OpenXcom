@@ -26,14 +26,23 @@ namespace OpenXcom
 {
 
 Palette::Palette(EngineContext& context, const std::string& name, std::size_t count)
+	: _name(name)
 {
 	_deviceBuffer = context.getResourceSystem().getBufferManager().createDeviceBuffer(sizeof(PackedColor), count, BufferUsage::Storage);
 }
 
 Palette::Palette(EngineContext& context, const std::string& name, const PackedColor* data, std::size_t count)
+	: _name(name)
 {
 	_deviceBuffer = context.getResourceSystem().getBufferManager().createDeviceBuffer<PackedColor>(data, count, BufferUsage::Storage);
 }
+
+Palette::Palette(EngineContext& context, const std::string& name, const Palette& palette)
+	: _name(name)
+{
+	_deviceBuffer = context.getResourceSystem().getBufferManager().createDeviceBuffer(*palette._deviceBuffer);
+}
+
 
 Palette::~Palette()
 {

@@ -46,6 +46,9 @@ public:
 
 	// load palette from parameters
 	OwningHandle<Palette> createPalette(const std::string& name, std::initializer_list<PackedColor> data);
+
+	// load palette from existing palette
+	OwningHandle<Palette> createPalette(const std::string& name, ResourceHandle<Palette> palette);
 };
 
 } // namespace OpenXcom

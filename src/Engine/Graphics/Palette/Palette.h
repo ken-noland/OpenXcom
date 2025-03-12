@@ -43,6 +43,9 @@ public:
 	// create a palette from an array of colors
 	Palette(EngineContext& context, const std::string& name, const PackedColor* data, std::size_t count);
 
+	// create a palette from an existing palette
+	Palette(EngineContext& context, const std::string& name, const Palette& palette);
+
 	virtual ~Palette();
 
 	const std::string& getName() const { return _name; };

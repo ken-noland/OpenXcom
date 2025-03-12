@@ -274,9 +274,14 @@ public:
 		return std::make_unique<NullDeviceBuffer>(usage, elementSize);
 	}
 
-	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(HostBuffer& hostBuffer) override
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(const HostBuffer& hostBuffer) override
 	{
-		return std::make_unique<NullDeviceBuffer>(hostBuffer.getUsage() , hostBuffer.getElementSize());
+		return std::make_unique<NullDeviceBuffer>(hostBuffer.getUsage(), hostBuffer.getElementSize());
+	}
+
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(const DeviceBuffer& hostBuffer) override
+	{
+		return std::make_unique<NullDeviceBuffer>(hostBuffer.getUsage(), hostBuffer.getElementSize());
 	}
 };
 

@@ -49,7 +49,10 @@ public:
 	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) override;
 
 	// Create a device buffer from a host buffer
-	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(HostBuffer& hostBuffer) override;
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(const HostBuffer& hostBuffer) override;
+	
+	// Create a device buffer from another device buffer
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(const DeviceBuffer& hostBuffer) override;
 };
 
 } // namespace OpenXcom

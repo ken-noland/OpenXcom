@@ -76,9 +76,11 @@ private:
 	void deallocate();
 
 	void copy(const VulkanHostBuffer& hostBuffer);
+	void copy(const VulkanDeviceBuffer& deviceBuffer);
 
 public:
-	VulkanDeviceBuffer(VulkanContext& context, VulkanHostBuffer& hostBuffer);
+	VulkanDeviceBuffer(VulkanContext& context, const VulkanHostBuffer& hostBuffer);
+	VulkanDeviceBuffer(VulkanContext& context, const VulkanDeviceBuffer& deviceBuffer);
 	VulkanDeviceBuffer(VulkanContext& context, std::size_t elementSize, std::size_t count, BufferUsage usage); // create a blank device buffer
 	virtual ~VulkanDeviceBuffer();
 

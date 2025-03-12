@@ -57,7 +57,10 @@ public:
 	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(std::size_t elementSize, std::size_t count, BufferUsage usage) = 0;
 
 	// Create a device buffer from a host buffer
-	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(HostBuffer& hostBuffer) = 0;
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(const HostBuffer& hostBuffer) = 0;
+
+	// Create a device buffer from another device buffer
+	virtual std::unique_ptr<DeviceBuffer> createDeviceBuffer(const DeviceBuffer& hostBuffer) = 0;
 
 	// Create a device buffer and copy data into it
 	// WARNING: this function is not efficient for frequent updates. It creates a temporary host buffer to then upload the

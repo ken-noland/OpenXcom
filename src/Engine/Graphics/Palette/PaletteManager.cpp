@@ -45,4 +45,9 @@ OwningHandle<Palette> PaletteManager::createPalette(const std::string& name, std
 	return OwningHandle<Palette>();
 }
 
+OwningHandle<Palette> PaletteManager::createPalette(const std::string& name, ResourceHandle<Palette> palette)
+{
+	return add(std::make_unique<Palette>(_context, name, get(palette)));
+}
+
 } // namespace OpenXcom

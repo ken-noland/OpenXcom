@@ -49,10 +49,16 @@ std::unique_ptr<DeviceBuffer> VulkanBufferManager::createDeviceBuffer(std::size_
 	return std::make_unique<VulkanDeviceBuffer>(_context, elementSize, count, usage);
 }
 
-std::unique_ptr<DeviceBuffer> VulkanBufferManager::createDeviceBuffer(HostBuffer& hostBuffer)
+std::unique_ptr<DeviceBuffer> VulkanBufferManager::createDeviceBuffer(const HostBuffer& hostBuffer)
 {
-	VulkanHostBuffer& vkHostBuffer = static_cast<VulkanHostBuffer&>(hostBuffer);
+	const VulkanHostBuffer& vkHostBuffer = static_cast<const VulkanHostBuffer&>(hostBuffer);
 	return std::make_unique<VulkanDeviceBuffer>(_context, vkHostBuffer);
+}
+
+std::unique_ptr<DeviceBuffer> VulkanBufferManager::createDeviceBuffer(const DeviceBuffer& hostBuffer)
+{
+	const VulkanDeviceBuffer& vkDeviceBuffer = static_cast<const VulkanDeviceBuffer&>(hostBuffer);
+	return std::make_unique<VulkanDeviceBuffer>(_context, vkDeviceBuffer);
 }
 
 } // namespace OpenXcom
