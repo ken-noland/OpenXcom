@@ -189,7 +189,7 @@ ImageBMPFileProcessor::~ImageBMPFileProcessor()
 {
 }
 
-ImageFile ImageBMPFileProcessor::load(const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params)
+ImageFile ImageBMPFileProcessor::load(const std::string& name, const std::filesystem::path& filename, const ImageLoadParams& params)
 {
 	// Open the file in binary mode and position at the end.
 	std::ifstream file(filename, std::ios::binary | std::ios::ate);
@@ -214,7 +214,7 @@ ImageFile ImageBMPFileProcessor::load(const std::string& name, const std::filesy
 	return load(name, reinterpret_cast<const uint8_t*>(buffer.data()), static_cast<std::size_t>(size), params);
 }
 
-ImageFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bmpBuffer, std::size_t size, ImageLoadParams& params)
+ImageFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bmpBuffer, std::size_t size, const ImageLoadParams& params)
 {
 	// Verify magic.
 	unsigned short magic;

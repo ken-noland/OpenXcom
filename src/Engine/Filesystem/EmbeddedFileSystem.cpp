@@ -102,6 +102,12 @@ EmbeddedFileSystem::~EmbeddedFileSystem()
 {
 }
 
+std::filesystem::path EmbeddedFileSystem::getPath()
+{
+	//TODO: return the path to the executable
+	return "<embedded>";
+}
+
 std::unique_ptr<FileEntry> EmbeddedFileSystem::getFile(const std::filesystem::path& path)
 {
 	return std::unique_ptr<FileEntry>();

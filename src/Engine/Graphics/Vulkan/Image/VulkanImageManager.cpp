@@ -35,12 +35,12 @@ VulkanImageManager::~VulkanImageManager()
 
 OwningHandle<HostImage> VulkanImageManager::createHostImage(const std::string& name, glm::ivec2 size, ImageFormat format)
 {
-	return _hostImageManager.add(std::make_unique<VulkanHostImage>(_context, size, format));
+	return _hostImageManager.add(std::make_unique<VulkanHostImage>(_context, name, size, format));
 }
 
 OwningHandle<DeviceImage> VulkanImageManager::createDeviceImage(const std::string& name, glm::ivec2 size, ImageFormat format)
 {
-	return _deviceImageManager.add(std::make_unique<VulkanDeviceImage>(_context, size, format));
+	return _deviceImageManager.add(std::make_unique<VulkanDeviceImage>(_context, name, size, format));
 }
 
 OwningHandle<DeviceImage> VulkanImageManager::createDeviceImage(HostImage& image)

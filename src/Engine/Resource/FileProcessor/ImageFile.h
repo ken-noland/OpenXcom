@@ -29,7 +29,6 @@ struct ImageLoadParams
 {
 	bool loadPalette = false;
 };
-;
 
 // This class represents an image that is being read from disk. It contains the image
 // and palette handles, and is used to transfer ownership of these resources between

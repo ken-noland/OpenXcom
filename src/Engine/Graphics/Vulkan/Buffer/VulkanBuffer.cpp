@@ -306,7 +306,6 @@ void VulkanDeviceBuffer::copy(const VulkanHostBuffer& hostBuffer)
 		Log(LOG_ERROR) << "Failed to submit command buffer";
 		return;
 	}
-
 	transferQueue.waitIdle();
 }
 

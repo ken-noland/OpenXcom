@@ -26,6 +26,7 @@
 namespace OpenXcom
 {
 
+class EngineContext;
 class Mod;
 
 namespace ModLoader_8_1_2
@@ -63,7 +64,7 @@ struct ResourceConfigFile
 
 
 // global function to load 8.1.2 version mods
-bool load(Mod* mod);
+bool load(EngineContext& context, Mod* mod);
 
 } // namespace ModLoader_8_1_2
 

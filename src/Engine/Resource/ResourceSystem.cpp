@@ -33,6 +33,8 @@
 #include "FileProcessor/ImageFileProcessor.h"
 #include "FileProcessor/ImageBMPFileProcessor.h"
 #include "FileProcessor/ImagePNGFileProcessor.h"
+#include "FileProcessor/ImageSCRFileProcessor.h"
+#include "FileProcessor/PaletteDATFileProcessor.h"
 
 namespace OpenXcom
 {
@@ -52,6 +54,8 @@ ResourceSystem::ResourceSystem(EngineContext& context)
 	_imageFileProcessor = std::make_unique<ImageFileProcessor>(context);
 	_imageBMPFileProcessor = std::make_unique<ImageBMPFileProcessor>(context);
 	_imagePNGFileProcessor = std::make_unique<ImagePNGFileProcessor>(context);
+	_imageSCRFileProcessor = std::make_unique<ImageSCRFileProcessor>(context);
+	_paletteDATFileProcessor = std::make_unique<PaletteDATFileProcessor>(context);
 }
 
 ResourceSystem::~ResourceSystem()

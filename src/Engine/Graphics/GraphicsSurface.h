@@ -34,7 +34,7 @@ protected:
 	std::unique_ptr<PrimitiveFactory> _primitiveFactory;
 
 public:
-	RenderTarget(ImageType imageType = ImageType::RenderTarget) : DeviceImage(imageType) {}
+	RenderTarget(ImageType imageType = ImageType::RenderTarget) : DeviceImage(imageType, "RenderTarget") {}
 	virtual ~RenderTarget() = default;
 
 	virtual void beginRenderPass(GraphicsCommand& commandContext) = 0;

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Xcom1MasterFileProcessor.h"
+#include "Xcom1FileProcessor.h"
 #include "../../Engine/EngineContext.h"
 #include "../../Engine/Logger.h"
 #include "../../Engine/Filesystem/VirtualFileSystem.h"

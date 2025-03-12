@@ -39,6 +39,8 @@ class GraphicsSystem;
 class ImageFileProcessor;
 class ImageBMPFileProcessor;
 class ImagePNGFileProcessor;
+class ImageSCRFileProcessor;
+class PaletteDATFileProcessor;
 
 class ResourceSystem
 {
@@ -54,6 +56,8 @@ class ResourceSystem
 	std::unique_ptr<ImageFileProcessor> _imageFileProcessor;
 	std::unique_ptr<ImageBMPFileProcessor> _imageBMPFileProcessor;
 	std::unique_ptr<ImagePNGFileProcessor> _imagePNGFileProcessor;
+	std::unique_ptr<ImageSCRFileProcessor> _imageSCRFileProcessor;
+	std::unique_ptr<PaletteDATFileProcessor> _paletteDATFileProcessor;
 
 public:
 	ResourceSystem(EngineContext& context);
@@ -71,6 +75,8 @@ public:
 	ImageFileProcessor& getImageFileProcessor() { return *_imageFileProcessor; };
 	ImageBMPFileProcessor& getImageBMPFileProcessor() { return *_imageBMPFileProcessor; };
 	ImagePNGFileProcessor& getImagePNGFileProcessor() { return *_imagePNGFileProcessor; };
+	ImageSCRFileProcessor& getImageSCRFileProcessor() { return *_imageSCRFileProcessor; };
+	PaletteDATFileProcessor& getPaletteDATFileProcessor() { return *_paletteDATFileProcessor; };
 };
 
 } // namespace OpenXcom

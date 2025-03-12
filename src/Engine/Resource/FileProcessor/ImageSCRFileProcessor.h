@@ -13,36 +13,37 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *e
+ *
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "FileSystem.h"
+#include "../Handle.h"
 #include <filesystem>
+
+#include <glm/vec2.hpp>
 
 namespace OpenXcom
 {
 
-// for files that exist on the physical filesystem
-class PhysicalFileSystem : public FileSystem
+class EngineContext;
+class FileEntry;
+class ImageFile;
+
+struct ImageSCRLoadParams
 {
-public:
-	PhysicalFileSystem(const std::filesystem::path& path);
-	virtual ~PhysicalFileSystem() override;
-
-	virtual std::filesystem::path getPath() override { return _path; };
-
-	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) override;
-	virtual std::unique_ptr<FolderEntry> getFolder(const std::filesystem::path& path) override;
-
-	virtual FileSystemIterator begin() override;
-	virtual FileSystemIterator end() override;
-
-	std::filesystem::path fullPathToRelative(const std::filesystem::path& path) const;
-
-private:
-	std::filesystem::path _path;
+	glm::ivec2 extent;
 };
 
+class ImageSCRFileProcessor
+{
+protected:
+	EngineContext& _context;
+
+public:
+	ImageSCRFileProcessor(EngineContext& context);
+	~ImageSCRFileProcessor();
+
+	ImageFile load(const std::string& name, const std::unique_ptr<FileEntry>& file, const ImageSCRLoadParams& params);
+};
 
 } // namespace OpenXcom

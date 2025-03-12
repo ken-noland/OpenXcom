@@ -218,6 +218,7 @@ set ( engine_src
   "Engine/Resource/FileProcessor/ImageFile.cpp"
   "Engine/Resource/FileProcessor/ImageFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"
+  "Engine/Resource/FileProcessor/ImageSCRFileProcessor.cpp"
   "Engine/Resource/FileProcessor/PaletteDATFileProcessor.cpp"
   "Engine/Resource/ResourceSystem.cpp"
   "Engine/Utility/Time/TimeSystem.cpp"
@@ -271,7 +272,9 @@ set( game_src
   "Game/GameMods.cpp"
   "Game/GameStates.cpp"
   "Game/GameWindow.cpp"
-  "Game/Resource/Xcom1MasterFileProcessor.cpp"
+  "Game/Resource/MasterFileProcessor.cpp"
+  "Game/Resource/Xcom1FileProcessor.cpp"
+  "Game/Resource/Xcom2FileProcessor.cpp"
   "Game/States/StartState.cpp"
   "Game/States/State.cpp"
 )

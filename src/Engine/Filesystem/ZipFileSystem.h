@@ -29,6 +29,8 @@ public:
 	ZipFileSystem(const std::filesystem::path& path);
 	virtual ~ZipFileSystem() override;
 
+	virtual std::filesystem::path getPath() override;
+
 	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) override;
 	virtual std::unique_ptr<FolderEntry> getFolder(const std::filesystem::path& path) override;
 

@@ -40,7 +40,7 @@ ImageFileProcessor::~ImageFileProcessor()
 {
 }
 
-ImageFile ImageFileProcessor::load(const std::string& name, std::filesystem::path file, ImageLoadParams& params)
+ImageFile ImageFileProcessor::load(const std::string& name, const std::filesystem::path& file, const ImageLoadParams& params)
 {
 	// Extract the extension, remove the leading dot, and convert to lowercase
 	std::string ext = file.extension().string();
@@ -68,7 +68,7 @@ ImageFile ImageFileProcessor::load(const std::string& name, std::filesystem::pat
 	}
 }
 
-ImageFile ImageFileProcessor::load(const std::string& name, std::filesystem::path file)
+ImageFile ImageFileProcessor::load(const std::string& name, const std::filesystem::path& file)
 {
 	ImageLoadParams params;
 	return load(name, file, params);

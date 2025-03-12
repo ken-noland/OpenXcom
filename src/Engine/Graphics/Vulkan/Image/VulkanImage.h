@@ -42,7 +42,7 @@ protected:
 	ImageFormat _format;
 
 public:
-	VulkanHostImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format);
+	VulkanHostImage(VulkanContext& context, const std::string& name, glm::ivec2 extent, ImageFormat format);
 	virtual ~VulkanHostImage();
 
 	virtual ImageFormat getFormat() const override;
@@ -76,7 +76,7 @@ protected:
 	vk::SampleCountFlagBits getSampleCountFlagBits() { return vk::SampleCountFlagBits::e1; }
 
 public:
-	VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format);
+	VulkanDeviceImage(VulkanContext& context, const std::string& name, glm::ivec2 extent, ImageFormat format);
 	VulkanDeviceImage(VulkanContext& context, VulkanHostImage& image);
 	virtual ~VulkanDeviceImage();
 

@@ -24,6 +24,57 @@
 namespace OpenXcom
 {
 
+
+class PhysicalFileIteratorImpl : public FileSystemIteratorImpl
+{
+public:
+	PhysicalFileIteratorImpl(const std::filesystem::path& path) : _currentIt(path), _endIt()
+	{
+	}
+
+	virtual ~PhysicalFileIteratorImpl() override = default;
+
+	virtual std::unique_ptr<VFSEntry> dereference() const override;
+
+	virtual void increment() override
+	{
+		++_currentIt;
+	}
+
+	virtual bool equals(const FileSystemIteratorImpl& other) const override
+	{
+		const PhysicalFileIteratorImpl* otherImpl = dynamic_cast<const PhysicalFileIteratorImpl*>(&other);
+		return otherImpl && _currentIt == otherImpl->_currentIt;
+	}
+
+	virtual std::unique_ptr<FileSystemIteratorImpl> clone() const override
+	{
+		auto cloned = std::make_unique<PhysicalFileIteratorImpl>(_currentIt->path());
+		cloned->_currentIt = _currentIt;
+		cloned->_endIt = _endIt;
+
+		if (_currentEntry)
+		{
+			// Assuming VFSEntry has a clone method
+			cloned->_currentEntry = _currentEntry->clone();
+		}
+
+		return cloned;
+	}
+
+
+	virtual bool isEnd() const override
+	{
+		return _currentIt == _endIt;
+	}
+
+private:
+	std::filesystem::directory_iterator _currentIt;
+	std::filesystem::directory_iterator _endIt;
+
+	mutable std::unique_ptr<VFSEntry> _currentEntry;
+};
+
 class PhysicalFileEntry : public FileEntry
 {
 private:
@@ -32,6 +83,11 @@ private:
 public:
 	PhysicalFileEntry(const std::filesystem::path& path) : _path(path) { }
 	virtual ~PhysicalFileEntry() override = default;
+		
+	virtual std::size_t getSize() const override
+	{
+		return std::filesystem::file_size(_path);
+	}
 
 	virtual std::unique_ptr<std::istream> openRead() override
 	{
@@ -96,69 +152,30 @@ public:
 	{
 		return std::make_unique<PhysicalFolderEntry>(_path);
 	}
+
+	// Iterator support
+	virtual FileSystemIterator begin()
+	{
+		return FileSystemIterator(std::make_unique<PhysicalFileIteratorImpl>(_path));
+	}
+
+	virtual FileSystemIterator end()
+	{
+		return FileSystemIterator(nullptr);
+	}
 };
 
-class PhysicalFileIteratorImpl : public FileSystemIteratorImpl
+std::unique_ptr<VFSEntry> PhysicalFileIteratorImpl::dereference() const
 {
-public:
-	PhysicalFileIteratorImpl(const std::filesystem::path& path, const PhysicalFileSystem& filesystem) : _currentIt(path), _filesystem(filesystem), _endIt()
+	if (std::filesystem::is_directory(*_currentIt))
 	{
+		return std::make_unique<PhysicalFolderEntry>(*_currentIt);
 	}
-
-	virtual ~PhysicalFileIteratorImpl() override = default;
-
-
-	virtual std::unique_ptr<VFSEntry> dereference() const override
+	else
 	{
-		if (std::filesystem::is_directory(*_currentIt))
-		{
-			return std::make_unique<PhysicalFolderEntry>(*_currentIt);
-		}
-		else
-		{
-			return std::make_unique<PhysicalFileEntry>(*_currentIt);
-		}
+		return std::make_unique<PhysicalFileEntry>(*_currentIt);
 	}
-
-	virtual void increment() override
-	{
-		++_currentIt;
-	}
-
-	virtual bool equals(const FileSystemIteratorImpl& other) const override
-	{
-		const PhysicalFileIteratorImpl* otherImpl = dynamic_cast<const PhysicalFileIteratorImpl*>(&other);
-		return otherImpl && _currentIt == otherImpl->_currentIt;
-	}
-
-	virtual std::unique_ptr<FileSystemIteratorImpl> clone() const override
-	{
-		auto cloned = std::make_unique<PhysicalFileIteratorImpl>(_currentIt->path(), _filesystem);
-		cloned->_currentIt = _currentIt;
-		cloned->_endIt = _endIt;
-
-		if (_currentEntry)
-		{
-			// Assuming VFSEntry has a clone method
-			cloned->_currentEntry = _currentEntry->clone();
-		}
-
-		return cloned;
-	}
-
-
-	virtual bool isEnd() const override
-	{
-		return _currentIt == _endIt;
-	}
-
-private:
-	std::filesystem::directory_iterator _currentIt;
-	std::filesystem::directory_iterator _endIt;
-
-	const PhysicalFileSystem& _filesystem;
-	mutable std::unique_ptr<VFSEntry> _currentEntry;
-};
+}
 
 PhysicalFileSystem::PhysicalFileSystem(const std::filesystem::path& path) : _path(path)
 {
@@ -196,7 +213,7 @@ std::unique_ptr<FolderEntry> PhysicalFileSystem::getFolder(const std::filesystem
 
 FileSystemIterator PhysicalFileSystem::begin()
 {
-	return FileSystemIterator(std::make_unique<PhysicalFileIteratorImpl>(_path, *this));
+	return FileSystemIterator(std::make_unique<PhysicalFileIteratorImpl>(_path));
 }
 
 FileSystemIterator PhysicalFileSystem::end()

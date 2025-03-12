@@ -104,8 +104,8 @@ void transitionImageLayout(
 }
 
 
-VulkanHostImage::VulkanHostImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format)
-	: HostImage(ImageType::Texture), _context(context), _format(format), _extent(extent)
+VulkanHostImage::VulkanHostImage(VulkanContext& context, const std::string& name, glm::ivec2 extent, ImageFormat format)
+	: HostImage(ImageType::Texture, name), _context(context), _format(format), _extent(extent)
 {
 	int bytePerPixel = 0;
 	switch(format)
@@ -181,8 +181,8 @@ void VulkanHostImage::unmap()
 	vmaUnmapMemory(_context.getAllocator(), _allocation);
 }
 
-VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, ImageFormat format)
-	: DeviceImage(ImageType::Texture), _context(context), _format(format), _extent(extent), _imageLayout(vk::ImageLayout::eUndefined)
+VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, const std::string& name, glm::ivec2 extent, ImageFormat format)
+	: DeviceImage(ImageType::Texture, name), _context(context), _format(format), _extent(extent), _imageLayout(vk::ImageLayout::eUndefined)
 {
 	vk::Format vkFormat;
 	switch (format)
@@ -239,7 +239,7 @@ VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, glm::ivec2 extent, 
 }
 
 VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, VulkanHostImage& image)
-	: VulkanDeviceImage(context, image.getExtent(), image.getFormat())
+	: VulkanDeviceImage(context, image.getName(), image.getExtent(), image.getFormat())
 {
 	copyFrom(static_cast<HostImage&>(image));
 }

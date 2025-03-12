@@ -23,6 +23,17 @@
 #include "../../../Utility/RTTR.h"
 #include "../../../Filesystem/CompositeFileSystem.h"
 
+#include "../../../EngineContext.h"
+
+#include "../../../Graphics/Image/Image.h"
+#include "../../../Graphics/Image/ImageManager.h"
+
+#include "../../../Resource/ResourceSystem.h"
+#include "../../../Resource/FileProcessor/ImageFile.h"
+#include "../../../Resource/FileProcessor/ImageSCRFileProcessor.h"
+#include "../../../Resource/FileProcessor/PaletteDATFileProcessor.h"
+
+
 namespace OpenXcom
 {
 
@@ -60,10 +71,17 @@ SIMPLERTTR
 
 }
 
-bool loadVanillaResources(Mod* mod, ResourceConfigFile& resourceConfig);
+bool loadVanillaResources(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig);
+
+bool loadPaletteData(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig);
+bool loadBackpalsData(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig);
+
+bool loadSCRImage();
+
+bool loadImages(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig);
 
 // global function to load 8.1.2 version mods
-bool load(Mod* mod)
+bool load(EngineContext& context, Mod* mod)
 {
 	CompositeFileSystem& fs = mod->getFileSystem();
 
@@ -89,7 +107,7 @@ bool load(Mod* mod)
 	Log(LOG_INFO) << "Loading vanilla resources...";
 
 	// now we can load the vanilla resources
-	if(!loadVanillaResources(mod, resourceConfig))
+	if(!loadVanillaResources(context, mod, resourceConfig))
 	{
 		return false;
 	}
@@ -97,19 +115,190 @@ bool load(Mod* mod)
 	return true;
 }
 
-bool loadVanillaResources(Mod* mod, ResourceConfigFile& resourceConfig)
+bool loadVanillaResources(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig)
 {
+	// ---
+	// Load in the palettes
+
+	// load in "PAL_GEOSCAPE", "PAL_BASESCAPE", "PAL_GRAPHS", and (optionally) "PAL_UFOPAEDIA", "PAL_BATTLEPEDIA"
+	if (!loadPaletteData(context, mod, resourceConfig)) { return false;	}
+
+	// load in "BACKPALS"
+	if (!loadBackpalsData(context, mod, resourceConfig)) { return false; }
+
+	// TODO: there's a chunk in the original source which loaded and "corrected" the "PAL_BATTLESCAPE" palette, but I'm not sure it's necessary anymore. I'll leave it out for now.
+
+	// ---
+	// Load images
+	if (!loadImages(context, mod, resourceConfig)) { return false; }
+
+
+
+
+	return true;
+}
+
+bool loadPaletteData(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig)
+{
+	ResourceSystem& resourceSystem = context.getResourceSystem();
+	PaletteDATFileProcessor& paletteDATProcessor = resourceSystem.getPaletteDATFileProcessor();
+
 	// Load palettes
-	const char *pal[] = { "PAL_GEOSCAPE", "PAL_BASESCAPE", "PAL_GRAPHS", "PAL_UFOPAEDIA", "PAL_BATTLEPEDIA" };
+	std::unique_ptr<FileEntry> paletteFile = mod->getFileSystem().getFile("GEODATA/PALETTES.DAT");
+	if (!paletteFile)
+	{
+		Log(LOG_ERROR) << "Failed to open palettes file GEODATA/PALETTES.DAT";
+		CompositeFileSystem& fs = mod->getFileSystem();
+		for (const std::unique_ptr<FileSystem>& filesystem : fs.getFileSystems())
+		{
+			Log(LOG_ERROR) << "    Searched in : " << filesystem->getPath();
+		}
+		return false;
+	}
 
-	// Load surfaces
+	PaletteLoadParams params;
+	params.paletteEntries = 256;
+	params.filePaletteEntries = 258; // two extra entries(no idea what they are for!)
 
+	std::vector<std::string> paletteNames;
+	size_t numPalettes = paletteDATProcessor.getPaletteCount(paletteFile, params);
 
-	// Load surface sets
-	std::string sets[] = { "BASEBITS.PCK", "INTICON.PCK", "TEXTURE.DAT" };
+	if(numPalettes == 5)
+	{
+		// xcom 1
+		paletteNames = { "PAL_GEOSCAPE", "PAL_BASESCAPE", "PAL_GRAPHS", "PAL_UFOPAEDIA", "PAL_BATTLEPEDIA" };
+	}
+	else if(numPalettes == 3)
+	{
+		// xcom 2
+		paletteNames = { "PAL_GEOSCAPE", "PAL_BASESCAPE", "PAL_GRAPHS" };
+	}
+	else
+	{
+		Log(LOG_ERROR) << "Unknown number of palettes in GEODATA/PALETTES.DAT";
+		return false;
+	}
+	
+	PaletteFile paletteFileData = paletteDATProcessor.load(paletteNames, paletteFile, params);
+	if(paletteFileData.getPalettes().size() != paletteNames.size())
+	{
+		Log(LOG_ERROR) << "Failed to load GEODATA/PALETTES.DAT palettes";
+		return false;
+	}
 
-	// Construct sound sets
+	// register the palettes with the mod
+	while (!paletteFileData.getPalettes().empty())
+	{
+		mod->registerPalette(paletteFileData.takePalette(0));
+	}
 
+	return true;
+}
+
+bool loadBackpalsData(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig)
+{
+	ResourceSystem& resourceSystem = context.getResourceSystem();
+	PaletteDATFileProcessor& paletteDATProcessor = resourceSystem.getPaletteDATFileProcessor();
+
+	// load in backpals
+	std::unique_ptr<FileEntry> backpalFile = mod->getFileSystem().getFile("GEODATA/BACKPALS.DAT");
+	if (!backpalFile)
+	{
+		Log(LOG_ERROR) << "Failed to open palettes file GEODATA/BACKPALS.DAT";
+		CompositeFileSystem& fs = mod->getFileSystem();
+		for (const std::unique_ptr<FileSystem>& filesystem : fs.getFileSystems())
+		{
+			Log(LOG_ERROR) << "    Searched in : " << filesystem->getPath();
+		}
+		return false;
+	}
+
+	PaletteLoadParams params;
+	params.paletteEntries = 128;
+	params.filePaletteEntries = 128;
+
+	PaletteFile backpalFileData = paletteDATProcessor.load({"BACKPALS"}, backpalFile, params);
+	if(backpalFileData.getPalettes().size() != 1)
+	{
+		Log(LOG_ERROR) << "Failed to load GEODATA/BACKPALS.DAT backpals";
+		return false;
+	}
+
+	// register the backpals with the mod
+	mod->registerPalette(backpalFileData.takePalette(0));
+	
+	return true;
+}
+
+bool loadSCRImage(EngineContext& context, Mod* mod, const std::string& name, std::filesystem::path path, const glm::ivec2& extents)
+{
+	ResourceSystem& resourceSystem = context.getResourceSystem();
+	ImageSCRFileProcessor& imageSCRProcessor = resourceSystem.getImageSCRFileProcessor();
+
+	// Open the file
+	std::unique_ptr<FileEntry> surfaceFile = mod->getFileSystem().getFile(path);
+	if (!surfaceFile)
+	{
+		Log(LOG_ERROR) << "Failed to open image file " << path.string();
+		return false;
+	}
+
+	// Load the image
+	ImageSCRLoadParams params{extents};
+	ImageFile imageFile = imageSCRProcessor.load(name, surfaceFile, params);
+
+	// Send the image to the device
+	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(imageFile.getImage());
+
+	mod->registerImage(std::move(deviceImage));
+
+	return true;
+}
+
+bool loadImages(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig)
+{
+	if (!loadSCRImage(context, mod, "INTERWIN.DAT", "GEODATA/INTERWIN.DAT", {160, 600})) { return false; }
+
+	std::unique_ptr<FolderEntry> geographFolder = mod->getFileSystem().getFolder("GEOGRAPH");
+	if (!geographFolder)
+	{
+		Log(LOG_ERROR) << "Failed to open folder GEOGRAPH";
+		return false;
+	}
+
+	// Loop through all the files in the GEOGRAPH folder
+	for (std::unique_ptr<VFSEntry> entry : *geographFolder)
+	{
+		// Only process files
+		if (entry->getType() == VFSEntry::EntryType::File)
+		{
+			std::unique_ptr<FileEntry> file(static_cast<FileEntry*>(entry.release()));
+			std::string ext = file->getPath().extension().string();
+
+			// Remove preceding dot and convert to lowercase
+			if (!ext.empty() && ext.front() == '.')
+				ext.erase(0, 1);
+			std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
+
+			if (ext == "scr")
+			{
+				std::string name = file->getPath().stem().string();
+				std::filesystem::path path = file->getPath();
+				if (!loadSCRImage(context, mod, name, path, {320, 200}))
+				{
+					return false;
+				}
+			}
+			else if(ext == "bdy")
+			{
+
+			}
+			else if(ext == "spk")
+			{
+
+			}
+		}
+	}
 
 	return true;
 }

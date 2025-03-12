@@ -18,6 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <cstdint>
+#include <string>
 #include <glm/vec2.hpp>
 
 namespace OpenXcom
@@ -60,10 +61,13 @@ class HostImage
 {
 protected:
 	ImageType _type;
+	std::string _name;
 
 public:
-	HostImage(ImageType type) : _type(type) {};
+	HostImage(ImageType type, const std::string& name) : _type(type), _name(name) {};
 	virtual ~HostImage() = default;
+
+	const std::string& getName() const { return _name; }
 
 	virtual ImageFormat getFormat() const = 0;
 	virtual glm::ivec2 getExtent() const = 0;
@@ -80,10 +84,13 @@ class DeviceImage
 {
 protected:
 	ImageType _type;
+	std::string _name;
 
 public:
-	DeviceImage(ImageType type) : _type(type) {};
+	DeviceImage(ImageType type, const std::string& name) : _type(type), _name(name) {};
 	virtual ~DeviceImage() = default;
+
+	const std::string& getName() const { return _name; }
 
 	// copy the host image to this device image
 	virtual void copyFrom(HostImage& hostImage) = 0;

@@ -1,3 +1,4 @@
+#include "Mod.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -24,10 +25,15 @@
 #include "Loader/Current/ModLoader.h"
 #include "Loader/8.1.2/ModLoader.h"
 
+#include "../Graphics/Palette/Palette.h"
+#include "../Graphics/Palette/PaletteManager.h"
+#include "../Graphics/Image/Image.h"
+#include "../Graphics/Image/ImageManager.h"
+
 namespace OpenXcom
 {
 
-Mod::Mod(ScannedMod& scannedModInfo)
+Mod::Mod(EngineContext& context, ScannedMod& scannedModInfo)
 	: _info(scannedModInfo.info),						// copy the ModInfo
 	  _filesystem(std::move(scannedModInfo.filesystem))	// move the filesystem
 {
@@ -43,7 +49,7 @@ Mod::Mod(ScannedMod& scannedModInfo)
 	}
 	else if (_info.loaderVersion == semver::version(8, 1, 2))
 	{
-		if (!ModLoader_8_1_2::load(this))
+		if (!ModLoader_8_1_2::load(context, this))
 		{
 			std::ostringstream os;
 			os << "Failed to load mod '" << _info.id << "' with loader version 8.1.2.";
@@ -68,5 +74,20 @@ Mod::~Mod()
 {
 }
 
+void Mod::registerPalette(OwningHandle<Palette>&& palette)
+{
+	std::string name = palette->getName();
+	_palettes[name] = std::move(palette);
+
+	Log(LOG_DEBUG) << "Registered palette '" << name << "' for mod '" << _info.id << "'";
+}
+
+void Mod::registerImage(OwningHandle<DeviceImage>&& image)
+{
+	std::string name = image->getName();
+	_images[name] = std::move(image);
+
+	Log(LOG_DEBUG) << "Registered image '" << name << "' for mod '" << _info.id << "'";
+}
 
 } // namespace OpenXcom

@@ -20,11 +20,16 @@
 
 #include "ModInfo.h"
 #include "../FileSystem/CompositeFileSystem.h"
+#include "../Resource/Handle.h"
 
 namespace OpenXcom
 {
 
+class EngineContext;
 struct ScannedMod;
+
+class Palette;
+class DeviceImage;
 
 class Mod
 {
@@ -34,14 +39,21 @@ protected:
 
 	std::unique_ptr<CompositeFileSystem> _filesystem;
 
+	// 
+	std::unordered_map<std::string, OwningHandle<Palette>> _palettes;
+	std::unordered_map<std::string, OwningHandle<DeviceImage>> _images;
+
 public:
-	Mod(ScannedMod& scannedModInfo);
+	Mod(EngineContext& context, ScannedMod& scannedModInfo);
 	Mod(Mod&& other) noexcept;
 	~Mod();
 
 	const ModInfo& getInfo() const { return _info; }
 
 	CompositeFileSystem& getFileSystem() { return *_filesystem; }
+
+	void registerPalette(OwningHandle<Palette>&& palette);
+	void registerImage(OwningHandle<DeviceImage>&& image);
 };
 
 } // namespace OpenXcom

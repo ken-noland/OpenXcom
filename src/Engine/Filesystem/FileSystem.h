@@ -23,57 +23,9 @@ namespace OpenXcom
 {
 
 class FileSystem;
+class VFSEntry;
 
-// Virtual File System Entry. Could be either a file or a directory
-class VFSEntry
-{
-public:
-	enum class EntryType
-	{
-		Directory,
-		File,
-		FileSystem
-	};
-
-	virtual ~VFSEntry() = default;
-
-	virtual std::unique_ptr<VFSEntry> clone() const = 0;
-
-	virtual EntryType getType() const = 0;
-
-	// return the relative path from the root of the filesystem
-	virtual std::filesystem::path getPath() const = 0;
-};
-
-// File Entry
-class FileEntry : public VFSEntry
-{
-public:
-	FileEntry() = default;
-	virtual ~FileEntry() = default;
-
-	virtual EntryType getType() const override { return EntryType::File; }
-
-	virtual std::unique_ptr<std::istream> openRead() = 0;
-	virtual std::unique_ptr<std::ostream> openWrite() = 0;
-	virtual std::unique_ptr<std::iostream> open() = 0;
-
-protected:
-};
-
-class FolderEntry : public VFSEntry
-{
-public:
-	virtual ~FolderEntry() = default;
-
-	virtual EntryType getType() const override { return EntryType::Directory; }
-
-	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) = 0;
-
-	// create a filesystem for the folder
-	virtual std::unique_ptr<FileSystem> createFileSystem() const = 0;
-};
-
+// Iterator implementation for the filesystem or folder
 class FileSystemIteratorImpl
 {
 public:
@@ -87,6 +39,7 @@ public:
 	virtual bool isEnd() const = 0;
 };
 
+// Iterator for the filesystem or folder
 class FileSystemIterator
 {
 private:
@@ -160,11 +113,71 @@ public:
 	bool operator!=(const FileSystemIterator& other) const { return !(other == *this); }
 };
 
+
+
+// Virtual File System Entry. Could be either a file or a directory
+class VFSEntry
+{
+public:
+	enum class EntryType
+	{
+		Directory,
+		File,
+		FileSystem
+	};
+
+	virtual ~VFSEntry() = default;
+
+	virtual std::unique_ptr<VFSEntry> clone() const = 0;
+
+	virtual EntryType getType() const = 0;
+
+	// return the relative path from the root of the filesystem
+	virtual std::filesystem::path getPath() const = 0;
+};
+
+// File Entry
+class FileEntry : public VFSEntry
+{
+public:
+	FileEntry() = default;
+	virtual ~FileEntry() = default;
+
+	virtual EntryType getType() const override { return EntryType::File; }
+
+	virtual std::size_t getSize() const = 0;
+
+	virtual std::unique_ptr<std::istream> openRead() = 0;
+	virtual std::unique_ptr<std::ostream> openWrite() = 0;
+	virtual std::unique_ptr<std::iostream> open() = 0;
+
+protected:
+};
+
+class FolderEntry : public VFSEntry
+{
+public:
+	virtual ~FolderEntry() = default;
+
+	virtual EntryType getType() const override { return EntryType::Directory; }
+
+	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) = 0;
+
+	// create a filesystem for the folder
+	virtual std::unique_ptr<FileSystem> createFileSystem() const = 0;
+
+	// iterator support
+	virtual FileSystemIterator begin() = 0;
+	virtual FileSystemIterator end() = 0;
+};
+
 // Interface for all filesystem types
 class FileSystem
 {
 public:
 	virtual ~FileSystem() = default;
+
+	virtual std::filesystem::path getPath() = 0;
 
 	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) = 0;
 	virtual std::unique_ptr<FolderEntry> getFolder(const std::filesystem::path& path) = 0;

@@ -46,7 +46,7 @@ ImagePNGFileProcessor::~ImagePNGFileProcessor()
 {
 }
 
-ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesystem::path& filename, ImageLoadParams& params)
+ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesystem::path& filename, const ImageLoadParams& params)
 {
 	ResourceSystem& resourceSystem = _context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();

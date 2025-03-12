@@ -22,6 +22,7 @@
 #include "../Engine/EngineContext.h"
 #include "../Engine/Options.h"
 #include "../Engine/Filesystem/VirtualFileSystem.h"
+#include "../Engine/Filesystem/CompositeFileSystem.h"
 
 namespace OpenXcom
 {
@@ -156,13 +157,13 @@ bool GameMods::load()
 	}
 
 	// Step 4: Load the mods
-	Mod masterMod(*_scannedMods.activeMaster);
+	Mod masterMod(_context.getEngineContext(), *_scannedMods.activeMaster);
 	_loadedMods.mods.push_back(std::move(masterMod));
 	_loadedMods.activeMaster = &_loadedMods.mods.back();
 
 	for(ScannedMod& scannedMod : _scannedMods.activeMods)
 	{
-		Mod mod(scannedMod);
+		Mod mod(_context.getEngineContext(), scannedMod);
 		_loadedMods.mods.push_back(std::move(mod));
 	}
 
@@ -306,9 +307,33 @@ bool GameMods::activateMaster(const std::string& id)
 		Log(LOG_ERROR) << "Master mod '" + id + "' not found";
 		return false;
 	}
+	ScannedMod* master = &(*it);
 
-	// Step 3: Activate the master
-	_scannedMods.activeMaster = &(*it);
+	// Step 3: If the mod contains resourceDirectories, add them to the filesystem
+	for(const std::filesystem::path& path : master->info.resourceDirectories)
+	{
+		// path is relative to the data folders
+		VirtualFileSystem& vfs = _context.getEngineContext().getVirtualFileSystem();
+		FileSystem& dataFs = vfs.getDataFileSystem();
+
+		// check if folder exists
+		std::unique_ptr<FolderEntry> folder = dataFs.getFolder(path);
+		if(!folder)
+		{
+			Log(LOG_ERROR) << "Unable to locate resource data folder '" << path << "' for mod '" + id + "'";
+			return false;
+		}
+
+		if(!master->filesystem)
+		{
+			master->filesystem = std::make_unique<CompositeFileSystem>();
+		}
+
+		master->filesystem->addFileSystem(folder->createFileSystem());
+	}
+
+	// Step 4: Activate the master
+	_scannedMods.activeMaster = master;
 
 	return true;
 }

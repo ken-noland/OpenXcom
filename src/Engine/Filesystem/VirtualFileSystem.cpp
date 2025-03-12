@@ -1,4 +1,5 @@
 #include "VirtualFileSystem.h"
+#include "ZipFileSystem.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -32,6 +33,12 @@ ZipFileSystem::ZipFileSystem(const std::filesystem::path& path)
 
 ZipFileSystem::~ZipFileSystem()
 {
+}
+
+std::filesystem::path ZipFileSystem::getPath()
+{
+	// TODO: return the zip file location
+	return "<zip file>";
 }
 
 std::unique_ptr<FileEntry> ZipFileSystem::getFile(const std::filesystem::path& path)
@@ -101,6 +108,7 @@ FileSystem& VirtualFileSystem::getDataFileSystem()
 {
 	return _data;
 }
+
 
 FileSystem& VirtualFileSystem::getUserFileSystem()
 {

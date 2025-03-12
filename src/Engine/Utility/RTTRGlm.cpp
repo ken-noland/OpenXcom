@@ -222,7 +222,7 @@ bool fromYaml<glm::ivec4>(ryml::ConstNodeRef const& yaml, glm::ivec4& type, Yaml
 			throw YamlException(yaml, context, "Expected an array of 4 elements for glm::ivec4, but got " + std::to_string(yaml.num_children()));
 		}
 
-		for (std::size_t i = 0; i < 4; ++i)
+		for (uint32_t i = 0; i < 4; ++i)
 		{
 			c4::csubstr valueSubstr = yaml[i].val();
 			std::string valueStr = std::string(valueSubstr.begin(), valueSubstr.end());

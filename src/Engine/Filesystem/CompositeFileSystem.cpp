@@ -1,3 +1,4 @@
+#include "CompositeFileSystem.h"
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -113,6 +114,11 @@ CompositeFileSystem::CompositeFileSystem()
 
 CompositeFileSystem::~CompositeFileSystem()
 {
+}
+
+std::filesystem::path CompositeFileSystem::getPath()
+{
+	return "<composite>";
 }
 
 void CompositeFileSystem::addFileSystem(std::unique_ptr<FileSystem> fs)

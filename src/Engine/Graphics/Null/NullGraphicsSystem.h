@@ -82,7 +82,7 @@ class NullHostImage : public HostImage
 	void* image;
 
 public:
-	NullHostImage(glm::ivec2 size, ImageFormat format) : HostImage(ImageType::Texture)
+	NullHostImage(const std::string& name, glm::ivec2 size, ImageFormat format) : HostImage(ImageType::Texture, name)
 	{
 		image = malloc(size.x * size.y * bytesPerPixel(format));
 	}
@@ -108,7 +108,7 @@ protected:
 	NullDeviceBuffer _deviceBuffer;
 
 public:
-	NullDeviceImage(glm::ivec2 size, ImageFormat format) : DeviceImage(ImageType::Texture), _deviceBuffer(BufferUsage::Uniform, 1) {};
+	NullDeviceImage(const std::string& name, glm::ivec2 size, ImageFormat format) : DeviceImage(ImageType::Texture, name), _deviceBuffer(BufferUsage::Uniform, 1) {};
 	virtual ~NullDeviceImage() = default;
 
 	virtual ImageFormat getFormat() const override { return ImageFormat::R8G8B8A8; }
@@ -295,17 +295,17 @@ public:
 
 	virtual OwningHandle<HostImage> createHostImage(const std::string& name, glm::ivec2 size, ImageFormat format) override
 	{
-		return _hostImageManager.add(std::make_unique<NullHostImage>(size, format));
+		return _hostImageManager.add(std::make_unique<NullHostImage>(name, size, format));
 	}
 
 	virtual OwningHandle<DeviceImage> createDeviceImage(const std::string& name, glm::ivec2 size, ImageFormat format) override
 	{
-		return _deviceImageManager.add(std::make_unique<NullDeviceImage>(size, format));
+		return _deviceImageManager.add(std::make_unique<NullDeviceImage>(name, size, format));
 	}
 
 	virtual OwningHandle<DeviceImage> createDeviceImage(HostImage& host) override
 	{
-		return _deviceImageManager.add(std::make_unique<NullDeviceImage>(host.getExtent(), host.getFormat()));
+		return _deviceImageManager.add(std::make_unique<NullDeviceImage>(host.getName(), host.getExtent(), host.getFormat()));
 	}
 };
 
