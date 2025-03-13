@@ -261,52 +261,60 @@ void VulkanDeviceImage::copyFrom(HostImage& image)
 {
 	VulkanHostImage& hostImage = static_cast<VulkanHostImage&>(image);
 
-	vk::CommandBuffer cmdBuffer = _context.getGraphicsQueue().getCommandBuffer(0);
+	std::function<void()> commandBufferFunc = [this, &hostImage]()
+	{
+		vk::CommandBuffer cmdBuffer = _context.getGraphicsQueue().getCommandBuffer(0);
 
-	// Begin recording commands
-	vk::CommandBufferBeginInfo beginInfo{};
-	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
-	cmdBuffer.begin(beginInfo);
+		// Begin recording commands
+		vk::CommandBufferBeginInfo beginInfo{};
+		beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+		cmdBuffer.begin(beginInfo);
 
-	// Transition device image to TRANSFER_DST layout
-	transitionImageLayout(cmdBuffer, _image, _imageLayout, vk::ImageLayout::eTransferDstOptimal);
+		// Transition device image to TRANSFER_DST layout
+		transitionImageLayout(cmdBuffer, _image, _imageLayout, vk::ImageLayout::eTransferDstOptimal);
 
-	// Define the region for copying from the buffer to the image
-	vk::BufferImageCopy region{};
-	region.bufferOffset = 0;
-	region.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
-	region.imageSubresource.mipLevel = 0;
-	region.imageSubresource.baseArrayLayer = 0;
-	region.imageSubresource.layerCount = 1;
-	region.imageExtent = vk::Extent3D(_extent.x, _extent.y, 1);
+		// Define the region for copying from the buffer to the image
+		vk::BufferImageCopy region{};
+		region.bufferOffset = 0;
+		region.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+		region.imageSubresource.mipLevel = 0;
+		region.imageSubresource.baseArrayLayer = 0;
+		region.imageSubresource.layerCount = 1;
+		region.imageExtent = vk::Extent3D(_extent.x, _extent.y, 1);
 
-	// Perform the buffer-to-image copy
-	cmdBuffer.copyBufferToImage(
-		hostImage.getBuffer(),
-		_image,
-		vk::ImageLayout::eTransferDstOptimal,
-		1,
-		&region);
+		// Perform the buffer-to-image copy
+		cmdBuffer.copyBufferToImage(
+			hostImage.getBuffer(),
+			_image,
+			vk::ImageLayout::eTransferDstOptimal,
+			1,
+			&region);
 
-	// Transition device image to SHADER_READ layout
-	transitionImageLayout(cmdBuffer, _image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
-	_imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+		// Transition device image to SHADER_READ layout
+		transitionImageLayout(cmdBuffer, _image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+		_imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 
-	// End recording commands
-	cmdBuffer.end();
+		// End recording commands
+		cmdBuffer.end();
 
-	// Submit and wait
-	vk::SubmitInfo submitInfo{};
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &cmdBuffer;
+		// Submit and wait
+		vk::SubmitInfo submitInfo{};
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &cmdBuffer;
 
-	vk::Queue graphicsQueue = _context.getGraphicsQueue().getQueue();
-	graphicsQueue.submit(submitInfo, nullptr);
-	graphicsQueue.waitIdle();
+		vk::Queue graphicsQueue = _context.getGraphicsQueue().getQueue();
+		graphicsQueue.submit(submitInfo, nullptr);
+		graphicsQueue.waitIdle();
+	};
+
+	VulkanQueueThread& graphicsQueueThread = _context.getGraphicsQueueThread();
+	std::future<void> future = graphicsQueueThread.enqueueTask(commandBufferFunc);
+	future.wait();
 }
 
 void VulkanDeviceImage::copyTo(HostImage& hostImage)
 {
+	throw std::runtime_error("VulkanDeviceImage::copyTo Not implemented.");
 }
 
 ImageFormat VulkanDeviceImage::getFormat() const

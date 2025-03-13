@@ -20,8 +20,9 @@
 #include <memory>
 #include <vulkan/vulkan.hpp>
 #include <vk_mem_alloc.h> // VMA
-#include <limits>
 #include <optional>
+
+#include "VulkanQueue.h"
 
 namespace OpenXcom
 {
@@ -38,35 +39,6 @@ class VulkanPipelineManager;
 
 enum class BufferUsage;
 
-class VulkanQueue
-{
-protected:
-	vk::Queue _queue;
-	uint32_t _familyIndex;
-
-	vk::Device _device;
-
-	
-	vk::CommandPool _commandPool;
-	std::vector<vk::CommandBuffer> _commandBuffers;
-
-	friend class VulkanContext;
-	void create(vk::Device device, uint32_t familyIndex, bool shouldCreateCommandBuffer);
-
-public:
-	VulkanQueue();
-	~VulkanQueue();
-
-	uint32_t getFamilyIndex() { return _familyIndex; }
-	vk::Queue& getQueue() { return _queue; }
-
-	vk::CommandPool& getCommandPool() { return _commandPool; }
-	vk::CommandBuffer& getCommandBuffer(int index = 0) { return _commandBuffers[index]; }
-
-	bool isValid() { return _familyIndex != std::numeric_limits<uint32_t>::max(); }
-	void reset();
-};
-
 class VulkanContext
 {
 protected:
@@ -82,6 +54,9 @@ protected:
 	VulkanQueue _graphicsQueue;
 	VulkanQueue _transferQueue;
 	VulkanQueue _presentQueue;
+
+	VulkanQueueThread _graphicsQueueThread;
+	VulkanQueueThread _transferQueueThread;
 
 	vk::Format _swapChainImageFormat;
 
@@ -127,6 +102,9 @@ public:
 	VulkanQueue& getGraphicsQueue() { return _graphicsQueue; }
 	VulkanQueue& getTransferQueue() { return _transferQueue; }
 	VulkanQueue& getPresentQueue() { return _presentQueue; }
+
+	VulkanQueueThread& getGraphicsQueueThread() { return _graphicsQueueThread; }
+	VulkanQueueThread& getTransferQueueThread() { return _transferQueueThread; }
 
 	// helpers
 	vk::BufferUsageFlags getBufferUsageFlags(BufferUsage usage);

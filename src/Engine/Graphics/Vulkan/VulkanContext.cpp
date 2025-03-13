@@ -66,65 +66,6 @@ VkBool32 debugCallback(
 	return VK_FALSE;
 }
 
-VulkanQueue::VulkanQueue()
-	: _device(nullptr), _familyIndex(std::numeric_limits<uint32_t>::max()), _queue(nullptr), _commandPool(nullptr)
-{
-}
-
-VulkanQueue::~VulkanQueue()
-{
-	reset();
-}
-
-void VulkanQueue::reset()
-{
-	if (_device)
-	{
-		if (_commandBuffers.size() > 0)
-		{
-			_device.freeCommandBuffers(_commandPool, _commandBuffers);
-			_commandBuffers.clear();
-		}
-
-		if (_commandPool)
-		{
-			_device.destroyCommandPool(_commandPool);
-			_commandPool = nullptr;
-		}
-		_device = nullptr;
-	}
-
-	_familyIndex = std::numeric_limits<uint32_t>::max();
-	_queue = nullptr;
-}
-
-void VulkanQueue::create(vk::Device device, uint32_t familyIndex, bool shouldCreateCommandBuffer)
-{
-	_device = device;
-	_familyIndex = familyIndex;
-
-	_queue = _device.getQueue(_familyIndex, 0);
-
-	if(shouldCreateCommandBuffer)
-	{
-		// create the command pool
-		vk::CommandPoolCreateInfo createInfo;
-		createInfo.queueFamilyIndex = _familyIndex;
-		createInfo.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;	//vk::CommandPoolCreateFlagBits::eTransient?
-		_commandPool = _device.createCommandPool(createInfo);
-
-		vk::CommandBufferAllocateInfo allocInfo{};
-		allocInfo.level = vk::CommandBufferLevel::ePrimary;
-		allocInfo.commandPool = _commandPool;
-
-		//If/when we ever have multithreaded rendering, it would be good to have command buffers for each thread.
-		allocInfo.commandBufferCount = 1;
-
-		_commandBuffers = _device.allocateCommandBuffers(allocInfo);
-	}
-}
-
-
 VulkanContext::VulkanContext(EngineContext& context)
 	: _engineContext(context), _instance(nullptr), _device(nullptr), _physicalDevice(nullptr),
 	  _swapChainImageFormat(vk::Format::eUndefined), _allocator()
@@ -186,6 +127,10 @@ VulkanContext::~VulkanContext()
 
 	// destroy the descriptor set factory
 	_descriptorSetFactory.reset();
+
+	// stop the queue threads
+	_graphicsQueueThread.stop();
+	_transferQueueThread.stop();
 
 	// destroy the queues
 	_graphicsQueue.reset();
@@ -426,7 +371,6 @@ bool VulkanContext::checkPhysicalDeviceHasFeatures(const vk::PhysicalDevicePrope
 	return true;
 }
 
-
 void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 {
 	uint32_t graphicsQueueFamilyIndex = std::numeric_limits<uint32_t>::max();
@@ -532,6 +476,10 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 
 	_graphicsQueue.create(_device, graphicsQueueFamilyIndex, true);
 	_transferQueue.create(_device, transferQueueFamilyIndex, true);
+
+	// create queue threads
+	_graphicsQueueThread.start();
+	_transferQueueThread.start();
 
 	if (!isHeadless)
 	{

@@ -280,47 +280,55 @@ void VulkanRenderTarget::copyFrom(HostImage& hostImage)
 void VulkanRenderTarget::copyTo(HostImage& image)
 {
 	VulkanHostImage& hostImage = static_cast<VulkanHostImage&>(image);
-	vk::CommandBuffer cmdBuffer = _context.getGraphicsQueue().getCommandBuffer(0);
 
-	// Begin recording commands
-	vk::CommandBufferBeginInfo beginInfo{};
-	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
-	cmdBuffer.begin(beginInfo);
+	std::function<void()> commandBufferFunc = [this, &hostImage]()
+	{
+		vk::CommandBuffer cmdBuffer = _context.getGraphicsQueue().getCommandBuffer(0);
 
-	// Transition image for reading
-	transitionImageLayout(cmdBuffer, _image[1], vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageLayout::eTransferSrcOptimal);
+		// Begin recording commands
+		vk::CommandBufferBeginInfo beginInfo{};
+		beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+		cmdBuffer.begin(beginInfo);
 
-	// Define buffer copy region
-	vk::BufferImageCopy region{};
-	region.bufferOffset = 0;
-	region.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
-	region.imageSubresource.mipLevel = 0;
-	region.imageSubresource.baseArrayLayer = 0;
-	region.imageSubresource.layerCount = 1;
-	region.imageExtent = vk::Extent3D(_extent.x, _extent.y, 1);
+		// Transition image for reading
+		transitionImageLayout(cmdBuffer, _image[1], vk::ImageLayout::eShaderReadOnlyOptimal, vk::ImageLayout::eTransferSrcOptimal);
 
-	// Copy image to buffer
-	cmdBuffer.copyImageToBuffer(
-		_image[1], // Render target image
-		vk::ImageLayout::eTransferSrcOptimal,
-		hostImage.getBuffer(),
-		1,
-		&region);
+		// Define buffer copy region
+		vk::BufferImageCopy region{};
+		region.bufferOffset = 0;
+		region.imageSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+		region.imageSubresource.mipLevel = 0;
+		region.imageSubresource.baseArrayLayer = 0;
+		region.imageSubresource.layerCount = 1;
+		region.imageExtent = vk::Extent3D(_extent.x, _extent.y, 1);
 
-	// Transition image back to readable state
-	transitionImageLayout(cmdBuffer, _image[1], vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
+		// Copy image to buffer
+		cmdBuffer.copyImageToBuffer(
+			_image[1], // Render target image
+			vk::ImageLayout::eTransferSrcOptimal,
+			hostImage.getBuffer(),
+			1,
+			&region);
 
-	// End recording commands
-	cmdBuffer.end();
+		// Transition image back to readable state
+		transitionImageLayout(cmdBuffer, _image[1], vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal);
 
-	// Submit the command buffer and wait for completion
-	vk::SubmitInfo submitInfo{};
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &cmdBuffer;
+		// End recording commands
+		cmdBuffer.end();
 
-	vk::Queue graphicsQueue = _context.getGraphicsQueue().getQueue();
-	graphicsQueue.submit(submitInfo, nullptr);
-	graphicsQueue.waitIdle();
+		// Submit the command buffer and wait for completion
+		vk::SubmitInfo submitInfo{};
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &cmdBuffer;
+
+		vk::Queue graphicsQueue = _context.getGraphicsQueue().getQueue();
+		graphicsQueue.submit(submitInfo, nullptr);
+		graphicsQueue.waitIdle();
+	};
+	
+	VulkanQueueThread& graphicsQueueThread = _context.getGraphicsQueueThread();
+	std::future<void> future = graphicsQueueThread.enqueueTask(commandBufferFunc);
+	future.wait();
 }
 
 void VulkanRenderTarget::beginRenderPass(GraphicsCommand& command)

@@ -113,31 +113,37 @@ void VulkanHostBuffer::copy(DeviceBuffer& deviceBuffer)
 
 	resize(vulkanBuffer.getCount());
 
-	vk::Result result = vk::Result::eSuccess;
+	std::function<void()> commandBufferFunc = [this, &vulkanBuffer]()
+	{
+		vk::Result result = vk::Result::eSuccess;
 
-	vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
+		vk::CommandBufferBeginInfo beginInfo{};
+		beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
-	vk::CommandBufferBeginInfo beginInfo{};
-	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+		vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
+		result = commandBuffer.begin(&beginInfo);
 
-	result = commandBuffer.begin(&beginInfo);
+		vk::BufferCopy copyRegion{};
+		copyRegion.srcOffset = 0;
+		copyRegion.dstOffset = 0;
+		copyRegion.size = _size;
+		commandBuffer.copyBuffer(vulkanBuffer.getBuffer(), _buffer, 1, &copyRegion);
 
-	vk::BufferCopy copyRegion{};
-	copyRegion.srcOffset = 0;
-	copyRegion.dstOffset = 0;
-	copyRegion.size = _size;
-	commandBuffer.copyBuffer(vulkanBuffer.getBuffer(), _buffer, 1, &copyRegion);
+		commandBuffer.end();
 
-	commandBuffer.end();
+		vk::SubmitInfo submitInfo{};
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
 
-	vk::SubmitInfo submitInfo{};
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
+		vk::Queue& transferQueue = _context.getTransferQueue().getQueue();
+		result = transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
 
-	vk::Queue& transferQueue = _context.getTransferQueue().getQueue();
-	result = transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+		transferQueue.waitIdle();
+	};
 
-	transferQueue.waitIdle();
+	VulkanQueueThread& transferQueueThread = _context.getTransferQueueThread();
+	std::future<void> future = transferQueueThread.enqueueTask(commandBufferFunc);
+	future.wait();
 }
 
 void* VulkanHostBuffer::map()
@@ -273,91 +279,100 @@ void VulkanDeviceBuffer::copy(const VulkanHostBuffer& hostBuffer)
 
 	resize(hostBuffer.getCount());
 
-	vk::Result result = vk::Result::eSuccess;
-
-	vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
-
-	vk::CommandBufferBeginInfo beginInfo{};
-	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
-
-	result = commandBuffer.begin(&beginInfo);
-	if(result != vk::Result::eSuccess)
+	std::function<void()> commandBufferFunc = [this, &hostBuffer]()
 	{
-		Log(LOG_ERROR) << "Failed to begin command buffer";
-		return;
-	}
+		vk::Result result = vk::Result::eSuccess;
 
-	vk::BufferCopy copyRegion{};
-	copyRegion.srcOffset = 0;
-	copyRegion.dstOffset = 0;
-	copyRegion.size = _size;
-	commandBuffer.copyBuffer(hostBuffer.getBuffer(), _buffer, 1, &copyRegion);
+		vk::CommandBufferBeginInfo beginInfo{};
+		beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
-	commandBuffer.end();
+		vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
+		result = commandBuffer.begin(&beginInfo);
+		if(result != vk::Result::eSuccess)
+		{
+			Log(LOG_ERROR) << "Failed to begin command buffer";
+			return;
+		}
 
-	vk::SubmitInfo submitInfo{};
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
+		vk::BufferCopy copyRegion{};
+		copyRegion.srcOffset = 0;
+		copyRegion.dstOffset = 0;
+		copyRegion.size = _size;
+		commandBuffer.copyBuffer(hostBuffer.getBuffer(), _buffer, 1, &copyRegion);
 
-	vk::Queue& transferQueue = _context.getTransferQueue().getQueue();
-	result = transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
-	if (result != vk::Result::eSuccess)
-	{
-		Log(LOG_ERROR) << "Failed to submit command buffer";
-		return;
-	}
-	transferQueue.waitIdle();
+		commandBuffer.end();
+
+		vk::SubmitInfo submitInfo{};
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+
+		vk::Queue& transferQueue = _context.getTransferQueue().getQueue();
+		result = transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+		if (result != vk::Result::eSuccess)
+		{
+			Log(LOG_ERROR) << "Failed to submit command buffer";
+			return;
+		}
+		transferQueue.waitIdle();
+	};
+
+	VulkanQueueThread& transferQueueThread = _context.getTransferQueueThread();
+	transferQueueThread.enqueueTask(commandBufferFunc).wait();
 }
 
 void VulkanDeviceBuffer::copy(const VulkanDeviceBuffer& deviceBuffer)
 {
 	if(deviceBuffer.getCount() == 0)
-    {
-        Log(LOG_DEBUG) << "Attempting to copy a zero sized buffer";
-        return;
-    }
-
-    // Ensure the destination buffer is resized appropriately
-    resize(deviceBuffer.getCount());
-
-    vk::Result result = vk::Result::eSuccess;
-
-    // Get a command buffer from the transfer queue
-    vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
-
-    vk::CommandBufferBeginInfo beginInfo{};
-    beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
-
-    result = commandBuffer.begin(&beginInfo);
-	if(result != vk::Result::eSuccess)
 	{
-		Log(LOG_ERROR) << "Failed to begin command buffer";
+		Log(LOG_DEBUG) << "Attempting to copy a zero sized buffer";
 		return;
 	}
 
-    // Define the region to copy: entire buffer in this case
-    vk::BufferCopy copyRegion{};
-    copyRegion.srcOffset = 0;
-    copyRegion.dstOffset = 0;
-    copyRegion.size = _size;
-    commandBuffer.copyBuffer(deviceBuffer.getBuffer(), _buffer, 1, &copyRegion);
+	// Ensure the destination buffer is resized appropriately
+	resize(deviceBuffer.getCount());
 
-    commandBuffer.end();
-
-    vk::SubmitInfo submitInfo{};
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffer;
-
-    // Submit the command buffer to the transfer queue
-    vk::Queue& transferQueue = _context.getTransferQueue().getQueue();
-    result = transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
-	if (result != vk::Result::eSuccess)
+	std::function<void()> commandBufferFunc = [this, &deviceBuffer]()
 	{
-		Log(LOG_ERROR) << "Failed to submit command buffer";
-		return;
-	}
+		vk::Result result = vk::Result::eSuccess;
 
-    transferQueue.waitIdle();
+		vk::CommandBufferBeginInfo beginInfo{};
+		beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+
+		vk::CommandBuffer& commandBuffer = _context.getTransferQueue().getCommandBuffer();
+		result = commandBuffer.begin(&beginInfo);
+		if(result != vk::Result::eSuccess)
+		{
+			Log(LOG_ERROR) << "Failed to begin command buffer";
+			return;
+		}
+
+		// Define the region to copy: entire buffer in this case
+		vk::BufferCopy copyRegion{};
+		copyRegion.srcOffset = 0;
+		copyRegion.dstOffset = 0;
+		copyRegion.size = _size;
+		commandBuffer.copyBuffer(deviceBuffer.getBuffer(), _buffer, 1, &copyRegion);
+
+		commandBuffer.end();
+
+		vk::SubmitInfo submitInfo{};
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+
+		// Submit the command buffer to the transfer queue
+		vk::Queue& transferQueue = _context.getTransferQueue().getQueue();
+		result = transferQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+		if (result != vk::Result::eSuccess)
+		{
+			Log(LOG_ERROR) << "Failed to submit command buffer";
+			return;
+		}
+
+		transferQueue.waitIdle();
+	};
+	
+	VulkanQueueThread& transferQueueThread = _context.getTransferQueueThread();
+	transferQueueThread.enqueueTask(commandBufferFunc).wait();
 }
 
 void VulkanDeviceBuffer::copy(const HostBuffer& buffer)

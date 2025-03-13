@@ -90,14 +90,21 @@ void VulkanHeadlessSurface::endCommandPass(GraphicsCommand& commandContext)
 	// End command buffer recording
 	_commandBuffer.end();
 
-	// Submit the command buffer and wait for completion
-	vk::SubmitInfo submitInfo{};
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &_commandBuffer;
+	std::function<void()> commandBufferFunc = [this]()
+	{
+		// Submit the command buffer and wait for completion
+		vk::SubmitInfo submitInfo{};
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &_commandBuffer;
 
-	vk::Queue graphicsQueue = _context.getGraphicsQueue().getQueue();
-	graphicsQueue.submit(submitInfo, nullptr);
-	graphicsQueue.waitIdle();
+		vk::Queue graphicsQueue = _context.getGraphicsQueue().getQueue();
+		graphicsQueue.submit(submitInfo, nullptr);
+		graphicsQueue.waitIdle();
+	};
+
+	VulkanQueueThread& graphicsQueueThread = _context.getGraphicsQueueThread();
+	std::future<void> future = graphicsQueueThread.enqueueTask(commandBufferFunc);
+	future.wait();
 }
 
 void VulkanHeadlessSurface::beginRenderPass(GraphicsCommand& commandContext)

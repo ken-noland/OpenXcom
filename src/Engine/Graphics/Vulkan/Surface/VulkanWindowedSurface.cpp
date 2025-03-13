@@ -460,17 +460,24 @@ void VulkanWindowedSurface::endCommandPass(GraphicsCommand& command)
 	vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
 	vk::Semaphore signalSemaphores[] = {_frames[_currentFrame].renderFinishedSemaphore};
 
-	// Submit the command buffer for execution
-	vk::SubmitInfo submitInfo{};
-	submitInfo.waitSemaphoreCount = 1;
-	submitInfo.pWaitSemaphores = waitSemaphores;
-	submitInfo.pWaitDstStageMask = waitStages;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
-	submitInfo.signalSemaphoreCount = 1;
-	submitInfo.pSignalSemaphores = signalSemaphores;
+	std::function<void()> submitCommandPass = [this, &waitSemaphores, &waitStages, &commandBuffer, &signalSemaphores]()
+	{
+		// Submit the command buffer for execution
+		vk::SubmitInfo submitInfo{};
+		submitInfo.waitSemaphoreCount = 1;
+		submitInfo.pWaitSemaphores = waitSemaphores;
+		submitInfo.pWaitDstStageMask = waitStages;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+		submitInfo.signalSemaphoreCount = 1;
+		submitInfo.pSignalSemaphores = signalSemaphores;
 
-	vk::Result result = _context.getGraphicsQueue().getQueue().submit(1, &submitInfo, _frames[_currentFrame].inFlightFence);
+		vk::Result result = _context.getGraphicsQueue().getQueue().submit(1, &submitInfo, _frames[_currentFrame].inFlightFence);
+	};
+
+	// Post the command to the graphics queue and wait
+	VulkanQueueThread& graphicsQueueThread = _context.getGraphicsQueueThread();
+	graphicsQueueThread.enqueueTask(submitCommandPass).wait();
 
 	// Present the image
 	vk::PresentInfoKHR presentInfo{};
@@ -480,7 +487,7 @@ void VulkanWindowedSurface::endCommandPass(GraphicsCommand& command)
 	presentInfo.pSwapchains = &_swapChain;
 	presentInfo.pImageIndices = &_imageIndex; // Present the acquired image index
 
-	result = _context.getPresentQueue().getQueue().presentKHR(&presentInfo);
+	vk::Result result = _context.getPresentQueue().getQueue().presentKHR(&presentInfo);
 	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
 	{
 		handleResize(glm::ivec2(-1, -1)); // Handle window resize (recreate swapchain)
