@@ -9,7 +9,7 @@
       "name": "openxcom_tests.exe (src\\Tests\\openxcom_tests.exe)",
       "args": [
         "--gtest_output=xml:${ProjectDir}\\temp\\test_results.xml",
-        "--gtest_filter=TestModInfo.*"
+        "--gtest_filter=TestGameMods.TestGameModDependencies"
       ]
     },
     {
@@ -30,7 +30,8 @@
       "args": [
         "-data ${ProjectDir}\\data\\data\\",
         "-user ${ProjectDir}\\data\\user\\",
-        "-config ${ProjectDir}\\data\\config\\"
+        "-config ${ProjectDir}\\data\\config\\",
+        "-master xcom2"
       ],
       "environment": [
         {

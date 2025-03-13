@@ -36,7 +36,7 @@ public:
 
 	virtual std::filesystem::path getPath() override;
 
-	void addFileSystem(std::unique_ptr<FileSystem> fs);
+	void addFileSystem(std::unique_ptr<FileSystem>&& fs);
 	const std::vector<std::unique_ptr<FileSystem>>& getFileSystems() const { return _filesystems; }
 
 	virtual std::unique_ptr<FileEntry> getFile(const std::filesystem::path& path) override;

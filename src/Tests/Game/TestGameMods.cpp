@@ -124,7 +124,12 @@ public:
 
 	void addScannedMod(const ModInfo& modInfo)
 	{
-		_scannedMods.inactiveMods.push_back(ScannedMod(modInfo));
+		// we need to add a filesystem here, because mods specified this way do not have a folder which we scanned ModInfo from
+		// so we need to add a dummy filesystem to the mod
+		std::unique_ptr<CompositeFileSystem> filesystem = std::make_unique<CompositeFileSystem>();
+		filesystem->addFileSystem(std::make_unique<PhysicalFileSystem>(TEST_DATA_DIR));
+
+		_scannedMods.inactiveMods.push_back(ScannedMod{modInfo, TEST_DATA_DIR, std::move(filesystem)});
 	}
 
 };
@@ -139,6 +144,9 @@ TEST(TestGameMods, TestGameXcom1)
 	options.set<&GameOptions::_master>(OptionLevel::COMMAND, "xcom1");
 
 	ASSERT_TRUE(game.load());
+
+	// now lets go through the resources loaded and see if we can extract some resources to verify they are present
+
 }
 
 TEST(TestGameMods, TestGameXcom2)
@@ -161,7 +169,7 @@ TEST(TestGameMods, TestGameModDependencies)
 	// Add three mods. The first is a master, the second depends on the first, and the third depends on the first.
 	game.getGameMods().addScannedMod(ModInfo{"master1_id", "master1 name", "master1 description", "master1 author",
 		semver::version(0, 1, 0), ModType::Master, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
-		{/* dependencies */}, {/* conflicts */}, "", {""}});
+		{/* dependencies */}, {/* conflicts */}, "", {"UFO"}});
 	game.getGameMods().addScannedMod(ModInfo{"mod1_id", "mod1 name", "mod1 description", "mod1 author",
 		semver::version(0, 1, 0), ModType::Mod, "required_engine", semver::version(0, 1, 0), semver::version(8, 1, 2),
 		{DependencyExpression{"master1_id"}}, {/* conflicts */}, "", {""}});

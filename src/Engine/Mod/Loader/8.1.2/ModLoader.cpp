@@ -30,7 +30,10 @@
 
 #include "../../../Resource/ResourceSystem.h"
 #include "../../../Resource/FileProcessor/ImageFile.h"
+#include "../../../Resource/FileProcessor/ImageBDYFileProcessor.h"
+#include "../../../Resource/FileProcessor/ImagePNGFileProcessor.h"
 #include "../../../Resource/FileProcessor/ImageSCRFileProcessor.h"
+#include "../../../Resource/FileProcessor/ImageSPKFileProcessor.h"
 #include "../../../Resource/FileProcessor/PaletteDATFileProcessor.h"
 
 
@@ -76,22 +79,26 @@ bool loadVanillaResources(EngineContext& context, Mod* mod, ResourceConfigFile& 
 bool loadPaletteData(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig);
 bool loadBackpalsData(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig);
 
-bool loadSCRImage();
+bool loadSCRImage(EngineContext& context, Mod* mod, const std::string& name, std::filesystem::path path, const glm::ivec2& extents);
+bool loadBDYImage(EngineContext& context, Mod* mod, const std::string& name, std::filesystem::path path, const glm::ivec2& extents);
+bool loadSPKImage(EngineContext& context, Mod* mod, const std::string& name, std::filesystem::path path, const glm::ivec2& extents);
 
 bool loadImages(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig);
 
 // global function to load 8.1.2 version mods
 bool load(EngineContext& context, Mod* mod)
 {
-	CompositeFileSystem& fs = mod->getFileSystem();
-
-	ResourceConfigFile resourceConfig;
-
-	Log(LOG_INFO) << "Pre-loading rulesets...";
+	assert(mod);
+	assert(&mod->getFileSystem());
 
 	// if the mod has a resourceConfigFile, we need to extract the sounds and transparency LUTs
+	ResourceConfigFile resourceConfig;
 	if(!mod->getInfo().resourceConfigFile.empty())
 	{
+		Log(LOG_INFO) << "Pre-loading rulesets...";
+
+		CompositeFileSystem& fs = mod->getFileSystem();
+
 		std::unique_ptr<FileEntry> resourceConfigFile = fs.getFile(mod->getInfo().resourceConfigFile);
 		if (!resourceConfigFile)
 		{
@@ -147,7 +154,7 @@ bool loadPaletteData(EngineContext& context, Mod* mod, ResourceConfigFile& resou
 	std::unique_ptr<FileEntry> paletteFile = mod->getFileSystem().getFile("GEODATA/PALETTES.DAT");
 	if (!paletteFile)
 	{
-		Log(LOG_ERROR) << "Failed to open palettes file GEODATA/PALETTES.DAT";
+		Log(LOG_ERROR) << "Failed to open palettes file 'GEODATA/PALETTES.DAT' for mod '" << mod->getInfo().id << "'";
 		CompositeFileSystem& fs = mod->getFileSystem();
 		for (const std::unique_ptr<FileSystem>& filesystem : fs.getFileSystems())
 		{
@@ -230,31 +237,6 @@ bool loadBackpalsData(EngineContext& context, Mod* mod, ResourceConfigFile& reso
 	return true;
 }
 
-bool loadSCRImage(EngineContext& context, Mod* mod, const std::string& name, std::filesystem::path path, const glm::ivec2& extents)
-{
-	ResourceSystem& resourceSystem = context.getResourceSystem();
-	ImageSCRFileProcessor& imageSCRProcessor = resourceSystem.getImageSCRFileProcessor();
-
-	// Open the file
-	std::unique_ptr<FileEntry> surfaceFile = mod->getFileSystem().getFile(path);
-	if (!surfaceFile)
-	{
-		Log(LOG_ERROR) << "Failed to open image file " << path.string();
-		return false;
-	}
-
-	// Load the image
-	ImageSCRLoadParams params{extents};
-	ImageFile imageFile = imageSCRProcessor.load(name, surfaceFile, params);
-
-	// Send the image to the device
-	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(imageFile.getImage());
-
-	mod->registerImage(std::move(deviceImage));
-
-	return true;
-}
-
 bool loadImages(EngineContext& context, Mod* mod, ResourceConfigFile& resourceConfig)
 {
 	if (!loadSCRImage(context, mod, "INTERWIN.DAT", "GEODATA/INTERWIN.DAT", {160, 600})) { return false; }
@@ -280,25 +262,113 @@ bool loadImages(EngineContext& context, Mod* mod, ResourceConfigFile& resourceCo
 				ext.erase(0, 1);
 			std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
 
+			std::string name = file->getPath().stem().string();
+			std::filesystem::path path = file->getPath();
 			if (ext == "scr")
 			{
-				std::string name = file->getPath().stem().string();
-				std::filesystem::path path = file->getPath();
-				if (!loadSCRImage(context, mod, name, path, {320, 200}))
-				{
-					return false;
-				}
+				if (!loadSCRImage(context, mod, name, path, {320, 200})) { return false; }
 			}
 			else if(ext == "bdy")
 			{
-
+				if (!loadBDYImage(context, mod, name, path, {320, 200})) { return false; }
 			}
 			else if(ext == "spk")
 			{
-
+				if (!loadSPKImage(context, mod, name, path, {320, 200})) { return false; }
 			}
 		}
 	}
+
+	return true;
+}
+
+
+bool loadSCRImage(EngineContext& context, Mod* mod, const std::string& name, std::filesystem::path path, const glm::ivec2& extents)
+{
+	ResourceSystem& resourceSystem = context.getResourceSystem();
+	ImageSCRFileProcessor& imageSCRProcessor = resourceSystem.getImageSCRFileProcessor();
+
+	// Open the file
+	std::unique_ptr<FileEntry> surfaceFile = mod->getFileSystem().getFile(path);
+	if (!surfaceFile)
+	{
+		Log(LOG_ERROR) << "Failed to open image file " << path.string();
+		return false;
+	}
+
+	// Load the image
+	ImageSCRLoadParams params{extents};
+	ImageFile imageFile = imageSCRProcessor.load(name, surfaceFile, params);
+	if (!imageFile.hasImage())
+	{
+		Log(LOG_ERROR) << "Failed to load SCR image " << path.string();
+		return false;
+	}
+
+	// Send the image to the device
+	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(imageFile.getImage());
+
+	mod->registerImage(std::move(deviceImage));
+
+	return true;
+}
+
+bool loadBDYImage(EngineContext& context, Mod* mod, const std::string& name, std::filesystem::path path, const glm::ivec2& extents)
+{
+	ResourceSystem& resourceSystem = context.getResourceSystem();
+	ImageBDYFileProcessor& imageBDYProcessor = resourceSystem.getImageBDYFileProcessor();
+
+	// Open the file
+	std::unique_ptr<FileEntry> surfaceFile = mod->getFileSystem().getFile(path);
+	if (!surfaceFile)
+	{
+		Log(LOG_ERROR) << "Failed to open image file " << path.string();
+		return false;
+	}
+
+	// Load the image
+	ImageBDYLoadParams params{extents};
+	ImageFile imageFile = imageBDYProcessor.load(name, surfaceFile, params);
+	if (!imageFile.hasImage())
+	{
+		Log(LOG_ERROR) << "Failed to load BDY image " << path.string();
+		return false;
+	}
+
+	// Send the image to the device
+	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(imageFile.getImage());
+
+	mod->registerImage(std::move(deviceImage));
+
+	return true;
+}
+
+bool loadSPKImage(EngineContext& context, Mod* mod, const std::string& name, std::filesystem::path path, const glm::ivec2& extents)
+{
+	ResourceSystem& resourceSystem = context.getResourceSystem();
+	ImageSPKFileProcessor& imageSPKProcessor = resourceSystem.getImageSPKFileProcessor();
+
+	// Open the file
+	std::unique_ptr<FileEntry> surfaceFile = mod->getFileSystem().getFile(path);
+	if (!surfaceFile)
+	{
+		Log(LOG_ERROR) << "Failed to open image file " << path.string();
+		return false;
+	}
+
+	// Load the image
+	ImageSPKLoadParams params{extents};
+	ImageFile imageFile = imageSPKProcessor.load(name, surfaceFile, params);
+	if (!imageFile.hasImage())
+	{
+		Log(LOG_ERROR) << "Failed to load BDY image " << path.string();
+		return false;
+	}
+
+	// Send the image to the device
+	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(imageFile.getImage());
+
+	mod->registerImage(std::move(deviceImage));
 
 	return true;
 }

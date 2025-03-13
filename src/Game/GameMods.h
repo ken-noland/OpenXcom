@@ -85,6 +85,9 @@ public:
 	ActivateModResult activateMod(const std::string& id);
 
 	bool activateMaster(const std::string& id);
+
+	Mod& getMaster() { return *_loadedMods.activeMaster; }
+	const std::vector<Mod>& getMods() const { return _loadedMods.mods; }
 };
 
 } // namespace OpenXcom

@@ -157,6 +157,8 @@ bool GameMods::load()
 	}
 
 	// Step 4: Load the mods
+	_loadedMods.mods.reserve(_scannedMods.activeMods.size() + 1);
+
 	Mod masterMod(_context.getEngineContext(), *_scannedMods.activeMaster);
 	_loadedMods.mods.push_back(std::move(masterMod));
 	_loadedMods.activeMaster = &_loadedMods.mods.back();

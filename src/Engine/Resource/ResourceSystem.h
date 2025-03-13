@@ -37,9 +37,11 @@ class GraphicsSystem;
 
 // Loaders
 class ImageFileProcessor;
+class ImageBDYFileProcessor;
 class ImageBMPFileProcessor;
 class ImagePNGFileProcessor;
 class ImageSCRFileProcessor;
+class ImageSPKFileProcessor;
 class PaletteDATFileProcessor;
 
 class ResourceSystem
@@ -54,9 +56,11 @@ class ResourceSystem
 
 	// Loaders
 	std::unique_ptr<ImageFileProcessor> _imageFileProcessor;
+	std::unique_ptr<ImageBDYFileProcessor> _imageBDYFileProcessor;
 	std::unique_ptr<ImageBMPFileProcessor> _imageBMPFileProcessor;
 	std::unique_ptr<ImagePNGFileProcessor> _imagePNGFileProcessor;
 	std::unique_ptr<ImageSCRFileProcessor> _imageSCRFileProcessor;
+	std::unique_ptr<ImageSPKFileProcessor> _imageSPKFileProcessor;
 	std::unique_ptr<PaletteDATFileProcessor> _paletteDATFileProcessor;
 
 public:
@@ -73,9 +77,11 @@ public:
 
 	// Loaders
 	ImageFileProcessor& getImageFileProcessor() { return *_imageFileProcessor; };
+	ImageBDYFileProcessor& getImageBDYFileProcessor() { return *_imageBDYFileProcessor; };
 	ImageBMPFileProcessor& getImageBMPFileProcessor() { return *_imageBMPFileProcessor; };
 	ImagePNGFileProcessor& getImagePNGFileProcessor() { return *_imagePNGFileProcessor; };
 	ImageSCRFileProcessor& getImageSCRFileProcessor() { return *_imageSCRFileProcessor; };
+	ImageSPKFileProcessor& getImageSPKFileProcessor() { return *_imageSPKFileProcessor; };
 	PaletteDATFileProcessor& getPaletteDATFileProcessor() { return *_paletteDATFileProcessor; };
 };
 

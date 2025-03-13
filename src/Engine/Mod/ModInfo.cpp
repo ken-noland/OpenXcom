@@ -404,7 +404,7 @@ bool fromYaml<ModInfo>(ryml::ConstNodeRef const& yaml, ModInfo& modInfo, YamlCon
 
 	if(legacyLoader)
 	{
-		Log(LOG_WARNING) << "This mod file uses deprecated fields. Please update it to use the new fields.";
+		Log(LOG_WARNING) << "Mod '" << modInfo.id << "' uses deprecated fields. Please update it to use the new fields.";
 		Log(LOG_WARNING) << context.toString(yaml);
 
 		// we forked off the loader at 8.1.2, so we'll set the loader version to that

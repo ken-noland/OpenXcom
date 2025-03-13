@@ -68,6 +68,9 @@ Mod::Mod(Mod&& other) noexcept
 {
 	_info = std::move(other._info);
 	_filesystem = std::move(other._filesystem);
+
+	_palettes = std::move(other._palettes);
+	_images = std::move(other._images);
 }
 
 Mod::~Mod()
@@ -81,6 +84,7 @@ void Mod::registerPalette(OwningHandle<Palette>&& palette)
 
 	Log(LOG_DEBUG) << "Registered palette '" << name << "' for mod '" << _info.id << "'";
 }
+
 
 void Mod::registerImage(OwningHandle<DeviceImage>&& image)
 {

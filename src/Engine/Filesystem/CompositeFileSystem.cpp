@@ -121,7 +121,7 @@ std::filesystem::path CompositeFileSystem::getPath()
 	return "<composite>";
 }
 
-void CompositeFileSystem::addFileSystem(std::unique_ptr<FileSystem> fs)
+void CompositeFileSystem::addFileSystem(std::unique_ptr<FileSystem>&& fs)
 {
 	_filesystems.push_back(std::move(fs));
 }
