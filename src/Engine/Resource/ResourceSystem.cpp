@@ -33,6 +33,7 @@
 #include "FileProcessor/ImageFileProcessor.h"
 #include "FileProcessor/ImageBDYFileProcessor.h"
 #include "FileProcessor/ImageBMPFileProcessor.h"
+#include "FileProcessor/ImageDATFileProcessor.h"
 #include "FileProcessor/ImagePCKFileProcessor.h"
 #include "FileProcessor/ImagePNGFileProcessor.h"
 #include "FileProcessor/ImageSCRFileProcessor.h"
@@ -57,6 +58,7 @@ ResourceSystem::ResourceSystem(EngineContext& context)
 	_imageFileProcessor = std::make_unique<ImageFileProcessor>(context);
 	_imageBDYFileProcessor = std::make_unique<ImageBDYFileProcessor>(context);
 	_imageBMPFileProcessor = std::make_unique<ImageBMPFileProcessor>(context);
+	_imageDATFileProcessor = std::make_unique<ImageDATFileProcessor>(context);
 	_imagePCKFileProcessor = std::make_unique<ImagePCKFileProcessor>(context);
 	_imagePNGFileProcessor = std::make_unique<ImagePNGFileProcessor>(context);
 	_imageSCRFileProcessor = std::make_unique<ImageSCRFileProcessor>(context);

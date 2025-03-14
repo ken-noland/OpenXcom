@@ -55,8 +55,7 @@ protected:
 	VulkanQueue _transferQueue;
 	VulkanQueue _presentQueue;
 
-	VulkanQueueThread _graphicsQueueThread;
-	VulkanQueueThread _transferQueueThread;
+	VulkanQueueThread _queueThread;
 
 	vk::Format _swapChainImageFormat;
 
@@ -103,8 +102,8 @@ public:
 	VulkanQueue& getTransferQueue() { return _transferQueue; }
 	VulkanQueue& getPresentQueue() { return _presentQueue; }
 
-	VulkanQueueThread& getGraphicsQueueThread() { return _graphicsQueueThread; }
-	VulkanQueueThread& getTransferQueueThread() { return _transferQueueThread; }
+	VulkanQueueThread& getGraphicsQueueThread() { return _queueThread; }
+	VulkanQueueThread& getTransferQueueThread() { return _queueThread; }
 
 	// helpers
 	vk::BufferUsageFlags getBufferUsageFlags(BufferUsage usage);

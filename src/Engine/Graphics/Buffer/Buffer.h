@@ -91,6 +91,7 @@ void HostBuffer::set(std::initializer_list<Type> data)
 
 	// Resize the buffer to hold the new count of elements.
 	resize(data.size());
+
 	// Copy data into the buffer.
 	copy(static_cast<const void*>(data.data()), data.size());
 }
@@ -104,6 +105,7 @@ void HostBuffer::set(const std::vector<Type>& data)
 
 	// Resize the buffer to hold the new count of elements.
 	resize(data.size());
+
 	// Copy data into the buffer.
 	copy(static_cast<const void*>(data.data()), data.size());
 }

@@ -17,41 +17,33 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "../Handle.h"
+#include <filesystem>
 
-#include "../Types/PackedColor.h"
-
-#include <memory>
-#include <string>
-#include <initializer_list>
+#include <glm/vec2.hpp>
 
 namespace OpenXcom
 {
 
 class EngineContext;
-class DeviceBuffer;
+class FileEntry;
+struct ImageSetFile;
 
-class Palette
+struct ImageDATLoadParams
 {
-private:
-	std::string _name;
-	std::unique_ptr<DeviceBuffer> _deviceBuffer;
-
-public:
-	// create an empty palette
-	Palette(EngineContext& context, const std::string& name, std::size_t count);
-
-	// create a palette from an array of colors
-	Palette(EngineContext& context, const std::string& name, const PackedColor* data, std::size_t count);
-
-	// create a palette from an existing palette
-	Palette(EngineContext& context, const std::string& name, const Palette& palette);
-
-	virtual ~Palette();
-
-	const std::string& name() const { return _name; };
-
-	DeviceBuffer& getDeviceBuffer() { return *_deviceBuffer; };
+	glm::ivec2 extent;
 };
 
+class ImageDATFileProcessor
+{
+protected:
+	EngineContext& _context;
 
-}
+public:
+	ImageDATFileProcessor(EngineContext& context);
+	~ImageDATFileProcessor();
+
+	ImageSetFile load(const std::string& name, const std::unique_ptr<FileEntry>& datFile, const ImageDATLoadParams& params);
+};
+
+} // namespace OpenXcom

@@ -26,8 +26,6 @@
 #include "../ResourceSystem.h"
 #include "../../Graphics/Image/Image.h"
 #include "../../Graphics/Image/ImageManager.h"
-#include "../../Graphics/Palette/Palette.h"
-#include "../../Graphics/Palette/PaletteManager.h"
 
 namespace OpenXcom
 {

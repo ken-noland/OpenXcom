@@ -217,6 +217,7 @@ set ( engine_src
   "Engine/Platform/PlatformWindowSystem.cpp"
   "Engine/Resource/FileProcessor/ImageBDYFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImageBMPFileProcessor.cpp"
+  "Engine/Resource/FileProcessor/ImageDATFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImageFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImagePCKFileProcessor.cpp"
   "Engine/Resource/FileProcessor/ImagePNGFileProcessor.cpp"

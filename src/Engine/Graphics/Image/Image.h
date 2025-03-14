@@ -90,7 +90,7 @@ public:
 	DeviceImage(ImageType type, const std::string& name) : _type(type), _name(name) {};
 	virtual ~DeviceImage() = default;
 
-	const std::string& getName() const { return _name; }
+	const std::string& name() const { return _name; }
 
 	// copy the host image to this device image
 	virtual void copyFrom(HostImage& hostImage) = 0;

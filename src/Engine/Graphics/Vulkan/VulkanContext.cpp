@@ -128,9 +128,8 @@ VulkanContext::~VulkanContext()
 	// destroy the descriptor set factory
 	_descriptorSetFactory.reset();
 
-	// stop the queue threads
-	_graphicsQueueThread.stop();
-	_transferQueueThread.stop();
+	// stop the queue thread(s)
+	_queueThread.stop();
 
 	// destroy the queues
 	_graphicsQueue.reset();
@@ -478,8 +477,7 @@ void VulkanContext::initializeDevice(std::optional<vk::SurfaceKHR> surface)
 	_transferQueue.create(_device, transferQueueFamilyIndex, true);
 
 	// create queue threads
-	_graphicsQueueThread.start();
-	_transferQueueThread.start();
+	_queueThread.start();
 
 	if (!isHeadless)
 	{

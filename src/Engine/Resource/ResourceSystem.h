@@ -39,6 +39,7 @@ class GraphicsSystem;
 class ImageFileProcessor;
 class ImageBDYFileProcessor;
 class ImageBMPFileProcessor;
+class ImageDATFileProcessor;
 class ImagePCKFileProcessor;
 class ImagePNGFileProcessor;
 class ImageSCRFileProcessor;
@@ -59,6 +60,7 @@ class ResourceSystem
 	std::unique_ptr<ImageFileProcessor> _imageFileProcessor;
 	std::unique_ptr<ImageBDYFileProcessor> _imageBDYFileProcessor;
 	std::unique_ptr<ImageBMPFileProcessor> _imageBMPFileProcessor;
+	std::unique_ptr<ImageDATFileProcessor> _imageDATFileProcessor;
 	std::unique_ptr<ImagePCKFileProcessor> _imagePCKFileProcessor;
 	std::unique_ptr<ImagePNGFileProcessor> _imagePNGFileProcessor;
 	std::unique_ptr<ImageSCRFileProcessor> _imageSCRFileProcessor;
@@ -81,6 +83,7 @@ public:
 	ImageFileProcessor& getImageFileProcessor() { return *_imageFileProcessor; };
 	ImageBDYFileProcessor& getImageBDYFileProcessor() { return *_imageBDYFileProcessor; };
 	ImageBMPFileProcessor& getImageBMPFileProcessor() { return *_imageBMPFileProcessor; };
+	ImageDATFileProcessor& getImageDATFileProcessor() { return *_imageDATFileProcessor; };
 	ImagePCKFileProcessor& getImagePCKFileProcessor() { return *_imagePCKFileProcessor; };
 	ImagePNGFileProcessor& getImagePNGFileProcessor() { return *_imagePNGFileProcessor; };
 	ImageSCRFileProcessor& getImageSCRFileProcessor() { return *_imageSCRFileProcessor; };

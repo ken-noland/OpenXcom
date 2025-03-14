@@ -218,10 +218,16 @@ VulkanDeviceImage::VulkanDeviceImage(VulkanContext& context, const std::string& 
 	allocCreateInfo.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 
 	// Step 3: Allocate Image Memory with VMA
-	VkImage rawImage;
-	vmaCreateImage(_context.getAllocator(), reinterpret_cast<VkImageCreateInfo*>(&imageInfo), &allocCreateInfo, &rawImage, &_allocation, nullptr);
-	_image = rawImage;
-
+	std::function<void()> commandBufferFunc = [this, &imageInfo, &allocCreateInfo]()
+	{
+		VkImage rawImage;
+		vmaCreateImage(_context.getAllocator(), reinterpret_cast<VkImageCreateInfo*>(&imageInfo), &allocCreateInfo, &rawImage, &_allocation, nullptr);
+		_image = rawImage;
+	};
+	
+	VulkanQueueThread& transferQueueThread = _context.getTransferQueueThread();
+	transferQueueThread.enqueueTask(commandBufferFunc).wait();
+	
 	// Step 4: Create Image View (For GPU Use)
 	vk::ImageViewCreateInfo imageViewInfo{};
 	imageViewInfo.image = _image;
@@ -253,7 +259,13 @@ VulkanDeviceImage::~VulkanDeviceImage()
 
 	if (_image)
 	{
-		vmaDestroyImage(_context.getAllocator(), _image, _allocation);
+		std::function<void()> commandBufferFunc = [this]()
+		{
+			vmaDestroyImage(_context.getAllocator(), _image, _allocation);
+		};
+
+		VulkanQueueThread& transferQueueThread = _context.getTransferQueueThread();
+		transferQueueThread.enqueueTask(commandBufferFunc).wait();
 	}
 }
 

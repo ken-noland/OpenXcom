@@ -28,6 +28,7 @@
 #include "../Graphics/Palette/Palette.h"
 #include "../Graphics/Palette/PaletteManager.h"
 #include "../Graphics/Image/Image.h"
+#include "../Graphics/Image/ImageSet.h"
 #include "../Graphics/Image/ImageManager.h"
 
 namespace OpenXcom
@@ -79,7 +80,7 @@ Mod::~Mod()
 
 void Mod::registerPalette(OwningHandle<Palette>&& palette)
 {
-	std::string name = palette->getName();
+	std::string name = palette->name();
 	_palettes[name] = std::move(palette);
 
 	Log(LOG_DEBUG) << "Registered palette '" << name << "' for mod '" << _info.id << "'";
@@ -88,10 +89,18 @@ void Mod::registerPalette(OwningHandle<Palette>&& palette)
 
 void Mod::registerImage(OwningHandle<DeviceImage>&& image)
 {
-	std::string name = image->getName();
+	std::string name = image->name();
 	_images[name] = std::move(image);
 
 	Log(LOG_DEBUG) << "Registered image '" << name << "' for mod '" << _info.id << "'";
+}
+
+void Mod::registerImageSet(ImageSet&& images)
+{
+	std::string name = images.name();
+	_imageSets[name] = std::move(images);
+
+	Log(LOG_DEBUG) << "Registered image set '" << name << "' for mod '" << _info.id << "'";
 }
 
 } // namespace OpenXcom

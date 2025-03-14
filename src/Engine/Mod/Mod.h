@@ -28,6 +28,7 @@ namespace OpenXcom
 class EngineContext;
 struct ScannedMod;
 
+class ImageSet;
 class Palette;
 class DeviceImage;
 
@@ -43,6 +44,9 @@ protected:
 	std::unordered_map<std::string, OwningHandle<Palette>> _palettes;
 	std::unordered_map<std::string, OwningHandle<DeviceImage>> _images;
 
+	// Image sets are just named collections of image handles
+	std::unordered_map<std::string, ImageSet> _imageSets;
+
 public:
 	Mod(EngineContext& context, ScannedMod& scannedModInfo);
 	Mod(Mod&& other) noexcept;
@@ -52,8 +56,15 @@ public:
 
 	CompositeFileSystem& getFileSystem() { return *_filesystem; }
 
+	const std::unordered_map<std::string, OwningHandle<Palette>>& getPalettes() const { return _palettes; }
+	const std::unordered_map<std::string, OwningHandle<DeviceImage>>& getImages() const { return _images; }
+
+	const std::unordered_map<std::string, ImageSet>& getImageSets() const { return _imageSets; }
+
 	void registerPalette(OwningHandle<Palette>&& palette);
 	void registerImage(OwningHandle<DeviceImage>&& image);
+
+	void registerImageSet(ImageSet&& images);
 };
 
 } // namespace OpenXcom
