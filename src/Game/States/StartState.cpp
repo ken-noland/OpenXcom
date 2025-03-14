@@ -285,8 +285,8 @@ void StartState::createDosFont()
 
 	// Load the DOS font image
 	ImageLoadParams params;
-	ImageFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, params);
-	OpenXcom::OwningHandle<OpenXcom::HostImage> hostFontTexture = fontTextureFile.takeImage();
+	ImagePaletteFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, params);
+	OpenXcom::OwningHandle<OpenXcom::HostImage> hostFontTexture = std::move(fontTextureFile.image);
 
 	// Move to device
 	OpenXcom::OwningHandle<OpenXcom::DeviceImage> deviceFontTexture = imageManager.createDeviceImage(*hostFontTexture);

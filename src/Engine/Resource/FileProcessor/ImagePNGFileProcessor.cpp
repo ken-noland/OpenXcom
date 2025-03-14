@@ -46,7 +46,7 @@ ImagePNGFileProcessor::~ImagePNGFileProcessor()
 {
 }
 
-ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesystem::path& filename, const ImageLoadParams& params)
+ImagePaletteFile ImagePNGFileProcessor::load(const std::string& name, const std::filesystem::path& filename, const ImageLoadParams& params)
 {
 	ResourceSystem& resourceSystem = _context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
@@ -60,7 +60,7 @@ ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesy
 	if (!file)
 	{
 		throw std::runtime_error("Failed to load PNG file \"" + filename.string() + "\". File not found.");
-		return ImageFile();
+		return ImagePaletteFile();
 	}
 
 	// load into a buffer
@@ -79,7 +79,7 @@ ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesy
 	if (error)
 	{
 		throw std::runtime_error("Failed to decode PNG file \"" + filename.string() + "\" with error: " + lodepng_error_text(error));
-		return ImageFile();
+		return ImagePaletteFile();
 	}
 
 	// For now, only support 8-bit (R8) images.
@@ -112,16 +112,16 @@ ImageFile ImagePNGFileProcessor::load(const std::string& name, const std::filesy
 		paletteHandle = paletteManager.createPalette(name + "_png_palette", paletteData.data(), paletteData.size());
 	}
 
-	return ImageFile(std::move(hostImageHandle), std::move(paletteHandle));
+	return ImagePaletteFile{std::move(hostImageHandle), std::move(paletteHandle)};
 }
 
-bool ImagePNGFileProcessor::save(const std::filesystem::path& filename, ImageFile& imageData)
+bool ImagePNGFileProcessor::save(const std::filesystem::path& filename, ImagePaletteFile& imageData)
 {
 	ResourceSystem& resourceSystem = _context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
 
-	HostImage& hostImage = imageData.getImage();
-	DeviceBuffer& devicePaletteBuffer = imageData.getPalette().getDeviceBuffer();
+	HostImage& hostImage = *imageData.image;
+	DeviceBuffer& devicePaletteBuffer = imageData.palette->getDeviceBuffer();
 	std::unique_ptr<HostBuffer> hostPaletteBufferPtr = bufferManager.createHostBuffer(devicePaletteBuffer);
 	HostBuffer& hostPaletteBuffer = *hostPaletteBufferPtr;
 

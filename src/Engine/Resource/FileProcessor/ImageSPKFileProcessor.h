@@ -27,7 +27,7 @@ namespace OpenXcom
 
 class EngineContext;
 class FileEntry;
-class ImageFile;
+struct ImageFile;
 
 struct ImageSPKLoadParams
 {

@@ -31,11 +31,10 @@ protected:
 
 TEST_F(ImageFileProcessorTest, TestBmp8bit)
 {
-	ImageFile generatedImage = createImage();
-	ASSERT_TRUE(generatedImage.getImageHandle().isValid()) << "Image handle should be valid";
-	ASSERT_NE(&generatedImage.getImage(), nullptr) << "Image should not be null";
-	ASSERT_TRUE(generatedImage.getPaletteHandle().isValid()) << "Palette handle should be valid";
-	ASSERT_EQ(generatedImage.getImage().getFormat(), ImageFormat::R8) << "Generated image format should be R8";
+	ImagePaletteFile generatedImage = createImage();
+	ASSERT_TRUE(generatedImage.image.isValid()) << "Image handle should be valid";
+	ASSERT_TRUE(generatedImage.palette.isValid()) << "Palette handle should be valid";
+	ASSERT_EQ(generatedImage.image->getFormat(), ImageFormat::R8) << "Generated image format should be R8";
 
 	ImageBMPFileProcessor& bmpProcessor = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor();
 
@@ -52,20 +51,19 @@ TEST_F(ImageFileProcessorTest, TestBmp8bit)
 
 	// Load the image back
 	ImageLoadParams params;
-	ImageFile loadedImage = bmpProcessor.load("loaded_bmp_bitmap", path, params);
-	ASSERT_TRUE(loadedImage.hasImage()) << "Unable to load bitmap";
+	ImagePaletteFile loadedImage = bmpProcessor.load("loaded_bmp_bitmap", path, params);
+	ASSERT_TRUE(loadedImage.image) << "Unable to load bitmap";
 
-	ASSERT_TRUE(loadedImage.getImageHandle().isValid()) << "Image handle should be valid";
-	ASSERT_NE(&loadedImage.getImage(), nullptr) << "Image should not be null";
-	ASSERT_FALSE(loadedImage.getPaletteHandle().isValid()) << "Palette handle should not be valid(we didn't request it to load)";
+	ASSERT_TRUE(loadedImage.image.isValid()) << "Image handle should be valid";
+	ASSERT_FALSE(loadedImage.palette.isValid()) << "Palette handle should not be valid(we didn't request it to load)";
 
 	// Check image format
-	ASSERT_EQ(loadedImage.getImage().getFormat(), ImageFormat::R8) << "Image format mismatch";
+	ASSERT_EQ(loadedImage.image->getFormat(), ImageFormat::R8) << "Image format mismatch";
 
 	// Check the image data
-	HostImage& loadedHostImage = loadedImage.getImage();
+	HostImage& loadedHostImage = *loadedImage.image;
 	const uint8_t* loadedPixels = static_cast<const uint8_t*>(loadedHostImage.map());
-	const uint8_t* generatedPixels = static_cast<const uint8_t*>(generatedImage.getImage().map());
+	const uint8_t* generatedPixels = static_cast<const uint8_t*>(generatedImage.image->map());
 
 	for (uint32_t y = 0; y < loadedHostImage.getHeight(); y++)
 	{
@@ -76,17 +74,16 @@ TEST_F(ImageFileProcessorTest, TestBmp8bit)
 	}
 
 	loadedHostImage.unmap();
-	generatedImage.getImage().unmap();
+	generatedImage.image->unmap();
 }
 
 
 TEST_F(ImageFileProcessorTest, TestPng8bit)
 {
-	ImageFile generatedImage = createImage();
-	ASSERT_TRUE(generatedImage.getImageHandle().isValid()) << "Image handle should be valid";
-	ASSERT_NE(&generatedImage.getImage(), nullptr) << "Image should not be null";
-	ASSERT_TRUE(generatedImage.getPaletteHandle().isValid()) << "Palette handle should be valid";
-	ASSERT_EQ(generatedImage.getImage().getFormat(), ImageFormat::R8) << "Generated image format should be R8";
+	ImagePaletteFile generatedImage = createImage();
+	ASSERT_TRUE(generatedImage.image.isValid()) << "Image handle should be valid";
+	ASSERT_TRUE(generatedImage.palette.isValid()) << "Palette handle should be valid";
+	ASSERT_EQ(generatedImage.image->getFormat(), ImageFormat::R8) << "Generated image format should be R8";
 
 	ImagePNGFileProcessor& pngProcessor = _engine->getEngineContext().getResourceSystem().getImagePNGFileProcessor();
 
@@ -103,20 +100,19 @@ TEST_F(ImageFileProcessorTest, TestPng8bit)
 
 	// Load the image back
 	ImageLoadParams params;
-	ImageFile loadedImage = pngProcessor.load("loaded_bmp_bitmap", path, params);
-	ASSERT_TRUE(loadedImage.hasImage()) << "Unable to load bitmap";
+	ImagePaletteFile loadedImage = pngProcessor.load("loaded_bmp_bitmap", path, params);
+	ASSERT_TRUE(loadedImage.image) << "Unable to load bitmap";
 
-	ASSERT_TRUE(loadedImage.getImageHandle().isValid()) << "Image handle should be valid";
-	ASSERT_NE(&loadedImage.getImage(), nullptr) << "Image should not be null";
-	ASSERT_FALSE(loadedImage.getPaletteHandle().isValid()) << "Palette handle should not be valid(we didn't request it to load)";
+	ASSERT_TRUE(loadedImage.image.isValid()) << "Image handle should be valid";
+	ASSERT_FALSE(loadedImage.palette.isValid()) << "Palette handle should not be valid(we didn't request it to load)";
 
 	// Check image format
-	ASSERT_EQ(loadedImage.getImage().getFormat(), ImageFormat::R8) << "Image format mismatch";
+	ASSERT_EQ(loadedImage.image->getFormat(), ImageFormat::R8) << "Image format mismatch";
 
 	// Check the image data
-	HostImage& loadedHostImage = loadedImage.getImage();
+	HostImage& loadedHostImage = *loadedImage.image;
 	const uint8_t* loadedPixels = static_cast<const uint8_t*>(loadedHostImage.map());
-	const uint8_t* generatedPixels = static_cast<const uint8_t*>(generatedImage.getImage().map());
+	const uint8_t* generatedPixels = static_cast<const uint8_t*>(generatedImage.image->map());
 
 	for (uint32_t y = 0; y < loadedHostImage.getHeight(); y++)
 	{
@@ -127,5 +123,5 @@ TEST_F(ImageFileProcessorTest, TestPng8bit)
 	}
 
 	loadedHostImage.unmap();
-	generatedImage.getImage().unmap();
+	generatedImage.image->unmap();
 }

@@ -64,7 +64,7 @@ ImageFile ImageSCRFileProcessor::load(const std::string& name, const std::unique
 	std::copy(data.begin(), data.end(), dstImageData);
 	hostImage.unmap();
 
-	return ImageFile(std::move(hostImageHandle), OwningHandle<Palette>());
+	return ImageFile{std::move(hostImageHandle)};
 }
 
 } // namespace OpenXcom

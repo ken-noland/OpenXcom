@@ -39,6 +39,7 @@ class GraphicsSystem;
 class ImageFileProcessor;
 class ImageBDYFileProcessor;
 class ImageBMPFileProcessor;
+class ImagePCKFileProcessor;
 class ImagePNGFileProcessor;
 class ImageSCRFileProcessor;
 class ImageSPKFileProcessor;
@@ -58,6 +59,7 @@ class ResourceSystem
 	std::unique_ptr<ImageFileProcessor> _imageFileProcessor;
 	std::unique_ptr<ImageBDYFileProcessor> _imageBDYFileProcessor;
 	std::unique_ptr<ImageBMPFileProcessor> _imageBMPFileProcessor;
+	std::unique_ptr<ImagePCKFileProcessor> _imagePCKFileProcessor;
 	std::unique_ptr<ImagePNGFileProcessor> _imagePNGFileProcessor;
 	std::unique_ptr<ImageSCRFileProcessor> _imageSCRFileProcessor;
 	std::unique_ptr<ImageSPKFileProcessor> _imageSPKFileProcessor;
@@ -75,10 +77,11 @@ public:
 	FontManager& getFontManager() { return *_fontManager; };
 	ImageManager& getImageManager() { return *_imageManager; };
 
-	// Loaders
+	// File processors
 	ImageFileProcessor& getImageFileProcessor() { return *_imageFileProcessor; };
 	ImageBDYFileProcessor& getImageBDYFileProcessor() { return *_imageBDYFileProcessor; };
 	ImageBMPFileProcessor& getImageBMPFileProcessor() { return *_imageBMPFileProcessor; };
+	ImagePCKFileProcessor& getImagePCKFileProcessor() { return *_imagePCKFileProcessor; };
 	ImagePNGFileProcessor& getImagePNGFileProcessor() { return *_imagePNGFileProcessor; };
 	ImageSCRFileProcessor& getImageSCRFileProcessor() { return *_imageSCRFileProcessor; };
 	ImageSPKFileProcessor& getImageSPKFileProcessor() { return *_imageSPKFileProcessor; };

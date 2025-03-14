@@ -105,7 +105,7 @@ ImageFile ImageBDYFileProcessor::load(const std::string& name, const std::unique
 	std::copy(decompressed.begin(), decompressed.end(), dstImageData);
 	hostImage.unmap();
 
-	return ImageFile(std::move(hostImageHandle), OwningHandle<Palette>());
+	return ImageFile{std::move(hostImageHandle)};
 }
 
 } // namespace OpenXcom

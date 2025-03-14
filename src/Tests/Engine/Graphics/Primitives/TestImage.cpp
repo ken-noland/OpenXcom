@@ -46,15 +46,15 @@ protected:
 
 TEST_F(GraphicsImageTest, TestBasicImage)
 {
-	ImageFile imageFile = createImage();
+	ImagePaletteFile imageFile = createImage();
 
 	ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();
 	ImageManager& imageManager = resourceSystem.getImageManager();
 
 	//transfer the image to device
-	OwningHandle<DeviceImage> deviceImage = imageManager.createDeviceImage(imageFile.getImage());
+	OwningHandle<DeviceImage> deviceImage = imageManager.createDeviceImage(*imageFile.image);
 
-	std::unique_ptr<ImagePrimitive> image = _gameSurface->getRenderTarget().getPrimitiveFactory().createImagePrimitive({0, 0}, {0, 0}, {32, 32}, deviceImage.getHandle(), imageFile.getPaletteHandle());
+	std::unique_ptr<ImagePrimitive> image = _gameSurface->getRenderTarget().getPrimitiveFactory().createImagePrimitive({0, 0}, {0, 0}, {32, 32}, deviceImage.getHandle(), imageFile.palette.getHandle());
 	ASSERT_TRUE(image);
 
 	// draw the line

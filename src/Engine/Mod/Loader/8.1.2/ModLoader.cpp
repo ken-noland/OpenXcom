@@ -31,6 +31,7 @@
 #include "../../../Resource/ResourceSystem.h"
 #include "../../../Resource/FileProcessor/ImageFile.h"
 #include "../../../Resource/FileProcessor/ImageBDYFileProcessor.h"
+#include "../../../Resource/FileProcessor/ImagePCKFileProcessor.h"
 #include "../../../Resource/FileProcessor/ImagePNGFileProcessor.h"
 #include "../../../Resource/FileProcessor/ImageSCRFileProcessor.h"
 #include "../../../Resource/FileProcessor/ImageSPKFileProcessor.h"
@@ -138,9 +139,6 @@ bool loadVanillaResources(EngineContext& context, Mod* mod, ResourceConfigFile& 
 	// ---
 	// Load images
 	if (!loadImages(context, mod, resourceConfig)) { return false; }
-
-
-
 
 	return true;
 }
@@ -279,6 +277,8 @@ bool loadImages(EngineContext& context, Mod* mod, ResourceConfigFile& resourceCo
 		}
 	}
 
+	// Load the surface sets
+
 	return true;
 }
 
@@ -299,14 +299,14 @@ bool loadSCRImage(EngineContext& context, Mod* mod, const std::string& name, std
 	// Load the image
 	ImageSCRLoadParams params{extents};
 	ImageFile imageFile = imageSCRProcessor.load(name, surfaceFile, params);
-	if (!imageFile.hasImage())
+	if (!imageFile.image)
 	{
 		Log(LOG_ERROR) << "Failed to load SCR image " << path.string();
 		return false;
 	}
 
 	// Send the image to the device
-	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(imageFile.getImage());
+	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(*imageFile.image);
 
 	mod->registerImage(std::move(deviceImage));
 
@@ -329,14 +329,14 @@ bool loadBDYImage(EngineContext& context, Mod* mod, const std::string& name, std
 	// Load the image
 	ImageBDYLoadParams params{extents};
 	ImageFile imageFile = imageBDYProcessor.load(name, surfaceFile, params);
-	if (!imageFile.hasImage())
+	if (!imageFile.image)
 	{
 		Log(LOG_ERROR) << "Failed to load BDY image " << path.string();
 		return false;
 	}
 
 	// Send the image to the device
-	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(imageFile.getImage());
+	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(*imageFile.image);
 
 	mod->registerImage(std::move(deviceImage));
 
@@ -359,20 +359,56 @@ bool loadSPKImage(EngineContext& context, Mod* mod, const std::string& name, std
 	// Load the image
 	ImageSPKLoadParams params{extents};
 	ImageFile imageFile = imageSPKProcessor.load(name, surfaceFile, params);
-	if (!imageFile.hasImage())
+	if (!imageFile.image)
 	{
 		Log(LOG_ERROR) << "Failed to load BDY image " << path.string();
 		return false;
 	}
 
 	// Send the image to the device
-	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(imageFile.getImage());
+	OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(*imageFile.image);
 
 	mod->registerImage(std::move(deviceImage));
 
 	return true;
 }
 
+bool loadPCKImages(EngineContext& context, Mod* mod, const std::string& pckName, const std::string& tabName, std::filesystem::path path, const glm::ivec2& extents)
+{
+	ResourceSystem& resourceSystem = context.getResourceSystem();
+	ImagePCKFileProcessor& imagePCKProcessor = resourceSystem.getImagePCKFileProcessor();
+
+	// Open the files
+	std::unique_ptr<FileEntry> pckFile = mod->getFileSystem().getFile(path / pckName);
+	if (!pckFile)
+	{
+		Log(LOG_ERROR) << "Failed to open image PCK file " << (path / pckName).string();
+		return false;
+	}
+
+	std::unique_ptr<FileEntry> tabFile = mod->getFileSystem().getFile(path / tabName);
+	if (!tabFile)
+	{
+		Log(LOG_ERROR) << "Failed to open image TAB file " << (path / tabName).string();
+		return false;
+	}
+
+	// Load the images
+	ImageSetFile imageSetFile = imagePCKProcessor.load(pckName, pckFile, tabFile, {extents});
+	if (imageSetFile.images.empty())
+	{
+		Log(LOG_ERROR) << "Failed to load PCK image " << path.string();
+		return false;
+	}
+
+	// Send the images to the device
+	for (OwningHandle<HostImage>& hostImage : imageSetFile.images)
+	{
+		OwningHandle<DeviceImage> deviceImage = resourceSystem.getImageManager().createDeviceImage(*hostImage);
+		mod->registerImage(std::move(deviceImage));
+	}
+	return true;
+}
 
 } // namespace ModLoader_8_1_2
 

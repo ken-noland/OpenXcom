@@ -126,11 +126,11 @@ void FontPack::load(const std::filesystem::path& path)
 			std::filesystem::path imagePath = path.parent_path() / imageDef.file;
 			std::string name = fontDef.id + "_FontImage";
 
-			ImageFile imageFile = imageFileProcessor.load(name, imagePath);
+			ImagePaletteFile imageFile = imageFileProcessor.load(name, imagePath);
 
 			// We still need to keep the host image around for this function because we parse out the width of
 			// each char from the actual image data itself.
-			OwningHandle<HostImage> hostImage = imageFile.takeImage();
+			OwningHandle<HostImage> hostImage = std::move(imageFile.image);
 
 			if (hostImage->getFormat() != ImageFormat::R8)
 			{

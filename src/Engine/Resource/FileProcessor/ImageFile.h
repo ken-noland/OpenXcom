@@ -19,6 +19,12 @@
  */
 #include "../Handle.h"
 
+#include "../../Graphics/Image/Image.h"
+#include "../../Graphics/Image/ImageManager.h"
+
+#include "../../Graphics/Palette/Palette.h"
+#include "../../Graphics/Palette/PaletteManager.h"
+
 namespace OpenXcom
 {
 
@@ -30,50 +36,23 @@ struct ImageLoadParams
 	bool loadPalette = false;
 };
 
-// This class represents an image that is being read from disk. It contains the image
-// and palette handles, and is used to transfer ownership of these resources between
-// the file processor and the resource manager.
-class ImageFile
+// a single image file
+struct ImageFile
 {
-protected:
-	OwningHandle<HostImage> _image;
-	OwningHandle<Palette> _palette;
+	OwningHandle<HostImage> image;
+};
 
-public:
-	// Blank constructor: Invalid handle
-	ImageFile();
+// a single image file with a palette
+struct ImagePaletteFile
+{
+	OwningHandle<HostImage> image;
+	OwningHandle<Palette> palette;
+};
 
-	// Constructor with image and palette handles
-	ImageFile(OwningHandle<HostImage> image, OwningHandle<Palette> palette);
-
-	// Move constructor: Transfers ownership
-	ImageFile(ImageFile&& other);
-
-	// Destructor
-	~ImageFile();
-
-	// Move assignment: Transfers ownership
-	ImageFile& operator=(ImageFile&& other);
-
-	// Delete copy constructor and copy assignment
-	ImageFile(const ImageFile&) = delete;
-	ImageFile& operator=(const ImageFile&) = delete;
-
-	bool hasImage() const;
-	bool hasPalette() const;
-
-	HostImage& getImage();
-	Palette& getPalette();
-
-	ResourceHandle<HostImage> getImageHandle();
-	ResourceHandle<Palette> getPaletteHandle();
-
-	// Transfers ownership of the image and invalidates the internal handle.
-	OwningHandle<HostImage> takeImage();
-
-	// Transfers ownership of the palette and invalidates the internal handle.
-	OwningHandle<Palette> takePalette();
-
+// a set of images
+struct ImageSetFile
+{
+	std::vector<OwningHandle<HostImage>> images;
 };
 
 } // namespace OpenXcom

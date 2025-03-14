@@ -189,14 +189,14 @@ ImageBMPFileProcessor::~ImageBMPFileProcessor()
 {
 }
 
-ImageFile ImageBMPFileProcessor::load(const std::string& name, const std::filesystem::path& filename, const ImageLoadParams& params)
+ImagePaletteFile ImageBMPFileProcessor::load(const std::string& name, const std::filesystem::path& filename, const ImageLoadParams& params)
 {
 	// Open the file in binary mode and position at the end.
 	std::ifstream file(filename, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 	{
 		throw std::runtime_error("Failed to open file: " + filename.string());
-		return ImageFile();
+		return ImagePaletteFile();
 	}
 
 	// Get the file size by checking the current position (at the end).
@@ -208,13 +208,13 @@ ImageFile ImageBMPFileProcessor::load(const std::string& name, const std::filesy
 	if (!file.read(buffer.data(), size))
 	{
 		throw std::runtime_error("Failed to read file: " + filename.string());
-		return ImageFile();
+		return ImagePaletteFile();
 	}
 
 	return load(name, reinterpret_cast<const uint8_t*>(buffer.data()), static_cast<std::size_t>(size), params);
 }
 
-ImageFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bmpBuffer, std::size_t size, const ImageLoadParams& params)
+ImagePaletteFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bmpBuffer, std::size_t size, const ImageLoadParams& params)
 {
 	// Verify magic.
 	unsigned short magic;
@@ -222,7 +222,7 @@ ImageFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bm
 	if (magic != BMP_MAGIC)
 	{
 		throw std::runtime_error("Failed to open BMP file due to invalid header");
-		return ImageFile();
+		return ImagePaletteFile();
 	}
 
 	// Read header.
@@ -280,7 +280,7 @@ ImageFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bm
 	if (!hostImageHandle.isValid())
 	{
 		throw std::runtime_error("Unable to create host image");
-		return ImageFile();
+		return ImagePaletteFile();
 	}
 	HostImage& hostImage = hostImageHandle.get();
 
@@ -333,16 +333,16 @@ ImageFile ImageBMPFileProcessor::load(const std::string& name, const uint8_t* bm
 	}
 	hostImage.unmap();
 
-	return ImageFile(std::move(hostImageHandle), std::move(paletteHandle));
+	return ImagePaletteFile{std::move(hostImageHandle), std::move(paletteHandle)};
 }
 
-bool ImageBMPFileProcessor::save(const std::filesystem::path& filename, ImageFile& imageData)
+bool ImageBMPFileProcessor::save(const std::filesystem::path& filename, ImagePaletteFile& imageData)
 {
 	ResourceSystem& resourceSystem = _context.getResourceSystem();
 	BufferManager& bufferManager = resourceSystem.getBufferManager();
 
-	HostImage& hostImage = imageData.getImage();
-	DeviceBuffer& devicePaletteBuffer = imageData.getPalette().getDeviceBuffer();
+	HostImage& hostImage = *imageData.image;
+	DeviceBuffer& devicePaletteBuffer = imageData.palette->getDeviceBuffer();
 	std::unique_ptr<HostBuffer> hostPaletteBufferPtr = bufferManager.createHostBuffer(devicePaletteBuffer);
 	HostBuffer& hostPaletteBuffer = *hostPaletteBufferPtr;
 

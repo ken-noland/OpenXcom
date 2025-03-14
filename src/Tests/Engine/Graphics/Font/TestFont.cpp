@@ -126,10 +126,10 @@ protected:
 
 		// Load the DOS font
 		ImageLoadParams params;
-		ImageFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, params);
-		ASSERT_TRUE(fontTextureFile.hasImage()) << "Failed to load DOS font bitmap";
+		ImagePaletteFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, params);
+		ASSERT_TRUE(fontTextureFile.image) << "Failed to load DOS font bitmap";
 
-		OwningHandle<HostImage> hostFontTexture = fontTextureFile.takeImage();
+		OwningHandle<HostImage> hostFontTexture = std::move(fontTextureFile.image);
 		ASSERT_TRUE(hostFontTexture.isValid()) << "Failed to load DOS font";
 
 		// Transfer the host image to device so we can use it as a font texture

@@ -298,7 +298,7 @@ public:
 	}
 
 	// Create an ImageFile
-	OpenXcom::ImageFile createImage()
+	OpenXcom::ImagePaletteFile createImage()
 	{
 		OpenXcom::ResourceSystem& resourceSystem = _engine->getEngineContext().getResourceSystem();
 		const uint32_t width = 256;
@@ -415,7 +415,7 @@ public:
 		OpenXcom::PaletteManager& paletteManager = resourceSystem.getPaletteManager();
 		OpenXcom::OwningHandle<OpenXcom::Palette> paletteHandle = paletteManager.createPalette("squareColorWheelPalette", paletteColors, 256);
 
-		return OpenXcom::ImageFile(std::move(imageHandle), std::move(paletteHandle));
+		return OpenXcom::ImagePaletteFile{std::move(imageHandle), std::move(paletteHandle)};
 	}
 
 	// helper function to get the glyph from the font
@@ -462,9 +462,9 @@ public:
 
 		// Load the DOS font
 		OpenXcom::ImageLoadParams params;
-		OpenXcom::ImageFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, params);
+		OpenXcom::ImagePaletteFile fontTextureFile = resourceSystem.getImageBMPFileProcessor().load("DosFont", dosFont, DOSFONT_SIZE, params);
 
-		OpenXcom::OwningHandle<OpenXcom::HostImage> hostFontTexture = fontTextureFile.takeImage();
+		OpenXcom::OwningHandle<OpenXcom::HostImage> hostFontTexture = std::move(fontTextureFile.image);
 
 		// Transfer the host image to device so we can use it as a font texture
 		OpenXcom::OwningHandle<OpenXcom::DeviceImage> deviceFontTexture = resourceSystem.getImageManager().createDeviceImage(*hostFontTexture);

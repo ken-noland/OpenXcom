@@ -27,23 +27,23 @@ namespace OpenXcom
 
 class EngineContext;
 class FileEntry;
-struct ImageFile;
+struct ImageSetFile;
 
-struct ImageSCRLoadParams
+struct ImagePCKLoadParams
 {
 	glm::ivec2 extent;
 };
 
-class ImageSCRFileProcessor
+class ImagePCKFileProcessor
 {
 protected:
 	EngineContext& _context;
 
 public:
-	ImageSCRFileProcessor(EngineContext& context);
-	~ImageSCRFileProcessor();
+	ImagePCKFileProcessor(EngineContext& context);
+	~ImagePCKFileProcessor();
 
-	ImageFile load(const std::string& name, const std::unique_ptr<FileEntry>& file, const ImageSCRLoadParams& params);
+	ImageSetFile load(const std::string& name, const std::unique_ptr<FileEntry>& pckFile, const std::unique_ptr<FileEntry>& tabFile, const ImagePCKLoadParams& params);
 };
 
 } // namespace OpenXcom

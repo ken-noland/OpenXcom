@@ -212,14 +212,14 @@ TEST_F(BMPTest, TestLoadBMP)
 {
 	// Specify the BMP file path; assume it�s located in the Data directory
 	ImageLoadParams params;
-	ImageFile imageFile = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load("dosFont", dosFont, DOSFONT_SIZE, params);
+	ImagePaletteFile imageFile = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load("dosFont", dosFont, DOSFONT_SIZE, params);
 
-	ASSERT_TRUE(imageFile.hasImage()) << "Image should be able to load";
+	ASSERT_TRUE(imageFile.image) << "Image should be able to load";
 
-	OwningHandle<HostImage> hostImage = imageFile.takeImage();
+	OwningHandle<HostImage> hostImage = std::move(imageFile.image);
 	ASSERT_TRUE(hostImage.isValid()) << "Failed to load BMP file.";
 
-	OwningHandle<Palette> paletteHandle = imageFile.takePalette();
+	OwningHandle<Palette> paletteHandle = std::move(imageFile.palette);
 	ASSERT_FALSE(paletteHandle.isValid()) << "Loaded palette, even though we told it not to";
 
 	// Compare the loaded image with a baseline
@@ -232,14 +232,14 @@ TEST_F(BMPTest, TestLoadBMP1)
 {
 	// Specify the BMP file path; assume it�s located in the Data directory
 	ImageLoadParams params;
-	ImageFile imageFile = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load("dosFont", dosFont, DOSFONT_SIZE, params);
+	ImagePaletteFile imageFile = _engine->getEngineContext().getResourceSystem().getImageBMPFileProcessor().load("dosFont", dosFont, DOSFONT_SIZE, params);
 
-	ASSERT_TRUE(imageFile.hasImage()) << "Image should be able to load";
+	ASSERT_TRUE(imageFile.image) << "Image should be able to load";
 
-	OwningHandle<HostImage> hostImage = imageFile.takeImage();
+	OwningHandle<HostImage> hostImage = std::move(imageFile.image);
 	ASSERT_TRUE(hostImage.isValid()) << "Failed to load BMP file.";
 
-	OwningHandle<Palette> paletteHandle = imageFile.takePalette();
+	OwningHandle<Palette> paletteHandle = std::move(imageFile.palette);
 	ASSERT_FALSE(paletteHandle.isValid()) << "Loaded palette, even though we told it not to";
 
 	//multiply each value in the image by 255

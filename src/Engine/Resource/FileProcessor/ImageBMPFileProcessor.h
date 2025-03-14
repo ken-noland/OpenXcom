@@ -26,7 +26,7 @@ namespace OpenXcom
 class EngineContext;
 class HostImage;
 class Palette;
-class ImageFile;
+struct ImagePaletteFile;
 struct ImageLoadParams;
 
 class ImageBMPFileProcessor
@@ -38,10 +38,10 @@ public:
 	ImageBMPFileProcessor(EngineContext& context);
 	~ImageBMPFileProcessor();
 
-	ImageFile load(const std::string& name, const std::filesystem::path& filename, const ImageLoadParams& params);
-	ImageFile load(const std::string& name, const uint8_t* buffer, std::size_t size, const ImageLoadParams& params);
+	ImagePaletteFile load(const std::string& name, const std::filesystem::path& filename, const ImageLoadParams& params);
+	ImagePaletteFile load(const std::string& name, const uint8_t* buffer, std::size_t size, const ImageLoadParams& params);
 
-	bool save(const std::filesystem::path& filename, ImageFile& imageData);
+	bool save(const std::filesystem::path& filename, ImagePaletteFile& imageData);
 };
 
 } // namespace OpenXcom

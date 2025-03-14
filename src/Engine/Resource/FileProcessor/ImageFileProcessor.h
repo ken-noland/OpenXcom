@@ -23,7 +23,7 @@ namespace OpenXcom
 {
 
 class EngineContext;
-class ImageFile;
+struct ImagePaletteFile;
 struct ImageLoadParams;
 
 // This class just serves as a router for basic file types to their respective
@@ -38,8 +38,8 @@ public:
 	ImageFileProcessor(EngineContext& context);
 	virtual ~ImageFileProcessor();
 
-	ImageFile load(const std::string& name, const std::filesystem::path& file, const ImageLoadParams& params);
-	ImageFile load(const std::string& name, const std::filesystem::path& file);
+	ImagePaletteFile load(const std::string& name, const std::filesystem::path& file, const ImageLoadParams& params);
+	ImagePaletteFile load(const std::string& name, const std::filesystem::path& file);
 };
 
 } // namespace OpenXcom
