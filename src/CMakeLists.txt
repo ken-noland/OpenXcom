@@ -6,8 +6,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type (Debug, Release, etc.)" FORCE)
 endif()
 
-# Define option to enable or disable the EntityInspector
-option(ENABLE_ENTITY_INSPECTOR "Enable the EntityInspector for debugging and editing entities." OFF)
+# Define option to enable or disable the Inspector
+option(ENABLE_ENTITY_INSPECTOR "Enable the Inspector for debugging and editing entities." ON)
 
 # Force fetch of github dependencies
 option(FORCE_FETCH "Force re-download of FetchContent dependencies" OFF)
@@ -571,12 +571,7 @@ set ( entity_interface_src
 )
 
 set (inspector_src
-  "Inspector/CustomPropertyGrid.cpp"
-  "Inspector/EntityPanel.cpp"
-  "Inspector/Inspector.cpp"
-  "Inspector/InspectorFrame.cpp"
-  "Inspector/InspectorApp.cpp"
-  "Inspector/TypePropertyMapping.cpp"
+  "Game/Inspector/Inspector.cpp"
 )
 
 set ( cxx_src
@@ -647,6 +642,10 @@ set(openxcom_defines
   VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
   VMA_STATIC_VULKAN_FUNCTIONS=0
 )
+
+if(ENABLE_ENTITY_INSPECTOR)
+  list(APPEND openxcom_defines ENABLE_ENTITY_INSPECTOR)
+endif()
 
 if(MSVC)
   # Add a define which instructs Vulkan to use the Win32 KHR

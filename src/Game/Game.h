@@ -29,7 +29,7 @@
 #include "../Entity/Engine/ECS.h"
 
 #if defined(ENABLE_ENTITY_INSPECTOR)
-#include "../Inspector/Inspector.h"
+#include "Inspector/Inspector.h"
 #endif
 
 namespace OpenXcom

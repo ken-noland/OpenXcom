@@ -9,7 +9,7 @@
       "name": "openxcom_tests.exe (src\\Tests\\openxcom_tests.exe)",
       "args": [
         "--gtest_output=xml:${ProjectDir}\\temp\\test_results.xml",
-        "--gtest_filter=GraphicsTextTest.TestHelloWorld"
+        "--gtest_filter=*"
       ]
     },
     {

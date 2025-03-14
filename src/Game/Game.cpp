@@ -105,7 +105,8 @@ void Game::onGameRender(GraphicsCommand& command)
 void Game::onWindowRender(GraphicsCommand& command)
 {
 }
-void Game::update()
+
+void Game::update()
 {
 	_gameWindow->update();
 	_gameStates->update();

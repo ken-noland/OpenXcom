@@ -29,8 +29,6 @@
 namespace OpenXcom
 {
 
-class InspectorApp;
-
 class Inspector
 {
 public:
