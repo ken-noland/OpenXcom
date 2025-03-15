@@ -74,8 +74,14 @@ VulkanWindowedSurface::~VulkanWindowedSurface()
 {
 	_onResize.reset();
 
-	// Wait for the device to finish
-	_context.getDevice().waitIdle();
+	std::function<void()> commandBufferFunc = [this]()
+	{
+		// Wait for the device to finish
+		_context.getDevice().waitIdle();
+	};
+	
+	VulkanQueueThread& transferQueueThread = _context.getTransferQueueThread();
+	transferQueueThread.enqueueTask(commandBufferFunc).wait();
 
 	destroySwapChain();
 
@@ -312,7 +318,14 @@ void VulkanWindowedSurface::handleResize(glm::ivec2 newSize)
 	}
 
 	// Wait for the device to finish
-	_context.getDevice().waitIdle();
+	std::function<void()> commandBufferFunc = [this]()
+	{
+		// Wait for the device to finish
+		_context.getDevice().waitIdle();
+	};
+	
+	VulkanQueueThread& transferQueueThread = _context.getTransferQueueThread();
+	transferQueueThread.enqueueTask(commandBufferFunc).wait();
 
 	// Destroy the current swap chain
 	destroySwapChain();

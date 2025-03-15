@@ -18,7 +18,7 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <cstdint>
-#include <simplerttr.h>
+#include "../Utility/RTTR.h"
 
 namespace OpenXcom
 {

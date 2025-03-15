@@ -46,7 +46,15 @@ VulkanSampler::VulkanSampler(VulkanContext& context)
 
 VulkanSampler::~VulkanSampler()
 {
-	_context.getDevice().waitIdle();
+	std::function<void()> commandBufferFunc = [this]()
+	{
+		// Wait for the device to finish
+		_context.getDevice().waitIdle();
+	};
+	
+	VulkanQueueThread& transferQueueThread = _context.getTransferQueueThread();
+	transferQueueThread.enqueueTask(commandBufferFunc).wait();
+
 	_context.getDevice().destroySampler(_sampler);
 }
 

@@ -28,10 +28,6 @@
 #include "../Engine/Platform/PlatformWindow.h"
 #include "../Entity/Engine/ECS.h"
 
-#if defined(ENABLE_ENTITY_INSPECTOR)
-#include "Inspector/Inspector.h"
-#endif
-
 namespace OpenXcom
 {
 
@@ -42,6 +38,11 @@ class GameWindow;
 class GameStates;
 class GameMods;
 class GraphicsCommand;
+
+#if defined(ENABLE_ENTITY_INSPECTOR)
+class Inspector;
+#endif
+
 
 /**
  * The core of the game engine, manages the game's entire contents and structure.
@@ -72,7 +73,7 @@ protected:
 	MulticastDelegate<void(GraphicsCommand&)>::Handle _onGameRenderHandle;
 
 #if defined(ENABLE_ENTITY_INSPECTOR)
-	Inspector _inspector;
+	std::unique_ptr<Inspector> _inspector;
 #endif
 
 	void onGameRender(GraphicsCommand& command);

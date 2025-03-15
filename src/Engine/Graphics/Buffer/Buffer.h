@@ -68,10 +68,13 @@ public:
 	virtual void* map() = 0;
 	virtual void unmap() = 0;
 
-
 	virtual void copy(DeviceBuffer& deviceBuffer) = 0;
 
 	virtual void copy(const void* data, std::size_t size) = 0;
+
+	// Template helper to set data from a plain old data array.
+	template <typename T>
+	inline void set(const T* data, std::size_t count);
 
     // Template helper to set data from a vector.
 	template <typename T>
@@ -81,6 +84,21 @@ public:
 	template <typename T>
 	inline void set(std::initializer_list<T> data);
 };
+
+template <typename T>
+inline void HostBuffer::set(const T* data, std::size_t count)
+{
+	// Verify that the element size matches.
+	if (_elementSize != sizeof(T))
+		throw std::runtime_error("Element size mismatch in HostBuffer::set()");
+
+	// Resize the buffer to hold the new count of elements.
+	resize(count);
+
+	// Copy data into the buffer.
+	copy(static_cast<const void*>(data), count * _elementSize);
+}
+
 
 template <typename Type>
 void HostBuffer::set(std::initializer_list<Type> data)
@@ -93,7 +111,7 @@ void HostBuffer::set(std::initializer_list<Type> data)
 	resize(data.size());
 
 	// Copy data into the buffer.
-	copy(static_cast<const void*>(data.data()), data.size());
+	copy(static_cast<const void*>(data.data()), data.size() * _elementSize);
 }
 
 template <typename Type>
@@ -107,7 +125,7 @@ void HostBuffer::set(const std::vector<Type>& data)
 	resize(data.size());
 
 	// Copy data into the buffer.
-	copy(static_cast<const void*>(data.data()), data.size());
+	copy(static_cast<const void*>(data.data()), data.size() * _elementSize);
 }
 
 

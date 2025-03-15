@@ -117,7 +117,14 @@ VulkanContext::VulkanContext(EngineContext& context)
 
 VulkanContext::~VulkanContext()
 {
-	_device.waitIdle();
+	std::function<void()> commandBufferFunc = [this]()
+	{
+		// Wait for the device to finish
+		_device.waitIdle();
+	};
+	
+	VulkanQueueThread& transferQueueThread = getTransferQueueThread();
+	transferQueueThread.enqueueTask(commandBufferFunc).wait();
 
 	// destroy the pipeline factory
 	_pipelineFactory.reset();

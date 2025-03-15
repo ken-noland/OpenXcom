@@ -32,6 +32,10 @@
 #include "GameStates.h"
 #include "GameMods.h"
 
+#if defined(ENABLE_ENTITY_INSPECTOR)
+#include "Inspector/Inspector.h"
+#endif
+
 namespace OpenXcom
 {
 
@@ -61,17 +65,26 @@ Game::Game(Engine& engine)
 
 	// Set the initial game state to the start state
 	_gameStates->set(std::make_unique<StartState>(*_gameContext));
+
+#if defined(ENABLE_ENTITY_INSPECTOR)
+	_inspector = std::make_unique<Inspector>(*_gameContext);
+	_inspector->show();
+#endif()
 }
 
 /**
- * Deletes the display screen, cursor, states and shuts down all the SDL subsystems.
+ * Deletes the game
  */
 Game::~Game()
-{
+{	
+	_gameStates->clear();
+
+#if defined(ENABLE_ENTITY_INSPECTOR)
+	_inspector.reset();
+#endif()
+
 	_onGameRenderHandle.reset();
 	_onWindowRenderHandle.reset();
-
-	_gameStates->clear();
 
 	_gameWindow.reset();
 }
@@ -110,6 +123,11 @@ void Game::update()
 {
 	_gameWindow->update();
 	_gameStates->update();
+
+#if defined(ENABLE_ENTITY_INSPECTOR)
+	_inspector->update();
+#endif()
+
 }
 
 /**

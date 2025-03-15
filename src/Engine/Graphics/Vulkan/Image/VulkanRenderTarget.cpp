@@ -241,7 +241,13 @@ void VulkanRenderTarget::create()
 
 void VulkanRenderTarget::destroy()
 {
-	_context.getDevice().waitIdle();
+	std::function<void()> commandBufferFunc = [this]()
+	{
+		_context.getDevice().waitIdle();
+	};
+
+	VulkanQueueThread& graphicsQueueThread = _context.getGraphicsQueueThread();
+	std::future<void> future = graphicsQueueThread.enqueueTask(commandBufferFunc);
 
 	_context.getDevice().destroyFramebuffer(_framebuffer);
 	_context.getDevice().destroyRenderPass(_renderPass);

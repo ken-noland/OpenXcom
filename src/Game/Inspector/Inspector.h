@@ -19,24 +19,56 @@
  */
 
 #include <memory>
-
-// Clean up the preprocessor directives left behind by FLTK
-#undef min
-#undef max
-#undef small
-#undef big
+#include <glm/mat4x4.hpp>
+#include "../../Engine/Resource/Handle.h"
 
 namespace OpenXcom
 {
 
+class GameContext;
+
+class PlatformWindow;
+class GraphicsSurface;
+
+class HostBuffer;
+class DeviceBuffer;
+
+class DeviceImage;
+
+class Shader;
+class Pipeline;
+class PipelineBinding;
+
 class Inspector
 {
+protected:
+	GameContext& _game;
+
+	OwningHandle<PlatformWindow> _window;
+	std::unique_ptr<GraphicsSurface> _windowSurface;
+
+	OwningHandle<DeviceImage> _font;
+
+	std::unique_ptr<Shader> _vertexShader;
+	std::unique_ptr<Shader> _fragmentShader;
+
+	std::unique_ptr<Pipeline> _pipeline;
+	std::unique_ptr<PipelineBinding> _pipelineBinding;
+	glm::mat4 _projection;
+
+	std::unique_ptr<HostBuffer> _hostVertexBuffer;
+	std::unique_ptr<HostBuffer> _hostIndexBuffer;
+
+	std::unique_ptr<DeviceBuffer> _deviceVertexBuffer;
+	std::unique_ptr<DeviceBuffer> _deviceIndexBuffer;
+
+
 public:
-	Inspector();
+	Inspector(GameContext& game);
 	~Inspector();
 
-	void create();
-	void destroy();
+	void show();
+	void hide();
 
 	void update();
 };
