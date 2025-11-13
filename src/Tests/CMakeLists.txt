@@ -56,14 +56,10 @@ target_link_libraries(openxcom_tests PUBLIC openxcom_lib GTest::gtest_main)
 
 # Discover tests
 include(GoogleTest)
-gtest_discover_tests(openxcom_tests)
-
-# Create a custom target to run tests after building the main executable
-add_custom_target(run_tests_after_build ALL
-    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
-    DEPENDS openxcom openxcom_tests
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src/Tests
-)
+enable_testing()
+gtest_discover_tests(openxcom_tests
+    DISCOVERY_TIMEOUT 900
+  )
 
 # Ensure tests run after the main executable is built
 #add_dependencies(run_tests_after_build openxcom)
